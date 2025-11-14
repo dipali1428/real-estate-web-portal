@@ -1,0 +1,82 @@
+
+const AboutSection = () => (
+    <section id="about" className="py-20 bg-linear-to-br from-blue-50 via-teal-50 to-emerald-50" style={{ background: 'linear-gradient(to bottom right, #b5d9f3ff, #ffffffff, #ecf5ecff)' }}>
+        <div className="container mx-auto px-6">
+            {/* Section Heading */}
+            <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                    About Us
+                </h2>
+                <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
+                <p className="text-gray-700 max-w-3xl mx-auto text-lg leading-relaxed">
+                    At <span className="font-semibold text-[#1CADA3]">Infinity Arthvishva</span>,
+                    we blend technology and trust to simplify your financial journey.
+                    Our expert team provides transparent, unbiased, and goal-oriented financial guidance designed to help you achieve lasting success. By aligning every strategy with your unique investment goals, we ensure sustainable growth, informed decisions, and a secure financial future.
+                </p>
+            </div>
+
+            {/* Content Grid */}
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+                {/* Left Side: Vision and Points */}
+                <div className="space-y-6">
+                    <h3 className="text-3xl md:text-2xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-6 text-center md:text-left">
+                        Our Vision
+                    </h3>
+                    <p className="text-gray-700 leading-relaxed mb-6 text-center md:text-left">
+                        At <span className="font-semibold text-[#2076C7]">Infinity Arthvishva Advisor Pvt. Ltd.</span>,
+                        our vision is to seamlessly integrate advanced financial intelligence into everyday life —
+                        empowering families across India to achieve stability, growth, and prosperity.
+                    </p>
+
+
+                    {/* Highlights */}
+                    <div className="space-y-6">
+                        {[
+                            {
+                                num: "1",
+                                title: "Strategic Approach",
+                                desc: "We deliver innovative loan and investment solutions that align with your goals.",
+                            },
+                            {
+                                num: "2",
+                                title: "Long-Term Strategy",
+                                desc: "Our plans focus on sustainable financial growth and lasting security.",
+                            },
+                            {
+                                num: "3",
+                                title: "Growth-Oriented Vision",
+                                desc: "We create tailored strategies that help you expand your financial horizon.",
+                            },
+                        ].map((item, idx) => (
+                            <div
+                                key={idx}
+                                className="flex items-start space-x-4 hover:translate-x-2 transition-transform duration-300">
+                                <div className="w-12 h-12 rounded-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold shadow-md shrink-0">
+                                    {item.num}
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-gray-800 text-lg mb-1">
+                                        {item.title}
+                                    </h4>
+                                    <p className="text-gray-600 text-sm">{item.desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Right Side: Image */}
+                <div className="rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-500">
+                    <img
+                        src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop"
+                        alt="Team collaboration at Infinity Arthviksha"
+                        className="w-full h-120 object-cover"
+                    />
+                </div>
+
+            </div>
+        </div>
+    </section>
+);
+
+export default AboutSection;
