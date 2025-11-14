@@ -6,7 +6,7 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
   const [loanType, setLoanType] = useState("");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4">

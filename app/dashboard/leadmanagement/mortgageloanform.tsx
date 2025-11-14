@@ -43,7 +43,7 @@ const selfEmployedUploads = [
   "Business Office Address Proof",
 ];
 
-export default function PersonalLoanForm({
+export default function MortgageLoanForm({
   onClose,
 }: {
   onClose: () => void;

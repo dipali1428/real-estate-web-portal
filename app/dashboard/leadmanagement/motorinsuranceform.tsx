@@ -7,13 +7,8 @@ export default function MotorInsuranceForm({ onClose }: { onClose: () => void })
   const [hasPrevPolicy, setHasPrevPolicy] = useState("");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center ">
-   
-        {/* Popup card */}
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl mx-4 relative animate-fadeIn">
-
-
-        
+     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4">
           <h2 className="text-xl font-semibold text-[#1CADA3]">

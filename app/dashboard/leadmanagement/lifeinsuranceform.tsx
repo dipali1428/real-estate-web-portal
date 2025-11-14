@@ -1,37 +1,34 @@
 "use client";
-
 import { useState } from "react";
-import { X } from "lucide-react"; // ✅ Import close icon
+import { X } from "lucide-react";
 
-export default function LifeInsuranceForm({ onClose }: { onClose?: () => void }) {
+export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) {
+  // State for Insurance Plan Type
   const [planType, setPlanType] = useState("");
 
+  // Conditions for showing sections
   const showWholeTermFields =
     planType === "wholeLife" || planType === "termInsurance";
+
   const showInvestmentFields =
     planType === "ulip" || planType === "childPlan" || planType === "pensionPlan";
 
   return (
-    
-    <div className="relative w-5/12 max-w-5xl mx-auto my-10 bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-      
-   
-       {/* X Close Button (upper-right corner) */}
-      {onClose && (
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-red-600 transition"
-        >
-          <X size={24} /> {/* Lucide icon */}
-        </button>
-      )}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
 
-        <h2 className="text-center text-2xl font-semibold text-[#1CADA3] mb-6">
-          Life Insurance Plan Details
-        </h2>
+        {/* Header */}
+        <div className="flex justify-between items-center border-b px-6 py-4">
+          <h2 className="text-xl font-semibold text-[#1CADA3]">
+            Life Insurance Form
+          </h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
+            <X size={22} />
+          </button>
+        </div>
 
         {/* Select Plan */}
-        <div className="mb-5">
+        <div className="mb-5 p-6">
           <label className="font-semibold text-sm block mb-2">
             Select Insurance Type:
           </label>
@@ -47,50 +44,51 @@ export default function LifeInsuranceForm({ onClose }: { onClose?: () => void })
             <option value="childPlan">Child Plan</option>
             <option value="pensionPlan">Pension Plan</option>
           </select>
+
+          {/* Whole Life / Term Insurance Fields */}
+          {showWholeTermFields && (
+            <div className="space-y-3 mt-4">
+              <Input label="Customer Name" type="text" />
+              <Input label="Birthdate" type="date" />
+              <Input label="Education" type="text" />
+              <Input label="Profession" type="text" />
+              <Input label="Income" type="number" />
+              <Input label="3 Yrs ITR / Form 16 Provided?" type="text" />
+              <Input label="Sum Assured Amount" type="number" />
+              <Input label="Policy Term" type="text" />
+              <Input label="PPT (Premium Paying Term)" type="text" />
+              <Input label="Smoker / Non-Smoker" type="text" />
+              <Input label="Drinker / Non-Drinker" type="text" />
+              <Input label="Any Existing Disease?" type="text" />
+            </div>
+          )}
+
+          {/* ULIP / Child / Pension Plans */}
+          {showInvestmentFields && (
+            <div className="space-y-3 mt-4">
+              <Input label="Birthdate" type="date" />
+              <Input label="Profession" type="text" />
+              <Input label="Income" type="number" />
+              <Input label="Policy Term" type="text" />
+              <Input label="Premium Paying Term (PPT)" type="text" />
+              <Input label="Investment Budget (Yearly)" type="number" />
+            </div>
+          )}
+
+          {/* Button */}
+          <button
+            type="submit"
+            className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md w-full hover:bg-[#16948d] transition"
+          >
+            Submit
+          </button>
         </div>
-
-        {/* Whole Life / Term Insurance */}
-        {showWholeTermFields && (
-          <div className="space-y-3">
-            <Input label="Customer Name" type="text" />
-            <Input label="Birthdate" type="date" />
-            <Input label="Education" type="text" />
-            <Input label="Profession" type="text" />
-            <Input label="Income" type="number" />
-            <Input label="3 Yrs ITR / Form 16" type="text" />
-            <Input label="Sum Assured Amount" type="number" />
-            <Input label="Policy Term" type="text" />
-            <Input label="PPT" type="text" />
-            <Input label="Smoker / Non-Smoker" type="text" />
-            <Input label="Drinker / Non-Drinker" type="text" />
-            <Input label="Any Existing Disease" type="text" />
-          </div>
-        )}
-
-        {/* ULIP / Child / Pension Plans */}
-        {showInvestmentFields && (
-          <div className="space-y-3">
-            <Input label="Birthdate" type="date" />
-            <Input label="Profession" type="text" />
-            <Input label="Income" type="number" />
-            <Input label="Policy Term" type="text" />
-            <Input label="Premium Paying Term" type="text" />
-            <Input label="Investment Budget" type="number" />
-          </div>
-        )}
-
-        <button
-          type="submit"
-          className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md w-25 hover:bg-[#1f376b] transition"
-        >
-          Submit
-        </button>
       </div>
-    
+    </div>
   );
 }
 
-/* ✅ Reusable Input Component */
+/* REUSABLE INPUT COMPONENT */
 function Input({
   label,
   type = "text",

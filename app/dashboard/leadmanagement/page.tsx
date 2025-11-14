@@ -5,10 +5,15 @@ import AddLeadModal from "./AddLeadModal";
 import LifeInsuranceForm from "./lifeinsuranceform";
 import HealthInsuranceForm from "./healthisurancform";
 import MotorInsuranceForm from "./motorinsuranceform";
-import  HomeLoanForm from "./homeloanform"
-import  PersonalLoanForm from "./personaloanform"
+import TravelInsuranceForm from "./TravelInsuranceForm"
+import  PropertyInsuranceForm from "./pif";
+import  CattleInsuranceForm from "./cattleinsuranceform";
+import  MarineInsuranceForm from "./marineinsuranceform";
+import  HomeLoanForm from "./homeloanform";
+import  PersonalLoanForm from "./personaloanform";
 import  BusinessLoanForm from "./businessloanform"
-import  MortgageLoanForm from "./mortgageloanform"
+import  MortgageLoanForm from "./mortgageloanform";
+import  SMELoanForm from "./semform";
 export default function LeadManagement() {
   // Modal open/close state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,10 +25,15 @@ export default function LeadManagement() {
   const [showLifeInsuranceForm, setShowLifeInsuranceForm] = useState(false);
   const [showHealthInsuranceForm, setShowHealthInsuranceForm] = useState(false);
   const [showMotorInsuranceForm, setShowMotorInsuranceForm] = useState(false);
+  const [showTravelInsuranceForm, setShowTravelInsuranceForm] = useState(false);
+  const [showPropertyInsuranceForm, setShowPropertyInsuranceForm] = useState(false);
+  const [showCattleInsuranceForm, setShowCattleInsuranceForm] = useState(false);
+  const [showMarineInsuranceForm, setShowMarineInsuranceForm] = useState(false);
   const [showHomeLoanForm, setShowHomeLoanForm] = useState(false);
   const [showPersonalLoanForm, setShowPersonalLoanForm] = useState(false);
   const [showBusinessLoanForm, setShowBusinessLoanForm] = useState(false);
   const [showMortgageLoanForm, setShowMortgageLoanForm] = useState(false);
+  const [showSMELoanForm, setShowSMELoanForm] = useState(false);
     // If LifeInsuranceForm is open, show only that
   if (showLifeInsuranceForm) {
     return <LifeInsuranceForm onClose={() => setShowLifeInsuranceForm(false)} />;
@@ -33,6 +43,18 @@ export default function LeadManagement() {
   }
   if (showMotorInsuranceForm) {
     return <MotorInsuranceForm onClose={() => setShowMotorInsuranceForm(false)} />;
+  }
+  if (showTravelInsuranceForm) {
+    return <TravelInsuranceForm onClose={() => setShowTravelInsuranceForm(false)} />;
+  }
+   if (showPropertyInsuranceForm) {
+  return <PropertyInsuranceForm onClose={() => setShowPropertyInsuranceForm(false)} />;
+  }
+   if (showCattleInsuranceForm) {
+  return <CattleInsuranceForm onClose={() => setShowCattleInsuranceForm(false)} />;
+  }
+  if (showMarineInsuranceForm) {
+  return <MarineInsuranceForm onClose={() => setShowMarineInsuranceForm(false)} />;
   }
   if (showHomeLoanForm) {
     return <HomeLoanForm onClose={() => setShowHomeLoanForm(false)} />;
@@ -45,6 +67,9 @@ export default function LeadManagement() {
   }
   if (showMortgageLoanForm) {
   return <MortgageLoanForm onClose={() => setShowMortgageLoanForm(false)} />;
+  }
+   if (showSMELoanForm) {
+    return <SMELoanForm onClose={() => setShowSMELoanForm(false)} />;
   }
   // Tabs list
   const tabs = [
@@ -108,19 +133,16 @@ export default function LeadManagement() {
                   <h2 className="text-xl font-semibold mb-3 text-center">
                     Life Insurance
                   </h2>
-                  <p className="text-sm mb-4 leading-relaxed">
+                 <p className="text-sm mb-4 leading-relaxed">
                     Life insurance provides financial security to beneficiaries
-                    by offering a lump-sum payment upon the policyholder’s
-                    death.
-                  
-                  <ul className="list-disc list-inside space-y-2 text-sm">
-                    <li>
-                      Term life insurance offers coverage for 10–30 years.
-                    </li>
-                    <li>
-                      Helps dependents maintain financial stability post-loss.
-                    </li>
-                  </ul></p>
+                    by offering a lump-sum payment upon the policyholder's death.
+                  </p>
+
+                  <ul className="list-disc list-inside space-y-2 text-sm mb-4">
+                    <li>Term life insurance offers coverage for 10‒30 years.</li>
+                    <li>Helps dependents maintain financial stability post-loss.</li>
+                  </ul>
+
                 </div>
                 <button   onClick={() => setShowLifeInsuranceForm(true)} 
                   className="flex items-center gap-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded hover:bg-blue-700 transition">
@@ -161,25 +183,71 @@ export default function LeadManagement() {
                   Click to Add New
                 </button>
               </div>
-
-              {/* Other Insurance */}
+             
+               {/* Travel Insurance */}
               <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
                 <div>
                   <h2 className="text-xl font-semibold mb-3 text-center">
-                    Other Insurance
+                    Travel Insurance
                   </h2>
-                  <ul className="list-disc list-inside text-sm space-y-2">
-                    <li>Property Insurance</li>
-                    <li>Travel Insurance</li>
-                    <li>Cattle Insurance</li>
-                    <li>Marine Insurance</li>
-                  </ul>
+                  <p className="text-sm leading-relaxed">
+                   Travel insurance protects travelers from unexpected costs like medical emergencies or trip cancellations. </p>
                 </div>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition ">
+                <button onClick={() => setShowTravelInsuranceForm(true)}
+                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
                   Click to Add New
                 </button>
               </div>
-            </div>
+                {/*Property  Insurance */}
+              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold mb-3 text-center">
+                    Property Insurance
+                  </h2>
+                  <p className="text-sm leading-relaxed">
+                  Property insurance is a type of coverage that protects physical assets-such as homes, buildings, 
+                  and personal belongings-against risks like damage, theft, or loss. It ensures financial 
+                  compensation when unforeseen events affect your property.
+                                 
+                  </p>
+                </div>
+                <button onClick={() => setShowPropertyInsuranceForm(true)}
+                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                  Click to Add New
+                </button>
+              </div>
+              {/* Cattle Insurance */}
+              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold mb-3 text-center">
+                    Cattle Insurance
+                  </h2>
+                  <p className="text-sm leading-relaxed">
+                  Cattle insurance protects farmers from financial loss if their animals die, get sick, or face accidents.  </p>
+                </div>
+                <button onClick={() => setShowCattleInsuranceForm(true)}
+                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                  Click to Add New
+                </button>
+              </div>
+
+              {/* Marine Insurance */}
+              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold mb-3 text-center">
+                   Marine Insurance
+                  </h2>
+                   <p className="text-sm leading-relaxed">
+                   Marine insurance protects ships, cargo, and goods against loss or damage during transit by sea. </p>
+                </div>
+                <button onClick={() => setShowMarineInsuranceForm(true)}
+                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                  Click to Add New
+                </button>
+              </div>
+              </div>
+
+            
           )}
            {activeTab ==="loans" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -243,7 +311,8 @@ export default function LeadManagement() {
                   in terms of employees, revenue, or assets, compared to large corporations. 
                   SMEs are vital to economies worldwide, as they contribute significantly to job creation, 
                   innovation, and economic growth.</p></div>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                <button onClick={() => setShowSMELoanForm(true)}
+                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
                 </div>
               {/* Education loan*/}
               <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
