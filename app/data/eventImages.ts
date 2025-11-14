@@ -181,7 +181,7 @@ export const getEventImages = (event: Event): string[] => {
       "/22 oct 2024/image 3.jpeg"
     ],
     "Sangamner 27 feb 25": [
-      "/Remaining/image 15.jpeg",
+      "/Remaining/image15.jpeg",
       "/Remaining/image 16.jpeg",
       "/Remaining/image 17.jpeg"
     ],
