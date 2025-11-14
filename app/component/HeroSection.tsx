@@ -34,7 +34,7 @@ const HeroSection = () => {
             <div className="relative container mx-auto px-4 py-24 md:py-32">
                 <div className="text-center max-w-4xl mx-auto">
                     {/* Main heading with typing effect */}
-                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 min-h-16 md:min-h-20" style={{
+                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 min-h-16 md:min-h-20 leading-tight" style={{
                         background: 'linear-gradient(to right, #2076C7, #1CADA3, #2076C7)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
