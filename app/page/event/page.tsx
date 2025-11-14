@@ -418,7 +418,8 @@ const EventSection: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div>
                 <div className="text-3xl md:text-4xl font-bold text-teal-600">
-                  {Object.values(eventsByYear).flat().length}+
+                  {/* {Object.values(eventsByYear).flat().length}+ */}
+                  55+ 
                 </div>
                 <div className="text-gray-600">Total Events</div>
               </div>
