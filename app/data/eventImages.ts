@@ -9,10 +9,7 @@ export const getEventImages = (event: Event): string[] => {
       "/Akola 13 feb 2024/image 2.jpeg",
       "/Akola 13 feb 2024/image 3.jpeg",
       "/Akola 13 feb 2024/image 4.jpeg",
-      "/Akola 13 feb 2024/image 5.jpeg",
-      "/Akola 13 feb 2024/image 6.jpeg",
-      "/Akola 13 feb 2024/image 7.jpeg",
-      "/Akola 13 feb 2024/image 8.jpeg"
+      "/Akola 13 feb 2024/image 5.jpeg"
     ],
     "Yavatmal 14 feb 24": [
       "/sangli Event 5 june 2024/image 1.jpeg",
@@ -116,12 +113,7 @@ export const getEventImages = (event: Event): string[] => {
       "/Pune 4 dec 2024/image 2.jpeg",
       "/Pune 4 dec 2024/image 3.jpeg",
       "/Pune 4 dec 2024/image 4.jpeg",
-      "/Pune 4 dec 2024/image 5.jpeg",
-      "/Pune 4 dec 2024/image 6.jpeg",
-      "/Pune 4 dec 2024/image 7.jpeg",
-      "/Pune 4 dec 2024/image 8.jpeg",
-      "/Pune 4 dec 2024/image 9.jpeg",
-      "/Pune 4 dec 2024/image 10.jpeg"
+      "/Pune 4 dec 2024/image 5.jpeg"
     ],
     "Pune 11 dec 24": [
       "/Pune event 11 dec 2024/image 1.jpeg",
@@ -150,20 +142,14 @@ export const getEventImages = (event: Event): string[] => {
       "/14 aug 2024/image 2.jpeg",
       "/14 aug 2024/image 3.jpeg",
       "/14 aug 2024/image 4.jpeg",
-      "/14 aug 2024/image 5.jpeg",
-      "/14 aug 2024/image 6.jpeg",
-      "/14 aug 2024/image 7.jpeg",
-      "/14 aug 2024/image 8.jpeg"
+      "/14 aug 2024/image 5.jpeg"
     ],
     "13 sep 24": [
       "/13 sep 2024/image 1.jpeg",
       "/13 sep 2024/image 2.jpeg",
       "/13 sep 2024/image 3.jpeg",
       "/13 sep 2024/image 4.jpeg",
-      "/13 sep 2024/image 5.jpeg",
-      "/13 sep 2024/image 6.jpeg",
-      "/13 sep 2024/image 7.jpeg",
-      "/13 sep 2024/image 8.jpeg"
+      "/13 sep 2024/image 5.jpeg"
     ],
     "Sambhajinagar 19 jul 24": [
       "/19 jul 2024/image 1.jpeg",
@@ -176,30 +162,21 @@ export const getEventImages = (event: Event): string[] => {
       "/22 oct 2024/image 2.jpeg",
       "/22 oct 2024/image 3.jpeg",
       "/22 oct 2024/image 4.jpeg",
-      "/22 oct 2024/image 5.jpeg",
-      "/22 oct 2024/image 6.jpeg",
-      "/22 oct 2024/image 7.jpeg",
-      "/22 oct 2024/image 8.jpeg"
+      "/22 oct 2024/image 5.jpeg"
     ],
     "30 jul 24": [
       "/30 jul 2024/image 1.jpeg",
       "/30 jul 2024/image 2.jpeg",
       "/30 jul 2024/image 3.jpeg",
       "/30 jul 2024/image 4.jpeg",
-      "/30 jul 2024/image 5.jpeg",
-      "/30 jul 2024/image 6.jpeg",
-      "/30 jul 2024/image 7.jpeg",
-      "/30 jul 2024/image 8.jpeg"
+      "/30 jul 2024/image 5.jpeg"
     ],
     "Akola 13 feb 25": [
       "/Akola 13 feb 2024/image 1.jpeg",
       "/Akola 13 feb 2024/image 2.jpeg",
       "/Akola 13 feb 2024/image 3.jpeg",
       "/Akola 13 feb 2024/image 4.jpeg",
-      "/Akola 13 feb 2024/image 5.jpeg",
-      "/Akola 13 feb 2024/image 6.jpeg",
-      "/Akola 13 feb 2024/image 7.jpeg",
-      "/Akola 13 feb 2024/image 8.jpeg"
+      "/Akola 13 feb 2024/image 5.jpeg"
     ],
     "Yavatmal 14 feb 25": [
       "/sangli Event 5 june 2024/image 1.jpeg",
@@ -211,10 +188,7 @@ export const getEventImages = (event: Event): string[] => {
       "/Amravati 15 feb 2025/image 2.jpeg",
       "/Amravati 15 feb 2025/image 3.jpeg",
       "/Amravati 15 feb 2025/image 4.jpeg",
-      "/Amravati 15 feb 2025/image 5.jpeg",
-      "/Amravati 15 feb 2025/image 6.jpeg",
-      "/Amravati 15 feb 2025/image 7.jpeg",
-      "/Amravati 15 feb 2025/image 8.jpeg"
+      "/Amravati 15 feb 2025/image 5.jpeg"
     ],
     "Kolkata 21 feb 25": [
       "/kol first event 22 may 2024/image 1.jpeg",
@@ -236,10 +210,7 @@ export const getEventImages = (event: Event): string[] => {
       "/14 aug 2024/image 2.jpeg",
       "/14 aug 2024/image 3.jpeg",
       "/14 aug 2024/image 4.jpeg",
-      "/14 aug 2024/image 5.jpeg",
-      "/14 aug 2024/image 6.jpeg",
-      "/14 aug 2024/image 7.jpeg",
-      "/14 aug 2024/image 8.jpeg"
+      "/14 aug 2024/image 5.jpeg"
     ],
     "Pune 21 mar 25": [
       "/pune event 3 sept 2024/image 1.jpeg",
@@ -261,8 +232,7 @@ export const getEventImages = (event: Event): string[] => {
       "/Kolkata 23 may 2025/image 2.jpeg",
       "/Kolkata 23 may 2025/image 3.jpeg",
       "/Kolkata 23 may 2025/image 4.jpeg",
-      "/Kolkata 23 may 2025/image 5.jpeg",
-      "/Kolkata 23 may 2025/image 6.jpeg"
+      "/Kolkata 23 may 2025/image 5.jpeg"
     ],
     "Nashik 24 jun 25": [
       "/Nashik event 24 jun 2025/image 1.jpeg",
