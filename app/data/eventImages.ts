@@ -96,9 +96,9 @@ export const getEventImages = (event: Event): string[] => {
       "/HYD 13 Nov 2024/image-4.jpeg"
     ],
     "Indore 29 nov 24": [
-      "/19 jul 2024/image-1.jpeg",
-      "/19 jul 2024/image-2.jpeg",
-      "/19 jul 2024/image-3.jpeg"
+      "/19 jul 2024/Image-1.jpeg",
+      "/19 jul 2024/Image-2.jpeg",
+      "/19 jul 2024/Image-3.jpeg"
     ],
     "Pune 4 dec 24": [
       "/Pune 4 dec 2024/image-1.jpeg",
@@ -141,10 +141,10 @@ export const getEventImages = (event: Event): string[] => {
       "/13 sep 2024/image-4.jpeg"
     ],
     "Sambhajinagar 19 jul 24": [
-      "/19 jul 2024/image-1.jpeg",
-      "/19 jul 2024/image-2.jpeg",
-      "/19 jul 2024/image-3.jpeg",
-      "/19 jul 2024/image-4.jpeg"
+      "/19 jul 2024/Image-1.jpeg",
+      "/19 jul 2024/Image-2.jpeg",
+      "/19 jul 2024/Image-3.jpeg",
+      "/19 jul 2024/Image-4.jpeg"
     ],
     "22 oct 24": [
       "/22 oct 2024/image-1.jpeg",
@@ -170,10 +170,10 @@ export const getEventImages = (event: Event): string[] => {
       "/Remaining/Image-46.jpeg"
     ],
     "Amravati 15 feb 25": [
-      "/Amravati 15 feb 2025/image-1.jpeg",
-      "/Amravati 15 feb 2025/image-2.jpeg",
-      "/Amravati 15 feb 2025/image-3.jpeg",
-      "/Amravati 15 feb 2025/image-4.jpeg"
+      "/Amravati 15 feb 2025/Image-1.jpeg",
+      "/Amravati 15 feb 2025/Image-2.jpeg",
+      "/Amravati 15 feb 2025/Image-3.jpeg",
+      "/Amravati 15 feb 2025/Image-4.jpeg"
     ],
     "Kolkata 21 feb 25": [
       "/22 oct 2024/Image-1.jpeg", 
@@ -259,8 +259,8 @@ export const getEventImages = (event: Event): string[] => {
     ],
     "Bhubaneswar 10 sep 25": [
       "/30 july 2024/Image-4.jpeg",
-      "/30 july 2024/Image 5.jpeg",
-      "/30 july 2024/Image 6.jpeg"
+      "/30 july 2024/Image-5.jpeg",
+      "/30 july 2024/Image-6.jpeg"
     ],
     "Kolhapur 23 sep 25": [
       "/kol first event 22 may 2024/image-1.jpeg",
