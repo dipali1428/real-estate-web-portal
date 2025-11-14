@@ -159,10 +159,10 @@ export const getEventImages = (event: Event): string[] => {
       "/30 jul 2024/image 4.jpeg"
     ],
     "Akola 13 feb 25": [
-      "/Akola 13 feb 2024/image 1.jpeg",
-      "/Akola 13 feb 2024/image 2.jpeg",
-      "/Akola 13 feb 2024/image 3.jpeg",
-      "/Akola 13 feb 2024/image 4.jpeg"
+      "/Akola event 13 feb 2025/image-1.jpeg",
+      "/Akola event 13 feb 2025/image-2.jpeg",
+      "/Akola event 13 feb 2025/image-3.jpeg",
+      // "/Akola 13 feb 2024/image-4.jpeg"
     ],
     "Yavatmal 14 feb 25": [
       "/Remaining/image 44.jpeg",
