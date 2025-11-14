@@ -7,7 +7,7 @@ export default function PrivacyPolicy() {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg flex flex-col hover:shadow-xl transition-shadow duration-300 max-h-[calc(100vh-4rem)]">
           {/* Header Section - Fixed */}
-          <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-8 px-6 text-center flex-shrink-0">
+          <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-8 px-6 text-center shrink-0">
             <h1 className="text-3xl md:text-4xl font-bold mb-2">Privacy Policy</h1>
             <p className="text-blue-100 italic">Last Updated: November 10, 2025</p>
           </div>
