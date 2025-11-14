@@ -13,15 +13,15 @@ const Footer = () => (
             {/* Title + Description */}
             <div>
               <div className="flex flex-col items-center md:items-start text-center md:text-left">
-              <h3 className="font-bold text-2xl mb-4 relative inline-block after:content-[''] after:block after:w-71 after:h-[3px] after:bg-gradient-to-r after:from-[#2076C7] after:to-[#1CADA3] after:mt-2 mx-auto md:mx-0">
-                About Infinity Arthvishva
-              </h3>
-              <p className="text-sm md:text-base text-gray-400 leading-relaxed max-w-lg">
-                We are a leading financial advisory firm providing comprehensive
-                solutions across loans, insurance, and investments. Your financial
-                success is our mission.
-              </p>
-            </div>
+                <h3 className="font-bold text-2xl mb-4 relative inline-block after:content-[''] after:block after:w-71 after:h-[3px] after:bg-gradient-to-r after:from-[#2076C7] after:to-[#1CADA3] after:mt-2 mx-auto md:mx-0">
+                  About Infinity Arthvishva
+                </h3>
+                <p className="text-sm md:text-base text-gray-400 leading-relaxed max-w-lg">
+                  We are a leading financial advisory firm providing comprehensive
+                  solutions across loans, insurance, and investments. Your financial
+                  success is our mission.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -117,7 +117,7 @@ const Footer = () => (
           <p className="text-sm text-gray-400 mb-2">
             © 2025{" "}
             <span className="font-medium">
-              Infinity Arthvishva Advisory Pvt. Ltd.
+              Infinity Arthvishva
             </span>{" "}— All Rights Reserved.
           </p>
           <div className="flex flex-wrap justify-center  gap-4 text-sm text-gray-400">

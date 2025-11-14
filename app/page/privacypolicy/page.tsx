@@ -7,9 +7,9 @@ export default function PrivacyPolicy() {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg flex flex-col hover:shadow-xl transition-shadow duration-300 max-h-[calc(100vh-4rem)]">
           {/* Header Section - Fixed */}
-          <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-8 px-6 text-center flex-shrink-0">
+          <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-8 px-6 text-center flex-shrink-0">
             <h1 className="text-3xl md:text-4xl font-bold mb-2">Privacy Policy</h1>
-            <p className="text-blue-100 italic">Last Updated: January 1, 2024</p>
+            <p className="text-blue-100 italic">Last Updated: November 10, 2025</p>
           </div>
 
           {/* Scrollable Content Section */}
@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
               {/* Definitions */}
               <section className="space-y-6">
                 <h2 className="text-2xl font-semibold text-[#2076C7] border-l-4 border-[#1CADA3] pl-4">2. Definitions</h2>
-                
+
                 <div className="grid gap-4">
                   {[
                     {
@@ -35,7 +35,7 @@ export default function PrivacyPolicy() {
                     },
                     {
                       term: "Company",
-                      definition: "refers to Infinity Arthvishva Advisory Private Limited and its affiliates or subsidiaries."
+                      definition: "refers to Infinity Arthvishva and its affiliates or subsidiaries."
                     },
                     {
                       term: "Site/Website",
@@ -46,7 +46,7 @@ export default function PrivacyPolicy() {
                       definition: "refers to any personal data provided by the User in accordance with the Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data) Rules, 2011."
                     }
                   ].map((item, index) => (
-                    <div 
+                    <div
                       key={index}
                       className="bg-gray-50 p-6 rounded-lg border-l-4 border-[#2076C7] hover:bg-gray-100 transition-colors duration-200"
                     >
@@ -82,23 +82,23 @@ export default function PrivacyPolicy() {
               {/* Privacy Protection Principles */}
               <section className="space-y-6">
                 <h2 className="text-2xl font-semibold text-[#2076C7] border-l-4 border-[#1CADA3] pl-4">5. Privacy Protection Principles</h2>
-                
+
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-xl font-semibold text-[#1CADA3] mb-3">Security</h3>
                     <p className="text-gray-700">The Company employs various security technologies to safeguard users&apos; personal information from unauthorized access, use, or disclosure.</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-xl font-semibold text-[#1CADA3] mb-3">Choice</h3>
                     <p className="text-gray-700">Users may choose whether to provide their personal information, although failure to do so may limit access to certain services.</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-xl font-semibold text-[#1CADA3] mb-3">Notice</h3>
                     <p className="text-gray-700">The Company collects personal information only for legitimate purposes and does not share it with third parties without user consent, unless required by law.</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-xl font-semibold text-[#1CADA3] mb-3">Access/Accuracy</h3>
                     <p className="text-gray-700">Users can update or correct their personal information upon request.</p>

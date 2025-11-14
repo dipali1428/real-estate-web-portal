@@ -37,7 +37,7 @@ export default function TermsConditions() {
           {/* Header Section - Fixed */}
           <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-8 px-6 text-center flex-shrink-0">
             <h1 className="text-3xl md:text-4xl font-bold mb-2">Terms of Use</h1>
-            <p className="text-blue-100 italic">Effective Date: January 1, 2024</p>
+            <p className="text-blue-100 italic">Effective Date: November 10, 2025</p>
           </div>
 
           {/* Scrollable Content Section */}
@@ -68,7 +68,7 @@ export default function TermsConditions() {
                     <div>
                       <strong className="text-blue-800">Important:</strong>
                       <p className="text-blue-700 mt-1">
-                        By accessing www.infinityarthvishva.com or the Infinity Arthvishva Advisory Pvt. Ltd. mobile application (the &quot;Site&quot; or &quot;Website&quot;), you agree to the terms of this legal agreement between you (&quot;User&quot;) and Infinity Arthvishva Advisory Pvt. Ltd. (the &quot;Company&quot;).
+                        By accessing www.infinityarthvishva.com or the Infinity Arthvishva. mobile application (the &quot;Site&quot; or &quot;Website&quot;), you agree to the terms of this legal agreement between you (&quot;User&quot;) and Infinity Arthvishva. (the &quot;Company&quot;).
                       </p>
                     </div>
                   </div>
@@ -147,7 +147,7 @@ export default function TermsConditions() {
                     },
                     {
                       term: '"Company"',
-                      definition: 'Refers to Infinity Arthvishva Advisory Pvt. Ltd. and its affiliates/subsidiaries.'
+                      definition: 'Refers to Infinity Arthvishva and its affiliates/subsidiaries.'
                     },
                     {
                       term: '"Site" or "Website"',
