@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { ImageCarousel } from "../../component/ImageCarousel";
 import { eventsByYear, Event } from "../../data/events";
 import { successContests } from "../../data/contests";
 import { getEventImages } from "../../data/eventImages";
@@ -54,104 +55,7 @@ const LazyLoad: React.FC<LazyLoadProps> = ({
   );
 };
 
-// Image Carousel Component with Error Handling
-interface ImageCarouselProps {
-  images: string[];
-  alt: string;
-  delay: number;
-  onError?: () => void;
-}
-
-const ImageCarousel: React.FC<ImageCarouselProps> = ({ 
-  images, 
-  alt, 
-  delay,
-  onError 
-}) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
-  const [failedImages, setFailedImages] = useState<Set<number>>(new Set());
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
-        prevIndex === images.length - 1 ? 0 : prevIndex + 1
-      );
-    }, delay);
-
-    return () => clearInterval(interval);
-  }, [images.length, delay]);
-
-  const handleImageError = (index: number) => {
-    console.error(`Failed to load image: ${images[index]}`);
-    setFailedImages(prev => new Set(prev).add(index));
-    
-    // If all images fail, trigger the error callback
-    if (failedImages.size + 1 === images.length) {
-      onError?.();
-    }
-  };
-
-  const handleImageLoad = (index: number) => {
-    setLoadedImages(prev => new Set(prev).add(index));
-  };
-
-  // Filter out failed images
-  const validImages = images.filter((_, index) => !failedImages.has(index));
-
-  // If no valid images, show error
-  if (validImages.length === 0) {
-    return (
-      <div className="h-64 md:h-80 bg-gray-200 rounded-t-2xl flex items-center justify-center">
-        <div className="text-gray-500 text-center">
-          <div className="text-lg mb-2">No images available</div>
-          <div className="text-sm text-gray-400">Failed to load event images</div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative h-64 md:h-80 bg-gray-100 rounded-t-2xl overflow-hidden">
-      {validImages.map((image, index) => (
-        <img
-          key={index}
-          src={image}
-          alt={`${alt} ${index + 1}`}
-          className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500 ${
-            index === currentIndex ? 'opacity-100' : 'opacity-0'
-          }`}
-          onError={() => handleImageError(index)}
-          onLoad={() => handleImageLoad(index)}
-        />
-      ))}
-      
-      {/* Loading indicator */}
-      {loadedImages.size === 0 && validImages.length > 0 && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
-          <div className="text-gray-400">Loading image...</div>
-        </div>
-      )}
-      
-      {/* Image indicators */}
-      {validImages.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          {validImages.map((_, index) => (
-            <button
-              key={index}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentIndex ? 'bg-white scale-125' : 'bg-white bg-opacity-50'
-              }`}
-              onClick={() => setCurrentIndex(index)}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Lazy Image Carousel component with enhanced error handling
+// Lazy Image Carousel component
 interface LazyImageCarouselProps {
   images: string[];
   alt: string;
@@ -164,16 +68,7 @@ const LazyImageCarousel: React.FC<LazyImageCarouselProps> = ({
   delay 
 }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
-
-  // Reset error state when images change or component becomes visible
-  useEffect(() => {
-    if (isVisible) {
-      setImageError(false);
-    }
-  }, [images, isVisible]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -197,111 +92,15 @@ const LazyImageCarousel: React.FC<LazyImageCarouselProps> = ({
     };
   }, []);
 
-  const handleRetry = () => {
-    setImageError(false);
-    setRetryCount(prev => prev + 1);
-  };
-
   return (
     <div ref={ref}>
       {isVisible ? (
-        imageError ? (
-          <div className="h-64 md:h-80 bg-gray-200 rounded-t-2xl flex items-center justify-center">
-            <div className="text-gray-500 text-center">
-              <div className="text-lg mb-2">Failed to load images</div>
-              <div className="text-sm text-gray-400 mb-4">
-                {retryCount > 0 ? `Retry attempt ${retryCount}` : 'Check your connection'}
-              </div>
-              <button 
-                onClick={handleRetry}
-                className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
-              >
-                Retry Loading
-              </button>
-            </div>
-          </div>
-        ) : (
-          <ImageCarousel 
-            key={retryCount} // Force re-render on retry
-            images={images} 
-            alt={alt} 
-            delay={delay}
-            onError={() => setImageError(true)}
-          />
-        )
+        <ImageCarousel images={images} alt={alt} delay={delay} />
       ) : (
         <div className="h-64 md:h-80 bg-gray-200 rounded-t-2xl animate-pulse flex items-center justify-center">
           <div className="text-gray-400">Loading images...</div>
         </div>
       )}
-    </div>
-  );
-};
-
-// Image Debugger Component (Remove in production)
-interface ImageDebuggerProps {
-  images: string[];
-}
-
-const ImageDebugger: React.FC<ImageDebuggerProps> = ({ images }) => {
-  const [status, setStatus] = useState<{ [key: string]: string }>({});
-
-  // Utility function to check if image exists
-  const checkImageExists = async (url: string): Promise<boolean> => {
-    try {
-      // For data URLs, they're always valid
-      if (url.startsWith('data:')) return true;
-      
-      // For external URLs, check if they exist
-      const response = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
-      return true; // If we get here, the request didn't fail (CORS might block but image might still exist)
-    } catch (error) {
-      console.error(`Image check failed for ${url}:`, error);
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    const verifyImages = async () => {
-      const newStatus: { [key: string]: string } = {};
-      
-      for (const image of images) {
-        try {
-          // Quick check - if it's a relative path, it might need the base URL in production
-          if (image.startsWith('/') && !image.startsWith('//') && process.env.NODE_ENV === 'production') {
-            newStatus[image] = '⚠️ Relative path in production';
-          } else {
-            const exists = await checkImageExists(image);
-            newStatus[image] = exists ? '✅ Loaded' : '❌ Failed';
-          }
-        } catch (error) {
-          newStatus[image] = '❌ Error checking';
-        }
-      }
-      
-      setStatus(newStatus);
-    };
-
-    verifyImages();
-  }, [images]);
-
-  // Don't show debugger in production
-  if (process.env.NODE_ENV === 'production') return null;
-
-  return (
-    <div className="fixed bottom-4 right-4 bg-black bg-opacity-90 text-white p-4 rounded-lg text-xs max-w-sm z-50 border border-gray-600">
-      <div className="font-bold mb-2 text-teal-300">Image Debugger:</div>
-      {Object.entries(status).map(([image, status]) => (
-        <div key={image} className="mb-1 border-b border-gray-700 pb-1 last:border-b-0">
-          <span className={status.includes('✅') ? 'text-green-400' : status.includes('❌') ? 'text-red-400' : 'text-yellow-400'}>
-            {status}
-          </span>
-          <div className="truncate text-gray-300 mt-1">{image}</div>
-        </div>
-      ))}
-      <div className="mt-2 text-gray-400 text-xs">
-        Total: {images.length} images
-      </div>
     </div>
   );
 };
@@ -315,23 +114,6 @@ interface YouTubeVideoProps {
 
 const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ videoId, title }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
-
-  const handleError = () => {
-    console.error(`Failed to load YouTube video: ${videoId}`);
-    setHasError(true);
-  };
-
-  if (hasError) {
-    return (
-      <div className="relative w-full h-0 pb-[56.25%] rounded-2xl overflow-hidden bg-gray-200 flex items-center justify-center">
-        <div className="text-center text-gray-500">
-          <div className="text-lg mb-2">Failed to load video</div>
-          <div className="text-sm">YouTube video unavailable</div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="relative w-full h-0 pb-[56.25%] rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105">
@@ -348,7 +130,6 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ videoId, title }) => {
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
         onLoad={() => setIsLoaded(true)}
-        onError={handleError}
       />
     </div>
   );
@@ -466,9 +247,6 @@ const EventMonthSection: React.FC<EventMonthSectionProps> = ({ month, events }) 
           return (
             <LazyLoad key={idx} rootMargin="100px">
               <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden transition-transform duration-300 hover:scale-105">
-                {/* Debugger for images */}
-                <ImageDebugger images={getEventImages(event)} />
-                
                 {/* Lazy Image Carousel for Events */}
                 <LazyImageCarousel 
                   images={getEventImages(event)}
@@ -521,6 +299,8 @@ const EventSection: React.FC = () => {
     <section className="bg-gray-50">
       <div className="container mx-auto px-4 py-20">
 
+        
+
         {/* ===== Success Contest Section ===== */}
         <div className="mb-20">
           <div className="text-center mb-16">
@@ -538,9 +318,6 @@ const EventSection: React.FC = () => {
               {successContests.map((contest, idx) => (
                 <LazyLoad key={idx} rootMargin="150px">
                   <div className="bg-white rounded-3xl shadow-2xl hover:shadow-3xl overflow-hidden transition-all duration-300 hover:scale-105">
-                    {/* Debugger for contest images */}
-                    <ImageDebugger images={contest.images || [contest.img]} />
-                    
                     {/* Lazy Image Carousel with actual multiple images */}
                     <LazyImageCarousel 
                       images={contest.images || [contest.img]}
