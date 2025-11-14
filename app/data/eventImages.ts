@@ -327,5 +327,5 @@ export const getEventImages = (event: Event): string[] => {
     ]
   };
   
-  return eventImages[event.id] || [event.img]; // Fallback to single image
+  return eventImages[event.id]; // Fallback to single image
 };
