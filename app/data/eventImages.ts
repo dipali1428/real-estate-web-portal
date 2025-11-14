@@ -5,10 +5,10 @@ export const getEventImages = (event: Event): string[] => {
   const eventImages: { [key: string]: string[] } = {
     // Events with actual images
     "Akola 13 feb 24": [
-      "/Akola 13 feb 2024/image 1.jpeg",
-      "/Akola 13 feb 2024/image 2.jpeg",
-      "/Akola 13 feb 2024/image 3.jpeg",
-      "/Akola 13 feb 2024/image 4.jpeg"
+      "/Akola-13-feb-2024/image-1.jpeg",
+      "/Akola-13-feb-2024/image-2.jpeg",
+      "/Akola-13-feb-2024/image-3.jpeg",
+      "/Akola-13-feb-2024/image-4.jpeg"
     ],
     "Yavatmal 14 feb 24": [
       "/Remaining/image 1.jpeg",
