@@ -5,7 +5,7 @@ const LeadershipSection = () => {
       name: "Mr. Rajesh Parkhi",
       title: "Executive Director",
       description: "Over 25 years of extensive experience in the retail finance sector with an MBA in Marketing. Expertise in structuring retail loan portfolios and fostering sustainable business growth.",
-      image: "image 8.jpeg"
+      image: "Image 8.jpeg"
     },
     {
       name: "Mr. Rahul Kangane",
