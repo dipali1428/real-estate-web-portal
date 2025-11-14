@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 // ✅ Works now because this is still a Server Component
 export const metadata: Metadata = {
-  title: "Infinity Arthvishva Advisory",
+  title: "Infinity Arthvishva",
   description: "Financial Solutions Platform for Investment, Finance, and Protection",
   keywords: ["investment", "finance", "insurance", "arthvishva", "infinity", "wealth"],
   authors: [{ name: "Infinity Arthvishva" }],
