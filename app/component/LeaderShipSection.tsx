@@ -11,7 +11,7 @@ const LeadershipSection = () => {
       name: "Mr. Rahul Kangane",
       title: "Chairman and Managing Director",
       description: "13 years of expertise in broking and wealth management, with a focus on portfolio strategy. His sharp market insights fuel the company's growth and success.",
-      image: "Img2.jpeg"
+      image: "rahulsir.jpeg"
     },
     {
       name: "Mr. Pravin Marathe",
