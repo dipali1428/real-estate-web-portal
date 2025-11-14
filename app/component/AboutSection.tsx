@@ -23,7 +23,7 @@ const AboutSection = () => (
                         Our Vision
                     </h3>
                     <p className="text-gray-700 leading-relaxed mb-6 text-center md:text-left">
-                        At <span className="font-semibold text-[#2076C7]">Infinity Arthvishva Advisor Pvt. Ltd.</span>,
+                        At <span className="font-semibold text-[#2076C7]">Infinity Arthvishva</span>,
                         our vision is to seamlessly integrate advanced financial intelligence into everyday life —
                         empowering families across India to achieve stability, growth, and prosperity.
                     </p>

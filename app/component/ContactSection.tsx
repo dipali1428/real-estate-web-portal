@@ -162,7 +162,7 @@ const ContactSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.8 }}
             className="text-gray-700 max-w-2xl mx-auto mb-10 text-lg leading-relaxed">
-            With branches across <span className="font-semibold text-green-500">20+ cities</span>, Infinity Arthvishva Advisory Pvt. Ltd. is empowering clients nationwide through trusted financial solutions.
+            With branches across <span className="font-semibold text-green-500">20+ cities</span>, Infinity Arthvishva is empowering clients nationwide through trusted financial solutions.
           </motion.p>
 
           {/* Cities grid */}
