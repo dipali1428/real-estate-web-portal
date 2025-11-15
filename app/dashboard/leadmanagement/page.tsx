@@ -6,14 +6,21 @@ import LifeInsuranceForm from "./lifeinsuranceform";
 import HealthInsuranceForm from "./healthisurancform";
 import MotorInsuranceForm from "./motorinsuranceform";
 import TravelInsuranceForm from "./TravelInsuranceForm"
-import  PropertyInsuranceForm from "./pif";
+import  PropertyInsuranceForm from "./propertyinsuranceform";
 import  CattleInsuranceForm from "./cattleinsuranceform";
 import  MarineInsuranceForm from "./marineinsuranceform";
 import  HomeLoanForm from "./homeloanform";
 import  PersonalLoanForm from "./personaloanform";
 import  BusinessLoanForm from "./businessloanform"
 import  MortgageLoanForm from "./mortgageloanform";
-import  SMELoanForm from "./semform";
+import  SMELoanForm from "./smeloanform";
+import  EducationLoanForm from "./educationloanform";
+import  VehicleLoanForm from "./smeloanform";
+import LoanAgainstSecuritiesForm from "./loanagainstsecuritiesform";
+import DebtCapitalMarketForm from "./debtcapitalmarketform";
+import MutualFundForm from "./MutualFundForm";
+import WealthManagementForm from "./WealthManagementForm";
+import PMSAIFForm from "./PMSAIFForm"
 export default function LeadManagement() {
   // Modal open/close state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,6 +41,13 @@ export default function LeadManagement() {
   const [showBusinessLoanForm, setShowBusinessLoanForm] = useState(false);
   const [showMortgageLoanForm, setShowMortgageLoanForm] = useState(false);
   const [showSMELoanForm, setShowSMELoanForm] = useState(false);
+  const [showEducationLoanForm, setShowEducationLoanForm] = useState(false)
+  const [showVehicleLoanForm, setShowVehicleLoanForm] = useState(false);
+  const [showLoanAgainstSecuritiesForm, setShowLoanAgainstSecuritiesForm] = useState(false);
+  const [showDebtCapitalMarketForm, setShowDebtCapitalMarketForm] =useState(false); //
+  const [showMutualFundForm, setShowMutualFundForm] =useState(false); //
+   const [showWealthManagementForm, setShowWealthManagementForm] =useState(false); //
+   const [showPMSAIFForm, setShowPMSAIFForm] =useState(false);
     // If LifeInsuranceForm is open, show only that
   if (showLifeInsuranceForm) {
     return <LifeInsuranceForm onClose={() => setShowLifeInsuranceForm(false)} />;
@@ -71,6 +85,27 @@ export default function LeadManagement() {
    if (showSMELoanForm) {
     return <SMELoanForm onClose={() => setShowSMELoanForm(false)} />;
   }
+   if (showEducationLoanForm) {
+    return <EducationLoanForm onClose={() => setShowEducationLoanForm(false)} />;
+  }
+  if (showVehicleLoanForm) {
+    return <VehicleLoanForm onClose={() => setShowVehicleLoanForm(false)} />;
+  }
+  if (showLoanAgainstSecuritiesForm) {
+    return <LoanAgainstSecuritiesForm onClose={() => setShowLoanAgainstSecuritiesForm(false)} />;
+  }
+  if (showDebtCapitalMarketForm) {
+    return <DebtCapitalMarketForm onClose={() => setShowDebtCapitalMarketForm(false)} />;
+  }
+   if (showMutualFundForm) {
+    return <MutualFundForm onClose={() => setShowMutualFundForm(false)} />;
+  }
+  if (showWealthManagementForm) {
+    return <WealthManagementForm onClose={() => setShowWealthManagementForm(false)} />;
+  }
+  if (showPMSAIFForm) {
+    return <PMSAIFForm onClose={() => setShowPMSAIFForm(false)} />;
+  }
   // Tabs list
   const tabs = [
     { id: "insurance", label: "Insurance" },
@@ -94,7 +129,7 @@ export default function LeadManagement() {
         </p>
 
         {/* Header Row */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 ">
           <h3 className="text-xl font-semibold text-gray-700"></h3>
           <button
             onClick={() => setIsModalOpen(true)}
@@ -138,7 +173,7 @@ export default function LeadManagement() {
                     by offering a lump-sum payment upon the policyholder's death.
                   </p>
 
-                  <ul className="list-disc list-inside space-y-2 text-sm mb-4">
+                  <ul className="list-disc list-inside space-y-2 text-sm mb-4 ">
                     <li>Term life insurance offers coverage for 10‒30 years.</li>
                     <li>Helps dependents maintain financial stability post-loss.</li>
                   </ul>
@@ -168,9 +203,9 @@ export default function LeadManagement() {
               </div>
 
               {/* Motor Insurance */}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between ">
                 <div>
-                  <h2 className="text-xl font-semibold mb-3 text-center">
+                  <h2 className="text-xl font-semibold mb-3 text-center ">
                     Motor Insurance
                   </h2>
                   <p className="text-sm leading-relaxed">
@@ -204,11 +239,7 @@ export default function LeadManagement() {
                   <h2 className="text-xl font-semibold mb-3 text-center">
                     Property Insurance
                   </h2>
-                  <p className="text-sm leading-relaxed">
-                  Property insurance is a type of coverage that protects physical assets-such as homes, buildings, 
-                  and personal belongings-against risks like damage, theft, or loss. It ensures financial 
-                  compensation when unforeseen events affect your property.
-                                 
+                  <p className="text-sm leading-relaxed">Property insurance is a type of coverage that protects physical assets-such as homes, buildings, and personal belongings-against risks like damage, theft, or loss. It ensures financial compensation when unforeseen events affect your property.              
                   </p>
                 </div>
                 <button onClick={() => setShowPropertyInsuranceForm(true)}
@@ -254,12 +285,9 @@ export default function LeadManagement() {
              {/* Home Loans */}
               <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
                 <div>
-                <h2 className="text-xl font-semibold mb-3">Home Loans</h2>
+                  <h2 className="text-xl font-semibold mb-3">Home Loans</h2>
                 <p className="text-sm mb-6">
-                  A home loan, also known as a mortgage, is a type of loan 
-                  specifically designed to help individuals purchase a home. 
-                  When you take out a home loan, you borrow money from a lender 
-                  (usually a bank or a financial institution) to buy a property.
+                  A home loan, also known as a mortgage, is a type of loan specifically designed to help individuals purchase a home.  When you take out a home loan, you borrow money from a lender (usually a bank or a financial institution) to buy a property.
                 </p> 
                 </div>
                 <button onClick={() => setShowHomeLoanForm(true)}
@@ -269,11 +297,7 @@ export default function LeadManagement() {
               <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
                 <div>
                 <h2 className="text-xl font-semibold mb-3">Personal Loans</h2>
-                <p className="text-sm mb-6">
-                  A personal loan is a type of loan that you can use for almost 
-                  any personal expense, such as consolidating debt, paying for 
-                  medical bills, home improvements, or even funding a big purchase like a car.
-                </p>     
+                <p className="text-sm mb-6">A personal loan is a type of loan that you can use for almost any personal expense, such as consolidating debt, paying for medical bills, home improvements, or even funding a big purchase like a car.</p>     
                 </div>
                 <button onClick={() => setShowPersonalLoanForm(true)} 
                 className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
@@ -282,11 +306,7 @@ export default function LeadManagement() {
               <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
                 <div>
                 <h2 className="text-xl font-semibold mb-3">Business Loan</h2>
-                <p className="text-sm mb-6">A business loan is a loan specifically 
-                  intended to help a business cover various expenses, such as startup costs, 
-                  expanding operations, purchasing equipment, or managing cash flow. These loans are 
-                  typically provided by banks, credit unions, or alternative lenders and come in different forms 
-                  depending on the needs of the business.</p>
+                <p className="text-sm mb-6">A business loan is a loan specifically intended to help a business cover various expenses, such as startup costs, expanding operations, purchasing equipment, or managing cash flow. These loans are  typically provided by banks, credit unions, or alternative lenders and come in different forms  depending on the needs of the business.</p>
                   </div>
                 <button onClick={() => setShowBusinessLoanForm(true)} 
                 className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
@@ -295,10 +315,7 @@ export default function LeadManagement() {
               <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
                 <div>
                 <h2 className="text-xl font-semibold mb-3">Mortgage Loans</h2>
-                <p className="text-sm mb-6">A mortgage loan is a type of home loan that allows you to borrow money 
-                  from a lender (usually a bank or mortgage lender) to buy a home or property. The loan is secured by 
-                  the property itself, meaning that if you fail to repay the loan, the lender can take possession of the 
-                  home through a legal process called foreclosure.</p></div>
+                <p className="text-sm mb-6">A mortgage loan is a type of home loan that allows you to borrow money from a lender (usually a bank or mortgage lender) to buy a home or property. The loan is secured by the property itself, meaning that if you fail to repay the loan, the lender can take possession of the home through a legal process called foreclosure.</p></div>
                 <button onClick={() => setShowMortgageLoanForm(true)}  
                 className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
                 </div>
@@ -306,11 +323,7 @@ export default function LeadManagement() {
               <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
                 <div>
                 <h2 className="text-xl font-semibold mb-3">SME</h2>
-                <p className="text-sm mb-6">SME stands for Small and Medium-sized Enterprises. 
-                  These are businesses that have a relatively small to medium scale of operations, 
-                  in terms of employees, revenue, or assets, compared to large corporations. 
-                  SMEs are vital to economies worldwide, as they contribute significantly to job creation, 
-                  innovation, and economic growth.</p></div>
+                <p className="text-sm mb-6">SME stands for Small and Medium-sized Enterprises. These are businesses that have a relatively small to medium scale of operations, in terms of employees, revenue, or assets, compared to large corporations.  SMEs are vital to economies worldwide, as they contribute significantly to job creation, innovation, and economic growth.</p></div>
                 <button onClick={() => setShowSMELoanForm(true)}
                 className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
                 </div>
@@ -322,7 +335,8 @@ export default function LeadManagement() {
                   help students finance their education. It covers expenses such as tuition fees, books, 
                   living expenses, and sometimes other education-related costs like equipment or transportation. 
                   Education loans are commonly offered by banks, financial institutions, and government schemes</p></div>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                <button onClick={() => setShowEducationLoanForm(true)}
+                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
                 </div>
               {/* Balance Transfer*/}
               <div className="bg-white text-black rounded-lg shadow p-6 justify-between">
@@ -338,28 +352,24 @@ export default function LeadManagement() {
             {/* Vehicle Loan*/}
               <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
                 <h2 className="text-xl font-semibold mb-3">Vehicle Loan</h2>
-                <p className="text-sm mb-6">A vehicle loan is a type of loan specifically designed to help individuals or 
-                  businesses purchase a vehicle, such as a car, motorcycle, truck, or commercial vehicle. 
-                  The loan is typically offered by banks, financial institutions, or auto dealerships, and the vehicle 
-                  itself acts as collateral for the loan.</p>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                <p className="text-sm mb-6">A vehicle loan is a type of loan specifically designed to help individuals or  businesses purchase a vehicle, such as a car, motorcycle, truck, or commercial vehicle. The loan is typically offered by banks, financial institutions, or auto dealerships, and the vehicle  itself acts as collateral for the loan.</p>
+                <button onClick={() => setShowVehicleLoanForm(true)}
+                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
                 </div>
             {/* loan against securities / MF*/}
               <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
                 <h2 className="text-xl font-semibold mb-3">loan against securities / MF</h2>
-                <p className="text-sm mb-6">A loan against securities is a type of secured loan where you pledge your 
-                  financial assets, such as stocks, bonds, mutual funds, or other securities, as collateral to secure the loan. 
-                  The lender offers you a loan based on the value of the securities you pledge.</p>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                <p className="text-sm mb-6">A loan against securities is a type of secured loan where you pledge your  financial assets, such as stocks, bonds, mutual funds, or other securities, as collateral to secure the loan. The lender offers you a loan based on the value of the securities you pledge.</p>
+                <button 
+                onClick={() => setShowLoanAgainstSecuritiesForm(true)}
+                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
                 </div>
              {/* Debt Capital Market (DCM)*/}
               <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
                 <h2 className="text-xl font-semibold mb-3">Debt Capital Market (DCM)</h2>
-                <p className="text-sm mb-6">The Debt Capital Market refers to the market where companies, governments, 
-                  and other entities issue debt securities to raise capital. These debt instruments are typically bonds, 
-                  notes, or debentures. Loan syndication is the process in which a group of lenders 
-                  (often banks or other financial institutions) come together to provide a large loan to a borrower.</p>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                <p className="text-sm mb-6">The Debt Capital Market refers to the market where companies, governments, and other entities issue debt securities to raise capital. These debt instruments are typically bonds, notes, or debentures. Loan syndication is the process in which a group of lenders (often banks or other financial institutions) come together to provide a large loan to a borrower.</p>
+                <button onClick={() => setShowDebtCapitalMarketForm(true)}
+                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
                 </div>
                </div>
           )}
@@ -370,23 +380,18 @@ export default function LeadManagement() {
               <div className="bg-white text-black rounded-lg shadow p-6 ">
                 <h2 className="text-xl font-semibold mb-3">Unlisted</h2>
                 <p className="text-sm mb-6"></p>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                <button //onClick={() => setShowVehicleLoanForm(true)}
+                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
                 </div>
-            </div>
-              
+            </div>   
           )}
-
           {activeTab === "investment" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Mutual Fund */}
               <div className="bg-[white] text-black p-6 rounded-lg shadow">
                 <h2 className="text-xl font-semibold mb-3">Mutual Fund</h2>
-                <p className="text-sm mb-6">
-                  A mutual fund is a type of investment vehicle that pools money
-                  from many investors to purchase a diversified portfolio of
-                  stocks, bonds, or other securities.
-                </p>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                <p className="text-sm mb-6">A mutual fund is a type of investment vehicle that pools moneyfrom many investors to purchase a diversified portfolio of  stocks, bonds, or other securities.</p>
+                <button onClick={() => setShowMutualFundForm(true)} className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
                   Click to Add New
                 </button>
               </div>
@@ -398,7 +403,7 @@ export default function LeadManagement() {
                   Wealth management helps individuals manage and grow their
                   wealth with personalized strategies.
                 </p>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                <button onClick={() => setShowWealthManagementForm(true)} className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
                   Click to Add New
                 </button>
               </div>
@@ -406,11 +411,9 @@ export default function LeadManagement() {
               {/* PMS / AIF */}
               <div className="bg-[white] text-black p-6 rounded-lg shadow">
                 <h2 className="text-xl font-semibold mb-3">PMS / AIF</h2>
-                <p className="text-sm mb-6">
-                  PMS offers personalized investment services. AIFs invest in
-                  assets like private equity, hedge funds, and real estate.
+                <p className="text-sm mb-6">PMS offers personalized investment services. AIFs invest in assets like private equity, hedge funds, and real estate.
                 </p>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                <button onClick={() => setShowPMSAIFForm(true)} className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
                   Click to Add New
                 </button>
               </div>
@@ -430,9 +433,7 @@ export default function LeadManagement() {
               {/* Bonds */}
               <div className="bg-[white] text-black p-6 rounded-lg shadow">
                 <h2 className="text-xl font-semibold mb-3">Bonds</h2>
-                <p className="text-sm mb-6">
-                  Bonds are fixed-income instruments providing regular interest
-                  and principal return at maturity.
+                <p className="text-sm mb-6">Bonds are fixed-income instruments providing regular interest and principal return at maturity.
                 </p>
                 <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
                   Click to Add New
@@ -444,10 +445,7 @@ export default function LeadManagement() {
                 <h2 className="text-xl font-semibold mb-3">
                   Real Estate Investment
                 </h2>
-                <p className="text-sm mb-6">
-                  Real estate investment involves buying or renting property to
-                  generate income or profit.
-                </p>
+                <p className="text-sm mb-6">Real estate investment involves buying or renting property to generate income or profit.</p>
                 <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
                   Click to Add New
                 </button>
@@ -461,7 +459,7 @@ export default function LeadManagement() {
               <div className="bg-white text-black rounded-lg shadow p-6 ">
                 <h2 className="text-xl font-semibold mb-3"></h2>
                 <p className="text-sm mb-6"></p>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                <button  className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
                 </div>
 
               </div>

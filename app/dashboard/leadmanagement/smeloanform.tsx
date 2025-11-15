@@ -64,14 +64,14 @@ export default function SMELoanForm({ onClose }: { onClose?: () => void }) {
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4">
-          <h2 className="text-xl font-semibold text-black">Business Loan Form</h2>
+          <h2 className="text-xl font-semibold text-[#1CADA3]">SME Loan Form</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
             <X size={22} />
           </button>
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 text-gray-700">
           <Input label="Client Name" placeholder="Enter Client Name" />
           <Input label="Phone Number" placeholder="Enter Client Phone Number" />
           <Input label="Email ID" placeholder="Enter Client Email ID" />
@@ -92,8 +92,7 @@ export default function SMELoanForm({ onClose }: { onClose?: () => void }) {
                   <label className="text-gray-700 text-sm font-medium">{label}</label>
                   <input
                     type="file"
-                    className="border border-gray-300 rounded-lg p-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-teal-600 file:text-white hover:file:bg-teal-700"
-                  />
+                    className="border border-gray-300 rounded-lg p-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-teal-600 file:text-white hover:file:bg-teal-700" />
                 </div>
               ))}
             </div>
@@ -108,10 +107,10 @@ export default function SMELoanForm({ onClose }: { onClose?: () => void }) {
           </div>
 
           {/* Submit */}
-          <div className="col-span-2 flex justify-center mt-6">
+           <div className="col-span-2 mt-4 flex justify-center">
             <button
               type="submit"
-              className="bg-[#1CADA3] text-white px-8 py-3 rounded-xl w-full md:w-1/2 hover:bg-[#16948d] transition"
+              className="w-50 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:bg-[#178d84] transition"
             >
               Submit
             </button>

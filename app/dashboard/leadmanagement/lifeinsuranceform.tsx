@@ -76,12 +76,13 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
           )}
 
           {/* Button */}
-          <button
+          <div  className="col-span-2 mt-4 flex justify-center" ><button
             type="submit"
-            className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md w-full hover:bg-[#16948d] transition"
+            className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md w-50 hover:bg-[#16948d] transition"
           >
             Submit
           </button>
+          </div>
         </div>
       </div>
     </div>

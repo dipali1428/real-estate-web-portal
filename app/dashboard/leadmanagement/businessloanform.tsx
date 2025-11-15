@@ -10,7 +10,7 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4">
-          <h2 className="text-xl font-semibold text-black">Business Loan Form</h2>
+          <h2 className="text-xl font-semibold text-[#1CADA3]">Business Loan Form</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
             <X size={22} />
           </button>
@@ -82,10 +82,10 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
           </div>
 
           {/* Submit Button */}
-          <div className="col-span-2 text-center mt-4 flex justify-center">
+           <div className="col-span-2 mt-4 flex justify-center">
             <button
               type="submit"
-              className="bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-all"
+              className="w-50 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:bg-[#178d84] transition"
             >
               Submit
             </button>

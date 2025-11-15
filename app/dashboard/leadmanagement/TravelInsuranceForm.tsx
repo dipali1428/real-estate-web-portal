@@ -13,7 +13,7 @@ export default function TravelInsuranceForm({ onClose }: TravelInsuranceForm) {
 
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4">
-          <h2 className="text-xl font-semibold text-gray-900">Travel Insurance Form</h2>
+          <h2 className="text-xl font-semibold text-[#1CADA3]">Travel Insurance Form</h2>
           <button className="text-gray-500 hover:text-gray-800" onClick={onClose}>
             <X size={22} />
           </button>
@@ -110,10 +110,10 @@ export default function TravelInsuranceForm({ onClose }: TravelInsuranceForm) {
             </div>
 
             {/* Submit Button */}
-            <div className="col-span-2">
+            <div  className="col-span-2 mt-4 flex justify-center" >
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-md mt-3"
+                className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md w-50 hover:bg-[#16948d] transition"
               >
                 Submit
               </button>

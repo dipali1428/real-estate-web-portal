@@ -7,17 +7,17 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh] text-gray-700">
         {/* Header */}
-        <div className="flex justify-between items-center border-b px-6 py-4">
-          <h2 className="text-xl font-semibold text-black">Home Loan Form</h2>
+        <div className="flex justify-between items-center border-b px-6 py-4 text-gray-700">
+          <h2 className="text-xl font-semibold text-[#1CADA3]">Home Loan Form</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
             <X size={22} />
           </button>
         </div>
 
         {/* Body */}
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 text-">
           <Select
             label="Type of Home Loan"
             options={["Salaried", "Self Employed", "Balance Transfer (BT)"]}
@@ -35,6 +35,24 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
             placeholder="Enter Other Loan Obligation Details"
             className="md:col-span-2"
           />
+          {[
+            "Aadhar Card",
+            "Pan Card",
+            "3 Months Salary Slip",
+            "Form 16",
+            "3 Months Banking Statement",
+            "Address Proof",
+            "Photograph",
+            "Existing Loan Statement",
+          ].map((label, idx) => (
+            <div key={idx} className="col-span-1">
+              <label className="block font-medium mb-1">{label}</label>
+              <input
+                type="file"
+                className="border rounded-lg p-2 text-sm file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-teal-500 file:text-white hover:file:bg-teal-600"
+              />
+            </div>
+          ))}
 
           {/* Dynamic Upload Sections */}
           {loanType === "Salaried" && <SalariedDocs />}

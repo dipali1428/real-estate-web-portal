@@ -8,12 +8,12 @@ interface MarineInsuranceFormProps {
 
 export default function MarineInsuranceForm({ onClose }: MarineInsuranceFormProps) {
   return (
-     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 text-gray-700">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
 
         {/* Header */}
-        <div className="flex justify-between items-center border-b px-6 py-4">
-          <h2 className="text-xl font-semibold text-gray-800">Marine Insurance</h2>
+        <div className="flex justify-between items-center border-b px-6 py-4 ">
+          <h2 className="text-xl font-semibold text-[#1CADA3]">Marine Insurance</h2>
 
           <button
             onClick={onClose}
@@ -199,8 +199,11 @@ export default function MarineInsuranceForm({ onClose }: MarineInsuranceFormProp
             </div>
 
             {/* Submit Button */}
-            <div className="col-span-2">
-              <button className="w-full bg-blue-600 text-white py-3 rounded-md mt-3 hover:bg-blue-700">
+            <div  className="col-span-2 mt-4 flex justify-center" >
+              <button
+                type="submit"
+                className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md w-50 hover:bg-[#16948d] transition"
+              >
                 Submit
               </button>
             </div>

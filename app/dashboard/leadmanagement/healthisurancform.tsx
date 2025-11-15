@@ -75,10 +75,10 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-5xl mx-4 overflow-y-auto max-h-[90vh]">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center border-b px-6 py-4">
+        <div className="flex justify-between items-center border-b px-6 py-4 text-gray-700">
           <h2 className="text-xl font-semibold text-[#1CADA3]">Health Insurance Form</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
             <X size={22} />
@@ -259,12 +259,13 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
           )}
 
           {/* SUBMIT BUTTON */}
-          <button
+          <div className="col-span-2 mt-4 flex justify-center" ><button
             onClick={handleSubmit}
             className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md hover:bg-[#16948d]"
           >
             Submit
           </button>
+          </div>
         </div>
       </div>
     </div>

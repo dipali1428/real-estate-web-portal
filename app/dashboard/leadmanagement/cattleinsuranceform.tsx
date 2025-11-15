@@ -13,7 +13,7 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
 
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4">
-          <h2 className="text-xl font-semibold text-gray-800">Cattle Insurance Form</h2>
+          <h2 className="text-xl font-semibold text-[#1CADA3]">Cattle Insurance Form</h2>
 
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
             <X size={22} />
@@ -171,8 +171,11 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
             </div>
 
             {/* Submit */}
-            <div className="col-span-2 mt-3">
-              <button className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition">
+            <div  className="col-span-2 mt-4 flex justify-center" >
+              <button
+                type="submit"
+                className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md w-50 hover:bg-[#16948d] transition"
+              >
                 Submit
               </button>
             </div>
