@@ -48,7 +48,7 @@ const ServicesSection = () => {
                 "Demat Account",
                 "Real Estate Investments",
                 "Portfolio Management Service",
-                "AIF",
+                "Alternative Investment Fund",
                 "Fixed Deposit",
                 "Bonds",
                 "Tax Consultancy",
