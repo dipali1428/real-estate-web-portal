@@ -1,7 +1,14 @@
 // components/ContactPage.jsx
+"use client";
+import { usePathname } from "next/navigation";
+import Header from "@/app/component/Header";
+import Footer from "@/app/component/Footer";
 import React from 'react';
 
 const ContactPage = () => {
+  const pathname = usePathname()
+  const isContactList = pathname?.startsWith("/page/contactlist") 
+
   const contacts = [
     {
       product: "Life Insurance",
@@ -66,6 +73,9 @@ const ContactPage = () => {
 //   };
 
   return (
+   <>
+   {!isContactList && <Header />}
+{
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -114,7 +124,6 @@ const ContactPage = () => {
                   </span>
                 </div>
               </div>
-
               {/* Action Buttons */}
               <div className="mt-6 flex space-x-3">
                 <button
@@ -155,6 +164,9 @@ const ContactPage = () => {
         </div>
       </div>
     </div>
+}
+ {!isContactList && <Footer />}
+    </>
   );
 };
 
