@@ -9,7 +9,7 @@ export type Contest = {
 export const successContests: Contest[] = [
   { 
     title: "Vietnam 2025", 
-    desc: "Vietnam Contest – Successfully Conquered! A journey of excellence, teamwork, and unforgettable memories. Congratulations to all achievers who made this milestone truly special! 🇻🇳 #InfinityArthvishva#VietnamConest2025#Succes", 
+    desc: "Vietnam Contest – Successfully Conquered! A journey of excellence, teamwork, and unforgettable memories. Congratulations to all achievers who made this milestone truly special! #InfinityArthvishva #VietnamConest2025 #Succes", 
     img: "/Vietnaam1.jpeg",
     images: [
       "/Vietnaam1.jpeg",

@@ -48,7 +48,7 @@ export default function DashboardSidebar() {
   },
   {
     label: "Client Portfolio",
-    href: "",
+    href: "/dashboard/clientPortfolio",
     icon: <Briefcase className="h-5 w-5 shrink-0 text-neutral-700" />,
   },
   {
