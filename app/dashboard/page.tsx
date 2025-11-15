@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { DashboardService } from "../services/dashboardService";
+import { useRouter } from "next/navigation";
 
 interface UserProfile {
     id: number;
@@ -18,12 +19,13 @@ interface UserProfile {
 export default function DashboardHome() {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     // ✅ Fetch profile data from API
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const token = localStorage.getItem("token");
+                const token = document.cookie.includes("authToken=");
                 if (!token) return;
                 setLoading(true);
 
@@ -36,6 +38,12 @@ export default function DashboardHome() {
             }
         };
         fetchProfile();
+    }, []);
+
+    // token check 
+    useEffect(() => {
+        const cookie = document.cookie.includes("authToken=");
+        if (!cookie) router.push("/");
     }, []);
 
     return (
@@ -119,3 +127,8 @@ export default function DashboardHome() {
         </div>
     );
 }
+
+
+
+
+

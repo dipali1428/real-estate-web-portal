@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useState, ReactNode } from "react";
-import Login from "../component/auth/Login"; // Adjust path accordingly
-import PartnershipPage from "../component/auth/BecomePartnerForm";
+import Login from "../auth/login/page"; // Adjust path accordingly
+import PartnershipPage from "../auth/register/page";
 import { X } from "lucide-react";
 
 const ModalContext = createContext({
