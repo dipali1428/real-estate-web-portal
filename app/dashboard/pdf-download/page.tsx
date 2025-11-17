@@ -1,220 +1,523 @@
-"use client"
-import React from 'react';
-import { FileText, BookOpen, FileCheck, ClipboardList, Scale, Download } from 'lucide-react';
+'use client';
+
+import { useState } from 'react';
 
 // Types
-interface Document {
-    id: string;
-    name: string;
-    fileName: string;
-    path: string;
+interface DownloadItem {
+  id: string;
+  name: string;
+  type: 'pdf' | 'doc' | 'xlsx';
+  size: string;
+  uploadDate: string;
+  category: 'payout' | 'brochures' | 'forms'; // Changed to match activeSection
+  month?: string;
+  year?: string;
 }
 
-interface DocumentSection {
-    id: string;
-    title: string;
-    icon: any;
-    documents: Document[];
-}
-
-// Mock Data - Update paths to match your public/documents folder structure
-const mockData: DocumentSection[] = [
+export default function Downloads() {
+  const [activeSection, setActiveSection] = useState<'payout' | 'brochures' | 'forms'>('payout');
+  const [selectedMonth, setSelectedMonth] = useState<string>('november-2025');
+  
+  // Sample data for downloads
+  const downloadData: DownloadItem[] = [
+    // Payout Structure Documents
     {
-        id: 'payout-structure',
-        title: 'Payout Structure',
-        icon: FileText,
-        documents: [
-            {
-                id: 'doc-1',
-                name: 'DSA Commission Structure - 2025.pdf',
-                fileName: 'DSA Commission Structure - 2025.pdf',
-                path: '/documents/DSA_Commission_Structure_2025.pdf'
-            }
-        ]
+      id: '1',
+      name: 'DSA Commission Structure - 2025.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025'
     },
     {
-        id: 'product-brochures',
-        title: 'Product Brochures',
-        icon: BookOpen,
-        documents: [
-            {
-                id: 'doc-2',
-                name: 'Life Insurance Product Catalog.pdf',
-                fileName: 'Life Insurance Product Catalog.pdf',
-                path: '/documents/Life_Insurance_Product_Catalog.pdf'
-            },
-            {
-                id: 'doc-3',
-                name: 'Comprehensive Health Insurance Guide.pdf',
-                fileName: 'Comprehensive Health Insurance Guide.pdf',
-                path: '/documents/Comprehensive_Health_Insurance_Guide.pdf'
-            },
-            {
-                id: 'doc-4',
-                name: 'Motor Insurance Brochure.pdf',
-                fileName: 'Motor Insurance Brochure.pdf',
-                path: '/documents/Motor_Insurance_Brochure.pdf'
-            }
-        ]
+      id: '2',
+      name: 'Home Loan Festive Flights Payout.pdf',
+      type: 'pdf',
+      size: '1.8 MB',
+      uploadDate: '2025-11-10',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025'
     },
     {
-        id: 'policy-documents',
-        title: 'Policy Documents',
-        icon: FileCheck,
-        documents: [
-            {
-                id: 'doc-5',
-                name: 'Sample Policy Wordings - Life.pdf',
-                fileName: 'Sample Policy Wordings - Life.pdf',
-                path: '/documents/Sample_Policy_Wordings_Life.pdf'
-            }
-        ]
+      id: '3',
+      name: 'Q4 Bonus Structure.xlsx',
+      type: 'xlsx',
+      size: '3.1 MB',
+      uploadDate: '2025-10-28',
+      category: 'payout',
+      month: 'october-2025',
+      year: '2025'
     },
     {
-        id: 'application-forms',
-        title: 'Application Forms',
-        icon: ClipboardList,
-        documents: [
-            {
-                id: 'doc-6',
-                name: 'New Business Application Form.pdf',
-                fileName: 'New Business Application Form.pdf',
-                path: '/documents/New_Business_Application_Form.pdf'
-            }
-        ]
+      id: '4',
+      name: 'September Commission Report.pdf',
+      type: 'pdf',
+      size: '2.1 MB',
+      uploadDate: '2025-09-30',
+      category: 'payout',
+      month: 'september-2025',
+      year: '2025'
+    },
+    
+    // Product Brochures
+    {
+      id: '5',
+      name: 'Life Insurance Product Catalog.pdf',
+      type: 'pdf',
+      size: '4.2 MB',
+      uploadDate: '2025-11-01',
+      category: 'brochures'
     },
     {
-        id: 'compliance-documents',
-        title: 'Compliance Documents',
-        icon: Scale,
-        documents: [
-            {
-                id: 'doc-7',
-                name: 'IRDAI Guidelines Summary.pdf',
-                fileName: 'IRDAI Guidelines Summary.pdf',
-                path: '/documents/IRDAI_Guidelines_Summary.pdf'
-            }
-        ]
+      id: '6',
+      name: 'Comprehensive Health Insurance Guide.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures'
+    },
+    {
+      id: '7',
+      name: 'Motor Insurance Brochure.pdf',
+      type: 'pdf',
+      size: '2.9 MB',
+      uploadDate: '2025-10-10',
+      category: 'brochures'
+    },
+    {
+      id: '8',
+      name: 'Term Life Insurance Overview.pdf',
+      type: 'pdf',
+      size: '3.2 MB',
+      uploadDate: '2025-09-20',
+      category: 'brochures'
+    },
+    
+    // Application Forms
+    {
+      id: '9',
+      name: 'New Client Application Form.pdf',
+      type: 'pdf',
+      size: '1.5 MB',
+      uploadDate: '2025-11-05',
+      category: 'forms'
+    },
+    {
+      id: '10',
+      name: 'Policy Renewal Form.docx',
+      type: 'doc',
+      size: '0.8 MB',
+      uploadDate: '2025-10-25',
+      category: 'forms'
+    },
+    {
+      id: '11',
+      name: 'Claim Intimation Form.pdf',
+      type: 'pdf',
+      size: '1.2 MB',
+      uploadDate: '2025-10-12',
+      category: 'forms'
     }
-];
+  ];
 
-const DownloadsPage = () => {
-    const handleDownload = (document: Document) => {
-        // Create a temporary anchor element to trigger download
-        const link = window.document.createElement('a');
-        link.href = document.path;
-        link.download = document.fileName;
-        link.click();
+  // Filter data based on active section and selected month
+  const filteredData = downloadData.filter(item => {
+    if (activeSection === 'payout') {
+      return item.category === 'payout' && item.month === selectedMonth;
+    }
+    return item.category === activeSection;
+  });
 
-        // Alternative: Open in new tab if download doesn't work
-        // window.open(document.path, '_blank');
-    };
+  // Generate months for dropdown (from November 2025 backwards)
+  const months = [
+    { value: 'november-2025', label: 'November 2025' },
+    { value: 'october-2025', label: 'October 2025' },
+    { value: 'september-2025', label: 'September 2025' },
+    { value: 'august-2025', label: 'August 2025' },
+    { value: 'july-2025', label: 'July 2025' },
+    { value: 'june-2025', label: 'June 2025' },
+  ];
 
-    const IconComponent = ({ icon: Icon }: { icon: any }) => (
-        <Icon className="w-6 h-6 text-teal-600" />
-    );
+  // File type icons
+  const getFileIcon = (type: string) => {
+    switch (type) {
+      case 'pdf':
+        return (
+          <div className="w-10 h-12 bg-red-500 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-xs">PDF</span>
+          </div>
+        );
+      case 'doc':
+        return (
+          <div className="w-10 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-xs">DOC</span>
+          </div>
+        );
+      case 'xlsx':
+        return (
+          <div className="w-10 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-xs">XLS</span>
+          </div>
+        );
+      default:
+        return (
+          <div className="w-10 h-12 bg-gray-500 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-xs">FILE</span>
+          </div>
+        );
+    }
+  };
 
-    return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-            <div className="max-w-5xl mx-auto">
-                {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-2xl md:text-3xl font-bold text-teal-700 mb-2">
-                        Downloads
-                    </h1>
-                    <p className="text-gray-600 text-sm md:text-base">
-                        A centralized repository for all documents essential for your business.
-                    </p>
+  // Handle file download
+  const handleDownload = (file: DownloadItem) => {
+    // In a real application, this would download the actual file
+    // For demo purposes, we'll create a mock download
+    const blob = new Blob(['Mock file content for ' + file.name], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Handle file upload
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // In a real application, you would upload the file to your server
+      alert(`File "${file.name}" uploaded successfully!`);
+      // Reset the input
+      event.target.value = '';
+    }
+  };
+
+  // Calculate stats for visualization
+  const payoutStats = {
+    totalFiles: downloadData.filter(item => item.category === 'payout').length,
+    totalSize: '15.2 MB',
+    recentUpload: '2 days ago'
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <div className="space-y-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+              Downloads
+            </h1>
+            <p className="text-slate-600 mt-2 text-lg">
+              A centralized repository for all documents essential for your business.
+            </p>
+          </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-2">
+          <div className="flex space-x-1">
+            <button
+              onClick={() => setActiveSection('payout')}
+              className={`flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 ${
+                activeSection === 'payout'
+                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <div className="flex items-center justify-center space-x-2">
+                <span>💰</span>
+                <span>Payout Structure</span>
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveSection('brochures')}
+              className={`flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 ${
+                activeSection === 'brochures'
+                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <div className="flex items-center justify-center space-x-2">
+                <span>📄</span>
+                <span>Product Brochures</span>
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveSection('forms')}
+              className={`flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 ${
+                activeSection === 'forms'
+                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <div className="flex items-center justify-center space-x-2">
+                <span>📋</span>
+                <span>Application Forms</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="space-y-6">
+          
+          {/* Payout Structure Section */}
+          {activeSection === 'payout' && (
+            <div className="space-y-6">
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-slate-600">Total Files</p>
+                      <p className="text-3xl font-bold text-slate-900 mt-2">{payoutStats.totalFiles}</p>
+                    </div>
+                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                      <span className="text-2xl">📊</span>
+                    </div>
+                  </div>
                 </div>
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-slate-600">Total Size</p>
+                      <p className="text-3xl font-bold text-slate-900 mt-2">{payoutStats.totalSize}</p>
+                    </div>
+                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                      <span className="text-2xl">💾</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-slate-600">Last Updated</p>
+                      <p className="text-3xl font-bold text-slate-900 mt-2">{payoutStats.recentUpload}</p>
+                    </div>
+                    <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                      <span className="text-2xl">🕒</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                {/* Document Sections */}
-                <div className="space-y-8">
-                    {mockData.map((section) => (
-                        <div key={section.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                            {/* Section Header */}
-                            <div className="bg-gradient-to-r from-teal-50 to-white px-6 py-4 border-b border-gray-200">
-                                <div className="flex items-center gap-3">
-                                    <IconComponent icon={section.icon} />
-                                    <h2 className="text-lg md:text-xl font-bold text-teal-700">
-                                        {section.title}
-                                    </h2>
-                                </div>
+              {/* Month Selector and Upload */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center space-x-4">
+                  <label className="text-sm font-medium text-slate-700">Select Month:</label>
+                  <select 
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                    className="px-4 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {months.map(month => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                {/* Upload Button */}
+                <label className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 cursor-pointer text-sm font-medium">
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  Upload Document
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx,.xlsx,.xls"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              {/* Files List */}
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6 border-b border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    Documents for {months.find(m => m.value === selectedMonth)?.label}
+                  </h3>
+                </div>
+                <div className="divide-y divide-slate-200">
+                  {filteredData.map((file) => (
+                    <div key={file.id} className="p-6 hover:bg-slate-50 transition-colors duration-150">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          {getFileIcon(file.type)}
+                          <div>
+                            <h4 className="text-sm font-medium text-slate-900">{file.name}</h4>
+                            <div className="flex items-center space-x-4 mt-1 text-xs text-slate-500">
+                              <span>{file.size}</span>
+                              <span>•</span>
+                              <span>Uploaded {file.uploadDate}</span>
                             </div>
-
-                            {/* Documents List */}
-                            <div className="divide-y divide-gray-100">
-                                {section.documents.map((document) => (
-                                    <div
-                                        key={document.id}
-                                        className="px-6 py-4 hover:bg-gray-50 transition-colors"
-                                    >
-                                        <div className="flex items-center justify-between gap-4">
-                                            {/* Document Info */}
-                                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                <div className="flex-shrink-0">
-                                                    <div className="w-10 h-10 bg-red-100 rounded flex items-center justify-center">
-                                                        <svg
-                                                            className="w-6 h-6 text-red-600"
-                                                            fill="currentColor"
-                                                            viewBox="0 0 20 20"
-                                                        >
-                                                            <path
-                                                                fillRule="evenodd"
-                                                                d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
-                                                                clipRule="evenodd"
-                                                            />
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <button
-                                                        onClick={() => handleDownload(document)}
-                                                        className="text-blue-600 hover:text-blue-800 hover:underline text-left text-sm md:text-base font-medium transition-colors truncate block w-full"
-                                                    >
-                                                        {document.name}
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Download Button */}
-                                            <button
-                                                onClick={() => handleDownload(document)}
-                                                className="flex-shrink-0 p-2 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors"
-                                                title="Download"
-                                            >
-                                                <Download className="w-5 h-5" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                          </div>
                         </div>
+                        <button
+                          onClick={() => handleDownload(file)}
+                          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <span>Download</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {filteredData.length === 0 && (
+                    <div className="p-12 text-center">
+                      <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="text-2xl">📁</span>
+                      </div>
+                      <h3 className="text-lg font-medium text-slate-900 mb-2">No documents found</h3>
+                      <p className="text-slate-600 text-sm">
+                        No payout documents available for {months.find(m => m.value === selectedMonth)?.label}.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Product Brochures Section */}
+          {activeSection === 'brochures' && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6 border-b border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-900">Product Brochures</h3>
+                  <p className="text-slate-600 text-sm mt-1">Marketing materials and product information</p>
+                </div>
+                <div className="divide-y divide-slate-200">
+                  {downloadData
+                    .filter(file => file.category === 'brochures')
+                    .map((file) => (
+                      <div key={file.id} className="p-6 hover:bg-slate-50 transition-colors duration-150">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            {getFileIcon(file.type)}
+                            <div>
+                              <h4 className="text-sm font-medium text-slate-900">{file.name}</h4>
+                              <div className="flex items-center space-x-4 mt-1 text-xs text-slate-500">
+                                <span>{file.size}</span>
+                                <span>•</span>
+                                <span>Uploaded {file.uploadDate}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleDownload(file)}
+                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>Download</span>
+                          </button>
+                        </div>
+                      </div>
                     ))}
                 </div>
-
-                {/* Info Note */}
-                <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-0.5">
-                            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-sm text-gray-700">
-                                <strong>Note:</strong> Make sure to place your PDF files in the <code className="bg-blue-100 px-1.5 py-0.5 rounded text-xs">public/documents/</code> folder of your Next.js project. Update the file paths in the code if you use a different folder structure.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Footer Note */}
-                <div className="mt-6 text-center text-sm text-gray-500">
-                    All documents are in PDF format. Click on the document name or download icon to save.
-                </div>
+              </div>
             </div>
-        </div>
-    );
-};
+          )}
 
-export default DownloadsPage;
+          {/* Application Forms Section */}
+          {activeSection === 'forms' && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6 border-b border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-900">Application Forms</h3>
+                  <p className="text-slate-600 text-sm mt-1">Forms for client onboarding and policy management</p>
+                </div>
+                <div className="divide-y divide-slate-200">
+                  {downloadData
+                    .filter(file => file.category === 'forms')
+                    .map((file) => (
+                      <div key={file.id} className="p-6 hover:bg-slate-50 transition-colors duration-150">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            {getFileIcon(file.type)}
+                            <div>
+                              <h4 className="text-sm font-medium text-slate-900">{file.name}</h4>
+                              <div className="flex items-center space-x-4 mt-1 text-xs text-slate-500">
+                                <span>{file.size}</span>
+                                <span>•</span>
+                                <span>Uploaded {file.uploadDate}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleDownload(file)}
+                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>Download</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <span className="text-2xl">📥</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900 mb-1">Easy Access</h3>
+                <p className="text-blue-800 text-sm">
+                  All your business documents in one place, organized and ready to download.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-green-50 rounded-xl p-6 border border-green-200">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <span className="text-2xl">🔄</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-green-900 mb-1">Always Updated</h3>
+                <p className="text-green-800 text-sm">
+                  Latest versions of all documents with regular updates and new additions.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                <span className="text-2xl">📱</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-purple-900 mb-1">Mobile Friendly</h3>
+                <p className="text-purple-800 text-sm">
+                  Access and download documents on the go from any device.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
