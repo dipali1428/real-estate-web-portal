@@ -19,7 +19,7 @@ export interface Lead {
   followUpActivity: string;
   nextFollowUpDate: string;
   notes: string;
-  priority: 'Hot' | 'Warm' | 'Cold';
+  priority: 'High' | 'Mid' | 'Low';
 }
 
 export interface Application {
@@ -573,7 +573,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Document Collection',
     nextFollowUpDate: '2024-01-20',
     notes: 'Interested in personal loan for education',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '2',
@@ -583,7 +583,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Initial Consultation',
     nextFollowUpDate: '2024-01-18',
     notes: 'Looking for home loan for new property',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '3',
@@ -593,7 +593,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Business Verification',
     nextFollowUpDate: '2024-01-22',
     notes: 'Business expansion loan required',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '4',
@@ -603,7 +603,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Property Evaluation',
     nextFollowUpDate: '2024-01-19',
     notes: 'Loan against property for business',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '9',
@@ -613,7 +613,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Initial Discussion',
     nextFollowUpDate: '2024-01-24',
     notes: 'Personal loan for medical expenses',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '10',
@@ -623,7 +623,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Document Verification',
     nextFollowUpDate: '2024-01-26',
     notes: 'Home loan for new construction',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '11',
@@ -633,7 +633,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Vehicle Selection',
     nextFollowUpDate: '2024-01-27',
     notes: 'Car loan for new SUV purchase',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '12',
@@ -643,7 +643,7 @@ export const leads: Lead[] = [
     followUpActivity: 'University Verification',
     nextFollowUpDate: '2024-01-28',
     notes: 'Education loan for Masters in US',
-    priority: 'Warm'
+    priority: 'Mid'
   },
 
   // Insurance Category Leads
@@ -655,7 +655,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Policy Issuance',
     nextFollowUpDate: '2024-01-25',
     notes: 'Life insurance policy completed',
-    priority: 'Cold'
+    priority: 'Low'
   },
   {
     id: '15',
@@ -665,7 +665,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Medical Checkup',
     nextFollowUpDate: '2024-01-29',
     notes: 'Family health insurance required',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '16',
@@ -675,7 +675,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Vehicle Inspection',
     nextFollowUpDate: '2024-01-30',
     notes: 'Car insurance renewal with better coverage',
-    priority: 'Warm'
+    priority: 'Mid'
   },
 
   // Investment Category Leads
@@ -687,7 +687,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Follow-up',
     nextFollowUpDate: '2024-02-01',
     notes: 'Client postponed investment decision',
-    priority: 'Cold'
+    priority: 'Low'
   },
   {
     id: '8',
@@ -697,7 +697,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Investment Planning',
     nextFollowUpDate: '2024-01-23',
     notes: 'Wealth management consultation',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '18',
@@ -707,7 +707,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Rate Discussion',
     nextFollowUpDate: '2024-02-02',
     notes: 'Fixed deposit for 3 years',
-    priority: 'Warm'
+    priority: 'Mid'
   },
 
   // Credit Category Leads
@@ -719,7 +719,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Credit Assessment',
     nextFollowUpDate: '2024-01-21',
     notes: 'Premium credit card application',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '21',
@@ -729,17 +729,17 @@ export const leads: Lead[] = [
     followUpActivity: 'Credit Limit Discussion',
     nextFollowUpDate: '2024-02-03',
     notes: 'Business credit line requirement',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '22',
-    clientId: '23',
+    clientId: '22',
     source: 'Tele-calling',
     status: 'New',
     followUpActivity: 'Initial Discussion',
     nextFollowUpDate: '2024-02-05',
     notes: 'Personal loan for wedding expenses',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '23',
@@ -749,7 +749,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Document Collection',
     nextFollowUpDate: '2024-02-06',
     notes: 'Debt consolidation loan required',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '24',
@@ -759,7 +759,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Property Verification',
     nextFollowUpDate: '2024-02-07',
     notes: 'Home loan for apartment purchase',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '25',
@@ -769,7 +769,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Initial Consultation',
     nextFollowUpDate: '2024-02-08',
     notes: 'Home construction loan inquiry',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '26',
@@ -779,7 +779,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Business Plan Review',
     nextFollowUpDate: '2024-02-09',
     notes: 'Business expansion funding',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '27',
@@ -789,7 +789,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Factory Visit',
     nextFollowUpDate: '2024-02-10',
     notes: 'SME loan for textile unit',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '28',
@@ -799,7 +799,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Property Assessment',
     nextFollowUpDate: '2024-02-11',
     notes: 'Loan against commercial property',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '29',
@@ -809,7 +809,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Project Evaluation',
     nextFollowUpDate: '2024-02-12',
     notes: 'Construction project financing',
-    priority: 'Hot'
+    priority: 'High'
   },
 
   // New leads for additional clients
@@ -821,7 +821,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Loan Transfer Discussion',
     nextFollowUpDate: '2024-02-15',
     notes: 'Balance transfer from other bank',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '31',
@@ -831,7 +831,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Rate Comparison',
     nextFollowUpDate: '2024-02-16',
     notes: 'Looking for better interest rates',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '32',
@@ -841,7 +841,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Document Verification',
     nextFollowUpDate: '2024-02-17',
     notes: 'Balance transfer for existing loan',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '33',
@@ -851,7 +851,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Vehicle Selection',
     nextFollowUpDate: '2024-02-18',
     notes: 'Commercial vehicle loan required',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '34',
@@ -861,7 +861,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Initial Discussion',
     nextFollowUpDate: '2024-02-19',
     notes: 'Two-wheeler loan application',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '35',
@@ -871,7 +871,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Vehicle Inspection',
     nextFollowUpDate: '2024-02-20',
     notes: 'Truck loan for transport business',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '36',
@@ -881,7 +881,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Capital Market Consultation',
     nextFollowUpDate: '2024-02-21',
     notes: 'Debt capital raising for expansion',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '37',
@@ -891,7 +891,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Financial Analysis',
     nextFollowUpDate: '2024-02-22',
     notes: 'Infrastructure project financing',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '38',
@@ -901,7 +901,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Travel Plan Discussion',
     nextFollowUpDate: '2024-02-23',
     notes: 'International travel insurance required',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '39',
@@ -911,7 +911,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Policy Customization',
     nextFollowUpDate: '2024-02-24',
     notes: 'Family travel insurance for Europe trip',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '40',
@@ -921,7 +921,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Travel Details Collection',
     nextFollowUpDate: '2024-02-25',
     notes: 'Business travel insurance',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '41',
@@ -931,7 +931,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Property Valuation',
     nextFollowUpDate: '2024-02-26',
     notes: 'Commercial property insurance',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '42',
@@ -941,7 +941,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Risk Assessment',
     nextFollowUpDate: '2024-02-27',
     notes: 'Shopping mall insurance',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '43',
@@ -951,7 +951,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Property Inspection',
     nextFollowUpDate: '2024-02-28',
     notes: 'Warehouse insurance coverage',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '44',
@@ -961,7 +961,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Livestock Assessment',
     nextFollowUpDate: '2024-03-01',
     notes: 'Cattle insurance for dairy farm',
-    priority: 'Warm'
+    priority: 'Mid'
   },
   {
     id: '45',
@@ -971,7 +971,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Livestock Count',
     nextFollowUpDate: '2024-03-02',
     notes: 'Large scale cattle insurance',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '46',
@@ -981,7 +981,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Cargo Details',
     nextFollowUpDate: '2024-03-03',
     notes: 'Marine insurance for shipping',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '47',
@@ -991,7 +991,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Export Documentation',
     nextFollowUpDate: '2024-03-04',
     notes: 'Marine insurance for exports',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '48',
@@ -1001,7 +1001,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Wealth Assessment',
     nextFollowUpDate: '2024-03-05',
     notes: 'High net worth portfolio management',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '49',
@@ -1011,7 +1011,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Family Office Setup',
     nextFollowUpDate: '2024-03-06',
     notes: 'Comprehensive wealth management',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '50',
@@ -1021,7 +1021,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Investment Strategy',
     nextFollowUpDate: '2024-03-07',
     notes: 'Business owner wealth management',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '51',
@@ -1031,7 +1031,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Portfolio Review',
     nextFollowUpDate: '2024-03-08',
     notes: 'Portfolio management services',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '52',
@@ -1041,7 +1041,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Fund Strategy Discussion',
     nextFollowUpDate: '2024-03-09',
     notes: 'Alternative investment fund',
-    priority: 'Hot'
+    priority: 'High'
   },
   {
     id: '53',
@@ -1051,7 +1051,7 @@ export const leads: Lead[] = [
     followUpActivity: 'Trust Setup',
     nextFollowUpDate: '2024-03-10',
     notes: 'Investment trust management',
-    priority: 'Hot'
+    priority: 'High'
   }
 ];
 
@@ -1140,6 +1140,11 @@ export const applications: Application[] = [
   },
   {
     clientId: '21',
+    status: 'Under Processing',
+    lastUpdated: '2024-01-25'
+  },
+  {
+    clientId: '22',
     status: 'Under Processing',
     lastUpdated: '2024-01-25'
   },
@@ -1429,6 +1434,13 @@ export const documents: Document[] = [
   },
   {
     clientId: '21',
+    type: 'Business Proof',
+    name: 'business_registration.pdf',
+    uploadedDate: '2024-01-25',
+    status: 'Uploaded'
+  },
+  {
+    clientId: '22',
     type: 'Business Proof',
     name: 'business_registration.pdf',
     uploadedDate: '2024-01-25',
@@ -1770,6 +1782,13 @@ export const commissions: Commission[] = [
   },
   {
     clientId: '21',
+    expectedPayout: 10000,
+    approvedPayout: 8000,
+    paidCommission: 0,
+    pendingCommission: 8000
+  },
+  {
+    clientId: '22',
     expectedPayout: 10000,
     approvedPayout: 8000,
     paidCommission: 0,

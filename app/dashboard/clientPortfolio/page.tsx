@@ -127,11 +127,11 @@ const ClientPortfolio: React.FC = () => {
                 return 'bg-red-100 text-red-800';
             case 'Document Pending':
                 return 'bg-orange-100 text-orange-800';
-            case 'Hot':
+            case 'High':
                 return 'bg-red-100 text-red-800';
-            case 'Warm':
+            case 'Mid':
                 return 'bg-yellow-100 text-yellow-800';
-            case 'Cold':
+            case 'Low':
                 return 'bg-blue-100 text-[#2076C7]';
             default:
                 return 'bg-gray-100 text-gray-800';
@@ -201,7 +201,7 @@ const ClientPortfolio: React.FC = () => {
                 {/* Quick Stats */}
                 <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-white">{filteredClients.length}</div>
+                        <div className="text-2xl font-bold text-yellow">{filteredClients.length}</div>
                         <div className="text-sm text-white">Total Clients</div>
                     </div>
                     <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
