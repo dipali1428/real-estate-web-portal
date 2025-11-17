@@ -11,7 +11,7 @@ import {
 // Define categories and subcategories
 export const categories = {
     'All': ['All'],
-    'Loan': ['Personal Loan', 'Home Loan', 'Business Loan', 'LAP', 'Car Loan', 'Education Loan', 'Mortgage Loan', 'SME Loan','Balance transfer Loan', 'Vehicle Loan','loan against securities / MF', 'Debt Capital Market (DCM)'],
+    'Loan': ['Personal Loan', 'Home Loan', 'Business Loan', 'Car Loan', 'Education Loan', 'Mortgage Loan', 'SME Loan','Balance Transfer Loan', 'Vehicle Loan','Loan Against Securities', 'Debt Capital Market (DCM)'],
     'Insurance': ['Life Insurance', 'Health Insurance', 'Motor Insurance', 'Travel Insurance','Property Insurance','Cattle Insurance','Marine Insurance'],
     'Investment': ['Mutual Funds', 'Stocks', 'Fixed Deposits', 'Bonds', 'Real Estate','Wealth Management','PMS / AIF']
 };
@@ -37,14 +37,13 @@ const ClientPortfolio: React.FC = () => {
         'Personal Loan': 'Loan',
         'Home Loan': 'Loan',
         'Business Loan': 'Loan',
-        'LAP': 'Loan',
         'Car Loan': 'Loan',
         'Education Loan': 'Loan',
         'Mortgage Loan' : 'Loan',
         'SME Loan': 'Loan',
-        'Balance transfer Loan': 'Loan',
+        'Balance Transfer Loan': 'Loan',
         'Vehicle Loan': 'Loan',
-        'loan against securities / MF': 'Loan',
+        'Loan Against Securities': 'Loan',
         'Debt Capital Market (DCM)': 'Loan',
         'Insurance': 'Insurance',
         'Life Insurance': 'Insurance',
@@ -64,7 +63,6 @@ const ClientPortfolio: React.FC = () => {
         'Wealth Management': 'Investment',
         'PMS / AIF': 'Investment',
         'Credit Line': 'Credit',
-        'Loan Against Securities': 'Credit'
     };
 
     // Filter data based on selected category and subcategory
@@ -163,14 +161,14 @@ const ClientPortfolio: React.FC = () => {
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">My Client Portfolio</h1>
-                    <p className="text-gray-600 mt-2">Centralized management of all clients, leads, and applications</p>
+                    <h1 className="text-3xl font-bold text-gray-600">My Client Portfolio</h1>
+                    <p className="text-gray-500 mt-2">Centralized management of all clients, leads, and applications</p>
                 </div>
 
                 {/* Category and Subcategory Filters */}
                 <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-600 mb-2">
                             Category
                         </label>
                         <select
@@ -185,8 +183,8 @@ const ClientPortfolio: React.FC = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Subcategory
+                        <label className="block text-sm font-medium text-gray-600 mb-2">
+                            Product
                         </label>
                         <select
                             value={selectedSubcategory}
@@ -202,32 +200,32 @@ const ClientPortfolio: React.FC = () => {
 
                 {/* Quick Stats */}
                 <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-[#2076C7]">{filteredClients.length}</div>
-                        <div className="text-sm text-gray-600">Total Clients</div>
+                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-white">{filteredClients.length}</div>
+                        <div className="text-sm text-white">Total Clients</div>
                     </div>
-                    <div className="bg-white rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-[#1CADA3]">{filteredLeads.length}</div>
-                        <div className="text-sm text-gray-600">Active Leads</div>
+                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-white">{filteredLeads.length}</div>
+                        <div className="text-sm text-white">Active Leads</div>
                     </div>
-                    <div className="bg-white rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-[#FF6B6B]">
+                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-white">
                             ₹{filteredCommissions.reduce((sum, comm) => sum + comm.pendingCommission, 0).toLocaleString()}
                         </div>
-                        <div className="text-sm text-gray-600">Pending Commission</div>
+                        <div className="text-sm text-white">Pending Commission</div>
                     </div>
-                    <div className="bg-white rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-[#4ECDC4]">
+                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-white]">
                             ₹{filteredCommissions.reduce((sum, comm) => sum + comm.paidCommission, 0).toLocaleString()}
                         </div>
-                        <div className="text-sm text-gray-600">Paid Commission</div>
+                        <div className="text-sm text-white">Paid Commission</div>
                     </div>
                 </div>
 
                 {/* Product Distribution */}
                 {selectedCategory !== 'All' && (
                     <div className="mb-6 bg-white rounded-lg p-4 shadow border">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Product Distribution</h3>
+                        <h3 className="text-lg font-semibold text-gray-700 mb-3">Product Distribution</h3>
                         <div className="flex flex-wrap gap-2">
                             {Object.entries(productDistribution).map(([product, count]) => (
                                 <div key={product} className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full">
@@ -271,7 +269,7 @@ const ClientPortfolio: React.FC = () => {
                     {/* Client Details */}
                     {activeTab === 'clients' && (
                         <div className="p-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4">All Client Details</h2>
+                            <h2 className="text-xl font-semibold text-gray-700 mb-4">All Client Details</h2>
                             {filteredClients.length === 0 ? (
                                 <div className="text-center py-8">
                                     <p className="text-gray-500">No clients found for the selected category filter.</p>
@@ -279,21 +277,21 @@ const ClientPortfolio: React.FC = () => {
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
+                                        <thead className="bg-[#1CADA3]">
                                             <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Client
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Contact
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Product
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Category
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     RM
                                                 </th>
                                             </tr>
@@ -424,21 +422,21 @@ const ClientPortfolio: React.FC = () => {
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
+                                        <thead className="bg-[#1CADA3]">
                                             <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Client
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Document Type
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     File Name
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Status
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Upload Date
                                                 </th>
                                             </tr>
