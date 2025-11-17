@@ -26,139 +26,139 @@ import { motion } from "motion/react";
 import { useRouter, usePathname } from "next/navigation";
 
 export default function DashboardSidebar() {
-    const router = useRouter();
-    const pathname = usePathname();
-    const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
-    const links = [
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: <LayoutDashboard className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-  {
-    label: "Profile",
-    href: "/dashboard/profile",
-    icon: <User className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-  {
-    label: "Lead Management",
-    href: "/dashboard/leadmanagement",
-    icon: <UserCheck className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-  {
-    label: "Client Portfolio",
-    href: "/dashboard/clientPortfolio",
-    icon: <Briefcase className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-  {
-    label: "Incentives & Payouts",
-    href: "",
-    icon: <HandCoins className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-  {
-    label: "Marketing Campaigns",
-    href: "",
-    icon: <Megaphone className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-  {
-    label: "Downloads",
-    href: "",
-    icon: <Download className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-  {
-    label: "Relationship Manager",
-    href: "",
-    icon: <Users className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-  {
-    label: "Compliance Corner",
-    href: "",
-    icon: <ShieldCheck className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-  {
-    label: "Help & Support",
-    href: "",
-    icon: <HelpCircle className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-  {
-    label: "Reports",
-    href: "/dashboard/reports",
-    icon: <BarChart3 className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-  {
-    label: "Settings",
-    href: "/dashboard/settings",
-    icon: <Settings className="h-5 w-5 shrink-0 text-neutral-700" />,
-  },
-];
+  const links = [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <LayoutDashboard className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+    {
+      label: "Profile",
+      href: "/dashboard/profile",
+      icon: <User className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+    {
+      label: "Lead Management",
+      href: "/dashboard/leadmanagement",
+      icon: <UserCheck className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+    {
+      label: "Client Portfolio",
+      href: "/dashboard/clientPortfolio",
+      icon: <Briefcase className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+    {
+      label: "Incentives & Payouts",
+      href: "/dashboard/incentives",
+      icon: <HandCoins className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+    {
+      label: "Marketing Campaigns",
+      href: "/dashboard/marketing",
+      icon: <Megaphone className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+    {
+      label: "Downloads",
+      href: "/dashboard/pdf-download",
+      icon: <Download className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+    {
+      label: "Relationship Manager",
+      href: "",
+      icon: <Users className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+    {
+      label: "Compliance Corner",
+      href: "",
+      icon: <ShieldCheck className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+    {
+      label: "Help & Support",
+      href: "",
+      icon: <HelpCircle className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+    {
+      label: "Reports",
+      href: "/dashboard/reports",
+      icon: <BarChart3 className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+    {
+      label: "Settings",
+      href: "/dashboard/settings",
+      icon: <Settings className="h-5 w-5 shrink-0 text-neutral-700" />,
+    },
+  ];
 
-    return (
-        <div className={cn("flex h-full flex-col border-r border-neutral-200 dark:border-neutral-700")}>
-            <Sidebar open={open} setOpen={setOpen} animate={false}>
-                <SidebarBody className="justify-between gap-10">
-                    {/* Logo Section */}
-                    <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto bg-gray-100">
-                        <Logo />
+  return (
+    <div className={cn("flex h-full flex-col border-r border-neutral-200 dark:border-neutral-700")}>
+      <Sidebar open={open} setOpen={setOpen} animate={false}>
+        <SidebarBody className="justify-between gap-10">
+          {/* Logo Section */}
+          <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto bg-gray-100">
+            <Logo />
 
-                        <div className="mt-8 flex flex-col gap-1">
-                            {links.map((link, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => router.push(link.href)}
-                                    className={cn(
-                                        "flex items-center gap-2 px-3 py-2 rounded-md transition-all text-left",
-                                        pathname === link.href
-                                            ? "bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white"
-                                            : "hover:bg-[#60b2ff9c] text-gray-700"
-                                    )}>
-                                    {link.icon}
-                                    <motion.span
-                                        animate={{
-                                            opacity: open ? 1 : 1,
-                                            display: "inline-block",
-                                        }}
-                                        className="text-sm">
-                                        {link.label}
-                                    </motion.span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
+            <div className="mt-8 flex flex-col gap-1">
+              {links.map((link, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => router.push(link.href)}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-md transition-all text-left",
+                    pathname === link.href
+                      ? "bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white"
+                      : "hover:bg-[#60b2ff9c] text-gray-700"
+                  )}>
+                  {link.icon}
+                  <motion.span
+                    animate={{
+                      opacity: open ? 1 : 1,
+                      display: "inline-block",
+                    }}
+                    className="text-sm">
+                    {link.label}
+                  </motion.span>
+                </button>
+              ))}
+            </div>
+          </div>
 
-                    {/* Footer Section */}
-                    <div>
-                        <SidebarLink
-                            link={{
-                                label: "Logout",
-                                href: "/",
-                                icon: <LogOut className="h-5 w-5 text-neutral-800" />,
-                            }}
-                            className="text-red-600"
-                        />
-                    </div>
-                </SidebarBody>
-            </Sidebar>
-        </div>
-    );
+          {/* Footer Section */}
+          <div>
+            <SidebarLink
+              link={{
+                label: "Logout",
+                href: "/",
+                icon: <LogOut className="h-5 w-5 text-neutral-800" />,
+              }}
+              className="text-red-600"
+            />
+          </div>
+        </SidebarBody>
+      </Sidebar>
+    </div>
+  );
 }
 
 export const Logo = () => {
-    return (
-        // <a
-        //     href="/logo.png"
-        //     className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal">
-        //     <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-[#1CADA3]" />
-        //     <motion.span
-        //         initial={{ opacity: 0 }}
-        //         animate={{ opacity: 1 }}
-        //         className="font-medium text-[#2076C7]">
-        //     </motion.span>
-        // </a>
-        <img
-            src="/logo.png" // <-- replace with your actual logo file name
-            alt="Infinity Arthviksha Logo"
-            className="h-17 w-auto object-contain"
-          />
-    );
+  return (
+    // <a
+    //     href="/logo.png"
+    //     className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal">
+    //     <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-[#1CADA3]" />
+    //     <motion.span
+    //         initial={{ opacity: 0 }}
+    //         animate={{ opacity: 1 }}
+    //         className="font-medium text-[#2076C7]">
+    //     </motion.span>
+    // </a>
+    <img
+      src="/logo.png" // <-- replace with your actual logo file name
+      alt="Infinity Arthviksha Logo"
+      className="h-17 w-auto object-contain"
+    />
+  );
 };
