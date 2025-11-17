@@ -68,7 +68,7 @@ export default function DashboardSidebar() {
     },
     {
       label: "Relationship Manager",
-      href: "",
+      href: "/dashboard/relationshipManager",
       icon: <Users className="h-5 w-5 shrink-0 text-neutral-700" />,
     },
     {
