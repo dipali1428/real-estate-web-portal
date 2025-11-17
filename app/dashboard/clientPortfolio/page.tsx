@@ -16,6 +16,74 @@ export const categories = {
     'Investment': ['Mutual Funds', 'Stocks', 'Fixed Deposits', 'Bonds', 'Real Estate', 'Wealth Management', 'PMS / AIF']
 };
 
+// Utility functions for initials and colors
+const generateInitials = (name: string): string => {
+    if (!name) return '?';
+    
+    // Remove extra spaces and split into words
+    const words = name.trim().split(/\s+/);
+    
+    if (words.length === 0) return '?';
+    
+    if (words.length === 1) {
+        // Single word - take first 2 characters
+        return words[0].substring(0, 2).toUpperCase();
+    }
+    
+    // Multiple words - take first character of first two words
+    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+};
+
+const generateColorFromName = (name: string): string => {
+    const colors = [
+        'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500',
+        'bg-red-500', 'bg-yellow-500', 'bg-indigo-500', 'bg-teal-500',
+        'bg-orange-500', 'bg-cyan-500', 'bg-blue-600', 'bg-green-600',
+        'bg-purple-600', 'bg-pink-600', 'bg-red-600'
+    ];
+    
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
+};
+
+// Avatar Component
+interface ClientAvatarProps {
+    name: string;
+    size?: 'sm' | 'md' | 'lg';
+    className?: string;
+}
+
+const ClientAvatar: React.FC<ClientAvatarProps> = ({ 
+    name, 
+    size = 'md',
+    className = ''
+}) => {
+    const initials = generateInitials(name);
+    const colorClass = generateColorFromName(name);
+    
+    const sizeClasses = {
+        sm: 'w-8 h-8 text-xs',
+        md: 'w-10 h-10 text-sm',
+        lg: 'w-12 h-12 text-base'
+    };
+
+    return (
+        <div className={`
+            ${sizeClasses[size]} 
+            ${colorClass}
+            rounded-full flex items-center justify-center text-white font-semibold
+            shadow-sm ${className}
+        `}>
+            {initials}
+        </div>
+    );
+};
+
 const ClientPortfolio: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'clients' | 'leads' | 'applications' | 'documents' | 'earnings'>('clients');
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -127,11 +195,11 @@ const ClientPortfolio: React.FC = () => {
                 return 'bg-red-100 text-red-800';
             case 'Document Pending':
                 return 'bg-orange-100 text-orange-800';
-            case 'High':
+            case 'Hot':
                 return 'bg-red-100 text-red-800';
-            case 'Mid':
+            case 'Warm':
                 return 'bg-yellow-100 text-yellow-800';
-            case 'Low':
+            case 'Cold':
                 return 'bg-blue-100 text-[#2076C7]';
             default:
                 return 'bg-gray-100 text-gray-800';
@@ -201,7 +269,7 @@ const ClientPortfolio: React.FC = () => {
                 {/* Quick Stats */}
                 <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-yellow">{filteredClients.length}</div>
+                        <div className="text-2xl font-bold text-white">{filteredClients.length}</div>
                         <div className="text-sm text-white">Total Clients</div>
                     </div>
                     <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
@@ -215,7 +283,7 @@ const ClientPortfolio: React.FC = () => {
                         <div className="text-sm text-white">Pending Commission</div>
                     </div>
                     <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-white]">
+                        <div className="text-2xl font-bold text-white">
                             ₹{filteredCommissions.reduce((sum, comm) => sum + comm.paidCommission, 0).toLocaleString('en-IN')}
                         </div>
                         <div className="text-sm text-white">Paid Commission</div>
@@ -300,8 +368,13 @@ const ClientPortfolio: React.FC = () => {
                                             {filteredClients.map(client => (
                                                 <tr key={client.id} className="hover:bg-gray-50">
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm font-medium text-gray-900">{client.name}</div>
-                                                        <div className="text-sm text-gray-500">{client.address}</div>
+                                                        <div className="flex items-center">
+                                                            <ClientAvatar name={client.name} size="sm" />
+                                                            <div className="ml-3">
+                                                                <div className="text-sm font-medium text-gray-900">{client.name}</div>
+                                                                <div className="text-sm text-gray-500">{client.address}</div>
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-900">{client.mobile}</div>
@@ -342,9 +415,12 @@ const ClientPortfolio: React.FC = () => {
                                         return (
                                             <div key={lead.id} className="border border-gray-200 rounded-lg p-4">
                                                 <div className="flex justify-between items-start">
-                                                    <div>
-                                                        <h3 className="text-lg font-medium text-gray-900">{client?.name}</h3>
-                                                        <p className="text-gray-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
+                                                    <div className="flex items-start space-x-3">
+                                                        <ClientAvatar name={client?.name || ''} size="md" />
+                                                        <div>
+                                                            <h3 className="text-lg font-medium text-gray-900">{client?.name}</h3>
+                                                            <p className="text-gray-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
+                                                        </div>
                                                     </div>
                                                     <div className="flex space-x-2">
                                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead.priority)}`}>
@@ -392,9 +468,12 @@ const ClientPortfolio: React.FC = () => {
                                         return (
                                             <div key={app.clientId} className="border border-gray-200 rounded-lg p-4">
                                                 <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <h3 className="text-lg font-medium text-gray-900">{client?.name}</h3>
-                                                        <p className="text-gray-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
+                                                    <div className="flex items-center space-x-3">
+                                                        <ClientAvatar name={client?.name || ''} size="sm" />
+                                                        <div>
+                                                            <h3 className="text-lg font-medium text-gray-900">{client?.name}</h3>
+                                                            <p className="text-gray-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
+                                                        </div>
                                                     </div>
                                                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(app.status)}`}>
                                                         {app.status}
@@ -446,8 +525,13 @@ const ClientPortfolio: React.FC = () => {
                                                 const client = clients.find(c => c.id === doc.clientId);
                                                 return (
                                                     <tr key={`${doc.clientId}-${doc.type}-${index}`}>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                            {client?.name}
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="flex items-center">
+                                                                <ClientAvatar name={client?.name || ''} size="sm" />
+                                                                <div className="ml-3 text-sm font-medium text-gray-900">
+                                                                    {client?.name}
+                                                                </div>
+                                                            </div>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                             {doc.type}
@@ -488,9 +572,12 @@ const ClientPortfolio: React.FC = () => {
                                         return (
                                             <div key={commission.clientId} className="border border-gray-200 rounded-lg p-4">
                                                 <div className="flex justify-between items-start mb-4">
-                                                    <div>
-                                                        <h3 className="text-lg font-medium text-gray-900">{client?.name}</h3>
-                                                        <p className="text-gray-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
+                                                    <div className="flex items-center space-x-3">
+                                                        <ClientAvatar name={client?.name || ''} size="md" />
+                                                        <div>
+                                                            <h3 className="text-lg font-medium text-gray-900">{client?.name}</h3>
+                                                            <p className="text-gray-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
