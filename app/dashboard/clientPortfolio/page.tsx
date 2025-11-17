@@ -6,7 +6,7 @@ import {
     applications,
     documents,
     commissions
-} from '../../data/clientData';
+} from '../data/clientData';
 
 // Define categories and subcategories
 export const categories = {
