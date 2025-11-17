@@ -25,7 +25,7 @@ export default function DashboardHome() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const token = document.cookie.includes("authToken=");
+                const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
                 if (!token) return;
                 setLoading(true);
 

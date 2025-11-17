@@ -23,10 +23,10 @@ export default function ProfileSection() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const token = localStorage.getItem("token");
+                const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
                 if (!token) return;
                 setLoading(true);
-                const response = await DashboardService.getProfile(); // ⬅️ You'll add this method below
+                const response = await DashboardService.getProfile();
                 setProfile(response.user);
             } catch (err: any) {
                 console.error("Error fetching profile:", err);
