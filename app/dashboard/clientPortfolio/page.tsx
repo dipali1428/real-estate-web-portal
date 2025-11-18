@@ -202,7 +202,7 @@ const ClientPortfolio: React.FC = () => {
             case 'Cold':
                 return 'bg-blue-100 text-[#2076C7]';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-slate-100 text-slate-800';
         }
     };
 
@@ -225,24 +225,24 @@ const ClientPortfolio: React.FC = () => {
     }, [filteredClients]);
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen bg-slate-50 p-6">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-600">My Client Portfolio</h1>
-                    <p className="text-gray-500 mt-2">Centralized management of all clients, leads, and applications</p>
+                    <h1 className="text-3xl font-bold text-slate-700">My Client Portfolio</h1>
+                    <p className="text-slate-500 mt-2">Centralized management of all clients, leads, and applications</p>
                 </div>
 
                 {/* Category and Subcategory Filters */}
                 <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
                             Category
                         </label>
                         <select
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2076C7] focus:border-[#2076C7] text-gray-600"
+                            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2076C7] focus:border-[#2076C7] text-slate-600"
                         >
                             {Object.keys(categories).map(category => (
                                 <option key={category} value={category}>{category}</option>
@@ -251,13 +251,13 @@ const ClientPortfolio: React.FC = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
                             Product
                         </label>
                         <select
                             value={selectedSubcategory}
                             onChange={(e) => setSelectedSubcategory(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2076C7] focus:border-[#2076C7] text-gray-600"
+                            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2076C7] focus:border-[#2076C7] text-slate-600"
                         >
                             {availableSubcategories.map(subcategory => (
                                 <option key={subcategory} value={subcategory}>{subcategory}</option>
@@ -268,32 +268,32 @@ const ClientPortfolio: React.FC = () => {
 
                 {/* Quick Stats */}
                 <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-white">{filteredClients.length}</div>
-                        <div className="text-sm text-white">Total Clients</div>
+                    <div className="bg-white rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-slate-700">{filteredClients.length}</div>
+                        <div className="text-sm text-emerald-600">Total Clients</div>
                     </div>
-                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-white">{filteredLeads.length}</div>
-                        <div className="text-sm text-white">Active Leads</div>
+                    <div className="bg-white rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-slate-700">{filteredLeads.length}</div>
+                        <div className="text-sm text-blue-600">Active Leads</div>
                     </div>
-                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-white">
+                    <div className="bg-white rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-slate-700">
                             ₹{filteredCommissions.reduce((sum, comm) => sum + comm.pendingCommission, 0).toLocaleString('en-IN')}
                         </div>
-                        <div className="text-sm text-white">Pending Commission</div>
+                        <div className="text-sm text-slate-600">Pending Commission</div>
                     </div>
-                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-white">
+                    <div className="bg-white rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-slate-700">
                             ₹{filteredCommissions.reduce((sum, comm) => sum + comm.paidCommission, 0).toLocaleString('en-IN')}
                         </div>
-                        <div className="text-sm text-white">Paid Commission</div>
+                        <div className="text-sm text-green-600">Paid Commission</div>
                     </div>
                 </div>
 
                 {/* Product Distribution */}
                 {selectedCategory !== 'All' && (
                     <div className="mb-6 bg-white rounded-lg p-4 shadow border">
-                        <h3 className="text-lg font-semibold text-gray-700 mb-3">Product Distribution</h3>
+                        <h3 className="text-lg font-semibold text-slate-700 mb-3">Product Distribution</h3>
                         <div className="flex flex-wrap gap-2">
                             {Object.entries(productDistribution).map(([product, count]) => (
                                 <div key={product} className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full">
@@ -320,11 +320,11 @@ const ClientPortfolio: React.FC = () => {
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
                                     ? 'border-[#2076C7] text-[#2076C7]'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
                                     }`}
                             >
                                 {tab.name}
-                                <span className="ml-2 bg-gray-200 text-gray-700 py-0.5 px-2 rounded-full text-xs">
+                                <span className="ml-2 bg-slate-200 text-slate-700 py-0.5 px-2 rounded-full text-xs">
                                     {tabCounts[tab.id]}
                                 </span>
                             </button>
@@ -337,14 +337,14 @@ const ClientPortfolio: React.FC = () => {
                     {/* Client Details */}
                     {activeTab === 'clients' && (
                         <div className="p-6">
-                            <h2 className="text-xl font-semibold text-gray-700 mb-4">All Client Details</h2>
+                            <h2 className="text-xl font-semibold text-slate-700 mb-4">All Client Details</h2>
                             {filteredClients.length === 0 ? (
                                 <div className="text-center py-8">
-                                    <p className="text-gray-500">No clients found for the selected category filter.</p>
+                                    <p className="text-slate-500">No clients found for the selected category filter.</p>
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
+                                    <table className="min-w-full divide-y divide-slate-200">
                                         <thead className="bg-[#1CADA3]">
                                             <tr>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
@@ -364,31 +364,31 @@ const ClientPortfolio: React.FC = () => {
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
+                                        <tbody className="bg-white divide-y divide-slate-200">
                                             {filteredClients.map(client => (
-                                                <tr key={client.id} className="hover:bg-gray-50">
+                                                <tr key={client.id} className="hover:bg-slate-50">
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center">
                                                             <ClientAvatar name={client.name} size="sm" />
                                                             <div className="ml-3">
-                                                                <div className="text-sm font-medium text-gray-900">{client.name}</div>
-                                                                <div className="text-sm text-gray-500">{client.address}</div>
+                                                                <div className="text-sm font-medium text-slate-900">{client.name}</div>
+                                                                <div className="text-sm text-slate-500">{client.address}</div>
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-900">{client.mobile}</div>
-                                                        <div className="text-sm text-gray-500">{client.email}</div>
+                                                        <div className="text-sm text-slate-900">{client.mobile}</div>
+                                                        <div className="text-sm text-slate-500">{client.email}</div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-[#2076C7]">
                                                             {client.product}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                                                         {productCategoryMap[client.product] || 'Other'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                                                         {client.relationshipManager || 'Not Assigned'}
                                                     </td>
                                                 </tr>
@@ -403,23 +403,23 @@ const ClientPortfolio: React.FC = () => {
                     {/* Lead Management */}
                     {activeTab === 'leads' && (
                         <div className="p-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4">Lead Details</h2>
+                            <h2 className="text-xl font-semibold text-slate-900 mb-4">Lead Details</h2>
                             {filteredLeads.length === 0 ? (
                                 <div className="text-center py-8">
-                                    <p className="text-gray-500">No leads found for the selected category filter.</p>
+                                    <p className="text-slate-500">No leads found for the selected category filter.</p>
                                 </div>
                             ) : (
                                 <div className="grid gap-4">
                                     {filteredLeads.map(lead => {
                                         const client = clients.find(c => c.id === lead.clientId);
                                         return (
-                                            <div key={lead.id} className="border border-gray-200 rounded-lg p-4">
+                                            <div key={lead.id} className="border border-slate-200 rounded-lg p-4">
                                                 <div className="flex justify-between items-start">
                                                     <div className="flex items-start space-x-3">
                                                         <ClientAvatar name={client?.name || ''} size="md" />
                                                         <div>
-                                                            <h3 className="text-lg font-medium text-gray-900">{client?.name}</h3>
-                                                            <p className="text-gray-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
+                                                            <h3 className="text-lg font-medium text-slate-900">{client?.name}</h3>
+                                                            <p className="text-slate-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex space-x-2">
@@ -431,7 +431,7 @@ const ClientPortfolio: React.FC = () => {
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                                                <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-slate-600">
                                                     <div>
                                                         <span className="font-medium">Source:</span> {lead.source}
                                                     </div>
@@ -442,7 +442,7 @@ const ClientPortfolio: React.FC = () => {
                                                         <span className="font-medium">Activity:</span> {lead.followUpActivity}
                                                     </div>
                                                 </div>
-                                                <div className="mt-2 text-sm text-gray-600">
+                                                <div className="mt-2 text-sm text-slate-600">
                                                     <span className="font-medium">Notes:</span> {lead.notes}
                                                 </div>
                                             </div>
@@ -456,30 +456,30 @@ const ClientPortfolio: React.FC = () => {
                     {/* Application Status */}
                     {activeTab === 'applications' && (
                         <div className="p-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4">Application Status Tracking</h2>
+                            <h2 className="text-xl font-semibold text-slate-900 mb-4">Application Status Tracking</h2>
                             {filteredApplications.length === 0 ? (
                                 <div className="text-center py-8">
-                                    <p className="text-gray-500">No applications found for the selected category filter.</p>
+                                    <p className="text-slate-500">No applications found for the selected category filter.</p>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
                                     {filteredApplications.map(app => {
                                         const client = clients.find(c => c.id === app.clientId);
                                         return (
-                                            <div key={app.clientId} className="border border-gray-200 rounded-lg p-4">
+                                            <div key={app.clientId} className="border border-slate-200 rounded-lg p-4">
                                                 <div className="flex justify-between items-center">
                                                     <div className="flex items-center space-x-3">
                                                         <ClientAvatar name={client?.name || ''} size="sm" />
                                                         <div>
-                                                            <h3 className="text-lg font-medium text-gray-900">{client?.name}</h3>
-                                                            <p className="text-gray-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
+                                                            <h3 className="text-lg font-medium text-slate-900">{client?.name}</h3>
+                                                            <p className="text-slate-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
                                                         </div>
                                                     </div>
                                                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(app.status)}`}>
                                                         {app.status}
                                                     </span>
                                                 </div>
-                                                <div className="mt-3 text-sm text-gray-600">
+                                                <div className="mt-3 text-sm text-slate-600">
                                                     Last Updated: {app.lastUpdated}
                                                 </div>
                                             </div>
@@ -493,14 +493,14 @@ const ClientPortfolio: React.FC = () => {
                     {/* Documents */}
                     {activeTab === 'documents' && (
                         <div className="p-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4">Uploaded Document Records</h2>
+                            <h2 className="text-xl font-semibold text-slate-900 mb-4">Uploaded Document Records</h2>
                             {filteredDocuments.length === 0 ? (
                                 <div className="text-center py-8">
-                                    <p className="text-gray-500">No documents found for the selected category filter.</p>
+                                    <p className="text-slate-500">No documents found for the selected category filter.</p>
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
+                                    <table className="min-w-full divide-y divide-slate-200">
                                         <thead className="bg-[#1CADA3]">
                                             <tr>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
@@ -520,7 +520,7 @@ const ClientPortfolio: React.FC = () => {
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
+                                        <tbody className="bg-white divide-y divide-slate-200">
                                             {filteredDocuments.map((doc, index) => {
                                                 const client = clients.find(c => c.id === doc.clientId);
                                                 return (
@@ -528,15 +528,15 @@ const ClientPortfolio: React.FC = () => {
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <div className="flex items-center">
                                                                 <ClientAvatar name={client?.name || ''} size="sm" />
-                                                                <div className="ml-3 text-sm font-medium text-gray-900">
+                                                                <div className="ml-3 text-sm font-medium text-slate-900">
                                                                     {client?.name}
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                                                             {doc.type}
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                                                             {doc.name}
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap">
@@ -544,7 +544,7 @@ const ClientPortfolio: React.FC = () => {
                                                                 {doc.status}
                                                             </span>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                                                             {doc.uploadedDate}
                                                         </td>
                                                     </tr>
@@ -560,42 +560,42 @@ const ClientPortfolio: React.FC = () => {
                     {/* Earnings */}
                     {activeTab === 'earnings' && (
                         <div className="p-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4">Earnings & Commission Mapping</h2>
+                            <h2 className="text-xl font-semibold text-slate-900 mb-4">Earnings & Commission Mapping</h2>
                             {filteredCommissions.length === 0 ? (
                                 <div className="text-center py-8">
-                                    <p className="text-gray-500">No commission records found for the selected category filter.</p>
+                                    <p className="text-slate-500">No commission records found for the selected category filter.</p>
                                 </div>
                             ) : (
                                 <div className="grid gap-4">
                                     {filteredCommissions.map(commission => {
                                         const client = clients.find(c => c.id === commission.clientId);
                                         return (
-                                            <div key={commission.clientId} className="border border-gray-200 rounded-lg p-4">
+                                            <div key={commission.clientId} className="border border-slate-200 rounded-lg p-4">
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div className="flex items-center space-x-3">
                                                         <ClientAvatar name={client?.name || ''} size="md" />
                                                         <div>
-                                                            <h3 className="text-lg font-medium text-gray-900">{client?.name}</h3>
-                                                            <p className="text-gray-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
+                                                            <h3 className="text-lg font-medium text-slate-900">{client?.name}</h3>
+                                                            <p className="text-slate-600">{client?.product} • {productCategoryMap[client?.product || '']}</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                                     <div className="text-center">
                                                         <div className="text-2xl font-bold text-[#2076C7]">₹{commission.expectedPayout.toLocaleString()}</div>
-                                                        <div className="text-sm text-gray-500">Expected Payout</div>
+                                                        <div className="text-sm text-slate-500">Expected Payout</div>
                                                     </div>
                                                     <div className="text-center">
                                                         <div className="text-2xl font-bold text-[#1CADA3]">₹{commission.approvedPayout.toLocaleString()}</div>
-                                                        <div className="text-sm text-gray-500">Approved Payout</div>
+                                                        <div className="text-sm text-slate-500">Approved Payout</div>
                                                     </div>
                                                     <div className="text-center">
                                                         <div className="text-2xl font-bold text-[#2076C7]">₹{commission.paidCommission.toLocaleString()}</div>
-                                                        <div className="text-sm text-gray-500">Paid Commission</div>
+                                                        <div className="text-sm text-slate-500">Paid Commission</div>
                                                     </div>
                                                     <div className="text-center">
                                                         <div className="text-2xl font-bold text-[#1CADA3]">₹{commission.pendingCommission.toLocaleString()}</div>
-                                                        <div className="text-sm text-gray-500">Pending Commission</div>
+                                                        <div className="text-sm text-slate-500">Pending Commission</div>
                                                     </div>
                                                 </div>
                                             </div>
