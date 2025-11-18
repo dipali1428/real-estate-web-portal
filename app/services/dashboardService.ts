@@ -7,4 +7,16 @@ export const DashboardService = {
         const response = await api.get("/api/auth/profile");
         return response.data;
     },
+
+    // 🔹 Edit profile (update email, mobile, head, category, password)
+    editProfile: async (payload: {
+        email: string;
+        mobile: string;
+        head: string;
+        category: string;
+        password: string;
+    }) => {
+        const response = await api.put("/api/auth/profile", payload);
+        return response.data;
+    },
 };
