@@ -35,7 +35,7 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
             "Pan Card",
             "3 Months Salary Slip",
             "Form 16",
-            "3 Months Banking Statement",
+            "6 Months Banking Statement",
             "Address Proof",
             "Photograph",
             "Existing Loan Statement",

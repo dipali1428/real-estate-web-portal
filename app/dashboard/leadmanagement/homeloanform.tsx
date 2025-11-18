@@ -20,7 +20,7 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
         <form className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 text-">
           <Select
             label="Type of Home Loan"
-            options={["Salaried", "Self Employed", "Balance Transfer (BT)"]}
+            options={["Balance Transfer", "Fresh Home Loan", "Home Equity Loan", "Top-up Loan", "Plot  Loan", "Construction Loan"]}
             value={loanType}
             onChange={setLoanType}
           />
@@ -40,7 +40,7 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
             "Pan Card",
             "3 Months Salary Slip",
             "Form 16",
-            "3 Months Banking Statement",
+            "6 Months Banking Statement",
             "Address Proof",
             "Photograph",
             "Existing Loan Statement",

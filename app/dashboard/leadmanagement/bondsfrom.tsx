@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
-export default function PMSAIFForm({
+export default function BondsForm({
   onClose,
 }: {
   onClose: () => void;
@@ -14,7 +14,7 @@ export default function PMSAIFForm({
 
         {/* HEADER */}
         <div className="flex justify-between items-center px-5 py-3 border-b">
-          <h2 className="text-xl font-semibold text-[#1CADA3] ">PMS / AIF Form</h2>
+          <h2 className="text-xl font-semibold text-[#1CADA3] ">Bonds Form</h2>
           <button onClick={onClose} className="text-gray-700 hover:text-black">
             <X size={22} />
           </button>
@@ -44,9 +44,21 @@ export default function PMSAIFForm({
               <input type="text" className="input border p-2 rounded" placeholder="Enter location" />
             </div>
              <div className="flex flex-col ">
-              <label className="font-medium mb-1"> Pincode</label>
-              <input type="text" className="input border p-2 rounded"placeholder="Enter pincode" />
+              <label className="font-medium mb-1"> Lumsum Deposit Amount</label>
+              <input type="text" className="input border p-2 rounded"placeholder="Enter Lumsum Deposit Amount" />
             </div>
+            <div className="flex flex-col ">
+              <label className="font-medium mb-1"> Total Monthly Income</label>
+              <input type="text" className="input border p-2 rounded"placeholder="Enter Total Monthly Income" />
+            </div>
+            <div>
+              <label className="block font-medium mb-1">Safety Type</label>
+              <select className="w-full border border-gray-300 rounded-md px-3 py-2">
+                <option>Corporate Bonds</option>
+                <option>Sovereign Gold Bonds</option>
+              </select>
+            </div>
+
             {/* Checkbox */}
             <div className="md:col-span-2 mt-2">
               <label className="flex items-center gap-2">
