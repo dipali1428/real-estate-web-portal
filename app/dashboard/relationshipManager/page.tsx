@@ -109,7 +109,7 @@ const RelationshipManager: React.FC = () => {
       'Commission Structure': 'bg-amber-100 text-amber-800'
     };
 
-    return serviceColors[service] || 'bg-slate-100 text-slate-800';
+    return serviceColors[service] || 'bg-gray-100 text-gray-800';
   };
 
   const getTypeStyles = (type: string) => {
@@ -118,29 +118,29 @@ const RelationshipManager: React.FC = () => {
       investment: 'bg-green-100 text-green-800 border-green-200',
       insurance: 'bg-blue-100 text-blue-800 border-blue-200',
     };
-    return styles[type as keyof typeof styles] || 'bg-slate-100 text-slate-800 border-slate-200';
+    return styles[type as keyof typeof styles] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-700">My Relationship Manager</h1>
-          <p className="text-slate-600 mt-2">
+          <h1 className="text-3xl font-bold text-gray-700">My Relationship Manager</h1>
+          <p className="text-gray-600 mt-2">
             Your dedicated partner for business growth and client management
           </p>
         </div>
 
         {/* Tabs */}
         <div className="mb-6">
-          <div className="border-b border-slate-200">
+          <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
               <button
                 onClick={() => setActiveTab('profile')}
                 className={`py-3 px-1 border-b-2 font-medium text-sm ${activeTab === 'profile'
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
                 RM Profile
@@ -149,7 +149,7 @@ const RelationshipManager: React.FC = () => {
                 onClick={() => setActiveTab('appointments')}
                 className={`py-3 px-1 border-b-2 font-medium text-sm ${activeTab === 'appointments'
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
                 My Appointments ({appointments.filter(a => a.status === 'scheduled').length})
@@ -162,40 +162,40 @@ const RelationshipManager: React.FC = () => {
           <div className="gap-6">
             {/* RM Profile Card */}
             <div className="lg:col-span-2">
-              <div className="bg-[#ffffff] rounded-lg shadow-md border border-slate-200">
-                <div className="p-6">
+              <div className="bg-[#1CADA3] rounded-lg shadow-md border border-gray-200">
+                <div className="p-8">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-6">
                     <div>
-                      <h2 className="text-2xl font-bold text-slate-700">{relationshipManager.name}</h2>
-                      <p className="text-slate-700 text-lg">{relationshipManager.position}</p>
+                      <h2 className="text-2xl font-bold text-white">{relationshipManager.name}</h2>
+                      <p className="text-white text-lg">{relationshipManager.position}</p>
                     </div>
                     <div className="flex items-center">
                       <div
                         className={`w-3 h-3 rounded-full mr-2 ${relationshipManager.isAvailable ? 'bg-green-400' : 'bg-red-500'
                           }`}
                       ></div>
-                      <span className="text-sm text-slate-700 mt-1">
+                      <span className="text-sm text-white mt-1">
                         {relationshipManager.isAvailable ? 'Available Now' : 'Currently Busy'}
                       </span>
                     </div>
                   </div>
 
                   {/* Contact Info */}
-                  <div className="bg-slate-50 rounded-lg p-4">
-                    <h3 className="font-semibold text-slate-600 mb-3">Contact Information</h3>
+                  <div className="bg-white rounded-lg p-4">
+                    <h3 className="font-semibold text-gray-600 mb-3">Contact Information</h3>
                     <div className="space-y-3">
-                      <div className="flex items-center text-slate-600">
-                        <svg className="w-5 h-5 mr-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex items-center text-gray-600">
+                        <svg className="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                         {relationshipManager.email}
                       </div>
                       <button
                         onClick={() => handlePhoneCall(relationshipManager.phone)}
-                        className="flex items-center text-slate-600 hover:text-blue-600 transition-colors duration-200 w-full text-left"
+                        className="flex items-center text-gray-600 hover:text-blue-600 transition-colors duration-200 w-full text-left"
                       >
-                        <svg className="w-5 h-5 mr-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
                         <span className="hover:underline">{relationshipManager.phone}</span>
@@ -206,9 +206,9 @@ const RelationshipManager: React.FC = () => {
                   {/* Quick Actions Sidebar */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-6">
                     {/* Support Hours */}
-                    <div className="bg-white rounded-lg shadow-md border border-slate-200 p-6">
-                      <h3 className="font-semibold text-slate-600 mb-3">Support Hours</h3>
-                      <div className="space-y-2 text-sm text-slate-600">
+                    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                      <h3 className="font-semibold text-gray-600 mb-3">Support Hours</h3>
+                      <div className="space-y-2 text-sm text-gray-600">
                         <div className="flex justify-between">
                           <span>Monday - Friday</span>
                           <span className="font-medium">9:00 AM - 6:00 PM</span>
@@ -224,8 +224,8 @@ const RelationshipManager: React.FC = () => {
                       </div>
                     </div>
                     {/* Quick Actions */}
-                    <div className="bg-white rounded-lg shadow-md border border-slate-200 p-6">
-                      <h3 className="font-semibold text-slate-700 mb-4">Quick Actions</h3>
+                    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                      <h3 className="font-semibold text-gray-700 mb-4">Quick Actions</h3>
                       <div className="space-y-3">
                         <button
                           onClick={handleScheduleMeeting}
@@ -238,7 +238,7 @@ const RelationshipManager: React.FC = () => {
                         </button>
                         <button
                           onClick={handleSendMessage}
-                          className="w-full border border-slate-300 text-slate-700 py-3 px-4 rounded-lg bg-slate-50 hover:bg-[#00e4d5] transition-colors duration-200 font-medium flex items-center justify-center"
+                          className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg bg-gray-50 hover:bg-[#00e4d5] transition-colors duration-200 font-medium flex items-center justify-center"
                         >
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
@@ -255,12 +255,12 @@ const RelationshipManager: React.FC = () => {
         )}
 
         {activeTab === 'appointments' && (
-          <div className="bg-white rounded-lg shadow-md border border-slate-200">
-            <div className="px-6 py-4 border-b bg-[#1CADA3] border-slate-200 flex justify-between items-center">
+          <div className="bg-white rounded-lg shadow-md border border-gray-200">
+            <div className="px-6 py-4 border-b bg-[#1CADA3] border-gray-200 flex justify-between items-center">
               <h3 className="text-lg font-medium text-white">My Appointments</h3>
               <button
                 onClick={handleScheduleNewAppointment}
-                className="bg-white text-slate-700 py-2 px-4 rounded-lg hover:bg-slate-100 transition-colors duration-200 font-medium flex items-center"
+                className="bg-white text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-medium flex items-center"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -272,11 +272,11 @@ const RelationshipManager: React.FC = () => {
             <div className="p-6">
               {appointments.length === 0 ? (
                 <div className="text-center py-12">
-                  <svg className="w-16 h-16 mx-auto text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <p className="mt-4 text-slate-500 text-lg">No upcoming appointments</p>
-                  <p className="text-slate-400 text-sm mt-2">Schedule a meeting with your Relationship Manager</p>
+                  <p className="mt-4 text-gray-500 text-lg">No upcoming appointments</p>
+                  <p className="text-gray-400 text-sm mt-2">Schedule a meeting with your Relationship Manager</p>
                   <button
                     onClick={handleScheduleNewAppointment}
                     className="mt-6 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
@@ -289,7 +289,7 @@ const RelationshipManager: React.FC = () => {
                   {appointments.map((appointment) => (
                     <div
                       key={appointment.id}
-                      className="flex items-center justify-between p-6 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-200"
+                      className="flex items-center justify-between p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200"
                     >
                       <div className="flex items-center space-x-4">
                         <div className={`p-3 rounded-lg ${getTypeStyles(appointment.type)}`}>
@@ -298,8 +298,8 @@ const RelationshipManager: React.FC = () => {
                           </svg>
                         </div>
                         <div>
-                          <h4 className="font-semibold text-slate-700">{appointment.clientName}</h4>
-                          <p className="text-sm text-slate-600">
+                          <h4 className="font-semibold text-gray-700">{appointment.clientName}</h4>
+                          <p className="text-sm text-gray-600">
                             {new Date(appointment.date).toLocaleDateString()} at {appointment.time}
                           </p>
                           <div className="flex items-center space-x-2 mt-1">
@@ -312,7 +312,7 @@ const RelationshipManager: React.FC = () => {
                               className={`px-2 py-1 text-xs rounded-full ${appointment.status === 'scheduled'
                                   ? 'bg-green-100 text-green-800'
                                   : appointment.status === 'completed'
-                                    ? 'bg-slate-100 text-slate-800'
+                                    ? 'bg-gray-100 text-gray-800'
                                     : 'bg-red-100 text-red-800'
                                 }`}
                             >

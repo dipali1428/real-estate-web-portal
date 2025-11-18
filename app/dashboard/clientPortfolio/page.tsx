@@ -268,25 +268,25 @@ const ClientPortfolio: React.FC = () => {
 
                 {/* Quick Stats */}
                 <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-slate-700">{filteredClients.length}</div>
-                        <div className="text-sm text-emerald-600">Total Clients</div>
+                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-white">{filteredClients.length}</div>
+                        <div className="text-sm text-white">Total Clients</div>
                     </div>
-                    <div className="bg-white rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-slate-700">{filteredLeads.length}</div>
-                        <div className="text-sm text-blue-600">Active Leads</div>
+                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-white">{filteredLeads.length}</div>
+                        <div className="text-sm text-white">Active Leads</div>
                     </div>
-                    <div className="bg-white rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-slate-700">
+                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-white">
                             ₹{filteredCommissions.reduce((sum, comm) => sum + comm.pendingCommission, 0).toLocaleString('en-IN')}
                         </div>
-                        <div className="text-sm text-slate-600">Pending Commission</div>
+                        <div className="text-sm text-white">Pending Commission</div>
                     </div>
-                    <div className="bg-white rounded-lg p-4 shadow border">
-                        <div className="text-2xl font-bold text-slate-700">
+                    <div className="bg-[#2076C7] rounded-lg p-4 shadow border">
+                        <div className="text-2xl font-bold text-white">
                             ₹{filteredCommissions.reduce((sum, comm) => sum + comm.paidCommission, 0).toLocaleString('en-IN')}
                         </div>
-                        <div className="text-sm text-green-600">Paid Commission</div>
+                        <div className="text-sm text-white">Paid Commission</div>
                     </div>
                 </div>
 

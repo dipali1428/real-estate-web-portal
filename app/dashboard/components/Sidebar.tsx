@@ -73,7 +73,7 @@ export default function DashboardSidebar() {
     },
     {
       label: "Compliance Corner",
-      href: "",
+      href: "/dashboard/complianceCorner",
       icon: <ShieldCheck className="h-5 w-5 shrink-0 text-neutral-700" />,
     },
     {
