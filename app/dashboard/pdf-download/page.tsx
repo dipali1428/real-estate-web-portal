@@ -9,136 +9,261 @@ interface DownloadItem {
   type: 'pdf' | 'doc' | 'xlsx';
   size: string;
   uploadDate: string;
-  category: 'payout' | 'brochures' | 'forms'; // Changed to match activeSection
+  category: 'payout' | 'brochures' | 'forms';
   month?: string;
   year?: string;
+  subCategory?: 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan';
+  filePath?: string;
 }
 
 export default function Downloads() {
   const [activeSection, setActiveSection] = useState<'payout' | 'brochures' | 'forms'>('payout');
   const [selectedMonth, setSelectedMonth] = useState<string>('november-2025');
-  
-  // Sample data for downloads
+  const [selectedCategory, setSelectedCategory] = useState<'insurance' | 'loan'>('insurance');
+  const [selectedSubCategory, setSelectedSubCategory] = useState<'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan'>('motor-insurance');
+  const [isInsuranceOpen, setIsInsuranceOpen] = useState(false);
+  const [isLoanOpen, setIsLoanOpen] = useState(false);
+
+  // Sample data for downloads with actual file paths
   const downloadData: DownloadItem[] = [
-    // Payout Structure Documents
     {
       id: '1',
-      name: 'DSA Commission Structure - 2025.pdf',
+      name: 'Motor Insurance IA Payout OCT with logo.pdf',
       type: 'pdf',
       size: '2.4 MB',
       uploadDate: '2025-11-15',
       category: 'payout',
       month: 'november-2025',
-      year: '2025'
+      year: '2025',
+      subCategory: 'motor-insurance',
+      filePath: '/pdfs/motorinsurancepdf/Motor Insurance IA Payout OCT with logo.pdf'
     },
+    
+    // Insurance - Life Insurance
     {
       id: '2',
-      name: 'Home Loan Festive Flights Payout.pdf',
+      name: 'ABSLI FESTIVE FLIGHTS CONTEST.pdf',
       type: 'pdf',
-      size: '1.8 MB',
-      uploadDate: '2025-11-10',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
       category: 'payout',
       month: 'november-2025',
-      year: '2025'
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/ABSLI FESTIVE FLIGHTS CONTEST.pdf'
     },
     {
       id: '3',
-      name: 'Q4 Bonus Structure.xlsx',
-      type: 'xlsx',
-      size: '3.1 MB',
-      uploadDate: '2025-10-28',
+      name: 'AXIS MAX FESTIVE FLIGHTS CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
       category: 'payout',
-      month: 'october-2025',
-      year: '2025'
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/AXIS MAX FESTIVE FLIGHTS CONTEST.pdf'
     },
     {
       id: '4',
-      name: 'September Commission Report.pdf',
+      name: 'BAJAJ LIFE FESTIVE FLIGHTS CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/BAJAJ LIFE FESTIVE FLIGHTS CONTEST.pdf'
+    },
+    {
+      id: '5',
+      name: 'DIGIT LIFE FESTIVE FLIGHTS CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/DIGIT LIFE FESTIVE FLIGHTS CONTEST.pdf'
+    },
+    {
+      id: '6',
+      name: 'HDFC LIFE -GRID FESTIVE FLIGHTS CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/HDFC LIFE -GRID FESTIVE FLIGHTS CONTEST.pdf'
+    },
+    {
+      id: '7',
+      name: 'ICICI PRUDENTIAL FESTIVE FLIGHTS CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/ICICI PRUDENTIAL FESTIVE FLIGHTS CONTEST.pdf'
+    },
+    {
+      id: '8',
+      name: 'TATA AIA FESTIVE FLIGHTS CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/TATA AIA FESTIVE FLIGHTS CONTEST.pdf'
+    },
+    
+    // Insurance - Health Insurance
+    {
+      id: '9',
+      name: 'HEALTH FINAL PAYOUT FESTIVE FLIGHTS 2025.pdf',
+      type: 'pdf',
+      size: '2.8 MB',
+      uploadDate: '2025-11-01',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/healthinsurancepdf/HEALTH FINAL PAYOUT FESTIVE FLIGHTS 2025.pdf'
+    },
+
+    // Loan - Home Loan
+    {
+      id: '10',
+      name: 'IA Festive Flights Home Loan Payout.pdf',
+      type: 'pdf',
+      size: '2.2 MB',
+      uploadDate: '2025-11-05',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'home-loan',
+      filePath: '/pdfs/loans/IA Festive Flights Home Loan Payout.pdf'
+    },
+    {
+      id: '11',
+      name: 'Home Loan Payout Rates 2025.xlsx',
+      type: 'xlsx',
+      size: '1.7 MB',
+      uploadDate: '2025-10-25',
+      category: 'payout',
+      month: 'october-2025',
+      year: '2025',
+      subCategory: 'home-loan',
+      filePath: '/pdfs/homeloanpdf/Home Loan Payout Rates 2025.xlsx'
+    },
+
+    // Loan - Business Loan
+    {
+      id: '12',
+      name: 'IA Festive Flights Business Loan Payout.pdf',
+      type: 'pdf',
+      size: '2.5 MB',
+      uploadDate: '2025-11-05',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'business-loan',
+      filePath: '/pdfs/loans/IA Festive Flights Business Loan Payout.pdf'
+    },
+
+    // Loan - LAP Loan
+    {
+      id: '13',
+      name: 'IA Festive Flights LAP Loan Payout.pdf',
+      type: 'pdf',
+      size: '2.3 MB',
+      uploadDate: '2025-11-05',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'lap-loan',
+      filePath: '/pdfs/loans/IA Festive Flights LAP Loan Payout.pdf'
+    },
+
+    // Loan - Personal Loan
+    {
+      id: '14',
+      name: 'IA Festive Flights Personal Loan Payout.pdf',
       type: 'pdf',
       size: '2.1 MB',
-      uploadDate: '2025-09-30',
+      uploadDate: '2025-11-05',
       category: 'payout',
-      month: 'september-2025',
-      year: '2025'
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'personal-loan',
+      filePath: '/pdfs/loans/IA Festive Flights Personal Loan Payout.pdf'
     },
     
     // Product Brochures
     {
-      id: '5',
+      id: '15',
       name: 'Life Insurance Product Catalog.pdf',
       type: 'pdf',
       size: '4.2 MB',
       uploadDate: '2025-11-01',
-      category: 'brochures'
+      category: 'brochures',
+      filePath: '/pdfs/brochures/Life Insurance Product Catalog.pdf'
     },
     {
-      id: '6',
+      id: '16',
       name: 'Comprehensive Health Insurance Guide.pdf',
       type: 'pdf',
       size: '3.8 MB',
       uploadDate: '2025-10-15',
-      category: 'brochures'
-    },
-    {
-      id: '7',
-      name: 'Motor Insurance Brochure.pdf',
-      type: 'pdf',
-      size: '2.9 MB',
-      uploadDate: '2025-10-10',
-      category: 'brochures'
-    },
-    {
-      id: '8',
-      name: 'Term Life Insurance Overview.pdf',
-      type: 'pdf',
-      size: '3.2 MB',
-      uploadDate: '2025-09-20',
-      category: 'brochures'
+      category: 'brochures',
+      filePath: '/pdfs/brochures/Comprehensive Health Insurance Guide.pdf'
     },
     
     // Application Forms
     {
-      id: '9',
+      id: '17',
       name: 'New Client Application Form.pdf',
       type: 'pdf',
       size: '1.5 MB',
       uploadDate: '2025-11-05',
-      category: 'forms'
+      category: 'forms',
+      filePath: '/pdfs/forms/New Client Application Form.pdf'
     },
     {
-      id: '10',
+      id: '18',
       name: 'Policy Renewal Form.docx',
       type: 'doc',
       size: '0.8 MB',
       uploadDate: '2025-10-25',
-      category: 'forms'
-    },
-    {
-      id: '11',
-      name: 'Claim Intimation Form.pdf',
-      type: 'pdf',
-      size: '1.2 MB',
-      uploadDate: '2025-10-12',
-      category: 'forms'
+      category: 'forms',
+      filePath: '/pdfs/forms/Policy Renewal Form.docx'
     }
   ];
 
   // Filter data based on active section and selected month
   const filteredData = downloadData.filter(item => {
     if (activeSection === 'payout') {
-      return item.category === 'payout' && item.month === selectedMonth;
+      return item.category === 'payout' && 
+             item.month === selectedMonth && 
+             item.subCategory === selectedSubCategory;
     }
     return item.category === activeSection;
   });
 
-  // Generate months for dropdown (from November 2025 backwards)
+  // Generate months for dropdown
   const months = [
     { value: 'november-2025', label: 'November 2025' },
     { value: 'october-2025', label: 'October 2025' },
     { value: 'september-2025', label: 'September 2025' },
     { value: 'august-2025', label: 'August 2025' },
-    { value: 'july-2025', label: 'July 2025' },
-    { value: 'june-2025', label: 'June 2025' },
   ];
 
   // File type icons
@@ -171,35 +296,66 @@ export default function Downloads() {
     }
   };
 
-  // Handle file download
-  const handleDownload = (file: DownloadItem) => {
-    // In a real application, this would download the actual file
-    // For demo purposes, we'll create a mock download
-    const blob = new Blob(['Mock file content for ' + file.name], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = file.name;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  // Handle actual file download
+  const handleDownload = async (file: DownloadItem) => {
+    try {
+      if (!file.filePath) {
+        alert('File path not available');
+        return;
+      }
+
+      // Create a temporary link for download
+      const link = document.createElement('a');
+      link.href = file.filePath;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Error downloading file. Please try again.');
+    }
   };
 
-  // Handle file upload
+  // Handle file upload (for admin functionality)
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // In a real application, you would upload the file to your server
+      // In a real application, you would upload to your server
+      // For demo, we'll just show a success message
       alert(`File "${file.name}" uploaded successfully!`);
-      // Reset the input
       event.target.value = '';
     }
   };
 
+  // Handle insurance dropdown toggle
+  const handleInsuranceToggle = () => {
+    setIsInsuranceOpen(!isInsuranceOpen);
+    setIsLoanOpen(false);
+  };
+
+  // Handle loan dropdown toggle
+  const handleLoanToggle = () => {
+    setIsLoanOpen(!isLoanOpen);
+    setIsInsuranceOpen(false);
+  };
+
+  // Handle subcategory selection
+  const handleSubCategorySelect = (subCategory: 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan') => {
+    setSelectedSubCategory(subCategory);
+    if (subCategory === 'home-loan' || subCategory === 'business-loan' || subCategory === 'lap-loan' || subCategory === 'personal-loan') {
+      setSelectedCategory('loan');
+    } else {
+      setSelectedCategory('insurance');
+    }
+    setIsInsuranceOpen(false);
+    setIsLoanOpen(false);
+  };
+
   // Calculate stats for visualization
   const payoutStats = {
-    totalFiles: downloadData.filter(item => item.category === 'payout').length,
+    totalFiles: downloadData.filter(item => item.category === 'payout' && item.subCategory === selectedSubCategory).length,
     totalSize: '15.2 MB',
     recentUpload: '2 days ago'
   };
@@ -211,7 +367,7 @@ export default function Downloads() {
         {/* Header */}
         <div className="space-y-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-3xl font-bold text-slate-700 tracking-tight">
               Downloads
             </h1>
             <p className="text-slate-600 mt-2 text-lg">
@@ -231,7 +387,7 @@ export default function Downloads() {
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center font-semibold  justify-center space-x-2">
                 <span>💰</span>
                 <span>Payout Structure</span>
               </div>
@@ -244,7 +400,7 @@ export default function Downloads() {
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center font-semibold  justify-center space-x-2">
                 <span>📄</span>
                 <span>Product Brochures</span>
               </div>
@@ -257,7 +413,7 @@ export default function Downloads() {
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center font-semibold justify-center space-x-2">
                 <span>📋</span>
                 <span>Application Forms</span>
               </div>
@@ -277,29 +433,19 @@ export default function Downloads() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-slate-600">Total Files</p>
-                      <p className="text-3xl font-bold text-slate-900 mt-2">{payoutStats.totalFiles}</p>
+                      <p className="text-3xl font-bold text-slate-700 mt-2">{payoutStats.totalFiles}</p>
                     </div>
                     <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                       <span className="text-2xl">📊</span>
                     </div>
                   </div>
                 </div>
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">Total Size</p>
-                      <p className="text-3xl font-bold text-slate-900 mt-2">{payoutStats.totalSize}</p>
-                    </div>
-                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                      <span className="text-2xl">💾</span>
-                    </div>
-                  </div>
-                </div>
+                
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-slate-600">Last Updated</p>
-                      <p className="text-3xl font-bold text-slate-900 mt-2">{payoutStats.recentUpload}</p>
+                      <p className="text-3xl font-bold text-slate-700 mt-2">{payoutStats.recentUpload}</p>
                     </div>
                     <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
                       <span className="text-2xl">🕒</span>
@@ -326,7 +472,7 @@ export default function Downloads() {
                 </div>
                 
                 {/* Upload Button */}
-                <label className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 cursor-pointer text-sm font-medium">
+                <label className="inline-flex items-center px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3] transition-colors duration-200 cursor-pointer text-sm font-medium">
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
@@ -340,11 +486,169 @@ export default function Downloads() {
                 </label>
               </div>
 
+              {/* Category Navigation Bar */}
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-1">
+                <div className="flex space-x-1">
+                  {/* Insurance Dropdown */}
+                  <div className="relative flex-1">
+                    <button
+                      onClick={handleInsuranceToggle}
+                      className={`w-full py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-between ${
+                        selectedCategory === 'insurance'
+                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span>🛡️</span>
+                        <span>Insurance</span>
+                      </div>
+                      <svg 
+                        className={`w-4 h-4 transform transition-transform duration-200 ${
+                          isInsuranceOpen ? 'rotate-180' : ''
+                        }`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {/* Insurance Dropdown Menu */}
+                    {isInsuranceOpen && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
+                        <button
+                          onClick={() => handleSubCategorySelect('motor-insurance')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            selectedSubCategory === 'motor-insurance' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>🚗</span>
+                          <span>Motor Insurance</span>
+                        </button>
+                        <button
+                          onClick={() => handleSubCategorySelect('life-insurance')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            selectedSubCategory === 'life-insurance' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>👨‍👩‍👧‍👦</span>
+                          <span>Life Insurance</span>
+                        </button>
+                        <button
+                          onClick={() => handleSubCategorySelect('health-insurance')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            selectedSubCategory === 'health-insurance' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>🏥</span>
+                          <span>Health Insurance</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Loan Dropdown */}
+                  <div className="relative flex-1">
+                    <button
+                      onClick={handleLoanToggle}
+                      className={`w-full py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-between ${
+                        selectedCategory === 'loan'
+                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span>💰</span>
+                        <span>Loan</span>
+                      </div>
+                      <svg 
+                        className={`w-4 h-4 transform transition-transform duration-200 ${
+                          isLoanOpen ? 'rotate-180' : ''
+                        }`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {/* Loan Dropdown Menu */}
+                    {isLoanOpen && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
+                        <button
+                          onClick={() => handleSubCategorySelect('home-loan')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            selectedSubCategory === 'home-loan' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>🏠</span>
+                          <span>Home Loan</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleSubCategorySelect('business-loan')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            selectedSubCategory === 'business-loan' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>💼</span>
+                          <span>Business Loan</span>
+                        </button>
+
+                         <button
+                          onClick={() => handleSubCategorySelect('lap-loan')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            selectedSubCategory === 'lap-loan' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>🏘️</span>
+                          <span>LAP Loan</span>
+                        </button>
+                        <button
+                          onClick={() => handleSubCategorySelect('personal-loan')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            selectedSubCategory === 'personal-loan' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>👤</span>
+                          <span>Personal Loan</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Files List */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-6 border-b border-slate-200">
                   <h3 className="text-lg font-semibold text-slate-900">
-                    Documents for {months.find(m => m.value === selectedMonth)?.label}
+                    {selectedCategory === 'insurance' ? 'Insurance' : 'Loan'} - {' '}
+                    {selectedSubCategory === 'motor-insurance' && '🚗 Motor Insurance'}
+                    {selectedSubCategory === 'life-insurance' && '👨‍👩‍👧‍👦 Life Insurance'}
+                    {selectedSubCategory === 'health-insurance' && '🏥 Health Insurance'}
+                    {selectedSubCategory === 'home-loan' && '🏠 Home Loan'}
+                    {selectedSubCategory === 'business-loan' && '💼 Business Loan'}
+                    {selectedSubCategory === 'lap-loan' && '🏘️LAP Loan'}
+                    {selectedSubCategory === 'personal-loan' && '👤 Personal Loan'}
+                    {' '}Documents for {months.find(m => m.value === selectedMonth)?.label}
                   </h3>
                 </div>
                 <div className="divide-y divide-slate-200">
@@ -364,7 +668,7 @@ export default function Downloads() {
                         </div>
                         <button
                           onClick={() => handleDownload(file)}
-                          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
+                          className="flex items-center space-x-2 px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3] transition-colors duration-200 text-sm font-medium"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -381,7 +685,7 @@ export default function Downloads() {
                       </div>
                       <h3 className="text-lg font-medium text-slate-900 mb-2">No documents found</h3>
                       <p className="text-slate-600 text-sm">
-                        No payout documents available for {months.find(m => m.value === selectedMonth)?.label}.
+                        No {selectedSubCategory?.replace('-', ' ')} documents available for {months.find(m => m.value === selectedMonth)?.label}.
                       </p>
                     </div>
                   )}
@@ -390,7 +694,7 @@ export default function Downloads() {
             </div>
           )}
 
-          {/* Product Brochures Section */}
+          {/* Other sections remain the same */}
           {activeSection === 'brochures' && (
             <div className="space-y-6">
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -417,7 +721,7 @@ export default function Downloads() {
                           </div>
                           <button
                             onClick={() => handleDownload(file)}
-                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
+                            className="flex items-center space-x-2 px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3] transition-colors duration-200 text-sm font-medium"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -432,7 +736,6 @@ export default function Downloads() {
             </div>
           )}
 
-          {/* Application Forms Section */}
           {activeSection === 'forms' && (
             <div className="space-y-6">
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -459,7 +762,7 @@ export default function Downloads() {
                           </div>
                           <button
                             onClick={() => handleDownload(file)}
-                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
+                            className="flex items-center space-x-2 px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3] transition-colors duration-200 text-sm font-medium"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -473,49 +776,6 @@ export default function Downloads() {
               </div>
             </div>
           )}
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">📥</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-blue-900 mb-1">Easy Access</h3>
-                <p className="text-blue-800 text-sm">
-                  All your business documents in one place, organized and ready to download.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-green-50 rounded-xl p-6 border border-green-200">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">🔄</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-green-900 mb-1">Always Updated</h3>
-                <p className="text-green-800 text-sm">
-                  Latest versions of all documents with regular updates and new additions.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">📱</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-purple-900 mb-1">Mobile Friendly</h3>
-                <p className="text-purple-800 text-sm">
-                  Access and download documents on the go from any device.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
