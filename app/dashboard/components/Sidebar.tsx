@@ -81,16 +81,6 @@ export default function DashboardSidebar() {
       href: "/dashboard/helpSupport",
       icon: <HelpCircle className="h-5 w-5 shrink-0 text-neutral-700" />,
     },
-    {
-      label: "Reports",
-      href: "/dashboard/reports",
-      icon: <BarChart3 className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
-    {
-      label: "Settings",
-      href: "/dashboard/settings",
-      icon: <Settings className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
   ];
 
   return (
