@@ -64,19 +64,6 @@ const HelpSupportPage: React.FC = () => {
           </p>
         </div>
 
-        {/* FAQ Section */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-semibold text-slate-700 mb-8">Frequently Asked Questions</h2>
-          <div className="space-y-6">
-            {faqs.map((faq, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                <h3 className="text-lg font-medium text-slate-900 mb-3">{faq.question}</h3>
-                <p className="text-slate-600 leading-relaxed">{faq.answer}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Support Ticket Section */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
           <h2 className="text-2xl font-semibold text-slate-700 mb-8">Raise a Support Ticket</h2>
@@ -149,6 +136,21 @@ const HelpSupportPage: React.FC = () => {
             </div>
           </form>
         </div>
+
+        {/* FAQ Section */}
+        <div className="mb-16 mt-16">
+          <h2 className="text-2xl font-semibold text-slate-700 mb-8">Frequently Asked Questions</h2>
+          <div className="space-y-6">
+            {faqs.map((faq, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 className="text-lg font-medium text-slate-900 mb-3">{faq.question}</h3>
+                <p className="text-slate-600 leading-relaxed">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        
 
         {/* Additional Help Section */}
         <div className="mt-12 text-center">
