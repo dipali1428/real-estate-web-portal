@@ -12,10 +12,10 @@ export const successContests: Contest[] = [
     desc: "Vietnam Contest – Successfully Conquered! A journey of excellence, teamwork, and unforgettable memories. Congratulations to all achievers who made this milestone truly special! #InfinityArthvishva #VietnamConest2025 #Succes", 
     img: "/Vietnaam1.jpeg",
     images: [
-      "/Vietnaam1.jpeg",
-      "/Vietnaam2.jpeg", 
-      "/Vietnaam3.jpeg",
-      "/Vietnaam4.jpeg"
+      "/Vietnaam/Vietnaam1.jpeg",
+      "/Vietnaam/Vietnaam2.jpeg", 
+      "/Vietnaam/Vietnaam3.jpeg",
+      "/Vietnaam/Vietnaam4.jpeg"
     ]
   },
   { 
@@ -23,9 +23,9 @@ export const successContests: Contest[] = [
     desc: "Thailand Achievement Unlocked!Our journey of passion, purpose, and performance reached new heights in Thailand.Proud of every achiever who made this global success possible! #InfinityArthvishva #ThailandAchievement2025 #ProudMoment", 
     img: "/Thailand.jpeg",
     images: [
-      "/Thailand.jpeg",
-      "/Thailand2.jpeg",
-      "/Thailand3.jpeg",
+      "/Thailand/Thailand.jpeg",
+      "/Thailand/Thailand2.jpeg",
+      "/Thailand/Thailand3.jpeg",
     ]
   },
 ];
