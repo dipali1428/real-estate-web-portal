@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // Types
 interface TemplateItem {
@@ -20,6 +20,11 @@ interface UserProfile {
   contactNumber: string;
 }
 
+interface DraggablePosition {
+  x: number;
+  y: number;
+}
+
 interface FontSizeSettings {
   name: number;
   number: number;
@@ -30,11 +35,20 @@ export default function ImageTemplates() {
   const [activeSubCategory, setActiveSubCategory] = useState<string>('all');
   const [isInsuranceOpen, setIsInsuranceOpen] = useState(false);
   const [isLoanOpen, setIsLoanOpen] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showPositionModal, setShowPositionModal] = useState(false);
+  const [currentSharedImage, setCurrentSharedImage] = useState<string>('');
+  const [currentTemplate, setCurrentTemplate] = useState<TemplateItem | null>(null);
+  const [userPosition, setUserPosition] = useState<DraggablePosition>({ x: 50, y: 85 });
+  const [isDragging, setIsDragging] = useState(false);
   const [fontSize, setFontSize] = useState<FontSizeSettings>({
-    name: 20,
-    number: 18
+    name: 18,
+    number: 16
   });
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number }>({ width: 800, height: 600 });
   
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // Mock user profile data
   const userProfile: UserProfile = {
     name: 'Rajesh Kumar',
@@ -52,7 +66,7 @@ export default function ImageTemplates() {
       category: 'insurance',
       subCategory: 'life',
       description: 'Comprehensive life insurance coverage for you and your family',
-      imageUrl: '/templateimg/healthinsurance.jpeg'
+      imageUrl: '/templateimg/life-insurance.jpg'
     },
     {
       id: '2',
@@ -63,7 +77,7 @@ export default function ImageTemplates() {
       category: 'insurance',
       subCategory: 'health',
       description: 'Complete health insurance protection for medical emergencies',
-      imageUrl: '/templateimg/healthinsurance.jpeg'
+      imageUrl: '/templateimg/healthinsurance.jpg'
     },
     {
       id: '3',
@@ -85,7 +99,7 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'home',
       description: 'Affordable home loans with low interest rates',
-      imageUrl: '/templateimg/homeloanimg.jpeg'
+      imageUrl: '/templateimg/homeloan.jpeg'
     },
     {
       id: '5',
@@ -96,7 +110,7 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'personal',
       description: 'Quick personal loans for all your needs',
-      imageUrl: '/templateimg/homeloanimg.jpeg'
+      imageUrl: '/templateimg/personalloan.jpeg'
     },
     {
       id: '6',
@@ -166,36 +180,128 @@ export default function ImageTemplates() {
     }
   };
 
+  // Handle mouse events for dragging
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    updatePosition(e);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    updatePosition(e);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    updateTouchPosition(e);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    updateTouchPosition(e);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  const updatePosition = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    // Keep within bounds (5-95%)
+    const boundedX = Math.max(5, Math.min(95, x));
+    const boundedY = Math.max(5, Math.min(95, y));
+    
+    setUserPosition({ x: boundedX, y: boundedY });
+  };
+
+  const updateTouchPosition = (e: React.TouchEvent) => {
+    if (!containerRef.current || !e.touches[0]) return;
+    
+    const touch = e.touches[0];
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = ((touch.clientX - rect.left) / rect.width) * 100;
+    const y = ((touch.clientY - rect.top) / rect.height) * 100;
+    
+    // Keep within bounds (5-95%)
+    const boundedX = Math.max(5, Math.min(95, x));
+    const boundedY = Math.max(5, Math.min(95, y));
+    
+    setUserPosition({ x: boundedX, y: boundedY });
+  };
+
   // Handle font size changes
   const handleFontSizeChange = (type: 'name' | 'number', value: number) => {
     setFontSize(prev => ({
       ...prev,
-      [type]: Math.max(12, Math.min(36, value)) // Limit between 12-36px
+      [type]: Math.max(10, Math.min(30, value)) // Limit between 10-30px
     }));
   };
 
-  // Quick download with white background and name+number in single line
-  const quickDownload = async (template: TemplateItem) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+  // Get original image dimensions
+  const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        resolve({
+          width: img.naturalWidth,
+          height: img.naturalHeight
+        });
+      };
+      img.onerror = reject;
+      img.src = url;
+    });
+  };
+
+  // Open position modal
+  const openPositionModal = async (template: TemplateItem) => {
+    setCurrentTemplate(template);
+    setUserPosition({ x: 50, y: 85 }); // Reset to bottom center
+    setFontSize({ name: 18, number: 16 }); // Reset font sizes
     
-    if (!ctx) {
-      alert('Error creating image. Please try again.');
-      return;
-    }
-
     try {
-      // Set canvas size
-      const canvasWidth = 800;
-      const canvasHeight = 600;
-      canvas.width = canvasWidth;
-      canvas.height = canvasHeight;
+      const dimensions = await getImageDimensions(template.imageUrl);
+      setImageDimensions(dimensions);
+      setShowPositionModal(true);
+    } catch (error) {
+      console.error('Error loading image dimensions:', error);
+      // Fallback dimensions
+      setImageDimensions({ width: 800, height: 600 });
+      setShowPositionModal(true);
+    }
+  };
 
-      // Fill with white background
+  // Quick download without positioning - adds details below image
+  const quickDownload = async (template: TemplateItem) => {
+    try {
+      const dimensions = await getImageDimensions(template.imageUrl);
+      
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        alert('Error creating image. Please try again.');
+        return;
+      }
+
+      // Calculate extended canvas height (original height + space for details)
+      const extendedHeight = dimensions.height + 120; // Add 120px for details section
+      canvas.width = dimensions.width;
+      canvas.height = extendedHeight;
+
+      // Set white background for the entire canvas
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Load the template image
+      // Load and draw the template image at the top
       const img = new Image();
       img.crossOrigin = 'anonymous';
       
@@ -205,69 +311,45 @@ export default function ImageTemplates() {
         img.src = template.imageUrl;
       });
 
-      // Calculate dimensions to fit image within canvas while maintaining aspect ratio
-      const imgAspectRatio = img.width / img.height;
-      const canvasAspectRatio = canvasWidth / canvasHeight;
+      // Draw the template image at original size at the top
+      ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
 
-      let drawWidth, drawHeight, drawX, drawY;
-
-      if (imgAspectRatio > canvasAspectRatio) {
-        // Image is wider than canvas
-        drawWidth = canvasWidth;
-        drawHeight = drawWidth / imgAspectRatio;
-        drawX = 0;
-        drawY = (canvasHeight - drawHeight) / 2;
-      } else {
-        // Image is taller than canvas
-        drawHeight = canvasHeight;
-        drawWidth = drawHeight * imgAspectRatio;
-        drawX = (canvasWidth - drawWidth) / 2;
-        drawY = 0;
-      }
-
-      // Draw the template image centered on white background
-      ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-
-      // Add user details in single line at bottom center
-      const userText = `${userProfile.name} • ${userProfile.contactNumber}`;
-      const userX = canvasWidth / 2;
-      const userY = canvasHeight - 30;
-
-      // Calculate text width for background
-      ctx.font = `bold ${fontSize.name}px Arial`;
-      const textWidth = ctx.measureText(userText).width;
-      const boxWidth = textWidth + 40;
-      const boxHeight = fontSize.name + 16;
-
-      // Add semi-transparent background for better text visibility
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      // Add separator line
+      ctx.strokeStyle = '#e5e7eb';
       ctx.lineWidth = 2;
-      
-      // Draw rounded rectangle background
       ctx.beginPath();
-      ctx.roundRect(userX - boxWidth/2, userY - boxHeight/2, boxWidth, boxHeight, 8);
-      ctx.fill();
+      ctx.moveTo(50, dimensions.height + 20);
+      ctx.lineTo(canvas.width - 50, dimensions.height + 20);
       ctx.stroke();
 
-      // Add text shadow for better readability
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-      ctx.shadowBlur = 6;
-      ctx.shadowOffsetX = 2;
-      ctx.shadowOffsetY = 2;
+      // Add user details section below the image
+      const detailsY = dimensions.height + 60;
 
-      // User details in single line
-      ctx.fillStyle = '#ffffff';
+      // Add background for contact info
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(40, dimensions.height + 40, canvas.width - 80, 70);
+
+      // Add border around contact info
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(40, dimensions.height + 40, canvas.width - 80, 70);
+
+      // User name
+      ctx.fillStyle = '#1e293b';
       ctx.font = `bold ${fontSize.name}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(userText, userX, userY);
+      ctx.fillText(userProfile.name, canvas.width / 2, detailsY - 10);
 
-      // Reset shadow
-      ctx.shadowColor = 'transparent';
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
+      // Contact number
+      ctx.fillStyle = '#475569';
+      ctx.font = `bold ${fontSize.number}px Arial`;
+      ctx.fillText(userProfile.contactNumber, canvas.width / 2, detailsY + 15);
+
+      // Add call to action text
+      ctx.fillStyle = '#64748b';
+      ctx.font = 'italic 14px Arial';
+      ctx.fillText('Contact me for more information!', canvas.width / 2, detailsY + 40);
 
       // Download the image
       canvas.toBlob((blob) => {
@@ -289,6 +371,166 @@ export default function ImageTemplates() {
     }
   };
 
+  // Create personalized image with details below the image
+  const createPersonalizedImage = async (template: TemplateItem, action: 'download' | 'share' = 'download') => {
+    try {
+      const dimensions = await getImageDimensions(template.imageUrl);
+      
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        alert('Error creating image. Please try again.');
+        return;
+      }
+
+      // Calculate extended canvas height (original height + space for details)
+      const extendedHeight = dimensions.height + 120; // Add 120px for details section
+      canvas.width = dimensions.width;
+      canvas.height = extendedHeight;
+
+      // Set white background for the entire canvas
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Load and draw the template image at the top
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = template.imageUrl;
+      });
+
+      // Draw the template image at original size at the top
+      ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
+
+      // Add separator line
+      ctx.strokeStyle = '#e5e7eb';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(50, dimensions.height + 20);
+      ctx.lineTo(canvas.width - 50, dimensions.height + 20);
+      ctx.stroke();
+
+      // Add user details section below the image
+      const detailsY = dimensions.height + 60;
+
+      // Add background for contact info
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(40, dimensions.height + 40, canvas.width - 80, 70);
+
+      // Add border around contact info
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(40, dimensions.height + 40, canvas.width - 80, 70);
+
+      // User name
+      ctx.fillStyle = '#1e293b';
+      ctx.font = `bold ${fontSize.name}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(userProfile.name, canvas.width / 2, detailsY - 10);
+
+      // Contact number
+      ctx.fillStyle = '#475569';
+      ctx.font = `bold ${fontSize.number}px Arial`;
+      ctx.fillText(userProfile.contactNumber, canvas.width / 2, detailsY + 15);
+
+      // Add call to action text
+      ctx.fillStyle = '#64748b';
+      ctx.font = 'italic 14px Arial';
+      ctx.fillText('Contact me for more information!', canvas.width / 2, detailsY + 40);
+
+      // Convert to image
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          
+          if (action === 'download') {
+            // Download the image
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `personalized-${template.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            setShowPositionModal(false);
+          } else if (action === 'share') {
+            // Set the image for sharing
+            setCurrentSharedImage(url);
+            setShowShareModal(true);
+            setShowPositionModal(false);
+          }
+        }
+      }, 'image/png');
+
+    } catch (error) {
+      console.error('Error creating personalized image:', error);
+      alert('Error creating personalized image. Please try again.');
+    }
+  };
+
+  // Share on social media
+  const shareOnSocialMedia = (platform: string) => {
+    if (!currentSharedImage) return;
+
+    const text = `Check out this ${activeCategory} template personalized for you! Contact ${userProfile.name} at ${userProfile.contactNumber} for more details.`;
+    
+    let shareUrl = '';
+    
+    switch (platform) {
+      case 'whatsapp':
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+        break;
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentSharedImage)}&quote=${encodeURIComponent(text)}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(currentSharedImage)}`;
+        break;
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentSharedImage)}&summary=${encodeURIComponent(text)}`;
+        break;
+      case 'instagram':
+        alert('For Instagram, please save the image and share it directly from your gallery.');
+        return;
+      default:
+        return;
+    }
+    
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+  };
+
+  // Copy image to clipboard
+  const copyToClipboard = async () => {
+    try {
+      if (!currentSharedImage) return;
+      
+      const response = await fetch(currentSharedImage);
+      const blob = await response.blob();
+      
+      if (navigator.clipboard && navigator.clipboard.write) {
+        const item = new ClipboardItem({ 'image/png': blob });
+        await navigator.clipboard.write([item]);
+        alert('Image copied to clipboard!');
+      } else {
+        const link = document.createElement('a');
+        link.href = currentSharedImage;
+        link.download = 'personalized-template.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        alert('Image download started. You can share the downloaded image.');
+      }
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      alert('Unable to copy image. Please try downloading and sharing manually.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
@@ -300,54 +542,23 @@ export default function ImageTemplates() {
               Professional Templates
             </h1>
             <p className="text-slate-600 mt-2 text-base sm:text-lg">
-              Download personalized templates with your contact information
+              Download personalized templates with contact details below the image
             </p>
           </div>
         </div>
 
-        {/* User Profile Info with Text Size Settings */}
+        {/* User Profile Info */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl p-4 sm:p-6 text-white">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="text-center sm:text-left">
               <h3 className="text-lg sm:text-xl font-bold mb-2">Personalized Marketing Templates</h3>
               <p className="text-blue-100 text-sm sm:text-base">
-                Your contact details will be added automatically at the bottom
+                Contact details will be added below the template image
               </p>
             </div>
             <div className="text-center sm:text-right">
-              <div className="mb-2">
-                <p className="font-semibold text-base sm:text-lg">{userProfile.name}</p>
-                <p className="text-blue-200 text-sm sm:text-base">{userProfile.contactNumber}</p>
-              </div>
-              <div className="bg-white bg-opacity-20 rounded-lg p-3 border border-white border-opacity-30">
-                <p className="text-xs text-blue-100 mb-1">Text Size Settings</p>
-                <div className="flex flex-col sm:flex-row gap-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="text-blue-100">Name:</span>
-                    <input
-                      type="number"
-                      min="12"
-                      max="36"
-                      value={fontSize.name}
-                      onChange={(e) => handleFontSizeChange('name', parseInt(e.target.value) || 20)}
-                      className="w-12 px-1 py-1 rounded text-slate-900 text-center text-xs"
-                    />
-                    <span className="text-blue-100">px</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-blue-100">Number:</span>
-                    <input
-                      type="number"
-                      min="12"
-                      max="36"
-                      value={fontSize.number}
-                      onChange={(e) => handleFontSizeChange('number', parseInt(e.target.value) || 18)}
-                      className="w-12 px-1 py-1 rounded text-slate-900 text-center text-xs"
-                    />
-                    <span className="text-blue-100">px</span>
-                  </div>
-                </div>
-              </div>
+              <p className="font-semibold text-base sm:text-lg">{userProfile.name}</p>
+              <p className="text-blue-200 text-sm sm:text-base">{userProfile.contactNumber}</p>
             </div>
           </div>
         </div>
@@ -486,7 +697,6 @@ export default function ImageTemplates() {
             </span>
           </div>
         </div>
-
         {/* Template Cards Grid */}
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -503,11 +713,11 @@ export default function ImageTemplates() {
               {filteredTemplates.map((template) => (
                 <div key={template.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-200 group">
                   {/* Template Preview */}
-                  <div className="h-40 sm:h-48 relative overflow-hidden bg-slate-100">
+                  <div className="h-40 sm:h-48 relative overflow-hidden bg-slate-100 flex items-center justify-center">
                     <img 
                       src={template.imageUrl} 
                       alt={template.name}
-                      className="w-full h-full object-cover"
+                      className="max-w-full max-h-full object-contain"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
@@ -548,20 +758,21 @@ export default function ImageTemplates() {
                       {template.description}
                     </p>
 
-                    {/* Single Download Button */}
-                    <button
-                      onClick={() => quickDownload(template)}
-                      className={`w-full flex items-center justify-center space-x-2 px-4 py-3 text-white rounded-lg transition-all duration-200 text-sm font-semibold ${
-                        template.category === 'insurance'
-                          ? 'bg-blue-600 hover:bg-blue-700'
-                          : 'bg-green-600 hover:bg-green-700'
-                      }`}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <span>Download with Contact Info</span>
-                    </button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => quickDownload(template)}
+                        className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 text-white rounded-lg transition-all duration-200 text-xs font-semibold ${
+                          template.category === 'insurance'
+                            ? 'bg-blue-600 hover:bg-blue-700'
+                            : 'bg-green-600 hover:bg-green-700'
+                        }`}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>Quick Download</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
