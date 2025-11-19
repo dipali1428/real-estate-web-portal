@@ -132,22 +132,22 @@ const ContactSection = () => (
             <input
               type="text"
               placeholder="Your Name"
-              className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#2076C7] placeholder-gray-400"
+              className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#2076C7] placeholder-gray-400 text-gray-700"
             />
             <input
               type="email"
               placeholder="Email Address"
-              className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#2076C7] placeholder-gray-400"
+              className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#2076C7] placeholder-gray-400 text-gray-700"
             />
             <input
               type="tel"
               placeholder="Your Phone Number"
-              className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#2076C7] placeholder-gray-400"
+              className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#2076C7] placeholder-gray-400 text-gray-700"
             />
             <textarea
               placeholder="Your Message"
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#2076C7] placeholder-gray-400">
+              className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#2076C7] placeholder-gray-400 text-gray-700">
             </textarea>
             <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-3 rounded font-semibold hover:bg-indigo-800 transition cursor-pointer shadow-md hover:shadow-lg">
               Send Message
