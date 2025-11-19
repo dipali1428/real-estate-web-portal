@@ -23,9 +23,16 @@ export default function Downloads() {
   const [selectedSubCategory, setSelectedSubCategory] = useState<'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan'>('motor-insurance');
   const [isInsuranceOpen, setIsInsuranceOpen] = useState(false);
   const [isLoanOpen, setIsLoanOpen] = useState(false);
+  
+  // New states for brochures section
+  const [brochureSelectedCategory, setBrochureSelectedCategory] = useState<'insurance' | 'loan'>('insurance');
+  const [brochureSelectedSubCategory, setBrochureSelectedSubCategory] = useState<'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan'>('motor-insurance');
+  const [isBrochureInsuranceOpen, setIsBrochureInsuranceOpen] = useState(false);
+  const [isBrochureLoanOpen, setIsBrochureLoanOpen] = useState(false);
 
   // Sample data for downloads with actual file paths
   const downloadData: DownloadItem[] = [
+    // ... (keep all your existing downloadData array as is)
     {
       id: '1',
       name: 'Motor Insurance IA Payout OCT with logo.pdf',
@@ -52,184 +59,83 @@ export default function Downloads() {
       subCategory: 'life-insurance',
       filePath: '/pdfs/lifeinsurancepdf/ABSLI FESTIVE FLIGHTS CONTEST.pdf'
     },
-    {
-      id: '3',
-      name: 'AXIS MAX FESTIVE FLIGHTS CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/AXIS MAX FESTIVE FLIGHTS CONTEST.pdf'
-    },
-    {
-      id: '4',
-      name: 'BAJAJ LIFE FESTIVE FLIGHTS CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/BAJAJ LIFE FESTIVE FLIGHTS CONTEST.pdf'
-    },
-    {
-      id: '5',
-      name: 'DIGIT LIFE FESTIVE FLIGHTS CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/DIGIT LIFE FESTIVE FLIGHTS CONTEST.pdf'
-    },
-    {
-      id: '6',
-      name: 'HDFC LIFE -GRID FESTIVE FLIGHTS CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/HDFC LIFE -GRID FESTIVE FLIGHTS CONTEST.pdf'
-    },
-    {
-      id: '7',
-      name: 'ICICI PRUDENTIAL FESTIVE FLIGHTS CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/ICICI PRUDENTIAL FESTIVE FLIGHTS CONTEST.pdf'
-    },
-    {
-      id: '8',
-      name: 'TATA AIA FESTIVE FLIGHTS CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/TATA AIA FESTIVE FLIGHTS CONTEST.pdf'
-    },
-    
-    // Insurance - Health Insurance
-    {
-      id: '9',
-      name: 'HEALTH FINAL PAYOUT FESTIVE FLIGHTS 2025.pdf',
-      type: 'pdf',
-      size: '2.8 MB',
-      uploadDate: '2025-11-01',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'health-insurance',
-      filePath: '/pdfs/healthinsurancepdf/HEALTH FINAL PAYOUT FESTIVE FLIGHTS 2025.pdf'
-    },
+    // ... (all your existing items)
 
-    // Loan - Home Loan
-    {
-      id: '10',
-      name: 'IA Festive Flights Home Loan Payout.pdf',
-      type: 'pdf',
-      size: '2.2 MB',
-      uploadDate: '2025-11-05',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'home-loan',
-      filePath: '/pdfs/loans/IA Festive Flights Home Loan Payout.pdf'
-    },
-    {
-      id: '11',
-      name: 'Home Loan Payout Rates 2025.xlsx',
-      type: 'xlsx',
-      size: '1.7 MB',
-      uploadDate: '2025-10-25',
-      category: 'payout',
-      month: 'october-2025',
-      year: '2025',
-      subCategory: 'home-loan',
-      filePath: '/pdfs/homeloanpdf/Home Loan Payout Rates 2025.xlsx'
-    },
-
-    // Loan - Business Loan
-    {
-      id: '12',
-      name: 'IA Festive Flights Business Loan Payout.pdf',
-      type: 'pdf',
-      size: '2.5 MB',
-      uploadDate: '2025-11-05',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'business-loan',
-      filePath: '/pdfs/loans/IA Festive Flights Business Loan Payout.pdf'
-    },
-
-    // Loan - LAP Loan
-    {
-      id: '13',
-      name: 'IA Festive Flights LAP Loan Payout.pdf',
-      type: 'pdf',
-      size: '2.3 MB',
-      uploadDate: '2025-11-05',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'lap-loan',
-      filePath: '/pdfs/loans/IA Festive Flights LAP Loan Payout.pdf'
-    },
-
-    // Loan - Personal Loan
-    {
-      id: '14',
-      name: 'IA Festive Flights Personal Loan Payout.pdf',
-      type: 'pdf',
-      size: '2.1 MB',
-      uploadDate: '2025-11-05',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'personal-loan',
-      filePath: '/pdfs/loans/IA Festive Flights Personal Loan Payout.pdf'
-    },
-    
-    // Product Brochures
+    // Product Brochures - Updated with subCategories
     {
       id: '15',
+      name: 'Motor Insurance Product Brochure.pdf',
+      type: 'pdf',
+      size: '4.2 MB',
+      uploadDate: '2025-11-01',
+      category: 'brochures',
+      subCategory: 'motor-insurance',
+      filePath: '/pdfs/brochures/Motor Insurance Product Brochure.pdf'
+    },
+    {
+      id: '16',
       name: 'Life Insurance Product Catalog.pdf',
       type: 'pdf',
       size: '4.2 MB',
       uploadDate: '2025-11-01',
       category: 'brochures',
+      subCategory: 'life-insurance',
       filePath: '/pdfs/brochures/Life Insurance Product Catalog.pdf'
     },
     {
-      id: '16',
-      name: 'Comprehensive Health Insurance Guide.pdf',
+      id: '17',
+      name: 'Health Insurance Comprehensive Guide.pdf',
       type: 'pdf',
       size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
-      filePath: '/pdfs/brochures/Comprehensive Health Insurance Guide.pdf'
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/brochures/Health Insurance Comprehensive Guide.pdf'
+    },
+    {
+      id: '18',
+      name: 'Home Loan Benefits Brochure.pdf',
+      type: 'pdf',
+      size: '3.5 MB',
+      uploadDate: '2025-11-05',
+      category: 'brochures',
+      subCategory: 'home-loan',
+      filePath: '/pdfs/brochures/Home Loan Benefits Brochure.pdf'
+    },
+    {
+      id: '19',
+      name: 'Business Loan Solutions.pdf',
+      type: 'pdf',
+      size: '2.9 MB',
+      uploadDate: '2025-10-25',
+      category: 'brochures',
+      subCategory: 'business-loan',
+      filePath: '/pdfs/brochures/Business Loan Solutions.pdf'
+    },
+    {
+      id: '20',
+      name: 'LAP Loan Features Guide.pdf',
+      type: 'pdf',
+      size: '3.1 MB',
+      uploadDate: '2025-11-10',
+      category: 'brochures',
+      subCategory: 'lap-loan',
+      filePath: '/pdfs/brochures/LAP Loan Features Guide.pdf'
+    },
+    {
+      id: '21',
+      name: 'Personal Loan Options.pdf',
+      type: 'pdf',
+      size: '2.7 MB',
+      uploadDate: '2025-11-08',
+      category: 'brochures',
+      subCategory: 'personal-loan',
+      filePath: '/pdfs/brochures/Personal Loan Options.pdf'
     },
     
     // Application Forms
     {
-      id: '17',
+      id: '22',
       name: 'New Client Application Form.pdf',
       type: 'pdf',
       size: '1.5 MB',
@@ -238,7 +144,7 @@ export default function Downloads() {
       filePath: '/pdfs/forms/New Client Application Form.pdf'
     },
     {
-      id: '18',
+      id: '23',
       name: 'Policy Renewal Form.docx',
       type: 'doc',
       size: '0.8 MB',
@@ -254,6 +160,10 @@ export default function Downloads() {
       return item.category === 'payout' && 
              item.month === selectedMonth && 
              item.subCategory === selectedSubCategory;
+    }
+    if (activeSection === 'brochures') {
+      return item.category === 'brochures' && 
+             item.subCategory === brochureSelectedSubCategory;
     }
     return item.category === activeSection;
   });
@@ -329,19 +239,19 @@ export default function Downloads() {
     }
   };
 
-  // Handle insurance dropdown toggle
+  // Handle insurance dropdown toggle for payout
   const handleInsuranceToggle = () => {
     setIsInsuranceOpen(!isInsuranceOpen);
     setIsLoanOpen(false);
   };
 
-  // Handle loan dropdown toggle
+  // Handle loan dropdown toggle for payout
   const handleLoanToggle = () => {
     setIsLoanOpen(!isLoanOpen);
     setIsInsuranceOpen(false);
   };
 
-  // Handle subcategory selection
+  // Handle subcategory selection for payout
   const handleSubCategorySelect = (subCategory: 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan') => {
     setSelectedSubCategory(subCategory);
     if (subCategory === 'home-loan' || subCategory === 'business-loan' || subCategory === 'lap-loan' || subCategory === 'personal-loan') {
@@ -351,6 +261,30 @@ export default function Downloads() {
     }
     setIsInsuranceOpen(false);
     setIsLoanOpen(false);
+  };
+
+  // Handle insurance dropdown toggle for brochures
+  const handleBrochureInsuranceToggle = () => {
+    setIsBrochureInsuranceOpen(!isBrochureInsuranceOpen);
+    setIsBrochureLoanOpen(false);
+  };
+
+  // Handle loan dropdown toggle for brochures
+  const handleBrochureLoanToggle = () => {
+    setIsBrochureLoanOpen(!isBrochureLoanOpen);
+    setIsBrochureInsuranceOpen(false);
+  };
+
+  // Handle subcategory selection for brochures
+  const handleBrochureSubCategorySelect = (subCategory: 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan') => {
+    setBrochureSelectedSubCategory(subCategory);
+    if (subCategory === 'home-loan' || subCategory === 'business-loan' || subCategory === 'lap-loan' || subCategory === 'personal-loan') {
+      setBrochureSelectedCategory('loan');
+    } else {
+      setBrochureSelectedCategory('insurance');
+    }
+    setIsBrochureInsuranceOpen(false);
+    setIsBrochureLoanOpen(false);
   };
 
   // Calculate stats for visualization
@@ -694,48 +628,218 @@ export default function Downloads() {
             </div>
           )}
 
-          {/* Other sections remain the same */}
+          {/* Product Brochures Section */}
           {activeSection === 'brochures' && (
             <div className="space-y-6">
+              {/* Category Navigation Bar for Brochures */}
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-1">
+                <div className="flex space-x-1">
+                  {/* Insurance Dropdown for Brochures */}
+                  <div className="relative flex-1">
+                    <button
+                      onClick={handleBrochureInsuranceToggle}
+                      className={`w-full py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-between ${
+                        brochureSelectedCategory === 'insurance'
+                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span>🛡️</span>
+                        <span>Insurance</span>
+                      </div>
+                      <svg 
+                        className={`w-4 h-4 transform transition-transform duration-200 ${
+                          isBrochureInsuranceOpen ? 'rotate-180' : ''
+                        }`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {/* Insurance Dropdown Menu for Brochures */}
+                    {isBrochureInsuranceOpen && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
+                        <button
+                          onClick={() => handleBrochureSubCategorySelect('motor-insurance')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            brochureSelectedSubCategory === 'motor-insurance' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>🚗</span>
+                          <span>Motor Insurance</span>
+                        </button>
+                        <button
+                          onClick={() => handleBrochureSubCategorySelect('life-insurance')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            brochureSelectedSubCategory === 'life-insurance' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>👨‍👩‍👧‍👦</span>
+                          <span>Life Insurance</span>
+                        </button>
+                        <button
+                          onClick={() => handleBrochureSubCategorySelect('health-insurance')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            brochureSelectedSubCategory === 'health-insurance' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>🏥</span>
+                          <span>Health Insurance</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Loan Dropdown for Brochures */}
+                  <div className="relative flex-1">
+                    <button
+                      onClick={handleBrochureLoanToggle}
+                      className={`w-full py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-between ${
+                        brochureSelectedCategory === 'loan'
+                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span>💰</span>
+                        <span>Loan</span>
+                      </div>
+                      <svg 
+                        className={`w-4 h-4 transform transition-transform duration-200 ${
+                          isBrochureLoanOpen ? 'rotate-180' : ''
+                        }`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {/* Loan Dropdown Menu for Brochures */}
+                    {isBrochureLoanOpen && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
+                        <button
+                          onClick={() => handleBrochureSubCategorySelect('home-loan')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            brochureSelectedSubCategory === 'home-loan' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>🏠</span>
+                          <span>Home Loan</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleBrochureSubCategorySelect('business-loan')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            brochureSelectedSubCategory === 'business-loan' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>💼</span>
+                          <span>Business Loan</span>
+                        </button>
+
+                         <button
+                          onClick={() => handleBrochureSubCategorySelect('lap-loan')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            brochureSelectedSubCategory === 'lap-loan' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>🏘️</span>
+                          <span>LAP Loan</span>
+                        </button>
+                        <button
+                          onClick={() => handleBrochureSubCategorySelect('personal-loan')}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
+                            brochureSelectedSubCategory === 'personal-loan' 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>👤</span>
+                          <span>Personal Loan</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Files List for Brochures */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-6 border-b border-slate-200">
-                  <h3 className="text-lg font-semibold text-slate-900">Product Brochures</h3>
-                  <p className="text-slate-600 text-sm mt-1">Marketing materials and product information</p>
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    {brochureSelectedCategory === 'insurance' ? 'Insurance' : 'Loan'} - {' '}
+                    {brochureSelectedSubCategory === 'motor-insurance' && '🚗 Motor Insurance'}
+                    {brochureSelectedSubCategory === 'life-insurance' && '👨‍👩‍👧‍👦 Life Insurance'}
+                    {brochureSelectedSubCategory === 'health-insurance' && '🏥 Health Insurance'}
+                    {brochureSelectedSubCategory === 'home-loan' && '🏠 Home Loan'}
+                    {brochureSelectedSubCategory === 'business-loan' && '💼 Business Loan'}
+                    {brochureSelectedSubCategory === 'lap-loan' && '🏘️LAP Loan'}
+                    {brochureSelectedSubCategory === 'personal-loan' && '👤 Personal Loan'}
+                    {' '}Brochures
+                  </h3>
                 </div>
                 <div className="divide-y divide-slate-200">
-                  {downloadData
-                    .filter(file => file.category === 'brochures')
-                    .map((file) => (
-                      <div key={file.id} className="p-6 hover:bg-slate-50 transition-colors duration-150">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            {getFileIcon(file.type)}
-                            <div>
-                              <h4 className="text-sm font-medium text-slate-900">{file.name}</h4>
-                              <div className="flex items-center space-x-4 mt-1 text-xs text-slate-500">
-                                <span>{file.size}</span>
-                                <span>•</span>
-                                <span>Uploaded {file.uploadDate}</span>
-                              </div>
+                  {filteredData.map((file) => (
+                    <div key={file.id} className="p-6 hover:bg-slate-50 transition-colors duration-150">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          {getFileIcon(file.type)}
+                          <div>
+                            <h4 className="text-sm font-medium text-slate-900">{file.name}</h4>
+                            <div className="flex items-center space-x-4 mt-1 text-xs text-slate-500">
+                              <span>{file.size}</span>
+                              <span>•</span>
+                              <span>Uploaded {file.uploadDate}</span>
                             </div>
                           </div>
-                          <button
-                            onClick={() => handleDownload(file)}
-                            className="flex items-center space-x-2 px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3] transition-colors duration-200 text-sm font-medium"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span>Download</span>
-                          </button>
                         </div>
+                        <button
+                          onClick={() => handleDownload(file)}
+                          className="flex items-center space-x-2 px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3] transition-colors duration-200 text-sm font-medium"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <span>Download</span>
+                        </button>
                       </div>
-                    ))}
+                    </div>
+                  ))}
+                  {filteredData.length === 0 && (
+                    <div className="p-12 text-center">
+                      <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="text-2xl">📁</span>
+                      </div>
+                      <h3 className="text-lg font-medium text-slate-900 mb-2">No brochures found</h3>
+                      <p className="text-slate-600 text-sm">
+                        No {brochureSelectedSubCategory?.replace('-', ' ')} brochures available.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           )}
 
+          {/* Application Forms Section */}
           {activeSection === 'forms' && (
             <div className="space-y-6">
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
