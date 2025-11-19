@@ -68,9 +68,9 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
             <div>
               <label className="block font-medium mb-1">Gender</label>
               <select className="w-full border rounded-md px-3 py-2">
-                <option disabled selected>Gender</option>
-                <option>Male</option>
-                <option>Female</option>
+                <option value="" >Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
               </select>
             </div>
 

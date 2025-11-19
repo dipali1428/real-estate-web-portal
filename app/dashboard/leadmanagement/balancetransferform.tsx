@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
-export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
+export default function BalanceTransferForm({ onClose }: { onClose: () => void }) {
   const [loanType, setLoanType] = useState("");
   const [employmentType, setEmploymentType] = useState(""); // ✅ FIXED
 
@@ -12,7 +12,7 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
 
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4">
-          <h2 className="text-xl font-semibold text-[#1CADA3]">Home Loan Form</h2>
+          <h2 className="text-xl font-semibold text-[#1CADA3]">Balance Transfer Form</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
             <X size={22} />
           </button>
@@ -20,20 +20,6 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
 
         {/* Form Body */}
         <form className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
-          <Select
-            label="Type of Home Loan"
-            options={[
-              "Balance Transfer",
-              "Fresh Home Loan",
-              "Home Equity Loan",
-              "Top-up Loan",
-              "Plot Loan",
-              "Construction Loan",
-            ]}
-            value={loanType}
-            onChange={setLoanType}
-          />
-
           <Input label="Client Name" placeholder="Enter Client Name" />
           <Input label="Phone Number" placeholder="Enter Client Phone Number" />
           <Input label="Email ID" placeholder="Enter Client Email ID" />
@@ -155,6 +141,9 @@ function SalariedDocs() {
     "Existing Loan Statement / Index II",
     "Property Cost Sheet",
     "Own Contribution Proof",
+    "List Of Document",
+    "Loan Outstanding Letter",
+    "Loan Account Statement / Loan Track Record",
   ];
   return (
     <Section title="Upload Documents for Salaried Person">
@@ -181,6 +170,9 @@ function SelfEmployedDocs() {
     "Existing Loan Statement / Index II",
     "Property Cost Sheet",
     "Own Contribution Proof",
+    "List Of Document",
+    "Loan Outstanding Letter",
+    "Loan Account Statement / Loan Track Record",
   ];
   return (
     <Section title="Upload Documents for Self Employed Person">

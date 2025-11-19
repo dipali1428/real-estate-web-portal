@@ -24,6 +24,7 @@ import PMSAIFForm from "./PMSAIFForm";
 import BondsForm from "./bondsfrom";
 import FixedDepositForm from "./fineddf";
 import RealEstateForm from "./realestate";
+import BalanceTransferForm from "./balancetransferform";
 export default function LeadManagement() {
   // Modal open/close state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,6 +55,7 @@ export default function LeadManagement() {
    const [showFixedDepositForm, setShowFixedDepositForm] =useState(false);
     const [showBondsForm, setShowBondsForm] =useState(false);
     const [showRealEstateForm, setShowRealEstateForm] =useState(false);
+    const [showBalanceTransferForm, setShowBalanceTransferForm] =useState(false);
     // If LifeInsuranceForm is open, show only that
   if (showLifeInsuranceForm) {
     return <LifeInsuranceForm onClose={() => setShowLifeInsuranceForm(false)} />;
@@ -121,6 +123,9 @@ export default function LeadManagement() {
   if (showRealEstateForm) {
     return <RealEstateForm onClose={() => setShowRealEstateForm(false)} />;
   }
+  if (showBalanceTransferForm) {
+    return <BalanceTransferForm onClose={() => setShowBalanceTransferForm(false)} />;
+  }
   // Tabs list
   const tabs = [
     { id: "loans", label: "Loans" },
@@ -134,16 +139,13 @@ export default function LeadManagement() {
   return (
     <>
       {/* ======= Lead Management Section ======= */}
-      <section id="lead-management" className="p-1 bg-gray-20 min-h-screen">
+      <section id="lead-management" className="p-8 bg-gray-20 min-h-screen">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
-          
           {/* Left Side Title + Subtitle */}
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Lead Management
-            </h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-3xl font-bold text-slate-700">Lead Management</h1>
+            <p className="text-slate-600 mt-2 text-lg">
               Efficiently manage your sales pipeline from initial contact to conversion.
               Track all potential clients and their journey.
             </p>
@@ -152,13 +154,12 @@ export default function LeadManagement() {
           {/* Right Side Button */}
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white px-2 py-2 rounded hover:bg-blue-700 transition"
+            className="flex items-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-md hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
             <Plus className="w-4 h-4" />
             Add New Lead
           </button>
         </div>
-
 
         {/* Tabs / Navbar */}
         <div className="flex border-b border-gray-200 mb-6 space-x-6">
@@ -166,10 +167,10 @@ export default function LeadManagement() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`pb-2 font-medium ${
+              className={`pb-2 font-medium transition-all duration-300 ${
                 activeTab === tab.id
-                  ? "border-b-2 border-blue-600 text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "border-b-2 border-blue-600 text-blue-600 scale-105"
+                  : "text-gray-500 hover:text-gray-700 hover:scale-105"
               }`}
             >
               {tab.label}
@@ -183,7 +184,7 @@ export default function LeadManagement() {
           {activeTab ==="loans" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
              {/* Home Loans */}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                   <h2 className="text-xl font-semibold mb-3">Home Loans</h2>
                 <p className="text-sm mb-6">
@@ -201,10 +202,10 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowHomeLoanForm(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
              {/* Personal Loans*/}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                 <h2 className="text-xl font-semibold mb-3">Personal Loans</h2>
                 <p className="text-sm mb-6">A personal loan is money borrowed from a bank to cover personal expenses.</p>     
@@ -220,10 +221,10 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowPersonalLoanForm(true)} 
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
              {/* Business Loan*/}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                 <h2 className="text-xl font-semibold mb-3">Business Loan</h2>
                 <p className="text-sm mb-6">A business loan is money borrowed to help a company pay for its expenses.</p>
@@ -239,10 +240,10 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowBusinessLoanForm(true)} 
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
              {/*Mortgage Loans*/}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                 <h2 className="text-xl font-semibold mb-3">Mortgage Loans</h2>
                 <p className="text-sm mb-6">A mortgage loan is money borrowed to buy a home, secured by the property itself.</p></div>
@@ -257,10 +258,10 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowMortgageLoanForm(true)}  
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
               {/* SME*/}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                 <h2 className="text-xl font-semibold mb-3">SME</h2>
                 <p className="text-sm mb-6">SME means Small and Medium-sized Enterprises, which are smaller businesses that support jobs and growth.</p></div>
@@ -275,10 +276,10 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowSMELoanForm(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
               {/* Education loan*/}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                 <h2 className="text-xl font-semibold mb-3">Education loan</h2>
                 <p className="text-sm mb-6">
@@ -295,10 +296,10 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowEducationLoanForm(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
               {/* Balance Transfer*/}
-              <div className="bg-white text-black rounded-lg shadow p-6 justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                 <h2 className="text-xl font-semibold mb-3">Balance transfer</h2>
                 <p className="text-sm mb-6">A balance transfer moves debt to a lender with lower interest, and a top-up loan adds extra money to an existing loan.</p></div>
@@ -313,11 +314,12 @@ export default function LeadManagement() {
                   <p className="text-sm text-gray-600">Converted</p>
                 </div>
                 </div>
-                <button className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                <button onClick={() => setShowBalanceTransferForm(true)}
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
               
             {/* Vehicle Loan*/}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">Vehicle Loan</h2>
                 <p className="text-sm mb-6">A vehicle loan is money borrowed to buy a car or other vehicle, with the vehicle as security.</p>
                 {/*active leads*/}
@@ -332,10 +334,10 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowVehicleLoanForm(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
             {/* loan against securities / MF*/}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">loan against securities / MF</h2>
                 <p className="text-sm mb-6">A vehicle loan is money borrowed to buy a car or other vehicle, with the vehicle as collateral.</p>
                 {/*active leads*/}
@@ -351,10 +353,10 @@ export default function LeadManagement() {
                 </div>
                 <button 
                 onClick={() => setShowLoanAgainstSecuritiesForm(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
              {/* Debt Capital Market (DCM)*/}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">Debt Capital Market (DCM)</h2>
                 <p className="text-sm mb-6">The debt capital market is where bonds are issued to raise money, and loan syndication is when many lenders join to give one big loan.</p>
                 {/*active leads*/}
@@ -369,14 +371,14 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowDebtCapitalMarketForm(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
                </div>
           )}
           {activeTab === "insurance" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Life Insurance */}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                   <h2 className="text-xl font-semibold mb-3 text-center">
                     Life Insurance
@@ -397,13 +399,13 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button   onClick={() => setShowLifeInsuranceForm(true)} 
-                  className="flex items-center gap-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                  className="flex items-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">
                   Click to Add New
                 </button>
               </div>
 
               {/* Health Insurance */}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                   <h2 className="text-xl font-semibold mb-3 text-center">
                     Health Insurance
@@ -425,13 +427,13 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowHealthInsuranceForm(true)} 
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">
                   Click to Add New
                 </button>
               </div>
 
               {/* Motor Insurance */}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between ">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                   <h2 className="text-xl font-semibold mb-3 text-center ">
                     Motor Insurance
@@ -453,13 +455,13 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowMotorInsuranceForm(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">
                   Click to Add New
                 </button>
               </div>
              
                {/* Travel Insurance */}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                   <h2 className="text-xl font-semibold mb-3 text-center">
                     Travel Insurance
@@ -479,12 +481,12 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowTravelInsuranceForm(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">
                   Click to Add New
                 </button>
               </div>
                 {/*Property  Insurance */}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                   <h2 className="text-xl font-semibold mb-3 text-center">
                     Property Insurance
@@ -504,12 +506,12 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowPropertyInsuranceForm(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">
                   Click to Add New
                 </button>
               </div>
               {/* Cattle Insurance */}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                   <h2 className="text-xl font-semibold mb-3 text-center">
                     Cattle Insurance
@@ -529,13 +531,13 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowCattleInsuranceForm(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">
                   Click to Add New
                 </button>
               </div>
 
               {/* Marine Insurance */}
-              <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col justify-between">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
                   <h2 className="text-xl font-semibold mb-3 text-center">
                    Marine Insurance
@@ -554,7 +556,7 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button onClick={() => setShowMarineInsuranceForm(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">
                   Click to Add New
                 </button>
               </div>
@@ -563,7 +565,7 @@ export default function LeadManagement() {
           {activeTab === "mutual_fund" && (
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
              {/* */}
-              <div className="bg-white text-black rounded-lg shadow p-6 ">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">Mutual Fund </h2>
                 <p className="text-sm mb-6">A mutual fund pools money from many people to invest in stocks, bonds, or other assets.</p>
                 <div className="flex items-center justify-between my-4">
@@ -575,7 +577,8 @@ export default function LeadManagement() {
                   <span className="text-xl font-bold text-blue-600">5</span>
                   <p className="text-sm text-gray-600">Converted</p>
                 </div>
-                </div><button  onClick={() => setShowMutualFundForm(true)} className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                </div><button  onClick={() => setShowMutualFundForm(true)} 
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
 
               </div>
@@ -583,7 +586,7 @@ export default function LeadManagement() {
           {activeTab === "unlisted" && (
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
              {/* unlisted */}
-              <div className="bg-white text-black rounded-lg shadow p-6 ">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">Unlisted</h2>
                 <p className="text-sm mb-6"></p>
                 <div className="flex items-center justify-between my-4">
@@ -597,14 +600,14 @@ export default function LeadManagement() {
                 </div>
                 </div>
                 <button //onClick={() => setShow(true)}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
             </div>   
           )}
           {activeTab === "investment" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Wealth Management */}
-              <div className="bg-[white] text-black p-6 rounded-lg shadow">
+              <div className="bg-white text-black p-6 rounded-lg shadow-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">Wealth Management</h2>
                 <p className="text-sm mb-6">
                   Wealth management helps individuals manage and grow their
@@ -620,13 +623,14 @@ export default function LeadManagement() {
                   <p className="text-sm text-gray-600">Converted</p>
                 </div>
                 </div>
-                <button onClick={() => setShowWealthManagementForm(true)} className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                <button onClick={() => setShowWealthManagementForm(true)} 
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">
                   Click to Add New
                 </button>
               </div>
 
               {/* PMS / AIF */}
-              <div className="bg-[white] text-black p-6 rounded-lg shadow">
+              <div className="bg-white text-black p-6 rounded-lg shadow-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">PMS / AIF</h2>
                 <p className="text-sm mb-6">PMS offers personalized investment services. AIFs invest in assets like private equity, hedge funds, and real estate.
                 </p>
@@ -640,13 +644,14 @@ export default function LeadManagement() {
                   <p className="text-sm text-gray-600">Converted</p>
                 </div>
                 </div>
-                <button onClick={() => setShowPMSAIFForm(true)} className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                <button onClick={() => setShowPMSAIFForm(true)} 
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">
                   Click to Add New
                 </button>
               </div>
 
               {/* Fixed Deposit */}
-              <div className="bg-[white] text-black p-6 rounded-lg shadow">
+              <div className="bg-white text-black p-6 rounded-lg shadow-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">Fixed Deposit</h2>
                 <p className="text-sm mb-6">
                   A Fixed Deposit (FD) offers a fixed return over a set period —
@@ -661,13 +666,14 @@ export default function LeadManagement() {
                   <span className="text-xl font-bold text-blue-600">5</span>
                   <p className="text-sm text-gray-600">Converted</p>
                 </div>
-                </div><button  onClick={() => setShowFixedDepositForm(true)} className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                </div><button  onClick={() => setShowFixedDepositForm(true)} 
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">
                   Click to Add New
                 </button>
               </div>
 
               {/* Bonds */}
-              <div className="bg-[white] text-black p-6 rounded-lg shadow">
+              <div className="bg-white text-black p-6 rounded-lg shadow-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">Bonds</h2>
                 <p className="text-sm mb-6">Bonds are fixed-income instruments providing regular interest and principal return at maturity.
                 </p>
@@ -681,7 +687,8 @@ export default function LeadManagement() {
                   <p className="text-sm text-gray-600">Converted</p>
                 </div>
                 </div>
-                <button onClick={() => setShowBondsForm(true)} className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">
+                <button onClick={() => setShowBondsForm(true)} 
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">
                   Click to Add New
                 </button>
               </div>
@@ -691,7 +698,7 @@ export default function LeadManagement() {
           {activeTab === "real_estate" && (
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
              {/* real estate*/}
-              <div className="bg-white text-black rounded-lg shadow p-6 ">
+              <div className="bg-white text-black rounded-lg shadow-lg p-6 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">Real Estate</h2>
                 <p className="text-sm mb-6">Real estate investment involves buying or renting property to generate income or profit.</p>
                 <div className="flex items-center justify-between my-4">
@@ -703,7 +710,8 @@ export default function LeadManagement() {
                   <span className="text-xl font-bold text-blue-600">5</span>
                   <p className="text-sm text-gray-600">Converted</p>
                 </div>
-                </div><button onClick={() => setShowRealEstateForm(true)}  className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:bg-[#16948d] transition">Click to Add New</button>
+                </div><button onClick={() => setShowRealEstateForm(true)}  
+                className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
               </div>
           )}
