@@ -7,6 +7,14 @@ const HeroSection = () => {
     const [isTypingComplete, setIsTypingComplete] = useState(false);
 
     useEffect(() => {
+        const hasVisited = localStorage.getItem("heroVisited");
+
+        if (hasVisited) {
+            setDisplayedText(fullText);
+            setIsTypingComplete(true);
+            return;
+        }
+
         let index = 0;
         const typingInterval = setInterval(() => {
             if (index <= fullText.length) {
@@ -14,7 +22,7 @@ const HeroSection = () => {
                 index++;
             } else {
                 setIsTypingComplete(true);
-                clearInterval(typingInterval);
+                localStorage.setItem("heroVisited", "true");
             }
         }, 80);
 
@@ -54,7 +62,7 @@ const HeroSection = () => {
 
                     {/* CTA Buttons with fade-in effect */}
                     <div className={`flex flex-col sm:flex-row justify-center gap-4 transition-opacity duration-1000 delay-300 ${isTypingComplete ? 'opacity-100' : 'opacity-0'}`}>
-                        <button className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}>
+                        <button className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}>
                             <a href='#services'>
                                 <span className="relative z-10">Our Services</span>
                             </a>
@@ -102,7 +110,6 @@ const HeroSection = () => {
                 animation: blink 1s infinite;
             }`}
             </style>
-            
         </section>
     );
 };

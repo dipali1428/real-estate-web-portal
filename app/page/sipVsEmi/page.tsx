@@ -85,20 +85,20 @@ const LoanTenureCalculator: React.FC = () => {
   }, []);
 
   // Format currency
-const formatCurrency = useCallback((amount: number): string => {
-  // Check if amount is NaN, null, or undefined
-  if (isNaN(amount) || amount === null || amount === undefined) {
-    return '₹0';
-  }
-  
-  if (amount >= 10000000) {
-    return '₹' + (amount / 10000000).toFixed(2) + ' Cr';
-  } else if (amount >= 100000) {
-    return '₹' + (amount / 100000).toFixed(1) + ' L';
-  } else {
-    return '₹' + amount.toFixed(0).replace(/\d(?=(\d{3})+$)/g, '$&,');
-  }
-}, []);
+  const formatCurrency = useCallback((amount: number): string => {
+    // Check if amount is NaN, null, or undefined
+    if (isNaN(amount) || amount === null || amount === undefined) {
+      return '₹0';
+    }
+
+    if (amount >= 10000000) {
+      return '₹' + (amount / 10000000).toFixed(2) + ' Cr';
+    } else if (amount >= 100000) {
+      return '₹' + (amount / 100000).toFixed(1) + ' L';
+    } else {
+      return '₹' + amount.toFixed(0).replace(/\d(?=(\d{3})+$)/g, '$&,');
+    }
+  }, []);
 
   // Show notification
   const showNotification = useCallback((message: string, type: 'success' | 'error') => {
@@ -298,11 +298,11 @@ const formatCurrency = useCallback((amount: number): string => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 pb-4">
         {/* Input Card */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+        <div className="bg-white rounded-xl  border border-gray-200 shadow-md p-4 mb-6">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-[#1CADA3] flex items-center gap-2">
+            <h2 className="text-xl font-medium text-gray-800 flex items-center">
               <i className="fas fa-calculator"></i>
               Loan & Investment Parameters
             </h2>
@@ -310,7 +310,7 @@ const formatCurrency = useCallback((amount: number): string => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div>
-              <label htmlFor="loan-amount" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="loan-amount" className="block text-sm font-semibold text-gray-700 mb-2">
                 Loan Amount (₹)
               </label>
               <input
@@ -318,14 +318,15 @@ const formatCurrency = useCallback((amount: number): string => {
                 id="loan-amount"
                 value={parameters.loanAmount === 0 ? '' : parameters.loanAmount}
                 onChange={(e) => handleInputChange('loanAmount', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2076C7] focus:border-blue-500 transition-colors text-gray-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-[#a0ffbd] 
+             focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                 min="100000"
                 step="100000"
               />
             </div>
 
             <div>
-              <label htmlFor="interest-rate" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="interest-rate" className="block text-sm font-semibold text-gray-700 mb-2">
                 Interest Rate (%)
               </label>
               <input
@@ -333,7 +334,8 @@ const formatCurrency = useCallback((amount: number): string => {
                 id="interest-rate"
                 value={parameters.interestRate === 0 ? '' : parameters.interestRate}
                 onChange={(e) => handleInputChange('interestRate', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-[#a0ffbd] 
+             focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                 min="1"
                 max="30"
                 step="0.1"
@@ -341,7 +343,7 @@ const formatCurrency = useCallback((amount: number): string => {
             </div>
 
             <div>
-              <label htmlFor="sip-return" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="sip-return" className="block text-sm font-semibold text-gray-700 mb-2">
                 SIP Expected Return (%)
               </label>
               <input
@@ -349,7 +351,8 @@ const formatCurrency = useCallback((amount: number): string => {
                 id="sip-return"
                 value={parameters.sipReturn === 0 ? '' : parameters.sipReturn}
                 onChange={(e) => handleInputChange('sipReturn', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-[#a0ffbd] 
+             focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                 min="1"
                 max="30"
                 step="0.1"
@@ -360,15 +363,13 @@ const formatCurrency = useCallback((amount: number): string => {
           <div className="flex gap-3">
             <button
               onClick={calculateImpact}
-              className="bg-[#2076C7] hover:bg-[#006ace] text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
-            >
+              className="bg-[#2076C7] hover:bg-[#006ace] text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors">
               <i className="fas fa-calculator"></i>
               Calculate
             </button>
             <button
               onClick={resetForm}
-              className="bg-[#1CADA3] hover:bg-[#0d968d] text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
-            >
+              className="bg-[#1CADA3] hover:bg-[#0d968d] text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors">
               <i className="fas fa-redo"></i>
               Reset
             </button>
@@ -376,100 +377,37 @@ const formatCurrency = useCallback((amount: number): string => {
         </div>
 
         {/* Results */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-[#2076C7] text-white rounded-xl p-6 text-center shadow-md">
-            <i className="fas fa-money-bill-wave text-2xl mb-2"></i>
-            <div className="text-2xl font-bold mb-1">{formatCurrency(results.emi20)}</div>
-            <div className="text-blue-100 text-sm">EMI (20 Years)</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 font-sans">
+          <div className="bg-white border border-gray-200 text-gray-800 rounded-xl p-6 text-center shadow-sm hover:shadow-md transition">
+            <div className="text-2xl font-medium mb-1">{formatCurrency(results.emi20)}</div>
+            <div className="text-gray-500 text-sm">EMI (20 Years)</div>
           </div>
 
-          <div className="bg-[#2076C7] text-white rounded-xl p-6 text-center shadow-md">
-            <i className="fas fa-money-bill-wave text-2xl mb-2"></i>
-            <div className="text-2xl font-bold mb-1">{formatCurrency(results.emi30)}</div>
-            <div className="text-blue-100 text-sm">EMI (30 Years)</div>
+          <div className="bg-white border border-gray-200 text-gray-800 rounded-xl p-6 text-center shadow-sm hover:shadow-md transition">
+            <i className="fas fa-money-bill-wave text-2xl text-gray-600 mb-2"></i>
+            <div className="text-2xl font-medium mb-1">{formatCurrency(results.emi30)}</div>
+            <div className="text-gray-500 text-sm">EMI (30 Years)</div>
           </div>
 
-          <div className="bg-[#2076C7] text-white rounded-xl p-6 text-center shadow-md">
-            <i className="fas fa-chart-line text-2xl mb-2"></i>
-            <div className="text-2xl font-bold mb-1">{formatCurrency(results.emiDifference)}</div>
-            <div className="text-blue-100 text-sm">Monthly SIP Difference</div>
+          <div className="bg-white border border-gray-200 text-gray-800 rounded-xl p-6 text-center shadow-sm hover:shadow-md transition">
+            <i className="fas fa-chart-line text-2xl text-gray-600 mb-2"></i>
+            <div className="text-2xl font-medium mb-1">{formatCurrency(results.emiDifference)}</div>
+            <div className="text-gray-500 text-sm">Monthly SIP Difference</div>
           </div>
 
-          <div className="bg-[#2076C7] text-white rounded-xl p-6 text-center shadow-md">
-            <i className="fas fa-piggy-bank text-2xl mb-2"></i>
-            <div className="text-2xl font-bold mb-1">{formatCurrency(results.sipValue)}</div>
-            <div className="text-blue-100 text-sm">SIP Value After 30 Years</div>
-          </div>
-        </div>
-
-        {/* Insights */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6 border-l-4 border-green-500">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <i className="fas fa-lightbulb text-yellow-500"></i>
-            Key Insights
-          </h2>
-
-          <div className="text-gray-700 leading-relaxed">
-            <p className="mb-3">By extending your loan tenure from 20 to 30 years:</p>
-            <ul className="list-disc pl-5 mb-4 space-y-2">
-              <li>
-                Your monthly EMI decreases by{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-semibold">
-                  {formatCurrency(results.emiDifference)}
-                </span>{' '}
-                ({((results.emi20 - results.emi30) / results.emi20 * 100).toFixed(1)}% reduction)
-              </li>
-              <li>Total interest paid increases by {formatCurrency(results.totalInterest30 - results.totalInterest20)}</li>
-              <li>If you invest the EMI difference in a SIP with {parameters.sipReturn}% annual returns:</li>
-              <li>Your SIP grows to <span className="bg-blue-50 px-2 py-1 rounded font-semibold">{formatCurrency(results.sipValue)}</span> in 30 years</li>
-
-              <li>The SIP value is <span className="bg-blue-50 px-2 py-1 rounded font-semibold">
-                {((results.sipValue / (parameters.loanAmount + results.totalInterest30)) * 100).toFixed(1)}%
-              </span> of your total loan cost</li>
-              <li>You effectively convert EMI savings into significant wealth creation</li>
-              {(() => {
-                const sipExceedsYear = yearlyBreakdown.find(item =>
-                  item.sipValue >= item.loanBalance && item.loanBalance > 0
-                )?.year;
-
-                const loanClosedBySipYear = yearlyBreakdown.find(item =>
-                  item.status.includes('Loan Closed (SIP)')
-                )?.year;
-
-                const loanPayoffYear = yearlyBreakdown.find(item =>
-                  item.status.includes('Loan Closed (Regular)') && !item.status.includes('SIP')
-                )?.year || 30;
-
-                const yearsSaved = 30 - loanPayoffYear;
-
-                return (
-                  <>
-                    {sipExceedsYear && (
-                      <li>
-                        In <span className="bg-blue-50 px-2 py-1 rounded font-semibold">Year {sipExceedsYear}</span>, your SIP value exceeds your remaining loan balance
-                      </li>
-                    )}
-                    {loanClosedBySipYear && (
-                      <li>
-                        You can close your loan in <span className="bg-blue-50 px-2 py-1 rounded font-semibold">Year {loanClosedBySipYear}</span> by using your SIP funds, saving even more on interest
-                      </li>
-                    )}
-                    <li>You effectively pay off your loan early while building significant wealth</li>
-                  </>
-                );
-              })()}
-            </ul>
-            <p className="text-sm text-gray-600">
-              <strong>Note:</strong> This analysis assumes consistent SIP returns and doesn't account for inflation or tax implications.
-            </p>
+          <div className="bg-white border border-gray-200 text-gray-800 rounded-xl p-6 text-center shadow-sm hover:shadow-md transition">
+            <i className="fas fa-piggy-bank text-2xl text-gray-600 mb-2"></i>
+            <div className="text-2xl font-medium mb-1">{formatCurrency(results.sipValue)}</div>
+            <div className="text-gray-500 text-sm">SIP Value After 30 Years</div>
           </div>
         </div>
+
 
         {/* Yearly Breakdown Table */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6 flex flex-col max-h-[600px]">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-md overflow-hidden mb-6 flex flex-col max-h-[600px]">
           {/* Table Header - Fixed */}
-          <div className="flex-shrink-0 p-6 pb-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-[#2076C7] flex items-center gap-2">
+          <div className="shrink-0 p-4 pb-4 border-b border-gray-200">
+            <h2 className="text-xl font-medium text-gray-800 flex items-center">
               <i className="fas fa-table"></i>
               Yearly Breakdown: EMI Savings Invested in SIP
             </h2>
@@ -492,8 +430,7 @@ const formatCurrency = useCallback((amount: number): string => {
                   {yearlyBreakdown.map((row, index) => (
                     <tr
                       key={index}
-                      className={`border-b border-gray-200 hover:bg-gray-50 text-gray-500 ${row.className || ''}`}
-                    >
+                      className={`border-b border-gray-200 hover:bg-gray-50 text-gray-800 font-sans ${row.className || ''}`}>
                       <td className="px-4 py-3">{row.year}</td>
                       <td className="px-4 py-3">{formatCurrency(row.emiSavings)}</td>
                       <td className="px-4 py-3">{formatCurrency(row.sipValue)}</td>
@@ -506,6 +443,70 @@ const formatCurrency = useCallback((amount: number): string => {
             </div>
           </div>
         </div>
+
+        {/* Insights */}
+        <div className="bg-white rounded-xl border shadow-md p-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <i className="fas fa-lightbulb text-yellow-500"></i>
+            Key Insights
+          </h2>
+
+          <div className="text-gray-700 leading-relaxed">
+            <p className="mb-3">By extending your loan tenure from 20 to 30 years:</p>
+            <ul className="list-disc pl-5 mb-4 space-y-2">
+              <li>
+                Your monthly EMI decreases by{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                  {formatCurrency(results.emiDifference)}
+                </span>{' '}
+                ({((results.emi20 - results.emi30) / results.emi20 * 100).toFixed(1)}% reduction)
+              </li>
+              <li>Total interest paid increases by {formatCurrency(results.totalInterest30 - results.totalInterest20)}</li>
+              <li>If you invest the EMI difference in a SIP with {parameters.sipReturn}% annual returns:</li>
+              <li>Your SIP grows to <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">{formatCurrency(results.sipValue)}</span> in 30 years</li>
+
+              <li>The SIP value is <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                {((results.sipValue / (parameters.loanAmount + results.totalInterest30)) * 100).toFixed(1)}%
+              </span> of your total loan cost</li>
+              <li>You effectively convert EMI savings into significant wealth creation</li>
+              {(() => {
+                const sipExceedsYear = yearlyBreakdown.find(item =>
+                  item.sipValue >= item.loanBalance && item.loanBalance > 0
+                )?.year;
+
+                const loanClosedBySipYear = yearlyBreakdown.find(item =>
+                  item.status.includes('Loan Closed (SIP)')
+                )?.year;
+
+                const loanPayoffYear = yearlyBreakdown.find(item =>
+                  item.status.includes('Loan Closed (Regular)') && !item.status.includes('SIP')
+                )?.year || 30;
+
+                const yearsSaved = 30 - loanPayoffYear;
+
+                return (
+                  <>
+                    {sipExceedsYear && (
+                      <li>
+                        In <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">Year {sipExceedsYear}</span>, your SIP value exceeds your remaining loan balance
+                      </li>
+                    )}
+                    {loanClosedBySipYear && (
+                      <li>
+                        You can close your loan in <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">Year {loanClosedBySipYear}</span> by using your SIP funds, saving even more on interest
+                      </li>
+                    )}
+                    <li>You effectively pay off your loan early while building significant wealth</li>
+                  </>
+                );
+              })()}
+            </ul>
+            <p className="text-sm text-gray-600">
+              <strong>Note:</strong> This analysis assumes consistent SIP returns and doesn't account for inflation or tax implications.
+            </p>
+          </div>
+        </div>
+
       </div>
 
       {/* Notification */}
@@ -518,8 +519,7 @@ const formatCurrency = useCallback((amount: number): string => {
             <span className="flex-1 text-gray-600">{notification.message}</span>
             <button
               onClick={() => setNotification(prev => ({ ...prev, show: false }))}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
+              className="text-gray-400 hover:text-gray-600 transition-colors">
               <i className="fas fa-times"></i>
             </button>
           </div>

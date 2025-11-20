@@ -11,12 +11,12 @@ const EMICalculator: React.FC = () => {
   const [loanAmount, setLoanAmount] = useState<number>(1000000);
   const [interestRate, setInterestRate] = useState<number>(8.5);
   const [loanTenure, setLoanTenure] = useState<number>(20);
-  
+
   // State for calculated values
   const [emi, setEmi] = useState<number>(0);
   const [totalPayment, setTotalPayment] = useState<number>(0);
   const [totalInterest, setTotalInterest] = useState<number>(0);
-  
+
   // Chart reference
   const chartRef = useRef<Chart<'doughnut'> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -43,14 +43,14 @@ const EMICalculator: React.FC = () => {
       }
       return;
     }
-    
+
     // Remove any non-numeric characters except decimal point
     const cleanValue = value.replace(/[^\d.]/g, '');
-    
+
     // Ensure only one decimal point
     const parts = cleanValue.split('.');
     if (parts.length > 2) return; // Invalid input
-    
+
     const numValue = parseFloat(cleanValue);
     if (!isNaN(numValue)) {
       switch (field) {
@@ -73,30 +73,30 @@ const EMICalculator: React.FC = () => {
     if (!loanAmount || loanAmount < 100000 || loanAmount === 0) {
       return;
     }
-    
+
     if (!interestRate || interestRate < 7 || interestRate === 0) {
       return;
     }
-    
+
     if (!loanTenure || loanTenure < 1 || loanTenure === 0) {
       return;
     }
 
     const monthlyInterestRate = interestRate / 12 / 100;
     const tenureMonths = loanTenure * 12;
-    
+
     // EMI formula: [P x R x (1+R)^N]/[(1+R)^N-1]
-    const emiValue = loanAmount * monthlyInterestRate * 
-                    Math.pow(1 + monthlyInterestRate, tenureMonths) / 
-                    (Math.pow(1 + monthlyInterestRate, tenureMonths) - 1);
-    
+    const emiValue = loanAmount * monthlyInterestRate *
+      Math.pow(1 + monthlyInterestRate, tenureMonths) /
+      (Math.pow(1 + monthlyInterestRate, tenureMonths) - 1);
+
     const totalPaymentValue = emiValue * tenureMonths;
     const totalInterestValue = totalPaymentValue - loanAmount;
-    
+
     setEmi(emiValue);
     setTotalPayment(totalPaymentValue);
     setTotalInterest(totalInterestValue);
-    
+
     // Update chart
     updateChart(loanAmount, totalInterestValue);
   };
@@ -190,10 +190,11 @@ const EMICalculator: React.FC = () => {
             <h1 className="text-3xl font-bold mb-2">EMI Calculator</h1>
             <p className="text-blue-100">Calculate your Equated Monthly Installment</p>
           </div>
-          
+
           <div className="flex flex-col lg:flex-row p-6 lg:p-8">
             {/* Input Section */}
             <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
+
               {/* Loan Amount */}
               <div className="mb-6">
                 <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-2">
@@ -221,13 +222,13 @@ const EMICalculator: React.FC = () => {
                     id="loanAmountInput"
                     value={getLoanAmountDisplayValue()}
                     onChange={handleLoanAmountInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors pr-12 text-gray-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
                     placeholder="Enter loan amount"
                   />
                   <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
                 </div>
               </div>
-              
+
               {/* Interest Rate */}
               <div className="mb-6">
                 <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2">
@@ -242,7 +243,7 @@ const EMICalculator: React.FC = () => {
                     step="0.1"
                     value={interestRate}
                     onChange={handleInterestRateChange}
-                    className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
+                    className="w-full h-2 bg-gray-300 border border-gray-300 focus:outline-none focus:border-[#1CADA3] rounded-lg cursor-pointer slider"
                   />
                   <div className="flex justify-between text-sm text-gray-600 mt-1">
                     <span>7%</span>
@@ -258,12 +259,12 @@ const EMICalculator: React.FC = () => {
                     step="0.1"
                     value={interestRate === 0 ? '' : interestRate}
                     onChange={handleInterestRateInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors pr-12 text-gray-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3]  bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
                   />
                   <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
                 </div>
               </div>
-              
+
               {/* Loan Tenure */}
               <div className="mb-8">
                 <label htmlFor="loanTenure" className="block text-[#2076C7] font-semibold mb-2">
@@ -293,26 +294,26 @@ const EMICalculator: React.FC = () => {
                     max="30"
                     value={loanTenure === 0 ? '' : loanTenure}
                     onChange={handleLoanTenureInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors pr-20 text-gray-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3]  bg-gray-100 focus:bg-white  focus:ring-0 focus:ring-teal-200 transition-colors pr-20 text-gray-800 placeholder:text-gray-500"
                   />
                   <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">Years</span>
                 </div>
               </div>
-              
+
               {/* Results Section */}
               <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
-                <div className="text-3xl font-bold text-[#1CADA3] text-center mb-6">
+                <div className="text-3xl font-bold text-[#1CADA3] font-sans text-center mb-6">
                   {emi > 0 ? formatCurrency(emi) : '₹0'}
                 </div>
                 <div className="flex justify-between">
                   <div className="text-center flex-1 px-4">
-                    <div className="text-lg font-semibold text-[#1CADA3]">
+                    <div className="text-lg font-medium font-sans text-[#1CADA3]">
                       {totalPayment > 0 ? formatCurrency(totalPayment) : '₹0'}
                     </div>
                     <div className="text-sm text-[#1CADA3] mt-1">Total Payment</div>
                   </div>
                   <div className="text-center flex-1 px-4">
-                    <div className="text-lg font-semibold text-[#1CADA3]">
+                    <div className="text-lg font-medium font-sans text-[#1CADA3]">
                       {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                     </div>
                     <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
@@ -320,31 +321,31 @@ const EMICalculator: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Visualization Section */}
             <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0">
               <div className="chart-container h-64 mb-6">
                 <canvas ref={canvasRef}></canvas>
               </div>
-              
+
               <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
                 <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Loan Summary</h5>
                 <div className="space-y-4">
                   <div className="flex justify-between pb-3 border-b border-gray-200">
                     <span className="text-gray-600">Principal Amount</span>
-                    <span className="font-semibold text-[#1CADA3]">
+                    <span className="font-medium font-sans text-[#1CADA3]">
                       {loanAmount > 0 ? formatCurrency(loanAmount) : '₹0'}
                     </span>
                   </div>
                   <div className="flex justify-between pb-3 border-b border-gray-200">
                     <span className="text-gray-600">Total Interest Payable</span>
-                    <span className="font-semibold text-[#1CADA3]">
+                    <span className="font-medium font-sans text-[#1CADA3]">
                       {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total Amount Payable</span>
-                    <span className="font-semibold text-[#1CADA3]">
+                    <span className="font-medium font-sans text-[#1CADA3]">
                       {totalPayment > 0 ? formatCurrency(totalPayment) : '₹0'}
                     </span>
                   </div>

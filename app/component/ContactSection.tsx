@@ -16,14 +16,70 @@ const ContactSection = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let newValue = value;
+
+    // Name Logic → Capitalize each word
+    if (name === "name") {
+      newValue = newValue
+        .toLowerCase()
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
+    // Email Logic → Standard formatting
+    if (name === "email") {
+      newValue = newValue.trim().toLowerCase();
+    }
+
+    // Phone Logic → Only digits, max 10
+    if (name === "phone") {
+      newValue = newValue.replace(/\D/g, "");
+      if (newValue.length > 10) return;
+    }
+
+    // Message Logic → Keep raw text
+    if (name === "message") {
+      newValue = newValue; // no transformation
+    }
+
+    setForm({ ...form, [name]: newValue });
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
     setLoading(true);
+
+    const nameRegex = /^[A-Za-z]+(?:\s+[A-Za-z]+)+$/;  // At least first + last name
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    const phoneRegex = /^[6-9]\d{9}$/;
+
+    if (!nameRegex.test(form.name)) {
+      setError("Please enter your full name (first and last).");
+      setLoading(false);
+      return;
+    }
+
+    if (!emailRegex.test(form.email)) {
+      setError("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+
+    if (!phoneRegex.test(form.phone)) {
+      setError("Enter a valid 10-digit.");
+      setLoading(false);
+      return;
+    }
+
+    if (form.message.trim().length < 5) {
+      setError("Message should be at least 5 characters.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await AuthService.contactUs(form);
       setSuccess(`✅ ${res.message} (Enquiry ID: ${res.enquiry_id})`);
@@ -42,7 +98,7 @@ const ContactSection = () => {
     "Hyderabad", "Indore", "Surat", "Lucknow"
   ];
   return (
-    <section id="contact" className="bg-gray-50">
+    <section id="contact" className="bg-gray-50 pt-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
@@ -91,7 +147,7 @@ const ContactSection = () => {
 
           {/* Right - Form */}
           <div>
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Send Us A Message</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">Send Us A Message</h3>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <input
                 type="text"
@@ -100,7 +156,7 @@ const ContactSection = () => {
                 value={form.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
               />
               <input
                 type="email"
@@ -109,7 +165,7 @@ const ContactSection = () => {
                 value={form.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
               />
               <input
                 type="tel"
@@ -118,7 +174,7 @@ const ContactSection = () => {
                 value={form.phone}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
               />
               <textarea
                 name="message"
@@ -127,7 +183,7 @@ const ContactSection = () => {
                 value={form.message}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500">
+                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900">
               </textarea>
 
               <button
