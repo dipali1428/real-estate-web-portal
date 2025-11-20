@@ -224,7 +224,7 @@ const CreditScorePage: React.FC = () => {
                                             required
                                             placeholder="Enter your full name"
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg 
-                                            text-gray-700 placeholder-gray-500
+                                            text-gray-800 placeholder-gray-500
                                             focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3] 
                                              focus:outline-none transition-all duration-200"
                                         />
@@ -245,7 +245,7 @@ const CreditScorePage: React.FC = () => {
                                             required
                                             placeholder="Enter your email"
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg 
-                                            text-gray-700 placeholder-gray-500
+                                            text-gray-800 placeholder-gray-500
                                             focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3] 
                                             focus:outline-none transition-all duration-200"
                                         />
@@ -268,7 +268,7 @@ const CreditScorePage: React.FC = () => {
                                             required
                                             placeholder="Enter your mobile number"
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg 
-                                                 text-gray-700 placeholder-gray-500
+                                                 text-gray-800 placeholder-gray-500
                                                 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3] 
                                                 focus:outline-none transition-all duration-200"
                                         />
@@ -290,7 +290,7 @@ const CreditScorePage: React.FC = () => {
                                             required
                                             placeholder="Enter your PAN number"
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg uppercase
-                                         text-gray-700 placeholder-gray-500
+                                         text-gray-800 placeholder-gray-500
                                         focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3] 
                                         focus:outline-none transition-all duration-200"
                                         />
@@ -311,7 +311,7 @@ const CreditScorePage: React.FC = () => {
                                         onChange={handleFormChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg 
-                                          text-gray-700 placeholder-gray-500
+                                          text-gray-800 placeholder-gray-500
                                             focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3] 
                                             focus:outline-none transition-all duration-200"
                                     />

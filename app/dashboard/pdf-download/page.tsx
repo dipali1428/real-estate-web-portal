@@ -23,19 +23,18 @@ export default function Downloads() {
   const [selectedSubCategory, setSelectedSubCategory] = useState<'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan'>('motor-insurance');
   const [isInsuranceOpen, setIsInsuranceOpen] = useState(false);
   const [isLoanOpen, setIsLoanOpen] = useState(false);
-  
-  // New states for brochures section
-  const [brochureSelectedCategory, setBrochureSelectedCategory] = useState<'insurance' | 'loan'>('insurance');
-  const [brochureSelectedSubCategory, setBrochureSelectedSubCategory] = useState<'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan'>('motor-insurance');
-  const [isBrochureInsuranceOpen, setIsBrochureInsuranceOpen] = useState(false);
-  const [isBrochureLoanOpen, setIsBrochureLoanOpen] = useState(false);
+
+  // Separate state for brochures section 
+  const [selectedCategoryBrochures, setSelectedCategoryBrochures] = useState<'insurance' | 'loan'>('insurance');
+  const [selectedSubCategoryBrochures, setSelectedSubCategoryBrochures] = useState<'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan'>('motor-insurance');
+  const [isInsuranceOpenBrochures, setIsInsuranceOpenBrochures] = useState(false);
+  const [isLoanOpenBrochures, setIsLoanOpenBrochures] = useState(false);
 
   // Sample data for downloads with actual file paths
   const downloadData: DownloadItem[] = [
-    // ... (keep all your existing downloadData array as is)
     {
       id: '1',
-      name: 'Motor Insurance IA Payout OCT with logo.pdf',
+      name: 'Motor_Insurance_IA_Payout_OCT.pdf',
       type: 'pdf',
       size: '2.4 MB',
       uploadDate: '2025-11-15',
@@ -43,13 +42,13 @@ export default function Downloads() {
       month: 'november-2025',
       year: '2025',
       subCategory: 'motor-insurance',
-      filePath: '/pdfs/motorinsurancepdf/Motor Insurance IA Payout OCT with logo.pdf'
+      filePath: '/pdfs/motorinsurancepdf/Motor_Insurance_IA_Payout_OCT.pdf'
     },
     
     // Insurance - Life Insurance
     {
       id: '2',
-      name: 'ABSLI FESTIVE FLIGHTS CONTEST.pdf',
+      name: 'ABSLI_FESTIVE_FLIGHTS_CONTEST.pdf',
       type: 'pdf',
       size: '2.4 MB',
       uploadDate: '2025-11-15',
@@ -57,100 +56,340 @@ export default function Downloads() {
       month: 'november-2025',
       year: '2025',
       subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/ABSLI FESTIVE FLIGHTS CONTEST.pdf'
+      filePath: '/pdfs/lifeinsurancepdf/ABSLI_FESTIVE_FLIGHTS_CONTEST.pdf'
     },
-    // ... (all your existing items)
+    {
+      id: '3',
+      name: 'AXIS_MAX_FESTIVE_FLIGHTS_CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/AXIS_MAX_FESTIVE_FLIGHTS_CONTEST.pdf'
+    },
+    {
+      id: '4',
+      name: 'BAJAJ_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/BAJAJ_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf'
+    },
+    {
+      id: '5',
+      name: 'DIGIT_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/DIGIT_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf'
+    },
+    {
+      id: '6',
+      name: 'HDFC_LIFE_GRID_FESTIVE_FLIGHTS_CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE_GRID_FESTIVE_FLIGHTS_CONTEST.pdf'
+    },
+    {
+      id: '7',
+      name: 'ICICI_PRUDENTIAL_FESTIVE_FLIGHTS_CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/ICICI_PRUDENTIAL_FESTIVE_FLIGHTS_CONTEST.pdf'
+    },
+    {
+      id: '8',
+      name: 'TATA_AIA_FESTIVE_FLIGHTS_CONTEST.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2025-11-15',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_FESTIVE_FLIGHTS_CONTEST.pdf'
+    },
+    
+    // Insurance - Health Insurance
+    {
+      id: '9',
+      name: 'HEALTH_FINAL_PAYOUT_FESTIVE_FLIGHTS_2025.pdf',
+      type: 'pdf',
+      size: '2.8 MB',
+      uploadDate: '2025-11-01',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/healthinsurancepdf/HEALTH_FINAL_PAYOUT_FESTIVE_FLIGHTS_2025.pdf'
+    },
 
-    // Product Brochures - Updated with subCategories
+    // Loan - Home Loan
+    {
+      id: '10',
+      name: 'IA_Festive_Flights_Home_Loan_Payout.pdf',
+      type: 'pdf',
+      size: '2.2 MB',
+      uploadDate: '2025-11-05',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'home-loan',
+      filePath: '/pdfs/loans/IA_Festive_Flights_Home_Loan_Payout.pdf'
+    },
+    
+    // Loan - Business Loan
+    {
+      id: '11',
+      name: 'IA_Festive_Flights_Business_Loan_Payout.pdf',
+      type: 'xlsx',
+      size: '1.7 MB',
+      uploadDate: '2025-10-25',
+      category: 'payout',
+      month: 'october-2025',
+      year: '2025',
+      subCategory: 'business-loan',
+      filePath: '/pdfs/loans/IA_Festive_Flights_Business_Loan_Payout.pdf'
+    },
+
+    // Loan - LAP Loan
+    {
+      id: '12',
+      name: 'IA_Festive_Flights_LAP_Loan_Payout.pdf',
+      type: 'xlsx',
+      size: '1.7 MB',
+      uploadDate: '2025-10-25',
+      category: 'payout',
+      month: 'october-2025',
+      year: '2025',
+      subCategory: 'lap-loan',
+      filePath: '/pdfs/loans/IA_Festive_Flights_LAP_Loan_Payout.pdf'
+    },
+
+    // Loan - Personal Loan
+    {
+      id: '14',
+      name: 'IA_Festive_Flights_Personal_Loan_Payout.pdf',
+      type: 'pdf',
+      size: '2.1 MB',
+      uploadDate: '2025-11-05',
+      category: 'payout',
+      month: 'november-2025',
+      year: '2025',
+      subCategory: 'personal-loan',
+      filePath: '/pdfs/loans/IA_Festive_Flights_Personal_Loan_Payout.pdf'
+    },
+    
+    // Product Brochures
     {
       id: '15',
-      name: 'Motor Insurance Product Brochure.pdf',
-      type: 'pdf',
-      size: '4.2 MB',
-      uploadDate: '2025-11-01',
-      category: 'brochures',
-      subCategory: 'motor-insurance',
-      filePath: '/pdfs/brochures/Motor Insurance Product Brochure.pdf'
-    },
-    {
-      id: '16',
-      name: 'Life Insurance Product Catalog.pdf',
+      name: 'HDFC_Life_Sanchay_Plus_V24_.pdf',
       type: 'pdf',
       size: '4.2 MB',
       uploadDate: '2025-11-01',
       category: 'brochures',
       subCategory: 'life-insurance',
-      filePath: '/pdfs/brochures/Life Insurance Product Catalog.pdf'
+      filePath: '/pdfs/productbroucher/HDFC_Life_Sanchay_Plus_V24_.pdf'
+    },
+    {
+      id: '16',
+      name: 'HDFC_Life_Click.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/productbroucher/HDFC_Life_Click.pdf'
     },
     {
       id: '17',
-      name: 'Health Insurance Comprehensive Guide.pdf',
+      name: 'Bajaj-Allianz-Term-Insurance-Brochure_.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/productbroucher/Bajaj-Allianz-Term-Insurance-Brochure_.pdf'
+    },
+    {
+      id: '18',
+      name: 'Bajaj_Etouch_Brochure.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/productbroucher/Bajaj_Etouch_Brochure.pdf'
+    },
+    {
+      id: '19',
+      name: 'ACE_Variants_One.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/productbroucher/ACE_Variants_One.pdf'
+    },
+     {
+      id: '20',
+      name: 'HDFC_Life-_Systematic_Pension_Plan.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/productbroucher/HDFC_Life-_Systematic_Pension_Plan.pdf'
+    },
+    {
+      id: '21',
+      name: 'Health_insurance_Medicare_Select_One_Pager.pdf',
       type: 'pdf',
       size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
-      filePath: '/pdfs/brochures/Health Insurance Comprehensive Guide.pdf'
+      filePath: '/pdfs/productbroucher/health/Health_insurance_Medicare_Select_One_Pager.pdf'
+    },
+     {
+      id: '22',
+      name: 'Health_Insurance_Creative_Brief_MediCare_Select_Launch.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures',
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/productbroucher/health/Health_Insurance_Creative_Brief_MediCare_Select_Launch.pdf'
     },
     {
-      id: '18',
-      name: 'Home Loan Benefits Brochure.pdf',
+      id: '23',
+      name: 'Elevate_One_Page.pdf',
       type: 'pdf',
-      size: '3.5 MB',
-      uploadDate: '2025-11-05',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
       category: 'brochures',
-      subCategory: 'home-loan',
-      filePath: '/pdfs/brochures/Home Loan Benefits Brochure.pdf'
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/productbroucher/health/Elevate_One_Page.pdf'
     },
     {
-      id: '19',
-      name: 'Business Loan Solutions.pdf',
+      id: '24',
+      name: 'Broc_New_Elevate.pdf',
       type: 'pdf',
-      size: '2.9 MB',
-      uploadDate: '2025-10-25',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
       category: 'brochures',
-      subCategory: 'business-loan',
-      filePath: '/pdfs/brochures/Business Loan Solutions.pdf'
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/productbroucher/Broc_New_Elevate.pdf'
     },
     {
-      id: '20',
-      name: 'LAP Loan Features Guide.pdf',
+      id: '25',
+      name: 'Fabing_One_Pager_MAX_Sept2023.pdf',
       type: 'pdf',
-      size: '3.1 MB',
-      uploadDate: '2025-11-10',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
       category: 'brochures',
-      subCategory: 'lap-loan',
-      filePath: '/pdfs/brochures/LAP Loan Features Guide.pdf'
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/productbroucher/Fabing_One_Pager_MAX_Sept2023.pdf'
     },
     {
-      id: '21',
-      name: 'Personal Loan Options.pdf',
+      id: '26',
+      name: 'Star_Flexi_One Pager_Preferred_R10.pdf',
       type: 'pdf',
-      size: '2.7 MB',
-      uploadDate: '2025-11-08',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
       category: 'brochures',
-      subCategory: 'personal-loan',
-      filePath: '/pdfs/brochures/Personal Loan Options.pdf'
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/productbroucher/Star_Flexi_One_Pager_Preferred_R10.pdf'
     },
-    
+    {
+      id: '27',
+      name: 'One_pager_Super_Star_Classic_R10.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures',
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/productbroucher/One_pager_Super_Star_Classic_R10.pdf'
+    },
+    {
+      id: '28',
+      name: 'Star_Health_Assure_One_pager_Version_1.0.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures',
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/productbroucher/Star_Health_Assure_One_pager_Version_1.0.pdf'
+    },
+    {
+      id: '29',
+      name: 'Star_Women_Care_One_Pager_version_1.0.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures',
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/productbroucher/Star_Women_Care_One_Pager_version_1.0.pdf'
+    },
+    {
+      id: '30',
+      name: 'SBI_General_Health_Alpha_Leaflet_Alpha_Select_Alpha_Ultimate.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures',
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/productbroucher/SBI_General_Health_Alpha_Leaflet_Alpha_Select_Alpha_Ultimate.pdf'
+    },
+    {
+      id: '31',
+      name: 'SBI_General_Health_Alpha_Brochure.pdf',
+      type: 'pdf',
+      size: '3.8 MB',
+      uploadDate: '2025-10-15',
+      category: 'brochures',
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/productbroucher/SBI_General_Health_Alpha_Brochure.pdf'
+    },
     // Application Forms
     {
-      id: '22',
+      id: '32',
       name: 'New Client Application Form.pdf',
       type: 'pdf',
       size: '1.5 MB',
       uploadDate: '2025-11-05',
       category: 'forms',
-      filePath: '/pdfs/forms/New Client Application Form.pdf'
+      filePath: '/pdfs/forms/New_Client_Application_Form.pdf'
     },
     {
-      id: '23',
+      id: '33',
       name: 'Policy Renewal Form.docx',
       type: 'doc',
       size: '0.8 MB',
       uploadDate: '2025-10-25',
       category: 'forms',
-      filePath: '/pdfs/forms/Policy Renewal Form.docx'
+      filePath: '/pdfs/forms/Policy_Renewal_Form.docx'
     }
   ];
 
@@ -161,12 +400,19 @@ export default function Downloads() {
              item.month === selectedMonth && 
              item.subCategory === selectedSubCategory;
     }
-    if (activeSection === 'brochures') {
-      return item.category === 'brochures' && 
-             item.subCategory === brochureSelectedSubCategory;
-    }
     return item.category === activeSection;
   });
+
+  // Filter brochures data based on selected category
+  const filteredBrochuresData = downloadData.filter(item => 
+    item.category === 'brochures' && 
+    item.subCategory === selectedSubCategoryBrochures
+  );
+
+  // Filter forms data
+  const filteredFormsData = downloadData.filter(item => 
+    item.category === 'forms'
+  );
 
   // Generate months for dropdown
   const months = [
@@ -181,25 +427,25 @@ export default function Downloads() {
     switch (type) {
       case 'pdf':
         return (
-          <div className="w-10 h-12 bg-red-500 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-12 bg-red-500 rounded-lg flex items-center justify-center shrink-0">
             <span className="text-white font-bold text-xs">PDF</span>
           </div>
         );
       case 'doc':
         return (
-          <div className="w-10 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-12 bg-blue-500 rounded-lg flex items-center justify-center shrink-0">
             <span className="text-white font-bold text-xs">DOC</span>
           </div>
         );
       case 'xlsx':
         return (
-          <div className="w-10 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-12 bg-green-500 rounded-lg flex items-center justify-center shrink-0">
             <span className="text-white font-bold text-xs">XLS</span>
           </div>
         );
       default:
         return (
-          <div className="w-10 h-12 bg-gray-500 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-12 bg-gray-500 rounded-lg flex items-center justify-center shrink-0">
             <span className="text-white font-bold text-xs">FILE</span>
           </div>
         );
@@ -264,27 +510,27 @@ export default function Downloads() {
   };
 
   // Handle insurance dropdown toggle for brochures
-  const handleBrochureInsuranceToggle = () => {
-    setIsBrochureInsuranceOpen(!isBrochureInsuranceOpen);
-    setIsBrochureLoanOpen(false);
+  const handleInsuranceToggleBrochures = () => {
+    setIsInsuranceOpenBrochures(!isInsuranceOpenBrochures);
+    setIsLoanOpenBrochures(false);
   };
 
   // Handle loan dropdown toggle for brochures
-  const handleBrochureLoanToggle = () => {
-    setIsBrochureLoanOpen(!isBrochureLoanOpen);
-    setIsBrochureInsuranceOpen(false);
+  const handleLoanToggleBrochures = () => {
+    setIsLoanOpenBrochures(!isLoanOpenBrochures);
+    setIsInsuranceOpenBrochures(false);
   };
 
   // Handle subcategory selection for brochures
-  const handleBrochureSubCategorySelect = (subCategory: 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan') => {
-    setBrochureSelectedSubCategory(subCategory);
+  const handleSubCategorySelectBrochures = (subCategory: 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan') => {
+    setSelectedSubCategoryBrochures(subCategory);
     if (subCategory === 'home-loan' || subCategory === 'business-loan' || subCategory === 'lap-loan' || subCategory === 'personal-loan') {
-      setBrochureSelectedCategory('loan');
+      setSelectedCategoryBrochures('loan');
     } else {
-      setBrochureSelectedCategory('insurance');
+      setSelectedCategoryBrochures('insurance');
     }
-    setIsBrochureInsuranceOpen(false);
-    setIsBrochureLoanOpen(false);
+    setIsInsuranceOpenBrochures(false);
+    setIsLoanOpenBrochures(false);
   };
 
   // Calculate stats for visualization
@@ -294,25 +540,39 @@ export default function Downloads() {
     recentUpload: '2 days ago'
   };
 
+  // Get display name for subcategory
+  const getSubCategoryDisplayName = (subCategory: string) => {
+    const names: Record<string, string> = {
+      'motor-insurance': '🚗 Motor Insurance',
+      'life-insurance': '👨‍👩‍👧‍👦 Life Insurance',
+      'health-insurance': '🏥 Health Insurance',
+      'home-loan': '🏠 Home Loan',
+      'business-loan': '💼 Business Loan',
+      'lap-loan': '🏘️ LAP Loan',
+      'personal-loan': '👤 Personal Loan'
+    };
+    return names[subCategory] || subCategory;
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         
         {/* Header */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-700 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-700 tracking-tight">
               Downloads
             </h1>
-            <p className="text-slate-600 mt-2 text-lg">
+            <p className="text-slate-600 mt-1 sm:mt-2 text-base sm:text-lg">
               A centralized repository for all documents essential for your business.
             </p>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-2">
-          <div className="flex space-x-1">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-1 sm:p-2">
+          <div className="flex flex-col sm:flex-row sm:space-x-1 space-y-1 sm:space-y-0">
             <button
               onClick={() => setActiveSection('payout')}
               className={`flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 ${
@@ -321,9 +581,9 @@ export default function Downloads() {
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              <div className="flex items-center font-semibold  justify-center space-x-2">
+              <div className="flex items-center justify-center space-x-2">
                 <span>💰</span>
-                <span>Payout Structure</span>
+                <span className="font-semibold">Payout Structure</span>
               </div>
             </button>
             <button
@@ -334,9 +594,9 @@ export default function Downloads() {
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              <div className="flex items-center font-semibold  justify-center space-x-2">
+              <div className="flex items-center justify-center space-x-2">
                 <span>📄</span>
-                <span>Product Brochures</span>
+                <span className="font-semibold">Product Brochures</span>
               </div>
             </button>
             <button
@@ -347,9 +607,9 @@ export default function Downloads() {
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              <div className="flex items-center font-semibold justify-center space-x-2">
+              <div className="flex items-center justify-center space-x-2">
                 <span>📋</span>
-                <span>Application Forms</span>
+                <span className="font-semibold">Application Forms</span>
               </div>
             </button>
           </div>
@@ -362,27 +622,27 @@ export default function Downloads() {
           {activeSection === 'payout' && (
             <div className="space-y-6">
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-slate-200">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-slate-600">Total Files</p>
-                      <p className="text-3xl font-bold text-slate-700 mt-2">{payoutStats.totalFiles}</p>
+                      <p className="text-2xl sm:text-3xl font-bold text-slate-700 mt-1 sm:mt-2">{payoutStats.totalFiles}</p>
                     </div>
-                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                      <span className="text-2xl">📊</span>
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
+                      <span className="text-xl sm:text-2xl">📊</span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-slate-200">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-slate-600">Last Updated</p>
-                      <p className="text-3xl font-bold text-slate-700 mt-2">{payoutStats.recentUpload}</p>
+                      <p className="text-2xl sm:text-3xl font-bold text-slate-700 mt-1 sm:mt-2">{payoutStats.recentUpload}</p>
                     </div>
-                    <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-                      <span className="text-2xl">🕒</span>
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                      <span className="text-xl sm:text-2xl">🕒</span>
                     </div>
                   </div>
                 </div>
@@ -390,12 +650,12 @@ export default function Downloads() {
 
               {/* Month Selector and Upload */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex items-center space-x-4">
-                  <label className="text-sm font-medium text-slate-700">Select Month:</label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                  <label className="text-sm font-medium text-slate-700 whitespace-nowrap">Select Month:</label>
                   <select 
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="px-4 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 sm:px-4 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     {months.map(month => (
                       <option key={month.value} value={month.value}>
@@ -405,24 +665,12 @@ export default function Downloads() {
                   </select>
                 </div>
                 
-                {/* Upload Button */}
-                <label className="inline-flex items-center px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3] transition-colors duration-200 cursor-pointer text-sm font-medium">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                  Upload Document
-                  <input
-                    type="file"
-                    accept=".pdf,.doc,.docx,.xlsx,.xls"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
+          
               </div>
 
               {/* Category Navigation Bar */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-1">
-                <div className="flex space-x-1">
+                <div className="flex flex-col sm:flex-row sm:space-x-1 space-y-1 sm:space-y-0">
                   {/* Insurance Dropdown */}
                   <div className="relative flex-1">
                     <button
@@ -438,7 +686,7 @@ export default function Downloads() {
                         <span>Insurance</span>
                       </div>
                       <svg 
-                        className={`w-4 h-4 transform transition-transform duration-200 ${
+                        className={`w-4 h-4 transform transition-transform duration-200 shrink-0 ${
                           isInsuranceOpen ? 'rotate-180' : ''
                         }`}
                         fill="none" 
@@ -504,7 +752,7 @@ export default function Downloads() {
                         <span>Loan</span>
                       </div>
                       <svg 
-                        className={`w-4 h-4 transform transition-transform duration-200 ${
+                        className={`w-4 h-4 transform transition-transform duration-200 shrink-0 ${
                           isLoanOpen ? 'rotate-180' : ''
                         }`}
                         fill="none" 
@@ -572,37 +820,31 @@ export default function Downloads() {
 
               {/* Files List */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-200">
+                <div className="p-4 sm:p-6 border-b border-slate-200">
                   <h3 className="text-lg font-semibold text-slate-900">
                     {selectedCategory === 'insurance' ? 'Insurance' : 'Loan'} - {' '}
-                    {selectedSubCategory === 'motor-insurance' && '🚗 Motor Insurance'}
-                    {selectedSubCategory === 'life-insurance' && '👨‍👩‍👧‍👦 Life Insurance'}
-                    {selectedSubCategory === 'health-insurance' && '🏥 Health Insurance'}
-                    {selectedSubCategory === 'home-loan' && '🏠 Home Loan'}
-                    {selectedSubCategory === 'business-loan' && '💼 Business Loan'}
-                    {selectedSubCategory === 'lap-loan' && '🏘️LAP Loan'}
-                    {selectedSubCategory === 'personal-loan' && '👤 Personal Loan'}
+                    {getSubCategoryDisplayName(selectedSubCategory)}
                     {' '}Documents for {months.find(m => m.value === selectedMonth)?.label}
                   </h3>
                 </div>
                 <div className="divide-y divide-slate-200">
                   {filteredData.map((file) => (
-                    <div key={file.id} className="p-6 hover:bg-slate-50 transition-colors duration-150">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
+                    <div key={file.id} className="p-4 sm:p-6 hover:bg-slate-50 transition-colors duration-150">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
+                        <div className="flex items-start sm:items-center space-x-3 sm:space-x-4">
                           {getFileIcon(file.type)}
-                          <div>
-                            <h4 className="text-sm font-medium text-slate-900">{file.name}</h4>
-                            <div className="flex items-center space-x-4 mt-1 text-xs text-slate-500">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-sm font-medium text-slate-900 wrap-break-word">{file.name}</h4>
+                            <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 mt-1 text-xs text-slate-500">
                               <span>{file.size}</span>
-                              <span>•</span>
+                              <span className="hidden sm:inline">•</span>
                               <span>Uploaded {file.uploadDate}</span>
                             </div>
                           </div>
                         </div>
                         <button
                           onClick={() => handleDownload(file)}
-                          className="flex items-center space-x-2 px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3] transition-colors duration-200 text-sm font-medium"
+                          className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3]/90 transition-colors duration-200 text-sm font-medium w-full sm:w-auto mt-2 sm:mt-0"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -613,12 +855,12 @@ export default function Downloads() {
                     </div>
                   ))}
                   {filteredData.length === 0 && (
-                    <div className="p-12 text-center">
-                      <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span className="text-2xl">📁</span>
+                    <div className="p-8 sm:p-12 text-center">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                        <span className="text-xl sm:text-2xl">📁</span>
                       </div>
                       <h3 className="text-lg font-medium text-slate-900 mb-2">No documents found</h3>
-                      <p className="text-slate-600 text-sm">
+                      <p className="text-slate-600 text-sm max-w-md mx-auto">
                         No {selectedSubCategory?.replace('-', ' ')} documents available for {months.find(m => m.value === selectedMonth)?.label}.
                       </p>
                     </div>
@@ -633,13 +875,13 @@ export default function Downloads() {
             <div className="space-y-6">
               {/* Category Navigation Bar for Brochures */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-1">
-                <div className="flex space-x-1">
+                <div className="flex flex-col sm:flex-row sm:space-x-1 space-y-1 sm:space-y-0">
                   {/* Insurance Dropdown for Brochures */}
                   <div className="relative flex-1">
                     <button
-                      onClick={handleBrochureInsuranceToggle}
+                      onClick={handleInsuranceToggleBrochures}
                       className={`w-full py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-between ${
-                        brochureSelectedCategory === 'insurance'
+                        selectedCategoryBrochures === 'insurance'
                           ? 'bg-blue-50 text-blue-700 border border-blue-200'
                           : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                       }`}
@@ -649,8 +891,8 @@ export default function Downloads() {
                         <span>Insurance</span>
                       </div>
                       <svg 
-                        className={`w-4 h-4 transform transition-transform duration-200 ${
-                          isBrochureInsuranceOpen ? 'rotate-180' : ''
+                        className={`w-4 h-4 transform transition-transform duration-200 shrink-0 ${
+                          isInsuranceOpenBrochures ? 'rotate-180' : ''
                         }`}
                         fill="none" 
                         stroke="currentColor" 
@@ -661,12 +903,12 @@ export default function Downloads() {
                     </button>
                     
                     {/* Insurance Dropdown Menu for Brochures */}
-                    {isBrochureInsuranceOpen && (
+                    {isInsuranceOpenBrochures && (
                       <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
                         <button
-                          onClick={() => handleBrochureSubCategorySelect('motor-insurance')}
+                          onClick={() => handleSubCategorySelectBrochures('motor-insurance')}
                           className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
-                            brochureSelectedSubCategory === 'motor-insurance' 
+                            selectedSubCategoryBrochures === 'motor-insurance' 
                               ? 'bg-blue-50 text-blue-700' 
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
@@ -675,9 +917,9 @@ export default function Downloads() {
                           <span>Motor Insurance</span>
                         </button>
                         <button
-                          onClick={() => handleBrochureSubCategorySelect('life-insurance')}
+                          onClick={() => handleSubCategorySelectBrochures('life-insurance')}
                           className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
-                            brochureSelectedSubCategory === 'life-insurance' 
+                            selectedSubCategoryBrochures === 'life-insurance' 
                               ? 'bg-blue-50 text-blue-700' 
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
@@ -686,9 +928,9 @@ export default function Downloads() {
                           <span>Life Insurance</span>
                         </button>
                         <button
-                          onClick={() => handleBrochureSubCategorySelect('health-insurance')}
+                          onClick={() => handleSubCategorySelectBrochures('health-insurance')}
                           className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
-                            brochureSelectedSubCategory === 'health-insurance' 
+                            selectedSubCategoryBrochures === 'health-insurance' 
                               ? 'bg-blue-50 text-blue-700' 
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
@@ -703,9 +945,9 @@ export default function Downloads() {
                   {/* Loan Dropdown for Brochures */}
                   <div className="relative flex-1">
                     <button
-                      onClick={handleBrochureLoanToggle}
+                      onClick={handleLoanToggleBrochures}
                       className={`w-full py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-between ${
-                        brochureSelectedCategory === 'loan'
+                        selectedCategoryBrochures === 'loan'
                           ? 'bg-blue-50 text-blue-700 border border-blue-200'
                           : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                       }`}
@@ -715,8 +957,8 @@ export default function Downloads() {
                         <span>Loan</span>
                       </div>
                       <svg 
-                        className={`w-4 h-4 transform transition-transform duration-200 ${
-                          isBrochureLoanOpen ? 'rotate-180' : ''
+                        className={`w-4 h-4 transform transition-transform duration-200 shrink-0 ${
+                          isLoanOpenBrochures ? 'rotate-180' : ''
                         }`}
                         fill="none" 
                         stroke="currentColor" 
@@ -727,12 +969,12 @@ export default function Downloads() {
                     </button>
                     
                     {/* Loan Dropdown Menu for Brochures */}
-                    {isBrochureLoanOpen && (
+                    {isLoanOpenBrochures && (
                       <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
                         <button
-                          onClick={() => handleBrochureSubCategorySelect('home-loan')}
+                          onClick={() => handleSubCategorySelectBrochures('home-loan')}
                           className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
-                            brochureSelectedSubCategory === 'home-loan' 
+                            selectedSubCategoryBrochures === 'home-loan' 
                               ? 'bg-blue-50 text-blue-700' 
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
@@ -740,11 +982,10 @@ export default function Downloads() {
                           <span>🏠</span>
                           <span>Home Loan</span>
                         </button>
-
                         <button
-                          onClick={() => handleBrochureSubCategorySelect('business-loan')}
+                          onClick={() => handleSubCategorySelectBrochures('business-loan')}
                           className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
-                            brochureSelectedSubCategory === 'business-loan' 
+                            selectedSubCategoryBrochures === 'business-loan' 
                               ? 'bg-blue-50 text-blue-700' 
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
@@ -752,11 +993,10 @@ export default function Downloads() {
                           <span>💼</span>
                           <span>Business Loan</span>
                         </button>
-
-                         <button
-                          onClick={() => handleBrochureSubCategorySelect('lap-loan')}
+                        <button
+                          onClick={() => handleSubCategorySelectBrochures('lap-loan')}
                           className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
-                            brochureSelectedSubCategory === 'lap-loan' 
+                            selectedSubCategoryBrochures === 'lap-loan' 
                               ? 'bg-blue-50 text-blue-700' 
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
@@ -765,9 +1005,9 @@ export default function Downloads() {
                           <span>LAP Loan</span>
                         </button>
                         <button
-                          onClick={() => handleBrochureSubCategorySelect('personal-loan')}
+                          onClick={() => handleSubCategorySelectBrochures('personal-loan')}
                           className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
-                            brochureSelectedSubCategory === 'personal-loan' 
+                            selectedSubCategoryBrochures === 'personal-loan' 
                               ? 'bg-blue-50 text-blue-700' 
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
@@ -781,39 +1021,34 @@ export default function Downloads() {
                 </div>
               </div>
 
-              {/* Files List for Brochures */}
+              {/* Brochures Files List */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-200">
+                <div className="p-4 sm:p-6 border-b border-slate-200">
                   <h3 className="text-lg font-semibold text-slate-900">
-                    {brochureSelectedCategory === 'insurance' ? 'Insurance' : 'Loan'} - {' '}
-                    {brochureSelectedSubCategory === 'motor-insurance' && '🚗 Motor Insurance'}
-                    {brochureSelectedSubCategory === 'life-insurance' && '👨‍👩‍👧‍👦 Life Insurance'}
-                    {brochureSelectedSubCategory === 'health-insurance' && '🏥 Health Insurance'}
-                    {brochureSelectedSubCategory === 'home-loan' && '🏠 Home Loan'}
-                    {brochureSelectedSubCategory === 'business-loan' && '💼 Business Loan'}
-                    {brochureSelectedSubCategory === 'lap-loan' && '🏘️LAP Loan'}
-                    {brochureSelectedSubCategory === 'personal-loan' && '👤 Personal Loan'}
-                    {' '}Brochures
+                    Product Brochures - {' '}
+                    {selectedCategoryBrochures === 'insurance' ? 'Insurance' : 'Loan'} - {' '}
+                    {getSubCategoryDisplayName(selectedSubCategoryBrochures)}
                   </h3>
+                  <p className="text-slate-600 text-sm mt-1">Marketing materials and product information</p>
                 </div>
                 <div className="divide-y divide-slate-200">
-                  {filteredData.map((file) => (
-                    <div key={file.id} className="p-6 hover:bg-slate-50 transition-colors duration-150">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
+                  {filteredBrochuresData.map((file) => (
+                    <div key={file.id} className="p-4 sm:p-6 hover:bg-slate-50 transition-colors duration-150">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
+                        <div className="flex items-start sm:items-center space-x-3 sm:space-x-4">
                           {getFileIcon(file.type)}
-                          <div>
-                            <h4 className="text-sm font-medium text-slate-900">{file.name}</h4>
-                            <div className="flex items-center space-x-4 mt-1 text-xs text-slate-500">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-sm font-medium text-slate-900 wrap-break-word">{file.name}</h4>
+                            <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 mt-1 text-xs text-slate-500">
                               <span>{file.size}</span>
-                              <span>•</span>
+                              <span className="hidden sm:inline">•</span>
                               <span>Uploaded {file.uploadDate}</span>
                             </div>
                           </div>
                         </div>
                         <button
                           onClick={() => handleDownload(file)}
-                          className="flex items-center space-x-2 px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3] transition-colors duration-200 text-sm font-medium"
+                          className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3]/90 transition-colors duration-200 text-sm font-medium w-full sm:w-auto mt-2 sm:mt-0"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -823,14 +1058,14 @@ export default function Downloads() {
                       </div>
                     </div>
                   ))}
-                  {filteredData.length === 0 && (
-                    <div className="p-12 text-center">
-                      <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span className="text-2xl">📁</span>
+                  {filteredBrochuresData.length === 0 && (
+                    <div className="p-8 sm:p-12 text-center">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                        <span className="text-xl sm:text-2xl">📁</span>
                       </div>
                       <h3 className="text-lg font-medium text-slate-900 mb-2">No brochures found</h3>
-                      <p className="text-slate-600 text-sm">
-                        No {brochureSelectedSubCategory?.replace('-', ' ')} brochures available.
+                      <p className="text-slate-600 text-sm max-w-md mx-auto">
+                        No {selectedSubCategoryBrochures?.replace('-', ' ')} brochures available.
                       </p>
                     </div>
                   )}
@@ -843,39 +1078,46 @@ export default function Downloads() {
           {activeSection === 'forms' && (
             <div className="space-y-6">
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-200">
+                <div className="p-4 sm:p-6 border-b border-slate-200">
                   <h3 className="text-lg font-semibold text-slate-900">Application Forms</h3>
                   <p className="text-slate-600 text-sm mt-1">Forms for client onboarding and policy management</p>
                 </div>
                 <div className="divide-y divide-slate-200">
-                  {downloadData
-                    .filter(file => file.category === 'forms')
-                    .map((file) => (
-                      <div key={file.id} className="p-6 hover:bg-slate-50 transition-colors duration-150">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            {getFileIcon(file.type)}
-                            <div>
-                              <h4 className="text-sm font-medium text-slate-900">{file.name}</h4>
-                              <div className="flex items-center space-x-4 mt-1 text-xs text-slate-500">
-                                <span>{file.size}</span>
-                                <span>•</span>
-                                <span>Uploaded {file.uploadDate}</span>
-                              </div>
+                  {filteredFormsData.map((file) => (
+                    <div key={file.id} className="p-4 sm:p-6 hover:bg-slate-50 transition-colors duration-150">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
+                        <div className="flex items-start sm:items-center space-x-3 sm:space-x-4">
+                          {getFileIcon(file.type)}
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-sm font-medium text-slate-900 wrap-break-word">{file.name}</h4>
+                            <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 mt-1 text-xs text-slate-500">
+                              <span>{file.size}</span>
+                              <span className="hidden sm:inline">•</span>
+                              <span>Uploaded {file.uploadDate}</span>
                             </div>
                           </div>
-                          <button
-                            onClick={() => handleDownload(file)}
-                            className="flex items-center space-x-2 px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3] transition-colors duration-200 text-sm font-medium"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span>Download</span>
-                          </button>
                         </div>
+                        <button
+                          onClick={() => handleDownload(file)}
+                          className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#1CADA3]/90 transition-colors duration-200 text-sm font-medium w-full sm:w-auto mt-2 sm:mt-0"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <span>Download</span>
+                        </button>
                       </div>
-                    ))}
+                    </div>
+                  ))}
+                  {filteredFormsData.length === 0 && (
+                    <div className="p-8 sm:p-12 text-center">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                        <span className="text-xl sm:text-2xl">📁</span>
+                      </div>
+                      <h3 className="text-lg font-medium text-slate-900 mb-2">No forms found</h3>
+                      <p className="text-slate-600 text-sm">No application forms available at the moment.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
