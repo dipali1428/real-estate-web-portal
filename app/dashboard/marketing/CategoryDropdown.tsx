@@ -15,7 +15,8 @@ const subCategoryLabels: Record<string, string> = {
   home: 'Home Loan',
   business: 'Business Loan',
   lap: 'LAP Loan',
-  personal: 'Personal Loan'
+  personal: 'Personal Loan',
+  educational: 'Educational Loan'
 };
 
 export default function CategoryDropdown({
@@ -33,7 +34,7 @@ export default function CategoryDropdown({
     if (type === 'insurance') {
       return ['all', 'life', 'health', 'motor'];
     } else {
-      return ['all', 'home', 'business', 'lap', 'personal'];
+      return ['all', 'home', 'business', 'lap', 'personal', 'educational'];
     }
   };
 
@@ -44,7 +45,7 @@ export default function CategoryDropdown({
         className={`flex items-center justify-between w-full sm:w-auto space-x-2 px-4 sm:px-6 py-3 rounded-lg transition-all duration-200 font-semibold ${
           isActive 
             ? `bg-${bgColor}-100 text-${bgColor}-700 border-2 border-${bgColor}-300 shadow-sm` 
-            : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50 border-2 border-transparent'
+            : 'text-slate-700 hover:text-[#2076C7] hover:bg-slate-50 border-2 border-transparent'
         }`}
       >
         <span className="text-base sm:text-lg capitalize">{type}</span>

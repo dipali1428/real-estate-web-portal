@@ -46,7 +46,7 @@ export default function ImageTemplates() {
       category: 'insurance',
       subCategory: 'life',
       description: 'Comprehensive life insurance coverage for you and your family',
-      imageUrl: '/templateimg/life-insurance.jpg'
+      imageUrl: '/templateimg/homeInsurance.jpeg'
     },
     {
       id: '2',
@@ -68,7 +68,7 @@ export default function ImageTemplates() {
       category: 'insurance',
       subCategory: 'motor',
       description: 'Best car insurance policies with great benefits',
-      imageUrl: '/templateimg/car-insurance.jpeg'
+      imageUrl: '/templateimg/loanProtector.jpeg'
     },
     {
       id: '4',
@@ -101,7 +101,18 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'business',
       description: 'Business loans to grow your enterprise',
-      imageUrl: '/templateimg/business-loan.jpg'
+      imageUrl: '/templateimg/loanProtector.jpeg'
+    },
+    {
+      id: '7',
+      name: 'Educational Loan',
+      type: 'image',
+      size: '1.7 MB',
+      uploadDate: '2024-01-03',
+      category: 'loan',
+      subCategory: 'educational',
+      description: 'Business loans to grow your enterprise',
+      imageUrl: '/templateimg/educationalLoan.jpeg'
     },
   ]);
 
@@ -149,110 +160,108 @@ export default function ImageTemplates() {
   };
 
   // Quick download without positioning - adds details below image
-  const quickDownload = async (template: TemplateItem) => {
-    try {
-      const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => {
-            resolve({
-              width: img.naturalWidth,
-              height: img.naturalHeight
-            });
-          };
-          img.onerror = reject;
-          img.src = url;
-        });
-      };
-
-      const dimensions = await getImageDimensions(template.imageUrl);
-      
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
-      if (!ctx) {
-        alert('Error creating image. Please try again.');
-        return;
-      }
-
-      // Calculate extended canvas height (original height + space for details)
-      const extendedHeight = dimensions.height + 120;
-      canvas.width = dimensions.width;
-      canvas.height = extendedHeight;
-
-      // Set white background for the entire canvas
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Load and draw the template image at the top
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
+  // Quick download without positioning - adds details below image
+const quickDownload = async (template: TemplateItem) => {
+  try {
+    const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          resolve({
+            width: img.naturalWidth,
+            height: img.naturalHeight
+          });
+        };
         img.onerror = reject;
-        img.src = template.imageUrl;
+        img.src = url;
       });
+    };
 
-      // Draw the template image at original size at the top
-      ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
-
-      // Add separator line
-      ctx.strokeStyle = '#e5e7eb';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(50, dimensions.height + 20);
-      ctx.lineTo(canvas.width - 50, dimensions.height + 20);
-      ctx.stroke();
-
-      // Add user details section below the image
-      const detailsY = dimensions.height + 60;
-
-      // Add background for contact info
-      ctx.fillStyle = '#f8fafc';
-      ctx.fillRect(40, dimensions.height + 40, canvas.width - 80, 70);
-
-      // Add border around contact info
-      ctx.strokeStyle = '#e2e8f0';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(40, dimensions.height + 40, canvas.width - 80, 70);
-
-      // User name
-      ctx.fillStyle = '#1e293b';
-      ctx.font = `bold 18px Arial`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(userProfile.name, canvas.width / 2, detailsY - 10);
-
-      // Contact number
-      ctx.fillStyle = '#475569';
-      ctx.font = `bold 16px Arial`;
-      ctx.fillText(userProfile.contactNumber, canvas.width / 2, detailsY + 15);
-
-      // Add call to action text
-      ctx.fillStyle = '#64748b';
-      ctx.font = 'italic 14px Arial';
-      ctx.fillText('Contact me for more information!', canvas.width / 2, detailsY + 40);
-
-      // Download the image
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `personalized-${template.name.replace(/\s+/g, '-').toLowerCase()}.png`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-        }
-      }, 'image/png');
-
-    } catch (error) {
-      console.error('Error creating personalized image:', error);
-      alert('Error creating personalized image. Please try again.');
+    const dimensions = await getImageDimensions(template.imageUrl);
+    
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    if (!ctx) {
+      alert('Error creating image. Please try again.');
+      return;
     }
-  };
+
+    // Calculate extended canvas height (original height + space for details)
+    const extendedHeight = dimensions.height + 80;
+    canvas.width = dimensions.width;
+    canvas.height = extendedHeight;
+
+    // Set white background for the entire canvas
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Load and draw the template image at the top
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = template.imageUrl;
+    });
+
+    // Draw the template image at original size at the top
+    ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
+
+    // Add separator line
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(50, dimensions.height + 15);
+    ctx.lineTo(canvas.width - 50, dimensions.height + 15);
+    ctx.stroke();
+
+    // Add user details section below the image
+    const detailsY = dimensions.height + 45;
+
+    // Add background for contact info
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(40, dimensions.height + 25, canvas.width - 80, 50);
+
+    // Add border around contact info
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(40, dimensions.height + 25, canvas.width - 80, 50);
+
+    // User name and contact number in one line
+    ctx.fillStyle = '#1e293b';
+    ctx.font = `bold 22px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    const userDetails = `${userProfile.name} • ${userProfile.contactNumber}`;
+    ctx.fillText(userDetails, canvas.width / 2, detailsY);
+
+    // // Add call to action text below user details
+    // ctx.fillStyle = '#64748b';
+    // ctx.font = 'italic 14px Arial';
+    // ctx.fillText('Contact me for more information!', canvas.width / 2, detailsY + 25);
+
+    // Download the image
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `personalized-${template.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    }, 'image/png');
+
+  } catch (error) {
+    console.error('Error creating personalized image:', error);
+    alert('Error creating personalized image. Please try again.');
+  }
+};
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
@@ -287,7 +296,7 @@ export default function ImageTemplates() {
             <span className="text-sm font-medium text-slate-600">Showing:</span>
             <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
               activeCategory === 'insurance' 
-                ? 'bg-blue-100 text-blue-700' 
+                ? 'bg-blue-100 text-[#2076C7]' 
                 : 'bg-green-100 text-green-700'
             }`}>
               {activeCategory === 'insurance' ? 'Insurance' : 'Loan'} - {activeSubCategory === 'all' ? 'All Templates' : activeSubCategory}

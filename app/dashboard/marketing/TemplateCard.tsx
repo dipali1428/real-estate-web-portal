@@ -66,7 +66,7 @@ export default function TemplateCard({ template, onQuickDownload }: TemplateCard
           <h4 className="text-base sm:text-lg font-semibold text-slate-900 line-clamp-1">{template.name}</h4>
           <span className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ml-2 ${
             isInsurance
-              ? 'bg-blue-100 text-blue-700' 
+              ? 'bg-blue-100 text-[#2076C7]' 
               : 'bg-green-100 text-green-700'
           }`}>
             {subCategoryLabels[template.subCategory]}
@@ -82,8 +82,8 @@ export default function TemplateCard({ template, onQuickDownload }: TemplateCard
             onClick={() => onQuickDownload(template)}
             className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 text-white rounded-lg transition-all duration-200 text-xs font-semibold ${
               isInsurance
-                ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-green-600 hover:bg-green-700'
+                ? 'bg-[#2076C7] hover:bg-[#2076C7]'
+                : 'bg-[#1CADA3] hover:bg-green-700'
             }`}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

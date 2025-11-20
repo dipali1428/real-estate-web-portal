@@ -20,7 +20,7 @@ export default function Header({ userProfile }: HeaderProps) {
       </div>
 
       {/* User Profile Info */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl p-4 sm:p-6 text-white">
+      <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-xl p-4 sm:p-6 text-white">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="text-center sm:text-left">
             <h3 className="text-lg sm:text-xl font-bold mb-2">Personalized Marketing Templates</h3>
