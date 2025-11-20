@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { AuthService } from "../../services/authService"; // ✅ We'll define this new service next
+import { AuthService } from "../../services/authService";
 
 const CreditScorePage: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -19,17 +19,85 @@ const CreditScorePage: React.FC = () => {
 
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
+
+        let newValue = value;
+
+        //  Full Name Logic
+        if (name === "fullName") {
+            newValue = newValue
+                .toLowerCase()
+                .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter of every word
+        }
+
+        //  Email Logic
+        if (name === "email") {
+            newValue = newValue.trim().toLowerCase(); // standard email format
+        }
+
+        //  Mobile Logic
+        if (name === "mobile") {
+            newValue = newValue.replace(/\D/g, ""); // remove non-digits
+            if (newValue.length > 10) return;
+        }
+
+        //  PAN Logic
+        if (name === "pan") {
+            newValue = newValue.toUpperCase().replace(/[^A-Z0-9]/g, ""); // uppercase alphanumeric only
+            if (newValue.length > 10) return;
+        }
+
+        //  Checkbox Logic
+        if (type === "checkbox") {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: checked,
+            }));
+            return;
+        }
+
+        // Save the processed value
         setFormData((prev) => ({
             ...prev,
-            [name]: type === "checkbox" ? checked : value,
+            [name]: newValue,
         }));
     };
+
 
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
         setCibilResult(null);
+
+        // 🔍 VALIDATION START
+        const fullNameRegex = /^[A-Za-z]+(?:\s+[A-Za-z]+)+$/;
+        const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+        const mobileRegex = /^[6-9]\d{9}$/;
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+
+        if (!fullNameRegex.test(formData.fullName)) {
+            setError("Please enter your full name.");
+            setLoading(false);
+            return;
+        }
+
+        if (!emailRegex.test(formData.email)) {
+            setError("Enter a valid email address.");
+            setLoading(false);
+            return;
+        }
+
+        if (!mobileRegex.test(formData.mobile)) {
+            setError("Enter a valid 10-digit mobile number.");
+            setLoading(false);
+            return;
+        }
+
+        if (!panRegex.test(formData.pan.toUpperCase())) {
+            setError("Enter a valid PAN number (e.g., ABCDE1234F).");
+            setLoading(false);
+            return;
+        }
 
         try {
             const response = await AuthService.checkScore({
@@ -40,7 +108,7 @@ const CreditScorePage: React.FC = () => {
                 dob: formData.dob,
             });
 
-            setCibilResult(response.message || "Your CIBIL score fetched successfully!");
+            setCibilResult(response.message || "CIBIL request submitted successfully. Score will be updated soon.");
         } catch (err: any) {
             setError(err?.response?.data?.message || "Something went wrong. Try again.");
         } finally {
@@ -65,23 +133,23 @@ const CreditScorePage: React.FC = () => {
         {
             question: "How often is my CIBIL score updated?",
             answer:
-                "Typically every 30–45 days, depending on when your lenders report updates to the credit bureau.",
+                "Typically every 30-45 days, depending on when your lenders report updates to the credit bureau.",
         },
         {
             question: "What is a good CIBIL score?",
             answer: (
                 <ul className="list-disc pl-5 space-y-1">
                     <li>
-                        <strong>750–900:</strong> Excellent (Easy approvals, best rates)
+                        <strong>750 &#8211; 900:</strong> Excellent (Easy approvals, best rates)
                     </li>
                     <li>
-                        <strong>700–749:</strong> Good (High approval chances)
+                        <strong>700 &#8211; 749:</strong> Good (High approval chances)
                     </li>
                     <li>
-                        <strong>650–699:</strong> Fair (May get loans with higher interest)
+                        <strong>650 &#8211; 699:</strong> Fair (May get loans with higher interest)
                     </li>
                     <li>
-                        <strong>300–649:</strong> Poor (Difficult to get loans)
+                        <strong>300 &#8211; 649:</strong> Poor (Difficult to get loans)
                     </li>
                 </ul>
             ),
@@ -89,7 +157,7 @@ const CreditScorePage: React.FC = () => {
         {
             question: "Does checking my CIBIL score affect my credit?",
             answer:
-                "No, checking your own score is a ‘soft inquiry’ and doesn’t affect your credit. Only lender checks (‘hard inquiries’) may slightly impact it.",
+                "No, checking your own score is a \u2018soft inquiry\u2019 and doesn\u2019t affect your credit. Only lender checks (\u2018hard inquiries\u2019) may slightly impact it.",
         },
         {
             question: "What documents are needed?",
@@ -266,16 +334,12 @@ const CreditScorePage: React.FC = () => {
                                             I authorize Infinity Arthviksha to fetch my CIBIL score and report. I
                                             agree to the{" "}
                                             <a
-                                                href="#"
-                                                className="text-[#1CADA3] hover:underline font-medium"
-                                            >
+                                                className="text-[#1CADA3] hover:underline font-medium">
                                                 Terms & Conditions
                                             </a>{" "}
                                             and{" "}
                                             <a
-                                                href="#"
-                                                className="text-[#1CADA3] hover:underline font-medium"
-                                            >
+                                                className="text-[#1CADA3] hover:underline font-medium">
                                                 Privacy Policy
                                             </a>
                                             .
