@@ -715,7 +715,158 @@ export default function LeadManagement() {
                 </div>
               </div>
           )}
+
+
         </div>
+        <div className="w-full mt-6">
+  <h3 className="text-xl font-semibold mb-4">All Leads</h3>
+
+  <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+    <table className="min-w-full text-sm">
+      <thead className="bg-gray-100 text-gray-700">
+        <tr>
+          <th className="px-4 py-2 text-left">Lead ID</th>
+          <th className="px-4 py-2 text-left">Client Name</th>
+          <th className="px-4 py-2 text-left">Contact No.</th>
+          <th className="px-4 py-2 text-left">Products</th>
+          <th className="px-4 py-2 text-left">Status</th>
+          <th className="px-4 py-2 text-left">Last Updated</th>
+          <th className="px-4 py-2 text-left">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {/* Row 1 */}
+        <tr className="border-b">
+          <td className="px-4 py-3">LD-1024</td>
+          <td className="px-4 py-3">Amit Sharma</td>
+          <td className="px-4 py-3">9876543210</td>
+          <td className="px-4 py-3">Life Insurance</td>
+          <td className="px-4 py-3">
+            <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-700">
+              Converted
+            </span>
+          </td>
+          <td className="px-4 py-3">15 Oct 2023</td>
+          <td className="px-4 py-3">
+            <button className="text-blue-600 hover:text-blue-800">
+              {/* Edit Icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+
+        {/* Row 2 */}
+        <tr className="border-b">
+          <td className="px-4 py-3">LD-1025</td>
+          <td className="px-4 py-3">Priya Singh</td>
+          <td className="px-4 py-3">8765432109</td>
+          <td className="px-4 py-3">Health Insurance</td>
+          <td className="px-4 py-3">
+            <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
+              Follow-up
+            </span>
+          </td>
+          <td className="px-4 py-3">14 Oct 2023</td>
+          <td className="px-4 py-3">
+            <button className="text-blue-600 hover:text-blue-800">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+
+        {/* Row 3 */}
+        <tr className="border-b">
+          <td className="px-4 py-3">LD-1026</td>
+          <td className="px-4 py-3">Rahul Verma</td>
+          <td className="px-4 py-3">7654321098</td>
+          <td className="px-4 py-3">Motor Insurance</td>
+          <td className="px-4 py-3">
+            <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">
+              Contacted
+            </span>
+          </td>
+          <td className="px-4 py-3">13 Oct 2023</td>
+          <td className="px-4 py-3">
+            <button className="text-blue-600 hover:text-blue-800">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+
+        {/* Row 4 */}
+        <tr>
+          <td className="px-4 py-3">LD-1027</td>
+          <td className="px-4 py-3">Neha Patel</td>
+          <td className="px-4 py-3">6543210987</td>
+          <td className="px-4 py-3">Home Insurance</td>
+          <td className="px-4 py-3">
+            <span className="px-2 py-1 text-xs rounded bg-gray-200 text-gray-700">
+              New
+            </span>
+          </td>
+          <td className="px-4 py-3">12 Oct 2023</td>
+          <td className="px-4 py-3">
+            <button className="text-blue-600 hover:text-blue-800">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
       </section>
 
       {/* ===== Modal (Add New Lead) ===== */}

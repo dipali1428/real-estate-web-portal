@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-
+import { IndianRupee } from 'lucide-react';
 // Types
 interface Incentive {
   id: string;
@@ -413,19 +413,30 @@ export default function IncentivesPayouts() {
             <div className="flex items-center justify-between">
               <div className="space-y-3">
                 <p className="text-sm font-medium text-slate-600 uppercase tracking-wide">Total Payouts</p>
-                <p className="text-3xl font-bold text-slate-900">₹{totalPayouts}</p>
+                <p className="text-3xl  text-slate-800">₹{totalPayouts}</p>
                 <div className="flex items-center text-emerald-600 text-sm font-medium">
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    <IndianRupee/>
                   </svg>
                   +15% from last period
                 </div>
               </div>
               <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 4h12M6 8h12M12 20l-6-8h3a6 6 0 016-6"
+                  />
                 </svg>
               </div>
+
             </div>
           </div>
 
@@ -434,7 +445,7 @@ export default function IncentivesPayouts() {
             <div className="flex items-center justify-between">
               <div className="space-y-3">
                 <p className="text-sm font-medium text-slate-600 uppercase tracking-wide">Pending Payouts</p>
-                <p className="text-3xl font-bold text-slate-900">₹{pendingPayouts}</p>
+                <p className="text-3xl  text-slate-800">₹{pendingPayouts}</p>
                 <div className="flex items-center text-blue-600 text-sm font-medium">
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
@@ -455,7 +466,7 @@ export default function IncentivesPayouts() {
             <div className="flex items-center justify-between">
               <div className="space-y-3">
                 <p className="text-sm font-medium text-slate-600 uppercase tracking-wide">YTD Earnings</p>
-                <p className="text-3xl font-bold text-slate-900">₹{ytdEarnings}</p>
+                <p className="text-3xl  text-slate-800">₹{ytdEarnings}</p>
                 <div className="flex items-center text-slate-600 text-sm font-medium">
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
@@ -640,7 +651,7 @@ export default function IncentivesPayouts() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
             <div className="flex items-start space-x-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -656,7 +667,7 @@ export default function IncentivesPayouts() {
 
           <div className="bg-slate-100 rounded-xl p-6 border border-slate-300">
             <div className="flex items-start space-x-4">
-              <div className="w-10 h-10 bg-slate-200 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-slate-200 rounded-xl flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
