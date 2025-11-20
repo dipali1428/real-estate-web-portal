@@ -55,7 +55,7 @@ const HelpSupportPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto bg-white p-12 rounded-lg">
+      <div className="max-w-7xl mx-auto bg-white p-12 rounded-lg">
         {/* Header Section */}
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-slate-700 mb-4">Help & Support</h1>
@@ -81,7 +81,7 @@ const HelpSupportPage: React.FC = () => {
                 value={ticketData.subject}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-slate-500"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-slate-700"
                 placeholder="Enter the subject of your issue"
               />
             </div>
@@ -97,7 +97,7 @@ const HelpSupportPage: React.FC = () => {
                 value={ticketData.category}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-slate-500"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-slate-700"
               >
                 <option value="">Select a category</option>
                 {categories.map((category, index) => (
@@ -120,7 +120,7 @@ const HelpSupportPage: React.FC = () => {
                 onChange={handleInputChange}
                 required
                 rows={6}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical text-slate-600"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical text-slate-700"
                 placeholder="Please describe your issue in detail..."
               />
             </div>

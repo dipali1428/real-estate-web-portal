@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Header from './Header';
 import CategoryDropdown from './CategoryDropdown';
 import TemplateGrid from './TemplateGrid';
+import { DashboardService } from "@/app/services/dashboardService";
 
 // Types
 interface TemplateItem {
@@ -23,17 +24,60 @@ interface UserProfile {
   contactNumber: string;
 }
 
+interface ApiProfile {
+  adv_id: string;
+  name: string;
+  email: string;
+  mobile: string;
+  pan: string;
+  city: string;
+  head: string;
+  category: string;
+  password: string;
+}
+
 export default function ImageTemplates() {
   const [activeCategory, setActiveCategory] = useState<'insurance' | 'loan'>('insurance');
   const [activeSubCategory, setActiveSubCategory] = useState<string>('all');
   const [isInsuranceOpen, setIsInsuranceOpen] = useState(false);
   const [isLoanOpen, setIsLoanOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    name: '',
+    contactNumber: ''
+  });
+  const [loading, setLoading] = useState(true);
 
-  // Mock user profile data
-  const userProfile: UserProfile = {
-    name: 'Rajesh Kumar',
-    contactNumber: '+91-9876543210'
+  // Fetch user profile data from API
+useEffect(() => {
+  const fetchUserProfile = async () => {
+    try {
+      setLoading(true);
+      const response = await DashboardService.getProfile();
+      const profileData: ApiProfile = response.user;
+      
+      // Capitalize the first letter of the name
+      const capitalizedName = profileData.name 
+        ? profileData.name.charAt(0).toUpperCase() + profileData.name.slice(1)
+        : 'User';
+      
+      setUserProfile({
+        name: capitalizedName,
+        contactNumber: profileData.mobile || 'Not provided'
+      });
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      // Fallback to default values if API fails
+      setUserProfile({
+        name: 'User',
+        contactNumber: 'Not available'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  fetchUserProfile();
+}, []);
 
   // All Templates - Embedded images
   const [allTemplates] = useState<TemplateItem[]>([
@@ -160,7 +204,7 @@ export default function ImageTemplates() {
   };
 
   // Quick download without positioning - adds details below image
-  // Quick download without positioning - adds details below image
+  // Quick download with responsive text sizing
 const quickDownload = async (template: TemplateItem) => {
   try {
     const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
@@ -187,8 +231,13 @@ const quickDownload = async (template: TemplateItem) => {
       return;
     }
 
+    // Calculate responsive text size based on image width
+    const baseWidth = 800; // Reference width for font sizing
+    const scaleFactor = dimensions.width / baseWidth;
+    const responsiveFontSize = Math.max(16, Math.min(28, 22 * scaleFactor)); // Clamp between 16px and 28px
+    
     // Calculate extended canvas height (original height + space for details)
-    const extendedHeight = dimensions.height + 80;
+    const extendedHeight = dimensions.height + Math.max(60, 80 * scaleFactor); // Responsive padding
     canvas.width = dimensions.width;
     canvas.height = extendedHeight;
 
@@ -211,37 +260,49 @@ const quickDownload = async (template: TemplateItem) => {
 
     // Add separator line
     ctx.strokeStyle = '#e5e7eb';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = Math.max(1, 2 * scaleFactor); // Responsive line width
     ctx.beginPath();
-    ctx.moveTo(50, dimensions.height + 15);
-    ctx.lineTo(canvas.width - 50, dimensions.height + 15);
+    ctx.moveTo(50 * scaleFactor, dimensions.height + 15 * scaleFactor);
+    ctx.lineTo(canvas.width - 50 * scaleFactor, dimensions.height + 15 * scaleFactor);
     ctx.stroke();
 
     // Add user details section below the image
-    const detailsY = dimensions.height + 45;
+    const detailsY = dimensions.height + 45 * scaleFactor;
 
     // Add background for contact info
+    const infoHeight = 50 * scaleFactor;
+    const infoMargin = 40 * scaleFactor;
     ctx.fillStyle = '#f8fafc';
-    ctx.fillRect(40, dimensions.height + 25, canvas.width - 80, 50);
+    ctx.fillRect(infoMargin, dimensions.height + 25 * scaleFactor, canvas.width - 2 * infoMargin, infoHeight);
 
     // Add border around contact info
     ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(40, dimensions.height + 25, canvas.width - 80, 50);
+    ctx.lineWidth = 1 * scaleFactor;
+    ctx.strokeRect(infoMargin, dimensions.height + 25 * scaleFactor, canvas.width - 2 * infoMargin, infoHeight);
 
-    // User name and contact number in one line
+    // User name and contact number
     ctx.fillStyle = '#1e293b';
-    ctx.font = `bold 22px Arial`;
+    ctx.font = `bold ${responsiveFontSize}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     
     const userDetails = `${userProfile.name} • ${userProfile.contactNumber}`;
+    
+    // Check if text fits within the available width, otherwise adjust font size
+    const maxTextWidth = canvas.width - 2 * infoMargin - 20 * scaleFactor; // Padding inside the box
+    let finalFontSize = responsiveFontSize;
+    
+    // Measure text width and adjust font size if needed
+    ctx.font = `bold ${finalFontSize}px Arial`;
+    let textWidth = ctx.measureText(userDetails).width;
+    
+    while (textWidth > maxTextWidth && finalFontSize > 12) {
+      finalFontSize -= 1;
+      ctx.font = `bold ${finalFontSize}px Arial`;
+      textWidth = ctx.measureText(userDetails).width;
+    }
+    
     ctx.fillText(userDetails, canvas.width / 2, detailsY);
-
-    // // Add call to action text below user details
-    // ctx.fillStyle = '#64748b';
-    // ctx.font = 'italic 14px Arial';
-    // ctx.fillText('Contact me for more information!', canvas.width / 2, detailsY + 25);
 
     // Download the image
     canvas.toBlob((blob) => {
@@ -262,6 +323,17 @@ const quickDownload = async (template: TemplateItem) => {
     alert('Error creating personalized image. Please try again.');
   }
 };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 p-4 sm:p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2076C7] mx-auto"></div>
+          <p className="mt-4 text-slate-600">Loading user profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6">

@@ -30,7 +30,7 @@ export default function Header({ userProfile }: HeaderProps) {
           </div>
           <div className="text-center sm:text-right">
             <p className="font-semibold text-base sm:text-lg">{userProfile.name}</p>
-            <p className="text-blue-200 text-sm sm:text-base">{userProfile.contactNumber}</p>
+            <p className="text-white text-sm sm:text-base">{userProfile.contactNumber}</p>
           </div>
         </div>
       </div>
