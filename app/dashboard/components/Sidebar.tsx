@@ -72,11 +72,6 @@ export default function DashboardSidebar() {
       icon: <Users className="h-5 w-5 shrink-0 text-neutral-700" />,
     },
     {
-      label: "Compliance Corner",
-      href: "/dashboard/complianceCorner",
-      icon: <ShieldCheck className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
-    {
       label: "Help & Support",
       href: "/dashboard/helpSupport",
       icon: <HelpCircle className="h-5 w-5 shrink-0 text-neutral-700" />,

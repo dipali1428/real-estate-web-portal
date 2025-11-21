@@ -11,6 +11,7 @@ const ModalContext = createContext({
     isPartnerOpen: false,
     openPartner: () => { },
     closePartner: () => { },
+    closeAll: () => { },
 });
 
 
@@ -30,6 +31,11 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                 isPartnerOpen,
                 openPartner: () => setIsPartnerOpen(true),
                 closePartner: () => setIsPartnerOpen(false),
+
+                closeAll: () => {
+                    setIsLoginOpen(false);
+                    setIsPartnerOpen(false);
+                },
             }}>
             {children}
 

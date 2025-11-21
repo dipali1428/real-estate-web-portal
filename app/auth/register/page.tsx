@@ -66,7 +66,7 @@ function useMathCaptcha() {
 }
 
 export default function BecomePartnerForm() {
-    const { openLogin } = useModal();
+    const { openLogin, closeAll } = useModal();
     const [form, setForm] = useState({
         name: "",
         email: "",
@@ -126,13 +126,14 @@ export default function BecomePartnerForm() {
 
     useEffect(() => {
         if (success) {
-            const timer = setTimeout(() => {
-                openLogin(); // open modal after 6s
-                // setSuccess(null);     // ✅ close the registration form
-            }, 6000);
-            return () => clearTimeout(timer);
+            const t = setTimeout(() => {
+                closeAll();     // 👈 closes registration modal COMPLETELY
+                openLogin();    // 👈 open login modal cleanly
+            }, 2000);
+            return () => clearTimeout(t);
         }
-    }, [success, openLogin]);
+    }, [success, closeAll, openLogin]);
+
 
 
     const setField = (key: keyof typeof form, value: any) => {
