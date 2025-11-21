@@ -84,7 +84,7 @@ export default function DashboardSidebar() {
   ];
 
   return (
-    <div className={cn("flex h-full flex-col border-r border-neutral-200 dark:border-neutral-700")}>
+    <div className={cn("flex h-full flex-col border-r border-neutral-300 dark:border-neutral-300")}>
       <Sidebar open={open} setOpen={setOpen} animate={false}>
         <SidebarBody className="justify-between gap-10">
           {/* Logo Section */}

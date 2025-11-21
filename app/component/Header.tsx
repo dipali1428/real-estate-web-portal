@@ -150,7 +150,8 @@ const Header = () => {
             </motion.button>
 
             <motion.button
-              onClick={() => window.open("https://c1hcg687.caspio.com/dp/ff46c000bde0be0689754401a5cc", "_blank")}
+              // onClick={() => window.open("https://c1hcg687.caspio.com/dp/ff46c000bde0be0689754401a5cc", "_blank")}
+              onClick={openPartner}
               whileHover={{ scale: 1.07, y: -2 }}
               transition={{ type: "tween", ease: "easeOut", duration: 0.04 }}
               className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-3 xl:px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-[#E8F6FA] transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
@@ -236,11 +237,11 @@ const Header = () => {
                   Login
                 </button>
                 <button
-                  // onClick={() => {
-                  //   openPartner();
-                  //   setIsOpen(false);
-                  // }}
-                  onClick={() => window.open("https://c1hcg687.caspio.com/dp/ff46c000bde0be0689754401a5cc", "_blank")}
+                  onClick={() => {
+                    openPartner();
+                    setIsOpen(false);
+                  }}
+                  // onClick={() => window.open("https://c1hcg687.caspio.com/dp/ff46c000bde0be0689754401a5cc", "_blank")}
                   className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-2 rounded-lg font-semibold hover:bg-[#E8F6FA] transition w-[80%] max-w-xs mx-auto">
                   Become A Partner
                 </button>
