@@ -623,30 +623,30 @@ export default function Downloads() {
             <div className="space-y-6">
               {/* Stats Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">Total Files</p>
-                      <p className="text-2xl sm:text-3xl font-bold text-slate-700 mt-1 sm:mt-2">{payoutStats.totalFiles}</p>
-                    </div>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-                      <span className="text-xl sm:text-2xl">📊</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">Last Updated</p>
-                      <p className="text-2xl sm:text-3xl font-bold text-slate-700 mt-1 sm:mt-2">{payoutStats.recentUpload}</p>
-                    </div>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
-                      <span className="text-xl sm:text-2xl">🕒</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+  <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-slate-200">
+    <div className="flex items-center justify-between">
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-slate-600">Total Files</p>
+        <p className="text-2xl sm:text-3xl font-bold text-slate-700 mt-1 sm:mt-2 break-words">{payoutStats.totalFiles}</p>
+      </div>
+      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0 ml-4">
+        <span className="text-xl sm:text-2xl">📊</span>
+      </div>
+    </div>
+  </div>
+  
+  <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-slate-200 gap-4 sm:gap-6">
+    <div className="flex items-center justify-between">
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-slate-600">Last Updated</p>
+        <p className="text-2xl sm:text-3xl font-bold text-slate-700 mt-1 sm:mt-2 break-words">{payoutStats.recentUpload}</p>
+      </div>
+      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0 ml-4">
+        <span className="text-xl sm:text-2xl">🕒</span>
+      </div>
+    </div>
+  </div>
+</div>
 
               {/* Month Selector and Upload */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
