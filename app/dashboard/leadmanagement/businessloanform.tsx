@@ -5,9 +5,82 @@ import { X } from "lucide-react";
 export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
   const [loanType, setLoanType] = useState("");
 
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    dob: "",
+    location: "",
+    loanAmount: "",
+    deduction: "",
+    companyName: "",
+    companyAddress: "",
+    obligation: "",
+    businessStartDate: "",
+    notRobot: false,
+  });
+
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errors, setErrors] = useState<any>({});
+
+  const documents = [
+    "Aadhar Card",
+    "PAN Card",
+    "Udyam Aadhar Registration",
+    "Shop Act Licence",
+    "1 Year Banking Statement",
+    "Address Proof",
+    "ITR 3 Years",
+    "Photograph",
+    "Existing Loan Statement",
+  ];
+
+  // 🔹 Handle Input Change
+  const handleChange = (label: string, value: string | boolean) => {
+    setFormData({ ...formData, [label]: value });
+  };
+
+  // 🔹 Validation Function
+  const validateForm = () => {
+    let newErrors: any = {};
+
+    if (!formData.name) newErrors.name = "Client name is required";
+
+    if (!formData.phone) newErrors.phone = "Phone number is required";
+    else if (!/^[0-9]{10}$/.test(formData.phone))
+      newErrors.phone = "Phone number must be 10 digits";
+
+    if (!formData.email) newErrors.email = "Email is required";
+    if (!formData.dob) newErrors.dob = "Date of birth is required";
+    if (!formData.location) newErrors.location = "Location is required";
+    if (!formData.loanAmount) newErrors.loanAmount = "Loan amount is required";
+    if (!formData.companyName) newErrors.companyName = "Company name is required";
+    if (!formData.companyAddress) newErrors.companyAddress = "Company address is required";
+    if (!formData.businessStartDate)
+      newErrors.businessStartDate = "Business start date is required";
+    if (!formData.notRobot) newErrors.notRobot = "Please confirm you are not a robot";
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // 🔹 Submit Form
+  const submitForm = (e: any) => {
+    e.preventDefault();
+
+    if (validateForm()) {
+      setSuccessMsg("Form submitted successfully!");
+      setErrors({});
+    } else {
+      setSuccessMsg("");
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
+
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4">
           <h2 className="text-xl font-semibold text-[#1CADA3]">Business Loan Form</h2>
@@ -17,32 +90,42 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Body */}
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
-          <Input label="Client Name" placeholder="Enter Client Name" />
-          <Input label="Phone Number" placeholder="Enter Client Phone Number" />
-          <Input label="Email ID" placeholder="Enter Client Email ID" />
-          <Input label="Date of Birth" type="date" />
-          <Input label="Location" placeholder="Enter Location" />
-          <Input label="Loan Amount" placeholder="Enter Loan Amount" />
-          <Input label="Deduction Details" placeholder="Enter Deduction Details" />
-          <Input label="Company Name" placeholder="Enter Company Name" />
-          <Input label="Company Address" placeholder="Enter Company Address" />
+        <form onSubmit={submitForm} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
+
+          <Input label="name" title="Client Name" placeholder="Enter Client Name" value={formData.name} errors={errors} onChange={handleChange} />
+
+          {/* 🔥 Phone number with only digits allowed */}
           <Input
-            label="Other Loan Obligation Details"
-            placeholder="Enter Other Loan Obligation Details"
+            label="phone"
+            title="Phone Number"
+            placeholder="Enter Number"
+            type="tel"
+            maxLength={10}
+            onlyNumber
+            value={formData.phone}
+            errors={errors}
+            onChange={handleChange}
           />
+
+          <Input label="email" title="Email ID" placeholder="Enter Email ID" value={formData.email} errors={errors} onChange={handleChange} />
+          <Input label="dob" title="Date of Birth" type="date" value={formData.dob} errors={errors} onChange={handleChange} />
+          <Input label="location" title="Location" placeholder="Enter Location" value={formData.location} errors={errors} onChange={handleChange} />
+          <Input label="loanAmount" title="Loan Amount" placeholder="Enter Loan Amount" value={formData.loanAmount} errors={errors} onChange={handleChange} />
+          <Input label="deduction" title="Deduction Details" placeholder="Enter Deduction Details" value={formData.deduction} onChange={handleChange} />
+          <Input label="companyName" title="Company Name" placeholder="Enter Company Name" value={formData.companyName} errors={errors} onChange={handleChange} />
+          <Input label="companyAddress" title="Company Address" placeholder="Enter Company Address" value={formData.companyAddress} errors={errors} onChange={handleChange} />
+
+          <Input label="obligation" title="Other Loan Obligation Details" placeholder="Enter Other Loan Obligation Details" value={formData.obligation} onChange={handleChange} />
 
           {/* Type of Business */}
           <div className="flex flex-col">
             <label className="text-sm font-medium mb-1">Type of Business</label>
             <select
-              className="border rounded-lg p-3 focus:ring-2 focus:ring-teal-500 outline-none"
+              className="border rounded-lg p-3"
               defaultValue=""
               onChange={(e) => setLoanType(e.target.value)}
             >
-              <option value="" disabled>
-                Select Type
-              </option>
+              <option value="">Select Type</option>
               <option>Proprietorship</option>
               <option>Partnership</option>
               <option>Pvt. Ltd.</option>
@@ -50,70 +133,91 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
           </div>
 
           {/* Business Start Date */}
-          <Input label="Business Start Date" type="date" />
+          <Input label="businessStartDate" title="Business Start Date" type="date" value={formData.businessStartDate} errors={errors} onChange={handleChange} />
 
-          {/* Upload Documents */}
-          {[
-            "Aadhar Card",
-            "PAN Card",
-            "Udyam Aadhar Registration",
-            "Shop Act Licence",
-            "1 Year Banking Statement",
-            "Address Proof",
-            "ITR 3 Years",
-            "Photograph",
-            "Existing Loan Statement",
-          ].map((label, index) => (
-            <div key={index} className="flex flex-col">
-              <label className="text-sm font-medium mb-1">{label}</label>
-              <input
-                type="file"
-                className="border rounded-lg p-2 text-sm file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-teal-500 file:text-white hover:file:bg-teal-600"
-              />
+          {/* Document Upload */}
+          {documents.map((doc, i) => (
+            <div key={i} className="flex flex-col">
+              <label className="text-sm font-medium mb-1">{doc}</label>
+              <input type="file" className="border rounded-lg p-2 text-sm" />
             </div>
           ))}
 
           {/* Checkbox */}
           <div className="col-span-2 flex items-center gap-2">
-            <input type="checkbox" id="not-robot" className="w-4 h-4" />
-            <label htmlFor="not-robot" className="text-sm text-gray-700">
-              I am not a robot
-            </label>
+            <input type="checkbox" checked={formData.notRobot} onChange={(e) => handleChange("notRobot", e.target.checked)} />
+            <label>I am not a robot</label>
           </div>
 
+          {errors.notRobot && (
+            <p className="col-span-2 text-red-500 text-sm">{errors.notRobot}</p>
+          )}
+
+          {/* Success Message */}
+          {successMsg && (
+            <div className="col-span-2 text-center text-green-600 font-semibold">
+              {successMsg}
+            </div>
+          )}
+
           {/* Submit Button */}
-           <div className="col-span-2 mt-4 flex justify-center">
+          <div className="col-span-2 mt-4 flex justify-center">
             <button
               type="submit"
-              className="w-50 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:bg-[#178d84] transition"
+              className="w-50 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md"
             >
               Submit
             </button>
           </div>
+
         </form>
       </div>
     </div>
   );
 }
 
-/* ✅ Local Input Component */
+/* ---------------- INPUT COMPONENT ---------------- */
 function Input({
   label,
+  title,
   type = "text",
   placeholder,
-}: {
-  label: string;
-  type?: string;
-  placeholder?: string;
-}) {
+  maxLength,
+  onlyNumber = false,
+  value,
+  errors,
+  onChange,
+}: any) {
+
+  const handleValue = (e: any) => {
+    let val = e.target.value;
+
+    if (onlyNumber) {
+      val = val.replace(/[^0-9]/g, ""); // allow only digits
+    }
+
+    if (maxLength) {
+      val = val.slice(0, maxLength); // enforce max length (10 digits)
+    }
+
+    onChange(label, val);
+  };
+
   return (
     <div className="flex flex-col">
-      <label className="text-sm font-medium mb-1">{label}</label>
+      <label className="text-sm font-medium mb-1">{title}</label>
       <input
         type={type}
         placeholder={placeholder}
-        className="border rounded-lg p-3 focus:ring-2 focus:ring-teal-500 outline-none"
+        maxLength={maxLength}
+        value={value}
+        onChange={handleValue}
+        className="border rounded-lg p-3 outline-none"
       />
+
+      {errors && errors[label] && (
+        <p className="text-red-500 text-sm">{errors[label]}</p>
+      )}
     </div>
   );
 }

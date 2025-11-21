@@ -6,6 +6,18 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
   // State for Insurance Plan Type
   const [planType, setPlanType] = useState("");
 
+  // Success & Error message states
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
+
+  // ---------- Form State ----------
+  const [formData, setFormData] = useState<any>({});
+
+  // Handle Input Change
+  const handleChange = (label: string, value: any) => {
+    setFormData({ ...formData, [label]: value });
+  };
+
   // Conditions for showing sections
   const showWholeTermFields =
     planType === "wholeLife" || planType === "termInsurance";
@@ -13,25 +25,70 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
   const showInvestmentFields =
     planType === "ulip" || planType === "childPlan" || planType === "pensionPlan";
 
+  // Submit Handler with VALIDATION
+  const handleSubmit = () => {
+    let requiredFields: string[] = [];
+
+    if (showWholeTermFields) {
+      requiredFields = [
+        "Customer Name",
+        "Birthdate",
+        "Education",
+        "Profession",
+        "Income",
+        "ITR Filling",
+        "Sum Assured Amount",
+        "Policy Term",
+        "PPT (Premium Paying Term)",
+        "Smoker / Non-Smoker",
+        "Drinker / Non-Drinker",
+        "Any Existing Disease",
+      ];
+    }
+
+    if (showInvestmentFields) {
+      requiredFields = [
+        "Birthdate",
+        "Profession",
+        "Income",
+        "Policy Term",
+        "Premium Paying Term (PPT)",
+        "Investment Budget (Yearly)",
+      ];
+    }
+
+    // Check if all required fields are filled
+    const allFilled = requiredFields.every((field) => formData[field] && formData[field] !== "");
+
+    if (!allFilled || !planType) {
+      setError(true);
+      setSuccess(false);
+      return;
+    }
+
+    // If filled successfully
+    setError(false);
+    setSuccess(true);
+
+    setTimeout(() => setSuccess(false), 2000);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
 
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4">
-          <h2 className="text-xl font-semibold text-[#1CADA3]">
-            Life Insurance Form
-          </h2>
+          <h2 className="text-xl font-semibold text-[#1CADA3]">Life Insurance Form</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
             <X size={22} />
           </button>
         </div>
 
-        {/* Select Plan */}
+        {/* Form Section */}
         <div className="mb-5 p-6">
-          <label className="font-semibold text-sm block mb-2">
-            Select Insurance Type:
-          </label>
+          <label className="font-semibold text-sm block mb-2">Select Insurance Type:</label>
+
           <select
             value={planType}
             onChange={(e) => setPlanType(e.target.value)}
@@ -40,7 +97,7 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
             <option value="">-- Select Plan --</option>
             <option value="wholeLife">Whole Life Insurance</option>
             <option value="termInsurance">Term Insurance</option>
-            <option value="ulip">Unit Linked Insurance Plans (ULIP)</option>
+            <option value="ulip">ULIP</option>
             <option value="childPlan">Child Plan</option>
             <option value="pensionPlan">Pension Plan</option>
           </select>
@@ -48,40 +105,56 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
           {/* Whole Life / Term Insurance Fields */}
           {showWholeTermFields && (
             <div className="space-y-3 mt-4">
-              <Input label="Customer Name" type="text" />
-              <Input label="Birthdate" type="date" />
-              <Input label="Education" type="text" />
-              <Input label="Profession" type="text" />
-              <Input label="Income" type="number" />
-              <Input label="3 Yrs ITR / Form 16 Provided?" type="text" />
-              <Input label="Sum Assured Amount" type="number" />
-              <Input label="Policy Term" type="text" />
-              <Input label="PPT (Premium Paying Term)" type="text" />
-              <Input label="Smoker / Non-Smoker" type="text" />
-              <Input label="Drinker / Non-Drinker" type="text" />
-              <Input label="Any Existing Disease?" type="text" />
+              <Input label="Customer Name" onChange={handleChange} />
+              <Input label="Birthdate" type="date" onChange={handleChange} />
+              <Input label="Education" onChange={handleChange} />
+              <Input label="Profession" onChange={handleChange} />
+              <Input label="Income" type="number" onChange={handleChange} />
+              <Select label="ITR Filling" options={["Yes", "No"]} onChange={handleChange} />
+              <Input label="Sum Assured Amount" type="number" onChange={handleChange} />
+              <Input label="Policy Term" onChange={handleChange} />
+              <Input label="PPT (Premium Paying Term)" onChange={handleChange} />
+              <Input label="Smoker / Non-Smoker" onChange={handleChange} />
+              <Input label="Drinker / Non-Drinker" onChange={handleChange} />
+              <Input label="Any Existing Disease" onChange={handleChange} />
             </div>
           )}
 
-          {/* ULIP / Child / Pension Plans */}
+          {/* Investment Plans */}
           {showInvestmentFields && (
             <div className="space-y-3 mt-4">
-              <Input label="Birthdate" type="date" />
-              <Input label="Profession" type="text" />
-              <Input label="Income" type="number" />
-              <Input label="Policy Term" type="text" />
-              <Input label="Premium Paying Term (PPT)" type="text" />
-              <Input label="Investment Budget (Yearly)" type="number" />
+              <Input label="Birthdate" type="date" onChange={handleChange} />
+              <Input label="Profession" onChange={handleChange} />
+              <Input label="Income" type="number" onChange={handleChange} />
+              <Input label="Policy Term" onChange={handleChange} />
+              <Input label="Premium Paying Term (PPT)" onChange={handleChange} />
+              <Input label="Investment Budget (Yearly)" type="number" onChange={handleChange} />
             </div>
           )}
 
-          {/* Button */}
-          <div  className="col-span-2 mt-4 flex justify-center" ><button
-            type="submit"
-            className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md w-50 hover:bg-[#16948d] transition"
-          >
-            Submit
-          </button>
+          {/* ERROR MESSAGE */}
+          {error && (
+            <div className="mt-4 text-center text-red-600 font-semibold">
+              ⚠ Please fill all fields before submitting.
+            </div>
+          )}
+
+          {/* SUCCESS MESSAGE */}
+          {success && (
+            <div className="mt-4 text-center text-green-600 font-semibold">
+              ✔ Form submitted successfully!
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <div className="col-span-2 mt-4 flex justify-center">
+            <button
+              onClick={handleSubmit}
+              type="button"
+              className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md w-50 hover:bg-[#16948d] transition"
+            >
+              Submit
+            </button>
           </div>
         </div>
       </div>
@@ -93,17 +166,48 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
 function Input({
   label,
   type = "text",
+  onChange,
 }: {
   label: string;
   type?: string;
+  onChange: (label: string, value: any) => void;
 }) {
   return (
     <div>
       <label className="font-semibold text-sm block mb-1">{label}</label>
       <input
         type={type}
+        onChange={(e) => onChange(label, e.target.value)}
         className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400"
       />
+    </div>
+  );
+}
+
+/* REUSABLE SELECT COMPONENT */
+function Select({
+  label,
+  options,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  onChange: (label: string, value: any) => void;
+}) {
+  return (
+    <div>
+      <label className="font-semibold text-sm block mb-1">{label}</label>
+      <select
+        onChange={(e) => onChange(label, e.target.value)}
+        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400"
+      >
+        <option value="">Select</option>
+        {options.map((opt, i) => (
+          <option key={i} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

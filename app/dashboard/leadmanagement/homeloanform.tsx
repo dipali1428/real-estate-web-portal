@@ -4,7 +4,60 @@ import { X } from "lucide-react";
 
 export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
   const [loanType, setLoanType] = useState("");
-  const [employmentType, setEmploymentType] = useState(""); // ✅ FIXED
+  const [employmentType, setEmploymentType] = useState("");
+
+  // ✅ Form Data State
+  const [formData, setFormData] = useState({
+    clientName: "",
+    phone: "",
+    email: "",
+    dob: "",
+    location: "",
+    loanAmount: "",
+    otherLoan: "",
+  });
+
+  // Validation UI states
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  // Input value handler
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+  };
+
+  // Form Submit
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    setError(false);
+    setSuccess(false);
+
+    // Validate all fields
+    const required = [
+      formData.clientName,
+      formData.phone,
+      formData.email,
+      formData.dob,
+      formData.location,
+      formData.loanAmount,
+      formData.otherLoan,
+      loanType,
+      employmentType,
+    ];
+
+    if (required.some((f) => f === "")) {
+      setError(true);
+      return;
+    }
+
+    // Validate phone number
+    if (formData.phone.length !== 10) {
+      setError(true);
+      return;
+    }
+
+    setSuccess(true);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -19,7 +72,8 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Form Body */}
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
+
           <Select
             label="Type of Home Loan"
             options={[
@@ -34,41 +88,77 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
             onChange={setLoanType}
           />
 
-          <Input label="Client Name" placeholder="Enter Client Name" />
-          <Input label="Phone Number" placeholder="Enter Client Phone Number" />
-          <Input label="Email ID" placeholder="Enter Client Email ID" />
-          <Input label="Date of Birth" type="date" />
-          <Input label="Location" placeholder="Enter Location" />
-          <Input label="Loan Amount" placeholder="Enter Loan Amount" />
-          <Input label="Other Loan Obligation Details" placeholder="Enter Other Loan Obligation Details" />
-          
+          <Input
+            label="Client Name"
+            value={formData.clientName}
+            onChange={(v: any) => handleChange("clientName", v)}
+          />
+
+          <Input
+            label="Phone Number"
+            type="tel"
+            maxLength={10}
+            value={formData.phone}
+            onChange={(v: string) => {
+              if (/^\d*$/.test(v)) handleChange("phone", v);
+            }}
+          />
+
+          <Input
+            label="Email ID"
+            value={formData.email}
+            onChange={(v: any) => handleChange("email", v)}
+          />
+
+          <Input
+            label="Date of Birth"
+            type="date"
+            value={formData.dob}
+            onChange={(v: any) => handleChange("dob", v)}
+          />
+
+          <Input
+            label="Location"
+            value={formData.location}
+            onChange={(v: any) => handleChange("location", v)}
+          />
+
+          <Input
+            label="Loan Amount"
+            value={formData.loanAmount}
+            onChange={(v: any) => handleChange("loanAmount", v)}
+          />
+
+          <Input
+            label="Other Loan Obligation Details"
+            value={formData.otherLoan}
+            onChange={(v: any) => handleChange("otherLoan", v)}
+          />
+
           {/* Employment Type */}
-         <div className=" md:grid-cols-2 gap-4">
-            <label >Employment Type</label>
-            <select
-              value={employmentType}
-              onChange={(e) => setEmploymentType(e.target.value)}
-              className="border border-gray-300 rounded-lg p-2 mt-1 w-full"
-            >
-              <option value="">-- Select Employment Type --</option>
-              <option value="salaried">Salaried Person</option>
-              <option value="selfEmployed">Self Employed</option>
-            </select>
-          </div>
+          <Select
+            label="Employment Type"
+            options={["Salaried Person", "Self Employed"]}
+            value={employmentType}
+            onChange={(v: any) => setEmploymentType(v)}
+          />
 
-          {/* === Salaried Docs === */}
-          {employmentType === "salaried" && <SalariedDocs />}
+          {employmentType === "Salaried Person" && <SalariedDocs />}
+          {employmentType === "Self Employed" && <SelfEmployedDocs />}
 
-          {/* === Self Employed Docs === */}
-          {employmentType === "selfEmployed" && <SelfEmployedDocs />}
+          {/* Error */}
+          {error && (
+            <div className="col-span-2 text-center text-red-600 font-semibold">
+              ⚠ Please fill all fields correctly.
+            </div>
+          )}
 
-          {/* Not Robot */}
-          <div className="col-span-2 flex items-center gap-2 mt-4">
-            <input id="notRobot" type="checkbox" className="w-4 h-4" />
-            <label htmlFor="notRobot" className="text-sm text-gray-700">
-              I am not a robot
-            </label>
-          </div>
+          {/* Success */}
+          {success && (
+            <div className="col-span-2 text-center text-green-600 font-semibold">
+              ✔ Form submitted successfully!
+            </div>
+          )}
 
           {/* Submit */}
           <div className="col-span-2 mt-4 flex justify-center">
@@ -86,21 +176,23 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
   );
 }
 
-/* ---------------- INPUT ---------------- */
-function Input({ label, placeholder, type = "text", className = "" }: any) {
+/* ----------- Input Component ----------- */
+function Input({ label, value, onChange, type = "text", maxLength }: any) {
   return (
-    <div className={className}>
+    <div>
       <label className="block text-sm font-medium mb-1">{label}</label>
       <input
         type={type}
-        placeholder={placeholder}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#1CADA3]"
+        maxLength={maxLength}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border border-gray-300 rounded-md p-2"
       />
     </div>
   );
 }
 
-/* ---------------- SELECT ---------------- */
+/* ----------- Select Component ----------- */
 function Select({ label, options, value, onChange }: any) {
   return (
     <div>
@@ -108,7 +200,7 @@ function Select({ label, options, value, onChange }: any) {
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#1CADA3]"
+        className="w-full border border-gray-300 rounded-md p-2"
       >
         <option value="">Select {label}</option>
         {options.map((o: string) => (
@@ -119,21 +211,17 @@ function Select({ label, options, value, onChange }: any) {
   );
 }
 
-/* ---------------- FILE UPLOAD ---------------- */
+/* ----------- File Upload ----------- */
 function FileUpload({ label }: { label: string }) {
   return (
     <div>
       <label className="block text-sm font-medium mb-1">{label}</label>
-      <input
-        type="file"
-        className="border rounded-lg p-2 text-sm file:mr-3 file:py-2 file:px-4 
-        file:rounded-full file:border-0 file:bg-[#1CADA3] file:text-white hover:file:bg-[#178d84]"
-      />
+      <input type="file" className="border rounded-lg p-2 text-sm" />
     </div>
   );
 }
 
-/* ---------------- DOC SECTIONS ---------------- */
+/* ----------- Sections ----------- */
 function Section({ title, children }: any) {
   return (
     <div className="col-span-2 mt-6">
@@ -143,6 +231,7 @@ function Section({ title, children }: any) {
   );
 }
 
+/* ----------- Salaried ----------- */
 function SalariedDocs() {
   const docs = [
     "Aadhar Card",
@@ -165,14 +254,15 @@ function SalariedDocs() {
   );
 }
 
+/* ----------- Self Employed ----------- */
 function SelfEmployedDocs() {
   const docs = [
     "Aadhar Card",
     "Pan Card",
     "Udyam Registration",
     "Shop Act Licence",
-    "1 current Banking Statement",
-    "Saving  Bank account",
+    "1 Current Banking Statement",
+    "Saving Bank Account",
     "Address Proof",
     "3 Years ITR",
     "GST Certificate",

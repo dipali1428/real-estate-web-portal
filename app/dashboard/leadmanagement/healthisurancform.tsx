@@ -5,6 +5,19 @@ import { X } from "lucide-react";
 
 export default function HealthInsuranceForm({ onClose }: { onClose?: () => void }) {
   const [planType, setPlanType] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
+
+  const [form, setForm] = useState({
+    proposer: "",
+    pin: "",
+    dob: "",
+    disease: "",
+    maleDob: "",
+    femaleDob: "",
+    child1Dob: "",
+    child2Dob: "",
+  });
 
   const [employees, setEmployees] = useState<
     {
@@ -22,6 +35,10 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
       disease: string;
     }[]
   >([]);
+
+  const updateField = (key: string, value: any) => {
+    setForm({ ...form, [key]: value });
+  };
 
   const handleAddEmployee = () => {
     setEmployees([
@@ -65,12 +82,63 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
     setEmployees(updated);
   };
 
+  // ---------- VALIDATION ----------
+  const validateForm = () => {
+    if (!planType || !form.proposer) return false;
+
+    if (planType === "individual") {
+      return form.pin && form.dob && form.disease;
+    }
+
+    if (planType === "family") {
+      return (
+        form.pin &&
+        form.maleDob &&
+        form.femaleDob &&
+        form.child1Dob &&
+        form.child2Dob &&
+        form.disease
+      );
+    }
+
+    if (planType === "gmc") {
+      if (employees.length === 0) return false;
+
+      return employees.every(
+        (emp) =>
+          emp.name &&
+          emp.designation &&
+          emp.pan &&
+          emp.aadhaar &&
+          emp.branch &&
+          emp.email &&
+          emp.mobile &&
+          emp.dob &&
+          emp.age &&
+          emp.pin &&
+          emp.disease
+      );
+    }
+
+    return true;
+  };
+
+  // SUBMIT
   const handleSubmit = () => {
-    if (!planType) {
-      alert("Please select a plan type.");
+    if (!validateForm()) {
+      setError(true);
+      setSuccess(false);
       return;
     }
-    alert(`Form submitted for: ${planType.toUpperCase()}`);
+
+    // SUCCESS
+    setError(false);
+    setSuccess(true);
+
+    setTimeout(() => {
+      setSuccess(false);
+      onClose?.();
+    }, 2000);
   };
 
   return (
@@ -100,62 +168,69 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
             <option value="gmc">GMC (Group Mediclaim)</option>
           </select>
 
-          {/* COMMON FIELD */}
-          <label className="font-semibold text-sm block mb-2">Proposer Name</label>
-          <input
+          {/* PROPOSER NAME */}
+          <Input
+            label="Proposer Name"
             type="text"
-            className="w-full border border-gray-300 rounded-md p-2 mb-6"
-            placeholder="Enter Name"
+            value={form.proposer}
+            onChange={(v) => updateField("proposer", v)}
           />
 
-          {/* INDIVIDUAL PLAN */}
+          {/* INDIVIDUAL */}
           {planType === "individual" && (
             <div className="space-y-4">
-              <Input label="Pin Code" type="text" />
-              <Input label="Date of Birth" type="date" />
-              <Input label="Any Existing Disease" type="text" />
+              <Input label="Pin Code" type="text" value={form.pin} onChange={(v) => updateField("pin", v)} />
+              <Input label="Date of Birth" type="date" value={form.dob} onChange={(v) => updateField("dob", v)} />
+              <Input label="Any Existing Disease" type="text" value={form.disease} onChange={(v) => updateField("disease", v)} />
             </div>
           )}
 
-          {/* FAMILY PLAN */}
+          {/* FAMILY */}
           {planType === "family" && (
             <div className="space-y-4">
-              <Input label="Pin Code" type="text" />
+              <Input label="Pin Code" type="text" value={form.pin} onChange={(v) => updateField("pin", v)} />
 
-              {["Male DOB", "Female DOB", "1st Child DOB", "2nd Child DOB"].map(
-                (label, i) => (
-                  <Input key={i} label={label} type="date" />
-                )
-              )}
+              {[
+                { label: "Male DOB", field: "maleDob" },
+                { label: "Female DOB", field: "femaleDob" },
+                { label: "1st Child DOB", field: "child1Dob" },
+                { label: "2nd Child DOB", field: "child2Dob" },
+              ].map((item) => (
+                <Input
+                  key={item.field}
+                  label={item.label}
+                  type="date"
+                  value={(form as any)[item.field]}
+                  onChange={(v) => updateField(item.field, v)}
+                />
+              ))}
 
-              <Input label="Any Existing Disease" type="text" />
+              <Input label="Any Existing Disease" type="text" value={form.disease} onChange={(v) => updateField("disease", v)} />
             </div>
           )}
 
-          {/* GMC PLAN */}
+          {/* GMC */}
           {planType === "gmc" && (
             <div className="mt-6">
-              <Input label="Number of Employees" type="number" />
-
               <button
                 onClick={handleAddEmployee}
                 type="button"
-                className="bg-blue-600 text-white px-4 py-2 rounded-md mt-4 hover:bg-blue-700"
+                className="bg-blue-600 text-white px-4 py-2 rounded-md mb-4 hover:bg-blue-700"
               >
                 + Add Employee
               </button>
 
               {employees.length > 0 && (
-                <div className="overflow-x-auto mt-4">
+                <div className="overflow-x-auto">
                   <table className="w-full border-collapse border border-gray-300 text-sm">
                     <thead>
                       <tr className="bg-blue-600 text-white">
                         {[
-                          "Sr.",
+                          "Sr",
                           "Name",
                           "Designation",
                           "PAN",
-                          "Aadhaar",
+                          "Aadhar",
                           "Branch",
                           "Email",
                           "Mobile",
@@ -172,6 +247,7 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
                         ))}
                       </tr>
                     </thead>
+
                     <tbody>
                       {employees.map((emp, index) => (
                         <tr key={index}>
@@ -258,13 +334,28 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
             </div>
           )}
 
-          {/* SUBMIT BUTTON */}
-          <div className="col-span-2 mt-4 flex justify-center" ><button
-            onClick={handleSubmit}
-            className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md hover:bg-[#16948d]"
-          >
-            Submit
-          </button>
+          {/* ERROR */}
+          {error && (
+            <div className="mt-4 text-center text-red-600 font-semibold">
+              ⚠ Please fill all required fields.
+            </div>
+          )}
+
+          {/* SUCCESS */}
+          {success && (
+            <div className="mt-4 text-center text-green-600 font-semibold">
+              ✔ Form submitted successfully!
+            </div>
+          )}
+
+          {/* SUBMIT */}
+          <div className="col-span-2 mt-4 flex justify-center">
+            <button
+              onClick={handleSubmit}
+              className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md hover:bg-[#16948d]"
+            >
+              Submit
+            </button>
           </div>
         </div>
       </div>
@@ -272,13 +363,25 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
   );
 }
 
-/* REUSABLE INPUT */
-function Input({ label, type }: { label: string; type: string }) {
+/* INPUT COMPONENT */
+function Input({
+  label,
+  type,
+  value,
+  onChange,
+}: {
+  label: string;
+  type: string;
+  value: any;
+  onChange: (v: string) => void;
+}) {
   return (
     <div className="mb-4">
       <label className="font-semibold text-sm block mb-1">{label}</label>
       <input
         type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         className="w-full border border-gray-300 rounded-md p-2"
       />
     </div>

@@ -141,26 +141,25 @@ export default function LeadManagement() {
       {/* ======= Lead Management Section ======= */}
       <section id="lead-management" className="p-8 bg-gray-20 min-h-screen">
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
-          {/* Left Side Title + Subtitle */}
-          <div>
-            <h1 className="text-3xl font-bold text-slate-700">Lead Management</h1>
-            <p className="text-slate-600 mt-2 text-lg">
-              Efficiently manage your sales pipeline from initial contact to conversion.
-              Track all potential clients and their journey.
-            </p>
-          </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+  {/* Left Side Title + Subtitle */}
+  <div className="flex-1">
+    <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">Lead Management</h1>
+    <p className="text-slate-600 mt-2 text-base sm:text-lg">
+      Efficiently manage your sales pipeline from initial contact to conversion.
+      Track all potential clients and their journey.
+    </p>
+  </div>
 
-          {/* Right Side Button */}
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-md hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            <Plus className="w-4 h-4" />
-            Add New Lead
-          </button>
-        </div>
-
+  {/* Right Side Button */}
+  <button
+    onClick={() => setIsModalOpen(true)}
+    className="flex items-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-md hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap flex-shrink-0"
+  >
+    <Plus className="w-4 h-4" />
+    Add New Lead
+  </button>
+</div>
         {/* Tabs / Navbar */}
         <div className="flex border-b border-gray-200 mb-6 space-x-6">
           {tabs.map((tab) => (
@@ -182,7 +181,7 @@ export default function LeadManagement() {
         <div className="bg-white p-6 rounded-lg shadow">
           {/* === Insurance Tab === */}
           {activeTab ==="loans" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
              {/* Home Loans */}
               <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
@@ -281,7 +280,7 @@ export default function LeadManagement() {
               {/* Education loan*/}
               <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
-                <h2 className="text-xl font-semibold mb-3">Education loan</h2>
+                <h2 className="text-xl font-semibold mb-3">Education Loan</h2>
                 <p className="text-sm mb-6">
                   An education loan is money borrowed to pay for study expenses like fees, books, and living costs.</p></div>
                 {/*active leads*/}
@@ -301,7 +300,7 @@ export default function LeadManagement() {
               {/* Balance Transfer*/}
               <div className="bg-white text-black rounded-lg shadow-lg p-6 justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
-                <h2 className="text-xl font-semibold mb-3">Balance transfer</h2>
+                <h2 className="text-xl font-semibold mb-3">Balance Transfer</h2>
                 <p className="text-sm mb-6">A balance transfer moves debt to a lender with lower interest, and a top-up loan adds extra money to an existing loan.</p></div>
                 {/*active leads*/}
                 <div className="flex items-center justify-between my-4">
@@ -338,7 +337,7 @@ export default function LeadManagement() {
                 </div>
             {/* loan against securities / MF*/}
               <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
-                <h2 className="text-xl font-semibold mb-3">loan against securities / MF</h2>
+                <h2 className="text-xl font-semibold mb-3">Loan Against Securities / MF</h2>
                 <p className="text-sm mb-6">A vehicle loan is money borrowed to buy a car or other vehicle, with the vehicle as collateral.</p>
                 {/*active leads*/}
                 <div className="flex items-center justify-between my-4">
@@ -376,7 +375,7 @@ export default function LeadManagement() {
                </div>
           )}
           {activeTab === "insurance" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {/* Life Insurance */}
               <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
@@ -563,7 +562,7 @@ export default function LeadManagement() {
               </div>
           )}
           {activeTab === "mutual_fund" && (
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
              {/* */}
               <div className="bg-white text-black rounded-lg shadow-lg p-6 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">Mutual Fund </h2>
@@ -584,7 +583,7 @@ export default function LeadManagement() {
               </div>
           )}
           {activeTab === "unlisted" && (
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
              {/* unlisted */}
               <div className="bg-white text-black rounded-lg shadow-lg p-6 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">Unlisted</h2>
@@ -852,8 +851,7 @@ export default function LeadManagement() {
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+                strokeLinejoin="round" >
                 <path d="M12 20h9" />
                 <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
               </svg>
@@ -864,11 +862,7 @@ export default function LeadManagement() {
     </table>
   </div>
 </div>
-
-
-
       </section>
-
       {/* ===== Modal (Add New Lead) ===== */}
       <AddLeadModal
         isOpen={isModalOpen}

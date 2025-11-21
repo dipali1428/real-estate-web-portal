@@ -3,33 +3,124 @@ import { useState } from "react";
 import { X } from "lucide-react";
 
 export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
-  const [loanType, setLoanType] = useState("");
+  const [formData, setFormData] = useState({
+    clientName: "",
+    phone: "",
+    email: "",
+    dob: "",
+    location: "",
+    loanAmount: "",
+    deductionDetails: "",
+    companyName: "",
+    companyAddress: "",
+    loanObligation: "",
+  });
+
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  // Update form values
+  const handleChange = (key: string, value: string) => {
+    setFormData({ ...formData, [key]: value });
+  };
+
+  // Validate before submit
+  const submitForm = (e: any) => {
+    e.preventDefault();
+    setError(false);
+    setSuccess(false);
+
+    for (const key of Object.keys(formData)) {
+      if (!formData[key as keyof typeof formData]) {
+        setError(true);
+        return;
+      }
+    }
+
+    // If all good
+    setSuccess(true);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 ">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh] text-gray-700">
+
         {/* Header */}
-        <div className="flex justify-between items-center border-b px-6 py-4 text-gray-700">
+        <div className="flex justify-between items-center border-b px-6 py-4">
           <h2 className="text-xl font-semibold text-[#1CADA3]">Personal Loan Form</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
+          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
             <X size={22} />
           </button>
         </div>
 
-        {/* Body */}
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 text-gray-700">
-          <Input label="Client Name" placeholder="Enter Client Name" />
-          <Input label="Phone Number" placeholder="Enter Client Phone Number" />
-          <Input label="Email ID" placeholder="Enter Client Email ID" />
-          <Input label="Date of Birth" type="date" />
-          <Input label="Location" placeholder="Enter Location" />
-          <Input label="Loan Amount" placeholder="Enter Loan Amount" />
-          <Input label="Deduction Details" placeholder="Enter Deduction Details"/>
-          <Input label="Company Name" type="text" placeholder="Enter Company Name" />
-          <Input label="Company Address" type="text" placeholder="Enter Company Address"  />
-          <Input label="Other Loan Obligation Details" type="text" placeholder="Enter Other Loan Obligation Details"/>
+        {/* Form */}
+        <form onSubmit={submitForm} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
+
+          <Input 
+            label="Client Name"
+            value={formData.clientName}
+            onChange={(e: any) => handleChange("clientName", e.target.value)}
+          />
+
+          <Input
+            label="Phone Number"
+            type="tel"
+            maxLength={10}
+            onlyNumber
+            value={formData.phone}
+            onChange={(e: any) => handleChange("phone", e.target.value)}
+          />
+
+          <Input 
+            label="Email ID"
+            value={formData.email}
+            onChange={(e: any) => handleChange("email", e.target.value)}
+          />
+
+          <Input 
+            label="Date of Birth"
+            type="date"
+            value={formData.dob}
+            onChange={(e: any) => handleChange("dob", e.target.value)}
+          />
+
+          <Input 
+            label="Location"
+            value={formData.location}
+            onChange={(e: any) => handleChange("location", e.target.value)}
+          />
+
+          <Input 
+            label="Loan Amount"
+            value={formData.loanAmount}
+            onChange={(e: any) => handleChange("loanAmount", e.target.value)}
+          />
+
+          <Input 
+            label="Deduction Details"
+            value={formData.deductionDetails}
+            onChange={(e: any) => handleChange("deductionDetails", e.target.value)}
+          />
+
+          <Input 
+            label="Company Name"
+            value={formData.companyName}
+            onChange={(e: any) => handleChange("companyName", e.target.value)}
+          />
+
+          <Input 
+            label="Company Address"
+            value={formData.companyAddress}
+            onChange={(e: any) => handleChange("companyAddress", e.target.value)}
+          />
+
+          <Input 
+            label="Loan Obligation Details"
+            value={formData.loanObligation}
+            onChange={(e: any) => handleChange("loanObligation", e.target.value)}
+          />
+
           {/* File Uploads */}
-          
           {[
             "Aadhar Card",
             "Pan Card",
@@ -44,150 +135,71 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
               <label className="block font-medium mb-1">{label}</label>
               <input
                 type="file"
-                className="border rounded-lg p-2 text-sm file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-teal-500 file:text-white hover:file:bg-teal-600"
+                className="border rounded-lg p-2 text-sm 
+                file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 
+                file:bg-[#1CADA3] file:text-white hover:file:bg-teal-600"
               />
             </div>
           ))}
-          {/* Bottom Section */}
+
+          {/* Robot Check */}
           <div className="col-span-2 flex items-center gap-2 mt-4">
-            <input id="notRobot" type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 rounded" />
-            <label htmlFor="notRobot" className="text-sm text-gray-700">I am not a robot</label>
+            <input id="robot" type="checkbox" className="w-4 h-4" />
+            <label htmlFor="robot">I am not a robot</label>
           </div>
 
-          <div className="col-span-2 mt-4 flex justify-center">
+          {/* Error Message */}
+          {error && (
+            <div className="col-span-2 text-center text-red-600 font-semibold mt-2">
+              ⚠ Please fill all fields before submitting.
+            </div>
+          )}
+
+          {/* Success Message */}
+          {success && (
+            <div className="col-span-2 text-center text-green-600 font-semibold mt-2">
+              ✔ Form submitted successfully!
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <div className="col-span-2 flex justify-center mt-4">
             <button
               type="submit"
-              className="w-50 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:bg-[#178d84] transition"
+              className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-6 py-2 rounded-md hover:opacity-90"
             >
               Submit
             </button>
           </div>
+
         </form>
       </div>
     </div>
   );
 }
 
-/* --------------------------- COMPONENTS --------------------------- */
+/* ---------------- INPUT COMPONENT ---------------- */
+function Input({ label, value, onChange, type = "text", onlyNumber, maxLength }: any) {
 
-function Input({ label, placeholder, type = "text", className = "" }: any) {
+  const restrictNumber = (e: any) => {
+    if (!onlyNumber) return;
+
+    if (["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) return;
+
+    if (!/^[0-9]$/.test(e.key)) e.preventDefault();
+  };
+
   return (
-    <div className={className}>
+    <div>
       <label className="block text-sm font-medium mb-1">{label}</label>
       <input
+        value={value}
         type={type}
-        placeholder={placeholder}
+        maxLength={maxLength}
+        onKeyDown={restrictNumber}
+        onChange={onChange}
         className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#1CADA3]"
       />
-    </div>
-  );
-}
-
-function Select({ label, options, value, onChange }: any) {
-  return (
-    <div>
-      <label className="block text-sm font-medium mb-1">{label}</label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#1CADA3]"
-      >
-        <option value="">Select {label}</option>
-        {options.map((opt: string) => (
-          <option key={opt}>{opt}</option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function FileUpload({ label }: { label: string }) {
-  return (
-    <div>
-      <label className="block text-sm font-medium mb-1">{label}</label>
-      <div className="border border-dashed border-gray-400 rounded-md p-3 text-center hover:bg-gray-50">
-        <input type="file" id={label} className="hidden" />
-        <label htmlFor={label} className="text-blue-600 cursor-pointer">
-          Upload File
-        </label>
-      </div>
-    </div>
-  );
-}
-
-/* --------------------------- DOC SECTIONS --------------------------- */
-
-function SalariedDocs() {
-  const docs = [
-    "Aadhar Card",
-    "Pan Card",
-    "3 Months Salary Slip",
-    "2 Years Form 16",
-    "6 Months Banking Statement",
-    "Address Proof",
-    "Photograph",
-    "Existing Loan Statement",
-    "Property Cost Sheet",
-    "Own Contribution Proof",
-  ];
-  return (
-    <Section title="Upload Documents for Salaried Person">
-      {docs.map((d) => (
-        <FileUpload key={d} label={d} />
-      ))}
-    </Section>
-  );
-}
-
-function SelfEmployedDocs() {
-  const docs = [
-    "Aadhar Card",
-    "Pan Card",
-    "Udyam Aadhar Registration",
-    "Shop Act Licence",
-    "1 Year Banking Statement",
-    "Address Proof",
-    "ITR 3 Years",
-    "GST Certificate",
-    "Last 12 Months GST Returns",
-    "Photograph",
-    "Existing Loan Statement",
-    "Property Cost Sheet",
-    "Own Contribution Proof",
-  ];
-  return (
-    <Section title="Upload Documents for Self Employed Person">
-      {docs.map((d) => (
-        <FileUpload key={d} label={d} />
-      ))}
-    </Section>
-  );
-}
-
-function BTDocs() {
-  const docs = [
-    "Aadhar Card",
-    "Pan Card",
-    "Income Document (As Per Salaried / Self Employed)",
-    "Foreclosure Letter from Existing Loan",
-    "Property Cost Sheet",
-    "Own Contribution Proof",
-    "List of Documents from Existing Bank",
-  ];
-  return (
-    <Section title="Upload Documents for Balance Transfer">
-      {docs.map((d) => (
-        <FileUpload key={d} label={d} />
-      ))}
-    </Section>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="col-span-2 mt-6">
-      <h3 className="text-md font-semibold mb-3 text-[#1CADA3]">{title}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
     </div>
   );
 }
