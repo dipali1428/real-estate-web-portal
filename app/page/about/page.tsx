@@ -91,72 +91,93 @@ const AboutSection = () => (
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {/* Unnao Branch */}
-                    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-4 border border-gray-100">
-                        <h3 className="text-lg font-bold text-[#2076C7] mb-3 border-b-2 border-[#2076C7] pb-2">Unnao Branch</h3>
-                        <div className="text-gray-600 text-sm">
-                            <p>
-                                Office No -01, Kamlist Tower, Behind Mishra Jewellers, Near Joga Bhogha Chauraha, Nehru Nagar, Shuklaganj, Unnao, Uttar Pradesh-209861
-                            </p>
+                    <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="bg-white rounded-xl p-5 h-full">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3">Unnao Branch</h3>
+                            <div className="text-gray-600 text-sm leading-relaxed space-y-2">
+                            <p className="font-medium text-gray-700">Office No. 01, Kamlist Tower</p>
+                            <p>Behind Mishra Jewellers, Near Joga Bhogha Chauraha</p>
+                            <p>Nehru Nagar, Shuklaganj</p>
+                            <p>Unnao, Uttar Pradesh - 209861</p>
+                        </div>
                         </div>
                     </div>
 
                     {/* Nagpur Branch */}
-                    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-4 border border-gray-100">
-                        <h3 className="text-lg font-bold text-[#2076C7] mb-3 border-b-2 border-[#2076C7] pb-2">Nagpur Branch</h3>
-                        <div className="text-gray-600 text-sm">
-                            <p>
-                                Apartment No.202, 2nd Floor, Sharda Enclave, Nagji Bhai Town, Besides Platina Heart Institute, Sitabuldi, Nagpur, Maharashtra-440012
-                            </p>
+                    <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="bg-white rounded-xl p-5 h-full">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3">Nagpur Branch</h3>
+                            <div className="text-gray-600 text-sm leading-relaxed space-y-2">
+                            <p className="font-medium text-gray-700">Apartment No. 202, 2nd Floor</p>
+                            <p>Sharda Enclave, Nagji Bhai Town</p>
+                            <p>Besides Platina Heart Institute, Sitabuldi</p>
+                            <p>Nagpur, Maharashtra - 440012</p>
+                        </div>
                         </div>
                     </div>
 
                     {/* Kolkata Branch */}
-                    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-4 border border-gray-100">
-                        <h3 className="text-lg font-bold text-[#2076C7] mb-3 border-b-2 border-[#2076C7] pb-2">Kolkata Branch</h3>
-                        <div className="text-gray-600 text-sm">
-                            <p>
-                                PS Qube, Room No 620, 6th Floor, Plot No IID/31/1, NewTown, Kolkata, West Bengal-700135
-                            </p>
+                    <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="bg-white rounded-xl p-5 h-full">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3">Kolkata Branch</h3>
+                            <div className="text-gray-600 text-sm leading-relaxed space-y-2">
+                            <p className="font-medium text-gray-700">PS Qube, Room No. 620, 6th Floor</p>
+                            <p>Plot No. IID/31/1, NewTown</p>
+                            <p>Kolkata, West Bengal - 700135</p>
+                        </div>
                         </div>
                     </div>
 
                     {/* Nashik Branch */}
-                    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-4 border border-gray-100">
-                        <h3 className="text-lg font-bold text-[#2076C7] mb-3 border-b-2 border-[#2076C7] pb-2">Nashik Branch</h3>
-                        <div className="text-gray-600 text-sm">
-                            <p>
-                                2064, 2nd Floor Roongta Shopping Hub, Near Hotel Surya, Mumbai Agra Road, Indira Nagar, Nashik, Maharashtra 422009
-                            </p>
+                    <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="bg-white rounded-xl p-5 h-full">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3">Nashik Branch</h3>
+                            <div className="text-gray-600 text-sm leading-relaxed space-y-2">
+                            <p className="font-medium text-gray-700">2064, 2nd Floor</p>
+                            <p>Roongta Shopping Hub</p>
+                            <p>Near Hotel Surya, Mumbai Agra Road, Indira Nagar</p>
+                            <p>Nashik, Maharashtra - 422009</p>
+                        </div>
                         </div>
                     </div>
 
                     {/* Kolhapur Branch */}
-                    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-4 border border-gray-100">
-                        <h3 className="text-lg font-bold text-[#2076C7] mb-3 border-b-2 border-[#2076C7] pb-2">Kolhapur Branch</h3>
-                        <div className="text-gray-600 text-sm">
-                            <p>
-                                Yashonandan Plaza, 1st Floor, Shahupuri 3rd Lane, Near Shubhash Photo, Kolhapur, Maharashtra-416001
-                            </p>
+                    <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="bg-white rounded-xl p-5 h-full">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3">Kolhapur Branch</h3>
+                            <div className="text-gray-600 text-sm leading-relaxed space-y-2">
+                            <p className="font-medium text-gray-700">Yashonandan Plaza, 1st Floor</p>
+                            <p>Shahupuri 3rd Lane</p>
+                            <p>Near Shubhash Photo</p>
+                            <p>Kolhapur, Maharashtra - 416001</p>
+                        </div>
                         </div>
                     </div>
 
                     {/* Chiplun Branch */}
-                    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-4 border border-gray-100">
-                        <h3 className="text-lg font-bold text-[#2076C7] mb-3 border-b-2 border-[#2076C7] pb-2">Chiplun Branch</h3>
-                        <div className="text-gray-600 text-sm">
-                            <p>
-                                United Classic, 203/204, 2nd Floor, Near Old S.T. Stand, Chiplun Bazarpeth, Chiplun, Maharashtra - 415605
-                            </p>
+                    <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="bg-white rounded-xl p-5 h-full">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3">Chiplun Branch</h3>
+                            <div className="text-gray-600 text-sm leading-relaxed space-y-2">
+                            <p className="font-medium text-gray-700">United Classic, 203/204, 2nd Floor</p>
+                            <p>Near Old S.T. Stand</p>
+                            <p>Chiplun Bazarpeth</p>
+                            <p>Chiplun, Maharashtra - 415605</p>
+                        </div>
                         </div>
                     </div>
 
+
                     {/* Ratnagiri Branch */}
-                    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-4 border border-gray-100">
-                        <h3 className="text-lg font-bold text-[#2076C7] mb-3 border-b-2 border-[#2076C7] pb-2">Ratnagiri Branch</h3>
-                        <div className="text-gray-600 text-sm">
-                            <p>
-                                S. No. A-4, Soham Samarth Appartment, S.V.Road, Maruti Madir, Ratnagiri, Maharashtra - 415612
-                            </p>
+                    <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="bg-white rounded-xl p-5 h-full">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3">Ratnagiri Branch</h3>
+                            <div className="text-gray-600 text-sm leading-relaxed space-y-2">
+                            <p className="font-medium text-gray-700">S. No. A-4</p>
+                            <p>Soham Samarth Apartment, S.V. Road</p>
+                            <p>Maruti Mandir</p>
+                            <p>Ratnagiri, Maharashtra - 415612</p>
+                        </div>
                         </div>
                     </div>
                 </div>
