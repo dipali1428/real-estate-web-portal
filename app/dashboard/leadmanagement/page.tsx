@@ -154,7 +154,7 @@ export default function LeadManagement() {
   {/* Right Side Button */}
   <button
     onClick={() => setIsModalOpen(true)}
-    className="flex items-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-md hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap flex-shrink-0"
+    className="flex items-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-md hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap shrink-0"
   >
     <Plus className="w-4 h-4" />
     Add New Lead
