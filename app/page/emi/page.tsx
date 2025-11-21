@@ -187,11 +187,11 @@ const EMICalculator: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
           <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
-            <h1 className="text-3xl font-bold mb-2">EMI Calculator</h1>
+            <h1 className="text-3xl font-bold  mb-2">EMI Calculator</h1>
             <p className="text-blue-100">Calculate your Equated Monthly Installment</p>
           </div>
 
-          <div className="flex flex-col lg:flex-row p-6 lg:p-8">
+          <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
             {/* Input Section */}
             <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
 
@@ -209,9 +209,9 @@ const EMICalculator: React.FC = () => {
                     step="10000"
                     value={loanAmount}
                     onChange={handleLoanAmountChange}
-                    className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
+                    className="w-full h-2 bg-gray-300  rounded-lg cursor-pointer slider"
                   />
-                  <div className="flex justify-between text-sm text-gray-600 mt-1">
+                  <div className="flex justify-between text-sm  text-gray-600 mt-1">
                     <span>₹1,00,000</span>
                     <span>₹5,00,00,000</span>
                   </div>
@@ -222,10 +222,10 @@ const EMICalculator: React.FC = () => {
                     id="loanAmountInput"
                     value={getLoanAmountDisplayValue()}
                     onChange={handleLoanAmountInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12  text-gray-800 placeholder:text-gray-500"
                     placeholder="Enter loan amount"
                   />
-                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
+                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2  text-gray-600 font-medium">₹</span>
                 </div>
               </div>
 
@@ -259,7 +259,7 @@ const EMICalculator: React.FC = () => {
                     step="0.1"
                     value={interestRate === 0 ? '' : interestRate}
                     onChange={handleInterestRateInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3]  bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3]  bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12  text-gray-800 placeholder:text-gray-500"
                   />
                   <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
                 </div>

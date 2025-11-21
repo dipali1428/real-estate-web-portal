@@ -104,7 +104,7 @@ export default function Dashboard() {
                                 style={{ width: '90%' }}
                             ></div>
                         </div>
-                        <span className="text-white ml-3">90%</span>
+                        <span className="text-white ml-3 font-sans">90%</span>
                     </div>
                 </motion.div>
 
@@ -120,7 +120,7 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold text-gray-800">1.75CR</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">1.75CR</div>
                             <div className="text-gray-600 mt-1">Total Business Volume</div>
                             <div className="flex items-center text-green-500 text-sm mt-2">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -141,7 +141,7 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold text-gray-800">2CR</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">2CR</div>
                             <div className="text-gray-600 mt-1">Monthly Target</div>
                             <div className="mt-3">
                                 <div className="w-full bg-gray-200 rounded-full h-2">
@@ -150,7 +150,7 @@ export default function Dashboard() {
                                         style={{ width: '90%' }}
                                     ></div>
                                 </div>
-                                <div className="text-sm text-gray-500 mt-1">Achieved: 90%</div>
+                                <div className="text-sm font-sans text-gray-500 mt-1">Achieved: 90%</div>
                             </div>
                         </div>
                     </div>
@@ -165,7 +165,7 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold text-gray-800">142</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">142</div>
                             <div className="text-gray-600 mt-1">Active Policies</div>
                             <div className="flex items-center text-green-500 text-sm mt-2">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -186,7 +186,7 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold text-gray-800">3</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">3</div>
                             <div className="text-gray-600 mt-1">Pending Follow-ups</div>
                             <div className="flex items-center text-red-500 text-sm mt-2">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -207,7 +207,7 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold text-gray-800">89</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">89</div>
                             <div className="text-gray-600 mt-1">Total Clients</div>
                             <div className="flex items-center text-green-500 text-sm mt-2">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -238,7 +238,7 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold text-gray-800">₹ 3,42,500</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">₹ 3,42,500</div>
                             <div className="text-gray-600 mt-1">YTD Incentives Earned</div>
                             <div className="flex items-center text-green-500 text-sm mt-2">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
