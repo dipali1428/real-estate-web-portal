@@ -19,17 +19,17 @@ export const categories = {
 // Utility functions for initials and colors
 const generateInitials = (name: string): string => {
     if (!name) return '?';
-    
+
     // Remove extra spaces and split into words
     const words = name.trim().split(/\s+/);
-    
+
     if (words.length === 0) return '?';
-    
+
     if (words.length === 1) {
         // Single word - take first 2 characters
         return words[0].substring(0, 2).toUpperCase();
     }
-    
+
     // Multiple words - take first character of first two words
     return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 };
@@ -41,12 +41,12 @@ const generateColorFromName = (name: string): string => {
         'bg-orange-500', 'bg-cyan-500', 'bg-blue-600', 'bg-green-600',
         'bg-purple-600', 'bg-pink-600', 'bg-red-600'
     ];
-    
+
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
         hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
-    
+
     const index = Math.abs(hash) % colors.length;
     return colors[index];
 };
@@ -58,14 +58,14 @@ interface ClientAvatarProps {
     className?: string;
 }
 
-const ClientAvatar: React.FC<ClientAvatarProps> = ({ 
-    name, 
+const ClientAvatar: React.FC<ClientAvatarProps> = ({
+    name,
     size = 'md',
     className = ''
 }) => {
     const initials = generateInitials(name);
     const colorClass = generateColorFromName(name);
-    
+
     const sizeClasses = {
         sm: 'w-6 h-6 text-xs md:w-8 md:h-8',
         md: 'w-8 h-8 text-sm md:w-10 md:h-10',
@@ -307,7 +307,7 @@ const ClientPortfolio: React.FC = () => {
 
                 {/* Navigation Tabs */}
                 <div className="mb-6">
-                    <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto pb-2 -mx-4 px-4">
+                    <div className="flex flex-wrap gap-2">
                         {[
                             { id: 'clients' as const, name: 'Clients' },
                             { id: 'leads' as const, name: 'Leads' },
@@ -318,19 +318,19 @@ const ClientPortfolio: React.FC = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`py-2 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap flex-shrink-0 ${
-                                    activeTab === tab.id
-                                    ? 'border-[#2076C7] text-[#2076C7]'
-                                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-                                }`}
+                                className={`py-2 px-4 rounded-full font-medium text-sm flex items-center border transition-colors ${activeTab === tab.id
+                                    ? 'bg-[#2076C7] text-white border-[#2076C7]'
+                                    : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'
+                                    }`}
                             >
                                 {tab.name}
-                                <span className="ml-1 sm:ml-2 bg-slate-200 text-slate-700 py-0.5 px-1.5 sm:px-2 rounded-full text-xs">
+                                <span className={`ml-2 py-0.5 px-2 rounded-full text-xs ${activeTab === tab.id ? 'bg-white text-[#2076C7]' : 'bg-slate-100 text-slate-700'
+                                    }`}>
                                     {tabCounts[tab.id]}
                                 </span>
                             </button>
                         ))}
-                    </nav>
+                    </div>
                 </div>
 
                 {/* Content Sections */}
@@ -345,7 +345,7 @@ const ClientPortfolio: React.FC = () => {
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto -mx-4 sm:mx-0">
-                                    <div className="min-w-full inline-block align-middle">
+                                    <div className="min-w-full max-w-30 inline-block align-middle">
                                         <div className="overflow-hidden">
                                             {/* Mobile Cards View */}
                                             <div className="sm:hidden space-y-4 max-h-96 overflow-y-auto pr-2">
@@ -360,7 +360,7 @@ const ClientPortfolio: React.FC = () => {
                                                                         <div className="text-xs text-slate-500 mt-1">{client.mobile}</div>
                                                                         <div className="text-xs text-slate-500">{client.email}</div>
                                                                     </div>
-                                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-[#2076C7] ml-2">
+                                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-[#2076C7] ml-2 truncate max-w-[100px] sm:max-w-[150px]">
                                                                         {client.product}
                                                                     </span>
                                                                 </div>
@@ -373,7 +373,7 @@ const ClientPortfolio: React.FC = () => {
                                                     </div>
                                                 ))}
                                             </div>
-                                            
+
                                             {/* Desktop Table View */}
                                             <div className="hidden sm:block max-h-96 overflow-y-auto">
                                                 <table className="min-w-full divide-y divide-slate-200">
@@ -469,20 +469,20 @@ const ClientPortfolio: React.FC = () => {
                                                     </div>
                                                     <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 text-sm text-slate-600">
                                                         <div className="flex items-center">
-                                                            <span className="font-medium mr-2">Source:</span> 
+                                                            <span className="font-medium mr-2">Source:</span>
                                                             <span className="truncate">{lead.source}</span>
                                                         </div>
                                                         <div className="flex items-center">
-                                                            <span className="font-medium mr-2">Next Follow-up:</span> 
+                                                            <span className="font-medium mr-2">Next Follow-up:</span>
                                                             <span>{lead.nextFollowUpDate}</span>
                                                         </div>
                                                         <div className="flex items-center sm:col-span-2 lg:col-span-1">
-                                                            <span className="font-medium mr-2">Activity:</span> 
+                                                            <span className="font-medium mr-2">Activity:</span>
                                                             <span className="truncate">{lead.followUpActivity}</span>
                                                         </div>
                                                     </div>
                                                     <div className="mt-2 text-sm text-slate-600">
-                                                        <span className="font-medium">Notes:</span> 
+                                                        <span className="font-medium">Notes:</span>
                                                         <span className="ml-1 line-clamp-2">{lead.notes}</span>
                                                     </div>
                                                 </div>
@@ -536,14 +536,14 @@ const ClientPortfolio: React.FC = () => {
                     {/* Documents */}
                     {activeTab === 'documents' && (
                         <div className="p-4 sm:p-6">
-                            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4">Uploaded Document Records</h2>
+                            <h2 className="text-lg sm:text-xl font-semibold text-slate-700 mb-4">Uploaded Document Records</h2>
                             {filteredDocuments.length === 0 ? (
                                 <div className="text-center py-8">
                                     <p className="text-slate-500">No documents found for the selected category filter.</p>
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto -mx-4 sm:mx-0">
-                                    <div className="min-w-full inline-block align-middle">
+                                    <div className="min-w-full max-w-30 inline-block align-middle">
                                         <div className="overflow-hidden">
                                             {/* Mobile Cards View */}
                                             <div className="sm:hidden space-y-4 max-h-96 overflow-y-auto pr-2">
@@ -555,15 +555,15 @@ const ClientPortfolio: React.FC = () => {
                                                                 <ClientAvatar name={client?.name || ''} size="sm" />
                                                                 <div className="flex-1 min-w-0">
                                                                     <div className="flex items-start justify-between">
-                                                                        <div className="min-w-0">
+                                                                        <div>
                                                                             <div className="text-sm font-medium text-slate-900 truncate">{client?.name}</div>
                                                                             <div className="text-xs text-slate-500 mt-1">{doc.type}</div>
+                                                                            <div className="text-xs text-slate-500">{doc.name}</div>
                                                                         </div>
-                                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(doc.status)} ml-2 flex-shrink-0`}>
+                                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(doc.status)} ml-2 truncate max-w-[100px] sm:max-w-[150px]`}>
                                                                             {doc.status}
                                                                         </span>
                                                                     </div>
-                                                                    <div className="mt-2 text-xs text-slate-600 truncate">{doc.name}</div>
                                                                     <div className="mt-1 text-xs text-slate-400">{doc.uploadedDate}</div>
                                                                 </div>
                                                             </div>
@@ -571,7 +571,7 @@ const ClientPortfolio: React.FC = () => {
                                                     );
                                                 })}
                                             </div>
-                                            
+
                                             {/* Desktop Table View */}
                                             <div className="hidden sm:block max-h-96 overflow-y-auto">
                                                 <table className="min-w-full divide-y divide-slate-200">
@@ -598,12 +598,12 @@ const ClientPortfolio: React.FC = () => {
                                                         {filteredDocuments.map((doc, index) => {
                                                             const client = clients.find(c => c.id === doc.clientId);
                                                             return (
-                                                                <tr key={`${doc.clientId}-${doc.type}-${index}`}>
+                                                                <tr key={`${doc.clientId}-${doc.type}-${index}`} className="hover:bg-slate-50">
                                                                     <td className="px-4 py-4 whitespace-nowrap">
                                                                         <div className="flex items-center">
                                                                             <ClientAvatar name={client?.name || ''} size="sm" />
-                                                                            <div className="ml-3 text-sm font-medium text-slate-900">
-                                                                                {client?.name}
+                                                                            <div className="ml-3">
+                                                                                <div className="text-sm font-medium text-slate-900">{client?.name}</div>
                                                                             </div>
                                                                         </div>
                                                                     </td>
