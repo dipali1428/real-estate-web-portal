@@ -137,9 +137,43 @@ export default function BecomePartnerForm() {
 
 
     const setField = (key: keyof typeof form, value: any) => {
-        setForm((prev) => ({ ...prev, [key]: value }));
+        let newValue = value;
+
+        // Auto-capitalize Name (Full Name → Proper Case)
+        if (key === "name") {
+            newValue = newValue
+                .toLowerCase()
+                .replace(/\b\w/g, (char: string) => char.toUpperCase());
+        }
+
+        //  Auto-capitalize City
+        if (key === "city") {
+            newValue = newValue
+                .toLowerCase()
+                .replace(/\b\w/g, (char: string) => char.toUpperCase());
+        }
+
+        //  Normalize Email
+        if (key === "email") {
+            newValue = newValue.trim().toLowerCase();
+        }
+
+        //  Mobile: Only digits + max 10
+        if (key === "mobile") {
+            newValue = newValue.replace(/\D/g, "");
+            if (newValue.length > 10) return;
+        }
+
+        //  PAN: Uppercase + remove invalid chars
+        if (key === "pan") {
+            newValue = newValue.toUpperCase().replace(/[^A-Z0-9]/g, "");
+            if (newValue.length > 10) return;
+        }
+
+        setForm((prev) => ({ ...prev, [key]: newValue }));
         setErrors((prev) => ({ ...prev, [key]: "" }));
     };
+
 
     const validate = () => {
         const e: Record<string, string> = {};
@@ -215,19 +249,23 @@ export default function BecomePartnerForm() {
     const errorClass = "text-xs text-red-600 mt-1";
 
     return (
-        <main className="container mx-auto px-2 py-4">
+        <main className="container mx-auto px-2">
             <h1 className="text-2xl font-bold text-center mb-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">Become a Partner</h1>
             <p className="text-gray-500 text-center mt-2 mb-2">Register to access your dashboard.</p>
             <form
                 onSubmit={onSubmit}
-                className="bg-linear-to-br from-[#E8F6FA] via-[#F9FCFC] to-[#E9F8F6] 
-             p-5 md:p-8 rounded-2xl border border-[#1CADA3]/20 shadow-lg 
-             w-full max-w-4xl mx-auto overflow-y-auto 
-             max-h-[88vh] md:max-h-[82vh] scrollbar-thin scrollbar-thumb-[#B4E3DD] scrollbar-track-transparent hover:scrollbar-thumb-[#1CADA3]/40 transition-all duration-300">
+                className="bg-linear-to-br from-[#E8F6FA] via-[#F9FCFC] to-[#E9F8F6]
+                            p-4 sm:p-6 md:p-8
+                            rounded-2xl border border-[#1CADA3]/20 shadow-lg 
+                            w-full max-w-4xl mx-auto
+                            overflow-y-auto 
+                            max-h-[92vh] sm:max-h-[88vh] md:max-h-[82vh]
+                            scrollbar-thin scrollbar-thumb-[#B4E3DD] scrollbar-track-transparent hover:scrollbar-thumb-[#1CADA3]/40
+                            transition-all duration-300">
                 {!success ? (
                     <>
                         {/* --- ALL your existing input fields, captcha, and buttons go here --- */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-4">
                             {/* Name */}
                             <div>
                                 <label className={labelClass}>Name</label>
@@ -249,7 +287,7 @@ export default function BecomePartnerForm() {
                                     value={form.email}
                                     onChange={(e) => setField("email", e.target.value)}
                                     className={inputClass}
-                                    placeholder="you@example.com"
+                                    placeholder="abc@gmail.com"
                                 />
                                 {errors.email && <p className={errorClass}>{errors.email}</p>}
                             </div>
@@ -260,11 +298,9 @@ export default function BecomePartnerForm() {
                                 <input
                                     type="tel"
                                     value={form.mobile}
-                                    onChange={(e) =>
-                                        setField("mobile", e.target.value.replace(/[^0-9]/g, "").slice(0, 10))
-                                    }
+                                    onChange={(e) => setField("mobile", e.target.value)}
                                     className={inputClass}
-                                    placeholder="9876543210"
+                                    placeholder="Phone"
                                 />
                                 {errors.mobile && <p className={errorClass}>{errors.mobile}</p>}
                             </div>
@@ -275,7 +311,7 @@ export default function BecomePartnerForm() {
                                 <input
                                     type="text"
                                     value={form.pan}
-                                    onChange={(e) => setField("pan", e.target.value.toUpperCase())}
+                                    onChange={(e) => setField("pan", e.target.value)}
                                     className={inputClass}
                                     placeholder="ABCDE1234F"
                                     maxLength={10}
@@ -300,10 +336,14 @@ export default function BecomePartnerForm() {
                             <div className="md:col-span-2">
                                 <label className={labelClass}>Select Head Categories & Subcategories</label>
 
-                                <div className="border border-gray-200 rounded-xl p-4 bg-white/80 shadow-md 
-                                    hover:shadow-lg transition-all duration-300 
-                                    max-h-[280px] md:max-h-80 overflow-y-auto 
-                                    scrollbar-thin scrollbar-thumb-[#B4E3DD] scrollbar-track-transparent hover:scrollbar-thumb-[#1CADA3]/40">
+                                <div className="border border-gray-200 rounded-xl 
+                                                p-3 sm:p-4 
+                                              bg-white/80 shadow-md hover:shadow-lg 
+                                                transition-all duration-300
+                                                max-h-[360px] sm:max-h-[420px] md:max-h-80 
+                                                overflow-y-auto
+                                                scrollbar-thin scrollbar-thumb-[#B4E3DD] scrollbar-track-transparent 
+                                                hover:scrollbar-thumb-[#1CADA3]/40">
                                     {Object.entries(CATEGORY_MAP).map(([head, subs]) => {
                                         const selectedHeads = form.head ? form.head.split(",") : [];
                                         const selectedCats = form.category ? form.category.split(",") : [];
@@ -341,7 +381,7 @@ export default function BecomePartnerForm() {
                                         };
 
                                         return (
-                                            <div key={head} className="mb-3">
+                                            <div key={head} className="mb-4 sm:mb-5">
                                                 {/* Head checkbox */}
                                                 <label className="flex items-center gap-2 font-medium text-gray-800 cursor-pointer">
                                                     <input
@@ -355,7 +395,9 @@ export default function BecomePartnerForm() {
 
                                                 {/* Subcategories (only visible if head selected) */}
                                                 {isHeadSelected && (
-                                                    <div className="ml-6 mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                                                    <div className="ml-3 sm:ml-6 mt-2
+                                                            grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3
+                                                            gap-x-4 gap-y-2">
                                                         {subs.map((cat) => (
                                                             <label key={cat} className="flex items-center gap-2 text-gray-700 text-sm cursor-pointer">
                                                                 <input
@@ -511,7 +553,7 @@ export default function BecomePartnerForm() {
                 ) : (
                     <div className="text-center py-10">
                         <h2 className="text-2xl font-semibold text-[#1CADA3] mb-4">Registration Successful 🎉</h2>
-                        <div className="inline-block bg-white shadow-md rounded-xl p-6 border border-[#1CADA3]/20 text-left">
+                        <div className="inline-block w-full sm:w-auto bg-white shadow-md rounded-xl p-5 sm:p-6 border border-[#1CADA3]/20 text-left">
                             <p className="text-gray-700 mb-2"><b>Advisor ID:</b> {success.adv_id}</p>
                             <p className="text-gray-700 mb-2"><b>Email:</b> {success.email}</p>
                             <p className="text-gray-700 mb-2"><b>Mobile:</b> {success.mobile}</p>
@@ -523,17 +565,17 @@ export default function BecomePartnerForm() {
                     </div>
                 )}
                 {/* Buttons */}
-                <div className="mt-5 flex flex-col sm:flex-row gap-3">
+                <div className="mt-5 flex flex-col sm:flex-row gap-3 w-full">
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="w-full sm:w-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-6 py-2.5 rounded-lg shadow hover:shadow-md disabled:opacity-60 text-sm">
+                        className="w-full sm:w-auto flex-1 sm:flex-none bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-6 py-2.5 rounded-lg shadow hover:shadow-md disabled:opacity-60 text-sm">
                         {submitting ? "Submitting..." : "Create Account"}
                     </button>
                     <button
                         type="button"
                         onClick={(openLogin)}
-                        className="w-full sm:w-auto px-6 py-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-sm text-gray-700  cursor-pointer">
+                        className="w-full sm:w-auto flex-1 sm:flex-none px-6 py-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-sm text-gray-700  cursor-pointer">
                         Login
                     </button>
                 </div>

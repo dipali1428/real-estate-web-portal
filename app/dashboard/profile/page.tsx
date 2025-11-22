@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DashboardService } from "@/app/services/dashboardService";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 interface Profile {
     adv_id: string;
@@ -129,7 +129,6 @@ export default function ProfileSection() {
 
     return (
         <main className="w-full px-0 sm:px-2 lg:px-6 py-4 min-h-screen">
-            <Toaster />
 
             <section className="w-full md:mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-6">
                 {/* Header */}

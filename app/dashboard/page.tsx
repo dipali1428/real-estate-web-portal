@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { DashboardService } from "../services/dashboardService";
 import { useRouter } from "next/navigation";
 import PortfolioChart from './components/PortfolioChart';
+import toast from "react-hot-toast";
 
 interface UserProfile {
     id: number;
@@ -38,8 +39,17 @@ export default function Dashboard() {
 
                 // 🔥 If backend says token expired → logout user
                 if (error?.response?.status === 401) {
+
+                    // Show toast for 2 seconds
+                    toast.error("Login session expired! Please login again.", {
+                        duration: 2000,
+                    });
+
                     document.cookie = `authToken=; path=/; expires=${new Date(0).toUTCString()}`;
-                    router.push("/");
+
+                    setTimeout(() => {
+                        router.push("/");
+                    }, 500);
                 }
             } finally {
                 setLoading(false);

@@ -2,10 +2,15 @@
 
 import DashboardSidebar from "./components/Sidebar";
 import DashboardHeader from "./components/DashboardHeader";
+import { Toaster } from "react-hot-toast";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex h-screen bg-gray-50">
+
+            {/* 🔥 Global Dashboard Toast */}
+            <Toaster position="top-right" />
+
             {/* Sidebar */}
             <DashboardSidebar />
 
