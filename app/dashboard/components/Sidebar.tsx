@@ -78,6 +78,11 @@ export default function DashboardSidebar() {
     },
   ];
 
+  const handleLogout = () => {
+    document.cookie = "authToken=; path=/; max-age=0; SameSite=Lax";
+    router.push("/");
+  };
+
   return (
     <div className={cn("flex h-full flex-col border-r border-neutral-300 dark:border-neutral-300")}>
       <Sidebar open={open} setOpen={setOpen} animate={false}>
@@ -118,6 +123,7 @@ export default function DashboardSidebar() {
                 label: "Logout",
                 href: "/",
                 icon: <LogOut className="h-5 w-5 text-neutral-800" />,
+                onClick: handleLogout
               }}
               className="text-red-600"
             />
@@ -130,16 +136,6 @@ export default function DashboardSidebar() {
 
 export const Logo = () => {
   return (
-    // <a
-    //     href="/logo.png"
-    //     className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal">
-    //     <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-[#1CADA3]" />
-    //     <motion.span
-    //         initial={{ opacity: 0 }}
-    //         animate={{ opacity: 1 }}
-    //         className="font-medium text-[#2076C7]">
-    //     </motion.span>
-    // </a>
     <img
       src="/logo.png" // <-- replace with your actual logo file name
       alt="Infinity Arthviksha Logo"
