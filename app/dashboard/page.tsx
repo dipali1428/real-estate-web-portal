@@ -114,7 +114,7 @@ export default function Dashboard() {
                                 style={{ width: '90%' }}
                             ></div>
                         </div>
-                        <span className="text-white ml-3 font-sans">90%</span>
+                        <span className="text-white ml-3 font-sans">0%</span>
                     </div>
                 </motion.div>
 
@@ -130,13 +130,13 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold font-sans text-gray-800">1.75CR</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">0</div>
                             <div className="text-gray-600 mt-1">Total Business Volume</div>
                             <div className="flex items-center text-green-500 text-sm mt-2">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                                 </svg>
-                                12% from last month
+                                0% from last month
                             </div>
                         </div>
                     </div>
@@ -151,16 +151,16 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold font-sans text-gray-800">2CR</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">0</div>
                             <div className="text-gray-600 mt-1">Monthly Target</div>
                             <div className="mt-3">
                                 <div className="w-full bg-gray-200 rounded-full h-2">
                                     <div
                                         className="bg-linear-to-r from-[#0f766e] to-[#0f766e] h-2 rounded-full"
-                                        style={{ width: '90%' }}
+                                        style={{ width: '0%' }}
                                     ></div>
                                 </div>
-                                <div className="text-sm font-sans text-gray-500 mt-1">Achieved: 90%</div>
+                                <div className="text-sm font-sans text-gray-500 mt-1">Achieved: 0%</div>
                             </div>
                         </div>
                     </div>
@@ -175,13 +175,13 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold font-sans text-gray-800">142</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">0</div>
                             <div className="text-gray-600 mt-1">Active Policies</div>
                             <div className="flex items-center text-green-500 text-sm mt-2">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                                 </svg>
-                                8 new this month
+                                0 new this month
                             </div>
                         </div>
                     </div>
@@ -196,13 +196,13 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold font-sans text-gray-800">3</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">0</div>
                             <div className="text-gray-600 mt-1">Pending Follow-ups</div>
                             <div className="flex items-center text-red-500 text-sm mt-2">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                 </svg>
-                                2 overdue
+                                0 overdue
                             </div>
                         </div>
                     </div>
@@ -217,13 +217,13 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold font-sans text-gray-800">89</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">0</div>
                             <div className="text-gray-600 mt-1">Total Clients</div>
                             <div className="flex items-center text-green-500 text-sm mt-2">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                                 </svg>
-                                5 new this month
+                                0 new this month
                             </div>
                         </div>
                     </div>
@@ -248,13 +248,13 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold font-sans text-gray-800">₹ 3,42,500</div>
+                            <div className="text-2xl font-bold font-sans text-gray-800">0</div>
                             <div className="text-gray-600 mt-1">YTD Incentives Earned</div>
                             <div className="flex items-center text-green-500 text-sm mt-2">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                                 </svg>
-                                15% from last quarter
+                                0% from last quarter
                             </div>
                         </div>
                     </div>
@@ -285,7 +285,7 @@ export default function Dashboard() {
                             </svg>
                             Recent Activity
                         </h3>
-                        <p className="text-gray-600 mb-4">A log of recent actions.</p>
+                       <p className="text-gray-600 mb-4">A log of recent actions.</p>
                         <div className="space-y-4">
                             <div className="pb-3 border-b border-gray-100">
                                 <div className="flex items-start">
@@ -294,7 +294,7 @@ export default function Dashboard() {
                                     </svg>
                                     <div>
                                         <div className="text-gray-800">New lead added for Health Insurance</div>
-                                        <div className="text-sm text-gray-500">Today, 10:15 AM</div>
+                                    {/* <div className="text-sm text-gray-500">Today, 10:15 AM</div> */}
                                     </div>
                                 </div>
                             </div>
@@ -304,8 +304,8 @@ export default function Dashboard() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <div>
-                                        <div className="text-gray-800">Client Amit Sharma policy issued</div>
-                                        <div className="text-sm text-gray-500">Yesterday, 3:45 PM</div>
+                                        <div className="text-gray-800">Client policy issued</div>
+                                       {/*  <div className="text-sm text-gray-500">Yesterday, 3:45 PM</div>*/}
                                     </div>
                                 </div>
                             </div>
@@ -319,14 +319,14 @@ export default function Dashboard() {
                                                 <path d="M12.9494914,6 C13.4853936,6.52514205 13.8531598,7.2212202 13.9645556,8 L17.5,8 C17.7761424,8 18,8.22385763 18,8.5 C18,8.77614237 17.7761424,9 17.5,9 L13.9645556,9 C13.7219407,10.6961471 12.263236,12 10.5,12 L7.70710678,12 L13.8535534,18.1464466 C14.0488155,18.3417088 14.0488155,18.6582912 13.8535534,18.8535534 C13.6582912,19.0488155 13.3417088,19.0488155 13.1464466,18.8535534 L6.14644661,11.8535534 C5.83146418,11.538571 6.05454757,11 6.5,11 L10.5,11 C11.709479,11 12.7183558,10.1411202 12.9499909,9 L6.5,9 C6.22385763,9 6,8.77614237 6,8.5 C6,8.22385763 6.22385763,8 6.5,8 L12.9499909,8 C12.7183558,6.85887984 11.709479,6 10.5,6 L6.5,6 C6.22385763,6 6,5.77614237 6,5.5 C6,5.22385763 6.22385763,5 6.5,5 L10.5,5 L17.5,5 C17.7761424,5 18,5.22385763 18,5.5 C18,5.77614237 17.7761424,6 17.5,6 L12.9494914,6 L12.9494914,6 Z" />
                                             </svg>
                                             <div>
-                                                <div className="text-gray-800">Incentive of ₹12,500 credited</div>
-                                                <div className="text-sm text-gray-500">15 Oct 2023, 11:20 AM</div>
+                                                <div className="text-gray-800">Incentive of ₹0 credited</div>
+                                               {/*  <div className="text-sm text-gray-500">15 Oct 2023, 11:20 AM</div>*/}
                                             </div>
                                         </div>
                                     </div>
                                     <div>
-                                        <div className="text-gray-800">Incentive of ₹12,500 credited</div>
-                                        <div className="text-sm text-gray-500">15 Oct 2023, 11:20 AM</div>
+                                        <div className="text-gray-800">Incentive of ₹0 credited</div>
+                                       {/*  <div className="text-sm text-gray-500">15 Oct 2023, 11:20 AM</div>*/}
                                     </div>
                                 </div>
                             </div>
@@ -336,8 +336,8 @@ export default function Dashboard() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                     </svg>
                                     <div>
-                                        <div className="text-gray-800">Lead Priya Singh converted to client</div>
-                                        <div className="text-sm text-gray-500">14 Oct 2023, 4:30 PM</div>
+                                        <div className="text-gray-800">Lead converted to client</div>
+                                        {/*<div className="text-sm text-gray-500">14 Oct 2023, 4:30 PM</div>*/}
                                     </div>
                                 </div>
                             </div>
@@ -347,13 +347,13 @@ export default function Dashboard() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                                     </svg>
                                     <div>
-                                        <div className="text-gray-800">Follow-up scheduled for Mr. Verma</div>
-                                        <div className="text-sm text-gray-500">13 Oct 2023, 2:15 PM</div>
+                                        <div className="text-gray-800">Follow-up scheduled</div>
+                                       {/* <div className="text-sm text-gray-500">13 Oct 2023, 2:15 PM</div> */}
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </div> 
+                    </div> 
                 </div>
             </section>
         </div>
