@@ -17,7 +17,7 @@ import  SMELoanForm from "./smeloanform";
 import  EducationLoanForm from "./educationloanform";
 import  VehicleLoanForm from "./vahicleloanform";
 import LoanAgainstSecuritiesForm from "./loanagainstsecuritiesform";
-import DebtCapitalMarketForm from "./debtcapitalmarketform";
+//import DebtCapitalMarketForm from "./debtcapitalmarketform";
 import MutualFundForm from "./MutualFundForm";
 import WealthManagementForm from "./WealthManagementForm";
 import PMSAIFForm from "./PMSAIFForm";
@@ -48,7 +48,7 @@ export default function LeadManagement() {
   const [showEducationLoanForm, setShowEducationLoanForm] = useState(false)
   const [showVehicleLoanForm, setShowVehicleLoanForm] = useState(false);
   const [showLoanAgainstSecuritiesForm, setShowLoanAgainstSecuritiesForm] = useState(false);
-  const [showDebtCapitalMarketForm, setShowDebtCapitalMarketForm] =useState(false); //
+  //const [showDebtCapitalMarketForm, setShowDebtCapitalMarketForm] =useState(false); //
   const [showMutualFundForm, setShowMutualFundForm] =useState(false); //
    const [showWealthManagementForm, setShowWealthManagementForm] =useState(false); //
    const [showPMSAIFForm, setShowPMSAIFForm] =useState(false);
@@ -102,9 +102,9 @@ export default function LeadManagement() {
   if (showLoanAgainstSecuritiesForm) {
     return <LoanAgainstSecuritiesForm onClose={() => setShowLoanAgainstSecuritiesForm(false)} />;
   }
-  if (showDebtCapitalMarketForm) {
-    return <DebtCapitalMarketForm onClose={() => setShowDebtCapitalMarketForm(false)} />;
-  }
+  // if (showDebtCapitalMarketForm) {
+  //   return <DebtCapitalMarketForm onClose={() => setShowDebtCapitalMarketForm(false)} />;
+  // }
    if (showMutualFundForm) {
     return <MutualFundForm onClose={() => setShowMutualFundForm(false)} />;
   }
@@ -154,8 +154,7 @@ export default function LeadManagement() {
   {/* Right Side Button */}
   <button
     onClick={() => setIsModalOpen(true)}
-    className="flex items-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-md hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap shrink-0"
-  >
+    className="flex items-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-md hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap shrink-0" >
     <Plus className="w-4 h-4" />
     Add New Lead
   </button>
@@ -354,11 +353,11 @@ export default function LeadManagement() {
                 onClick={() => setShowLoanAgainstSecuritiesForm(true)}
                 className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
                 </div>
-             {/* Debt Capital Market (DCM)*/}
+             {/* Debt Capital Market (DCM)
               <div className="bg-white text-black rounded-lg shadow-lg p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <h2 className="text-xl font-semibold mb-3">Debt Capital Market (DCM)</h2>
                 <p className="text-sm mb-6">The debt capital market is where bonds are issued to raise money, and loan syndication is when many lenders join to give one big loan.</p>
-                {/*active leads*/}
+                
                 <div className="flex items-center justify-between my-4">
               <div className="text-center">
                   <span className="text-xl font-bold text-blue-600">15</span>
@@ -371,7 +370,7 @@ export default function LeadManagement() {
                 </div>
                 <button onClick={() => setShowDebtCapitalMarketForm(true)}
                 className="w-full bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white py-2 rounded hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md">Click to Add New</button>
-                </div>
+                </div>*/}
                </div>
           )}
           {activeTab === "insurance" && (
@@ -721,7 +720,7 @@ export default function LeadManagement() {
   <h3 className="text-xl font-semibold mb-4">All Leads</h3>
 
   <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-    <table className="min-w-full text-sm">
+    <table className="min-w-full mix-w-80 text-sm">
       <thead className="bg-gray-100 text-gray-700">
         <tr>
           <th className="px-4 py-2 text-left">Lead ID</th>

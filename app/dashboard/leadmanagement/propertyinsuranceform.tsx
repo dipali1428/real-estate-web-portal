@@ -155,12 +155,17 @@ export default function PropertyInsuranceForm({
             />
 
             <Input
-              label="Phone Number"
-              placeholder="Enter Phone Number"
-              value={form.phone}
-              onChange={(v) => updateField("phone", v)}
-              error={errors.phone}
-            />
+                label="Phone Number"
+                placeholder="Enter Phone Number"
+                value={form.phone}
+                onChange={(v) => {
+                  // Allow only numbers and maximum 10 digits
+                  if (/^\d{0,10}$/.test(v)) {
+                    updateField("phone", v);
+                  }
+                }}
+                error={errors.phone}
+              />
 
             <Input
               label="Email ID"
@@ -195,9 +200,9 @@ export default function PropertyInsuranceForm({
                 onChange={(e) => updateField("fireSafety", e.target.value)}
               >
                 <option value="">-- Select --</option>
-                <option>Fire Alarm</option>
-                <option>Sprinklers</option>
-                <option>Extinguishers</option>
+                <option> </option>
+                <option>Yes</option>
+                <option>No</option>
               </select>
               {errors.fireSafety && (
                 <p className="text-red-500 text-xs">{errors.fireSafety}</p>
@@ -213,8 +218,8 @@ export default function PropertyInsuranceForm({
                 onChange={(e) => updateField("safetyType", e.target.value)}
               >
                 <option value="">-- Select --</option>
-                <option>Yes</option>
-                <option>No</option>
+                <option>Fire Extinguishers</option>
+                <option>Smoke Alarm</option>
               </select>
               {errors.safetyType && (
                 <p className="text-red-500 text-xs">{errors.safetyType}</p>

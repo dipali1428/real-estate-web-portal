@@ -3,27 +3,12 @@ import { useState } from "react";
 import { X } from "lucide-react";
 
 // Reusable Input component
-function Input({
-  label,
-  placeholder,
-  type = "text",
-  value,
-  onChange,
-  error,
-  maxLength,
-}: {
-  label: string;
-  placeholder?: string;
-  type?: string;
-  value?: string;
-  onChange?: (e: any) => void;
-  error?: string;
-  maxLength?: number;
-}) {
+function Input({label, placeholder,type = "text",value,onChange,error,maxLength, }: 
+  {label: string; placeholder?: string;type?: string;value?: string;onChange?: (e: any) => void; error?: string; maxLength?: number;  })
+   {
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
-
       <input
         type={type}
         placeholder={placeholder}
