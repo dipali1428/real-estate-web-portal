@@ -90,7 +90,7 @@ useEffect(() => {
       category: 'insurance',
       subCategory: 'life',
       description: 'Comprehensive life insurance coverage for you and your family',
-      imageUrl: '/templateimg/homeInsurance.jpeg'
+      imageUrl: '/templateimg/personalLoan.jpeg'
     },
     {
       id: '2',
