@@ -623,42 +623,9 @@ export default function Downloads() {
             <div className="space-y-6">
               {/* Stats Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-slate-200">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-600">Total Files</p>
-                <p className="text-2xl sm:text-3xl font-bold text-slate-700 mt-1 sm:mt-2 wrap-break-word">{payoutStats.totalFiles}</p>
-              </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0 ml-4">
-                <span className="text-xl sm:text-2xl">📊</span>
-              </div>
-            </div>
-          </div>
+          
   
-                  <div className="bg-white rounded-xl p-4 lg:p-6 w-full shadow-sm border border-slate-200">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-600">Last Updated</p>
-                      <p 
-                        className="font-bold text-slate-700 mt-1 wrap-break-word"
-                        style={{
-                          fontSize: 'clamp(1.25rem, 2.5vw, 2rem)'
-                        }}
-                      >
-                        {payoutStats.recentUpload}
-                      </p>
-                    </div>
-                    <div 
-                      className="bg-amber-100 rounded-xl flex items-center justify-center shrink-0"
-                      style={{
-                        width: 'clamp(2.5rem, 5vw, 3.5rem)',
-                        height: 'clamp(2.5rem, 5vw, 3.5rem)'
-                      }}
-                    >
-                      <span style={{ fontSize: 'clamp(1rem, 2vw, 1.5rem)' }}>🕒</span>
-                    </div>
-                  </div>
-                </div>
+                 
                 </div>
 
               {/* Month Selector and Upload */}

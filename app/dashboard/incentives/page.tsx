@@ -208,7 +208,7 @@ const generatePDF = (invoice: Incentive) => {
         <div>
           <div class="label">BILLED TO</div>
           <div class="value">
-            <strong>Infinity Arthvishva Pvt Ltd.</strong><br>
+            <strong>Infinity Arthvishva</strong><br>
             Finance Department<br>
             info@infinityarthvishva.com<br>
             1800-532-7600
@@ -366,6 +366,7 @@ export default function IncentivesPayouts() {
 
   // Sample data
   const incentiveData: Incentive[] = [
+    
    // {
    //   id: 'INV-2023-0012',
     //  product: 'Life Insurance - New Business',
@@ -516,57 +517,57 @@ export default function IncentivesPayouts() {
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
 
           {/* Section Header */}
-          {/* Filter Tabs */}
-            <div className="flex flex-wrap gap-1 sm:gap-2">
-              {(['all', 'paid', 'processing', 'pending'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-medium rounded-md transition-all duration-200 capitalize min-w-12 sm:min-w-16 ${
-                    activeTab === tab
-                      ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
-                      : 'text-slate-600 hover:text-slate-900 bg-slate-100'
-                  }`}
-                >
-                  {tab === 'all' ? 'All' : STATUS_CONFIG[tab].label}
-                </button>
-              ))}
-            </div>
+         {/* Filter Tabs */}
+              <div className="flex flex-wrap gap-1 sm:gap-2">
+                {(['all', 'paid', 'processing', 'pending'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 sm:px-1 py-1 sm:py-1 text-sm font-medium rounded-lg transition-all duration-200 capitalize min-w-16 sm:min-w-20 ${
+                      activeTab === tab
+                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                        : 'text-slate-600 hover:text-slate-700 hover:bg-slate-200 rounded-4xl'
+                    }`}
+                  >
+                    {tab === 'all' ? 'All' : STATUS_CONFIG[tab].label}
+                  </button>
+                ))}
+              </div>
 
           {/* Desktop Table View - Hidden on mobile */}
-<div className="hidden md:block">
-  <div className="min-w-full max-w-30 inline-block align-middle">
-    <div className="overflow-x-auto border border-slate-200 rounded-lg">
-      <table className="w-full min-w-[600px]">
-        <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
-          <tr>
-            {['Invoice ID', 'Product', 'Amount', 'Status', 'Payment', 'Narration', 'Date', 'Actions'].map((header) => (
-              <th
-                key={header}
-                className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap"
-              >
-                {header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-200 bg-white">
-          {filteredData.map((item) => (
-            <tr
-              key={item.id}
-              className="hover:bg-slate-50/80 transition-colors duration-150"
-            >
-              {/* Invoice ID */}
-              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-slate-900 font-mono">
-                  {item.id}
-                </div>
-                {item.policyNumber && (
-                  <div className="text-xs text-slate-500 mt-1">
-                    {item.policyNumber}
-                  </div>
-                )}
-              </td>
+              <div className="hidden md:block">
+                <div className="min-w-full max-w-30 inline-block align-middle">
+                  <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                    <table className="w-full min-w-[600px]">
+                      <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
+                        <tr>
+                          {['Invoice ID', 'Product', 'Amount', 'Status', 'Payment', 'Narration', 'Date', 'Actions'].map((header) => (
+                            <th
+                              key={header}
+                              className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap"
+                            >
+                              {header}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 bg-white">
+                        {filteredData.map((item) => (
+                          <tr
+                            key={item.id}
+                            className="hover:bg-slate-50/80 transition-colors duration-150"
+                          >
+                            {/* Invoice ID */}
+                            <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-slate-900 font-mono">
+                                {item.id}
+                              </div>
+                              {item.policyNumber && (
+                                <div className="text-xs text-slate-500 mt-1">
+                                  {item.policyNumber}
+                                </div>
+                              )}
+                            </td>
 
               {/* Product */}
               <td className="px-4 sm:px-6 py-4">
