@@ -162,27 +162,27 @@ const RelationshipManager: React.FC = () => {
           <div className="gap-6">
             {/* RM Profile Card */}
             <div className="lg:col-span-2">
-              <div className="bg-[#1CADA3] rounded-lg shadow-md border border-gray-200">
+              <div className="bg-white rounded-lg shadow-md border border-gray-200">
                 <div className="p-8">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-6">
                     <div>
-                      <h2 className="text-2xl font-bold text-white">{relationshipManager.name}</h2>
-                      <p className="text-white text-lg">{relationshipManager.position}</p>
+                      <h2 className="text-2xl font-bold text-slate-700">{relationshipManager.name}</h2>
+                      <p className="text-slate-600 text-lg">{relationshipManager.position}</p>
                     </div>
                     <div className="flex items-center">
                       <div
                         className={`w-3 h-3 rounded-full mr-2 ${relationshipManager.isAvailable ? 'bg-green-400' : 'bg-red-500'
                           }`}
                       ></div>
-                      <span className="text-sm text-white mt-1">
+                      <span className="text-sm text-slate-600 mt-1">
                         {relationshipManager.isAvailable ? 'Available Now' : 'Currently Busy'}
                       </span>
                     </div>
                   </div>
 
                   {/* Contact Info */}
-                  <div className="bg-white rounded-lg p-4">
+                  <div className="bg-gray-100 rounded-lg p-4">
                     <h3 className="font-semibold text-gray-600 mb-3">Contact Information</h3>
                     <div className="space-y-3">
                       <div className="flex items-center text-gray-600">
@@ -255,99 +255,99 @@ const RelationshipManager: React.FC = () => {
         )}
 
         {activeTab === 'appointments' && (
-          <div className="bg-white rounded-lg shadow-md border border-gray-200">
-            <div className="px-6 py-4 border-b bg-[#1CADA3] border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-medium text-white">My Appointments</h3>
-              <button
-                onClick={handleScheduleNewAppointment}
-                className="bg-white text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-medium flex items-center"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Schedule New
-              </button>
-            </div>
+  <div className="bg-white rounded-lg shadow-md border border-gray-200 w-full max-w-6xl mx-auto">
+    <div className="px-4 sm:px-6 py-4 border-b bg-[#1CADA3] border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+      <h3 className="text-lg font-medium text-white">My Appointments</h3>
+      <button
+        onClick={handleScheduleNewAppointment}
+        className="bg-white text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-medium flex items-center w-full sm:w-auto justify-center"
+      >
+        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+        Schedule New
+      </button>
+    </div>
 
-            <div className="p-6">
-              {appointments.length === 0 ? (
-                <div className="text-center py-12">
-                  <svg className="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    <div className="p-4 sm:p-6">
+      {appointments.length === 0 ? (
+        <div className="text-center py-8 sm:py-12">
+          <svg className="w-12 h-12 sm:w-16 sm:h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p className="mt-4 text-gray-500 text-base sm:text-lg">No upcoming appointments</p>
+          <p className="text-gray-400 text-sm mt-2 px-4">Schedule a meeting with your Relationship Manager</p>
+          <button
+            onClick={handleScheduleNewAppointment}
+            className="mt-6 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium w-full sm:w-auto"
+          >
+            Schedule New Appointment
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-3 sm:space-y-4">
+          {appointments.map((appointment) => (
+            <div
+              key={appointment.id}
+              className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 gap-4"
+            >
+              <div className="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
+                <div className={`p-2 sm:p-3 rounded-lg flex-shrink-0 ${getTypeStyles(appointment.type)}`}>
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <p className="mt-4 text-gray-500 text-lg">No upcoming appointments</p>
-                  <p className="text-gray-400 text-sm mt-2">Schedule a meeting with your Relationship Manager</p>
-                  <button
-                    onClick={handleScheduleNewAppointment}
-                    className="mt-6 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
-                  >
-                    Schedule New Appointment
-                  </button>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {appointments.map((appointment) => (
-                    <div
-                      key={appointment.id}
-                      className="flex items-center justify-between p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-semibold text-gray-700 truncate">{appointment.clientName}</h4>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {new Date(appointment.date).toLocaleDateString()} at {appointment.time}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full border ${getTypeStyles(appointment.type)}`}
                     >
-                      <div className="flex items-center space-x-4">
-                        <div className={`p-3 rounded-lg ${getTypeStyles(appointment.type)}`}>
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-700">{appointment.clientName}</h4>
-                          <p className="text-sm text-gray-600">
-                            {new Date(appointment.date).toLocaleDateString()} at {appointment.time}
-                          </p>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <span
-                              className={`px-2 py-1 text-xs rounded-full border ${getTypeStyles(appointment.type)}`}
-                            >
-                              {appointment.type.charAt(0).toUpperCase() + appointment.type.slice(1)}
-                            </span>
-                            <span
-                              className={`px-2 py-1 text-xs rounded-full ${appointment.status === 'scheduled'
-                                  ? 'bg-green-100 text-green-800'
-                                  : appointment.status === 'completed'
-                                    ? 'bg-gray-100 text-gray-800'
-                                    : 'bg-red-100 text-red-800'
-                                }`}
-                            >
-                              {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <button
-                          onClick={() => handleRescheduleAppointment(appointment.id)}
-                          className="text-[#2076C7] hover:text-[#0068c9] text-sm font-medium flex items-center"
-                        >
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                          Reschedule
-                        </button>
-                        <button
-                          onClick={() => handleCancelAppointment(appointment.id)}
-                          className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center"
-                        >
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                      {appointment.type.charAt(0).toUpperCase() + appointment.type.slice(1)}
+                    </span>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${appointment.status === 'scheduled'
+                          ? 'bg-green-100 text-green-800'
+                          : appointment.status === 'completed'
+                            ? 'bg-gray-100 text-gray-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                    >
+                      {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                    </span>
+                  </div>
                 </div>
-              )}
+              </div>
+              <div className="flex items-center justify-end sm:justify-start space-x-3 w-full sm:w-auto border-t pt-3 sm:pt-0 sm:border-t-0">
+                <button
+                  onClick={() => handleRescheduleAppointment(appointment.id)}
+                  className="text-[#2076C7] hover:text-[#0068c9] text-sm font-medium flex items-center flex-1 sm:flex-none justify-center"
+                >
+                  <svg className="w-4 h-4 mr-1 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Reschedule
+                </button>
+                <button
+                  onClick={() => handleCancelAppointment(appointment.id)}
+                  className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center flex-1 sm:flex-none justify-center"
+                >
+                  <svg className="w-4 h-4 mr-1 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Cancel
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+)}
       </div>
     </div>
   );
