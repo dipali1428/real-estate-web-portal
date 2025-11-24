@@ -4,7 +4,7 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  size: string;
+  // size: string;
   uploadDate: string;
   category: 'insurance' | 'loan';
   subCategory: string;

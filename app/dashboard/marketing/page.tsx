@@ -11,7 +11,7 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  size: string;
+  // size: string;
   uploadDate: string;
   category: 'insurance' | 'loan';
   subCategory: string;
@@ -85,7 +85,7 @@ useEffect(() => {
       id: '1',
       name: 'Life Insurance Plan',
       type: 'image',
-      size: '1.2 MB',
+      // size: '1.2 MB',
       uploadDate: '2024-01-15',
       category: 'insurance',
       subCategory: 'life',
@@ -96,7 +96,7 @@ useEffect(() => {
       id: '2',
       name: 'Health Insurance',
       type: 'image',
-      size: '1.5 MB',
+      // size: '1.5 MB',
       uploadDate: '2024-01-10',
       category: 'insurance',
       subCategory: 'health',
@@ -107,7 +107,7 @@ useEffect(() => {
       id: '3',
       name: 'Car Insurance',
       type: 'image',
-      size: '1.3 MB',
+      // size: '1.3 MB',
       uploadDate: '2024-01-08',
       category: 'insurance',
       subCategory: 'motor',
@@ -118,7 +118,7 @@ useEffect(() => {
       id: '4',
       name: 'Home Loan Offer',
       type: 'image',
-      size: '1.4 MB',
+      // size: '1.4 MB',
       uploadDate: '2024-01-12',
       category: 'loan',
       subCategory: 'home',
@@ -129,7 +129,7 @@ useEffect(() => {
       id: '5',
       name: 'Personal Loan',
       type: 'image',
-      size: '1.6 MB',
+      // size: '1.6 MB',
       uploadDate: '2024-01-05',
       category: 'loan',
       subCategory: 'personal',
@@ -140,7 +140,7 @@ useEffect(() => {
       id: '6',
       name: 'Business Loan',
       type: 'image',
-      size: '1.7 MB',
+      // size: '1.7 MB',
       uploadDate: '2024-01-03',
       category: 'loan',
       subCategory: 'business',
@@ -151,7 +151,7 @@ useEffect(() => {
       id: '7',
       name: 'Educational Loan',
       type: 'image',
-      size: '1.7 MB',
+      // size: '1.7 MB',
       uploadDate: '2024-01-03',
       category: 'loan',
       subCategory: 'educational',
@@ -204,6 +204,7 @@ useEffect(() => {
   };
 
 // Quick download with SVG icons (with visible line separator and centered vertically)
+// Quick download with SVG icons (with increased font sizes)
 const quickDownload = async (template: TemplateItem) => {
   try {
     const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
@@ -230,11 +231,15 @@ const quickDownload = async (template: TemplateItem) => {
       return;
     }
 
-    // Calculate responsive sizes
+    // Calculate responsive sizes with INCREASED FONT SIZES
     const baseWidth = 800;
     const scaleFactor = dimensions.width / baseWidth;
-    const responsiveFontSize = Math.max(16, Math.min(28, 22 * scaleFactor));
-    const extendedHeight = dimensions.height + Math.max(80, 100 * scaleFactor);
+    
+    // INCREASED FONT SIZES: Changed from 16-28 to 24-40 range
+    const responsiveFontSize = Math.max(18, Math.min(40, 28 * scaleFactor));
+    
+    // Increased extended height to accommodate larger text
+    const extendedHeight = dimensions.height + Math.max(100, 120 * scaleFactor);
     canvas.width = dimensions.width;
     canvas.height = extendedHeight;
 
@@ -283,9 +288,9 @@ const quickDownload = async (template: TemplateItem) => {
     ]);
 
     // Add user details section
-    const iconSize = Math.max(20, 24 * scaleFactor);
+    const iconSize = Math.max(24, 28 * scaleFactor); // Slightly increased icon size
     const spacing = 12 * scaleFactor;
-    const lineSpacing = 20 * scaleFactor; // Space for the vertical line
+    const lineSpacing = 20 * scaleFactor;
 
     // Calculate text measurements
     ctx.fillStyle = '#1e293b';
@@ -302,24 +307,15 @@ const quickDownload = async (template: TemplateItem) => {
     // Center the entire block
     const startX = (canvas.width - totalWidthWithIcons) / 2;
 
-    // Calculate background container dimensions
-    const infoHeight = 60 * scaleFactor;
+    // Calculate background container dimensions - INCREASED for larger text
+    const infoHeight = 80 * scaleFactor; // Increased from 60
     const infoMargin = 40 * scaleFactor;
-    const backgroundWidth = totalWidthWithIcons + (infoMargin * 1.5); // Add some padding
+    const backgroundWidth = totalWidthWithIcons + (infoMargin * 1.5);
     const backgroundStartX = (canvas.width - backgroundWidth) / 2;
 
     // Calculate vertical center position for the entire content
     const contentStartY = dimensions.height + (extendedHeight - dimensions.height) / 2;
-    const detailsY = contentStartY; // This will be the vertical center for text and icons
-
-    // Add background for contact info - centered vertically
-    ctx.fillStyle = '#f8fafc';
-    ctx.fillRect(backgroundStartX, contentStartY - infoHeight/2, backgroundWidth, infoHeight);
-
-    // Add border around contact info
-    ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 1 * scaleFactor;
-    ctx.strokeRect(backgroundStartX, contentStartY - infoHeight/2, backgroundWidth, infoHeight);
+    const detailsY = contentStartY;
 
     // Draw user icon and name
     const userIconX = startX;
@@ -333,10 +329,10 @@ const quickDownload = async (template: TemplateItem) => {
     ctx.textBaseline = 'middle';
     ctx.fillText(userName, userNameX, detailsY);
 
-    // Draw vertical line separator - MORE VISIBLE
+    // Draw vertical line separator
     const lineX = userNameX + userNameWidth + (lineSpacing / 2);
-    ctx.strokeStyle = '#94a3b8'; // Darker gray for better visibility
-    ctx.lineWidth = Math.max(2, 2.5 * scaleFactor); // Thicker line
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = Math.max(2, 2.5 * scaleFactor);
     ctx.beginPath();
     ctx.moveTo(lineX, detailsY - (infoHeight / 3));
     ctx.lineTo(lineX, detailsY + (infoHeight / 3));

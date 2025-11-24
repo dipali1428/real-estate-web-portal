@@ -2,7 +2,7 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  size: string;
+  // size: string;
   uploadDate: string;
   category: 'insurance' | 'loan';
   subCategory: string;
@@ -27,10 +27,9 @@ const subCategoryLabels: Record<string, string> = {
 
 export default function TemplateCard({ template, onQuickDownload }: TemplateCardProps) {
   const isInsurance = template.category === 'insurance';
-  const bgColor = isInsurance ? 'blue' : 'green';
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-200 group">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-200 group flex flex-col">
       {/* Template Preview */}
       <div className="h-40 sm:h-48 relative overflow-hidden bg-slate-100 flex items-center justify-center">
         <img 
@@ -55,16 +54,15 @@ export default function TemplateCard({ template, onQuickDownload }: TemplateCard
             }
           }}
         />
-        <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-          {template.size}
-        </div>
       </div>
       
-      {/* Template Info */}
-      <div className="p-4 sm:p-5">
-        <div className="flex items-center justify-between mb-2">
-          <h4 className="text-base sm:text-lg font-semibold text-slate-900 line-clamp-1">{template.name}</h4>
-          <span className={`text-xs font-medium px-2 py-1 rounded-full shrink-0 ml-2 ${
+      {/* Template Info - Fixed height content area */}
+      <div className="p-4 sm:p-5 flex flex-col flex-1">
+        <div className="flex items-start justify-between mb-2">
+          <h4 className="text-base sm:text-lg font-semibold text-slate-900 line-clamp-1 flex-1 pr-2">
+            {template.name}
+          </h4>
+          <span className={`text-xs font-medium px-2 py-1 rounded-full shrink-0 ${
             isInsurance
               ? 'bg-blue-100 text-[#2076C7]' 
               : 'bg-green-100 text-green-700'
@@ -73,11 +71,12 @@ export default function TemplateCard({ template, onQuickDownload }: TemplateCard
           </span>
         </div>
         
-        <p className="text-slate-600 text-xs sm:text-sm mb-3 leading-relaxed line-clamp-2">
+        <p className="text-slate-600 text-xs sm:text-sm mb-3 leading-relaxed line-clamp-2 flex-1">
           {template.description}
         </p>
 
-        <div className="flex space-x-2">
+        {/* Button container - will always be at bottom */}
+        <div className="flex space-x-2 mt-auto">
           <button
             onClick={() => onQuickDownload(template)}
             className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 text-white rounded-lg transition-all duration-200 text-xs font-semibold ${
