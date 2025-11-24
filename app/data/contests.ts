@@ -14,7 +14,6 @@ export const successContests: Contest[] = [
     images: [
       "/Vietnaam/Vietnaam1.jpeg",
       "/Vietnaam/Vietnaam2.jpeg", 
-      "/Vietnaam/Vietnaam3.jpeg",
       "/Vietnaam/Vietnaam4.jpeg"
     ]
   },
@@ -23,7 +22,6 @@ export const successContests: Contest[] = [
     desc: "Thailand Achievement Unlocked!Our journey of passion, purpose, and performance reached new heights in Thailand.Proud of every achiever who made this global success possible! #InfinityArthvishva #ThailandAchievement2025 #ProudMoment", 
     img: "/Thailand.jpeg",
     images: [
-      "/Thailand/Thailand.jpeg",
       "/Thailand/Thailand2.jpeg",
       "/Thailand/Thailand3.jpeg",
     ]

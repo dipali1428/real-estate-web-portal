@@ -203,8 +203,7 @@ useEffect(() => {
     }
   };
 
-  // Quick download without positioning - adds details below image
-  // Quick download with responsive text sizing
+// Quick download with SVG icons (with visible line separator and centered vertically)
 const quickDownload = async (template: TemplateItem) => {
   try {
     const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
@@ -231,21 +230,19 @@ const quickDownload = async (template: TemplateItem) => {
       return;
     }
 
-    // Calculate responsive text size based on image width
-    const baseWidth = 800; // Reference width for font sizing
+    // Calculate responsive sizes
+    const baseWidth = 800;
     const scaleFactor = dimensions.width / baseWidth;
-    const responsiveFontSize = Math.max(16, Math.min(28, 22 * scaleFactor)); // Clamp between 16px and 28px
-    
-    // Calculate extended canvas height (original height + space for details)
-    const extendedHeight = dimensions.height + Math.max(60, 80 * scaleFactor); // Responsive padding
+    const responsiveFontSize = Math.max(16, Math.min(28, 22 * scaleFactor));
+    const extendedHeight = dimensions.height + Math.max(80, 100 * scaleFactor);
     canvas.width = dimensions.width;
     canvas.height = extendedHeight;
 
-    // Set white background for the entire canvas
+    // Set white background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Load and draw the template image at the top
+    // Load and draw template image
     const img = new Image();
     img.crossOrigin = 'anonymous';
     
@@ -255,54 +252,105 @@ const quickDownload = async (template: TemplateItem) => {
       img.src = template.imageUrl;
     });
 
-    // Draw the template image at original size at the top
     ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
 
-    // Add separator line
-    ctx.strokeStyle = '#e5e7eb';
-    ctx.lineWidth = Math.max(1, 2 * scaleFactor); // Responsive line width
-    ctx.beginPath();
-    ctx.moveTo(50 * scaleFactor, dimensions.height + 15 * scaleFactor);
-    ctx.lineTo(canvas.width - 50 * scaleFactor, dimensions.height + 15 * scaleFactor);
-    ctx.stroke();
+    // SVG Icons as data URLs
+    const userIconSVG = `data:image/svg+xml;base64,${btoa(`
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="#1d283a"/>
+        <path d="M12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="#1d283a"/>
+      </svg>
+    `)}`;
 
-    // Add user details section below the image
-    const detailsY = dimensions.height + 45 * scaleFactor;
+    const phoneIconSVG = `data:image/svg+xml;base64,${btoa(`
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 15.5C18.75 15.5 17.55 15.3 16.43 14.93C16.08 14.82 15.69 14.9 15.41 15.17L13.21 17.37C10.38 15.93 8.06 13.62 6.62 10.79L8.82 8.59C9.1 8.31 9.18 7.92 9.07 7.57C8.7 6.45 8.5 5.25 8.5 4C8.5 3.45 8.05 3 7.5 3H4C3.45 3 3 3.45 3 4C3 13.39 10.61 21 20 21C20.55 21 21 20.55 21 20V16.5C21 15.95 20.55 15.5 20 15.5Z" fill="#1d283a"/>
+      </svg>
+    `)}`;
 
-    // Add background for contact info
-    const infoHeight = 50 * scaleFactor;
+    const loadIcon = (svgData: string): Promise<HTMLImageElement> => {
+      return new Promise((resolve, reject) => {
+        const iconImg = new Image();
+        iconImg.onload = () => resolve(iconImg);
+        iconImg.onerror = reject;
+        iconImg.src = svgData;
+      });
+    };
+
+    const [userIcon, phoneIcon] = await Promise.all([
+      loadIcon(userIconSVG),
+      loadIcon(phoneIconSVG)
+    ]);
+
+    // Add user details section
+    const iconSize = Math.max(20, 24 * scaleFactor);
+    const spacing = 12 * scaleFactor;
+    const lineSpacing = 20 * scaleFactor; // Space for the vertical line
+
+    // Calculate text measurements
+    ctx.fillStyle = '#1e293b';
+    ctx.font = `bold ${responsiveFontSize}px Arial`;
+    const userName = userProfile.name;
+    const contactNumber = userProfile.contactNumber;
+    
+    const userNameWidth = ctx.measureText(userName).width;
+    const contactNumberWidth = ctx.measureText(contactNumber).width;
+    
+    // Calculate total width including icons, text, and line spacing
+    const totalWidthWithIcons = userNameWidth + contactNumberWidth + (iconSize * 2) + (spacing * 3) + lineSpacing;
+
+    // Center the entire block
+    const startX = (canvas.width - totalWidthWithIcons) / 2;
+
+    // Calculate background container dimensions
+    const infoHeight = 60 * scaleFactor;
     const infoMargin = 40 * scaleFactor;
+    const backgroundWidth = totalWidthWithIcons + (infoMargin * 1.5); // Add some padding
+    const backgroundStartX = (canvas.width - backgroundWidth) / 2;
+
+    // Calculate vertical center position for the entire content
+    const contentStartY = dimensions.height + (extendedHeight - dimensions.height) / 2;
+    const detailsY = contentStartY; // This will be the vertical center for text and icons
+
+    // Add background for contact info - centered vertically
     ctx.fillStyle = '#f8fafc';
-    ctx.fillRect(infoMargin, dimensions.height + 25 * scaleFactor, canvas.width - 2 * infoMargin, infoHeight);
+    ctx.fillRect(backgroundStartX, contentStartY - infoHeight/2, backgroundWidth, infoHeight);
 
     // Add border around contact info
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 1 * scaleFactor;
-    ctx.strokeRect(infoMargin, dimensions.height + 25 * scaleFactor, canvas.width - 2 * infoMargin, infoHeight);
+    ctx.strokeRect(backgroundStartX, contentStartY - infoHeight/2, backgroundWidth, infoHeight);
 
-    // User name and contact number
+    // Draw user icon and name
+    const userIconX = startX;
+    const userNameX = userIconX + iconSize + spacing;
+    
+    ctx.drawImage(userIcon, userIconX, detailsY - iconSize/2, iconSize, iconSize);
+    
     ctx.fillStyle = '#1e293b';
     ctx.font = `bold ${responsiveFontSize}px Arial`;
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
+    ctx.fillText(userName, userNameX, detailsY);
+
+    // Draw vertical line separator - MORE VISIBLE
+    const lineX = userNameX + userNameWidth + (lineSpacing / 2);
+    ctx.strokeStyle = '#94a3b8'; // Darker gray for better visibility
+    ctx.lineWidth = Math.max(2, 2.5 * scaleFactor); // Thicker line
+    ctx.beginPath();
+    ctx.moveTo(lineX, detailsY - (infoHeight / 3));
+    ctx.lineTo(lineX, detailsY + (infoHeight / 3));
+    ctx.stroke();
+
+    // Draw phone icon and contact number
+    const phoneIconX = lineX + (lineSpacing / 2);
+    const contactNumberX = phoneIconX + iconSize + spacing;
     
-    const userDetails = `${userProfile.name} • ${userProfile.contactNumber}`;
+    ctx.drawImage(phoneIcon, phoneIconX, detailsY - iconSize/2, iconSize, iconSize);
     
-    // Check if text fits within the available width, otherwise adjust font size
-    const maxTextWidth = canvas.width - 2 * infoMargin - 20 * scaleFactor; // Padding inside the box
-    let finalFontSize = responsiveFontSize;
-    
-    // Measure text width and adjust font size if needed
-    ctx.font = `bold ${finalFontSize}px Arial`;
-    let textWidth = ctx.measureText(userDetails).width;
-    
-    while (textWidth > maxTextWidth && finalFontSize > 12) {
-      finalFontSize -= 1;
-      ctx.font = `bold ${finalFontSize}px Arial`;
-      textWidth = ctx.measureText(userDetails).width;
-    }
-    
-    ctx.fillText(userDetails, canvas.width / 2, detailsY);
+    ctx.fillStyle = '#1e293b';
+    ctx.font = `bold ${responsiveFontSize}px Arial`;
+    ctx.fillText(contactNumber, contactNumberX, detailsY);
 
     // Download the image
     canvas.toBlob((blob) => {

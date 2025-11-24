@@ -64,7 +64,7 @@ export default function TemplateCard({ template, onQuickDownload }: TemplateCard
       <div className="p-4 sm:p-5">
         <div className="flex items-center justify-between mb-2">
           <h4 className="text-base sm:text-lg font-semibold text-slate-900 line-clamp-1">{template.name}</h4>
-          <span className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ml-2 ${
+          <span className={`text-xs font-medium px-2 py-1 rounded-full shrink-0 ml-2 ${
             isInsurance
               ? 'bg-blue-100 text-[#2076C7]' 
               : 'bg-green-100 text-green-700'

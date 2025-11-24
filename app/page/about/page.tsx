@@ -90,15 +90,15 @@ const AboutSection = () => (
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {/* Unnao Branch */}
+                    {/* Kanpur Branch */}
                     <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
                         <div className="bg-white rounded-xl p-5 h-full">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-3">Unnao Branch</h3>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3">Kanpur Branch</h3>
                             <div className="text-gray-600 text-sm leading-relaxed space-y-2">
                             <p className="font-medium text-gray-700">Office No. 01, Kamlist Tower</p>
                             <p>Behind Mishra Jewellers, Near Joga Bhogha Chauraha</p>
                             <p>Nehru Nagar, Shuklaganj</p>
-                            <p>Unnao, Uttar Pradesh - 209861</p>
+                            <p>Kanpur, Unnao, Uttar Pradesh - 209861</p>
                         </div>
                         </div>
                     </div>
