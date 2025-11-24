@@ -147,57 +147,67 @@ const ContactSection = () => {
 
           {/* Right - Form */}
           <div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Send Us A Message</h3>
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <input
-                type="text"
-                name="name"
-                placeholder="Your Name"
-                value={form.name}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={form.email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
-              />
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Your Phone Number"
-                value={form.phone}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
-              />
-              <textarea
-                name="message"
-                placeholder="Your Message"
-                rows={4}
-                value={form.message}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900">
-              </textarea>
+            {!success ? (
+              <>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Send Us A Message</h3>
+                <form className="space-y-4" onSubmit={handleSubmit}>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Your Name"
+                    value={form.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
+                  />
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email Address"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
+                  />
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Your Phone Number"
+                    value={form.phone}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
+                  />
+                  <textarea
+                    name="message"
+                    placeholder="Your Message"
+                    rows={4}
+                    value={form.message}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
+                  ></textarea>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-3 rounded font-semibold shadow-md hover:shadow-lg transition cursor-pointer">
-                {loading ? "Sending..." : "Send Message"}
-              </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-3 rounded font-semibold shadow-md hover:shadow-lg transition cursor-pointer">
+                    {loading ? "Sending..." : "Send Message"}
+                  </button>
 
-              {success && (
-                <p className="text-green-600 text-sm font-medium mt-2">{success}</p>
-              )}
-              {error && <p className="text-red-600 text-sm font-medium mt-2">{error}</p>}
-            </form>
+                  {error && <p className="text-red-600 text-sm font-medium mt-2">{error}</p>}
+                </form>
+              </>
+            ) : (
+              <div className="text-center py-10">
+                <h3 className="text-2xl font-semibold text-[#1CADA3] mb-3">Enquiry Received Successfully!</h3>
+                <p className="text-gray-700 text-base">
+                  Thank you for reaching out to <b>Infinity Arthvishva</b>.<br />
+                  Our team has received your enquiry and will contact you shortly.<br />
+                  We have also sent your <strong>Enquiry ID</strong> and additional details to your registered email address.
+                </p>
+              </div>
+            )}
           </div>
 
         </div>

@@ -44,10 +44,8 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                 password: passwordOrOtp,
             });
 
-            console.log("✅ Login Success:", data);
-
             if (data?.token) {
-                // ❗ VERY IMPORTANT → Save token in cookie (not localStorage)
+                // Save token in cookie (not localStorage)
                 document.cookie = `authToken=${data.token}; path=/; max-age=86400; SameSite=Lax`;
 
                 // Redirect to dashboard
@@ -75,29 +73,29 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0, y: -20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
-                        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+                        className="relative bg-white rounded-2xl shadow-2xl w-[90%] sm:w-full max-w-md p-6 max-h-screen overflow-y-auto text-sm sm:text-base">
                         <button
                             onClick={onClose}
                             className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 cursor-pointer">
                             <X size={20} />
                         </button>
 
-                        <h2 className="text-2xl font-bold text-center mb-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                        <h2 className="text-xl sm:text-2xl font-bold text-center mb-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
                             Login to Your Account
                         </h2>
-                        <p className="text-gray-500 text-center mb-6">
+                        <p className="text-gray-500 text-center mb-6 text-xs sm:text-sm">
                             Welcome back! Please login to continue.
                         </p>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1 pl-1">
+                                <label className="block text-sm sm:text-sm font-medium text-gray-700 mb-1 pl-1">
                                     Email or Phone
                                 </label>
                                 <input
@@ -110,7 +108,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1 pl-1">
+                                <label className="block text-sm sm:text-sm font-medium text-gray-700 mb-1 pl-1">
                                     {useOtp ? "OTP" : "Password"}
                                 </label>
                                 <input
@@ -125,7 +123,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                             {error && <p className="text-red-500 text-sm">{error}</p>}
 
                             <div className="flex justify-between items-center">
-                                <label className="text-sm text-gray-600 flex items-center gap-2">
+                                <label className="text-sm sm:text-sm text-gray-600 flex items-center gap-2">
                                     <input
                                         type="checkbox"
                                         checked={useOtp}
@@ -136,7 +134,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                 </label>
 
                                 {!useOtp && (
-                                    <a href="#" className="text-sm text-[#2076C7] hover:underline">
+                                    <a href="#" className="text-sm sm:text-sm text-[#2076C7] hover:underline">
                                         Forgot Password?
                                     </a>
                                 )}
@@ -146,7 +144,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                 type="submit"
                                 whileHover={{ scale: 1.03 }}
                                 disabled={loading}
-                                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer">
+                                className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer text-sm sm:text-sm">
                                 {loading
                                     ? "Please wait..."
                                     : useOtp
