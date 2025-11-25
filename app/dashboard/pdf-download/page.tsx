@@ -18,15 +18,15 @@ interface DownloadItem {
 
 export default function Downloads() {
   const [activeSection, setActiveSection] = useState<'payout' | 'brochures' | 'forms'>('payout');
-  const [selectedMonth, setSelectedMonth] = useState<string>('november-2025');
-  const [selectedCategory, setSelectedCategory] = useState<'insurance' | 'loan'>('insurance');
-  const [selectedSubCategory, setSelectedSubCategory] = useState<'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan'>('motor-insurance');
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'insurance' | 'loan'>('all');
+  const [selectedSubCategory, setSelectedSubCategory] = useState<'all' | 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan'>('all');
   const [isInsuranceOpen, setIsInsuranceOpen] = useState(false);
   const [isLoanOpen, setIsLoanOpen] = useState(false);
 
   // Separate state for brochures section 
-  const [selectedCategoryBrochures, setSelectedCategoryBrochures] = useState<'insurance' | 'loan'>('insurance');
-  const [selectedSubCategoryBrochures, setSelectedSubCategoryBrochures] = useState<'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan'>('motor-insurance');
+  const [selectedCategoryBrochures, setSelectedCategoryBrochures] = useState<'all' | 'insurance' | 'loan'>('all');
+  const [selectedSubCategoryBrochures, setSelectedSubCategoryBrochures] = useState<'all' | 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan'>('all');
   const [isInsuranceOpenBrochures, setIsInsuranceOpenBrochures] = useState(false);
   const [isLoanOpenBrochures, setIsLoanOpenBrochures] = useState(false);
 
@@ -393,21 +393,36 @@ export default function Downloads() {
     }
   ];
 
-  // Filter data based on active section and selected month
+  // Filter data based on active section and selected filters
   const filteredData = downloadData.filter(item => {
     if (activeSection === 'payout') {
-      return item.category === 'payout' && 
-             item.month === selectedMonth && 
-             item.subCategory === selectedSubCategory;
+      const monthMatch = selectedMonth === 'all' || item.month === selectedMonth;
+      const categoryMatch = selectedCategory === 'all' || 
+        (selectedCategory === 'insurance' && 
+          (item.subCategory === 'motor-insurance' || item.subCategory === 'life-insurance' || item.subCategory === 'health-insurance')) ||
+        (selectedCategory === 'loan' && 
+          (item.subCategory === 'home-loan' || item.subCategory === 'business-loan' || item.subCategory === 'lap-loan' || item.subCategory === 'personal-loan'));
+      const subCategoryMatch = selectedSubCategory === 'all' || item.subCategory === selectedSubCategory;
+      
+      return item.category === 'payout' && monthMatch && categoryMatch && subCategoryMatch;
     }
     return item.category === activeSection;
   });
 
   // Filter brochures data based on selected category
-  const filteredBrochuresData = downloadData.filter(item => 
-    item.category === 'brochures' && 
-    item.subCategory === selectedSubCategoryBrochures
-  );
+  const filteredBrochuresData = downloadData.filter(item => {
+    if (item.category === 'brochures') {
+      const categoryMatch = selectedCategoryBrochures === 'all' || 
+        (selectedCategoryBrochures === 'insurance' && 
+          (item.subCategory === 'motor-insurance' || item.subCategory === 'life-insurance' || item.subCategory === 'health-insurance')) ||
+        (selectedCategoryBrochures === 'loan' && 
+          (item.subCategory === 'home-loan' || item.subCategory === 'business-loan' || item.subCategory === 'lap-loan' || item.subCategory === 'personal-loan'));
+      const subCategoryMatch = selectedSubCategoryBrochures === 'all' || item.subCategory === selectedSubCategoryBrochures;
+      
+      return categoryMatch && subCategoryMatch;
+    }
+    return false;
+  });
 
   // Filter forms data
   const filteredFormsData = downloadData.filter(item => 
@@ -416,6 +431,7 @@ export default function Downloads() {
 
   // Generate months for dropdown
   const months = [
+    { value: 'all', label: 'All Months' },
     { value: 'november-2025', label: 'November 2025' },
     { value: 'october-2025', label: 'October 2025' },
     { value: 'september-2025', label: 'September 2025' },
@@ -474,17 +490,6 @@ export default function Downloads() {
     }
   };
 
-  // Handle file upload (for admin functionality)
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // In a real application, you would upload to your server
-      // For demo, we'll just show a success message
-      alert(`File "${file.name}" uploaded successfully!`);
-      event.target.value = '';
-    }
-  };
-
   // Handle insurance dropdown toggle for payout
   const handleInsuranceToggle = () => {
     setIsInsuranceOpen(!isInsuranceOpen);
@@ -498,9 +503,11 @@ export default function Downloads() {
   };
 
   // Handle subcategory selection for payout
-  const handleSubCategorySelect = (subCategory: 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan') => {
+  const handleSubCategorySelect = (subCategory: 'all' | 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan') => {
     setSelectedSubCategory(subCategory);
-    if (subCategory === 'home-loan' || subCategory === 'business-loan' || subCategory === 'lap-loan' || subCategory === 'personal-loan') {
+    if (subCategory === 'all') {
+      setSelectedCategory('all');
+    } else if (subCategory === 'home-loan' || subCategory === 'business-loan' || subCategory === 'lap-loan' || subCategory === 'personal-loan') {
       setSelectedCategory('loan');
     } else {
       setSelectedCategory('insurance');
@@ -522,9 +529,11 @@ export default function Downloads() {
   };
 
   // Handle subcategory selection for brochures
-  const handleSubCategorySelectBrochures = (subCategory: 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan') => {
+  const handleSubCategorySelectBrochures = (subCategory: 'all' | 'motor-insurance' | 'life-insurance' | 'health-insurance' | 'home-loan' | 'business-loan' | 'lap-loan' | 'personal-loan') => {
     setSelectedSubCategoryBrochures(subCategory);
-    if (subCategory === 'home-loan' || subCategory === 'business-loan' || subCategory === 'lap-loan' || subCategory === 'personal-loan') {
+    if (subCategory === 'all') {
+      setSelectedCategoryBrochures('all');
+    } else if (subCategory === 'home-loan' || subCategory === 'business-loan' || subCategory === 'lap-loan' || subCategory === 'personal-loan') {
       setSelectedCategoryBrochures('loan');
     } else {
       setSelectedCategoryBrochures('insurance');
@@ -533,23 +542,17 @@ export default function Downloads() {
     setIsLoanOpenBrochures(false);
   };
 
-  // Calculate stats for visualization
-  const payoutStats = {
-    totalFiles: downloadData.filter(item => item.category === 'payout' && item.subCategory === selectedSubCategory).length,
-    totalSize: '15.2 MB',
-    recentUpload: '2 days ago'
-  };
-
   // Get display name for subcategory
   const getSubCategoryDisplayName = (subCategory: string) => {
     const names: Record<string, string> = {
-      'motor-insurance': '🚗 Motor Insurance',
-      'life-insurance': '👨‍👩‍👧‍👦 Life Insurance',
-      'health-insurance': '🏥 Health Insurance',
-      'home-loan': '🏠 Home Loan',
-      'business-loan': '💼 Business Loan',
-      'lap-loan': '🏘️ LAP Loan',
-      'personal-loan': '👤 Personal Loan'
+      'all': 'All Documents',
+      'motor-insurance': 'Motor Insurance',
+      'life-insurance': 'Life Insurance',
+      'health-insurance': 'Health Insurance',
+      'home-loan': 'Home Loan',
+      'business-loan': 'Business Loan',
+      'lap-loan': 'LAP Loan',
+      'personal-loan': 'Personal Loan'
     };
     return names[subCategory] || subCategory;
   };
@@ -582,7 +585,7 @@ export default function Downloads() {
               }`}
             >
               <div className="flex items-center justify-center space-x-2">
-                <span>💰</span>
+                <span>💸</span>
                 <span className="font-semibold">Payout Structure</span>
               </div>
             </button>
@@ -621,14 +624,7 @@ export default function Downloads() {
           {/* Payout Structure Section */}
           {activeSection === 'payout' && (
             <div className="space-y-6">
-              {/* Stats Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          
-  
-                 
-                </div>
-
-              {/* Month Selector and Upload */}
+              {/* Month Selector */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                   <label className="text-sm font-medium text-slate-700 whitespace-nowrap">Select Month:</label>
@@ -644,13 +640,31 @@ export default function Downloads() {
                     ))}
                   </select>
                 </div>
-                
-          
               </div>
 
               {/* Category Navigation Bar */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-1">
                 <div className="flex flex-col sm:flex-row sm:space-x-1 space-y-1 sm:space-y-0">
+                  {/* All Documents Button */}
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('all');
+                      setSelectedSubCategory('all');
+                      setIsInsuranceOpen(false);
+                      setIsLoanOpen(false);
+                    }}
+                    className={`flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center ${
+                      selectedCategory === 'all'
+                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                    
+                      <span>All Documents</span>
+                    </div>
+                  </button>
+
                   {/* Insurance Dropdown */}
                   <div className="relative flex-1">
                     <button
@@ -662,7 +676,7 @@ export default function Downloads() {
                       }`}
                     >
                       <div className="flex items-center space-x-2">
-                        <span>🛡️</span>
+                        
                         <span>Insurance</span>
                       </div>
                       <svg 
@@ -688,7 +702,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>🚗</span>
                           <span>Motor Insurance</span>
                         </button>
                         <button
@@ -699,7 +712,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>👨‍👩‍👧‍👦</span>
                           <span>Life Insurance</span>
                         </button>
                         <button
@@ -710,7 +722,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>🏥</span>
                           <span>Health Insurance</span>
                         </button>
                       </div>
@@ -728,7 +739,7 @@ export default function Downloads() {
                       }`}
                     >
                       <div className="flex items-center space-x-2">
-                        <span>💰</span>
+                      l
                         <span>Loan</span>
                       </div>
                       <svg 
@@ -754,10 +765,8 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>🏠</span>
                           <span>Home Loan</span>
                         </button>
-
                         <button
                           onClick={() => handleSubCategorySelect('business-loan')}
                           className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
@@ -766,11 +775,9 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>💼</span>
                           <span>Business Loan</span>
                         </button>
-
-                         <button
+                        <button
                           onClick={() => handleSubCategorySelect('lap-loan')}
                           className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3 ${
                             selectedSubCategory === 'lap-loan' 
@@ -778,7 +785,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>🏘️</span>
                           <span>LAP Loan</span>
                         </button>
                         <button
@@ -789,7 +795,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>👤</span>
                           <span>Personal Loan</span>
                         </button>
                       </div>
@@ -802,9 +807,10 @@ export default function Downloads() {
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-4 sm:p-6 border-b border-slate-200">
                   <h3 className="text-lg font-semibold text-slate-900">
-                    {selectedCategory === 'insurance' ? 'Insurance' : 'Loan'} - {' '}
-                    {getSubCategoryDisplayName(selectedSubCategory)}
-                    {' '}Documents for {months.find(m => m.value === selectedMonth)?.label}
+                    {selectedCategory === 'all' ? 'All Payout Documents' : 
+                     selectedCategory === 'insurance' ? 'Insurance Documents' : 'Loan Documents'}
+                    {selectedSubCategory !== 'all' && ` - ${getSubCategoryDisplayName(selectedSubCategory)}`}
+                    {selectedMonth !== 'all' && ` for ${months.find(m => m.value === selectedMonth)?.label}`}
                   </h3>
                 </div>
                 <div className="divide-y divide-slate-200">
@@ -819,6 +825,14 @@ export default function Downloads() {
                               <span>{file.size}</span>
                               <span className="hidden sm:inline">•</span>
                               <span>Uploaded {file.uploadDate}</span>
+                              {file.subCategory && (
+                                <>
+                                  <span className="hidden sm:inline">•</span>
+                                  <span className="bg-slate-100 text-slate-700 px-2 py-1 rounded-md text-xs">
+                                    {getSubCategoryDisplayName(file.subCategory)}
+                                  </span>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -841,7 +855,7 @@ export default function Downloads() {
                       </div>
                       <h3 className="text-lg font-medium text-slate-900 mb-2">No documents found</h3>
                       <p className="text-slate-600 text-sm max-w-md mx-auto">
-                        No {selectedSubCategory?.replace('-', ' ')} documents available for {months.find(m => m.value === selectedMonth)?.label}.
+                        No documents available for the selected filters.
                       </p>
                     </div>
                   )}
@@ -856,6 +870,26 @@ export default function Downloads() {
               {/* Category Navigation Bar for Brochures */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-1">
                 <div className="flex flex-col sm:flex-row sm:space-x-1 space-y-1 sm:space-y-0">
+                  {/* All Documents Button for Brochures */}
+                  <button
+                    onClick={() => {
+                      setSelectedCategoryBrochures('all');
+                      setSelectedSubCategoryBrochures('all');
+                      setIsInsuranceOpenBrochures(false);
+                      setIsLoanOpenBrochures(false);
+                    }}
+                    className={`flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center ${
+                      selectedCategoryBrochures === 'all'
+                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                    
+                      <span>All Brochures</span>
+                    </div>
+                  </button>
+
                   {/* Insurance Dropdown for Brochures */}
                   <div className="relative flex-1">
                     <button
@@ -867,7 +901,7 @@ export default function Downloads() {
                       }`}
                     >
                       <div className="flex items-center space-x-2">
-                        <span>🛡️</span>
+                       
                         <span>Insurance</span>
                       </div>
                       <svg 
@@ -893,7 +927,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>🚗</span>
                           <span>Motor Insurance</span>
                         </button>
                         <button
@@ -904,7 +937,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>👨‍👩‍👧‍👦</span>
                           <span>Life Insurance</span>
                         </button>
                         <button
@@ -915,7 +947,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>🏥</span>
                           <span>Health Insurance</span>
                         </button>
                       </div>
@@ -933,7 +964,7 @@ export default function Downloads() {
                       }`}
                     >
                       <div className="flex items-center space-x-2">
-                        <span>💰</span>
+                      
                         <span>Loan</span>
                       </div>
                       <svg 
@@ -959,7 +990,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>🏠</span>
                           <span>Home Loan</span>
                         </button>
                         <button
@@ -970,7 +1000,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>💼</span>
                           <span>Business Loan</span>
                         </button>
                         <button
@@ -981,7 +1010,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>🏘️</span>
                           <span>LAP Loan</span>
                         </button>
                         <button
@@ -992,7 +1020,6 @@ export default function Downloads() {
                               : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>👤</span>
                           <span>Personal Loan</span>
                         </button>
                       </div>
@@ -1005,9 +1032,9 @@ export default function Downloads() {
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-4 sm:p-6 border-b border-slate-200">
                   <h3 className="text-lg font-semibold text-slate-900">
-                    Product Brochures - {' '}
-                    {selectedCategoryBrochures === 'insurance' ? 'Insurance' : 'Loan'} - {' '}
-                    {getSubCategoryDisplayName(selectedSubCategoryBrochures)}
+                    {selectedCategoryBrochures === 'all' ? 'All Product Brochures' : 
+                     selectedCategoryBrochures === 'insurance' ? 'Insurance Brochures' : 'Loan Brochures'}
+                    {selectedSubCategoryBrochures !== 'all' && ` - ${getSubCategoryDisplayName(selectedSubCategoryBrochures)}`}
                   </h3>
                   <p className="text-slate-600 text-sm mt-1">Marketing materials and product information</p>
                 </div>
@@ -1023,6 +1050,14 @@ export default function Downloads() {
                               <span>{file.size}</span>
                               <span className="hidden sm:inline">•</span>
                               <span>Uploaded {file.uploadDate}</span>
+                              {file.subCategory && (
+                                <>
+                                  <span className="hidden sm:inline">•</span>
+                                  <span className="bg-slate-100 text-slate-700 px-2 py-1 rounded-md text-xs">
+                                    {getSubCategoryDisplayName(file.subCategory)}
+                                  </span>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -1045,7 +1080,7 @@ export default function Downloads() {
                       </div>
                       <h3 className="text-lg font-medium text-slate-900 mb-2">No brochures found</h3>
                       <p className="text-slate-600 text-sm max-w-md mx-auto">
-                        No {selectedSubCategoryBrochures?.replace('-', ' ')} brochures available.
+                        No brochures available for the selected filters.
                       </p>
                     </div>
                   )}
