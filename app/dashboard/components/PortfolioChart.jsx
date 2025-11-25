@@ -15,28 +15,22 @@ export default function PortfolioChart() {
   // Chart data
   const data = {
     labels: [
-      'Life Insurance',
-      'Health Insurance', 
-      'Motor Insurance',
-      'Home Insurance',
-      'Travel Insurance'
+      'Insurance',
+      'Loans', 
+      'Investments'
     ],
     datasets: [
       {
-        data: [35, 25, 20, 15, 5],
+        data: [50, 30, 20],
         backgroundColor: [
           '#4f46e5', // Indigo
           '#06b6d4', // Cyan
           '#10b981', // Emerald
-          '#f59e0b', // Amber
-          '#ef4444', // Red
         ],
         borderColor: [
           '#4f46e5',
           '#06b6d4', 
           '#10b981',
-          '#f59e0b',
-          '#ef4444',
         ],
         borderWidth: 2,
         hoverOffset: 15,

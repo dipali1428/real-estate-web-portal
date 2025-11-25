@@ -4,7 +4,6 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  // size: string;
   uploadDate: string;
   category: 'insurance' | 'loan';
   subCategory: string;
@@ -16,6 +15,8 @@ interface TemplateGridProps {
   templates: TemplateItem[];
   activeSubCategory: string;
   onQuickDownload: (template: TemplateItem) => void;
+  onShareToWhatsApp: (template: TemplateItem, imageBlob: Blob) => void;
+  generatePersonalizedImage: (template: TemplateItem) => Promise<Blob>;
 }
 
 const subCategoryLabels: Record<string, string> = {
@@ -26,18 +27,25 @@ const subCategoryLabels: Record<string, string> = {
   home: 'Home Loan',
   business: 'Business Loan',
   lap: 'LAP Loan',
-  personal: 'Personal Loan'
+  personal: 'Personal Loan',
+  educational: 'Educational Loan'
 };
 
-export default function TemplateGrid({ templates, activeSubCategory, onQuickDownload }: TemplateGridProps) {
+export default function TemplateGrid({ 
+  templates, 
+  activeSubCategory, 
+  onQuickDownload, 
+  onShareToWhatsApp,
+  generatePersonalizedImage 
+}: TemplateGridProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center sm:text-left">
-          {subCategoryLabels[activeSubCategory]} Templates
+          {subCategoryLabels[activeSubCategory] || activeSubCategory} Templates
         </h2>
         <span className="text-slate-600 bg-slate-100 px-3 py-1 rounded-full text-sm text-center">
-          {templates.length} templates available
+          {templates.length} template{templates.length !== 1 ? 's' : ''} available
         </span>
       </div>
 
@@ -48,6 +56,8 @@ export default function TemplateGrid({ templates, activeSubCategory, onQuickDown
               key={template.id}
               template={template}
               onQuickDownload={onQuickDownload}
+              onShareToWhatsApp={onShareToWhatsApp}
+              generatePersonalizedImage={generatePersonalizedImage}
             />
           ))}
         </div>

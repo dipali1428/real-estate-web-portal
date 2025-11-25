@@ -151,13 +151,17 @@ export default function LeadManagement() {
             </p>
           </div>
 
-          {/* Right Side Button */}
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-md hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap shrink-0" >
-            <Plus className="w-4 h-4" />
-            Add New Lead
-          </button>
+          {/* Right Side Button + Text */}
+          <div className="flex flex-col items-center gap-2 shrink-0">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-md hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4" />
+              Add New Lead
+            </button>
+            <p className="text-xs text-slate-500 text-center">Only referral lead</p>
+          </div>
         </div>
         {/* Tabs / Navbar */}
         <div className="flex border-b border-gray-200 mb-6 space-x-6">
@@ -166,8 +170,8 @@ export default function LeadManagement() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`pb-2 font-medium transition-all duration-300 ${activeTab === tab.id
-                  ? "border-b-2 border-blue-600 text-blue-600 scale-105"
-                  : "text-gray-500 hover:text-gray-700 hover:scale-105"
+                ? "border-b-2 border-blue-600 text-blue-600 scale-105"
+                : "text-gray-500 hover:text-gray-700 hover:scale-105"
                 }`}
             >
               {tab.label}
@@ -298,8 +302,8 @@ export default function LeadManagement() {
               {/* Balance Transfer*/}
               <div className="bg-white text-black rounded-lg shadow-lg p-6 justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl border border-gray-100 hover:border-blue-200">
                 <div>
-                  <h2 className="text-xl font-semibold mb-3">Balance Transfer</h2>
-                  <p className="text-sm mb-6">A balance transfer moves debt to a lender with lower interest, and a top-up loan adds extra money to an existing loan.</p></div>
+                  <h2 className="text-xl font-semibold mb-3">NRP Loan</h2>
+                  <p className="text-sm mb-6">To purchase or construct a commercial property like an office, shop, or factory.</p></div>
                 {/*active leads*/}
                 <div className="flex items-center justify-between my-4">
                   <div className="text-center">
@@ -419,7 +423,7 @@ export default function LeadManagement() {
                     <p className="text-sm text-gray-600">Active Leads</p>
                   </div>
                   <div className="text-center">
-                    <span className="text-xl font-bold text-blue-600">5</span>
+                    <span className="text-xl font-bold text-blue-600">0</span>
                     <p className="text-sm text-gray-600">Converted</p>
                   </div>
                 </div>
@@ -715,7 +719,7 @@ export default function LeadManagement() {
 
 
         </div>
-        {/* <div className="w-full mt-6">
+        <div className="w-full mt-6">
           <h3 className="text-xl font-semibold mb-4">All Leads</h3>
 
           <div className="overflow-x-auto bg-white shadow-md rounded-lg">
@@ -858,7 +862,7 @@ export default function LeadManagement() {
               </tbody>
             </table>
           </div>
-        </div> */}
+        </div>
       </section>
       {/* ===== Modal (Add New Lead) ===== */}
       <AddLeadModal

@@ -83,6 +83,7 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
               "Top-up Loan",
               "Plot Loan",
               "Construction Loan",
+              "Resale Home Loan",
             ]}
             value={loanType}
             onChange={setLoanType}
@@ -241,8 +242,8 @@ function SalariedDocs() {
     "6 Months Banking Statement",
     "Address Proof",
     "Photograph",
-    "Existing Loan Statement / Index II",
-    "Property Cost Sheet",
+    "Existing Loan Statement",
+    "Property Cost Sheet / Index II",
     "Own Contribution Proof",
   ];
   return (
@@ -268,8 +269,8 @@ function SelfEmployedDocs() {
     "GST Certificate",
     "Last 12 Months GST Returns",
     "Photograph",
-    "Existing Loan Statement / Index II",
-    "Property Cost Sheet",
+    "Existing Loan Statement",
+    "Property Cost Sheet / Index II",
     "Own Contribution Proof",
   ];
   return (

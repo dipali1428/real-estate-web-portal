@@ -55,7 +55,6 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
     location: "",
     loanAmount: "",
     useOfFund: "",
-    deductionDetails: "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -176,14 +175,6 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
             value={formData.useOfFund}
             onChange={(e) => handleChange("useOfFund", e.target.value)}
             error={errors.useOfFund}
-          />
-
-          <Input
-            label="Deduction Details"
-            placeholder="Enter Deduction Details"
-            value={formData.deductionDetails}
-            onChange={(e) => handleChange("deductionDetails", e.target.value)}
-            error={errors.deductionDetails}
           />
 
           {/* Employment Type */}

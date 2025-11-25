@@ -9,7 +9,7 @@ interface FormData {
   vehicleReg: string;
   vehicleModel: string;
   idv: string;
-  requirement: string;
+  requirement: string[];
   claimTaken: string;
 }
 
@@ -29,7 +29,7 @@ export default function MotorInsuranceForm({ onClose }: MotorInsuranceFormProps)
     vehicleReg: "",
     vehicleModel: "",
     idv: "",
-    requirement: "",
+    requirement: [],
     claimTaken: ""
   });
   
@@ -40,7 +40,7 @@ export default function MotorInsuranceForm({ onClose }: MotorInsuranceFormProps)
   const [notRobot, setNotRobot] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
+  const handleInputChange = (field: keyof FormData, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
@@ -48,15 +48,32 @@ export default function MotorInsuranceForm({ onClose }: MotorInsuranceFormProps)
     }
   };
 
+  const handleCheckboxChange = (option: string, isChecked: boolean) => {
+    const currentValues = formData.requirement || [];
+    let newValues: string[];
+    
+    if (isChecked) {
+      newValues = [...currentValues, option];
+    } else {
+      newValues = currentValues.filter(item => item !== option);
+    }
+    
+    handleInputChange('requirement', newValues);
+  };
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
     // Required fields validation
-    Object.entries(formData).forEach(([key, value]) => {
-      if (!value.trim()) {
-        newErrors[key] = "This field is required";
-      }
-    });
+    if (!formData.vehicleType.trim()) newErrors.vehicleType = "This field is required";
+    if (!formData.clientName.trim()) newErrors.clientName = "This field is required";
+    if (!formData.vehicleReg.trim()) newErrors.vehicleReg = "This field is required";
+    if (!formData.claimTaken.trim()) newErrors.claimTaken = "This field is required";
+    
+    // Requirement validation - at least one checkbox should be selected
+    if (formData.requirement.length === 0) {
+      newErrors.requirement = "Select at least one requirement";
+    }
 
     // IDV validation - should be numeric
     if (formData.idv && !/^\d+$/.test(formData.idv)) {
@@ -126,7 +143,7 @@ export default function MotorInsuranceForm({ onClose }: MotorInsuranceFormProps)
               label="Type of Vehicle" 
               value={formData.vehicleType}
               onChange={(value) => handleInputChange('vehicleType', value)}
-              options={["Car Insurance", "2 Wheeler", "GCV", "PCV", "Mic-D"]} 
+              options={["Private Vehicle", "2 Wheeler", "GCV", "PCV", "Misc-D"]} 
               error={errors.vehicleType}
               required
             />
@@ -158,7 +175,6 @@ export default function MotorInsuranceForm({ onClose }: MotorInsuranceFormProps)
               onChange={(value) => handleInputChange('vehicleModel', value)}
               placeholder="Enter Vehicle Make & Model" 
               error={errors.vehicleModel}
-              required
             />
 
             <Input 
@@ -169,10 +185,10 @@ export default function MotorInsuranceForm({ onClose }: MotorInsuranceFormProps)
               placeholder="Enter Vehicle IDV" 
               error={errors.idv}
               type="number"
-              required
             />
 
-            <Select 
+            {/* Checkbox Group for Requirement */}
+            <CheckboxGroup 
               id="requirement"
               label="Requirement" 
               value={formData.requirement}
@@ -358,6 +374,62 @@ function Select({ id, label, value, onChange, options, error, required }: Select
           <option key={opt} value={opt}>{opt}</option>
         ))}
       </select>
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+    </div>
+  );
+}
+
+// Checkbox Group Component
+interface CheckboxGroupProps {
+  id: string;
+  label: string;
+  value: string[];
+  onChange: (value: string[]) => void;
+  options: string[];
+  error?: string;
+  required?: boolean;
+}
+
+function CheckboxGroup({ id, label, value = [], onChange, options, error, required }: CheckboxGroupProps) {
+  const handleCheckboxChange = (option: string, isChecked: boolean) => {
+    const currentValues = value || [];
+    let newValues: string[];
+    
+    if (isChecked) {
+      newValues = [...currentValues, option];
+    } else {
+      newValues = currentValues.filter(item => item !== option);
+    }
+    
+    onChange(newValues);
+  };
+
+  return (
+    <div className="md:col-span-2">
+      <label className="block text-sm font-medium mb-2">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      
+      <div className="space-y-3">
+        {options.map((option) => (
+          <div key={option} className="flex items-center">
+            <input
+              type="checkbox"
+              id={`${id}-${option}`}
+              checked={value?.includes(option) || false}
+              onChange={(e) => handleCheckboxChange(option, e.target.checked)}
+              className="w-4 h-4 text-[#1CADA3] focus:ring-[#1CADA3] border-gray-300 rounded"
+            />
+            <label 
+              htmlFor={`${id}-${option}`} 
+              className="ml-3 text-sm text-gray-700 cursor-pointer"
+            >
+              {option}
+            </label>
+          </div>
+        ))}
+      </div>
+      
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );

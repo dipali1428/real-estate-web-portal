@@ -11,7 +11,6 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  // size: string;
   uploadDate: string;
   category: 'insurance' | 'loan';
   subCategory: string;
@@ -48,36 +47,36 @@ export default function ImageTemplates() {
   const [loading, setLoading] = useState(true);
 
   // Fetch user profile data from API
-useEffect(() => {
-  const fetchUserProfile = async () => {
-    try {
-      setLoading(true);
-      const response = await DashboardService.getProfile();
-      const profileData: ApiProfile = response.user;
-      
-      // Capitalize the first letter of the name
-      const capitalizedName = profileData.name 
-        ? profileData.name.charAt(0).toUpperCase() + profileData.name.slice(1)
-        : 'User';
-      
-      setUserProfile({
-        name: capitalizedName,
-        contactNumber: profileData.mobile || 'Not provided'
-      });
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      // Fallback to default values if API fails
-      setUserProfile({
-        name: 'User',
-        contactNumber: 'Not available'
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await DashboardService.getProfile();
+        const profileData: ApiProfile = response.user;
 
-  fetchUserProfile();
-}, []);
+        // Capitalize the first letter of the name
+        const capitalizedName = profileData.name
+          ? profileData.name.charAt(0).toUpperCase() + profileData.name.slice(1)
+          : 'User';
+
+        setUserProfile({
+          name: capitalizedName,
+          contactNumber: profileData.mobile || 'Not provided'
+        });
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        // Fallback to default values if API fails
+        setUserProfile({
+          name: 'User',
+          contactNumber: 'Not available'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   // All Templates - Embedded images
   const [allTemplates] = useState<TemplateItem[]>([
@@ -85,7 +84,6 @@ useEffect(() => {
       id: '1',
       name: 'Life Insurance Plan',
       type: 'image',
-      // size: '1.2 MB',
       uploadDate: '2024-01-15',
       category: 'insurance',
       subCategory: 'life',
@@ -96,7 +94,6 @@ useEffect(() => {
       id: '2',
       name: 'Health Insurance',
       type: 'image',
-      // size: '1.5 MB',
       uploadDate: '2024-01-10',
       category: 'insurance',
       subCategory: 'health',
@@ -107,7 +104,6 @@ useEffect(() => {
       id: '3',
       name: 'Car Insurance',
       type: 'image',
-      // size: '1.3 MB',
       uploadDate: '2024-01-08',
       category: 'insurance',
       subCategory: 'motor',
@@ -118,7 +114,6 @@ useEffect(() => {
       id: '4',
       name: 'Home Loan Offer',
       type: 'image',
-      // size: '1.4 MB',
       uploadDate: '2024-01-12',
       category: 'loan',
       subCategory: 'home',
@@ -129,7 +124,6 @@ useEffect(() => {
       id: '5',
       name: 'Personal Loan',
       type: 'image',
-      // size: '1.6 MB',
       uploadDate: '2024-01-05',
       category: 'loan',
       subCategory: 'personal',
@@ -140,7 +134,6 @@ useEffect(() => {
       id: '6',
       name: 'Business Loan',
       type: 'image',
-      // size: '1.7 MB',
       uploadDate: '2024-01-03',
       category: 'loan',
       subCategory: 'business',
@@ -151,7 +144,6 @@ useEffect(() => {
       id: '7',
       name: 'Educational Loan',
       type: 'image',
-      // size: '1.7 MB',
       uploadDate: '2024-01-03',
       category: 'loan',
       subCategory: 'educational',
@@ -203,170 +195,252 @@ useEffect(() => {
     }
   };
 
-// Quick download with SVG icons (with visible line separator and centered vertically)
-// Quick download with SVG icons (with increased font sizes)
-const quickDownload = async (template: TemplateItem) => {
-  try {
-    const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => {
-          resolve({
-            width: img.naturalWidth,
-            height: img.naturalHeight
+  // Function to generate personalized image (used by both download and share)
+  const generatePersonalizedImage = async (template: TemplateItem): Promise<Blob> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+              resolve({
+                width: img.naturalWidth,
+                height: img.naturalHeight
+              });
+            };
+            img.onerror = reject;
+            img.src = url;
           });
         };
-        img.onerror = reject;
-        img.src = url;
-      });
-    };
 
-    const dimensions = await getImageDimensions(template.imageUrl);
-    
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    if (!ctx) {
-      alert('Error creating image. Please try again.');
-      return;
-    }
+        const dimensions = await getImageDimensions(template.imageUrl);
 
-    // Calculate responsive sizes with INCREASED FONT SIZES
-    const baseWidth = 800;
-    const scaleFactor = dimensions.width / baseWidth;
-    
-    // INCREASED FONT SIZES: Changed from 16-28 to 24-40 range
-    const responsiveFontSize = Math.max(18, Math.min(40, 28 * scaleFactor));
-    
-    // Increased extended height to accommodate larger text
-    const extendedHeight = dimensions.height + Math.max(100, 120 * scaleFactor);
-    canvas.width = dimensions.width;
-    canvas.height = extendedHeight;
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
 
-    // Set white background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+        if (!ctx) {
+          reject(new Error('Error creating canvas context'));
+          return;
+        }
 
-    // Load and draw template image
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = template.imageUrl;
-    });
+        // Calculate responsive sizes with INCREASED FONT SIZES
+        const baseWidth = 800;
+        const scaleFactor = dimensions.width / baseWidth;
 
-    ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
+        // INCREASED FONT SIZES: Changed from 16-28 to 24-40 range
+        const responsiveFontSize = Math.max(18, Math.min(40, 28 * scaleFactor));
 
-    // SVG Icons as data URLs
-    const userIconSVG = `data:image/svg+xml;base64,${btoa(`
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="#1d283a"/>
-        <path d="M12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="#1d283a"/>
-      </svg>
-    `)}`;
+        // Increased extended height to accommodate larger text
+        const extendedHeight = dimensions.height + Math.max(100, 120 * scaleFactor);
+        canvas.width = dimensions.width;
+        canvas.height = extendedHeight;
 
-    const phoneIconSVG = `data:image/svg+xml;base64,${btoa(`
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 15.5C18.75 15.5 17.55 15.3 16.43 14.93C16.08 14.82 15.69 14.9 15.41 15.17L13.21 17.37C10.38 15.93 8.06 13.62 6.62 10.79L8.82 8.59C9.1 8.31 9.18 7.92 9.07 7.57C8.7 6.45 8.5 5.25 8.5 4C8.5 3.45 8.05 3 7.5 3H4C3.45 3 3 3.45 3 4C3 13.39 10.61 21 20 21C20.55 21 21 20.55 21 20V16.5C21 15.95 20.55 15.5 20 15.5Z" fill="#1d283a"/>
-      </svg>
-    `)}`;
+        // Set white background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const loadIcon = (svgData: string): Promise<HTMLImageElement> => {
-      return new Promise((resolve, reject) => {
-        const iconImg = new Image();
-        iconImg.onload = () => resolve(iconImg);
-        iconImg.onerror = reject;
-        iconImg.src = svgData;
-      });
-    };
+        // Load and draw template image
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
 
-    const [userIcon, phoneIcon] = await Promise.all([
-      loadIcon(userIconSVG),
-      loadIcon(phoneIconSVG)
-    ]);
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = template.imageUrl;
+        });
 
-    // Add user details section
-    const iconSize = Math.max(24, 28 * scaleFactor); // Slightly increased icon size
-    const spacing = 12 * scaleFactor;
-    const lineSpacing = 20 * scaleFactor;
+        ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
 
-    // Calculate text measurements
-    ctx.fillStyle = '#1e293b';
-    ctx.font = `bold ${responsiveFontSize}px Arial`;
-    const userName = userProfile.name;
-    const contactNumber = userProfile.contactNumber;
-    
-    const userNameWidth = ctx.measureText(userName).width;
-    const contactNumberWidth = ctx.measureText(contactNumber).width;
-    
-    // Calculate total width including icons, text, and line spacing
-    const totalWidthWithIcons = userNameWidth + contactNumberWidth + (iconSize * 2) + (spacing * 3) + lineSpacing;
+        // SVG Icons as data URLs
+        const userIconSVG = `data:image/svg+xml;base64,${btoa(`
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="#1d283a"/>
+            <path d="M12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="#1d283a"/>
+          </svg>
+        `)}`;
 
-    // Center the entire block
-    const startX = (canvas.width - totalWidthWithIcons) / 2;
+        const phoneIconSVG = `data:image/svg+xml;base64,${btoa(`
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 15.5C18.75 15.5 17.55 15.3 16.43 14.93C16.08 14.82 15.69 14.9 15.41 15.17L13.21 17.37C10.38 15.93 8.06 13.62 6.62 10.79L8.82 8.59C9.1 8.31 9.18 7.92 9.07 7.57C8.7 6.45 8.5 5.25 8.5 4C8.5 3.45 8.05 3 7.5 3H4C3.45 3 3 3.45 3 4C3 13.39 10.61 21 20 21C20.55 21 21 20.55 21 20V16.5C21 15.95 20.55 15.5 20 15.5Z" fill="#1d283a"/>
+          </svg>
+        `)}`;
 
-    // Calculate background container dimensions - INCREASED for larger text
-    const infoHeight = 80 * scaleFactor; // Increased from 60
-    const infoMargin = 40 * scaleFactor;
-    const backgroundWidth = totalWidthWithIcons + (infoMargin * 1.5);
-    const backgroundStartX = (canvas.width - backgroundWidth) / 2;
+        const loadIcon = (svgData: string): Promise<HTMLImageElement> => {
+          return new Promise((resolve, reject) => {
+            const iconImg = new Image();
+            iconImg.onload = () => resolve(iconImg);
+            iconImg.onerror = reject;
+            iconImg.src = svgData;
+          });
+        };
 
-    // Calculate vertical center position for the entire content
-    const contentStartY = dimensions.height + (extendedHeight - dimensions.height) / 2;
-    const detailsY = contentStartY;
+        const [userIcon, phoneIcon] = await Promise.all([
+          loadIcon(userIconSVG),
+          loadIcon(phoneIconSVG)
+        ]);
 
-    // Draw user icon and name
-    const userIconX = startX;
-    const userNameX = userIconX + iconSize + spacing;
-    
-    ctx.drawImage(userIcon, userIconX, detailsY - iconSize/2, iconSize, iconSize);
-    
-    ctx.fillStyle = '#1e293b';
-    ctx.font = `bold ${responsiveFontSize}px Arial`;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(userName, userNameX, detailsY);
+        // Add user details section
+        const iconSize = Math.max(24, 28 * scaleFactor); // Slightly increased icon size
+        const spacing = 12 * scaleFactor;
+        const lineSpacing = 20 * scaleFactor;
 
-    // Draw vertical line separator
-    const lineX = userNameX + userNameWidth + (lineSpacing / 2);
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = Math.max(2, 2.5 * scaleFactor);
-    ctx.beginPath();
-    ctx.moveTo(lineX, detailsY - (infoHeight / 3));
-    ctx.lineTo(lineX, detailsY + (infoHeight / 3));
-    ctx.stroke();
+        // Calculate text measurements
+        ctx.fillStyle = '#1e293b';
+        ctx.font = `bold ${responsiveFontSize}px Arial`;
+        const userName = userProfile.name;
+        const contactNumber = userProfile.contactNumber;
 
-    // Draw phone icon and contact number
-    const phoneIconX = lineX + (lineSpacing / 2);
-    const contactNumberX = phoneIconX + iconSize + spacing;
-    
-    ctx.drawImage(phoneIcon, phoneIconX, detailsY - iconSize/2, iconSize, iconSize);
-    
-    ctx.fillStyle = '#1e293b';
-    ctx.font = `bold ${responsiveFontSize}px Arial`;
-    ctx.fillText(contactNumber, contactNumberX, detailsY);
+        const userNameWidth = ctx.measureText(userName).width;
+        const contactNumberWidth = ctx.measureText(contactNumber).width;
 
-    // Download the image
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `personalized-${template.name.replace(/\s+/g, '-').toLowerCase()}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        // Calculate total width including icons, text, and line spacing
+        const totalWidthWithIcons = userNameWidth + contactNumberWidth + (iconSize * 2) + (spacing * 3) + lineSpacing;
+
+        // Center the entire block
+        const startX = (canvas.width - totalWidthWithIcons) / 2;
+
+        // Calculate background container dimensions - INCREASED for larger text
+        const infoHeight = 80 * scaleFactor; // Increased from 60
+        const infoMargin = 40 * scaleFactor;
+        const backgroundWidth = totalWidthWithIcons + (infoMargin * 1.5);
+        const backgroundStartX = (canvas.width - backgroundWidth) / 2;
+
+        // Calculate vertical center position for the entire content
+        const contentStartY = dimensions.height + (extendedHeight - dimensions.height) / 2;
+        const detailsY = contentStartY;
+
+        // Draw user icon and name
+        const userIconX = startX;
+        const userNameX = userIconX + iconSize + spacing;
+
+        ctx.drawImage(userIcon, userIconX, detailsY - iconSize / 2, iconSize, iconSize);
+
+        ctx.fillStyle = '#1e293b';
+        ctx.font = `bold ${responsiveFontSize}px Arial`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(userName, userNameX, detailsY);
+
+        // Draw vertical line separator
+        const lineX = userNameX + userNameWidth + (lineSpacing / 2);
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = Math.max(2, 2.5 * scaleFactor);
+        ctx.beginPath();
+        ctx.moveTo(lineX, detailsY - (infoHeight / 3));
+        ctx.lineTo(lineX, detailsY + (infoHeight / 3));
+        ctx.stroke();
+
+        // Draw phone icon and contact number
+        const phoneIconX = lineX + (lineSpacing / 2);
+        const contactNumberX = phoneIconX + iconSize + spacing;
+
+        ctx.drawImage(phoneIcon, phoneIconX, detailsY - iconSize / 2, iconSize, iconSize);
+
+        ctx.fillStyle = '#1e293b';
+        ctx.font = `bold ${responsiveFontSize}px Arial`;
+        ctx.fillText(contactNumber, contactNumberX, detailsY);
+
+        // Convert to blob and resolve
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Error creating image blob'));
+          }
+        }, 'image/png');
+
+      } catch (error) {
+        reject(error);
       }
-    }, 'image/png');
+    });
+  };
 
-  } catch (error) {
-    console.error('Error creating personalized image:', error);
-    alert('Error creating personalized image. Please try again.');
-  }
-};
+  // Quick download function
+  const quickDownload = async (template: TemplateItem) => {
+    try {
+      const blob = await generatePersonalizedImage(template);
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `personalized-${template.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error('Error creating personalized image:', error);
+      alert('Error creating personalized image. Please try again.');
+    }
+  };
+
+  // WhatsApp share function
+  // Enhanced WhatsApp share function
+  const shareToWhatsApp = async (template: TemplateItem, imageBlob: Blob) => {
+    try {
+      // Create a File object from the blob
+      const file = new File([imageBlob], `personalized-${template.name.replace(/\s+/g, '-').toLowerCase()}.png`, {
+        type: 'image/png'
+      });
+
+      // Check if Web Share API is available (works on mobile devices and some desktop browsers)
+      if (navigator.share && navigator.canShare) {
+        try {
+          // Check if files can be shared
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: template.name,
+              text: `Check out this ${template.name} template!`,
+              files: [file]
+            });
+            return;
+          }
+        } catch (shareError) {
+          console.log('Web Share API failed, falling back to download method:', shareError);
+        }
+      }
+
+      // Fallback for desktop and browsers that don't support Web Share API
+      // Create download link first
+      const url = URL.createObjectURL(imageBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `personalized-${template.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Open WhatsApp with the message
+      const message = `Check out this ${template.name} template! I've downloaded the personalized image. Please check your downloads folder.`;
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+      // Open WhatsApp in a new tab
+      window.open(whatsappUrl, '_blank');
+
+      // Show user instruction
+      setTimeout(() => {
+        alert('Image downloaded! Please attach the downloaded image from your downloads folder to share on WhatsApp.');
+      }, 1000);
+
+      URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error('Error sharing to WhatsApp:', error);
+
+      // Ultimate fallback: just download the image
+      const url = URL.createObjectURL(imageBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `personalized-${template.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      alert('Image downloaded to your device. Please share it manually via WhatsApp.');
+    }
+  };
 
   if (loading) {
     return (
@@ -383,7 +457,7 @@ const quickDownload = async (template: TemplateItem) => {
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         <Header userProfile={userProfile} />
-        
+
         {/* Navigation Bar */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -410,11 +484,10 @@ const quickDownload = async (template: TemplateItem) => {
           {/* Active Subcategory Display */}
           <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
             <span className="text-sm font-medium text-slate-600">Showing:</span>
-            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-              activeCategory === 'insurance' 
-                ? 'bg-blue-100 text-[#2076C7]' 
+            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${activeCategory === 'insurance'
+                ? 'bg-blue-100 text-[#2076C7]'
                 : 'bg-green-100 text-green-700'
-            }`}>
+              }`}>
               {activeCategory === 'insurance' ? 'Insurance' : 'Loan'} - {activeSubCategory === 'all' ? 'All Templates' : activeSubCategory}
             </span>
           </div>
@@ -424,6 +497,8 @@ const quickDownload = async (template: TemplateItem) => {
           templates={filteredTemplates}
           activeSubCategory={activeSubCategory}
           onQuickDownload={quickDownload}
+          onShareToWhatsApp={shareToWhatsApp}
+          generatePersonalizedImage={generatePersonalizedImage}
         />
       </div>
     </div>

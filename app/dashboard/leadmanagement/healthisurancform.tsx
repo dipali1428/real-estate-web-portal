@@ -13,8 +13,8 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
     pin: "",
     dob: "",
     disease: "",
-    maleDob: "",
-    femaleDob: "",
+    FirstAdultDob: "",
+    SecondAdultDob: "",
     child1Dob: "",
     child2Dob: "",
   });
@@ -93,8 +93,8 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
     if (planType === "family") {
       return (
         form.pin &&
-        form.maleDob &&
-        form.femaleDob &&
+        form.FirstAdultDob &&
+        form.SecondAdultDob &&
         form.child1Dob &&
         form.child2Dob &&
         form.disease
@@ -191,10 +191,10 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
               <Input label="Pin Code" type="text" value={form.pin} onChange={(v) => updateField("pin", v)} />
 
               {[
-                { label: "Male DOB", field: "maleDob" },
-                { label: "Female DOB", field: "femaleDob" },
-                { label: "1st Child DOB", field: "child1Dob" },
-                { label: "2nd Child DOB", field: "child2Dob" },
+                { label: " DOB of First Adult Member", field: "FirstAdultDob" },
+                { label: "DOB of Second Adult Member", field: "SecondAdultDob" },
+                { label: "DOB of 1st Child", field: "child1Dob" },
+                { label: "DOB of 2nd Child", field: "child2Dob" },
               ].map((item) => (
                 <Input
                   key={item.field}
@@ -205,7 +205,7 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
                 />
               ))}
 
-              <Input label="Any Existing Disease" type="text" value={form.disease} onChange={(v) => updateField("disease", v)} />
+              <Input label="Pre Existing Disease" type="text" value={form.disease} onChange={(v) => updateField("disease", v)} />
             </div>
           )}
 

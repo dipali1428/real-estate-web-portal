@@ -106,16 +106,6 @@ export default function Dashboard() {
                         {loading ? "Loading..." : `Welcome back, ${user?.name || "Partner"}.`}
                     </h2>
                     <p className="text-sm sm:text-base mb-4">Here&apos;s a snapshot of your business performance.</p>
-                    <div className="flex items-center">
-                        <span className="text-white mr-3">Monthly Goal Progress</span>
-                        <div className="flex-1 bg-white bg-opacity-30 rounded-full h-3">
-                            <div
-                                className="bg-white bg-opacity-50 h-3 rounded-full"
-                                style={{ width: '90%' }}
-                            ></div>
-                        </div>
-                        <span className="text-white ml-3 font-sans">0%</span>
-                    </div>
                 </motion.div>
 
                 {/* KPI Cards Grid */}
@@ -141,29 +131,7 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/* Monthly Target */}
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                        <div className="flex items-start justify-between">
-                            <div className="w-12 h-12 bg-linear-to-r from-[#0f766e] to-[#0f766e] rounded-2xl flex items-center justify-center text-white">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <div className="text-2xl font-bold font-sans text-gray-800">0</div>
-                            <div className="text-gray-600 mt-1">Monthly Target</div>
-                            <div className="mt-3">
-                                <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div
-                                        className="bg-linear-to-r from-[#0f766e] to-[#0f766e] h-2 rounded-full"
-                                        style={{ width: '0%' }}
-                                    ></div>
-                                </div>
-                                <div className="text-sm font-sans text-gray-500 mt-1">Achieved: 0%</div>
-                            </div>
-                        </div>
-                    </div>
+                    
 
                     {/* Active Policies */}
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">

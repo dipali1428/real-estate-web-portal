@@ -1,209 +1,257 @@
 "use client";
-
 import { useState } from "react";
 import { X } from "lucide-react";
 
-export default function BalanceTransferForm({ onClose }: { onClose: () => void }) {
+// Reusable Input component
+function Input({label, placeholder,type = "text",value,onChange,error,maxLength, }: 
+  {label: string; placeholder?: string;type?: string;value?: string;onChange?: (e: any) => void; error?: string; maxLength?: number;  })
+   {
+  return (
+    <div className="flex flex-col">
+      <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        maxLength={maxLength}
+        className={`border rounded-lg p-2 focus:ring-2 focus:ring-teal-500 outline-none ${
+          error ? "border-red-500" : "border-gray-300"
+        }`}
+      />
+
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+    </div>
+  );
+}
+
+// Upload document labels
+const salariedUploads = [
+  "PAN Card",
+  "Aadhar Card",
+  "3 Months Salary Slip",
+  "6 Months Bank Statement",
+  "Company ID Card",
+  "Form 16 (if available)",
+];
+
+const selfEmployedUploads = [
+  "PAN Card",
+  "Aadhar Card",
+  "Business Registration Proof",
+  "Last 2 Years ITR",
+  "6 Months Bank Statement",
+  "Business Office Address Proof",
+];
+
+export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
+  const [employmentType, setEmploymentType] = useState("");
+
   const [formData, setFormData] = useState({
-    clientName: "",
+    name: "",
     phone: "",
     email: "",
     dob: "",
     location: "",
     loanAmount: "",
-    otherDetails: "",
-    employmentType: "",
-    notRobot: false,
+    useOfFund: "",
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  /* ---------------- HANDLE CHANGE ---------------- */
-  const handleChange = (field: string, value: any) => {
-    setFormData({ ...formData, [field]: value });
+  // Handle input change
+  const handleChange = (field: string, value: string) => {
+    if (field === "phone") {
+      if (!/^\d*$/.test(value)) return; // Only digits allowed
+    }
 
-    setErrors({ ...errors, [field]: "" }); // remove error when typing
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  /* ---------------- VALIDATION ---------------- */
+  // Validate form
   const validateForm = () => {
-    const newErrors: any = {};
+    let newErrors: { [key: string]: string } = {};
 
-    Object.entries(formData).forEach(([key, val]) => {
-      if (!val && key !== "otherDetails") newErrors[key] = "This field is required";
+    Object.entries(formData).forEach(([key, value]) => {
+      if (!value || value.trim() === "") {
+        newErrors[key] = "This field is required";
+      }
     });
 
-    if (formData.phone && formData.phone.length !== 10) {
+    if (formData.phone.length !== 10) {
       newErrors.phone = "Phone number must be 10 digits";
     }
 
-    return newErrors;
+    if (!employmentType) {
+      newErrors.employmentType = "Please select employment type";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  /* ---------------- HANDLE SUBMIT ---------------- */
-  const handleSubmit = (e: any) => {
+  // Submit handler
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const validationErrors = validateForm();
 
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      alert("❌ Please fill all required fields correctly");
+    if (!validateForm()) {
+      alert("Please fill all required fields");
       return;
     }
 
-    alert("🎉 Form Submitted Successfully!");
+    alert("Form submitted successfully!");
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh] text-gray-700">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
 
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4">
-          <h2 className="text-xl font-semibold text-[#1CADA3]">Balance Transfer Form</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
+          <h2 className="text-xl font-semibold text-[#1CADA3]">
+            NRP Loan Form
+          </h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition">
             <X size={22} />
           </button>
         </div>
 
-        {/* Form Body */}
+        {/* Body */}
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
-
-          <Input label="Client Name" value={formData.clientName} error={errors.clientName}
-            onChange={(v: any) => handleChange("clientName", v)} />
-
-          <Input label="Phone Number" value={formData.phone} maxLength={10}
-            type="tel"
-            error={errors.phone}
-            onChange={(v: string) => {
-              if (/^\d*$/.test(v)) handleChange("phone", v); // only numbers
-            }}
+          
+          <Input
+            label="Client Name"
+            placeholder="Enter Client Name"
+            value={formData.name}
+            onChange={(e) => handleChange("name", e.target.value)}
+            error={errors.name}
           />
 
-          <Input label="Email ID" value={formData.email} error={errors.email}
-            onChange={(v: any) => handleChange("email", v)} />
+          <Input
+            label="Phone Number"
+            placeholder="Enter Phone Number"
+            type="tel"
+            maxLength={10}
+            value={formData.phone}
+            onChange={(e) => handleChange("phone", e.target.value)}
+            error={errors.phone}
+          />
 
-          <Input label="Date of Birth" type="date" value={formData.dob} error={errors.dob}
-            onChange={(v: any) => handleChange("dob", v)} />
+          <Input
+            label="Email ID"
+            placeholder="Enter Client Email ID"
+            value={formData.email}
+            onChange={(e) => handleChange("email", e.target.value)}
+            error={errors.email}
+          />
 
-          <Input label="Location" value={formData.location} error={errors.location}
-            onChange={(v: any) => handleChange("location", v)} />
+          <Input
+            label="Date of Birth"
+            type="date"
+            value={formData.dob}
+            onChange={(e) => handleChange("dob", e.target.value)}
+            error={errors.dob}
+          />
 
-          <Input label="Loan Amount" value={formData.loanAmount} error={errors.loanAmount}
-            onChange={(v: any) => handleChange("loanAmount", v)} />
+          <Input
+            label="Location"
+            placeholder="Enter Location"
+            value={formData.location}
+            onChange={(e) => handleChange("location", e.target.value)}
+            error={errors.location}
+          />
 
-          <Input label="Other Loan Details" value={formData.otherDetails}
-            onChange={(v: any) => handleChange("otherDetails", v)} />
+          <Input
+            label="Loan Amount"
+            placeholder="Enter Loan Amount"
+            value={formData.loanAmount}
+            onChange={(e) => handleChange("loanAmount", e.target.value)}
+            error={errors.loanAmount}
+          />
+
+          <Input
+            label="Use of Fund"
+            placeholder="Enter Use of Fund"
+            value={formData.useOfFund}
+            onChange={(e) => handleChange("useOfFund", e.target.value)}
+            error={errors.useOfFund}
+          />
 
           {/* Employment Type */}
-          <div>
-            <label className="block text-sm font-medium ">Employment Type</label>
+          <div className="col-span-2">
+            <label className="text-sm font-semibold">Employment Type</label>
             <select
-              value={formData.employmentType}
-              onChange={(e) => handleChange("employmentType", e.target.value)}
-              className="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-[#1CADA3]"
+              value={employmentType}
+              onChange={(e) => setEmploymentType(e.target.value)}
+              className={`border rounded-lg p-2 w-full mt-1 ${
+                errors.employmentType ? "border-red-500" : "border-gray-300"
+              }`}
             >
               <option value="">-- Select Employment Type --</option>
               <option value="salaried">Salaried Person</option>
               <option value="selfEmployed">Self Employed</option>
             </select>
-            {errors.employmentType && <p className="text-red-500 text-sm">{errors.employmentType}</p>}
+
+            {errors.employmentType && (
+              <p className="text-red-500 text-xs mt-1">{errors.employmentType}</p>
+            )}
           </div>
 
-          {/* Document Sections */}
-          {formData.employmentType === "salaried" && <SalariedDocs />}
-          {formData.employmentType === "selfEmployed" && <SelfEmployedDocs />}
+          {/* Salaried Docs */}
+          {employmentType === "salaried" && (
+            <>
+              <div className="col-span-2">
+                <h3 className="text-lg font-semibold text-gray-700 mt-4 mb-2">
+                  Upload Documents for Salaried Person
+                </h3>
+              </div>
 
-          {/* Not Robot */}
-          <div className="col-span-2 flex items-center gap-2 mt-4">
-            <input type="checkbox" checked={formData.notRobot}
-              onChange={(e) => handleChange("notRobot", e.target.checked)}
-              className="w-4 h-4" />
-            <label className="text-sm text-gray-700">I am not a robot</label>
+              {salariedUploads.map((label, index) => (
+                <div key={index} className="flex flex-col">
+                  <label className="text-sm font-medium mb-1">{label}</label>
+                  <input type="file" className="border rounded-lg p-2" />
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* Self-Employed Docs */}
+          {employmentType === "selfEmployed" && (
+            <>
+              <div className="col-span-2">
+                <h3 className="text-lg font-semibold text-gray-700 mt-4 mb-2">
+                  Upload Documents for Self Employed
+                </h3>
+              </div>
+
+              {selfEmployedUploads.map((label, index) => (
+                <div key={index} className="flex flex-col">
+                  <label className="text-sm font-medium mb-1">{label}</label>
+                  <input type="file" className="border rounded-lg p-2" />
+                </div>
+              ))}
+            </>
+          )}
+          {/* Checkbox */}
+          <div className="col-span-2 flex items-center mt-4">
+            <input type="checkbox" id="notRobot" className="mr-2" />
+            <label htmlFor="notRobot" className="text-gray-700">
+              I am not a robot
+            </label>
           </div>
 
-          {/* Submit */}
-          <div className="col-span-2 mt-4 flex justify-center">
-            <button type="submit"
-              className="w-40 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md shadow hover:opacity-90"
+          {/* Submit Button */}
+          <div className="col-span-2 flex justify-center mt-4">
+            <button
+              type="submit"
+              className="bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-all"
             >
-              Submit
+              Submit Form
             </button>
           </div>
-
         </form>
 
       </div>
     </div>
   );
-}
-
-/* ---------------- INPUT COMPONENT ---------------- */
-function Input({ label, value, onChange, type = "text", placeholder, maxLength, error }: any) {
-  return (
-    <div>
-      <label className="block text-sm font-medium mb-1">{label}</label>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        maxLength={maxLength}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#1CADA3]"
-      />
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-    </div>
-  );
-}
-
-/* ---------------- FILE UPLOAD ---------------- */
-function FileUpload({ label }: { label: string }) {
-  return (
-    <div>
-      <label className="block text-sm font-medium mb-1">{label}</label>
-      <input type="file"
-        className="border rounded-lg p-2 text-sm file:mr-3 file:py-2 file:px-4 
-        file:rounded-full file:border-0 file:bg-[#1CADA3] file:text-white hover:file:bg-[#178d84]"
-      />
-    </div>
-  );
-}
-
-/* ---------------- DOC SECTION ---------------- */
-function Section({ title, children }: any) {
-  return (
-    <div className="col-span-2 mt-6">
-      <h3 className="text-md font-semibold mb-3 text-[#1CADA3]">{title}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
-    </div>
-  );
-}
-
-/* ---------------- SALARIED DOCS ---------------- */
-function SalariedDocs() {
-  const docs = [
-    "Aadhar Card", "Pan Card", "3 Months Salary Slip", "2 Years Form 16",
-    "6 Months Banking Statement", "Address Proof", "Photograph",
-    "Existing Loan Statement / Index II", "Property Cost Sheet",
-    "Own Contribution Proof", "List Of Document",
-    "Loan Outstanding Letter", "Loan Account Statement / Loan Track Record",
-  ];
-  return <Section title="Upload Documents for Salaried Person">
-    {docs.map((d) => <FileUpload key={d} label={d} />)}
-  </Section>;
-}
-
-/* ---------------- SELF EMPLOYED DOCS ---------------- */
-function SelfEmployedDocs() {
-  const docs = [
-    "Aadhar Card", "Pan Card", "Udyam Registration", "Shop Act Licence",
-    "1 current Banking Statement", "Saving Bank Account", "Address Proof",
-    "3 Years ITR", "GST Certificate", "Last 12 Months GST Returns", "Photograph",
-    "Existing Loan Statement / Index II", "Property Cost Sheet",
-    "Own Contribution Proof", "List Of Document",
-    "Loan Outstanding Letter", "Loan Account Statement / Loan Track Record",
-  ];
-  return <Section title="Upload Documents for Self Employed Person">
-    {docs.map((d) => <FileUpload key={d} label={d} />)}
-  </Section>;
 }
