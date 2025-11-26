@@ -66,11 +66,11 @@ const AboutSection = () => (
                 </div>
 
                 {/* Right Side: Image */}
-                <div className="rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-500">
+                <div className="rounded-4xl overflow-hidden shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-500">
                     <img
-                        src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop"
-                        alt="Team collaboration at Infinity Arthviksha"
-                        className="w-full h-120 object-cover"
+                        src="Vietnaam\Vietnaam4.jpeg"
+                        alt="Team collaboration at Infinity Arthvishva"
+                        className="w-full h-90 object-cover"
                     />
                 </div>
 

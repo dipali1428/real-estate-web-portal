@@ -61,14 +61,14 @@ const RelationshipManager: React.FC = () => {
     {
       id: '1',
       name: 'Sandip Powar',
-      phone: '+91-9876543210',
+      phone: '+91 95952 47614',
       designation: 'Vice President',
       specialization: 'Vice President'
     },
     {
       id: '2',
       name: 'Satyen Mehta',
-      phone: '+91-9876543211',
+      phone: '+91 98331 96133',
       designation: 'General Manager',
       specialization: 'General Manager'
     },
@@ -88,10 +88,10 @@ const RelationshipManager: React.FC = () => {
     },
     {
       id: '5',
-      name: 'Akshay Pathak',
-      phone: '+91-9876543214',
-      designation: 'Relationship Manager',
-      specialization: ''
+      name: 'Ganesh Mahadik',
+      phone: '+91 98765 43214',
+      designation: 'Operation Executive',
+      specialization: 'Operation Executive'
     },
     {
       id: '6',
@@ -105,7 +105,7 @@ const RelationshipManager: React.FC = () => {
       name: 'Rakhi Wankhade',
       phone: '+91 80107 12260',
       designation: 'Operation Manager',
-      specialization: ''
+      specialization: 'Home Loan '
     },
     {
       id: '8',
@@ -119,35 +119,35 @@ const RelationshipManager: React.FC = () => {
       name: 'Yashraj Naik',
       phone: '+91 90750 19462',
       designation: 'Relationship Manager',
-      specialization: ''
+      specialization: 'Personal Loan & Business Loan'
     },
     {
       id: '10',
       name: 'Shubham Kshirsagar',
-      phone: '+91-9876543219',
+      phone: '+91 77740 25772',
       designation: 'Loan Advisor',
-      specialization: ''
+      specialization: 'Home Loan'
     },
     {
       id: '11',
       name: 'Ritesh Pardeshi',
-      phone: '+91 98765 43210',
+      phone: '+91 80809 05911',
       designation: 'Field Sales Officer',
-      specialization: ''
+      specialization: 'Home Loan'
     },
     {
       id: '12',
       name: 'Prajakta Deshpande',
       phone: '+91 70574 85583',
       designation: 'Business Co-Ordinator',
-      specialization: 'Education Loan'
+      specialization: 'Education Loan & Car Loan'
     },
     {
       id: '13',
       name: 'Girish Bansode',
-      phone: '+91 98765 43212',
+      phone: '+91 7447820657',
       designation: 'Business Co-Ordinator',
-      specialization: ''
+      specialization: 'Life Insurance'
     }
   ];
 
@@ -245,7 +245,7 @@ const RelationshipManager: React.FC = () => {
           <div className="gap-6">
             {/* RM Profile Card */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-lg shadow-blue-200 border border-blue-200">
+              <div className="bg-white rounded-lg shadow-lg border border-blue-100">
                 <div className="p-8">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-6">
@@ -333,6 +333,40 @@ const RelationshipManager: React.FC = () => {
                 </div>
               </div>
             </div>
+            {/* Contact Cards Section */}
+        <div className="mt-8">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold  text-gray-700">Team Contacts</h2>
+            <p className="text-gray-600 mt-2">
+              Reach out to our specialized team members for specific queries
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            {contactCards.map((contact) => (
+              <div
+                key={contact.id}
+                className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-200"
+              >
+                <div className="mb-3">
+                  <h3 className="font-semibold text-gray-800 text-sm mb-1">{contact.name}</h3>
+                  <p className="text-xs text-blue-600 font-medium mb-2">{contact.designation}</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="text-xs text-gray-600">
+                    <span className="font-medium">Phone: </span>
+                    <span className="text-gray-800">{contact.phone}</span>
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    <span className="font-medium">Specialization: </span>
+                    <span className="text-gray-800">{contact.specialization}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
           </div>
         )}
 
@@ -559,40 +593,7 @@ const RelationshipManager: React.FC = () => {
           </div>
         )}
 
-        {/* Contact Cards Section */}
-        <div className="mt-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-700">Team Contacts</h2>
-            <p className="text-gray-600 mt-2">
-              Reach out to our specialized team members for specific queries
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            {contactCards.map((contact) => (
-              <div
-                key={contact.id}
-                className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-200"
-              >
-                <div className="mb-3">
-                  <h3 className="font-semibold text-gray-800 text-sm mb-1">{contact.name}</h3>
-                  <p className="text-xs text-blue-600 font-medium mb-2">{contact.designation}</p>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="text-xs text-gray-600">
-                    <span className="font-medium">Phone: </span>
-                    <span className="text-gray-800">{contact.phone}</span>
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    <span className="font-medium">Specialization: </span>
-                    <span className="text-gray-800">{contact.specialization}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        
       </div>
     </div>
   );
