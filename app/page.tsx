@@ -8,7 +8,9 @@ import ServicesSection from "./component/ServicesSection";
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full overflow-x-hidden">
+
+      {/* Responsive container */}
       <HeroSection />
       <ServicesSection />
       <AboutSection />
@@ -16,6 +18,7 @@ export default function Home() {
       <PartnershipSection />
       <ContactSection />
       <CTASection />
+
     </div>
   );
 }

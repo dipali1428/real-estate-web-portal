@@ -35,13 +35,18 @@ export const AuthService = {
     // 🔹 Register endpoint → /api/auth/register
     register: async (formData: RegisterPayload) => {
         const response = await api.post("/api/auth/register", formData);
-        console.log(response);
         return response.data;
     },
 
-    // 🔹 Get Profile → /api/auth/profile
-    getProfile: async () => {
-        const response = await api.get("/api/auth/profile");
+    // 🔹 Verify user (check if email OR mobile exists)
+    verifyUser: async ({ identifier }: { identifier: string }) => {
+        const response = await api.post("/api/auth/verify", { identifier });
+        return response.data;
+    },
+
+    // 🔹 Update Password → /api/auth/update-password
+    updatePassword: async ({ identifier, newPassword }: { identifier: string; newPassword: string }) => {
+        const response = await api.post("/api/auth/update-password", { identifier, newPassword });
         return response.data;
     },
 
@@ -50,7 +55,7 @@ export const AuthService = {
         const response = await api.post("/api/cibil/check", payload);
         return response.data;
     },
-    
+
     // 🔹 Submit Contact Enquiry
     contactUs: async (formData: { name: string; email: string; phone: string; message: string }) => {
         const response = await api.post("/api/contact", formData);

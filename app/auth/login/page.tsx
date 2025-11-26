@@ -5,11 +5,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const [useOtp, setUseOtp] = useState(false);
     const [emailOrPhone, setEmailOrPhone] = useState("");
     const [passwordOrOtp, setPasswordOrOtp] = useState("");
+
+    const [isForgot, setIsForgot] = useState(false);
+    const [isVerified, setIsVerified] = useState(false);
+    const [verifying, setVerifying] = useState(false);
+    const [newPassword, setNewPassword] = useState("");
+
+    const [passwordUpdated, setPasswordUpdated] = useState(false);
+
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -25,13 +34,57 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
             return;
         }
 
-        if (!useOtp && passwordOrOtp.length < 6) {
-            setError("Password must be at least 6 characters long.");
-            return;
+        // RUN ONLY IF NOT FORGOT MODE
+        if (!isForgot) {
+            if (!useOtp && passwordOrOtp.length < 8) {
+                setError("Password must be at least 8 characters long.");
+                return;
+            }
+
+            if (useOtp && passwordOrOtp.length !== 6) {
+                setError("Please enter a valid 6-digit OTP.");
+                return;
+            }
         }
 
-        if (useOtp && passwordOrOtp.length !== 6) {
-            setError("Please enter a valid 6-digit OTP.");
+
+        // ---- FORGOT PASSWORD FLOW ----
+        if (isForgot) {
+            if (!isVerified) {
+                setError("Please verify your email or mobile first.");
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                setError("New password must be at least 8 characters.");
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                await AuthService.updatePassword({
+                    identifier: emailOrPhone,
+                    newPassword,
+                });
+
+                setError("");
+
+                // RESET STATES
+                setIsForgot(false);
+                setIsVerified(false);
+                setNewPassword("");
+
+                setPasswordUpdated(true);       // Show success message inside modal
+                setTimeout(() => setPasswordUpdated(false), 4000);
+
+                return;
+            } catch (err: any) {
+                setError(err?.response?.data?.message || "Could not update password.");
+            } finally {
+                setLoading(false);
+            }
+
             return;
         }
 
@@ -45,13 +98,10 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
             });
 
             if (data?.token) {
-                // Save token in cookie (not localStorage)
+                // Save token in cookie
                 document.cookie = `authToken=${data.token}; path=/; max-age=86400; SameSite=Lax`;
-
-                // Redirect to dashboard
                 router.push("/dashboard");
             }
-
             // Close modal
             onClose();
 
@@ -98,45 +148,126 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                 <label className="block text-sm sm:text-sm font-medium text-gray-700 mb-1 pl-1">
                                     Email or Phone
                                 </label>
-                                <input
-                                    type="text"
-                                    value={emailOrPhone}
-                                    onChange={(e) => setEmailOrPhone(e.target.value)}
-                                    placeholder="Enter your email or phone number"
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#1CADA3] focus:outline-none text-gray-800 placeholder:text-gray-400"
-                                />
+
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={emailOrPhone}
+                                        onChange={(e) => {
+                                            let value = e.target.value.trim();
+
+                                            // If it's an email → lowercase it
+                                            if (emailRegex.test(value)) {
+                                                value = value.toLowerCase();
+                                            }
+                                            setEmailOrPhone(value);
+                                            setIsVerified(false);
+                                        }}
+                                        placeholder="Enter your email or phone number"
+                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#1CADA3] focus:outline-none text-gray-800 placeholder:text-gray-400"
+                                    />
+
+                                    {/* VERIFY BUTTON ONLY IN FORGOT MODE */}
+                                    {isForgot && (
+                                        <button
+                                            type="button"
+                                            onClick={async () => {
+                                                setError("");
+
+                                                if (!emailRegex.test(emailOrPhone) && !phoneRegex.test(emailOrPhone)) {
+                                                    setError("Enter valid email or mobile.");
+                                                    return;
+                                                }
+
+                                                setVerifying(true);
+                                                try {
+                                                    await AuthService.verifyUser({ identifier: emailOrPhone });
+                                                    setIsVerified(true);
+                                                } catch (err: any) {
+                                                    setIsVerified(false);
+                                                    setError(err?.response?.data?.message || "Account not found.");
+                                                }
+                                                setVerifying(false);
+                                            }}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#2076C7] text-white text-xs px-3 py-1 rounded-md shadow">
+                                            {verifying ? "..." : isVerified ? "✔" : "Verify"}
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
+
                             <div>
-                                <label className="block text-sm sm:text-sm font-medium text-gray-700 mb-1 pl-1">
-                                    {useOtp ? "OTP" : "Password"}
-                                </label>
-                                <input
-                                    type={useOtp ? "number" : "password"}
-                                    value={passwordOrOtp}
-                                    onChange={(e) => setPasswordOrOtp(e.target.value)}
-                                    placeholder={useOtp ? "Enter 6-digit OTP" : "Enter your password"}
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#1CADA3] focus:outline-none text-gray-800 placeholder:text-gray-400"
-                                />
+                                {!isForgot && (
+                                    <label className="block text-sm sm:text-sm font-medium text-gray-700 mb-1 pl-1">
+                                        {useOtp ? "OTP" : "Password"}
+                                    </label>
+                                )}
+
+                                {/* PASSWORD FIELD (Normal login mode only) */}
+                                {!isForgot && (
+                                    <div>
+                                        <input
+                                            type={useOtp ? "number" : "password"}
+                                            value={passwordOrOtp}
+                                            onChange={(e) => setPasswordOrOtp(e.target.value)}
+                                            placeholder={useOtp ? "Enter 6-digit OTP" : "Enter your password"}
+                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#1CADA3] focus:outline-none text-gray-800 placeholder:text-gray-400"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* NEW PASSWORD FIELD (Forgot mode → only after verify) */}
+                                {isVerified && (
+                                    <div>
+                                        <label className="block text-sm sm:text-sm font-medium text-gray-700 mb-1 pl-1">
+                                            {"Update Password"}
+                                        </label>
+                                        <input
+                                            type="password"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            placeholder="Enter new password"
+                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#1CADA3] focus:outline-none text-gray-800 placeholder:text-gray-400"
+                                        />
+                                    </div>
+                                )}
+                                
+                                {passwordUpdated && (
+                                    <p className="text-green-600 text-sm mt-2">
+                                        Password updated! Please login with your new password.
+                                    </p>
+                                )}
                             </div>
 
                             {error && <p className="text-red-500 text-sm">{error}</p>}
 
-                            <div className="flex justify-between items-center">
-                                <label className="text-sm sm:text-sm text-gray-600 flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={useOtp}
-                                        onChange={() => setUseOtp(!useOtp)}
-                                        className="accent-[#2076C7]"
-                                    />
-                                    Login with OTP instead
-                                </label>
+                            <div className="flex justify-end">
+                                {/* {!isForgot && (
+                                    <label className="text-sm sm:text-sm text-gray-600 flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={useOtp}
+                                            onChange={() => setUseOtp(!useOtp)}
+                                            className="accent-[#2076C7]"
+                                        />
+                                        Login with OTP instead
+                                    </label>
+                                )} */}
 
                                 {!useOtp && (
-                                    <a href="#" className="text-sm sm:text-sm text-[#2076C7] hover:underline">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsForgot(!isForgot);
+                                            setIsVerified(false);
+                                            setPasswordOrOtp("");
+                                            setNewPassword("");
+                                            setError("");
+                                        }}
+                                        className={`${!isForgot ? "" : "ml-auto"} text-sm sm:text-sm text-[#2076C7] hover:underline`}>
                                         Forgot Password?
-                                    </a>
+                                    </button>
                                 )}
                             </div>
 
@@ -152,6 +283,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                         : "Login"}
                             </motion.button>
                         </form>
+
                     </motion.div>
                 </motion.div>
             )}

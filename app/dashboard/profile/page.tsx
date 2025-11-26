@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DashboardService } from "@/app/services/dashboardService";
 import toast from "react-hot-toast";
 
@@ -55,9 +55,13 @@ export default function ProfileSection() {
     const [saving, setSaving] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState("");
     const [profile, setProfile] = useState<Profile | null>(null);
+    const hasFetched = useRef(false);
 
-    // Fetch profile on mount
+    // prevents double API call in React Strict Mode
     useEffect(() => {
+        if (hasFetched.current) return;
+        hasFetched.current = true;
+
         const fetchProfile = async () => {
             try {
                 setLoading(true);
@@ -67,8 +71,10 @@ export default function ProfileSection() {
                 setLoading(false);
             }
         };
+
         fetchProfile();
     }, []);
+
 
     const evaluatePassword = (pwd: string) => {
         if (!pwd) return setPasswordStrength("");
@@ -128,21 +134,21 @@ export default function ProfileSection() {
     const selectedCats = profile.category ? profile.category.split(",") : [];
 
     return (
-        <main className="w-full px-0 sm:px-2 lg:px-6 py-4 min-h-screen">
+        <main className="w-full px-2 sm:px-4 lg:px-6 py-4 min-h-screen">
 
-            <section className="w-full md:mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-6">
+            <section className="w-full md:mx-auto bg-white rounded-2xl shadow-lg p-3 sm:p-4 md:p-6">
                 {/* Header */}
                 <div className="flex justify-between mb-6">
-                    <h2 className="text-3xl font-bold text-slate-700">Profile Information</h2>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-700">Profile Information</h2>
 
                     <button
                         onClick={() => setIsEditing(!isEditing)}
-                        className="px-5 py-2 text-[#1CADA3] border border-[#1CADA3] rounded-lg cursor-pointer hover:bg-blue-400 hover:text-white">
+                        className="px-3 sm:px-5 py-2 text-sm sm:text-base text-[#1CADA3] border border-[#1CADA3] rounded-lg cursor-pointer hover:bg-blue-400 hover:text-white">
                         {isEditing ? "Cancel" : "Edit"}
                     </button>
                 </div>
 
-                <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <form className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
                     {/* READ ONLY FIELDS */}
                     {[
@@ -152,12 +158,12 @@ export default function ProfileSection() {
                         { label: "City", key: "city" },
                     ].map((f) => (
                         <div key={f.key}>
-                            <label className="text-sm text-gray-700">{f.label}</label>
+                            <label className="text-xs sm:text-sm text-gray-700">{f.label}</label>
                             <input
                                 type="text"
                                 value={(profile as any)[f.key]}
                                 disabled
-                                className="w-full px-3 py-2 text-gray-800 rounded-lg bg-gray-200"
+                                className="w-full px-3 py-2 text-xs sm:text-sm text-gray-800 rounded-lg bg-gray-200"
                             />
                         </div>
                     ))}
@@ -171,7 +177,7 @@ export default function ProfileSection() {
                             onChange={(e) =>
                                 setProfile({ ...profile, email: e.target.value })
                             }
-                            className={`w-full px-3 py-2 text-gray-800 rounded-lg ${isEditing ? "border-[#1CADA3]" : "bg-gray-200"}`}
+                            className={`w-full px-3 py-2 text-xs sm:text-sm text-gray-800 rounded-lg bg-gray-200 ${isEditing ? "border-[#1CADA3]" : "bg-gray-200"}`}
                         />
                     </div>
 
@@ -184,7 +190,7 @@ export default function ProfileSection() {
                             onChange={(e) =>
                                 setProfile({ ...profile, mobile: e.target.value })
                             }
-                            className={`w-full px-3 py-2 text-gray-800 rounded-lg ${isEditing ? "border-[#1CADA3]" : "bg-gray-200"}`}
+                            className={`w-full px-3 py-2 text-xs sm:text-sm text-gray-800 rounded-lg bg-gray-200 ${isEditing ? "border-[#1CADA3]" : "bg-gray-200"}`}
                         />
                     </div>
 
@@ -198,7 +204,7 @@ export default function ProfileSection() {
                                     type="button"
                                     disabled={!isEditing}
                                     onClick={() => toggleHead(head)}
-                                    className={`px-4 py-1 rounded-full border ${selectedHeads.includes(head)
+                                    className={`px-3 sm:px-4 py-1 text-xs sm:text-sm rounded-full border ${selectedHeads.includes(head)
                                         ? "bg-[#cee9fd] text-[#006dda]"
                                         : "bg-gray-100 text-gray-500"
                                         }`}>
@@ -226,7 +232,7 @@ export default function ProfileSection() {
                                                 type="button"
                                                 disabled={!isEditing}
                                                 onClick={() => toggleCategory(cat)}
-                                                className={`px-4 py-1 rounded-full border ${selectedCats.includes(cat)
+                                                className={`px-3 sm:px-4 py-1 text-xs sm:text-sm rounded-full border ${selectedCats.includes(cat)
                                                     ? "bg-[#cee9fd] text-[#006dda]"
                                                     : "bg-gray-100 text-gray-500"
                                                     }`}>
@@ -254,7 +260,7 @@ export default function ProfileSection() {
                                 }`}
                         />
                         {isEditing && (
-                            <p className="text-sm text-gray-600 mt-1">{passwordStrength}</p>
+                            <p className="text-xs sm:text-sm text-gray-600 mt-1">{passwordStrength}</p>
                         )}
                     </div>
                 </form>
@@ -292,7 +298,7 @@ export default function ProfileSection() {
                                     setSaving(false);
                                 }
                             }}
-                            className="px-6 py-2 bg-[#1CADA3] text-white rounded-lg shadow">
+                            className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-[#1CADA3] text-white rounded-lg shadow">
                             {saving ? "Saving..." : "Save Changes"}
                         </button>
                     </div>

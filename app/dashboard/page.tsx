@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { DashboardService } from "../services/dashboardService";
 import { useRouter } from "next/navigation";
@@ -22,9 +22,15 @@ export default function Dashboard() {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const hasFetched = useRef(false);
 
     // ✅ Fetch profile data from API
     useEffect(() => {
+
+        // Hit API Once
+        if (hasFetched.current) return;
+        hasFetched.current = true;
+
         const fetchProfile = async () => {
             try {
                 const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
@@ -253,7 +259,7 @@ export default function Dashboard() {
                             </svg>
                             Recent Activity
                         </h3>
-                       <p className="text-gray-800 text-sm sm:text-base">A log of recent actions.</p>
+                        <p className="text-gray-800 text-sm sm:text-base">A log of recent actions.</p>
                         <div className="space-y-4">
                             <div className="pb-3 border-b border-gray-100">
                                 <div className="flex items-start">
@@ -262,7 +268,7 @@ export default function Dashboard() {
                                     </svg>
                                     <div>
                                         <div className="text-gray-800">New lead added for Health Insurance</div>
-                                    {/* <div className="text-sm text-gray-500">Today, 10:15 AM</div> */}
+                                        {/* <div className="text-sm text-gray-500">Today, 10:15 AM</div> */}
                                     </div>
                                 </div>
                             </div>
@@ -273,7 +279,7 @@ export default function Dashboard() {
                                     </svg>
                                     <div>
                                         <div className="text-gray-800">Client policy issued</div>
-                                       {/*  <div className="text-sm text-gray-500">Yesterday, 3:45 PM</div>*/}
+                                        {/*  <div className="text-sm text-gray-500">Yesterday, 3:45 PM</div>*/}
                                     </div>
                                 </div>
                             </div>
@@ -288,13 +294,13 @@ export default function Dashboard() {
                                             </svg>
                                             <div>
                                                 <div className="text-gray-800">Incentive of ₹0 credited</div>
-                                               {/*  <div className="text-sm text-gray-500">15 Oct 2023, 11:20 AM</div>*/}
+                                                {/*  <div className="text-sm text-gray-500">15 Oct 2023, 11:20 AM</div>*/}
                                             </div>
                                         </div>
                                     </div>
                                     <div>
                                         <div className="text-gray-800">Incentive of ₹0 credited</div>
-                                       {/*  <div className="text-sm text-gray-500">15 Oct 2023, 11:20 AM</div>*/}
+                                        {/*  <div className="text-sm text-gray-500">15 Oct 2023, 11:20 AM</div>*/}
                                     </div>
                                 </div>
                             </div>
@@ -316,12 +322,12 @@ export default function Dashboard() {
                                     </svg>
                                     <div>
                                         <div className="text-gray-800">Follow-up scheduled</div>
-                                       {/* <div className="text-sm text-gray-500">13 Oct 2023, 2:15 PM</div> */}
+                                        {/* <div className="text-sm text-gray-500">13 Oct 2023, 2:15 PM</div> */}
                                     </div>
                                 </div>
                             </div>
-                        </div> 
-                    </div> 
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
