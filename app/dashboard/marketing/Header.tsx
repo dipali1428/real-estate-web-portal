@@ -11,7 +11,7 @@ export default function Header({ userProfile }: HeaderProps) {
   return (
     <div className="space-y-3 sm:space-y-4">
       <div className="text-center sm:text-left">
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-700 tracking-tight">
           Professional Templates
         </h1>
         <p className="text-slate-600 mt-2 text-base sm:text-lg">

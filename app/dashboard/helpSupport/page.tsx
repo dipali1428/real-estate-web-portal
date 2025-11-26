@@ -7,6 +7,7 @@ const HelpSupportPage: React.FC = () => {
     category: '',
     description: ''
   });
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const faqs = [
     {
@@ -39,7 +40,7 @@ const HelpSupportPage: React.FC = () => {
     },
     {
       question: "Where can I see the detailed payout structure for different products?",
-      answer: "The complete payout structure, including commission rates for various insurance and loan products, is available for download in the 'Downloads' section under the '💰 Payout Structure' category."
+      answer: "The complete payout structure, including commission rates for various insurance and loan products, is available for download in the 'Downloads' section under the 'Payout Structure' category."
     },
     {
       question: "The status for my incentive is 'Processing.' What does this mean?",
@@ -105,22 +106,48 @@ const HelpSupportPage: React.FC = () => {
     });
   };
 
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto bg-white p-12 rounded-lg">
+    <div className="min-h-screen bg-slate-50 py-4 sm:py-6 lg:py-8 px-3 sm:px-4 lg:px-6">
+      <div className="max-w-7xl mx-auto bg-white p-4 sm:p-6 lg:p-8 xl:p-12 rounded-lg">
         {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-slate-700 mb-4">Help & Support</h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+        <div className="text-center mb-8 sm:mb-10 lg:mb-12">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-700 mb-3 sm:mb-4">Help & Support</h1>
+          <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto px-2 sm:px-0">
             Find answers to frequently asked questions or raise a ticket for dedicated support.
           </p>
         </div>
 
         {/* Support Ticket Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-16">
-          <h2 className="text-2xl font-semibold text-slate-700 mb-8">Raise a Support Ticket</h2>
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 mb-10 sm:mb-12 lg:mb-16">
+          <h2 className="text-xl sm:text-2xl font-semibold text-slate-700 mb-6 sm:mb-8">Raise a Support Ticket</h2>
           
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            {/* Category Field */}
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-2">
+                Category
+              </label>
+              <select
+                id="category"
+                name="category"
+                value={ticketData.category}
+                onChange={handleInputChange}
+                required
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-400 transition-colors text-slate-700 outline-none text-sm sm:text-base"
+              >
+                <option value="">Select a category</option>
+                {categories.map((category, index) => (
+                  <option key={index} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Subject Field */}
             <div>
               <label htmlFor="subject" className="block text-sm font-medium text-slate-700 mb-2">
@@ -133,31 +160,9 @@ const HelpSupportPage: React.FC = () => {
                 value={ticketData.subject}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-slate-700"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-400 transition-colors text-slate-700 outline-none text-sm sm:text-base"
                 placeholder="Enter the subject of your issue"
               />
-            </div>
-
-            {/* Category Field */}
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-2">
-                Category
-              </label>
-              <select
-                id="category"
-                name="category"
-                value={ticketData.category}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-slate-700"
-              >
-                <option value="">Select a category</option>
-                {categories.map((category, index) => (
-                  <option key={index} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
             </div>
 
             {/* Description Field */}
@@ -171,17 +176,17 @@ const HelpSupportPage: React.FC = () => {
                 value={ticketData.description}
                 onChange={handleInputChange}
                 required
-                rows={6}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical text-slate-700"
+                rows={4}
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-400  transition-colors resize-vertical text-slate-700 outline-none text-sm sm:text-base"
                 placeholder="Please describe your issue in detail..."
               />
             </div>
 
             {/* Submit Button */}
-            <div className="pt-4">
+            <div className="pt-2 sm:pt-4">
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="w-full bg-blue-600 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base"
               >
                 Submit ticket
               </button>
@@ -190,23 +195,51 @@ const HelpSupportPage: React.FC = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-semibold text-slate-700 mb-8">Frequently Asked Questions</h2>
-          <div className="space-y-6">
+        <div className="mb-10 sm:mb-12 lg:mb-16">
+          <h2 className="text-xl sm:text-2xl font-semibold text-slate-700 mb-6 sm:mb-8">Frequently Asked Questions</h2>
+          <div className="space-y-3 sm:space-y-4">
             {faqs.map((faq, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-medium text-slate-900 mb-3">{faq.question}</h3>
-                <p className="text-slate-600 leading-relaxed">{faq.answer}</p>
+              <div key={index} className="bg-white rounded-lg border border-slate-200 hover:shadow-md transition-shadow overflow-hidden">
+                {/* FAQ Question - Clickable Header */}
+                <button
+                  className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left flex justify-between items-center outline-none select-none"
+                  onClick={() => toggleFaq(index)}
+                >
+                  <h3 className="text-base sm:text-lg font-medium text-slate-900 pr-3 sm:pr-4 leading-relaxed">
+                    {faq.question}
+                  </h3>
+                  <svg
+                    className={`w-4 h-4 sm:w-5 sm:h-5 text-slate-500 transition-transform duration-200 flex-shrink-0 mt-0.5 ${
+                      openFaqIndex === index ? 'transform rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* FAQ Answer - Collapsible Content */}
+                <div
+                  className={`overflow-hidden transition-all duration-200 ${
+                    openFaqIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-4 sm:px-6 pb-3 sm:pb-4 pt-1 sm:pt-2 border-t border-slate-100">
+                    <p className="text-slate-600 leading-relaxed text-sm sm:text-base">{faq.answer}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Additional Help Section */}
-        <div className="mt-12 text-center">
-          <p className="text-slate-600">
+        <div className="mt-8 sm:mt-10 lg:mt-12 text-center">
+          <p className="text-slate-600 text-sm sm:text-base">
             Need immediate assistance? Contact us at{" "}
-            <a href="mailto:info@infinityarthvishva.com" className="text-blue-600 hover:text-blue-700 font-medium">
+            <a href="mailto:info@infinityarthvishva.com" className="text-blue-600 hover:text-blue-700 font-medium wrap-break-word">
               info@infinityarthvishva.com
             </a>
           </p>
