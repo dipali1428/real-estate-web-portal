@@ -6,20 +6,13 @@ import { cn } from "../../lib/utils";
 import {
   LayoutDashboard,
   User,
-  FileText,
-  Settings,
   LogOut,
   Briefcase,
   Megaphone,
   Download,
   Users,
-  ShieldCheck,
   HelpCircle,
-  PieChart,
-  Wallet,
-  FolderKanban,
   HandCoins,
-  BarChart3,
   UserCheck,
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -137,7 +130,7 @@ export default function DashboardSidebar() {
 export const Logo = () => {
   return (
     <img
-      src="/logo.png" // <-- replace with your actual logo file name
+      src="/logo.png"
       alt="Infinity Arthviksha Logo"
       className="h-17 w-auto object-contain"
     />
