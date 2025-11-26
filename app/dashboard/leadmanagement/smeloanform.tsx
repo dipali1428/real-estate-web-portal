@@ -60,120 +60,118 @@ export default function SMELoanForm({ onClose }: { onClose: () => void }) {
         <div className="p-6 max-h-[80vh] overflow-y-auto">
           <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSubmit}>
 
-  <Input
-    label="Client Name"
-    placeholder="Enter Client Name"
-    value={formData.clientName}
-    onChange={(value: string) => setFormData({ ...formData, clientName: value })}
-    error={errors.clientName}
-  />
+            <Input
+              label="Client Name"
+              placeholder="Enter Client Name"
+              value={formData.clientName}
+              onChange={(value: string) => setFormData({ ...formData, clientName: value })}
+              error={errors.clientName}
+            />
 
-  <Input
-    label="Client Phone Number"
-    placeholder="Enter Phone Number"
-    value={formData.phone}
-    maxLength={10}
-    onChange={(value: string) =>
-      setFormData({ ...formData, phone: value.replace(/\D/g, "") })
-    }
-    error={errors.phone}
-  />
+            <Input
+              label="Client Phone Number"
+              placeholder="Enter Phone Number"
+              value={formData.phone}
+              maxLength={10}
+              onChange={(value: string) =>
+                setFormData({ ...formData, phone: value.replace(/\D/g, "") })
+              }
+              error={errors.phone}
+            />
 
-  <Input
-    label="Client Email ID"
-    placeholder="Enter Email ID"
-    value={formData.email}
-    onChange={(value: string) => setFormData({ ...formData, email: value })}
-    error={errors.email}
-  />
+            <Input
+              label="Client Email ID"
+              placeholder="Enter Email ID"
+              value={formData.email}
+              onChange={(value: string) => setFormData({ ...formData, email: value })}
+              error={errors.email}
+            />
 
-  <DateInput
-    label="Client Date of Birth"
-    value={formData.dob}
-    onChange={(value: string) => setFormData({ ...formData, dob: value })}
-    error={errors.dob}
-  />
+            <DateInput
+              label="Client Date of Birth"
+              value={formData.dob}
+              onChange={(value: string) => setFormData({ ...formData, dob: value })}
+              error={errors.dob}
+            />
 
-  <Input
-    label="Location"
-    placeholder="Enter Location"
-    value={formData.location}
-    onChange={(value: string) => setFormData({ ...formData, location: value })}
-    error={errors.location}
-  />
+            <Input
+              label="Location"
+              placeholder="Enter Location"
+              value={formData.location}
+              onChange={(value: string) => setFormData({ ...formData, location: value })}
+              error={errors.location}
+            />
 
-  <Input
-    label="Loan Amount"
-    placeholder="Enter Loan Amount"
-    value={formData.loanAmount}
-    onChange={(value: string) => setFormData({ ...formData, loanAmount: value })}
-    error={errors.loanAmount}
-  />
+            <Input
+              label="Loan Amount"
+              placeholder="Enter Loan Amount"
+              value={formData.loanAmount}
+              onChange={(value: string) => setFormData({ ...formData, loanAmount: value })}
+              error={errors.loanAmount}
+            />
 
-  <Input
-    label="Other Loan Obligation Details"
-    placeholder="Enter Other Loan Obligation Details"
-    value={formData.otherDetails}
-    onChange={(value: string) => setFormData({ ...formData, otherDetails: value })}
-    error={errors.otherDetails}
-  />
+            <Input
+              label="Other Loan Obligation Details"
+              placeholder="Enter Other Loan Obligation Details"
+              value={formData.otherDetails}
+              onChange={(value: string) => setFormData({ ...formData, otherDetails: value })}
+              error={errors.otherDetails}
+            />
 
-  {/* Section Heading */}
-  <div className="col-span-2 mt-4">
-    <h3 className="font-semibold text-lg text-gray-800">Upload Documents</h3>
-  </div>
+            {/* Section Heading */}
+            <div className="col-span-2 mt-4">
+              <h3 className="font-semibold text-lg text-gray-800">Upload Documents</h3>
+            </div>
 
-  {[
-    "Aadhar Card",
-    "Pan Card",
-    "Address Proof",
-    "GST Registration Certificate",
-    "Udyam Aadhar Registration",
-    "Shop Act Licence",
-    "1 Year Banking Statement",
-    "ITR 3 Years",
-    "Constitution Doc (Partnership deep, MOA, AOM and GST)",
-    "Photograph",
-    "Existing Loan Statement"
-  ].map((label, idx) => (
-    <div key={idx} className="col-span-1">
-      <label className="block font-medium mb-1">{label}</label>
-      <input
-        type="file"
-        className="border rounded-lg p-2 text-sm file:mr-3 file:py-2 file:px-4 
-        file:rounded-full file:border-0 file:bg-teal-500 file:text-white 
-        hover:file:bg-teal-600"
-      />
-    </div>
-  ))}
+            {/* File Uploads - Updated to match BusinessLoanForm style */}
+            {[
+              "Aadhar Card",
+              "Pan Card",
+              "Address Proof",
+              "GST Registration Certificate",
+              "Udyam Aadhar Registration",
+              "Shop Act Licence",
+              "1 Year Banking Statement",
+              "ITR 3 Years",
+              "Constitution Doc (Partnership deep, MOA, AOM and GST)",
+              "Photograph",
+              "Existing Loan Statement"
+            ].map((label, idx) => (
+              <div key={idx} className="flex flex-col">
+                <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
+                <input 
+                  type="file" 
+                  className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 text-sm" 
+                />
+              </div>
+            ))}
 
-  {/* Checkbox */}
-  <div className="col-span-2 flex items-center gap-2 mt-4">
-    <input
-      id="notRobot"
-      type="checkbox"
-      checked={formData.notRobot}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-        setFormData({ ...formData, notRobot: e.target.checked })
-      }
-      className="w-4 h-4 border-gray-400"
-    />
-    <label htmlFor="notRobot" className="text-sm">I am not a robot</label>
-  </div>
-  {errors.notRobot && <p className="text-red-600 text-sm">{errors.notRobot}</p>}
+            {/* Checkbox */}
+            <div className="col-span-2 flex items-center gap-2 mt-4 text-gray-700">
+              <input
+                id="notRobot"
+                type="checkbox"
+                checked={formData.notRobot}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData({ ...formData, notRobot: e.target.checked })
+                }
+                className="w-4 h-4 border-gray-400"
+              />
+              <label htmlFor="notRobot" className="text-sm">I am not a robot</label>
+            </div>
+            {errors.notRobot && <p className="text-red-600 text-sm">{errors.notRobot}</p>}
 
-  {/* Submit Button */}
-  <div className="col-span-2 mt-4 flex justify-center">
-    <button
-      type="submit"
-      className="w-50 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:bg-[#178d84] transition"
-    >
-      Submit
-    </button>
-  </div>
+            {/* Submit Button */}
+            <div className="col-span-2 mt-4 flex justify-center">
+              <button
+                type="submit"
+                className="w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors"
+              >
+                Submit
+              </button>
+            </div>
 
-</form>
-
+          </form>
         </div>
       </div>
     </div>
@@ -197,14 +195,14 @@ type InputProps = {
 function Input({ label, placeholder, type = "text", value, onChange, error, maxLength }: InputProps) {
   return (
     <div>
-      <label className="block text-sm font-medium mb-1">{label}</label>
+      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
       <input
         type={type}
         value={value}
         maxLength={maxLength}
         placeholder={placeholder}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400"
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-blue-400"
       />
       {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
     </div>
@@ -221,12 +219,12 @@ type DateProps = {
 function DateInput({ label, value, onChange, error }: DateProps) {
   return (
     <div>
-      <label className="block text-sm font-medium mb-1">{label}</label>
+      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
       <input
         type="date"
         value={value}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400"
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-blue-400"
       />
       {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
     </div>

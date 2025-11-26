@@ -24,7 +24,7 @@ import PMSAIFForm from "./PMSAIFForm";
 import BondsForm from "./bondsfrom";
 import FixedDepositForm from "./fineddf";
 import RealEstateForm from "./realestate";
-import BalanceTransferForm from "./balancetransferform";
+import BalanceTransferForm from "./nrploanform";
 export default function LeadManagement() {
   // Modal open/close state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -720,9 +720,9 @@ export default function LeadManagement() {
 
         </div>
         <div className="w-full mt-6">
-          <h3 className="text-xl font-semibold mb-4">All Leads</h3>
+          <h3 className="text-xl font-semibold mb-4 text-gray-700">All Leads</h3>
 
-          <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+          <div className="overflow-x-auto bg-white shadow-md rounded-lg text-gray-700">
             <table className="min-w-full mix-w-80 text-sm">
               <thead className="bg-gray-100 text-gray-700">
                 <tr>

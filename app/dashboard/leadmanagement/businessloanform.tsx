@@ -119,9 +119,9 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
 
           {/* Type of Business */}
           <div className="flex flex-col">
-            <label className="text-sm font-medium mb-1">Type of Business</label>
+            <label className="text-sm font-medium mb-1 text-gray-700">Type of Business</label>
             <select
-              className="border rounded-lg p-3"
+              className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700"
               defaultValue=""
               onChange={(e) => setLoanType(e.target.value)}
             >
@@ -138,13 +138,16 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
           {/* Document Upload */}
           {documents.map((doc, i) => (
             <div key={i} className="flex flex-col">
-              <label className="text-sm font-medium mb-1">{doc}</label>
-              <input type="file" className="border rounded-lg p-2 text-sm" />
+              <label className="text-sm font-medium mb-1 text-gray-700">{doc}</label>
+              <input 
+                type="file" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 text-sm" 
+              />
             </div>
           ))}
 
           {/* Checkbox */}
-          <div className="col-span-2 flex items-center gap-2">
+          <div className="col-span-2 flex items-center gap-2 text-gray-700">
             <input type="checkbox" checked={formData.notRobot} onChange={(e) => handleChange("notRobot", e.target.checked)} />
             <label>I am not a robot</label>
           </div>
@@ -160,11 +163,11 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* Submit Button - FIXED */}
           <div className="col-span-2 mt-4 flex justify-center">
             <button
               type="submit"
-              className="w-50 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md"
+              className="w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors"
             >
               Submit
             </button>
@@ -205,14 +208,14 @@ function Input({
 
   return (
     <div className="flex flex-col">
-      <label className="text-sm font-medium mb-1">{title}</label>
+      <label className="text-sm font-medium mb-1 text-gray-700">{title}</label>
       <input
         type={type}
         placeholder={placeholder}
         maxLength={maxLength}
         value={value}
         onChange={handleValue}
-        className="border rounded-lg p-3 outline-none"
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700"
       />
 
       {errors && errors[label] && (

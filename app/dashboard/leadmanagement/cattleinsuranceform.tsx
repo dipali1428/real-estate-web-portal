@@ -111,14 +111,14 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
               { label: "Loss Ratio Details", name: "lossRatio" },
             ].map((field, idx) => (
               <div key={idx}>
-                <label className="block font-medium mb-1">{field.label}</label>
+                <label className="block font-medium mb-1 text-gray-700">{field.label}</label>
                 <input
                   name={field.name}
                   type="text"
                   value={formData[field.name as keyof typeof formData] as string}
                   onChange={handleChange}
                   placeholder={`Enter ${field.label}`}
-                  className="w-full border rounded-md px-3 py-2"
+                  className="w-full border rounded-md px-3 py-2 border-gray-300 text-gray-700"
                 />
                 {errors[field.name] && (
                   <p className="text-red-500 text-xs">{errors[field.name]}</p>
@@ -128,12 +128,12 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
 
             {/* Gender */}
             <div>
-              <label className="block font-medium mb-1">Gender</label>
+              <label className="block font-medium mb-1 text-gray-700">Gender</label>
               <select
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2"
+                className="w-full border rounded-md px-3 py-2 border-gray-300 text-gray-700"
               >
                 <option value="">Select gender</option>
                 <option value="Male">Male</option>
@@ -144,12 +144,12 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
 
             {/* Prev Policy File */}
             <div>
-              <label className="block font-medium mb-2">Prev. Year Policy (Optional)</label>
+              <label className="block font-medium mb-2 text-gray-700">Prev. Year Policy (Optional)</label>
               <input
                 type="file"
                 name="prevPolicy"
                 onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 cursor-pointer"
+                className="w-full border rounded-md px-3 py-2 border-gray-300 cursor-pointer text-gray-700"
               />
             </div>
 
@@ -178,7 +178,7 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
 
             {/* Not Robot */}
             <div className="col-span-2">
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-2 text-gray-700">
                 <input
                   type="checkbox"
                   name="notRobot"

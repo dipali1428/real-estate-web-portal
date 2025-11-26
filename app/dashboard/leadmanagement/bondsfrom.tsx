@@ -14,7 +14,7 @@ export default function BondsForm({
 
         {/* HEADER */}
         <div className="flex justify-between items-center px-5 py-3 border-b">
-          <h2 className="text-xl font-semibold text-[#1CADA3] ">Bonds Form</h2>
+          <h2 className="text-xl font-semibold text-[#1CADA3]">Bonds Form</h2>
           <button onClick={onClose} className="text-gray-700 hover:text-black">
             <X size={22} />
           </button>
@@ -23,37 +23,80 @@ export default function BondsForm({
         {/* BODY */}
         <div className="px-5 py-4">
           <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* Client Name */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Client Name</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter Client Name" />
+              <label className="font-medium mb-1 text-gray-700">Client Name</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Client Name" 
+              />
             </div>
+
+            {/* Phone Number */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Client Phone No</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter Client Phone No" />
+              <label className="font-medium mb-1 text-gray-700">Client Phone No</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Client Phone No" 
+              />
             </div>
+
+            {/* Email */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Client Email ID</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter Client Email ID" />
+              <label className="font-medium mb-1 text-gray-700">Client Email ID</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Client Email ID" 
+              />
             </div>
+
+            {/* Date of Birth */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Client Date of Birth</label>
-              <input type="date" className="input border p-2 rounded" />
+              <label className="font-medium mb-1 text-gray-700">Client Date of Birth</label>
+              <input 
+                type="date" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+              />
             </div>
-             <div className="flex flex-col ">
-              <label className="font-medium mb-1"> Location</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter location" />
+
+            {/* Location */}
+            <div className="flex flex-col">
+              <label className="font-medium mb-1 text-gray-700">Location</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter location" 
+              />
             </div>
-             <div className="flex flex-col ">
-              <label className="font-medium mb-1"> Lumsum Deposit Amount</label>
-              <input type="text" className="input border p-2 rounded"placeholder="Enter Lumsum Deposit Amount" />
+
+            {/* Lumsum Deposit Amount */}
+            <div className="flex flex-col">
+              <label className="font-medium mb-1 text-gray-700">Lumsum Deposit Amount</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Lumsum Deposit Amount" 
+              />
             </div>
-            <div className="flex flex-col ">
-              <label className="font-medium mb-1"> Total Monthly Income</label>
-              <input type="text" className="input border p-2 rounded"placeholder="Enter Total Monthly Income" />
+
+            {/* Total Monthly Income */}
+            <div className="flex flex-col">
+              <label className="font-medium mb-1 text-gray-700">Total Monthly Income</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Total Monthly Income" 
+              />
             </div>
-            <div>
-              <label className="block font-medium mb-1">Safety Type</label>
-              <select className="w-full border border-gray-300 rounded-md px-3 py-2">
+
+            {/* Safety Type */}
+            <div className="flex flex-col">
+              <label className="font-medium mb-1 text-gray-700">Safety Type</label>
+              <select className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700">
                 <option>Corporate Bonds</option>
                 <option>Sovereign Gold Bonds</option>
               </select>
@@ -61,7 +104,7 @@ export default function BondsForm({
 
             {/* Checkbox */}
             <div className="md:col-span-2 mt-2">
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-2 text-gray-700">
                 <input type="checkbox" className="h-4 w-4" />
                 <span>I am not Robot</span>
               </label>
@@ -69,13 +112,13 @@ export default function BondsForm({
 
             {/* Submit Button */}
             <div className="col-span-2 mt-4 flex justify-center">
-            <button
-              type="submit"
-              className="w-50 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:bg-[#178d84] transition"
-            >
-              Submit
-            </button>
-          </div>
+              <button
+                type="submit"
+                className="w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors"
+              >
+                Submit
+              </button>
+            </div>
 
           </form>
         </div>

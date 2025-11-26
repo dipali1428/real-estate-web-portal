@@ -156,11 +156,11 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
         <div className="p-6">
 
           {/* PLAN TYPE */}
-          <label className="font-semibold text-sm block mb-2">Types of Plan</label>
+          <label className="font-semibold text-sm block mb-2 text-gray-700">Types of Plan</label>
           <select
             value={planType}
             onChange={(e) => setPlanType(e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 mb-6"
+            className="w-full border border-gray-300 rounded-md p-2 mb-6 text-gray-700"
           >
             <option value="">Select Plan</option>
             <option value="individual">Individual</option>
@@ -377,12 +377,12 @@ function Input({
 }) {
   return (
     <div className="mb-4">
-      <label className="font-semibold text-sm block mb-1">{label}</label>
+      <label className="font-semibold text-sm block mb-1 text-gray-700">{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2"
+        className="w-full border border-gray-300 rounded-md p-2 text-gray-700"
       />
     </div>
   );

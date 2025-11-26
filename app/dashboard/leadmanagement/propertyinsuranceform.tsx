@@ -25,14 +25,13 @@ function Input({
 }: InputProps) {
   return (
     <div>
-      <label className="block font-medium mb-1 text-black">{label}</label>
+      <label className="block font-medium mb-1 text-gray-700">{label}</label>
       <input
         type={type}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-md px-3 py-2 
-        focus:outline-none focus:ring-2 focus:ring-red-700"
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3]"
       />
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
@@ -155,17 +154,17 @@ export default function PropertyInsuranceForm({
             />
 
             <Input
-                label="Phone Number"
-                placeholder="Enter Phone Number"
-                value={form.phone}
-                onChange={(v) => {
-                  // Allow only numbers and maximum 10 digits
-                  if (/^\d{0,10}$/.test(v)) {
-                    updateField("phone", v);
-                  }
-                }}
-                error={errors.phone}
-              />
+              label="Phone Number"
+              placeholder="Enter Phone Number"
+              value={form.phone}
+              onChange={(v) => {
+                // Allow only numbers and maximum 10 digits
+                if (/^\d{0,10}$/.test(v)) {
+                  updateField("phone", v);
+                }
+              }}
+              error={errors.phone}
+            />
 
             <Input
               label="Email ID"
@@ -193,27 +192,26 @@ export default function PropertyInsuranceForm({
 
             {/* Fire Safety Dropdown */}
             <div>
-              <label className="block font-medium mb-1">Fire Safety Measures</label>
+              <label className="block font-medium mb-1 text-gray-700">Fire Safety Measures</label>
               <select
-                className="w-full border rounded-md p-2"
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700"
                 value={form.fireSafety}
                 onChange={(e) => updateField("fireSafety", e.target.value)}
               >
                 <option value="">-- Select --</option>
-                <option> </option>
                 <option>Yes</option>
                 <option>No</option>
               </select>
               {errors.fireSafety && (
-                <p className="text-red-500 text-xs">{errors.fireSafety}</p>
+                <p className="text-red-500 text-xs mt-1">{errors.fireSafety}</p>
               )}
             </div>
 
             {/* Safety Type */}
             <div>
-              <label className="block font-medium mb-1">Safety Type</label>
+              <label className="block font-medium mb-1 text-gray-700">Safety Type</label>
               <select
-                className="w-full border rounded-md p-2"
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700"
                 value={form.safetyType}
                 onChange={(e) => updateField("safetyType", e.target.value)}
               >
@@ -222,42 +220,61 @@ export default function PropertyInsuranceForm({
                 <option>Smoke Alarm</option>
               </select>
               {errors.safetyType && (
-                <p className="text-red-500 text-xs">{errors.safetyType}</p>
+                <p className="text-red-500 text-xs mt-1">{errors.safetyType}</p>
               )}
             </div>
 
-            {/* File Upload */}
-            <div className="col-span-1">
-              <label className="block font-medium mb-1">Copy of Index II</label>
-              <input
-                type="file"
+            {/* File Upload - Updated to match BusinessLoanForm style */}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1 text-gray-700">Copy of Index II</label>
+              <input 
+                type="file" 
                 onChange={(e) => updateField("file", e.target.files?.[0] || null)}
-                className="border rounded-lg p-2 text-sm file:bg-teal-500 file:text-white file:px-4 file:rounded-full"
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 text-sm" 
               />
-              {errors.file && <p className="text-red-500 text-xs">{errors.file}</p>}
+              {errors.file && <p className="text-red-500 text-xs mt-1">{errors.file}</p>}
             </div>
 
             {/* Companies List */}
-            
+            <div className="col-span-2">
+              <label className="block font-medium mb-2 text-gray-700">Insurance Companies</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {companiesList.map((company) => (
+                  <label key={company} className="flex items-center gap-2 text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={form.companies.includes(company)}
+                      onChange={() => toggleCompany(company)}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">{company}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.companies && (
+                <p className="text-red-500 text-xs mt-1">{errors.companies}</p>
+              )}
+            </div>
 
             {/* Not Robot */}
-            <div className="col-span-2 flex items-center gap-2">
+            <div className="col-span-2 flex items-center gap-2 text-gray-700">
               <input
                 type="checkbox"
                 checked={form.notRobot}
                 onChange={(e) => updateField("notRobot", e.target.checked)}
+                className="w-4 h-4"
               />
               <span>I am not a Robot</span>
             </div>
             {errors.notRobot && (
-              <p className="text-red-500 text-xs">{errors.notRobot}</p>
+              <p className="text-red-500 text-xs mt-1">{errors.notRobot}</p>
             )}
 
             {/* Submit */}
             <div className="col-span-2 mt-4 flex justify-center">
               <button
                 type="submit"
-                className="bg-[#1CADA3] text-white px-6 py-2 rounded-md hover:bg-[#16948d]"
+                className="w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors"
               >
                 Submit
               </button>

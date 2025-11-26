@@ -151,11 +151,11 @@ export default function EducationLoanForm({ onClose }: { onClose: () => void }) 
               </>
             {/* Employment Type */}
             <div className="col-span-2">
-              <label className="font-medium text-sm">Employment Type</label>
+              <label className="font-medium text-sm text-gray-700">Employment Type</label>
               <select
                 value={employmentType}
                 onChange={(e) => setEmploymentType(e.target.value)}
-                className={`border rounded-lg p-2 w-80 mt-1 ${errors.employmentType ? "border-red-500" : "border-gray-300"}`}
+                className={`border rounded-lg p-2 w-80 mt-1 ${errors.employmentType ? "border-red-500" : "border-gray-300 text-gray-700"}`}
               >
                 <option value="">-- Select Employment Type --</option>
                 <option value="salaried">Salaried Person</option>
@@ -200,7 +200,7 @@ export default function EducationLoanForm({ onClose }: { onClose: () => void }) 
             )}
 
             {/* Checkbox */}
-            <div className="col-span-2 flex items-center gap-2 mt-4">
+            <div className="col-span-2 flex items-center gap-2 mt-4 text-gray-700">
               <input type="checkbox" checked={formData.notRobot}
                 onChange={(e) => setFormData({ ...formData, notRobot: e.target.checked })} />
               <label>I am not a robot</label>
@@ -234,13 +234,13 @@ interface InputProps {
 function Input({ label, value, onChange, error, maxLength }: InputProps) {
   return (
     <div>
-      <label className="text-sm font-medium">{label}</label>
+      <label className="text-sm font-medium text-gray-700">{label}</label>
       <input
         type="text"
         maxLength={maxLength}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="border border-gray-300 rounded-md p-2 w-full"
+        className="border border-gray-300 rounded-md p-2 w-full text-gray-700"
       />
       {error && <p className="text-red-600 text-xs">{error}</p>}
     </div>
@@ -257,12 +257,12 @@ interface DateInputProps {
 function DateInput({ label, value, onChange, error }: DateInputProps) {
   return (
     <div>
-      <label className="text-sm font-medium">{label}</label>
+      <label className="text-sm font-medium text-gray-700">{label}</label>
       <input
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="border border-gray-300 rounded-md p-2 w-full"
+        className="border border-gray-300 rounded-md p-2 w-full text-gray-700"
       />
       {error && <p className="text-red-600 text-xs">{error}</p>}
     </div>
@@ -276,8 +276,8 @@ interface FileUploadProps {
 function FileUpload({ label }: FileUploadProps) {
   return (
     <div className="flex flex-col">
-      <label className="text-sm font-medium mb-1">{label}</label>
-      <input type="file" className="border rounded-lg p-2" />
+      <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
+      <input type="file" className="border rounded-lg p-2 text-gray-400" />
     </div>
   );
 }

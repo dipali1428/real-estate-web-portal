@@ -88,7 +88,7 @@ export default function TravelInsuranceForm({ onClose }: TravelInsuranceFormProp
 
         {/* Body */}
         <div className="p-6">
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={submitForm}>
+          <form className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700" onSubmit={submitForm}>
 
             {/* Name */}
             <div>

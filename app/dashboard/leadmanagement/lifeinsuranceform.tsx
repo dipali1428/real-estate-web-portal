@@ -87,12 +87,12 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
 
         {/* Form Section */}
         <div className="mb-5 p-6">
-          <label className="font-semibold text-sm block mb-2">Select Insurance Type:</label>
+          <label className="font-semibold text-sm block mb-2 text-gray-700">Select Insurance Type:</label>
 
           <select
             value={planType}
             onChange={(e) => setPlanType(e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400"
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 text-gray-700"
           >
             <option value="">-- Select Plan --</option>
             <option value="wholeLife">Whole Life Insurance</option>
@@ -174,11 +174,11 @@ function Input({
 }) {
   return (
     <div>
-      <label className="font-semibold text-sm block mb-1">{label}</label>
+      <label className="font-semibold text-sm block mb-1 text-gray-700">{label}</label>
       <input
         type={type}
         onChange={(e) => onChange(label, e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400"
+        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 text-gray-700"
       />
     </div>
   );
@@ -196,10 +196,10 @@ function Select({
 }) {
   return (
     <div>
-      <label className="font-semibold text-sm block mb-1">{label}</label>
+      <label className="font-semibold text-sm block mb-1 text-gray-700">{label}</label>
       <select
         onChange={(e) => onChange(label, e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400"
+        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 text-gray-700"
       >
         <option value="">Select</option>
         {options.map((opt, i) => (

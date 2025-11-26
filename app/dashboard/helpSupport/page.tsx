@@ -69,6 +69,130 @@ const HelpSupportPage: React.FC = () => {
     {
       question: "I forgot my password. How can I reset it?",
       answer: "On the login screen, click on 'Forgot Password.' You will receive a password reset link on your registered email address. You can also update your password anytime from the 'Update Password' section within your Profile."
+    },
+    {
+      question: "How do I track my business performance?",
+      answer: "You can track your business performance through the Dashboard section. It provides a comprehensive overview of your total business volume, active policies, pending follow-ups, client growth, and YTD incentives earned."
+    },
+    {
+      question: "What should I do if a client wants to cancel their policy?",
+      answer: "For policy cancellations, please contact your Relationship Manager or raise a support ticket under the 'Commission Related' category. They will guide you through the cancellation process and any impact on your incentives."
+    },
+    {
+      question: "How do I access product training materials?",
+      answer: "Product training materials, including brochures and detailed product information, are available in the 'Downloads' section under 'Product Brochures'. You can filter by product category to find specific training resources."
+    },
+    {
+      question: "Can I transfer a lead to another DSA?",
+      answer: "Currently, lead transfer functionality is not available on the platform. If you have a lead that would be better handled by another DSA, please contact your Relationship Manager for assistance."
+    },
+    {
+      question: "How do I check my active policy count?",
+      answer: "Your active policy count is displayed on the Dashboard under 'Active Policies'. For detailed information, you can also check the 'My Client Portfolio' section which shows all your converted clients and their policy status."
+    },
+    {
+      question: "What is the difference between 'Pending Follow-ups' and 'Overdue' follow-ups?",
+      answer: "'Pending Follow-ups' are scheduled actions that are due in the future, while 'Overdue' follow-ups are those that have passed their scheduled date without being completed. The dashboard shows counts for both categories."
+    },
+    {
+      question: "How do I generate performance reports?",
+      answer: "Performance reports can be generated from the 'My Client Portfolio' and 'Incentives & Payouts' sections. You can filter data by date range, product category, or status, and export the information for your records."
+    },
+    {
+      question: "What happens if I miss a follow-up deadline?",
+      answer: "Missed follow-ups are marked as 'Overdue' in the system. It's important to regularly update follow-up statuses to maintain accurate tracking. Consistent overdue follow-ups may affect your performance metrics."
+    },
+    {
+      question: "How do I update my banking information for payouts?",
+      answer: "Banking information updates can be made in the 'My Profile' section under banking details. Please ensure your information is accurate to avoid delays in commission payouts."
+    },
+    {
+      question: "Can I see my year-to-date earnings breakdown?",
+      answer: "Yes, your YTD earnings are displayed on the Dashboard, and detailed breakdowns are available in the 'Incentives & Payouts' section where you can filter by date range and view transaction-level details."
+    },
+    {
+      question: "How do I handle client documentation?",
+      answer: "Client documentation can be managed through the 'My Client Portfolio' section. Required documents for each client can be uploaded and tracked in the Documents tab within each client's profile."
+    },
+    {
+      question: "What is the process for new product onboarding?",
+      answer: "New product onboarding is handled through your Relationship Manager. When new products are available, they will appear in your product categories, and training materials will be provided in the Downloads section."
+    },
+    {
+      question: "How do I check my lead conversion rate?",
+      answer: "Your lead conversion rate can be calculated from the 'Lead Management' section by comparing the number of converted leads against total active leads. The system shows both active leads and converted counts for each product category."
+    },
+    {
+      question: "What support is available for technical issues?",
+      answer: "For technical issues, you can raise a support ticket under the 'Technical Issue' category. Our support team typically responds within 24 hours. For urgent matters, contact your Relationship Manager directly."
+    },
+    {
+      question: "How do I access compliance guidelines?",
+      answer: "Compliance guidelines and regulatory information are available in the 'Downloads' section. You can also raise a 'Compliance Query' support ticket for specific compliance-related questions."
+    },
+    {
+      question: "Can I customize my marketing templates?",
+      answer: "Currently, marketing templates are pre-designed but personalized with your contact information. For custom marketing material requests, please contact your Relationship Manager to discuss available options."
+    },
+    {
+      question: "How do I handle client complaints?",
+      answer: "For client complaints, please escalate to your Relationship Manager immediately. They are trained to handle complaint resolution and will guide you through the proper channels and documentation required."
+    },
+    {
+      question: "What is the timeline for new lead approval?",
+      answer: "New leads are typically approved instantly when added through the platform. However, in some cases, there might be a brief review process which usually takes less than 24 hours."
+    },
+    {
+      question: "How do I check my incentive calculation for a specific policy?",
+      answer: "Incentive calculations for specific policies can be viewed in the 'Incentives & Payouts' section. Each transaction shows the product, amount, and status with detailed breakdowns available in the commission statements."
+    },
+    {
+      question: "What happens if a client's policy lapses?",
+      answer: "If a client's policy lapses, it will be reflected in your 'Active Policies' count. You should follow up with the client for policy renewal. Lapsed policies may affect your ongoing incentives for that client."
+    },
+    {
+      question: "How do I get support during non-business hours?",
+      answer: "For emergency support outside business hours, you can use the 24/7 emergency support line available in the 'My Relationship Manager' section. For non-urgent matters, raise a support ticket which will be addressed on the next business day."
+    },
+    {
+      question: "Can I have multiple product categories active?",
+      answer: "Yes, you can have multiple product categories active simultaneously. Your profile allows you to select multiple categories under different head categories (Investment, Protection, Finance) to diversify your business portfolio."
+    },
+    {
+      question: "How do I track my progress towards targets?",
+      answer: "Target progress can be tracked through the Dashboard which shows key performance indicators. For detailed target tracking and progress reports, consult with your Relationship Manager who can provide comprehensive performance analytics."
+    },
+    {
+      question: "What is the referral lead policy?",
+      answer: "The platform currently only allows adding referral leads. These are leads generated through your personal and professional networks. Cold calling or purchased lead databases are not permitted under our referral policy."
+    },
+    {
+      question: "How do I update my tax information?",
+      answer: "Tax information, including PAN details, can be updated in the 'My Profile' section. Ensure your PAN number is correctly entered as it is used for TDS calculations on your incentives."
+    },
+    {
+      question: "What training resources are available for new DSAs?",
+      answer: "New DSAs can access comprehensive training materials in the 'Downloads' section, including product brochures, application forms, and process guides. Regular training sessions are also conducted by Relationship Managers."
+    },
+    {
+      question: "How do I handle duplicate leads?",
+      answer: "If you encounter duplicate leads, please contact support with the lead IDs. The support team will help merge or remove duplicates to maintain clean data in your lead management system."
+    },
+    {
+      question: "What is the policy on client data privacy?",
+      answer: "Client data privacy is strictly maintained in accordance with regulatory requirements. All client information stored on the platform is encrypted and accessible only to authorized personnel. Never share client data outside the platform."
+    },
+    {
+      question: "How do I escalate an urgent client issue?",
+      answer: "Urgent client issues should be escalated directly to your Relationship Manager via phone or scheduled meeting. For critical matters, use the emergency support contact available in the 'My Relationship Manager' section."
+    },
+    {
+      question: "Can I access the platform on mobile devices?",
+      answer: "Yes, the platform is fully responsive and can be accessed on mobile devices through your web browser. The interface adapts to different screen sizes for optimal usability on smartphones and tablets."
+    },
+    {
+      question: "How do I provide feedback about the platform?",
+      answer: "Platform feedback can be submitted through the support ticket system under the 'Other' category. We regularly review feedback to improve the DSA experience and platform functionality."
     }
   ];
 
@@ -77,10 +201,7 @@ const HelpSupportPage: React.FC = () => {
     "Commission Related",
     "Product Information",
     "Lead Management",
-    "Client Portfolio",
-    "Marketing Templates",
     "Profile Settings",
-    "Compliance Query",
     "Other"
   ];
 

@@ -31,9 +31,9 @@ export default function RealEstateForm({ onClose }: { onClose: () => void }) {
 
             {/* REAL ESTATE TYPE DROPDOWN */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Type of Real Estate</label>
+              <label className="font-medium mb-1 text-gray-700">Type of Real Estate</label>
               <select
-                className="border p-2 rounded"
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700"
                 value={realestateType}
                 onChange={(e) => setRealestateType(e.target.value)}
               >
@@ -47,14 +47,14 @@ export default function RealEstateForm({ onClose }: { onClose: () => void }) {
             {/* CHECKBOX */}
             <div className="col-span-2 flex items-center gap-2 mt-2">
               <input type="checkbox" className="h-4 w-4" />
-              <label>I am not Robot</label>
+              <label className="text-gray-700">I am not Robot</label>
             </div>
 
             {/* SUBMIT BUTTON */}
             <div className="col-span-2 mt-4 flex justify-center">
               <button
                 type="submit"
-                className="w-50 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:bg-[#178d84] transition"
+                className="w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors"
               >
                 Submit
               </button>
@@ -79,11 +79,11 @@ function Input({
 }) {
   return (
     <div className="flex flex-col">
-      <label className="text-sm font-medium">{label}</label>
+      <label className="text-sm font-medium text-gray-700">{label}</label>
       <input
         type={type}
         placeholder={placeholder}
-        className="border p-2 rounded mt-1"
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 mt-1"
       />
     </div>
   );

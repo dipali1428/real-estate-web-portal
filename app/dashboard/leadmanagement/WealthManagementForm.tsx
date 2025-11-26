@@ -14,7 +14,7 @@ export default function WealthManagementForm({
 
         {/* HEADER */}
         <div className="flex justify-between items-center px-5 py-3 border-b">
-          <h2 className="text-xl font-semibold text-[#1CADA3] ">Wealth Management Form</h2>
+          <h2 className="text-xl font-semibold text-[#1CADA3]">Wealth Management Form</h2>
           <button onClick={onClose} className="text-gray-700 hover:text-black">
             <X size={22} />
           </button>
@@ -26,44 +26,66 @@ export default function WealthManagementForm({
 
             {/* Client Name */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Client Name</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter Client Name" />
+              <label className="font-medium mb-1 text-gray-700">Client Name</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Client Name" 
+              />
             </div>
 
             {/* Phone Number */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Client Phone No</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter Client Phone No" />
+              <label className="font-medium mb-1 text-gray-700">Client Phone No</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Client Phone No" 
+              />
             </div>
 
             {/* Email */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Client Email ID</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter Client Email ID" />
+              <label className="font-medium mb-1 text-gray-700">Client Email ID</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Client Email ID" 
+              />
             </div>
 
             {/* Client DOB */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Client Date of Birth</label>
-              <input type="date" className="input border p-2 rounded" />
+              <label className="font-medium mb-1 text-gray-700">Client Date of Birth</label>
+              <input 
+                type="date" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+              />
             </div>
 
             {/* Total Dependents */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Total No. of Dependents</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter Total Dependents" />
+              <label className="font-medium mb-1 text-gray-700">Total No. of Dependents</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Total Dependents" 
+              />
             </div>
 
             {/* Dependents DOB */}
-            <div className="flex flex-col ">
-              <label className="font-medium mb-1">Dependents Date of Birth</label>
-              <input type="date" className="input border p-2 rounded" />
+            <div className="flex flex-col">
+              <label className="font-medium mb-1 text-gray-700">Dependents Date of Birth</label>
+              <input 
+                type="date" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+              />
             </div>
 
             {/* Occupation */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Occupation</label>
-              <select className="input border p-2 rounded">
+              <label className="font-medium mb-1 text-gray-700">Occupation</label>
+              <select className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700">
                 <option disabled selected>Select Occupation</option>
                 <option>Job</option>
                 <option>Business</option>
@@ -72,8 +94,8 @@ export default function WealthManagementForm({
 
             {/* Monthly Income */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Total Monthly Income</label>
-              <select className="input border p-2 rounded">
+              <label className="font-medium mb-1 text-gray-700">Total Monthly Income</label>
+              <select className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700">
                 <option disabled selected>Select Income Type</option>
                 <option>Salary Income</option>
                 <option>Incentives / Commission</option>
@@ -86,37 +108,57 @@ export default function WealthManagementForm({
 
             {/* Rental Liability */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Rental Liability</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter Rental Liability" />
+              <label className="font-medium mb-1 text-gray-700">Rental Liability</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Rental Liability" 
+              />
             </div>
 
             {/* Loan Liability */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Loan Liability</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter Loan Liability" />
+              <label className="font-medium mb-1 text-gray-700">Loan Liability</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Loan Liability" 
+              />
             </div>
 
             {/* Insurance Liability */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Insurance Liability</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter Insurance Liability" />
+              <label className="font-medium mb-1 text-gray-700">Insurance Liability</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Insurance Liability" 
+              />
             </div>
 
             {/* Investment Liability */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Investment Liability</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Enter Investment Liability" />
+              <label className="font-medium mb-1 text-gray-700">Investment Liability</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Enter Investment Liability" 
+              />
             </div>
 
             {/* Total Liability */}
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Total Liability</label>
-              <input type="text" className="input border p-2 rounded" placeholder="Total Amount" />
+              <label className="font-medium mb-1 text-gray-700">Total Liability</label>
+              <input 
+                type="text" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700" 
+                placeholder="Total Amount" 
+              />
             </div>
 
             {/* Checkbox */}
             <div className="md:col-span-2 mt-2">
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-2 text-gray-700">
                 <input type="checkbox" className="h-4 w-4" />
                 <span>I am not Robot</span>
               </label>
@@ -124,13 +166,13 @@ export default function WealthManagementForm({
 
             {/* Submit Button */}
             <div className="col-span-2 mt-4 flex justify-center">
-            <button
-              type="submit"
-              className="w-50 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:bg-[#178d84] transition"
-            >
-              Submit
-            </button>
-          </div>
+              <button
+                type="submit"
+                className="w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors"
+              >
+                Submit
+              </button>
+            </div>
 
           </form>
         </div>

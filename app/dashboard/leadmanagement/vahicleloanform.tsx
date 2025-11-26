@@ -140,7 +140,7 @@ const selfEmployedUploads = [
               error={errors.otherDetails} />
 
             {/* Checkbox */}
-            <div className="col-span-2 flex items-center gap-2 mt-3">
+            <div className="col-span-2 flex items-center gap-2 mt-3 text-gray-700">
               <input type="checkbox" checked={formData.notRobot}
                 onChange={(e) => setFormData({ ...formData, notRobot: e.target.checked })}
                 className="w-4 h-4" />
@@ -169,10 +169,10 @@ function Input({ label, value, onChange, error, maxLength }:
   { label: string; value: string; onChange: (v: string) => void; error?: string; maxLength?: number }) {
   return (
     <div>
-      <label className="text-sm font-medium">{label}</label>
+      <label className="text-sm font-medium text-gray-700">{label}</label>
       <input type="text" value={value} maxLength={maxLength}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full mt-1 p-2 border rounded-md focus:ring-2
+        className={`w-full mt-1 p-2 border rounded-md focus:ring-2 text-gray-700
         ${error ? "border-red-500" : "border-gray-300"}`} />
       {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
     </div>
@@ -183,10 +183,10 @@ function DateInput({ label, value, onChange, error }:
   { label: string; value: string; onChange: (v: string) => void; error?: string }) {
   return (
     <div>
-      <label className="text-sm font-medium">{label}</label>
+      <label className="text-sm font-medium text-gray-700">{label}</label>
       <input type="date" value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full mt-1 p-2 border rounded-md focus:ring-2
+        className={`w-full mt-1 p-2 border rounded-md focus:ring-2 text-gray-700
         ${error ? "border-red-500" : "border-gray-300"}`} />
       {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
     </div>
@@ -197,10 +197,10 @@ function SelectInput({ label, options, value, onChange, error }:
   { label: string; options: string[]; value: string; onChange: (v: string) => void; error?: string }) {
   return (
     <div>
-      <label className="text-sm font-medium">{label}</label>
+      <label className="text-sm font-medium text-gray-700">{label}</label>
       <select value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full mt-1 p-2 border rounded-md ${error ? "border-red-500" : "border-gray-300"}`}>
+        className={`w-full mt-1 p-2 border rounded-md ${error ? "border-red-500" : "border-gray-300 text-gray-700"}`}>
         <option value="">Select {label}</option>
         {options.map((opt) => (
           <option key={opt} value={opt}>{opt}</option>

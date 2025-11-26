@@ -3,9 +3,8 @@ import { useState } from "react";
 import { X } from "lucide-react";
 
 // Reusable Input component
-function Input({label, placeholder,type = "text",value,onChange,error,maxLength, }: 
-  {label: string; placeholder?: string;type?: string;value?: string;onChange?: (e: any) => void; error?: string; maxLength?: number;  })
-   {
+function Input({ label, placeholder, type = "text", value, onChange, error, maxLength, }:
+  { label: string; placeholder?: string; type?: string; value?: string; onChange?: (e: any) => void; error?: string; maxLength?: number; }) {
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
@@ -15,9 +14,8 @@ function Input({label, placeholder,type = "text",value,onChange,error,maxLength,
         value={value}
         onChange={onChange}
         maxLength={maxLength}
-        className={`border rounded-lg p-2 focus:ring-2 focus:ring-teal-500 outline-none ${
-          error ? "border-red-500" : "border-gray-300"
-        }`}
+        className={`w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 ${error ? "border-red-500" : "border-gray-300"
+          }`}
       />
 
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
@@ -44,7 +42,7 @@ const selfEmployedUploads = [
   "Business Office Address Proof",
 ];
 
-export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
+export default function NrpLoanForm({ onClose }: { onClose: () => void }) {
   const [employmentType, setEmploymentType] = useState("");
 
   const [formData, setFormData] = useState({
@@ -118,7 +116,7 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
 
         {/* Body */}
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
-          
+
           <Input
             label="Client Name"
             placeholder="Enter Client Name"
@@ -179,13 +177,12 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
 
           {/* Employment Type */}
           <div className="col-span-2">
-            <label className="text-sm font-semibold">Employment Type</label>
+            <label className="text-sm font-semibold text-gray-700">Employment Type</label>
             <select
               value={employmentType}
               onChange={(e) => setEmploymentType(e.target.value)}
-              className={`border rounded-lg p-2 w-full mt-1 ${
-                errors.employmentType ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 mt-1 ${errors.employmentType ? "border-red-500" : "border-gray-300"
+                }`}
             >
               <option value="">-- Select Employment Type --</option>
               <option value="salaried">Salaried Person</option>
@@ -208,8 +205,8 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
 
               {salariedUploads.map((label, index) => (
                 <div key={index} className="flex flex-col">
-                  <label className="text-sm font-medium mb-1">{label}</label>
-                  <input type="file" className="border rounded-lg p-2" />
+                  <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
+                  <input type="file" className="border rounded-lg p-2 text-gray-400" />
                 </div>
               ))}
             </>
@@ -226,8 +223,8 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
 
               {selfEmployedUploads.map((label, index) => (
                 <div key={index} className="flex flex-col">
-                  <label className="text-sm font-medium mb-1">{label}</label>
-                  <input type="file" className="border rounded-lg p-2" />
+                  <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
+                  <input type="file" className="border rounded-lg p-2 text-gray-400" />
                 </div>
               ))}
             </>

@@ -120,7 +120,7 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
             onChange={(e: any) => handleChange("loanObligation", e.target.value)}
           />
 
-          {/* File Uploads */}
+          {/* File Uploads - Updated to match BusinessLoanForm style */}
           {[
             "Aadhar Card",
             "Pan Card",
@@ -131,19 +131,17 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
             "Photograph",
             "Existing Loan Statement",
           ].map((label, idx) => (
-            <div key={idx} className="col-span-1">
-              <label className="block font-medium mb-1">{label}</label>
-              <input
-                type="file"
-                className="border rounded-lg p-2 text-sm 
-                file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 
-                file:bg-[#1CADA3] file:text-white hover:file:bg-teal-600"
+            <div key={idx} className="flex flex-col">
+              <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
+              <input 
+                type="file" 
+                className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 text-sm" 
               />
             </div>
           ))}
 
           {/* Robot Check */}
-          <div className="col-span-2 flex items-center gap-2 mt-4">
+          <div className="col-span-2 flex items-center gap-2 mt-4 text-gray-700">
             <input id="robot" type="checkbox" className="w-4 h-4" />
             <label htmlFor="robot">I am not a robot</label>
           </div>
@@ -166,7 +164,7 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
           <div className="col-span-2 flex justify-center mt-4">
             <button
               type="submit"
-              className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-6 py-2 rounded-md hover:opacity-90"
+              className="w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors"
             >
               Submit
             </button>
@@ -191,14 +189,14 @@ function Input({ label, value, onChange, type = "text", onlyNumber, maxLength }:
 
   return (
     <div>
-      <label className="block text-sm font-medium mb-1">{label}</label>
+      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
       <input
         value={value}
         type={type}
         maxLength={maxLength}
         onKeyDown={restrictNumber}
         onChange={onChange}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#1CADA3]"
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3]"
       />
     </div>
   );

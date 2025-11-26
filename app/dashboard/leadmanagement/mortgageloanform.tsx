@@ -16,7 +16,7 @@ function Input({label, placeholder,type = "text",value,onChange,error,maxLength,
         onChange={onChange}
         maxLength={maxLength}
         className={`border rounded-lg p-2 focus:ring-2 focus:ring-teal-500 outline-none ${
-          error ? "border-red-500" : "border-gray-300"
+          error ? "border-red-500" : "border-gray-300 bg-white text-gray-700"
         }`}
       />
 
@@ -179,11 +179,11 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
 
           {/* Employment Type */}
           <div className="col-span-2">
-            <label className="text-sm font-semibold">Employment Type</label>
+            <label className="text-sm font-semibold text-gray-700">Employment Type</label>
             <select
               value={employmentType}
               onChange={(e) => setEmploymentType(e.target.value)}
-              className={`border rounded-lg p-2 w-full mt-1 ${
+              className={`border rounded-lg p-2 w-full mt-1 text-gray-700 ${
                 errors.employmentType ? "border-red-500" : "border-gray-300"
               }`}
             >
@@ -208,8 +208,8 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
 
               {salariedUploads.map((label, index) => (
                 <div key={index} className="flex flex-col">
-                  <label className="text-sm font-medium mb-1">{label}</label>
-                  <input type="file" className="border rounded-lg p-2" />
+                  <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
+                  <input type="file" className="border rounded-lg p-2 text-gray-400" />
                 </div>
               ))}
             </>
@@ -226,8 +226,8 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
 
               {selfEmployedUploads.map((label, index) => (
                 <div key={index} className="flex flex-col">
-                  <label className="text-sm font-medium mb-1">{label}</label>
-                  <input type="file" className="border rounded-lg p-2" />
+                  <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
+                  <input type="file" className="border rounded-lg p-2 text-gray-400" />
                 </div>
               ))}
             </>
