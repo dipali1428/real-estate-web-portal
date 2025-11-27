@@ -88,7 +88,7 @@ export default function ImageTemplates() {
       category: 'insurance',
       subCategory: 'life',
       description: 'Comprehensive life insurance coverage for you and your family',
-      imageUrl: '/templateimg/personalLoan.jpeg'
+      imageUrl: '/templateimg/Personal-Loan.jpeg'
     },
     {
       id: '2',
@@ -98,7 +98,7 @@ export default function ImageTemplates() {
       category: 'insurance',
       subCategory: 'health',
       description: 'Complete health insurance protection for medical emergencies',
-      imageUrl: '/templateimg/healthInsurance.jpeg'
+      imageUrl: '/templateimg/Health-Insurance.jpeg'
     },
     {
       id: '3',
@@ -108,7 +108,7 @@ export default function ImageTemplates() {
       category: 'insurance',
       subCategory: 'motor',
       description: 'Best car insurance policies with great benefits',
-      imageUrl: '/templateimg/loanProtector.jpeg'
+      imageUrl: '/templateimg/Loan-Protector.jpeg'
     },
     {
       id: '4',
@@ -118,7 +118,7 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'home',
       description: 'Affordable home loans with low interest rates',
-      imageUrl: '/templateimg/homeLoan.jpeg'
+      imageUrl: '/templateimg/Home-Loan.jpeg'
     },
     {
       id: '5',
@@ -128,7 +128,7 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'personal',
       description: 'Quick personal loans for all your needs',
-      imageUrl: '/templateimg/personalLoan.jpeg'
+      imageUrl: '/templateimg/Personal-Loan.jpeg'
     },
     {
       id: '6',
@@ -138,7 +138,7 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'business',
       description: 'Business loans to grow your enterprise',
-      imageUrl: '/templateimg/loanProtector.jpeg'
+      imageUrl: '/templateimg/Loan-Protector.jpeg'
     },
     {
       id: '7',
@@ -148,7 +148,7 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'educational',
       description: 'Business loans to grow your enterprise',
-      imageUrl: '/templateimg/educationalLoan.jpeg'
+      imageUrl: '/templateimg/Educational-Loan.jpeg'
     },
   ]);
 
