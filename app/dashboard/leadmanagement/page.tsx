@@ -1,33 +1,33 @@
 "use client";
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import AddLeadModal from "./AddLeadModal";
+import AddLeadModal from "./components/AddLeadModal";
 import ProductCard from "./components/ProductCard";
 import { productCards as initialProductCards } from "./data/productData";
 import { TabCounts } from "./types";
 // Import all form components
-import LifeInsuranceForm from "./lifeinsuranceform";
-import HealthInsuranceForm from "./healthisurancform";
-import MotorInsuranceForm from "./motorinsuranceform";
-import TravelInsuranceForm from "./TravelInsuranceForm"
-import PropertyInsuranceForm from "./propertyinsuranceform";
-import CattleInsuranceForm from "./cattleinsuranceform";
-import MarineInsuranceForm from "./marineinsuranceform";
-import HomeLoanForm from "./homeloanform";
-import PersonalLoanForm from "./personaloanform";
-import BusinessLoanForm from "./businessloanform";
-import MortgageLoanForm from "./mortgageloanform";
-import SMELoanForm from "./smeloanform";
-import EducationLoanForm from "./educationloanform";
-import VehicleLoanForm from "./vahicleloanform";
-import LoanAgainstSecuritiesForm from "./loanagainstsecuritiesform";
-import MutualFundForm from "./MutualFundForm";
-import WealthManagementForm from "./WealthManagementForm";
-import PMSAIFForm from "./PMSAIFForm";
-import BondsForm from "./bondsfrom";
-import FixedDepositForm from "./fineddf";
-import RealEstateForm from "./realestate";
-import NrpLoanForm from "./nrploanform";
+import LifeInsuranceForm from "./forms/lifeinsuranceform";
+import HealthInsuranceForm from "./forms/healthisurancform";
+import MotorInsuranceForm from "./forms/motorinsuranceform";
+import TravelInsuranceForm from "./forms/TravelInsuranceForm"
+import PropertyInsuranceForm from "./forms/propertyinsuranceform";
+import CattleInsuranceForm from "./forms/cattleinsuranceform";
+import MarineInsuranceForm from "./forms/marineinsuranceform";
+import HomeLoanForm from "./forms/homeloanform";
+import PersonalLoanForm from "./forms/personaloanform";
+import BusinessLoanForm from "./forms/businessloanform";
+import MortgageLoanForm from "./forms/mortgageloanform";
+import SMELoanForm from "./forms/smeloanform";
+import EducationLoanForm from "./forms/educationloanform";
+import VehicleLoanForm from "./forms/vahicleloanform";
+import LoanAgainstSecuritiesForm from "./forms/loanagainstsecuritiesform";
+import MutualFundForm from "./forms/MutualFundForm";
+import WealthManagementForm from "./forms/WealthManagementForm";
+import PMSAIFForm from "./forms/PMSAIFForm";
+import BondsForm from "./forms/bondsfrom";
+import FixedDepositForm from "./forms/fineddf";
+import RealEstateForm from "./forms/realestate";
+import NrpLoanForm from "./forms/nrploanform";
 import LeadTable from "./components/LeadTable";
 
 export default function LeadManagementPage() {
@@ -200,7 +200,8 @@ export default function LeadManagementPage() {
 
   return (
     <>
-      <section id="lead-management" className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
+      <section id="lead-management" className="min-h-screen bg-slate-50 p-4 sm:p-6">
+        <div className="max-w-7xl mx-auto">
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6 lg:mb-8 gap-4">
           <div className="flex-1">
@@ -280,6 +281,7 @@ export default function LeadManagementPage() {
             // Add your delete logic here
           }}
         />
+        </div>
       </section>
 
       {/* Add CSS for hiding scrollbar */}
