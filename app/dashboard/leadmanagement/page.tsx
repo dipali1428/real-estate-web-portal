@@ -121,7 +121,6 @@ export default function LeadManagementPage() {
   };
 
   // Helper function to map product titles to click handlers
-  // Helper function to map product titles to click handlers
   function getClickHandler(title: string): () => void {
     const handlerMap: { [key: string]: () => void } = {
       // Loans
@@ -212,15 +211,17 @@ export default function LeadManagementPage() {
             </p>
           </div>
 
+          <div className="flex flex-col items-start">
           <div className="flex flex-col items-center gap-2 shrink-0 w-full lg:w-auto">
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center justify-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-md hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-full lg:w-auto min-w-[140px]"
+              className="flex items-center justify-center gap-2 bg-linear-to-t from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-md hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-auto min-w-40"
             >
               <Plus className="w-4 h-4" />
               Add New Lead
             </button>
-            <p className="text-xs text-slate-500 text-center">Only referral lead</p>
+            <p className="text-xs text-slate-500">Only referral lead</p>
+          </div>
           </div>
         </div>
 
@@ -248,9 +249,9 @@ export default function LeadManagementPage() {
             activeTab === tabId && (
               <div
                 key={tabId}
-                className={`grid gap-4 sm:gap-6 ${tabId === 'investment'
-                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4'
-                  : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                className={`custom-product-grid grid gap-4 sm:gap-6 ${tabId === 'investment'
+                  ? 'grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-4'
+                  : 'grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 xl:grid-cols-4'
                   }`}
               >
                 {products.map((product, index) => (
@@ -294,6 +295,36 @@ export default function LeadManagementPage() {
           -webkit-line-clamp: 3;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+
+        .custom-product-grid {
+          grid-template-columns: repeat(1, 1fr);
+        }
+  
+        @media (min-width: 560px) and (max-width:767){
+          .custom-product-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+
+        /* 800px to 1023px - 2 columns */
+        @media (min-width: 820px) {
+          .custom-product-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+  
+        /* 1024px and up - use Tailwind classes */
+        @media (min-width: 1160px) {
+          .custom-product-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+        }
+
+        @media (min-width: 1360px) {
+          .custom-product-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
         }
       `}</style>
 

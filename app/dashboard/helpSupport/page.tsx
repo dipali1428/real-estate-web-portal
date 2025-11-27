@@ -205,13 +205,26 @@ const HelpSupportPage: React.FC = () => {
     "Other"
   ];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
+  const { name, value } = e.target;
+  
+  if (name === 'description' || 'subject') {
+    // Capitalize first letter only if the field was empty
+    const processedValue = ticketData.description === '' 
+      ? value.charAt(0).toUpperCase() + value.slice(1)
+      : value;
+    
+    setTicketData(prev => ({
+      ...prev,
+      [name]: processedValue
+    }));
+  } else {
     setTicketData(prev => ({
       ...prev,
       [name]: value
     }));
-  };
+  }
+};
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -330,7 +343,7 @@ const HelpSupportPage: React.FC = () => {
                     {faq.question}
                   </h3>
                   <svg
-                    className={`w-4 h-4 sm:w-5 sm:h-5 text-slate-500 transition-transform duration-200 flex-shrink-0 mt-0.5 ${
+                    className={`w-4 h-4 sm:w-5 sm:h-5 text-slate-500 transition-transform duration-200 shrink-0 mt-0.5 ${
                       openFaqIndex === index ? 'transform rotate-180' : ''
                     }`}
                     fill="none"
