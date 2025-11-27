@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Upload } from "lucide-react";
 
 export default function HealthInsuranceForm({ onClose }: { onClose?: () => void }) {
   const [planType, setPlanType] = useState("");
+  const [policyType, setPolicyType] = useState(""); // fresh, port, renewal
+  const [policyTenure, setPolicyTenure] = useState(""); // 1,2,3,4,5
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const [form, setForm] = useState({
     proposer: "",
+    city: "",
     pin: "",
+    PSA: "",
     dob: "",
     disease: "",
     FirstAdultDob: "",
@@ -19,104 +24,60 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
     child2Dob: "",
   });
 
-  const [employees, setEmployees] = useState<
-    {
-      name: string;
-      designation: string;
-      pan: string;
-      aadhaar: string;
-      branch: string;
-      email: string;
-      mobile: string;
-      altMobile: string;
-      dob: string;
-      age: number | "";
-      pin: string;
-      disease: string;
-    }[]
-  >([]);
-
   const updateField = (key: string, value: any) => {
     setForm({ ...form, [key]: value });
   };
 
-  const handleAddEmployee = () => {
-    setEmployees([
-      ...employees,
-      {
-        name: "",
-        designation: "",
-        pan: "",
-        aadhaar: "",
-        branch: "",
-        email: "",
-        mobile: "",
-        altMobile: "",
-        dob: "",
-        age: "",
-        pin: "",
-        disease: "",
-      },
-    ]);
-  };
-
-  const handleRemoveEmployee = (index: number) => {
-    const updated = [...employees];
-    updated.splice(index, 1);
-    setEmployees(updated);
-  };
-
-  const handleChangeEmployee = (index: number, field: string, value: string) => {
-    const updated = [...employees];
-
-    if (field === "dob") {
-      const dobDate = new Date(value);
-      const today = new Date();
-      let age = today.getFullYear() - dobDate.getFullYear();
-      const m = today.getMonth() - dobDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) age--;
-      updated[index]["age"] = age;
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const newFiles = Array.from(files);
+      
+      // Validate file sizes (max 10MB each)
+      const validFiles = newFiles.filter(file => file.size <= 10 * 1024 * 1024);
+      
+      if (validFiles.length !== newFiles.length) {
+        console.warn("Some files were too large and were not added");
+      }
+      
+      // Add new files to existing ones
+      setUploadedFiles(prev => [...prev, ...validFiles]);
+      
+      // Clear the input to allow selecting the same files again
+      e.target.value = '';
     }
+  };
 
-    (updated[index] as any)[field] = value;
-    setEmployees(updated);
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const clearAllFiles = () => {
+    setUploadedFiles([]);
   };
 
   // ---------- VALIDATION ----------
   const validateForm = () => {
-    if (!planType || !form.proposer) return false;
+    if (!planType || !form.proposer || !policyType || !policyTenure) return false;
+
+    // Validate document upload for port and renewal
+    if ((policyType === "port" || policyType === "renewal") && uploadedFiles.length === 0) {
+      return false;
+    }
 
     if (planType === "individual") {
-      return form.pin && form.dob && form.disease;
+      return form.city && form.pin && form.dob && form.disease;
     }
 
     if (planType === "family") {
       return (
+        form.city &&
         form.pin &&
         form.FirstAdultDob &&
         form.SecondAdultDob &&
         form.child1Dob &&
         form.child2Dob &&
         form.disease
-      );
-    }
-
-    if (planType === "gmc") {
-      if (employees.length === 0) return false;
-
-      return employees.every(
-        (emp) =>
-          emp.name &&
-          emp.designation &&
-          emp.pan &&
-          emp.aadhaar &&
-          emp.branch &&
-          emp.email &&
-          emp.mobile &&
-          emp.dob &&
-          emp.age &&
-          emp.pin &&
-          emp.disease
       );
     }
 
@@ -154,6 +115,18 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
         </div>
 
         <div className="p-6">
+          {/* POLICY TYPE */}
+          <label className="font-semibold text-sm block mb-2 text-gray-700">Policy Type</label>
+          <select
+            value={policyType}
+            onChange={(e) => setPolicyType(e.target.value)}
+            className="w-full border border-gray-300 rounded-md p-2 mb-6 text-gray-700"
+          >
+            <option value="">Select Policy Type</option>
+            <option value="fresh">Fresh</option>
+            <option value="port">Port</option>
+            <option value="renewal">Renewal</option>
+          </select>
 
           {/* PLAN TYPE */}
           <label className="font-semibold text-sm block mb-2 text-gray-700">Types of Plan</label>
@@ -165,7 +138,6 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
             <option value="">Select Plan</option>
             <option value="individual">Individual</option>
             <option value="family">Family Floater</option>
-            <option value="gmc">GMC (Group Mediclaim)</option>
           </select>
 
           {/* PROPOSER NAME */}
@@ -179,16 +151,55 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
           {/* INDIVIDUAL */}
           {planType === "individual" && (
             <div className="space-y-4">
+              <Input label="City" type="text" value={form.city} onChange={(v) => updateField("city", v)} />
               <Input label="Pin Code" type="text" value={form.pin} onChange={(v) => updateField("pin", v)} />
+              <Input label="Preferred Sum Assured (Min- 5 lakhs)" type="text" value={form.PSA} onChange={(v) => updateField("PSA", v)} />
+              
+              {/* POLICY TENURE - Only show when plan type is selected */}
+              <div className="mb-4">
+                <label className="font-semibold text-sm block mb-2 text-gray-700">Policy Tenure (Years)</label>
+                <select
+                  value={policyTenure}
+                  onChange={(e) => setPolicyTenure(e.target.value)}
+                  className="w-full border border-gray-300 rounded-md p-2 text-gray-700"
+                >
+                  <option value="">Select Tenure</option>
+                  <option value="1">1 Year</option>
+                  <option value="2">2 Years</option>
+                  <option value="3">3 Years</option>
+                  <option value="4">4 Years</option>
+                  <option value="5">5 Years</option>
+                </select>
+              </div>
+
               <Input label="Date of Birth" type="date" value={form.dob} onChange={(v) => updateField("dob", v)} />
-              <Input label="Any Existing Disease" type="text" value={form.disease} onChange={(v) => updateField("disease", v)} />
+              <Input label="Pre Existing Disease" type="text" value={form.disease} onChange={(v) => updateField("disease", v)} />
             </div>
           )}
 
           {/* FAMILY */}
           {planType === "family" && (
             <div className="space-y-4">
+              <Input label="City" type="text" value={form.city} onChange={(v) => updateField("city", v)} />
               <Input label="Pin Code" type="text" value={form.pin} onChange={(v) => updateField("pin", v)} />
+              <Input label="Preferred Sum Assured (Min- 5 lakhs)" type="text" value={form.PSA} onChange={(v) => updateField("PSA", v)} />
+              
+              {/* POLICY TENURE - Only show when plan type is selected */}
+              <div className="mb-4">
+                <label className="font-semibold text-sm block mb-2 text-gray-700">Policy Tenure (Years)</label>
+                <select
+                  value={policyTenure}
+                  onChange={(e) => setPolicyTenure(e.target.value)}
+                  className="w-full border border-gray-300 rounded-md p-2 text-gray-700"
+                >
+                  <option value="">Select Tenure</option>
+                  <option value="1">1 Year</option>
+                  <option value="2">2 Years</option>
+                  <option value="3">3 Years</option>
+                  <option value="4">4 Years</option>
+                  <option value="5">5 Years</option>
+                </select>
+              </div>
 
               {[
                 { label: " DOB of First Adult Member", field: "FirstAdultDob" },
@@ -209,126 +220,82 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
             </div>
           )}
 
-          {/* GMC */}
-          {planType === "gmc" && (
-            <div className="mt-6">
-              <button
-                onClick={handleAddEmployee}
-                type="button"
-                className="bg-blue-600 text-white px-4 py-2 rounded-md mb-4 hover:bg-blue-700"
-              >
-                + Add Employee
-              </button>
+          {/* DOCUMENT UPLOAD FOR PORT AND RENEWAL */}
+          {(policyType === "port" || policyType === "renewal") && (
+            <div className="mb-6 p-4 border border-gray-300 rounded-md bg-gray-50">
+              <div className="flex justify-between items-center mb-3">
+                <label className="font-semibold text-sm text-gray-700">
+                  Upload Previous Policy Document {policyType === "port" ? "(for Porting)" : "(for Renewal)"}
+                </label>
+                {uploadedFiles.length > 0 && (
+                  <button
+                    onClick={clearAllFiles}
+                    className="text-sm text-red-600 hover:text-red-800 font-medium"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
+              
+              {/* File Upload Area */}
+              <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center mb-4">
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="policy-document"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                />
+                <label
+                  htmlFor="policy-document"
+                  className="cursor-pointer flex flex-col items-center justify-center text-gray-600"
+                >
+                  <Upload size={32} className="mb-2 text-[#1CADA3]" />
+                  <span className="font-medium">Click to upload documents</span>
+                  <span className="text-sm text-gray-500 mt-1">
+                    PDF, JPG, PNG, DOC (Max 10MB each) - Select multiple files
+                  </span>
+                </label>
+              </div>
 
-              {employees.length > 0 && (
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse border border-gray-300 text-sm">
-                    <thead>
-                      <tr className="bg-blue-600 text-white">
-                        {[
-                          "Sr",
-                          "Name",
-                          "Designation",
-                          "PAN",
-                          "Aadhar",
-                          "Branch",
-                          "Email",
-                          "Mobile",
-                          "Alt Mobile",
-                          "DOB",
-                          "Age",
-                          "Pin",
-                          "Disease",
-                          "Remove",
-                        ].map((head) => (
-                          <th key={head} className="p-2 border border-gray-300">
-                            {head}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {employees.map((emp, index) => (
-                        <tr key={index}>
-                          <td className="border p-2 text-center">{index + 1}</td>
-
-                          {[
-                            "name",
-                            "designation",
-                            "pan",
-                            "aadhaar",
-                            "branch",
-                            "email",
-                            "mobile",
-                            "altMobile",
-                          ].map((field) => (
-                            <td key={field} className="border p-1">
-                              <input
-                                type="text"
-                                value={emp[field as keyof typeof emp] as string}
-                                onChange={(e) =>
-                                  handleChangeEmployee(index, field, e.target.value)
-                                }
-                                className="w-full border rounded p-1"
-                              />
-                            </td>
-                          ))}
-
-                          <td className="border p-1">
-                            <input
-                              type="date"
-                              value={emp.dob}
-                              onChange={(e) =>
-                                handleChangeEmployee(index, "dob", e.target.value)
-                              }
-                              className="w-full border rounded p-1"
-                            />
-                          </td>
-
-                          <td className="border p-1">
-                            <input
-                              type="number"
-                              value={emp.age}
-                              readOnly
-                              className="w-full border rounded p-1 bg-gray-100"
-                            />
-                          </td>
-
-                          <td className="border p-1">
-                            <input
-                              type="text"
-                              value={emp.pin}
-                              onChange={(e) =>
-                                handleChangeEmployee(index, "pin", e.target.value)
-                              }
-                              className="w-full border rounded p-1"
-                            />
-                          </td>
-
-                          <td className="border p-1">
-                            <input
-                              type="text"
-                              value={emp.disease}
-                              onChange={(e) =>
-                                handleChangeEmployee(index, "disease", e.target.value)
-                              }
-                              className="w-full border rounded p-1"
-                            />
-                          </td>
-
-                          <td className="border p-1 text-center">
-                            <button
-                              onClick={() => handleRemoveEmployee(index)}
-                              className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                            >
-                              X
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              {/* Uploaded Files List */}
+              {uploadedFiles.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold text-sm text-gray-700">
+                      Uploaded Files ({uploadedFiles.length})
+                    </h4>
+                  </div>
+                  {uploadedFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between bg-white p-3 rounded-md border border-gray-200"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-[#1CADA3] rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">
+                            {file.name.split('.').pop()?.toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm text-gray-700 truncate max-w-xs">
+                            {file.name}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => removeFile(index)}
+                        className="text-red-500 hover:text-red-700 p-1"
+                        title="Remove file"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -338,6 +305,9 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
           {error && (
             <div className="mt-4 text-center text-red-600 font-semibold">
               ⚠ Please fill all required fields.
+              {(policyType === "port" || policyType === "renewal") && uploadedFiles.length === 0 && (
+                <div className="text-sm mt-1">Please upload previous policy document.</div>
+              )}
             </div>
           )}
 

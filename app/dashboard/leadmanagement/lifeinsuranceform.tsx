@@ -19,19 +19,20 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
   };
 
   // Conditions for showing sections
-  const showWholeTermFields =
-    planType === "wholeLife" || planType === "termInsurance";
-
+  const showTermInsuranceFields = planType === "termInsurance";
   const showInvestmentFields =
     planType === "ulip" || planType === "childPlan" || planType === "pensionPlan";
+
+  // Check if income proof is selected (for showing upload field)
+  const showUploadField = formData["Income Proof"] === "3 Years ITR" || formData["Income Proof"] === "Form 16";
 
   // Submit Handler with VALIDATION
   const handleSubmit = () => {
     let requiredFields: string[] = [];
 
-    if (showWholeTermFields) {
+    if (showTermInsuranceFields) {
       requiredFields = [
-        "Customer Name",
+        "Proposer Name",
         "Birthdate",
         "Education",
         "Profession",
@@ -44,10 +45,16 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
         "Drinker / Non-Drinker",
         "Any Existing Disease",
       ];
+
+      // Add income proof document to required fields if income proof is selected
+      if (showUploadField && formData["Income Proof"]) {
+        requiredFields.push("Income Proof Document");
+      }
     }
 
     if (showInvestmentFields) {
       requiredFields = [
+        "Proposer Name",
         "Birthdate",
         "Profession",
         "Income",
@@ -73,6 +80,13 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
     setTimeout(() => setSuccess(false), 2000);
   };
 
+  // Handle file upload
+  const handleFileUpload = (label: string, files: FileList | null) => {
+    if (files && files.length > 0) {
+      handleChange(label, files[0]);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
@@ -95,22 +109,35 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
             className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 text-gray-700"
           >
             <option value="">-- Select Plan --</option>
-            <option value="wholeLife">Whole Life Insurance</option>
             <option value="termInsurance">Term Insurance</option>
             <option value="ulip">ULIP</option>
             <option value="childPlan">Child Plan</option>
             <option value="pensionPlan">Pension Plan</option>
           </select>
 
-          {/* Whole Life / Term Insurance Fields */}
-          {showWholeTermFields && (
+          {/* Term Insurance Fields */}
+          {showTermInsuranceFields && (
             <div className="space-y-3 mt-4">
-              <Input label="Customer Name" onChange={handleChange} />
+              <Input label="Proposer Name" onChange={handleChange} />
               <Input label="Birthdate" type="date" onChange={handleChange} />
               <Input label="Education" onChange={handleChange} />
-              <Input label="Profession" onChange={handleChange} />
-              <Input label="Income" type="number" onChange={handleChange} />
-              <Select label="ITR Filling" options={["Yes", "No"]} onChange={handleChange} />
+              <Select 
+                label="Profession" 
+                options={["Salaried", "Self Employed"]} 
+                onChange={handleChange} 
+              />
+              <Input label="Income (Yearly)" type="number" onChange={handleChange} />
+              <Select label="Income Proof" options={["3 Years ITR", "Form 16"]} onChange={handleChange} />
+              
+              {/* Upload Document Field - Shows when Income Proof is selected */}
+              {showUploadField && (
+                <FileInput 
+                  label="Income Proof Document" 
+                  onChange={handleFileUpload}
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                />
+              )}
+              
               <Input label="Sum Assured Amount" type="number" onChange={handleChange} />
               <Input label="Policy Term" onChange={handleChange} />
               <Input label="PPT (Premium Paying Term)" onChange={handleChange} />
@@ -123,9 +150,14 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
           {/* Investment Plans */}
           {showInvestmentFields && (
             <div className="space-y-3 mt-4">
+              <Input label="Proposer Name" onChange={handleChange} />
               <Input label="Birthdate" type="date" onChange={handleChange} />
-              <Input label="Profession" onChange={handleChange} />
-              <Input label="Income" type="number" onChange={handleChange} />
+              <Select 
+                label="Profession" 
+                options={["Salaried", "Self Employed"]} 
+                onChange={handleChange} 
+              />
+              <Input label="Income (Yearly)" type="number" onChange={handleChange} />
               <Input label="Policy Term" onChange={handleChange} />
               <Input label="Premium Paying Term (PPT)" onChange={handleChange} />
               <Input label="Investment Budget (Yearly)" type="number" onChange={handleChange} />
@@ -208,6 +240,30 @@ function Select({
           </option>
         ))}
       </select>
+    </div>
+  );
+}
+
+/* REUSABLE FILE INPUT COMPONENT */
+function FileInput({
+  label,
+  onChange,
+  accept = "*/*"
+}: {
+  label: string;
+  onChange: (label: string, files: FileList | null) => void;
+  accept?: string;
+}) {
+  return (
+    <div>
+      <label className="font-semibold text-sm block mb-1 text-gray-700">{label}</label>
+      <input
+        type="file"
+        accept={accept}
+        onChange={(e) => onChange(label, e.target.files)}
+        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+      />
+      <p className="text-xs text-gray-500 mt-1">Supported formats: PDF, JPG, PNG, DOC</p>
     </div>
   );
 }

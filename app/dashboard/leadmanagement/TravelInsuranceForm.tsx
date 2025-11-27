@@ -48,7 +48,6 @@ export default function TravelInsuranceForm({ onClose }: TravelInsuranceFormProp
 
     if (!formData.name) newErrors.name = "Client name is required";
     if (!formData.dob) newErrors.dob = "Date of birth is required";
-    if (!formData.designation) newErrors.designation = "Designation is required";
     if (!formData.duration) newErrors.duration = "Duration of travel is required";
     if (!formData.transport) newErrors.transport = "Transport mode is required";
     if (!formData.sumAssured) newErrors.sumAssured = "Sum assured is required";

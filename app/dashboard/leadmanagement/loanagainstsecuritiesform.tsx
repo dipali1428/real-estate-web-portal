@@ -76,7 +76,7 @@ export default function LoanAgainstSecuritiesForm({
             <div className="col-span-2 mt-4 flex justify-center">
               <button
                 type="submit"
-                className="w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors"
+                className="w-50 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors"
               >
                 Submit
               </button>
