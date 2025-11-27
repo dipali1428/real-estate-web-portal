@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import { DashboardService } from "@/app/services/dashboardService";
 
 const HelpSupportPage: React.FC = () => {
   const [ticketData, setTicketData] = useState({
@@ -205,45 +206,70 @@ const HelpSupportPage: React.FC = () => {
     "Other"
   ];
 
-  const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
-  const { name, value } = e.target;
-  
-  if (name === 'description' || 'subject') {
-    // Capitalize first letter only if the field was empty
-    const processedValue = ticketData.description === '' 
-      ? value.charAt(0).toUpperCase() + value.slice(1)
-      : value;
-    
-    setTicketData(prev => ({
-      ...prev,
-      [name]: processedValue
-    }));
-  } else {
-    setTicketData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  }
-};
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
 
-  const handleSubmit = (e: React.FormEvent) => {
+    let processedValue = value;
+
+    if (name === "subject") {
+      processedValue = processedValue.replace(/[0-9]/g, "");
+
+      // Capitalize first letter
+      processedValue =
+        processedValue.charAt(0).toUpperCase() + processedValue.slice(1).toLowerCase();
+    }
+
+    // ✏ Auto-capitalize description (first letter only)
+    if (name === "description") {
+      processedValue =
+        ticketData.description === ""
+          ? processedValue.charAt(0).toUpperCase() + processedValue.slice(1)
+          : processedValue;
+    }
+
+    setTicketData((prev) => ({
+      ...prev,
+      [name]: processedValue,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle ticket submission logic here
-    console.log('Ticket submitted:', ticketData);
-    alert('Support ticket submitted successfully!');
-    
+
+    const ticketPayload = {
+      category: ticketData.category,
+      subject: ticketData.subject,
+      description: ticketData.description,
+    };
+
+    try {
+      const result = await DashboardService.createTicket(ticketPayload);
+      console.log(result.ticketid);
+
+    } catch (error: any) {
+      console.error("Error submitting ticket:", error);
+
+      // Handle Axios error response
+      if (error.response) {
+        alert("Failed to submit ticket: " + (error.response.data?.message || "Please try again."));
+      } else {
+        alert("Failed to submit ticket. Please check your connection.");
+      }
+    }
+
     // Reset form
     setTicketData({
-      subject: '',
-      category: '',
-      description: ''
+      subject: "",
+      category: "",
+      description: "",
     });
   };
 
   const toggleFaq = (index: number) => {
     setOpenFaqIndex(openFaqIndex === index ? null : index);
   };
-
   return (
     <div className="min-h-screen bg-slate-50 py-4 sm:py-6 lg:py-8 px-3 sm:px-4 lg:px-6">
       <div className="max-w-7xl mx-auto bg-white p-4 sm:p-6 lg:p-8 xl:p-12 rounded-lg">
@@ -258,7 +284,7 @@ const HelpSupportPage: React.FC = () => {
         {/* Support Ticket Section */}
         <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 mb-10 sm:mb-12 lg:mb-16">
           <h2 className="text-xl sm:text-2xl font-semibold text-slate-700 mb-6 sm:mb-8">Raise a Support Ticket</h2>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Category Field */}
             <div>
@@ -282,11 +308,14 @@ const HelpSupportPage: React.FC = () => {
               </select>
             </div>
 
-            {/* Subject Field */}
             <div>
-              <label htmlFor="subject" className="block text-sm font-medium text-slate-700 mb-2">
+              <label
+                htmlFor="subject"
+                className="block text-sm font-medium text-slate-700 mb-2"
+              >
                 Subject
               </label>
+
               <input
                 type="text"
                 id="subject"
@@ -294,10 +323,13 @@ const HelpSupportPage: React.FC = () => {
                 value={ticketData.subject}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-400 transition-colors text-slate-700 outline-none text-sm sm:text-base"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 
+                            rounded-lg focus:ring-1 focus:ring-blue-400 transition-colors 
+                            text-slate-700 outline-none text-sm sm:text-base"
                 placeholder="Enter the subject of your issue"
               />
             </div>
+
 
             {/* Description Field */}
             <div>
@@ -326,6 +358,7 @@ const HelpSupportPage: React.FC = () => {
               </button>
             </div>
           </form>
+
         </div>
 
         {/* FAQ Section */}
@@ -343,9 +376,8 @@ const HelpSupportPage: React.FC = () => {
                     {faq.question}
                   </h3>
                   <svg
-                    className={`w-4 h-4 sm:w-5 sm:h-5 text-slate-500 transition-transform duration-200 shrink-0 mt-0.5 ${
-                      openFaqIndex === index ? 'transform rotate-180' : ''
-                    }`}
+                    className={`w-4 h-4 sm:w-5 sm:h-5 text-slate-500 transition-transform duration-200 flex-shrink-0 mt-0.5 ${openFaqIndex === index ? 'transform rotate-180' : ''
+                      }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -353,12 +385,11 @@ const HelpSupportPage: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                
+
                 {/* FAQ Answer - Collapsible Content */}
                 <div
-                  className={`overflow-hidden transition-all duration-200 ${
-                    openFaqIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                  }`}
+                  className={`overflow-hidden transition-all duration-200 ${openFaqIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                    }`}
                 >
                   <div className="px-4 sm:px-6 pb-3 sm:pb-4 pt-1 sm:pt-2 border-t border-slate-100">
                     <p className="text-slate-600 leading-relaxed text-sm sm:text-base">{faq.answer}</p>
@@ -378,6 +409,7 @@ const HelpSupportPage: React.FC = () => {
             </a>
           </p>
         </div>
+        
       </div>
     </div>
   );
