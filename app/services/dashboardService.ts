@@ -19,4 +19,13 @@ export const DashboardService = {
         const response = await api.put("/api/auth/profile", payload);
         return response.data;
     },
+
+    createTicket: async (payload: {
+        category: string;
+        subject: string;
+        description: string;
+    }) => {
+        const response = await api.post("/api/support/ticket", payload);
+        return response.data;
+    },
 };
