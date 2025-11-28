@@ -4,17 +4,22 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import AboutSection from "../page/about/page";
-// import ContactSection from "../page/contact/page";
 import ServicesSection from "../page/services/page";
 import CibilSection from "../page/cibil/page";
 import EMICalculator from "../page/emi/page";
 
 import { useModal } from "../context/ModalContext";
+import { useRouter } from "next/navigation";
+import { useClientCookie } from "../hooks/useClientCookie";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const { openLogin, openPartner } = useModal();
+
+  const router = useRouter();
+  const token = useClientCookie("authToken");
 
   const navLinks = [
     { label: "Home", href: "/" },
@@ -132,8 +137,7 @@ const Header = () => {
             />
             <a
               href="/#contact"
-              className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base"
-            >
+              className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
               Contact Us
             </a>
             <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
@@ -142,7 +146,13 @@ const Header = () => {
           {/* Buttons */}
           <div className="flex items-center space-x-2 xl:space-x-3 pl-1 xl:pl-2">
             <motion.button
-              onClick={openLogin}
+              onClick={() => {
+                if (token) {
+                  router.push("/dashboard");
+                } else {
+                  openLogin();
+                }
+              }}
               whileHover={{ scale: 1.07, y: -2 }}
               transition={{ type: "tween", ease: "easeOut", duration: 0.08 }}
               className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-3 xl:px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
@@ -150,7 +160,6 @@ const Header = () => {
             </motion.button>
 
             <motion.button
-              // onClick={() => window.open("https://c1hcg687.caspio.com/dp/ff46c000bde0be0689754401a5cc", "_blank")}
               onClick={openPartner}
               whileHover={{ scale: 1.07, y: -2 }}
               transition={{ type: "tween", ease: "easeOut", duration: 0.04 }}
@@ -230,8 +239,12 @@ const Header = () => {
               <div className="flex flex-col gap-3 pt-2 w-full justify-center items-center">
                 <button
                   onClick={() => {
-                    openLogin();
-                    setIsOpen(false);
+                    if (token) {
+                      router.push("/dashboard");
+                    } else {
+                      openLogin();
+                      setIsOpen(false);
+                    }
                   }}
                   className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition w-[80%] max-w-xs mx-auto">
                   Login

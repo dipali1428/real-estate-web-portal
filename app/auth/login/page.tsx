@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 
 const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const [useOtp, setUseOtp] = useState(false);
@@ -156,6 +155,12 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                         onChange={(e) => {
                                             let value = e.target.value.trim();
 
+                                            // If starts with a digit → treat as mobile number
+                                            if (/^\d/.test(value)) {
+                                                value = value.replace(/\D/g, "");
+                                                value = value.slice(0, 10);
+                                            }
+
                                             // If it's an email → lowercase it
                                             if (emailRegex.test(value)) {
                                                 value = value.toLowerCase();
@@ -163,8 +168,8 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                             setEmailOrPhone(value);
                                             setIsVerified(false);
                                         }}
-                                        placeholder="Enter your email or phone number"
-                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#1CADA3] focus:outline-none text-gray-800 placeholder:text-gray-400"
+                                        placeholder="Enter email or phone number"
+                                        className="w-full border border-gray-300 rounded-lg px-2 pr-10 py-2 focus:ring-2 focus:ring-[#1CADA3] focus:outline-none text-gray-800 placeholder:text-gray-400"
                                     />
 
                                     {/* VERIFY BUTTON ONLY IN FORGOT MODE */}
@@ -189,7 +194,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                                 }
                                                 setVerifying(false);
                                             }}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#2076C7] text-white text-xs px-3 py-1 rounded-md shadow">
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#2076C7] text-white text-xs px-2 py-2 h-7 flex items-center rounded-md shadow">
                                             {verifying ? "..." : isVerified ? "✔" : "Verify"}
                                         </button>
                                     )}
