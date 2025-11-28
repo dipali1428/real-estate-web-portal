@@ -118,15 +118,15 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
           {/* Term Insurance Fields */}
           {showTermInsuranceFields && (
             <div className="space-y-3 mt-4">
-              <Input label="Proposer Name" onChange={handleChange} />
+              <Input label="Proposer Name" onChange={handleChange} placeholder="Enter proposer's full name" />
               <Input label="Birthdate" type="date" onChange={handleChange} />
-              <Input label="Education" onChange={handleChange} />
+              <Input label="Education" onChange={handleChange} placeholder="Enter highest qualification" />
               <Select 
                 label="Profession" 
                 options={["Salaried", "Self Employed"]} 
                 onChange={handleChange} 
               />
-              <Input label="Income (Yearly)" type="number" onChange={handleChange} />
+              <Input label="Income (Yearly)" type="number" onChange={handleChange} placeholder="Enter annual income in ₹" />
               <Select label="Income Proof" options={["3 Years ITR", "Form 16"]} onChange={handleChange} />
               
               {/* Upload Document Field - Shows when Income Proof is selected */}
@@ -138,29 +138,29 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
                 />
               )}
               
-              <Input label="Sum Assured Amount" type="number" onChange={handleChange} />
-              <Input label="Policy Term" onChange={handleChange} />
-              <Input label="PPT (Premium Paying Term)" onChange={handleChange} />
-              <Input label="Smoker / Non-Smoker" onChange={handleChange} />
-              <Input label="Drinker / Non-Drinker" onChange={handleChange} />
-              <Input label="Any Existing Disease" onChange={handleChange} />
+              <Input label="Sum Assured Amount" type="number" onChange={handleChange} placeholder="Enter sum assured amount in ₹" />
+              <Input label="Policy Term" onChange={handleChange} placeholder="Enter policy term in years" />
+              <Input label="PPT (Premium Paying Term)" onChange={handleChange} placeholder="Enter premium paying term" />
+              <Input label="Smoker / Non-Smoker" onChange={handleChange} placeholder="Enter smoking status" />
+              <Input label="Drinker / Non-Drinker" onChange={handleChange} placeholder="Enter drinking status" />
+              <Input label="Any Existing Disease" onChange={handleChange} placeholder="Enter any medical conditions" />
             </div>
           )}
 
           {/* Investment Plans */}
           {showInvestmentFields && (
             <div className="space-y-3 mt-4">
-              <Input label="Proposer Name" onChange={handleChange} />
+              <Input label="Proposer Name" onChange={handleChange} placeholder="Enter proposer's full name" />
               <Input label="Birthdate" type="date" onChange={handleChange} />
               <Select 
                 label="Profession" 
                 options={["Salaried", "Self Employed"]} 
                 onChange={handleChange} 
               />
-              <Input label="Income (Yearly)" type="number" onChange={handleChange} />
-              <Input label="Policy Term" onChange={handleChange} />
-              <Input label="Premium Paying Term (PPT)" onChange={handleChange} />
-              <Input label="Investment Budget (Yearly)" type="number" onChange={handleChange} />
+              <Input label="Income (Yearly)" type="number" onChange={handleChange} placeholder="Enter annual income in ₹" />
+              <Input label="Policy Term" onChange={handleChange} placeholder="Enter policy term in years" />
+              <Input label="Premium Paying Term (PPT)" onChange={handleChange} placeholder="Enter premium paying term" />
+              <Input label="Investment Budget (Yearly)" type="number" onChange={handleChange} placeholder="Enter yearly investment amount in ₹" />
             </div>
           )}
 
@@ -199,10 +199,12 @@ function Input({
   label,
   type = "text",
   onChange,
+  placeholder = ""
 }: {
   label: string;
   type?: string;
   onChange: (label: string, value: any) => void;
+  placeholder?: string;
 }) {
   return (
     <div>
@@ -211,6 +213,7 @@ function Input({
         type={type}
         onChange={(e) => onChange(label, e.target.value)}
         className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 text-gray-700"
+        placeholder={placeholder}
       />
     </div>
   );

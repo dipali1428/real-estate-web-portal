@@ -29,7 +29,25 @@ export default function MutualFundForm({ onClose }: { onClose: () => void }) {
     
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+    }));
+
+    setErrors(prev => ({
+      ...prev,
+      [name]: ""
+    }));
+  };
+
+  // Handle Number Input Change (for phone number)
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    // Allow only numbers
+    const numericValue = value.replace(/[^0-9]/g, '');
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: numericValue,
     }));
 
     setErrors(prev => ({
@@ -50,6 +68,10 @@ export default function MutualFundForm({ onClose }: { onClose: () => void }) {
 
     if (formData.phone && formData.phone.length !== 10) {
       newErrors.phone = "Phone number must be 10 digits";
+    }
+
+    if (formData.pan && formData.pan.length !== 10) {
+      newErrors.pan = "Pan number must be 10 digits";
     }
 
     if (formData.pan && formData.pan.length !== 10) {
@@ -114,7 +136,7 @@ export default function MutualFundForm({ onClose }: { onClose: () => void }) {
                   maxLength={10}
                   placeholder="Enter 10-digit phone number" 
                   value={formData.phone}
-                  onChange={handleChange}
+                  onChange={handleNumberChange}
                   className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent" 
                 />
                 {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
@@ -140,6 +162,7 @@ export default function MutualFundForm({ onClose }: { onClose: () => void }) {
                 <input 
                   name="pan"
                   type="text" 
+                  maxLength={10}
                   placeholder="Enter PAN number" 
                   value={formData.pan}
                   onChange={handleChange}
@@ -303,19 +326,6 @@ export default function MutualFundForm({ onClose }: { onClose: () => void }) {
                   ))}
                 </div>
               </div>
-
-              {/* CAPTCHA */}
-              <div className="col-span-1 md:col-span-2 flex items-center gap-2 mt-4 text-gray-700">
-                <input 
-                  name="notRobot"
-                  type="checkbox" 
-                  checked={formData.notRobot}
-                  onChange={handleChange}
-                  className="h-4 w-4" 
-                />
-                <label className="text-sm sm:text-base">I am not a robot</label>
-              </div>
-              {errors.notRobot && <p className="col-span-1 md:col-span-2 text-red-500 text-xs mt-1">{errors.notRobot}</p>}
 
               {/* SUBMIT */}
               <div className="col-span-1 md:col-span-2 mt-4 flex justify-center">

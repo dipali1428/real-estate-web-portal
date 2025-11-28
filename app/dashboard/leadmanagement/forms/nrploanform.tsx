@@ -2,46 +2,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
-// Reusable Input component
-function Input({ label, placeholder, type = "text", value, onChange, error, maxLength, }:
-  { label: string; placeholder?: string; type?: string; value?: string; onChange?: (e: any) => void; error?: string; maxLength?: number; }) {
-  return (
-    <div className="flex flex-col w-full">
-      <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        maxLength={maxLength}
-        className={`w-full border rounded-md p-2 bg-white text-gray-700 text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent ${error ? "border-red-500" : "border-gray-300"
-          }`}
-      />
-
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    </div>
-  );
-}
-
-// Upload document labels
-const salariedUploads = [
-  "PAN Card",
-  "Aadhar Card",
-  "3 Months Salary Slip",
-  "6 Months Bank Statement",
-  "Company ID Card",
-  "Form 16 (if available)",
-];
-
-const selfEmployedUploads = [
-  "PAN Card",
-  "Aadhar Card",
-  "Business Registration Proof",
-  "Last 2 Years ITR",
-  "6 Months Bank Statement",
-  "Business Office Address Proof",
-];
-
 export default function NrpLoanForm({ onClose }: { onClose: () => void }) {
   const [employmentType, setEmploymentType] = useState("");
 
@@ -55,208 +15,269 @@ export default function NrpLoanForm({ onClose }: { onClose: () => void }) {
     useOfFund: "",
   });
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  // Handle input change
-  const handleChange = (field: string, value: string) => {
-    if (field === "phone") {
-      if (!/^\d*$/.test(value)) return; // Only digits allowed
-    }
-
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  // Update form values - matching Personal Loan behavior
+  const handleChange = (key: string, value: string) => {
+    setFormData({ ...formData, [key]: value });
   };
 
-  // Validate form
-  const validateForm = () => {
-    let newErrors: { [key: string]: string } = {};
-
-    Object.entries(formData).forEach(([key, value]) => {
-      if (!value || value.trim() === "") {
-        newErrors[key] = "This field is required";
-      }
-    });
-
-    if (formData.phone.length !== 10) {
-      newErrors.phone = "Phone number must be 10 digits";
-    }
-
-    if (!employmentType) {
-      newErrors.employmentType = "Please select employment type";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Submit handler
-  const handleSubmit = (e: React.FormEvent) => {
+  // Validate before submit - matching Personal Loan behavior
+  const submitForm = (e: any) => {
     e.preventDefault();
+    setError(false);
+    setSuccess(false);
 
-    if (!validateForm()) {
-      alert("Please fill all required fields");
+    // Check all required fields including the dropdown
+    const requiredFields = [
+      formData.name,
+      formData.phone,
+      formData.email,
+      formData.dob,
+      formData.location,
+      formData.loanAmount,
+      formData.useOfFund,
+      employmentType,
+    ];
+
+    for (const field of requiredFields) {
+      if (!field) {
+        setError(true);
+        return;
+      }
+    }
+
+    // Validate phone number length
+    if (formData.phone.length !== 10) {
+      setError(true);
       return;
     }
 
-    alert("Form submitted successfully!");
+    // If all good
+    setSuccess(true);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col">
         
-        {/* Header */}
+        {/* Header - Matching Personal Loan design */}
         <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
-          <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">
-            NRP Loan Form
-          </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition">
+          <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">NRP Loan Form</h2>
+          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
             <X size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        {/* Scrollable Form Body */}
+        {/* Scrollable Form Body - Matching Personal Loan structure */}
         <div className="flex-1 overflow-y-auto">
-          <form onSubmit={handleSubmit} className="p-4 sm:p-6">
+          <form onSubmit={submitForm} className="p-4 sm:p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
-              <Input
+              <Input 
                 label="Client Name"
-                placeholder="Enter client name"
+                placeholder="Enter your full name"
                 value={formData.name}
-                onChange={(e) => handleChange("name", e.target.value)}
-                error={errors.name}
+                onChange={(e: any) => handleChange("name", e.target.value)}
               />
 
               <Input
                 label="Phone Number"
-                placeholder="Enter 10-digit phone number"
                 type="tel"
                 maxLength={10}
+                onlyNumber
+                placeholder="Enter 10-digit mobile number"
                 value={formData.phone}
-                onChange={(e) => handleChange("phone", e.target.value)}
-                error={errors.phone}
+                onChange={(e: any) => handleChange("phone", e.target.value)}
               />
 
-              <Input
+              <Input 
                 label="Email ID"
-                placeholder="Enter email address"
+                type="email"
+                placeholder="Enter your email address"
                 value={formData.email}
-                onChange={(e) => handleChange("email", e.target.value)}
-                error={errors.email}
+                onChange={(e: any) => handleChange("email", e.target.value)}
               />
 
-              <Input
+              <Input 
                 label="Date of Birth"
                 type="date"
                 value={formData.dob}
-                onChange={(e) => handleChange("dob", e.target.value)}
-                error={errors.dob}
+                onChange={(e: any) => handleChange("dob", e.target.value)}
               />
 
-              <Input
+              <Input 
                 label="Location"
-                placeholder="Enter your location"
+                placeholder="Enter your city"
                 value={formData.location}
-                onChange={(e) => handleChange("location", e.target.value)}
-                error={errors.location}
+                onChange={(e: any) => handleChange("location", e.target.value)}
               />
 
-              <Input
+              <Input 
                 label="Loan Amount"
-                placeholder="Enter loan amount"
+                placeholder="Enter desired loan amount"
+                onlyNumber
                 value={formData.loanAmount}
-                onChange={(e) => handleChange("loanAmount", e.target.value)}
-                error={errors.loanAmount}
+                onChange={(e: any) => handleChange("loanAmount", e.target.value)}
               />
 
-              <Input
+              <Input 
                 label="Use of Fund"
                 placeholder="Enter purpose of loan"
                 value={formData.useOfFund}
-                onChange={(e) => handleChange("useOfFund", e.target.value)}
-                error={errors.useOfFund}
+                onChange={(e: any) => handleChange("useOfFund", e.target.value)}
               />
 
-              {/* Employment Type */}
-              <div className="col-span-1 md:col-span-2">
-                <label className="text-sm font-semibold text-gray-700">Employment Type</label>
-                <select
-                  value={employmentType}
-                  onChange={(e) => setEmploymentType(e.target.value)}
-                  className={`w-full border rounded-md p-2 bg-white text-gray-700 mt-1 text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent ${errors.employmentType ? "border-red-500" : "border-gray-300"
-                    }`}
-                >
-                  <option value="">-- Select Employment Type --</option>
-                  <option value="salaried">Salaried Person</option>
-                  <option value="selfEmployed">Self Employed</option>
-                </select>
+              {/* Employment Type - Updated with Personal Loan styling */}
+              <Select
+                label="Employment Type"
+                options={["Salaried Person", "Self Employed"]}
+                value={employmentType}
+                onChange={setEmploymentType}
+              />
 
-                {errors.employmentType && (
-                  <p className="text-red-500 text-xs mt-1">{errors.employmentType}</p>
-                )}
-              </div>
+              {/* Dynamic Document Sections */}
+              {employmentType === "Salaried Person" && <SalariedDocs />}
+              {employmentType === "Self Employed" && <SelfEmployedDocs />}
 
-              {/* Salaried Docs */}
-              {employmentType === "salaried" && (
-                <div className="col-span-1 md:col-span-2">
-                  <h3 className="text-base sm:text-lg font-semibold text-[#1CADA3] mt-4 mb-3 border-b pb-2">
-                    Upload Documents for Salaried Person
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {salariedUploads.map((label, index) => (
-                      <div key={index} className="flex flex-col">
-                        <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
-                        <input 
-                          type="file" 
-                          className="w-full border border-gray-300 rounded-md p-2 text-gray-700 text-sm" 
-                        />
-                      </div>
-                    ))}
-                  </div>
+              {/* Error Message - Matching Personal Loan styling */}
+              {error && (
+                <div className="col-span-1 md:col-span-2 text-center text-red-600 font-semibold mt-2 text-sm sm:text-base">
+                  ⚠ Please fill all fields before submitting.
                 </div>
               )}
 
-              {/* Self-Employed Docs */}
-              {employmentType === "selfEmployed" && (
-                <div className="col-span-1 md:col-span-2">
-                  <h3 className="text-base sm:text-lg font-semibold text-[#1CADA3] mt-4 mb-3 border-b pb-2">
-                    Upload Documents for Self Employed
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {selfEmployedUploads.map((label, index) => (
-                      <div key={index} className="flex flex-col">
-                        <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
-                        <input 
-                          type="file" 
-                          className="w-full border border-gray-300 rounded-md p-2 text-gray-700 text-sm" 
-                        />
-                      </div>
-                    ))}
-                  </div>
+              {/* Success Message - Matching Personal Loan styling */}
+              {success && (
+                <div className="col-span-1 md:col-span-2 text-center text-green-600 font-semibold mt-2 text-sm sm:text-base">
+                  ✔ Form submitted successfully!
                 </div>
               )}
 
-              {/* Checkbox */}
-              <div className="col-span-1 md:col-span-2 flex items-center mt-4">
-                <input type="checkbox" id="notRobot" className="mr-2 w-4 h-4" />
-                <label htmlFor="notRobot" className="text-gray-700 text-sm sm:text-base">
-                  I am not a robot
-                </label>
-              </div>
-
-              {/* Submit Button */}
+              {/* Submit Button - Matching Personal Loan styling */}
               <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
                 <button
                   type="submit"
                   className="w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base"
                 >
-                  Submit Form
+                  Submit
                 </button>
               </div>
+
             </div>
           </form>
         </div>
       </div>
     </div>
+  );
+}
+
+/* ---------------- INPUT COMPONENT - Matching Personal Loan exactly ---------------- */
+function Input({ label, value, onChange, type = "text", onlyNumber, maxLength, placeholder }: any) {
+
+  const restrictNumber = (e: any) => {
+    if (!onlyNumber) return;
+
+    if (["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) return;
+
+    if (!/^[0-9]$/.test(e.key)) e.preventDefault();
+  };
+
+  return (
+    <div className="w-full">
+      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
+      <input
+        value={value}
+        type={type}
+        maxLength={maxLength}
+        onKeyDown={restrictNumber}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
+      />
+    </div>
+  );
+}
+
+/* ---------------- SELECT COMPONENT - With Personal Loan styling ---------------- */
+function Select({ label, options, value, onChange }: any) {
+  return (
+    <div className="w-full">
+      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base"
+      >
+        <option value="">Select {label}</option>
+        {options.map((option: string) => (
+          <option key={option} value={option}>{option}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+/* ---------------- FILE UPLOAD - With Personal Loan styling ---------------- */
+function FileUpload({ label }: { label: string }) {
+  return (
+    <div className="flex flex-col">
+      <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
+      <input 
+        type="file" 
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 text-sm" 
+      />
+    </div>
+  );
+}
+
+/* ---------------- SECTION COMPONENT ---------------- */
+function Section({ title, children }: any) {
+  return (
+    <div className="col-span-1 md:col-span-2 mt-6">
+      <h3 className="text-md font-semibold mb-3 text-[#1CADA3]">{title}</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>
+    </div>
+  );
+}
+
+/* ---------------- SALARIED DOCUMENTS ---------------- */
+function SalariedDocs() {
+  const docs = [
+    "PAN Card",
+    "Aadhar Card",
+    "3 Months Salary Slip",
+    "6 Months Bank Statement",
+    "Company ID Card",
+    "Form 16 (if available)",
+  ];
+  
+  return (
+    <Section title="Upload Documents for Salaried Person">
+      {docs.map((doc) => (
+        <FileUpload key={doc} label={doc} />
+      ))}
+    </Section>
+  );
+}
+
+/* ---------------- SELF EMPLOYED DOCUMENTS ---------------- */
+function SelfEmployedDocs() {
+  const docs = [
+    "PAN Card",
+    "Aadhar Card",
+    "Business Registration Proof",
+    "Last 2 Years ITR",
+    "6 Months Bank Statement",
+    "Business Office Address Proof",
+  ];
+  
+  return (
+    <Section title="Upload Documents for Self Employed">
+      {docs.map((doc) => (
+        <FileUpload key={doc} label={doc} />
+      ))}
+    </Section>
   );
 }

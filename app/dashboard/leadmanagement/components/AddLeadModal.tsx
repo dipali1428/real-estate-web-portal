@@ -9,7 +9,7 @@ export default function AddLeadModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const [form, setForm] = useState({
+  const [formData, setFormData] = useState({
     leadName: "",
     contactNumber: "",
     emailAddress: "",
@@ -18,6 +18,9 @@ export default function AddLeadModal({
     additionalNotes: "",
   });
 
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
+
   const subProductOptions: Record<string, string[]> = {
     finance: ["Loans", "Credit Cards", "EMI Plans"],
     protection: ["Life Insurance", "Health Insurance"],
@@ -25,151 +28,210 @@ export default function AddLeadModal({
     real_estate: ["Apartments", "Commercial", "Land"],
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    setForm({ ...form, [e.target.id]: e.target.value });
+  // Update form values - matching Personal Loan behavior
+  const handleChange = (key: string, value: string) => {
+    setFormData({ ...formData, [key]: value });
   };
 
-  const handleSave = () => {
-    console.log("Lead Saved:", form);
-    onClose();
+  // Validate before submit - matching Personal Loan behavior
+  const submitForm = (e: any) => {
+    e.preventDefault();
+    setError(false);
+    setSuccess(false);
+
+    // Check all required fields
+    const requiredFields = [
+      formData.leadName,
+      formData.contactNumber,
+      formData.product,
+    ];
+
+    for (const field of requiredFields) {
+      if (!field) {
+        setError(true);
+        return;
+      }
+    }
+
+    // Validate phone number length
+    if (formData.contactNumber.length !== 10) {
+      setError(true);
+      return;
+    }
+
+    // If all good
+    setSuccess(true);
+    
+    // Reset form and close after success
+    setTimeout(() => {
+      setSuccess(false);
+      onClose();
+      setFormData({
+        leadName: "",
+        contactNumber: "",
+        emailAddress: "",
+        product: "",
+        subProduct: "",
+        additionalNotes: "",
+      });
+    }, 1500);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md animate-fadeIn">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b p-4">
-          <h2 className="text-lg font-semibold text-gray-700">Add New Lead</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X className="w-5 h-5" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto max-h-[90vh] flex flex-col">
+        
+        {/* Header - Matching Personal Loan design */}
+        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
+          <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Add New Lead</h2>
+          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
+            <X size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-4 space-y-4 text-gray-700">
-          <div>
-            <label htmlFor="leadName" className="block text-sm font-medium text-gray-700">
-              Client Name *
-            </label>
-            <input
-              id="leadName"
-              type="text"
-              required
-              value={form.leadName}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+        {/* Scrollable Form Body - Reduced bottom space */}
+        <div className="flex-1 overflow-y-auto">
+          <form onSubmit={submitForm} className="p-4 sm:p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
-          <div>
-            <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700">
-              Contact Number *
-            </label>
-            <input
-              id="contactNumber"
-              type="text"
-              required
-              value={form.contactNumber}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+              <Input 
+                label="Client Name"
+                placeholder="Enter client's full name"
+                value={formData.leadName}
+                onChange={(e: any) => handleChange("leadName", e.target.value)}
+              />
 
-          <div>
-            <label htmlFor="emailAddress" className="block text-sm font-medium text-gray-700">
-              Email Address
-            </label>
-            <input
-              id="emailAddress"
-              type="email"
-              value={form.emailAddress}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+              <Input
+                label="Contact Number"
+                type="tel"
+                maxLength={10}
+                onlyNumber
+                placeholder="Enter 10-digit contact number"
+                value={formData.contactNumber}
+                onChange={(e: any) => handleChange("contactNumber", e.target.value)}
+              />
 
-          <div>
-            <label htmlFor="product" className="block text-sm font-medium text-gray-700">
-              Product
-            </label>
-            <select
-              id="product"
-              value={form.product}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select Product</option>
-              <option value="finance">Finance</option>
-              <option value="protection">Protection</option>
-              <option value="investments">Investments</option>
-              <option value="real_estate">Real Estate</option>
-            </select>
-          </div>
+              <Input 
+                label="Email Address"
+                type="email"
+                placeholder="Enter email address"
+                value={formData.emailAddress}
+                onChange={(e: any) => handleChange("emailAddress", e.target.value)}
+              />
 
-          {form.product && (
-            <div>
-              <label htmlFor="subProduct" className="block text-sm font-medium text-gray-700">
-                Sub Product
-              </label>
-              <select
-                id="subProduct"
-                value={form.subProduct}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select Sub Product</option>
-                {subProductOptions[form.product]?.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+              {/* Product Selection */}
+              <Select
+                label="Product"
+                options={["Finance", "Protection", "Investments", "Real Estate"]}
+                value={formData.product}
+                onChange={(value: string) => handleChange("product", value)}
+              />
+
+              {/* Sub Product Selection */}
+              {formData.product && (
+                <Select
+                  label="Sub Product"
+                  options={subProductOptions[formData.product.toLowerCase()] || []}
+                  value={formData.subProduct}
+                  onChange={(value: string) => handleChange("subProduct", value)}
+                />
+              )}
+
+              {/* Additional Notes - Full width */}
+              <div className="col-span-1 md:col-span-2">
+                <label className="block text-sm font-medium mb-1 text-gray-700">Additional Notes</label>
+                <textarea
+                  value={formData.additionalNotes}
+                  onChange={(e: any) => handleChange("additionalNotes", e.target.value)}
+                  placeholder="Enter any additional notes or comments..."
+                  rows={3}
+                  className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
+                />
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="col-span-1 md:col-span-2 text-center text-red-600 font-semibold text-sm sm:text-base">
+                  ⚠ Please fill all required fields correctly.
+                </div>
+              )}
+
+              {/* Success Message */}
+              {success && (
+                <div className="col-span-1 md:col-span-2 text-center text-green-600 font-semibold text-sm sm:text-base">
+                  ✔ Lead saved successfully!
+                </div>
+              )}
+
+              {/* Action Buttons - Reduced top margin */}
+              <div className="col-span-1 md:col-span-2 flex justify-center gap-4">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-full sm:w-32 bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors text-sm sm:text-base"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="w-full sm:w-32 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base"
+                >
+                  Save Lead
+                </button>
+              </div>
+
             </div>
-          )}
-
-          <div>
-            <label htmlFor="additionalNotes" className="block text-sm font-medium text-gray-700">
-              Additional Notes
-            </label>
-            <textarea
-              id="additionalNotes"
-              rows={3}
-              value={form.additionalNotes}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            ></textarea>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex justify-end border-t p-4 gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded bg-gray-100 text-gray-700 hover:bg-gray-200"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
-          >
-            Save Lead
-          </button>
+          </form>
         </div>
       </div>
-      <style jsx>{`
-           @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
-          }
-        .animate-fadeIn {
-          animation: fadeIn 0.2s ease-out;
-        }`}
-      </style>
+    </div>
+  );
+}
+
+/* ---------------- INPUT COMPONENT - Matching Personal Loan exactly ---------------- */
+function Input({ label, value, onChange, type = "text", onlyNumber, maxLength, placeholder }: any) {
+
+  const restrictNumber = (e: any) => {
+    if (!onlyNumber) return;
+
+    if (["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) return;
+
+    if (!/^[0-9]$/.test(e.key)) e.preventDefault();
+  };
+
+  return (
+    <div className="w-full">
+      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
+      <input
+        value={value}
+        type={type}
+        maxLength={maxLength}
+        onKeyDown={restrictNumber}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
+      />
+    </div>
+  );
+}
+
+/* ---------------- SELECT COMPONENT - With Personal Loan styling ---------------- */
+function Select({ label, options, value, onChange }: any) {
+  return (
+    <div className="w-full">
+      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base"
+      >
+        <option value="">Select {label}</option>
+        {options.map((option: string) => (
+          <option key={option} value={option}>{option}</option>
+        ))}
+      </select>
     </div>
   );
 }

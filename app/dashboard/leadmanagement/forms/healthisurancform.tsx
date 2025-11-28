@@ -146,14 +146,15 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
             type="text"
             value={form.proposer}
             onChange={(v) => updateField("proposer", v)}
+            placeholder="Enter proposer's full name"
           />
 
           {/* INDIVIDUAL */}
           {planType === "individual" && (
             <div className="space-y-4">
-              <Input label="City" type="text" value={form.city} onChange={(v) => updateField("city", v)} />
-              <Input label="Pin Code" type="text" value={form.pin} onChange={(v) => updateField("pin", v)} />
-              <Input label="Preferred Sum Assured (Min- 5 lakhs)" type="text" value={form.PSA} onChange={(v) => updateField("PSA", v)} />
+              <Input label="City" type="text" value={form.city} onChange={(v) => updateField("city", v)} placeholder="Enter your city" />
+              <Input label="Pin Code" type="text" value={form.pin} onChange={(v) => updateField("pin", v.replace(/\D/g, ""))} placeholder="Enter 6-digit pin code" />
+              <Input label="Preferred Sum Assured (Min- 5 lakhs)" type="text" value={form.PSA} onChange={(v) => updateField("PSA", v.replace(/\D/g, ""))} placeholder="Enter sum assured amount" />
               
               {/* POLICY TENURE - Only show when plan type is selected */}
               <div className="mb-4">
@@ -173,16 +174,16 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
               </div>
 
               <Input label="Date of Birth" type="date" value={form.dob} onChange={(v) => updateField("dob", v)} />
-              <Input label="Pre Existing Disease" type="text" value={form.disease} onChange={(v) => updateField("disease", v)} />
+              <Input label="Pre Existing Disease" type="text" value={form.disease} onChange={(v) => updateField("disease", v)} placeholder="Enter any pre-existing medical conditions" />
             </div>
           )}
 
           {/* FAMILY */}
           {planType === "family" && (
             <div className="space-y-4">
-              <Input label="City" type="text" value={form.city} onChange={(v) => updateField("city", v)} />
-              <Input label="Pin Code" type="text" value={form.pin} onChange={(v) => updateField("pin", v)} />
-              <Input label="Preferred Sum Assured (Min- 5 lakhs)" type="text" value={form.PSA} onChange={(v) => updateField("PSA", v)} />
+              <Input label="City" type="text" value={form.city} onChange={(v) => updateField("city", v)} placeholder="Enter your city" />
+              <Input label="Pin Code" type="text" value={form.pin} onChange={(v) => updateField("pin", v.replace(/\D/g, ""))} placeholder="Enter 6-digit pin code" />
+              <Input label="Preferred Sum Assured (Min- 5 lakhs)" type="text" value={form.PSA} onChange={(v) => updateField("PSA", v.replace(/\D/g, ""))} placeholder="Enter sum assured amount" />
               
               {/* POLICY TENURE - Only show when plan type is selected */}
               <div className="mb-4">
@@ -202,7 +203,7 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
               </div>
 
               {[
-                { label: " DOB of First Adult Member", field: "FirstAdultDob" },
+                { label: "DOB of First Adult Member", field: "FirstAdultDob" },
                 { label: "DOB of Second Adult Member", field: "SecondAdultDob" },
                 { label: "DOB of 1st Child", field: "child1Dob" },
                 { label: "DOB of 2nd Child", field: "child2Dob" },
@@ -216,7 +217,7 @@ export default function HealthInsuranceForm({ onClose }: { onClose?: () => void 
                 />
               ))}
 
-              <Input label="Pre Existing Disease" type="text" value={form.disease} onChange={(v) => updateField("disease", v)} />
+              <Input label="Pre Existing Disease" type="text" value={form.disease} onChange={(v) => updateField("disease", v)} placeholder="Enter any pre-existing medical conditions" />
             </div>
           )}
 
@@ -339,11 +340,13 @@ function Input({
   type,
   value,
   onChange,
+  placeholder = ""
 }: {
   label: string;
   type: string;
   value: any;
   onChange: (v: string) => void;
+  placeholder?: string;
 }) {
   return (
     <div className="mb-4">
@@ -353,6 +356,7 @@ function Input({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-full border border-gray-300 rounded-md p-2 text-gray-700"
+        placeholder={placeholder}
       />
     </div>
   );

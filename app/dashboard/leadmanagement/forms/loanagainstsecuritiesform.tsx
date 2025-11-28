@@ -1,13 +1,8 @@
 "use client";
-
 import { useState } from "react";
 import { X } from "lucide-react";
 
-export default function LoanAgainstSecuritiesForm({
-  onClose,
-}: {
-  onClose: () => void;
-}) {
+export default function LoanAgainstSecuritiesForm({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
     clientName: "",
     phone: "",
@@ -19,120 +14,124 @@ export default function LoanAgainstSecuritiesForm({
     notRobot: false,
   });
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  // Handle form submit
-  const handleSubmit = (e: React.FormEvent) => {
+  // Update form values - matching Personal Loan behavior
+  const handleChange = (key: string, value: string | boolean) => {
+    setFormData({ ...formData, [key]: value });
+  };
+
+  // Validate before submit - matching Personal Loan behavior
+  const submitForm = (e: any) => {
     e.preventDefault();
-    const newErrors: { [key: string]: string } = {};
+    setError(false);
+    setSuccess(false);
 
-    Object.entries(formData).forEach(([key, value]) => {
-      if (!value && key !== "otherDetails" && key !== "notRobot") {
-        newErrors[key] = "This field is required";
+    // Check all required fields
+    const requiredFields = [
+      formData.clientName,
+      formData.phone,
+      formData.email,
+      formData.dob,
+      formData.location,
+      formData.loanAmount,
+      formData.notRobot,
+    ];
+
+    for (const field of requiredFields) {
+      if (!field) {
+        setError(true);
+        return;
       }
-    });
-
-    if (formData.phone && formData.phone.length !== 10)
-      newErrors.phone = "Phone number must be 10 digits";
-
-    if (!formData.notRobot)
-      newErrors.notRobot = "Please confirm you are not a robot";
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      alert("Form Submitted Successfully!");
-      console.log("Form Data:", formData);
     }
+
+    // Validate phone number length
+    if (formData.phone.length !== 10) {
+      setError(true);
+      return;
+    }
+
+    // If all good
+    setSuccess(true);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col">
         
-        {/* HEADER */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b flex-shrink-0">
-          <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">
-            Loan Against Securities Form
-          </h2>
-          <button onClick={onClose} className="text-gray-600 hover:text-black">
+        {/* Header - Matching Personal Loan design */}
+        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
+          <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Loan Against Securities Form</h2>
+          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
             <X size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        {/* SCROLLABLE BODY */}
+        {/* Scrollable Form Body - Matching Personal Loan structure */}
         <div className="flex-1 overflow-y-auto">
-          <form className="p-4 sm:p-6" onSubmit={handleSubmit}>
+          <form onSubmit={submitForm} className="p-4 sm:p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
-              {/* Personal Details */}
               <Input 
-                label="Client Name" 
-                placeholder="Enter client name"
+                label="Client Name"
+                placeholder="Enter your full name"
                 value={formData.clientName}
-                onChange={(value) => setFormData({ ...formData, clientName: value })}
-                error={errors.clientName}
+                onChange={(e: any) => handleChange("clientName", e.target.value)}
               />
-              
+
               <Input
-                label="Client Phone Number"
-                placeholder="Enter 10-digit phone number"
-                value={formData.phone}
-                onChange={(value) => setFormData({ ...formData, phone: value.replace(/\D/g, "") })}
+                label="Phone Number"
+                type="tel"
                 maxLength={10}
-                error={errors.phone}
+                onlyNumber
+                placeholder="Enter 10-digit mobile number"
+                value={formData.phone}
+                onChange={(e: any) => handleChange("phone", e.target.value)}
               />
-              
+
               <Input 
-                label="Client Email ID" 
-                placeholder="Enter email address"
+                label="Email ID"
+                type="email"
+                placeholder="Enter your email address"
                 value={formData.email}
-                onChange={(value) => setFormData({ ...formData, email: value })}
-                error={errors.email}
+                onChange={(e: any) => handleChange("email", e.target.value)}
               />
-              
-              <DateInput 
-                label="Client Date of Birth" 
+
+              <Input 
+                label="Date of Birth"
+                type="date"
                 value={formData.dob}
-                onChange={(value) => setFormData({ ...formData, dob: value })}
-                error={errors.dob}
+                onChange={(e: any) => handleChange("dob", e.target.value)}
               />
 
               <Input 
-                label="Location" 
-                placeholder="Enter your location"
+                label="Location"
+                placeholder="Enter your city"
                 value={formData.location}
-                onChange={(value) => setFormData({ ...formData, location: value })}
-                error={errors.location}
+                onChange={(e: any) => handleChange("location", e.target.value)}
               />
-              
+
               <Input 
-                label="Loan Amount" 
-                placeholder="Enter loan amount"
+                label="Loan Amount"
+                placeholder="Enter desired loan amount"
+                onlyNumber
                 value={formData.loanAmount}
-                onChange={(value) => setFormData({ ...formData, loanAmount: value })}
-                error={errors.loanAmount}
+                onChange={(e: any) => handleChange("loanAmount", e.target.value)}
               />
 
-              <div className="col-span-1 md:col-span-2">
-                <Input
-                  label="Other Loan Obligation Details"
-                  placeholder="Enter other loan details"
-                  value={formData.otherDetails}
-                  onChange={(value) => setFormData({ ...formData, otherDetails: value })}
-                  error={errors.otherDetails}
-                />
-              </div>
+              <Input 
+                label="Other Loan Obligation Details"
+                placeholder="Enter existing loan details"
+                value={formData.otherDetails}
+                onChange={(e: any) => handleChange("otherDetails", e.target.value)}
+              />
 
-              {/* Section Header */}
-              <div className="col-span-1 md:col-span-2 mt-4">
-                <h3 className="text-base sm:text-lg font-semibold text-[#1CADA3] border-b pb-2">
-                  Upload Documents
-                </h3>
-              </div>
 
-              {/* File Uploads - Responsive grid */}
+
+              {/* File Uploads - Full width with Personal Loan styling */}
               <div className="col-span-1 md:col-span-2">
+                <h3 className="text-md font-semibold mb-3 text-[#1CADA3]">Upload Documents</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   {[
                     "Aadhar Card",
@@ -157,20 +156,22 @@ export default function LoanAgainstSecuritiesForm({
                 </div>
               </div>
 
-              {/* Checkbox */}
-              <div className="col-span-1 md:col-span-2 flex items-center gap-2 mt-4 text-gray-700">
-                <input 
-                  type="checkbox" 
-                  checked={formData.notRobot}
-                  onChange={(e) => setFormData({ ...formData, notRobot: e.target.checked })}
-                  className="w-4 h-4" 
-                />
-                <label className="text-sm sm:text-base">I am not a robot</label>
-              </div>
-              {errors.notRobot && <p className="col-span-1 md:col-span-2 text-red-500 text-xs mt-1">{errors.notRobot}</p>}
+              {/* Error Message - Matching Personal Loan styling */}
+              {error && (
+                <div className="col-span-1 md:col-span-2 text-center text-red-600 font-semibold mt-2 text-sm sm:text-base">
+                  ⚠ Please fill all fields before submitting.
+                </div>
+              )}
 
-              {/* Submit */}
-              <div className="col-span-1 md:col-span-2 mt-4 flex justify-center">
+              {/* Success Message - Matching Personal Loan styling */}
+              {success && (
+                <div className="col-span-1 md:col-span-2 text-center text-green-600 font-semibold mt-2 text-sm sm:text-base">
+                  ✔ Form submitted successfully!
+                </div>
+              )}
+
+              {/* Submit Button - Matching Personal Loan styling */}
+              <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
                 <button
                   type="submit"
                   className="w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base"
@@ -178,6 +179,7 @@ export default function LoanAgainstSecuritiesForm({
                   Submit
                 </button>
               </div>
+
             </div>
           </form>
         </div>
@@ -186,58 +188,29 @@ export default function LoanAgainstSecuritiesForm({
   );
 }
 
-/* ---------------------------------------------------
-   REUSABLE COMPONENTS
------------------------------------------------------*/
+/* ---------------- INPUT COMPONENT - Matching Personal Loan exactly ---------------- */
+function Input({ label, value, onChange, type = "text", onlyNumber, maxLength, placeholder }: any) {
 
-interface InputProps {
-  label: string;
-  placeholder: string;
-  value?: string;
-  onChange?: (value: string) => void;
-  error?: string;
-  maxLength?: number;
-}
+  const restrictNumber = (e: any) => {
+    if (!onlyNumber) return;
 
-function Input({ label, placeholder, value, onChange, error, maxLength }: InputProps) {
+    if (["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) return;
+
+    if (!/^[0-9]$/.test(e.key)) e.preventDefault();
+  };
+
   return (
     <div className="w-full">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
+      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
       <input
-        type="text"
-        placeholder={placeholder}
         value={value}
+        type={type}
         maxLength={maxLength}
-        onChange={(e) => onChange?.(e.target.value)}
-        className={`w-full mt-1 p-2 border rounded-md bg-white text-gray-700 text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent ${
-          error ? "border-red-500" : "border-gray-300"
-        }`}
+        onKeyDown={restrictNumber}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
       />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    </div>
-  );
-}
-
-interface DateInputProps {
-  label: string;
-  value?: string;
-  onChange?: (value: string) => void;
-  error?: string;
-}
-
-function DateInput({ label, value, onChange, error }: DateInputProps) {
-  return (
-    <div className="w-full">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
-      <input
-        type="date"
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
-        className={`w-full mt-1 p-2 border rounded-md bg-white text-gray-700 text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent ${
-          error ? "border-red-500" : "border-gray-300"
-        }`}
-      />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 }

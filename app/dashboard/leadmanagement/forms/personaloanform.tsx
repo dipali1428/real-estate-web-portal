@@ -100,6 +100,7 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
               <Input 
                 label="Loan Amount"
                 placeholder="Enter desired loan amount"
+                onlyNumber
                 value={formData.loanAmount}
                 onChange={(e: any) => handleChange("loanAmount", e.target.value)}
               />
@@ -154,12 +155,6 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Robot Check */}
-              <div className="col-span-1 md:col-span-2 flex items-center gap-2 mt-4 text-gray-700">
-                <input id="robot" type="checkbox" className="w-4 h-4" />
-                <label htmlFor="robot" className="text-sm sm:text-base">I am not a robot</label>
               </div>
 
               {/* Error Message */}

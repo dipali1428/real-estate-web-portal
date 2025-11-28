@@ -14,118 +14,123 @@ export default function SMELoanForm({ onClose }: { onClose: () => void }) {
     notRobot: false,
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.clientName) newErrors.clientName = "Client Name is required";
-    if (!formData.phone) newErrors.phone = "Phone Number is required";
-    else if (!/^[0-9]{10}$/.test(formData.phone))
-      newErrors.phone = "Phone number must be 10 digits";
-
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.dob) newErrors.dob = "Date of Birth is required";
-    if (!formData.location) newErrors.location = "Location is required";
-    if (!formData.loanAmount) newErrors.loanAmount = "Loan Amount is required";
-    if (!formData.otherDetails)
-      newErrors.otherDetails = "Details are required";
-
-    if (!formData.notRobot) newErrors.notRobot = "Please verify";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  // Update form values - matching Personal Loan behavior
+  const handleChange = (key: string, value: string | boolean) => {
+    setFormData({ ...formData, [key]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Validate before submit - matching Personal Loan behavior
+  const submitForm = (e: any) => {
     e.preventDefault();
-    if (validateForm()) {
-      alert("Form Submitted Successfully!");
+    setError(false);
+    setSuccess(false);
+
+    // Check all required fields
+    const requiredFields = [
+      formData.clientName,
+      formData.phone,
+      formData.email,
+      formData.dob,
+      formData.location,
+      formData.loanAmount,
+      formData.otherDetails,
+      formData.notRobot,
+    ];
+
+    for (const field of requiredFields) {
+      if (!field) {
+        setError(true);
+        return;
+      }
     }
+
+    // Validate phone number length
+    if (formData.phone.length !== 10) {
+      setError(true);
+      return;
+    }
+
+    // If all good
+    setSuccess(true);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col">
         
-        {/* Header */}
+        {/* Header - Matching Personal Loan design */}
         <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">SME Loan Form</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
+          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
             <X size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        {/* Scrollable Form Body */}
+        {/* Scrollable Form Body - Matching Personal Loan structure */}
         <div className="flex-1 overflow-y-auto">
-          <form className="p-4 sm:p-6" onSubmit={handleSubmit}>
+          <form onSubmit={submitForm} className="p-4 sm:p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
-              <Input
+              <Input 
                 label="Client Name"
-                placeholder="Enter client name"
+                placeholder="Enter your full name"
                 value={formData.clientName}
-                onChange={(value: string) => setFormData({ ...formData, clientName: value })}
-                error={errors.clientName}
+                onChange={(e: any) => handleChange("clientName", e.target.value)}
               />
 
               <Input
-                label="Client Phone Number"
-                placeholder="Enter 10-digit phone number"
-                value={formData.phone}
+                label="Phone Number"
+                type="tel"
                 maxLength={10}
-                onChange={(value: string) =>
-                  setFormData({ ...formData, phone: value.replace(/\D/g, "") })
-                }
-                error={errors.phone}
+                onlyNumber
+                placeholder="Enter 10-digit mobile number"
+                value={formData.phone}
+                onChange={(e: any) => handleChange("phone", e.target.value)}
               />
 
-              <Input
-                label="Client Email ID"
-                placeholder="Enter email address"
+              <Input 
+                label="Email ID"
+                type="email"
+                placeholder="Enter your email address"
                 value={formData.email}
-                onChange={(value: string) => setFormData({ ...formData, email: value })}
-                error={errors.email}
+                onChange={(e: any) => handleChange("email", e.target.value)}
               />
 
-              <DateInput
-                label="Client Date of Birth"
+              <Input 
+                label="Date of Birth"
+                type="date"
                 value={formData.dob}
-                onChange={(value: string) => setFormData({ ...formData, dob: value })}
-                error={errors.dob}
+                onChange={(e: any) => handleChange("dob", e.target.value)}
               />
 
-              <Input
+              <Input 
                 label="Location"
-                placeholder="Enter your location"
+                placeholder="Enter your city"
                 value={formData.location}
-                onChange={(value: string) => setFormData({ ...formData, location: value })}
-                error={errors.location}
+                onChange={(e: any) => handleChange("location", e.target.value)}
               />
 
-              <Input
+              <Input 
                 label="Loan Amount"
-                placeholder="Enter loan amount"
+                placeholder="Enter desired loan amount"
+                onlyNumber
                 value={formData.loanAmount}
-                onChange={(value: string) => setFormData({ ...formData, loanAmount: value })}
-                error={errors.loanAmount}
+                onChange={(e: any) => handleChange("loanAmount", e.target.value)}
               />
 
-              <Input
+              <Input 
                 label="Other Loan Obligation Details"
-                placeholder="Enter other loan details"
+                placeholder="Enter existing loan details"
                 value={formData.otherDetails}
-                onChange={(value: string) => setFormData({ ...formData, otherDetails: value })}
-                error={errors.otherDetails}
+                onChange={(e: any) => handleChange("otherDetails", e.target.value)}
               />
 
-              {/* Section Heading */}
-              <div className="col-span-1 md:col-span-2 mt-4">
-                <h3 className="font-semibold text-base sm:text-lg text-[#1CADA3] border-b pb-2">Upload Documents</h3>
-              </div>
-
-              {/* File Uploads - Responsive grid */}
+              {/* File Uploads - Full width with Personal Loan styling */}
               <div className="col-span-1 md:col-span-2">
+                <h3 className="text-md font-semibold mb-3 text-[#1CADA3]">Upload Documents</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   {[
                     "Aadhar Card",
@@ -151,23 +156,22 @@ export default function SMELoanForm({ onClose }: { onClose: () => void }) {
                 </div>
               </div>
 
-              {/* Checkbox */}
-              <div className="col-span-1 md:col-span-2 flex items-center gap-2 mt-4 text-gray-700">
-                <input
-                  id="notRobot"
-                  type="checkbox"
-                  checked={formData.notRobot}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setFormData({ ...formData, notRobot: e.target.checked })
-                  }
-                  className="w-4 h-4 border-gray-400"
-                />
-                <label htmlFor="notRobot" className="text-sm sm:text-base">I am not a robot</label>
-              </div>
-              {errors.notRobot && <p className="col-span-1 md:col-span-2 text-red-600 text-sm mt-1">{errors.notRobot}</p>}
+              {/* Error Message - Matching Personal Loan styling */}
+              {error && (
+                <div className="col-span-1 md:col-span-2 text-center text-red-600 font-semibold mt-2 text-sm sm:text-base">
+                  ⚠ Please fill all fields before submitting.
+                </div>
+              )}
 
-              {/* Submit Button */}
-              <div className="col-span-1 md:col-span-2 mt-4 flex justify-center">
+              {/* Success Message - Matching Personal Loan styling */}
+              {success && (
+                <div className="col-span-1 md:col-span-2 text-center text-green-600 font-semibold mt-2 text-sm sm:text-base">
+                  ✔ Form submitted successfully!
+                </div>
+              )}
+
+              {/* Submit Button - Matching Personal Loan styling */}
+              <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
                 <button
                   type="submit"
                   className="w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base"
@@ -184,55 +188,29 @@ export default function SMELoanForm({ onClose }: { onClose: () => void }) {
   );
 }
 
-/*=====================================
-          Reusable Components
-======================================*/
+/* ---------------- INPUT COMPONENT - Matching Personal Loan exactly ---------------- */
+function Input({ label, value, onChange, type = "text", onlyNumber, maxLength, placeholder }: any) {
 
-type InputProps = {
-  label: string;
-  placeholder: string;
-  type?: string;
-  value: string;
-  onChange: (value: string) => void;
-  error?: string;
-  maxLength?: number;
-};
+  const restrictNumber = (e: any) => {
+    if (!onlyNumber) return;
 
-function Input({ label, placeholder, type = "text", value, onChange, error, maxLength }: InputProps) {
+    if (["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) return;
+
+    if (!/^[0-9]$/.test(e.key)) e.preventDefault();
+  };
+
   return (
     <div className="w-full">
       <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
       <input
+        value={value}
         type={type}
-        value={value}
         maxLength={maxLength}
+        onKeyDown={restrictNumber}
+        onChange={onChange}
         placeholder={placeholder}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent text-sm sm:text-base"
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
       />
-      {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
-    </div>
-  );
-}
-
-type DateProps = {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  error?: string;
-};
-
-function DateInput({ label, value, onChange, error }: DateProps) {
-  return (
-    <div className="w-full">
-      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
-      <input
-        type="date"
-        value={value}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent text-sm sm:text-base"
-      />
-      {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
     </div>
   );
 }

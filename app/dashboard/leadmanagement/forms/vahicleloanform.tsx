@@ -1,25 +1,11 @@
 "use client";
-
 import { useState } from "react";
 import { X } from "lucide-react";
 
-interface FormDataType {
-  clientName: string;
-  phone: string;
-  email: string;
-  dob: string;
-  location: string;
-  loanAmount: string;
-  vehicleType: string;
-  vehicleCompany: string;
-  vehicleModel: string;
-  otherDetails: string;
-  notRobot: boolean;
-}
-
 export default function VehicleLoanForm({ onClose }: { onClose: () => void }) {
   const [employmentType, setEmploymentType] = useState("");
-  const [formData, setFormData] = useState<FormDataType>({
+
+  const [formData, setFormData] = useState({
     clientName: "",
     phone: "",
     email: "",
@@ -33,225 +19,177 @@ export default function VehicleLoanForm({ onClose }: { onClose: () => void }) {
     notRobot: false,
   });
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  // Handle form submit
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newErrors: { [key: string]: string } = {};
-
-    Object.entries(formData).forEach(([key, value]) => {
-      if (!value && key !== "otherDetails" && key !== "notRobot") {
-        newErrors[key] = "This field is required";
-      }
-    });
-
-    if (formData.phone.length !== 10)
-      newErrors.phone = "Phone number must be 10 digits";
-
-    if (!employmentType)
-      newErrors.employmentType = "Please select employment type";
-
-    if (!formData.notRobot)
-      newErrors.notRobot = "Please confirm you are not a robot";
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      alert("Form Submitted Successfully!");
-      console.log("Form Data:", formData);
-    }
+  // Update form values - matching Personal Loan behavior
+  const handleChange = (key: string, value: string | boolean) => {
+    setFormData({ ...formData, [key]: value });
   };
 
-  const vehicleOptions = ["Two Wheeler", "Four Wheeler", "Commercial Vehicle"];
-   
-  const salariedUploads = [
-    "PAN Card",
-    "Aadhar Card",
-    "3 Months Salary Slip",
-    "6 Months Bank Statement",
-    "Company ID Card",
-    "Form 16 (if available)",
-  ];
+  // Validate before submit - matching Personal Loan behavior
+  const submitForm = (e: any) => {
+    e.preventDefault();
+    setError(false);
+    setSuccess(false);
 
-  const selfEmployedUploads = [
-    "PAN Card",
-    "Aadhar Card",
-    "Business Registration Proof",
-    "Last 2 Years ITR",
-    "6 Months Bank Statement",
-    "Business Office Address Proof",
-  ];
+    // Check all required fields including the dropdowns
+    const requiredFields = [
+      formData.clientName,
+      formData.phone,
+      formData.email,
+      formData.dob,
+      formData.location,
+      formData.loanAmount,
+      formData.vehicleType,
+      formData.vehicleCompany,
+      formData.vehicleModel,
+      formData.notRobot,
+      employmentType,
+    ];
+
+    for (const field of requiredFields) {
+      if (!field) {
+        setError(true);
+        return;
+      }
+    }
+
+    // Validate phone number length
+    if (formData.phone.length !== 10) {
+      setError(true);
+      return;
+    }
+
+    // If all good
+    setSuccess(true);
+  };
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-2 sm:p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-5xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col">
         
-        {/* HEADER */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b flex-shrink-0">
+        {/* Header - Matching Personal Loan design */}
+        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Vehicle Loan Form</h2>
-          <button onClick={onClose} className="text-gray-600 hover:text-black">
+          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
             <X size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        {/* SCROLLABLE BODY */}
+        {/* Scrollable Form Body - Matching Personal Loan structure */}
         <div className="flex-1 overflow-y-auto">
-          <form className="p-4 sm:p-6" onSubmit={handleSubmit}>
+          <form onSubmit={submitForm} className="p-4 sm:p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
-              {/* Basic Fields */}
               <Input 
-                label="Client Name" 
-                placeholder="Enter client name"
+                label="Client Name"
+                placeholder="Enter your full name"
                 value={formData.clientName}
-                onChange={(v) => setFormData({ ...formData, clientName: v })}
-                error={errors.clientName} 
+                onChange={(e: any) => handleChange("clientName", e.target.value)}
               />
 
-              <Input 
-                label="Client Phone Number" 
+              <Input
+                label="Phone Number"
+                type="tel"
                 maxLength={10}
-                placeholder="Enter 10-digit phone number"
+                onlyNumber
+                placeholder="Enter 10-digit mobile number"
                 value={formData.phone}
-                onChange={(v) => setFormData({ ...formData, phone: v.replace(/\D/g, "") })}
-                error={errors.phone} 
+                onChange={(e: any) => handleChange("phone", e.target.value)}
               />
 
               <Input 
-                label="Client Email ID" 
-                placeholder="Enter email address"
+                label="Email ID"
+                type="email"
+                placeholder="Enter your email address"
                 value={formData.email}
-                onChange={(v) => setFormData({ ...formData, email: v })}
-                error={errors.email} 
+                onChange={(e: any) => handleChange("email", e.target.value)}
               />
 
-              <DateInput 
-                label="Client Date of Birth" 
+              <Input 
+                label="Date of Birth"
+                type="date"
                 value={formData.dob}
-                onChange={(v) => setFormData({ ...formData, dob: v })}
-                error={errors.dob} 
+                onChange={(e: any) => handleChange("dob", e.target.value)}
               />
 
               <Input 
-                label="Location" 
-                placeholder="Enter your location"
+                label="Location"
+                placeholder="Enter your city"
                 value={formData.location}
-                onChange={(v) => setFormData({ ...formData, location: v })}
-                error={errors.location} 
+                onChange={(e: any) => handleChange("location", e.target.value)}
               />
 
               <Input 
-                label="Loan Amount" 
-                placeholder="Enter loan amount"
+                label="Loan Amount"
+                placeholder="Enter desired loan amount"
+                onlyNumber
                 value={formData.loanAmount}
-                onChange={(v) => setFormData({ ...formData, loanAmount: v })}
-                error={errors.loanAmount} 
+                onChange={(e: any) => handleChange("loanAmount", e.target.value)}
               />
 
-              <SelectInput 
-                label="Type of Vehicle" 
-                options={vehicleOptions}
+              {/* Vehicle Type Select */}
+              <Select
+                label="Type of Vehicle"
+                options={["Two Wheeler", "Four Wheeler", "Commercial Vehicle"]}
                 value={formData.vehicleType}
-                onChange={(v) => setFormData({ ...formData, vehicleType: v })}
-                error={errors.vehicleType} 
+                onChange={(value: string) => handleChange("vehicleType", value)}
               />
 
               <Input 
-                label="Vehicle Company Name" 
+                label="Vehicle Company Name"
                 placeholder="Enter vehicle company"
                 value={formData.vehicleCompany}
-                onChange={(v) => setFormData({ ...formData, vehicleCompany: v })}
-                error={errors.vehicleCompany} 
+                onChange={(e: any) => handleChange("vehicleCompany", e.target.value)}
               />
 
               <Input 
-                label="Vehicle Make & Model" 
+                label="Vehicle Make & Model"
                 placeholder="Enter vehicle model"
                 value={formData.vehicleModel}
-                onChange={(v) => setFormData({ ...formData, vehicleModel: v })}
-                error={errors.vehicleModel} 
+                onChange={(e: any) => handleChange("vehicleModel", e.target.value)}
               />
 
               <Input 
                 label="Other Loan Obligation Details"
-                placeholder="Enter other loan details"
+                placeholder="Enter existing loan details"
                 value={formData.otherDetails}
-                onChange={(v) => setFormData({ ...formData, otherDetails: v })}
-                error={errors.otherDetails} 
+                onChange={(e: any) => handleChange("otherDetails", e.target.value)}
               />
 
-              {/* Employment Type */}
-              <div className="col-span-1 md:col-span-2">
-                <label className="text-sm font-semibold text-gray-700">Employment Type</label>
-                <select
-                  value={employmentType}
-                  onChange={(e) => setEmploymentType(e.target.value)}
-                  className={`w-full border rounded-md p-2 mt-1 text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent ${
-                    errors.employmentType ? "border-red-500" : "border-gray-300 text-gray-700"
-                  }`}
+              {/* Employment Type - Updated with Personal Loan styling */}
+              <Select
+                label="Employment Type"
+                options={["Salaried Person", "Self Employed"]}
+                value={employmentType}
+                onChange={setEmploymentType}
+              />
+
+              {/* Dynamic Document Sections */}
+              {employmentType === "Salaried Person" && <SalariedDocs />}
+              {employmentType === "Self Employed" && <SelfEmployedDocs />}
+
+              {/* Error Message - Matching Personal Loan styling */}
+              {error && (
+                <div className="col-span-1 md:col-span-2 text-center text-red-600 font-semibold mt-2 text-sm sm:text-base">
+                  ⚠ Please fill all fields before submitting.
+                </div>
+              )}
+
+              {/* Success Message - Matching Personal Loan styling */}
+              {success && (
+                <div className="col-span-1 md:col-span-2 text-center text-green-600 font-semibold mt-2 text-sm sm:text-base">
+                  ✔ Form submitted successfully!
+                </div>
+              )}
+
+              {/* Submit Button - Matching Personal Loan styling */}
+              <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
+                <button
+                  type="submit"
+                  className="w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base"
                 >
-                  <option value="">-- Select Employment Type --</option>
-                  <option value="salaried">Salaried Person</option>
-                  <option value="selfEmployed">Self Employed</option>
-                </select>
-                {errors.employmentType && <p className="text-red-500 text-xs mt-1">{errors.employmentType}</p>}
-              </div>
-
-              {/* Document Uploads */}
-              {employmentType === "salaried" && (
-                <div className="col-span-1 md:col-span-2">
-                  <h3 className="text-base sm:text-lg font-semibold text-[#1CADA3] mt-4 mb-3 border-b pb-2">
-                    Upload Documents for Salaried Person
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {salariedUploads.map((label, index) => (
-                      <div key={index} className="flex flex-col">
-                        <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
-                        <input 
-                          type="file" 
-                          className="w-full border border-gray-300 rounded-md p-2 text-gray-700 text-sm" 
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {employmentType === "selfEmployed" && (
-                <div className="col-span-1 md:col-span-2">
-                  <h3 className="text-base sm:text-lg font-semibold text-[#1CADA3] mt-4 mb-3 border-b pb-2">
-                    Upload Documents for Self Employed
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {selfEmployedUploads.map((label, index) => (
-                      <div key={index} className="flex flex-col">
-                        <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
-                        <input 
-                          type="file" 
-                          className="w-full border border-gray-300 rounded-md p-2 text-gray-700 text-sm" 
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Checkbox */}
-              <div className="col-span-1 md:col-span-2 flex items-center gap-2 mt-4 text-gray-700">
-                <input 
-                  type="checkbox" 
-                  checked={formData.notRobot}
-                  onChange={(e) => setFormData({ ...formData, notRobot: e.target.checked })}
-                  className="w-4 h-4" 
-                />
-                <label className="text-sm sm:text-base">I am not a robot</label>
-              </div>
-              {errors.notRobot && <p className="col-span-1 md:col-span-2 text-red-500 text-xs mt-1">{errors.notRobot}</p>}
-
-              {/* Submit */}
-              <div className="col-span-1 md:col-span-2 mt-4">
-                <button className="w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base mx-auto block">
                   Submit
                 </button>
               </div>
@@ -264,65 +202,111 @@ export default function VehicleLoanForm({ onClose }: { onClose: () => void }) {
   );
 }
 
+/* ---------------- INPUT COMPONENT - Matching Personal Loan exactly ---------------- */
+function Input({ label, value, onChange, type = "text", onlyNumber, maxLength, placeholder }: any) {
 
-/* ============== REUSABLE COMPONENTS ================= */
+  const restrictNumber = (e: any) => {
+    if (!onlyNumber) return;
 
-function Input({ label, value, onChange, error, maxLength, placeholder }:
-  { label: string; value: string; onChange: (v: string) => void; error?: string; maxLength?: number; placeholder?: string }) {
+    if (["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) return;
+
+    if (!/^[0-9]$/.test(e.key)) e.preventDefault();
+  };
+
   return (
     <div className="w-full">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
-      <input 
-        type="text" 
-        value={value} 
+      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
+      <input
+        value={value}
+        type={type}
         maxLength={maxLength}
+        onKeyDown={restrictNumber}
+        onChange={onChange}
         placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-        className={`w-full mt-1 p-2 border rounded-md focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent text-gray-700 text-sm sm:text-base ${
-          error ? "border-red-500" : "border-gray-300"
-        }`} 
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
       />
-      {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
     </div>
   );
 }
 
-function DateInput({ label, value, onChange, error }:
-  { label: string; value: string; onChange: (v: string) => void; error?: string }) {
+/* ---------------- SELECT COMPONENT - With Personal Loan styling ---------------- */
+function Select({ label, options, value, onChange }: any) {
   return (
     <div className="w-full">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
-      <input 
-        type="date" 
+      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
+      <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full mt-1 p-2 border rounded-md focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent text-gray-700 text-sm sm:text-base ${
-          error ? "border-red-500" : "border-gray-300"
-        }`} 
-      />
-      {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
-    </div>
-  );
-}
-
-function SelectInput({ label, options, value, onChange, error }:
-  { label: string; options: string[]; value: string; onChange: (v: string) => void; error?: string }) {
-  return (
-    <div className="w-full">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
-      <select 
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={`w-full mt-1 p-2 border rounded-md focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent text-sm sm:text-base ${
-          error ? "border-red-500" : "border-gray-300 text-gray-700"
-        }`}
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base"
       >
         <option value="">Select {label}</option>
-        {options.map((opt) => (
-          <option key={opt} value={opt}>{opt}</option>
+        {options.map((option: string) => (
+          <option key={option} value={option}>{option}</option>
         ))}
       </select>
-      {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
     </div>
+  );
+}
+
+/* ---------------- FILE UPLOAD - With Personal Loan styling ---------------- */
+function FileUpload({ label }: { label: string }) {
+  return (
+    <div className="flex flex-col">
+      <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
+      <input 
+        type="file" 
+        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 text-sm" 
+      />
+    </div>
+  );
+}
+
+/* ---------------- SECTION COMPONENT ---------------- */
+function Section({ title, children }: any) {
+  return (
+    <div className="col-span-1 md:col-span-2 mt-6">
+      <h3 className="text-md font-semibold mb-3 text-[#1CADA3]">{title}</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>
+    </div>
+  );
+}
+
+/* ---------------- SALARIED DOCUMENTS ---------------- */
+function SalariedDocs() {
+  const docs = [
+    "PAN Card",
+    "Aadhar Card",
+    "3 Months Salary Slip",
+    "6 Months Bank Statement",
+    "Company ID Card",
+    "Form 16 (if available)",
+  ];
+  
+  return (
+    <Section title="Upload Documents for Salaried Person">
+      {docs.map((doc) => (
+        <FileUpload key={doc} label={doc} />
+      ))}
+    </Section>
+  );
+}
+
+/* ---------------- SELF EMPLOYED DOCUMENTS ---------------- */
+function SelfEmployedDocs() {
+  const docs = [
+    "PAN Card",
+    "Aadhar Card",
+    "Business Registration Proof",
+    "Last 2 Years ITR",
+    "6 Months Bank Statement",
+    "Business Office Address Proof",
+  ];
+  
+  return (
+    <Section title="Upload Documents for Self Employed">
+      {docs.map((doc) => (
+        <FileUpload key={doc} label={doc} />
+      ))}
+    </Section>
   );
 }

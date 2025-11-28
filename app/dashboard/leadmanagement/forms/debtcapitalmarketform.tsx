@@ -88,12 +88,6 @@ export default function DebtCapitalMarketForm({
               </div>
             ))}
 
-            {/* CAPTCHA */}
-            <div className="md:col-span-2 mt-2 flex items-center gap-2">
-              <input type="checkbox" className="h-4 w-4" />
-              <label className="text-sm">I am not Robot</label>
-            </div>
-
             {/* SUBMIT BUTTON */}
             <div className="col-span-2 mt-4 flex justify-center">
             <button

@@ -270,29 +270,6 @@ export default function MotorInsuranceForm({ onClose }: MotorInsuranceFormProps)
                 )}
               </div>
             )}
-
-            {/* Not Robot Checkbox */}
-            <div className="md:col-span-2 flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <input
-                id="notRobot"
-                type="checkbox"
-                checked={notRobot}
-                onChange={(e) => {
-                  setNotRobot(e.target.checked);
-                  if (errors.notRobot) {
-                    setErrors(prev => ({ ...prev, notRobot: "" }));
-                  }
-                }}
-                className="w-4 h-4 text-[#1CADA3] focus:ring-[#1CADA3] border-gray-300 rounded"
-              />
-              <label htmlFor="notRobot" className="text-sm font-medium">
-                I confirm that I am not a robot
-              </label>
-            </div>
-            {errors.notRobot && (
-              <p className="text-red-500 text-xs md:col-span-2 -mt-3">{errors.notRobot}</p>
-            )}
-
             {/* Submit Button */}
             <div className="md:col-span-2 flex justify-center pt-4">
               <button

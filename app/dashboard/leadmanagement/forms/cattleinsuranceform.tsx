@@ -44,6 +44,19 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
     }));
   };
 
+  // ---------- HANDLE NUMBER INPUT CHANGE ----------
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    // Allow only numbers
+    const numericValue = value.replace(/[^0-9]/g, '');
+    
+    setFormData((prev) => ({
+      ...prev,
+      [name]: numericValue,
+    }));
+  };
+
   // ---------- VALIDATION ----------
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -118,7 +131,7 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
                   type="tel"
                   maxLength={10}
                   value={formData.phone}
-                  onChange={handleChange}
+                  onChange={handleNumberChange}
                   placeholder="Enter 10-digit phone number"
                   className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
                 />
@@ -215,7 +228,7 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
                   name="age"
                   type="text"
                   value={formData.age}
-                  onChange={handleChange}
+                  onChange={handleNumberChange}
                   placeholder="Enter age"
                   className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
                 />
@@ -241,7 +254,7 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
                   name="tagNo"
                   type="text"
                   value={formData.tagNo}
-                  onChange={handleChange}
+                  onChange={handleNumberChange}
                   placeholder="Enter tag number"
                   className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
                 />
@@ -297,21 +310,6 @@ export default function CattleInsuranceForm({ onClose }: CattleInsuranceFormProp
                   className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm cursor-pointer"
                 />
               </div>
-
-              {/* Not Robot */}
-              <div className="col-span-1 md:col-span-2 flex items-center gap-2 mt-4 text-gray-700">
-                <input
-                  type="checkbox"
-                  name="notRobot"
-                  checked={formData.notRobot}
-                  onChange={handleChange}
-                  className="h-4 w-4"
-                />
-                <span className="text-sm sm:text-base">I am not a Robot</span>
-              </div>
-              {errors.notRobot && (
-                <p className="col-span-1 md:col-span-2 text-red-500 text-xs mt-1">{errors.notRobot}</p>
-              )}
 
               {/* Submit */}
               <div className="col-span-1 md:col-span-2 mt-4 flex justify-center">

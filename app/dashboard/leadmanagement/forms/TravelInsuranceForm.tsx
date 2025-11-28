@@ -240,20 +240,6 @@ export default function TravelInsuranceForm({ onClose }: TravelInsuranceFormProp
                 )}
               </div>
 
-              {/* Not Robot */}
-              <div className="col-span-1 md:col-span-2 flex items-center gap-2 mt-4">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4"
-                  checked={formData.notRobot}
-                  onChange={(e) => handleInput("notRobot", e.target.checked)}
-                />
-                <label className="text-sm sm:text-base">I am not a robot</label>
-              </div>
-              {errors.notRobot && (
-                <p className="col-span-1 md:col-span-2 text-red-500 text-xs mt-1">{errors.notRobot}</p>
-              )}
-
               {/* Submit Button */}
               <div className="col-span-1 md:col-span-2 mt-4 flex justify-center">
                 <button

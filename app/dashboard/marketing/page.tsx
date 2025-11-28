@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Header from './Header';
-import CategoryDropdown from './CategoryDropdown';
-import TemplateGrid from './TemplateGrid';
+import Header from './components/Header';
+import CategoryDropdown from './components/CategoryDropdown';
+import TemplateGrid from './components/TemplateGrid';
 import { DashboardService } from "@/app/services/dashboardService";
 
 // Types

@@ -62,15 +62,17 @@ const HeroSection = () => {
 
                     {/* CTA Buttons with fade-in effect */}
                     <div className={`flex flex-col sm:flex-row justify-center gap-4 transition-opacity duration-1000 delay-300 ${isTypingComplete ? 'opacity-100' : 'opacity-0'}`}>
-                        <button className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}>
-                            <a href='#services'>
-                                <span className="relative z-10">Our Services</span>
-                            </a>
-                            <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
-                        </button>
+                        <a href='#services'>
+                            <button className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}>
 
-                        <button className="group relative bg-white px-8 py-4 rounded-lg font-semibold text-lg border-2 hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-lg" style={{ color: '#2076C7', borderColor: '#2076C7' }}>
-                            <a href='#contact'>
+                                <span className="relative z-10">Our Services</span>
+
+                                <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
+                            </button>
+                        </a>
+                        <a href='#contact'>
+                            <button className="group relative bg-white px-8 py-4 rounded-lg font-semibold text-lg border-2 hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-lg" style={{ color: '#2076C7', borderColor: '#2076C7' }}>
+
 
                                 <span className="relative z-10 flex items-center justify-center gap-2">
                                     Contact Us
@@ -78,8 +80,9 @@ const HeroSection = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                     </svg>
                                 </span>
-                            </a>
-                        </button>
+
+                            </button>
+                        </a>
                     </div>
 
                     {/* Trust indicators */}
