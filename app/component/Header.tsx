@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import AboutSection from "../page/about/page";
-import ServicesSection from "../page/services/page";
 import CibilSection from "../page/cibil/page";
 import EMICalculator from "../page/emi/page";
 
@@ -25,7 +24,7 @@ const Header = () => {
     { label: "Home", href: "/" },
     { label: "About Us", href: "/page/about", component: AboutSection },
     { label: "Events", href: "/page/event", component: AboutSection },
-    { label: "Services", href: "/#services", component: ServicesSection },
+    { label: "Services", href: "/#services" },
     { label: "Cibil Check", href: "/page/cibil", component: CibilSection },
   ];
 

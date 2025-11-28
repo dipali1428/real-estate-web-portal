@@ -1,6 +1,8 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DashboardService } from "@/app/services/dashboardService";
+import toast from 'react-hot-toast';
+import TicketSummaryCard from "./TicketSummaryCard";
 
 const HelpSupportPage: React.FC = () => {
   const [ticketData, setTicketData] = useState({
@@ -9,6 +11,31 @@ const HelpSupportPage: React.FC = () => {
     description: ''
   });
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [submittedTicket, setSubmittedTicket] = useState<any>(null);
+  const [loadingTickets, setLoadingTickets] = useState(true);
+
+  const hasFetched = useRef(false);
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
+    const fetchTickets = async () => {
+      try {
+        const result = await DashboardService.getMyTickets();
+        if (result.tickets.length > 0) {
+          setSubmittedTicket(result.tickets[0]); // show latest ticket 
+        }
+      } catch (err) {
+        console.error("Error fetching tickets:", err);
+      } finally {
+        setLoadingTickets(false); // <-- VERY IMPORTANT
+      }
+    };
+
+    fetchTickets();
+  }, []);
+
 
   const faqs = [
     {
@@ -246,12 +273,12 @@ const HelpSupportPage: React.FC = () => {
 
     try {
       const result = await DashboardService.createTicket(ticketPayload);
-      console.log(result.ticketid);
+      toast.success("Ticket raised successfully!")
 
+      setSubmittedTicket(result.ticket);
     } catch (error: any) {
       console.error("Error submitting ticket:", error);
 
-      // Handle Axios error response
       if (error.response) {
         alert("Failed to submit ticket: " + (error.response.data?.message || "Please try again."));
       } else {
@@ -285,80 +312,86 @@ const HelpSupportPage: React.FC = () => {
         <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 mb-10 sm:mb-12 lg:mb-16">
           <h2 className="text-xl sm:text-2xl font-semibold text-slate-700 mb-6 sm:mb-8">Raise a Support Ticket</h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-            {/* Category Field */}
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-2">
-                Category
-              </label>
-              <select
-                id="category"
-                name="category"
-                value={ticketData.category}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-400 transition-colors text-slate-700 outline-none text-sm sm:text-base"
-              >
-                <option value="">Select a category</option>
-                {categories.map((category, index) => (
-                  <option key={index} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
+          {loadingTickets ? (
+            <div className="flex justify-center items-center py-10 sm:py-16 lg:py-20">
+              <div className="flex flex-col items-center gap-3">
+                <p className="text-slate-500 text-sm sm:text-base">Loading...</p>
+              </div>
             </div>
+          ) : submittedTicket && submittedTicket.status !== "Closed" ? (
+            <TicketSummaryCard ticket={submittedTicket} />
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              {/* Category Field */}
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-2">
+                  Category
+                </label>
+                <select
+                  id="category"
+                  name="category"
+                  value={ticketData.category}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-400 transition-colors text-slate-700 outline-none text-sm sm:text-base">
+                  <option value="">Select a category</option>
+                  {categories.map((category, index) => (
+                    <option key={index} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div>
-              <label
-                htmlFor="subject"
-                className="block text-sm font-medium text-slate-700 mb-2"
-              >
-                Subject
-              </label>
+              <div>
+                <label
+                  htmlFor="subject"
+                  className="block text-sm font-medium text-slate-700 mb-2">
+                  Subject
+                </label>
 
-              <input
-                type="text"
-                id="subject"
-                name="subject"
-                value={ticketData.subject}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  value={ticketData.subject}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 
                             rounded-lg focus:ring-1 focus:ring-blue-400 transition-colors 
                             text-slate-700 outline-none text-sm sm:text-base"
-                placeholder="Enter the subject of your issue"
-              />
-            </div>
+                  placeholder="Enter the subject of your issue"
+                />
+              </div>
 
 
-            {/* Description Field */}
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">
-                Description
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={ticketData.description}
-                onChange={handleInputChange}
-                required
-                rows={4}
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-400  transition-colors resize-vertical text-slate-700 outline-none text-sm sm:text-base"
-                placeholder="Please describe your issue in detail..."
-              />
-            </div>
+              {/* Description Field */}
+              <div>
+                <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={ticketData.description}
+                  onChange={handleInputChange}
+                  required
+                  rows={4}
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-400  transition-colors resize-vertical text-slate-700 outline-none text-sm sm:text-base"
+                  placeholder="Please describe your issue in detail..."
+                />
+              </div>
 
-            {/* Submit Button */}
-            <div className="pt-2 sm:pt-4">
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base"
-              >
-                Submit ticket
-              </button>
-            </div>
-          </form>
-
+              {/* Submit Button */}
+              <div className="pt-2 sm:pt-4">
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base">
+                  Submit ticket
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
         {/* FAQ Section */}
@@ -409,7 +442,7 @@ const HelpSupportPage: React.FC = () => {
             </a>
           </p>
         </div>
-        
+
       </div>
     </div>
   );

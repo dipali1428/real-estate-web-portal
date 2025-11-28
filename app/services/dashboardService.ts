@@ -20,12 +20,19 @@ export const DashboardService = {
         return response.data;
     },
 
+    // 🔹 Create Tciket
     createTicket: async (payload: {
         category: string;
         subject: string;
         description: string;
     }) => {
         const response = await api.post("/api/support/ticket", payload);
+        return response.data;
+    },
+
+    // 🔹 Get Tickets
+    getMyTickets: async () => {
+        const response = await api.get("/api/support/my-tickets");
         return response.data;
     },
 };
