@@ -37,7 +37,7 @@ const RelationshipManager: React.FC = () => {
   // Single Relationship Manager for the logged-in DSA
   const relationshipManager: RelationshipManager = {
     id: '1',
-    name: 'Ashwini Kamble',
+    name: 'Your RM will be assigned soon',
     email: 'info@infinityarthvishva.com',
     phone: '1800-532-7600',
     position: 'Senior Relationship Manager',
@@ -48,9 +48,9 @@ const RelationshipManager: React.FC = () => {
   const appointments: ClientAppointment[] = [
     {
       id: '1',
-      clientName: 'Ashwini Kamble',
-      date: '2024-01-15',
-      time: '14:30',
+      clientName: '',
+      date: '',
+      time: '',
       type: 'investment',
       status: 'scheduled'
     },
@@ -255,7 +255,7 @@ const RelationshipManager: React.FC = () => {
                     </div>
                     <div className="flex items-center ml-2 flex-shrink-0">
                       <div
-                        className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2 ${relationshipManager.isAvailable ? 'bg-green-500' : 'bg-gray-400'
+                        className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2 ${relationshipManager.isAvailable ? '' : ''
                           }`}
                       ></div>
                       <span className="text-xs sm:text-sm bg-green-600 text-white px-2 py-1 rounded whitespace-nowrap">
@@ -331,40 +331,41 @@ const RelationshipManager: React.FC = () => {
               </div>
             </div>
             
-            {/* Contact Cards Section */}
-            <div className="mt-6 sm:mt-8">
-              <div className="mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-700">Team Contacts</h2>
-                <p className="text-gray-600 mt-1 text-sm sm:text-base">
-                  Reach out to our specialized team members for specific queries
-                </p>
-              </div>
+           {/* Contact Cards Section */}
+<div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+  {contactCards.map((contact) => (
+    <div
+      key={contact.id}
+      className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-200 flex flex-col min-h-0"
+    >
+      <div className="mb-3 flex-shrink-0 min-w-0">
+        <h3 className="font-semibold text-gray-800 text-sm mb-1 truncate">
+          {contact.name}
+        </h3>
+        <p className="text-xs text-blue-600 font-medium mb-2 truncate">
+          {contact.designation}
+        </p>
+      </div>
 
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-                {contactCards.map((contact) => (
-                  <div
-                    key={contact.id}
-                    className="bg-white rounded-lg shadow-md border border-gray-200 p-3 sm:p-4 hover:shadow-lg transition-shadow duration-200"
-                  >
-                    <div className="mb-2 sm:mb-3">
-                      <h3 className="font-semibold text-gray-800 text-xs sm:text-sm mb-1 truncate">{contact.name}</h3>
-                      <p className="text-xs text-blue-600 font-medium mb-2 truncate">{contact.designation}</p>
-                    </div>
-                    
-                    <div className="space-y-1 sm:space-y-2">
-                      <div className="text-xs text-gray-600">
-                        <span className="font-medium">Phone: </span>
-                        <span className="text-gray-800 break-words">{contact.phone}</span>
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        <span className="font-medium">Specialization: </span>
-                        <span className="text-gray-800 line-clamp-2">{contact.specialization}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+      <div className="space-y-2 flex-grow min-w-0">
+        <div className="text-xs text-gray-600 leading-tight min-w-0">
+          <span className="font-medium">Phone: </span>
+          <span className="text-gray-800 break-normal whitespace-normal min-w-0">
+            {contact.phone}
+          </span>
+        </div>
+
+        <div className="text-xs text-gray-600 leading-tight min-w-0">
+          <span className="font-medium">Specialization:</span>
+          <span className="text-gray-800 ml-1 break-normal whitespace-normal min-w-0">
+            {contact.specialization}
+          </span>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
           </div>
         )}
 
@@ -453,7 +454,7 @@ const RelationshipManager: React.FC = () => {
                           </span>
                         </div>
 
-                        <div className="flex space-x-2 border-t pt-3">
+                      <div className="flex space-x-2 border-t pt-3">
                           <button
                             onClick={() => handleRescheduleAppointment(appointment.id)}
                             className="flex-1 bg-blue-50 text-blue-700 py-1.5 sm:py-2 px-2 sm:px-3 rounded text-xs sm:text-sm font-medium hover:bg-blue-100 transition-colors"
@@ -529,8 +530,8 @@ const RelationshipManager: React.FC = () => {
                       {/* Desktop Layout */}
                       <div className="hidden lg:grid lg:grid-cols-12 items-center p-4">
                         <div className="col-span-1">
-                          <div className={`p-3 rounded-lg ${getTypeStyles(appointment.type)}`}>
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className={`p-2 w-10 rounded-lg ${getTypeStyles(appointment.type)}`}>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" >
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                           </div>
@@ -544,12 +545,12 @@ const RelationshipManager: React.FC = () => {
                         </div>
                         
                         <div className="col-span-3">
-                          <div className="flex flex-wrap gap-2">
-                            <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full border ${getTypeStyles(appointment.type)}`}>
+                          <div className="flex flex-nowrap gap-2 min-w-0">
+                            <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full border whitespace-nowrap ${getTypeStyles(appointment.type)}`}>
                               {appointment.type.charAt(0).toUpperCase() + appointment.type.slice(1)}
                             </span>
                             <span
-                              className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full ${
+                              className={`px-2  sm:px-3 py-1 text-xs sm:text-sm rounded-full  ${
                                 appointment.status === 'scheduled'
                                   ? 'bg-green-100 text-green-800'
                                   : appointment.status === 'completed'
@@ -562,19 +563,19 @@ const RelationshipManager: React.FC = () => {
                           </div>
                         </div>
                         
-                        <div className="col-span-4 flex justify-end space-x-2 sm:space-x-3">
+                        <div className="col-span-4 flex  justify-end space-x-2 sm:space-x-3">
                           <button
                             onClick={() => handleRescheduleAppointment(appointment.id)}
-                            className="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+                            className="text-blue-600 hover:text-blue-800 font-medium flex  justify-end flex-nowrap space-x-2 min-w-0 items-center text-sm px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors  whitespace-nowrap "
                           >
-                            <svg className="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 mr-1 sm:mr-2 " fill="none" stroke="currentColor" viewBox="0 0 24 24" >
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                             Reschedule
                           </button>
                           <button
                             onClick={() => handleCancelAppointment(appointment.id)}
-                            className="text-red-600 hover:text-red-800 font-medium flex items-center text-sm px-3 sm:px-4 py-2 rounded-lg hover:bg-red-50 transition-colors"
+                            className="text-red-600 hover:text-red-800 font-medium flex  items-center text-sm px-3 sm:px-4 py-2 rounded-lg hover:bg-red-50 transition-colors  whitespace-nowrap"
                           >
                             <svg className="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
