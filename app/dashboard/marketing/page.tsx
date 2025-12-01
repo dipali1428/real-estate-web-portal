@@ -104,7 +104,7 @@ export default function ImageTemplates() {
       category: 'insurance',
       subCategory: 'life',
       description: 'Comprehensive life insurance coverage for you and your family',
-      imageUrl: '/templateimg/Personal-Loan.jpeg'
+      imageUrl: '/templateimg/LifeInsurance.jpg'
     },
     {
       id: '2',
@@ -114,17 +114,17 @@ export default function ImageTemplates() {
       category: 'insurance',
       subCategory: 'health',
       description: 'Complete health insurance protection for medical emergencies',
-      imageUrl: '/templateimg/Health-Insurance.jpeg'
+      imageUrl: '/templateimg/HealthInsurance.jpg'
     },
     {
       id: '3',
-      name: 'Car Insurance',
+      name: 'Motor Insurance',
       type: 'image',
       uploadDate: '2024-01-08',
       category: 'insurance',
       subCategory: 'motor',
       description: 'Best car insurance policies with great benefits',
-      imageUrl: '/templateimg/Loan-Protector.jpeg'
+      imageUrl: '/templateimg/MotorInsurance.jpg'
     },
     {
       id: '4',
@@ -134,7 +134,7 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'home',
       description: 'Affordable home loans with low interest rates',
-      imageUrl: '/templateimg/Home-Loan.jpeg'
+      imageUrl: '/templateimg/HomeLoan.jpg'
     },
     {
       id: '5',
@@ -144,7 +144,7 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'personal',
       description: 'Quick personal loans for all your needs',
-      imageUrl: '/templateimg/Personal-Loan.jpeg'
+      imageUrl: '/templateimg/PersonalLoan.jpg'
     },
     {
       id: '6',
@@ -154,7 +154,7 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'business',
       description: 'Business loans to grow your enterprise',
-      imageUrl: '/templateimg/Loan-Protector.jpeg'
+      imageUrl: '/templateimg/BusinessLoan.jpg'
     },
     {
       id: '7',
@@ -164,7 +164,7 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'educational',
       description: 'Business loans to grow your enterprise',
-      imageUrl: '/templateimg/Educational-Loan.jpeg'
+      imageUrl: '/templateimg/EducationLoan.jpg'
     },
   ]);
 
@@ -211,7 +211,7 @@ export default function ImageTemplates() {
     }
   };
 
-  // Function to generate personalized image (used by both download and share)
+  // Function to generate personalized image with better width-based scaling
   const generatePersonalizedImage = async (template: TemplateItem): Promise<Blob> => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -228,59 +228,82 @@ export default function ImageTemplates() {
             img.src = url;
           });
         };
-
+  
         const dimensions = await getImageDimensions(template.imageUrl);
-
+  
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-
+  
         if (!ctx) {
           reject(new Error('Error creating canvas context'));
           return;
         }
-
-        // Calculate responsive sizes with INCREASED FONT SIZES
-        const baseWidth = 800;
-        const scaleFactor = dimensions.width / baseWidth;
-
-        // INCREASED FONT SIZES: Changed from 16-28 to 24-40 range
-        const responsiveFontSize = Math.max(18, Math.min(40, 28 * scaleFactor));
-
-        // Increased extended height to accommodate larger text
-        const extendedHeight = dimensions.height + Math.max(100, 120 * scaleFactor);
+  
+        // Simple linear scaling based on image width
+        // 400px width = 24px font
+        // 1200px width = 48px font
+        // 2400px width = 64px font
+        const minWidth = 400;
+        const maxWidth = 2400;
+        const minFont = 24;
+        const maxFont = 64;
+        
+        let fontSize;
+        if (dimensions.width <= minWidth) {
+          fontSize = minFont;
+        } else if (dimensions.width >= maxWidth) {
+          fontSize = maxFont;
+        } else {
+          // Linear interpolation
+          const scale = (dimensions.width - minWidth) / (maxWidth - minWidth);
+          fontSize = minFont + (maxFont - minFont) * scale;
+        }
+        
+        // Round to nearest even number
+        fontSize = Math.round(fontSize / 2) * 2;
+  
+        // Calculate other sizes
+        const iconSize = fontSize * 1.3;
+        const spacing = fontSize * 0.6;
+        const lineSpacing = fontSize;
+        const lineWidth = Math.max(2, fontSize * 0.03);
+  
+        // Add white space at bottom for text
+        const textAreaHeight = fontSize * 3.5;
+        const extendedHeight = dimensions.height + textAreaHeight;
         canvas.width = dimensions.width;
         canvas.height = extendedHeight;
-
+  
         // Set white background
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+  
         // Load and draw template image
         const img = new Image();
         img.crossOrigin = 'anonymous';
-
+  
         await new Promise((resolve, reject) => {
           img.onload = resolve;
           img.onerror = reject;
           img.src = template.imageUrl;
         });
-
+  
         ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
-
-        // SVG Icons as data URLs
+  
+        // SVG Icons (same as before)
         const userIconSVG = `data:image/svg+xml;base64,${btoa(`
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="#1d283a"/>
             <path d="M12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="#1d283a"/>
           </svg>
         `)}`;
-
+  
         const phoneIconSVG = `data:image/svg+xml;base64,${btoa(`
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M20 15.5C18.75 15.5 17.55 15.3 16.43 14.93C16.08 14.82 15.69 14.9 15.41 15.17L13.21 17.37C10.38 15.93 8.06 13.62 6.62 10.79L8.82 8.59C9.1 8.31 9.18 7.92 9.07 7.57C8.7 6.45 8.5 5.25 8.5 4C8.5 3.45 8.05 3 7.5 3H4C3.45 3 3 3.45 3 4C3 13.39 10.61 21 20 21C20.55 21 21 20.55 21 20V16.5C21 15.95 20.55 15.5 20 15.5Z" fill="#1d283a"/>
           </svg>
         `)}`;
-
+  
         const loadIcon = (svgData: string): Promise<HTMLImageElement> => {
           return new Promise((resolve, reject) => {
             const iconImg = new Image();
@@ -289,73 +312,71 @@ export default function ImageTemplates() {
             iconImg.src = svgData;
           });
         };
-
+  
         const [userIcon, phoneIcon] = await Promise.all([
           loadIcon(userIconSVG),
           loadIcon(phoneIconSVG)
         ]);
-
-        // Add user details section
-        const iconSize = Math.max(24, 28 * scaleFactor); // Slightly increased icon size
-        const spacing = 12 * scaleFactor;
-        const lineSpacing = 20 * scaleFactor;
-
+  
         // Calculate text measurements
         ctx.fillStyle = '#1e293b';
-        ctx.font = `bold ${responsiveFontSize}px Arial`;
+        ctx.font = `bold ${fontSize}px Arial`;
         const userName = userProfile.name;
         const contactNumber = userProfile.contactNumber;
-
+  
         const userNameWidth = ctx.measureText(userName).width;
         const contactNumberWidth = ctx.measureText(contactNumber).width;
-
-        // Calculate total width including icons, text, and line spacing
+  
+        // Calculate total width
         const totalWidthWithIcons = userNameWidth + contactNumberWidth + (iconSize * 2) + (spacing * 3) + lineSpacing;
-
+  
         // Center the entire block
-        const startX = (canvas.width - totalWidthWithIcons) / 2;
-
-        // Calculate background container dimensions - INCREASED for larger text
-        const infoHeight = 80 * scaleFactor; // Increased from 60
-        const infoMargin = 40 * scaleFactor;
-        const backgroundWidth = totalWidthWithIcons + (infoMargin * 1.5);
-        const backgroundStartX = (canvas.width - backgroundWidth) / 2;
-
-        // Calculate vertical center position for the entire content
-        const contentStartY = dimensions.height + (extendedHeight - dimensions.height) / 2;
-        const detailsY = contentStartY;
-
+        const startX = Math.max(0, (canvas.width - totalWidthWithIcons) / 2);
+  
+        // Calculate vertical position
+        const detailsY = dimensions.height + (textAreaHeight / 2);
+  
+        // Scale and draw icons
+        const iconScale = iconSize / 24;
+        const drawScaledIcon = (icon: HTMLImageElement, x: number, y: number) => {
+          ctx.save();
+          ctx.translate(x, y - iconSize / 2);
+          ctx.scale(iconScale, iconScale);
+          ctx.drawImage(icon, 0, 0);
+          ctx.restore();
+        };
+  
         // Draw user icon and name
         const userIconX = startX;
         const userNameX = userIconX + iconSize + spacing;
-
-        ctx.drawImage(userIcon, userIconX, detailsY - iconSize / 2, iconSize, iconSize);
-
+  
+        drawScaledIcon(userIcon, userIconX, detailsY);
+  
         ctx.fillStyle = '#1e293b';
-        ctx.font = `bold ${responsiveFontSize}px Arial`;
+        ctx.font = `bold ${fontSize}px Arial`;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.fillText(userName, userNameX, detailsY);
-
+  
         // Draw vertical line separator
         const lineX = userNameX + userNameWidth + (lineSpacing / 2);
         ctx.strokeStyle = '#94a3b8';
-        ctx.lineWidth = Math.max(2, 2.5 * scaleFactor);
+        ctx.lineWidth = lineWidth;
         ctx.beginPath();
-        ctx.moveTo(lineX, detailsY - (infoHeight / 3));
-        ctx.lineTo(lineX, detailsY + (infoHeight / 3));
+        ctx.moveTo(lineX, detailsY - (fontSize * 0.7));
+        ctx.lineTo(lineX, detailsY + (fontSize * 0.7));
         ctx.stroke();
-
+  
         // Draw phone icon and contact number
         const phoneIconX = lineX + (lineSpacing / 2);
         const contactNumberX = phoneIconX + iconSize + spacing;
-
-        ctx.drawImage(phoneIcon, phoneIconX, detailsY - iconSize / 2, iconSize, iconSize);
-
+  
+        drawScaledIcon(phoneIcon, phoneIconX, detailsY);
+  
         ctx.fillStyle = '#1e293b';
-        ctx.font = `bold ${responsiveFontSize}px Arial`;
+        ctx.font = `bold ${fontSize}px Arial`;
         ctx.fillText(contactNumber, contactNumberX, detailsY);
-
+  
         // Convert to blob and resolve
         canvas.toBlob((blob) => {
           if (blob) {
@@ -364,7 +385,7 @@ export default function ImageTemplates() {
             reject(new Error('Error creating image blob'));
           }
         }, 'image/png');
-
+  
       } catch (error) {
         reject(error);
       }
