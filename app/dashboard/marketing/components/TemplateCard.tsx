@@ -91,7 +91,7 @@ export default function TemplateCard({ template, onQuickDownload, onShareToWhats
       {/* Template Info - Fixed height content area */}
       <div className="p-4 sm:p-5 flex flex-col flex-1">
         <div className="flex items-start justify-between mb-2">
-          <h4 className="text-base sm:text-lg font-semibold text-slate-900 line-clamp-1 flex-1 pr-2">
+          <h4 className="text-base sm:text-lg font-semibold text-slate-900 flex-1 pr-2">
             {template.name}
           </h4>
           <span className={`text-xs font-medium px-2 py-1 rounded-full shrink-0 ${
@@ -103,7 +103,7 @@ export default function TemplateCard({ template, onQuickDownload, onShareToWhats
           </span>
         </div>
         
-        <p className="text-slate-600 text-xs sm:text-sm mb-3 leading-relaxed line-clamp-2 flex-1">
+        <p className="text-slate-600 text-xs sm:text-sm mb-3 leading-relaxed flex-1">
           {template.description}
         </p>
 

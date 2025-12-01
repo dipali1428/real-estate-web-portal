@@ -32,7 +32,7 @@ import LeadTable from "./components/LeadTable";
 
 export default function LeadManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<keyof TabCounts>("insurance");
+  const [activeTab, setActiveTab] = useState<keyof TabCounts>("loans");
   const [tabCounts, setTabCounts] = useState<TabCounts>({
     loans: 0,
     insurance: 0,
@@ -309,14 +309,12 @@ export default function LeadManagementPage() {
           }
         }
 
-        /* 800px to 1023px - 2 columns */
         @media (min-width: 820px) {
           .custom-product-grid {
             grid-template-columns: repeat(2, 1fr) !important;
           }
         }
   
-        /* 1024px and up - use Tailwind classes */
         @media (min-width: 1160px) {
           .custom-product-grid {
             grid-template-columns: repeat(3, 1fr) !important;

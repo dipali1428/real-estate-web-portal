@@ -50,7 +50,7 @@ export default function TemplateGrid({
       </div>
 
       {templates.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className={`custom-template-grid gap-4 sm:gap-6`}>
           {templates.map((template) => (
             <TemplateCard
               key={template.id}
@@ -72,6 +72,57 @@ export default function TemplateGrid({
           </p>
         </div>
       )}
+
+      {/* Custom CSS for grid responsiveness */}
+      <style jsx>{`
+        .custom-template-grid {
+          display: grid;
+          width: 100%;
+        }
+
+        /* Custom breakpoints matching your reference code */
+        @media (min-width: 460px) and (max-width: 767px) {
+          .custom-template-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+
+        @media (min-width: 768px) and (max-width: 819px) {
+          .custom-template-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+
+        @media (min-width: 820px) and (max-width: 1023px) {
+          .custom-template-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+
+        @media (min-width: 1024px) and (max-width: 1159px) {
+          .custom-template-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+
+        @media (min-width: 1160px) and (max-width: 1279px) {
+          .custom-template-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+        }
+
+        @media (min-width: 1280px) and (max-width: 1359px) {
+          .custom-template-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+        }
+
+        @media (min-width: 1360px) {
+          .custom-template-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
