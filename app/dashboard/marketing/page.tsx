@@ -53,14 +53,30 @@ export default function ImageTemplates() {
         setLoading(true);
         const response = await DashboardService.getProfile();
         const profileData: ApiProfile = response.user;
-
-        // Capitalize the first letter of the name
-        const capitalizedName = profileData.name
-          ? profileData.name.charAt(0).toUpperCase() + profileData.name.slice(1)
-          : 'User';
-
+    
+        // Function to capitalize each word in the name
+        const capitalizeFullName = (name: string): string => {
+          if (!name || name.trim() === '') return 'User';
+          
+          return name
+            .toLowerCase()
+            .split(' ')
+            .filter(word => word.length > 0) // Remove empty strings
+            .map(word => {
+              // Handle hyphenated names (e.g., "Smith-Jones")
+              if (word.includes('-')) {
+                return word
+                  .split('-')
+                  .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+                  .join('-');
+              }
+              return word.charAt(0).toUpperCase() + word.slice(1);
+            })
+            .join(' ');
+        };
+    
         setUserProfile({
-          name: capitalizedName,
+          name: capitalizeFullName(profileData.name),
           contactNumber: profileData.mobile || 'Not provided'
         });
       } catch (error) {

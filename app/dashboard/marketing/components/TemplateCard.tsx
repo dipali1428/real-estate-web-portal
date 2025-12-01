@@ -117,7 +117,7 @@ export default function TemplateCard({ template, onQuickDownload, onShareToWhats
                 ? 'bg-slate-400 cursor-not-allowed'
                 : isInsurance
                   ? 'bg-[#2076C7] hover:bg-[#1a5e9a]'
-                  : 'bg-[#1CADA3] hover:bg-[#18918a]'
+                  : 'bg-[#2076C7] hover:bg-[#1a5e9a]'
             }`}
           >
             {isGenerating ? (
@@ -143,7 +143,7 @@ export default function TemplateCard({ template, onQuickDownload, onShareToWhats
                 ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
                 : isInsurance
                   ? 'bg-green-600 hover:bg-green-700 text-white'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  : 'bg-green-600 hover:bg-green-700 text-white'
             }`}
           >
             {isGenerating ? (

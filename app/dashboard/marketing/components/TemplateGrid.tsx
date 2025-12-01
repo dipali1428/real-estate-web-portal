@@ -20,7 +20,7 @@ interface TemplateGridProps {
 }
 
 const subCategoryLabels: Record<string, string> = {
-  all: 'All Templates',
+  all: 'All',
   life: 'Life Insurance',
   health: 'Health Insurance',
   motor: 'Motor Insurance',

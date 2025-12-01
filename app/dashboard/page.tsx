@@ -24,9 +24,29 @@ export default function Dashboard() {
     const router = useRouter();
     const hasFetched = useRef(false);
 
+    // ✅ Function to capitalize each word in the name
+    const capitalizeFullName = (name: string): string => {
+        if (!name || name.trim() === '') return 'User';
+        
+        return name
+            .toLowerCase()
+            .split(' ')
+            .filter(word => word.length > 0) // Remove empty strings
+            .map(word => {
+                // Handle hyphenated names (e.g., "Smith-Jones")
+                if (word.includes('-')) {
+                    return word
+                        .split('-')
+                        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+                        .join('-');
+                }
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            })
+            .join(' ');
+    };
+
     // ✅ Fetch profile data from API
     useEffect(() => {
-
         // Hit API Once
         if (hasFetched.current) return;
         hasFetched.current = true;
@@ -38,14 +58,21 @@ export default function Dashboard() {
                 setLoading(true);
 
                 const data = await DashboardService.getProfile();
-                setUser(data.user);
+                
+                // Capitalize the user's name before setting state
+                const userData = data.user;
+                const formattedUser = {
+                    ...userData,
+                    name: capitalizeFullName(userData.name)
+                };
+                
+                setUser(formattedUser);
 
             } catch (error: any) {
                 console.error("Profile fetch error:", error);
 
                 // 🔥 If backend says token expired → logout user
                 if (error?.response?.status === 401) {
-
                     // Show toast for 2 seconds
                     toast.error("Login session expired! Please login again.", {
                         duration: 2000,
@@ -98,7 +125,6 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
@@ -136,8 +162,6 @@ export default function Dashboard() {
                             </div>
                         </div>
                     </div>
-
-                    
 
                     {/* Active Policies */}
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
@@ -206,19 +230,9 @@ export default function Dashboard() {
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                         <div className="flex items-start justify-between">
                             <div className="w-12 h-12 bg-linear-to-r from-gray-700 to-gray-900 rounded-2xl flex items-center justify-center text-white">
-                                {/* Rupee Icon */}
-                                {/* YTD Incentives Earned */}
-                                <div className="bg-white rounded-2xl p-6 ">
-                                    <div className="flex items-start justify-between">
-                                        <div className="w-12 h-12 bg-linear-to-r from-gray-700 to-gray-900 rounded-2xl flex items-center justify-center text-white">
-                                            {/* Rupee Icon */}
-                                            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M12.9494914,6 C13.4853936,6.52514205 13.8531598,7.2212202 13.9645556,8 L17.5,8 C17.7761424,8 18,8.22385763 18,8.5 C18,8.77614237 17.7761424,9 17.5,9 L13.9645556,9 C13.7219407,10.6961471 12.263236,12 10.5,12 L7.70710678,12 L13.8535534,18.1464466 C14.0488155,18.3417088 14.0488155,18.6582912 13.8535534,18.8535534 C13.6582912,19.0488155 13.3417088,19.0488155 13.1464466,18.8535534 L6.14644661,11.8535534 C5.83146418,11.538571 6.05454757,11 6.5,11 L10.5,11 C11.709479,11 12.7183558,10.1411202 12.9499909,9 L6.5,9 C6.22385763,9 6,8.77614237 6,8.5 C6,8.22385763 6.22385763,8 6.5,8 L12.9499909,8 C12.7183558,6.85887984 11.709479,6 10.5,6 L6.5,6 C6.22385763,6 6,5.77614237 6,5.5 C6,5.22385763 6.22385763,5 6.5,5 L10.5,5 L17.5,5 C17.7761424,5 18,5.22385763 18,5.5 C18,5.77614237 17.7761424,6 17.5,6 L12.9494914,6 L12.9494914,6 Z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    {/* ... rest of card content ... */}
-                                </div>
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12.9494914,6 C13.4853936,6.52514205 13.8531598,7.2212202 13.9645556,8 L17.5,8 C17.7761424,8 18,8.22385763 18,8.5 C18,8.77614237 17.7761424,9 17.5,9 L13.9645556,9 C13.7219407,10.6961471 12.263236,12 10.5,12 L7.70710678,12 L13.8535534,18.1464466 C14.0488155,18.3417088 14.0488155,18.6582912 13.8535534,18.8535534 C13.6582912,19.0488155 13.3417088,19.0488155 13.1464466,18.8535534 L6.14644661,11.8535534 C5.83146418,11.538571 6.05454757,11 6.5,11 L10.5,11 C11.709479,11 12.7183558,10.1411202 12.9499909,9 L6.5,9 C6.22385763,9 6,8.77614237 6,8.5 C6,8.22385763 6.22385763,8 6.5,8 L12.9499909,8 C12.7183558,6.85887984 11.709479,6 10.5,6 L6.5,6 C6.22385763,6 6,5.77614237 6,5.5 C6,5.22385763 6.22385763,5 6.5,5 L10.5,5 L17.5,5 C17.7761424,5 18,5.22385763 18,5.5 C18,5.77614237 17.7761424,6 17.5,6 L12.9494914,6 L12.9494914,6 Z" />
+                                </svg>
                             </div>
                         </div>
                         <div className="mt-4">
@@ -268,7 +282,6 @@ export default function Dashboard() {
                                     </svg>
                                     <div>
                                         <div className="text-gray-800">New lead added for Health Insurance</div>
-                                        {/* <div className="text-sm text-gray-500">Today, 10:15 AM</div> */}
                                     </div>
                                 </div>
                             </div>
@@ -279,28 +292,16 @@ export default function Dashboard() {
                                     </svg>
                                     <div>
                                         <div className="text-gray-800">Client policy issued</div>
-                                        {/*  <div className="text-sm text-gray-500">Yesterday, 3:45 PM</div>*/}
                                     </div>
                                 </div>
                             </div>
                             <div className="pb-3 border-b border-gray-100">
                                 <div className="flex items-start">
-                                    {/* Rupee Icon for Incentive */}
-                                    <div className="pb-3 border-b border-gray-100">
-                                        <div className="flex items-start">
-                                            {/* Rupee Icon for Incentive */}
-                                            <svg className="w-5 h-5 text-yellow-500 mt-1 mr-3" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M12.9494914,6 C13.4853936,6.52514205 13.8531598,7.2212202 13.9645556,8 L17.5,8 C17.7761424,8 18,8.22385763 18,8.5 C18,8.77614237 17.7761424,9 17.5,9 L13.9645556,9 C13.7219407,10.6961471 12.263236,12 10.5,12 L7.70710678,12 L13.8535534,18.1464466 C14.0488155,18.3417088 14.0488155,18.6582912 13.8535534,18.8535534 C13.6582912,19.0488155 13.3417088,19.0488155 13.1464466,18.8535534 L6.14644661,11.8535534 C5.83146418,11.538571 6.05454757,11 6.5,11 L10.5,11 C11.709479,11 12.7183558,10.1411202 12.9499909,9 L6.5,9 C6.22385763,9 6,8.77614237 6,8.5 C6,8.22385763 6.22385763,8 6.5,8 L12.9499909,8 C12.7183558,6.85887984 11.709479,6 10.5,6 L6.5,6 C6.22385763,6 6,5.77614237 6,5.5 C6,5.22385763 6.22385763,5 6.5,5 L10.5,5 L17.5,5 C17.7761424,5 18,5.22385763 18,5.5 C18,5.77614237 17.7761424,6 17.5,6 L12.9494914,6 L12.9494914,6 Z" />
-                                            </svg>
-                                            <div>
-                                                <div className="text-gray-800">Incentive of ₹0 credited</div>
-                                                {/*  <div className="text-sm text-gray-500">15 Oct 2023, 11:20 AM</div>*/}
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <svg className="w-5 h-5 text-yellow-500 mt-1 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12.9494914,6 C13.4853936,6.52514205 13.8531598,7.2212202 13.9645556,8 L17.5,8 C17.7761424,8 18,8.22385763 18,8.5 C18,8.77614237 17.7761424,9 17.5,9 L13.9645556,9 C13.7219407,10.6961471 12.263236,12 10.5,12 L7.70710678,12 L13.8535534,18.1464466 C14.0488155,18.3417088 14.0488155,18.6582912 13.8535534,18.8535534 C13.6582912,19.0488155 13.3417088,19.0488155 13.1464466,18.8535534 L6.14644661,11.8535534 C5.83146418,11.538571 6.05454757,11 6.5,11 L10.5,11 C11.709479,11 12.7183558,10.1411202 12.9499909,9 L6.5,9 C6.22385763,9 6,8.77614237 6,8.5 C6,8.22385763 6.22385763,8 6.5,8 L12.9499909,8 C12.7183558,6.85887984 11.709479,6 10.5,6 L6.5,6 C6.22385763,6 6,5.77614237 6,5.5 C6,5.22385763 6.22385763,5 6.5,5 L10.5,5 L17.5,5 C17.7761424,5 18,5.22385763 18,5.5 C18,5.77614237 17.7761424,6 17.5,6 L12.9494914,6 L12.9494914,6 Z" />
+                                    </svg>
                                     <div>
                                         <div className="text-gray-800">Incentive of ₹0 credited</div>
-                                        {/*  <div className="text-sm text-gray-500">15 Oct 2023, 11:20 AM</div>*/}
                                     </div>
                                 </div>
                             </div>
@@ -311,7 +312,6 @@ export default function Dashboard() {
                                     </svg>
                                     <div>
                                         <div className="text-gray-800">Lead converted to client</div>
-                                        {/*<div className="text-sm text-gray-500">14 Oct 2023, 4:30 PM</div>*/}
                                     </div>
                                 </div>
                             </div>
@@ -322,7 +322,6 @@ export default function Dashboard() {
                                     </svg>
                                     <div>
                                         <div className="text-gray-800">Follow-up scheduled</div>
-                                        {/* <div className="text-sm text-gray-500">13 Oct 2023, 2:15 PM</div> */}
                                     </div>
                                 </div>
                             </div>
