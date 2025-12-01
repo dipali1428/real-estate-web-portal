@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { MobileSidebar, SidebarProvider } from "./ui/sidebar";
+import { MobileSidebar, SidebarProvider } from "../../component/ui/sidebar";
 import { useRouter } from "next/navigation";
 
 import {

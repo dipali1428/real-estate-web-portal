@@ -8,13 +8,15 @@ import { ModalProvider } from "./context/ModalContext";
 export default function RootClientWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
+  const isAdminDashboard = pathname?.startsWith("/admin");
+
   const isContactList = pathname?.startsWith("/page/contactlist");
 
   return (
     <ModalProvider>
-      {!isDashboard && !isContactList && <Header />}
+      {!isDashboard && !isContactList && !isAdminDashboard && <Header />}
       {children}
-      {!isDashboard && !isContactList && <Footer />}
+      {!isDashboard && !isContactList && !isAdminDashboard && <Footer />}
     </ModalProvider>
   );
 }

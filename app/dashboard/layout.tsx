@@ -1,6 +1,6 @@
 "use client";
 
-import DashboardSidebar from "./components/Sidebar";
+import DashboardSidebar from "../component/Sidebar";
 import DashboardHeader from "./components/DashboardHeader";
 import { Toaster } from "react-hot-toast";
 

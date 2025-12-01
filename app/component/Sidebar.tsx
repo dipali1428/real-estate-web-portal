@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Sidebar, SidebarBody, SidebarLink } from "../components/ui/sidebar";
-import { cn } from "../../lib/utils";
+import { Sidebar, SidebarBody, SidebarLink } from "../component/ui/sidebar";
+import { cn } from "../lib/utils";
 import {
   LayoutDashboard,
   User,
