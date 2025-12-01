@@ -21,11 +21,22 @@ export default function AddLeadModal({
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  const productKeyMap: Record<string, string> = {
+    "Finance": "finance",
+    "Protection": "protection",
+    "Investments": "investments",
+    "Real Estate": "real_estate",
+    "Mutual Funds": "mutual_funds",
+    "Unlisted": "unlisted",
+  };
+
   const subProductOptions: Record<string, string[]> = {
-    finance: ["Loans", "Credit Cards", "EMI Plans"],
-    protection: ["Life Insurance", "Health Insurance"],
-    investments: ["Mutual Funds", "Fixed Deposits", "Stocks"],
-    real_estate: ["Apartments", "Commercial", "Land"],
+    finance: ["Home Loan", "Personal Loan", "Business Loan", "Education Loan", "Lap Loan", "Vehicle Loan", "SME Loan", "Loan Against Securities", "NRP Loan", "Credit Cards"],
+    protection: ["Health Insurance", "Life Insurance", "Travel Insurance", "Motor Insurance", "Property Insurance", "Cattle Insurance", "Marine Insurance"],
+    investments: ["Wealth Management", "PMS/AIF", "Bonds", "Fixed Deposits"],
+    real_estate: ["Fractional Real Estate",],
+    mutual_funds: ["Mutual Funds"],
+    unlisted: ["Unlisted"],
   };
 
   // Update form values - matching Personal Loan behavior
@@ -61,7 +72,7 @@ export default function AddLeadModal({
 
     // If all good
     setSuccess(true);
-    
+
     // Reset form and close after success
     setTimeout(() => {
       setSuccess(false);
@@ -82,9 +93,9 @@ export default function AddLeadModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto max-h-[90vh] flex flex-col">
-        
+
         {/* Header - Matching Personal Loan design */}
-        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
+        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Add New Lead</h2>
           <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
             <X size={20} className="sm:w-6 sm:h-6" />
@@ -96,7 +107,7 @@ export default function AddLeadModal({
           <form onSubmit={submitForm} className="p-4 sm:p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
-              <Input 
+              <Input
                 label="Client Name"
                 placeholder="Enter client's full name"
                 value={formData.leadName}
@@ -113,7 +124,7 @@ export default function AddLeadModal({
                 onChange={(e: any) => handleChange("contactNumber", e.target.value)}
               />
 
-              <Input 
+              <Input
                 label="Email Address"
                 type="email"
                 placeholder="Enter email address"
@@ -124,7 +135,7 @@ export default function AddLeadModal({
               {/* Product Selection */}
               <Select
                 label="Product"
-                options={["Finance", "Protection", "Investments", "Real Estate"]}
+                options={["Finance", "Protection", "Investments", "Real Estate", "Mutual Funds", "Unlisted"]}
                 value={formData.product}
                 onChange={(value: string) => handleChange("product", value)}
               />
@@ -133,7 +144,7 @@ export default function AddLeadModal({
               {formData.product && (
                 <Select
                   label="Sub Product"
-                  options={subProductOptions[formData.product.toLowerCase()] || []}
+                  options={subProductOptions[productKeyMap[formData.product]] || []}
                   value={formData.subProduct}
                   onChange={(value: string) => handleChange("subProduct", value)}
                 />
@@ -170,14 +181,12 @@ export default function AddLeadModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="w-full sm:w-32 bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors text-sm sm:text-base"
-                >
+                  className="w-full sm:w-32 bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors text-sm sm:text-base">
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="w-full sm:w-32 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base"
-                >
+                  className="w-full sm:w-32 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base">
                   Save Lead
                 </button>
               </div>

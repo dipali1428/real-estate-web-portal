@@ -226,7 +226,7 @@ export default function ProfileSection() {
                                     <p className="font-semibold text-gray-700">{head}</p>
 
                                     <div className="flex flex-wrap gap-2 mt-2">
-                                        {CATEGORY_MAP[head].map((cat) => (
+                                        {(CATEGORY_MAP[head] ?? []).map((cat) => (
                                             <button
                                                 key={cat}
                                                 type="button"
