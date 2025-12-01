@@ -105,7 +105,7 @@ const RelationshipManager: React.FC = () => {
       name: 'Rakhi Wankhade',
       phone: '+91 80107 12260',
       designation: 'Operation Manager',
-      specialization: 'Home Loan '
+      specialization: 'Home Loan & LAP Loan '
     },
     {
       id: '8',
@@ -142,13 +142,8 @@ const RelationshipManager: React.FC = () => {
       designation: 'Business Co-Ordinator',
       specialization: 'Education Loan & Car Loan'
     },
-    {
-      id: '13',
-      name: 'Girish Bansode',
-      phone: '+91 7447820657',
-      designation: 'Business Co-Ordinator',
-      specialization: 'Life Insurance'
-    }
+    
+   
   ];
 
   // DSA Performance Data
@@ -332,38 +327,51 @@ const RelationshipManager: React.FC = () => {
             </div>
             
            {/* Contact Cards Section */}
-<div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
-  {contactCards.map((contact) => (
-    <div
-      key={contact.id}
-      className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-200 flex flex-col min-h-0"
-    >
-      <div className="mb-3 flex-shrink-0 min-w-0">
-        <h3 className="font-semibold text-gray-800 text-sm mb-1 truncate">
-          {contact.name}
-        </h3>
-        <p className="text-xs text-blue-600 font-medium mb-2 truncate">
-          {contact.designation}
-        </p>
-      </div>
-
-      <div className="space-y-2 flex-grow min-w-0">
-        <div className="text-xs text-gray-600 leading-tight min-w-0">
-          <span className="font-medium">Phone: </span>
-          <span className="text-gray-800 break-normal whitespace-normal min-w-0">
-            {contact.phone}
-          </span>
+<div className="min-h-screen bg-gray-50 p-4 md:p-6">
+  {/* Header Section */}
+  
+    
+  <div className="mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700">Our Team Contacts</h1>
+          <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">
+             Get in touch with our professional team members.
+          </p>
         </div>
 
-        <div className="text-xs text-gray-600 leading-tight min-w-0">
-          <span className="font-medium">Specialization:</span>
-          <span className="text-gray-800 ml-1 break-normal whitespace-normal min-w-0">
-            {contact.specialization}
-          </span>
+  {/* Contact Cards Grid */}
+  <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(240px,1fr))] px-4">
+    {contactCards.map((contact) => (
+      <div
+        key={contact.id}
+        className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-200 flex flex-col min-h-0"
+      >
+        <div className="mb-3 flex-shrink-0 min-w-0">
+          <h3 className="font-semibold text-gray-800 text-sm mb-1 truncate">
+            {contact.name}
+          </h3>
+          <p className="text-xs text-blue-600 font-medium mb-2 truncate">
+            {contact.designation}
+          </p>
+        </div>
+
+        <div className="space-y-2 flex-grow min-w-0">
+          <div className="text-xs text-gray-600 leading-tight min-w-0">
+            <span className="font-medium">Phone: </span>
+            <span className="text-gray-800 break-all whitespace-normal min-w-0">
+              {contact.phone}
+            </span>
+          </div>
+
+          <div className="text-xs text-gray-600 leading-tight min-w-0">
+            <span className="font-medium">Specialization:</span>
+            <span className="text-gray-800 ml-1 break-words whitespace-normal min-w-0">
+              {contact.specialization}
+            </span>
+          </div>
         </div>
       </div>
-    </div>
-  ))}
+    ))}
+  </div>
 </div>
 
           </div>
