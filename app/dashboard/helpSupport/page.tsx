@@ -343,7 +343,7 @@ const HelpSupportPage: React.FC = () => {
                 </select>
               </div>
 
-              <div>
+              <div className='col-span-1'>
                 <label
                   htmlFor="subject"
                   className="block text-sm font-medium text-slate-700 mb-2">
@@ -366,7 +366,7 @@ const HelpSupportPage: React.FC = () => {
 
 
               {/* Description Field */}
-              <div>
+              <div className='col-span-1 sm:col-span-2'>
                 <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">
                   Description
                 </label>
@@ -383,7 +383,7 @@ const HelpSupportPage: React.FC = () => {
               </div>
 
               {/* Submit Button */}
-              <div className="pt-2 sm:pt-4">
+              <div className="col-span-1 sm:col-span-2 pt-2 sm:pt-4">
                 <button
                   type="submit"
                   className="w-full bg-blue-600 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base">

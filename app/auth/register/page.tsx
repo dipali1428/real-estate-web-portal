@@ -265,7 +265,8 @@ export default function BecomePartnerForm() {
                 {!success ? (
                     <>
                         {/* --- ALL your existing input fields, captcha, and buttons go here --- */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-4">
+                        <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
+
                             {/* Name */}
                             <div>
                                 <label className={labelClass}>Name</label>
@@ -396,8 +397,7 @@ export default function BecomePartnerForm() {
                                                 {/* Subcategories (only visible if head selected) */}
                                                 {isHeadSelected && (
                                                     <div className="ml-3 sm:ml-6 mt-2
-                                                            grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3
-                                                            gap-x-4 gap-y-2">
+                                                            grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2">
                                                         {subs.map((cat) => (
                                                             <label key={cat} className="flex items-center gap-2 text-gray-700 text-sm cursor-pointer">
                                                                 <input
@@ -505,7 +505,7 @@ export default function BecomePartnerForm() {
                             <div className="md:col-span-2">
                                 <label className={labelClass}>Captcha</label>
                                 <div className="flex items-center gap-3">
-                                    <div className="select-none rounded-lg border border-dashed border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700">
+                                    <div className="select-none rounded-lg border border-dashed border-gray-300 bg-white px-3 py-1.5 text-sm sm:text-sm text-gray-700">
                                         What is <b>{a}</b> + <b>{b}</b>?
                                     </div>
                                     <input
@@ -528,7 +528,7 @@ export default function BecomePartnerForm() {
 
                             {/* Agree */}
                             <div className="md:col-span-2">
-                                <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+                                <label className="inline-flex items-center gap-2 text-sm sm:text-sm text-gray-700">
                                     <input
                                         type="checkbox"
                                         checked={form.agree}
@@ -536,15 +536,17 @@ export default function BecomePartnerForm() {
                                         className="h-4 w-4 rounded border-gray-300 text-[#1CADA3] focus:ring-[#1CADA3]"
                                     />
                                     I agree to the{" "}
-                                    <a href="#" className="underline" onClick={(e) => e.preventDefault()}>
+                                    <a href="#" className="underline text-sm sm:text-sm" onClick={(e) => e.preventDefault()}>
                                         Terms
                                     </a>{" "}
                                     &{" "}
-                                    <a href="#" className="underline" onClick={(e) => e.preventDefault()}>
-                                        Privacy Policy
+                                    <a href="#" className="underline text-sm sm:text-sm" onClick={(e) => e.preventDefault()}>
+                                        Privacy Policy.
                                     </a>
-                                    .
                                 </label>
+                                <p className="text-red-400 text-xs sm:text-sm">
+                                    *Please ensure your Name, Email and PAN are entered correctly. These details cannot be changed later.
+                                </p>
                                 {errors.agree && <p className={errorClass}>{errors.agree}</p>}
                             </div>
 
