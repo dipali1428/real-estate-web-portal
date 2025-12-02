@@ -298,8 +298,8 @@ const FDCalculator: React.FC = () => {
                   <input
                     type="range"
                     id="interestRate"
-                    min="2.7"
-                    max="6.6"
+                    min="1"
+                    max="15"
                     step="0.1"
                     value={interestRate}
                     onChange={handleInterestRateChange}
