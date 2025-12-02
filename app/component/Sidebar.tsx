@@ -3,73 +3,66 @@
 import React, { useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "../component/ui/sidebar";
 import { cn } from "../lib/utils";
-import {
-  LayoutDashboard,
-  User,
-  LogOut,
-  Briefcase,
-  Megaphone,
-  Download,
-  Users,
-  HelpCircle,
-  HandCoins,
-  UserCheck,
-} from "lucide-react";
+import { LogOut } from "lucide-react";
 import { motion } from "motion/react";
 import { useRouter, usePathname } from "next/navigation";
+import { getSidebarLinks } from "../utils/getSidebarLinks";
+import type { Role } from "../utils/getSidebarLinks";
 
-export default function DashboardSidebar() {
+
+export default function DashboardSidebar({ role }: { role: Role }) {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const links = getSidebarLinks(role);
 
-  const links = [
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-      icon: <LayoutDashboard className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
-    {
-      label: "Profile",
-      href: "/dashboard/profile",
-      icon: <User className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
-    {
-      label: "Lead Management",
-      href: "/dashboard/leadmanagement",
-      icon: <UserCheck className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
-    {
-      label: "Client Portfolio",
-      href: "/dashboard/clientPortfolio",
-      icon: <Briefcase className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
-    {
-      label: "Incentives & Payouts",
-      href: "/dashboard/incentives",
-      icon: <HandCoins className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
-    {
-      label: "Marketing Campaigns",
-      href: "/dashboard/marketing",
-      icon: <Megaphone className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
-    {
-      label: "Downloads",
-      href: "/dashboard/pdf-download",
-      icon: <Download className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
-    {
-      label: "Relationship Manager",
-      href: "/dashboard/relationshipManager",
-      icon: <Users className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
-    {
-      label: "Help & Support",
-      href: "/dashboard/helpSupport",
-      icon: <HelpCircle className="h-5 w-5 shrink-0 text-neutral-700" />,
-    },
-  ];
+  // const links = [
+  //   {
+  //     label: "Dashboard",
+  //     href: "/dashboard",
+  //     icon: <LayoutDashboard className="h-5 w-5 shrink-0 text-neutral-700" />,
+  //   },
+  //   {
+  //     label: "Profile",
+  //     href: "/dashboard/profile",
+  //     icon: <User className="h-5 w-5 shrink-0 text-neutral-700" />,
+  //   },
+  //   {
+  //     label: "Lead Management",
+  //     href: "/dashboard/leadmanagement",
+  //     icon: <UserCheck className="h-5 w-5 shrink-0 text-neutral-700" />,
+  //   },
+  //   {
+  //     label: "Client Portfolio",
+  //     href: "/dashboard/clientPortfolio",
+  //     icon: <Briefcase className="h-5 w-5 shrink-0 text-neutral-700" />,
+  //   },
+  //   {
+  //     label: "Incentives & Payouts",
+  //     href: "/dashboard/incentives",
+  //     icon: <HandCoins className="h-5 w-5 shrink-0 text-neutral-700" />,
+  //   },
+  //   {
+  //     label: "Marketing Campaigns",
+  //     href: "/dashboard/marketing",
+  //     icon: <Megaphone className="h-5 w-5 shrink-0 text-neutral-700" />,
+  //   },
+  //   {
+  //     label: "Downloads",
+  //     href: "/dashboard/pdf-download",
+  //     icon: <Download className="h-5 w-5 shrink-0 text-neutral-700" />,
+  //   },
+  //   {
+  //     label: "Relationship Manager",
+  //     href: "/dashboard/relationshipManager",
+  //     icon: <Users className="h-5 w-5 shrink-0 text-neutral-700" />,
+  //   },
+  //   {
+  //     label: "Help & Support",
+  //     href: "/dashboard/helpSupport",
+  //     icon: <HelpCircle className="h-5 w-5 shrink-0 text-neutral-700" />,
+  //   },
+  // ];
 
   const handleLogout = () => {
     document.cookie = "authToken=; path=/; max-age=0; SameSite=Lax";

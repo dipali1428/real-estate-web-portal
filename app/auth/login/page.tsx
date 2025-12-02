@@ -95,13 +95,16 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                 identifier: emailOrPhone,
                 password: passwordOrOtp,
             });
+            // console.log("--------->", data);
 
             if (data?.token) {
-                // Save token in cookie
                 document.cookie = `authToken=${data.token}; path=/; max-age=86400; SameSite=Lax`;
-                router.push("/dashboard");
+                if (data.role === "ADMIN") {
+                    router.push("/admin");
+                } else {
+                    router.push("/dashboard");
+                }
             }
-            // Close modal
             onClose();
 
         } catch (err: any) {

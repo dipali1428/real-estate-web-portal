@@ -3,39 +3,16 @@
 import { motion } from "motion/react";
 import { MobileSidebar, SidebarProvider } from "../../component/ui/sidebar";
 import { useRouter } from "next/navigation";
+import { getSidebarLinks } from "@/app/utils/getSidebarLinks";
+import type { Role } from "../../utils/getSidebarLinks";
 
-import {
-    LayoutDashboard,
-    User,
-    UserCheck,
-    Briefcase,
-    HandCoins,
-    Megaphone,
-    Download,
-    Users,
-    HelpCircle,
-} from "lucide-react";
-
-export default function DashboardHeader() {
+export default function DashboardHeader({ role }: { role: Role }) {
+    const links = getSidebarLinks(role);
     const router = useRouter();
-
-    const links = [
-        { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard /> },
-        { label: "Profile", href: "/dashboard/profile", icon: <User /> },
-        { label: "Lead Management", href: "/dashboard/leadmanagement", icon: <UserCheck /> },
-        { label: "Client Portfolio", href: "/dashboard/clientPortfolio", icon: <Briefcase /> },
-        { label: "Incentives & Payouts", href: "/dashboard/incentives", icon: <HandCoins /> },
-        { label: "Marketing Campaigns", href: "/dashboard/marketing", icon: <Megaphone /> },
-        { label: "Downloads", href: "/dashboard/pdf-download", icon: <Download /> },
-        { label: "Relationship Manager", href: "/dashboard/relationshipManager", icon: <Users /> },
-        { label: "Help & Support", href: "/dashboard/helpSupport", icon: <HelpCircle /> },
-    ];
-
 
     return (
         <>
             <SidebarProvider>
-
                 <motion.header className="border-b flex items-center justify-between px-4 py-3 shadow-sm bg-white">
                     <MobileSidebar
                         links={links}
