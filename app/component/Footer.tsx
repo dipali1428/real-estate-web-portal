@@ -13,8 +13,8 @@ const Footer = () => (
             {/* Title + Description */}
             <div>
               <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                <h3 className="font-bold text-2xl mb-4 relative inline-block after:content-[''] after:block after:w-71 after:h-[3px] after:bg-gradient-to-r after:from-[#2076C7] after:to-[#1CADA3] after:mt-2 mx-auto md:mx-0">
-                  About Infinity Arthvishva
+                <h3 className="font-bold text-2xl mb-4 relative inline-block after:content-[''] after:block after:w-18 after:h-1 after:bg-linear-to-r after:from-[#2076C7] after:to-[#1CADA3] after:mt-2 mx-auto md:mx-0">
+                  About 
                 </h3>
                 <p className="text-sm md:text-base text-gray-400 leading-relaxed max-w-lg">
                   We are a leading financial advisory firm providing comprehensive
@@ -144,7 +144,7 @@ const Footer = () => (
           href="https://www.facebook.com/share/17getCdK5b/"
           target="_blank"
           rel="noopener noreferrer"
-          className="group relative p-3 rounded-full bg-gray-800 hover:bg-gradient-to-r hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+          className="group relative p-3 rounded-full bg-gray-800 hover:bg-linear-to-r hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
           <Facebook className="w-4 h-4 text-gray-300 group-hover:text-white transition-colors duration-300" />
         </a>
 
@@ -153,7 +153,7 @@ const Footer = () => (
           href="https://www.instagram.com/infinity_arthvishva/?utm_source=qr&igsh=MWQ4ZTdraHcwZ3U0MQ%3D%3D#"
           target="_blank"
           rel="noopener noreferrer"
-          className="group relative p-3 rounded-full bg-gray-800 hover:bg-gradient-to-r hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+          className="group relative p-3 rounded-full bg-gray-800 hover:bg-linear-to-r hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
           <Instagram className="w-4 h-4 text-gray-300 group-hover:text-white transition-colors duration-300" />
         </a>
 
@@ -162,7 +162,7 @@ const Footer = () => (
           href="#"
           target="_blank"
           rel="noopener noreferrer"
-          className="group relative p-3 rounded-full bg-gray-800 hover:bg-gradient-to-r hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+          className="group relative p-3 rounded-full bg-gray-800 hover:bg-linear-to-r hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
           <Linkedin className="w-4 h-4 text-gray-300 group-hover:text-white transition-colors duration-300" />
         </a>
       </div>

@@ -32,6 +32,10 @@ const Header = () => {
     { label: "EMI Calculator", href: "/page/emi", component: EMICalculator },
     { label: "SIP Calculator", href: "/page/sip" },
     { label: "SIP Vs EMI", href: "/page/sipVsEmi" },
+    { label: "Home Loan Calculator", href: "/page/homeloan"},
+    { label: "Personal Loan Calculator", href: "/page/personalloan"},
+    { label: "Business Loan Calculator", href: "/page/businessloan"},
+    { label: "", href: "/page/loancalculator"},
   ];
 
   return (
@@ -107,7 +111,7 @@ const Header = () => {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute top-full left-0 mt-2 w-40 xl:w-44 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                  className="absolute top-full left-0 mt-2 w-40 xl:w-70 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                   {calculatorOptions.map((option, index) => (
                     <a
                       key={index}

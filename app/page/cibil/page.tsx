@@ -170,6 +170,50 @@ const CreditScorePage: React.FC = () => {
                 </ul>
             ),
         },
+        {
+        question: "Why did my CIBIL score drop suddenly?",
+        answer: (
+            <div>
+            <p className="font-medium mb-2">Common reasons include:</p>
+            <ul className="list-disc pl-5 space-y-1">
+                <li>Late or missed EMI payments</li>
+                <li>High credit card usage</li>
+                <li>Too many loan/credit card applications</li>
+                <li>Closing old credit accounts</li>
+                <li>Errors in your credit report</li>
+            </ul>
+            </div>
+        )
+        },
+        {
+           question: "How can I improve my CIBIL score?",
+        answer: (
+            <div>
+            <p className="font-medium mb-2">You can improve it by:</p>
+            <ul className="list-disc pl-5 space-y-1">
+                <li>Paying EMIs and credit card bills on time</li>
+                <li>Keeping credit utilization below 30%</li>
+                <li>Maintaining a long credit history</li>
+                <li>Avoiding multiple loan inquiries</li>
+                <li>Correcting errors in your report</li>
+            </ul>
+            </div>
+        )
+        },
+        {
+            question: "What is the minimum CIBIL score required for a loan?",
+            answer:"Most banks prefer a score of 700+, but some lenders offer loans even if your score is lower, depending on eligibility.",    
+        },
+        {
+            question: "Can I get a loan without a CIBIL score?",
+            answer:
+                "Yes. If you have no credit history, lenders may still offer loans based on income, documents, and alternative scoring systems.",
+        },
+        {
+            question: "How often should I check my CIBIL score?",
+            answer:
+                "It\u2019s recommended to check your score at least twice a year to track changes and correct errors early.",
+        },
     ];
 
     return (
