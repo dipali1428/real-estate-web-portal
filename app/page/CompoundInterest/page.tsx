@@ -1,0 +1,771 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { Chart, DoughnutController, ArcElement, Tooltip, Legend, LineController, LineElement, PointElement, LinearScale, CategoryScale } from 'chart.js';
+
+// Register Chart.js components
+Chart.register(
+  DoughnutController, ArcElement, Tooltip, Legend, LineController, LineElement, PointElement, LinearScale, CategoryScale
+);
+
+const CompoundInterestCalculator: React.FC = () => {
+  // State for investment parameters with proper initialization
+  const [principal, setPrincipal] = useState<number>(100000);
+  const [interestRate, setInterestRate] = useState<number>(7.5);
+  const [tenureValue, setTenureValue] = useState<number>(12);
+  const [tenureUnit, setTenureUnit] = useState<string>('years'); // 'months' or 'years'
+  const [frequency, setFrequency] = useState<string>('yearly');
+
+  // State for calculated values
+  const [finalAmount, setFinalAmount] = useState<number>(0);
+  const [totalInterest, setTotalInterest] = useState<number>(0);
+  const [yearlyData, setYearlyData] = useState<Array<{
+    year: string;
+    amount: number;
+    interest: number;
+    principal: number;
+  }>>([]);
+
+  // Chart references
+  const doughnutChartRef = useRef<Chart<'doughnut'> | null>(null);
+  const lineChartRef = useRef<Chart<'line'> | null>(null);
+  const doughnutCanvasRef = useRef<HTMLCanvasElement>(null);
+  const lineCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Ref for slider styles
+  const principalSliderRef = useRef<HTMLInputElement>(null);
+  const interestRateSliderRef = useRef<HTMLInputElement>(null);
+  const tenureSliderRef = useRef<HTMLInputElement>(null);
+
+  // Frequency mapping
+  const frequencyMap: Record<string, number> = {
+    yearly: 1,
+    halfyearly: 2,
+    quarterly: 4,
+    monthly: 12
+  };
+
+  // Calculate slider background gradient
+  const getSliderBackground = (value: number, min: number, max: number) => {
+    const percentage = ((value - min) / (max - min)) * 100;
+    return `linear-gradient(to right, #2076C7 0%, #1CADA3 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
+  };
+
+  // Format currency for display
+  const formatCurrency = (value: number): string => {
+    if (value === 0) return '₹0';
+    if (value >= 10000000) {
+      return '₹' + (value / 10000000).toFixed(2) + ' Cr';
+    }
+    if (value >= 100000) {
+      return '₹' + (value / 100000).toFixed(2) + ' L';
+    }
+    return '₹' + value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  // Handle input changes with proper type safety
+  const handleInputChange = (field: string, value: string) => {
+    if (value === '') {
+      switch (field) {
+        case 'principal':
+          setPrincipal(0);
+          break;
+        case 'interestRate':
+          setInterestRate(0);
+          break;
+        case 'tenureValue':
+          setTenureValue(0);
+          break;
+      }
+      return;
+    }
+
+    const cleanValue = value.replace(/[^\d.]/g, '');
+    const parts = cleanValue.split('.');
+    if (parts.length > 2) return;
+
+    const numValue = parseFloat(cleanValue);
+    if (!isNaN(numValue)) {
+      switch (field) {
+        case 'principal':
+          // Ensure value is a number and within reasonable bounds
+          setPrincipal(Math.max(0, Math.min(numValue, 10000000)));
+          break;
+        case 'interestRate':
+          // Ensure interest rate is between 0 and 25
+          setInterestRate(Math.max(0, Math.min(numValue, 25)));
+          break;
+        case 'tenureValue':
+          if (tenureUnit === 'years') {
+            setTenureValue(Math.max(1, Math.min(numValue, 50)));
+          } else {
+            setTenureValue(Math.max(1, Math.min(numValue, 600)));
+          }
+          break;
+      }
+    }
+  };
+
+  // Calculate compound interest with proper validation
+  const calculateCompoundInterest = () => {
+    // Validate inputs with proper number checks
+    const principalNum = Number(principal) || 0;
+    const interestRateNum = Number(interestRate) || 0;
+    const tenureValueNum = Number(tenureValue) || 0;
+    
+    if (principalNum <= 1000 || principalNum === 0) {
+      setFinalAmount(principalNum);
+      setTotalInterest(0);
+      updateCharts(principalNum, 0);
+      return;
+    }
+
+    if (interestRateNum <= 0) {
+      setFinalAmount(principalNum);
+      setTotalInterest(0);
+      updateCharts(principalNum, 0);
+      return;
+    }
+
+    if (tenureValueNum < 1) {
+      setFinalAmount(principalNum);
+      setTotalInterest(0);
+      updateCharts(principalNum, 0);
+      return;
+    }
+
+    // Convert tenure to years
+    const years = tenureUnit === 'years' ? tenureValueNum : tenureValueNum / 12;
+    
+    // Get compounding frequency
+    const n = frequencyMap[frequency] || 1;
+    const r = interestRateNum / 100;
+    
+    // Compound interest formula: A = P * (1 + r/n)^(n*t)
+    const finalAmountValue = principalNum * Math.pow(1 + r / n, n * years);
+    const totalInterestValue = finalAmountValue - principalNum;
+
+    // Ensure values are numbers
+    const finalAmountNum = isNaN(finalAmountValue) ? principalNum : finalAmountValue;
+    const totalInterestNum = isNaN(totalInterestValue) ? 0 : totalInterestValue;
+
+    setFinalAmount(finalAmountNum);
+    setTotalInterest(totalInterestNum);
+
+    // Generate yearly data
+    generateYearlyData(principalNum, r, n, years, finalAmountNum);
+
+    // Update charts
+    updateCharts(principalNum, totalInterestNum);
+  };
+
+  // Generate yearly data for line chart
+  const generateYearlyData = (
+    principalNum: number, 
+    rate: number, 
+    n: number, 
+    years: number, 
+    finalAmountNum: number
+  ) => {
+    const data = [];
+    const totalYears = Math.max(1, Math.ceil(years));
+    
+    for (let year = 1; year <= totalYears; year++) {
+      const t = Math.min(year, years);
+      const amount = principalNum * Math.pow(1 + rate / n, n * t);
+      const interest = amount - principalNum;
+      
+      data.push({
+        year: `Year ${year}`,
+        amount: Math.round(isNaN(amount) ? principalNum : amount),
+        interest: Math.round(isNaN(interest) ? 0 : interest),
+        principal: Math.round(principalNum)
+      });
+    }
+    
+    // Add final point if fractional years
+    if (years < totalYears) {
+      data.push({
+        year: `${(years * 12).toFixed(0)} months`,
+        amount: Math.round(isNaN(finalAmountNum) ? principalNum : finalAmountNum),
+        interest: Math.round(isNaN(finalAmountNum - principalNum) ? 0 : finalAmountNum - principalNum),
+        principal: Math.round(principalNum)
+      });
+    }
+    
+    setYearlyData(data);
+  };
+
+  // Update charts with type safety
+  const updateCharts = (principalNum: number, interestNum: number) => {
+    const principalValue = isNaN(principalNum) ? 0 : principalNum;
+    const interestValue = isNaN(interestNum) ? 0 : interestNum;
+
+    // Update doughnut chart
+    if (doughnutChartRef.current) {
+      doughnutChartRef.current.data.datasets[0].data = [principalValue, interestValue];
+      doughnutChartRef.current.update();
+    }
+
+    // Update line chart
+    if (lineChartRef.current && yearlyData.length > 0) {
+      lineChartRef.current.data.labels = yearlyData.map(d => d.year);
+      lineChartRef.current.data.datasets[0].data = yearlyData.map(d => d.amount);
+      lineChartRef.current.update();
+    }
+  };
+
+  // Update slider styles when values change
+  useEffect(() => {
+    // Update principal slider background
+    if (principalSliderRef.current) {
+      const min = 1000;
+      const max = 10000000;
+      const percentage = ((principal - min) / (max - min)) * 100;
+      principalSliderRef.current.style.background = 
+        `linear-gradient(to right, #2076C7 0%, #1CADA3 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
+    }
+
+    // Update interest rate slider background
+    if (interestRateSliderRef.current) {
+      const min = 1;
+      const max = 25;
+      const percentage = ((interestRate - min) / (max - min)) * 100;
+      interestRateSliderRef.current.style.background = 
+        `linear-gradient(to right, #2076C7 0%, #1CADA3 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
+    }
+
+    // Update tenure slider background
+    if (tenureSliderRef.current) {
+      const min = 1;
+      const max = tenureUnit === 'years' ? 50 : 600;
+      const percentage = ((tenureValue - min) / (max - min)) * 100;
+      tenureSliderRef.current.style.background = 
+        `linear-gradient(to right, #2076C7 0%, #1CADA3 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
+    }
+  }, [principal, interestRate, tenureValue, tenureUnit]);
+
+  // Initialize charts
+  useEffect(() => {
+    // Initialize Doughnut Chart
+    if (doughnutCanvasRef.current) {
+      const ctx = doughnutCanvasRef.current.getContext('2d');
+      if (ctx) {
+        doughnutChartRef.current = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Principal', 'Interest'],
+            datasets: [{
+              data: [principal, totalInterest],
+              backgroundColor: ['#1CADA3', '#2076C7'],
+              borderWidth: 0,
+              hoverOffset: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom' as const,
+                labels: {
+                  padding: 20,
+                  font: {
+                    size: 14
+                  }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    let label = context.label || '';
+                    if (label) {
+                      label += ': ';
+                    }
+                    label += formatCurrency(context.parsed);
+                    return label;
+                  }
+                }
+              }
+            },
+            cutout: '60%'
+          }
+        });
+      }
+    }
+
+    // Initialize Line Chart
+    if (lineCanvasRef.current) {
+      const ctx = lineCanvasRef.current.getContext('2d');
+      if (ctx) {
+        lineChartRef.current = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: yearlyData.map(d => d.year).slice(0, 5),
+            datasets: [{
+              label: 'Investment Value',
+              data: yearlyData.slice(0, 5).map(d => d.amount),
+              borderColor: '#1CADA3',
+              backgroundColor: 'rgba(28, 173, 163, 0.1)',
+              borderWidth: 3,
+              pointBackgroundColor: '#2076C7',
+              pointBorderColor: '#2076C7',
+              pointRadius: 6,
+              pointHoverRadius: 8,
+              fill: true,
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const value = typeof context.parsed.y === 'number' ? context.parsed.y : 0;
+                    return `Amount: ${formatCurrency(value)}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  font: {
+                    size: 12
+                  }
+                }
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    if (typeof value === 'number') {
+                      return formatCurrency(value);
+                    }
+                    return value;
+                  },
+                  font: {
+                    size: 12
+                  }
+                },
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)'
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    return () => {
+      if (doughnutChartRef.current) {
+        doughnutChartRef.current.destroy();
+      }
+      if (lineChartRef.current) {
+        lineChartRef.current.destroy();
+      }
+    };
+  }, []);
+
+  // Calculate when parameters change
+  useEffect(() => {
+    calculateCompoundInterest();
+  }, [principal, interestRate, tenureValue, tenureUnit, frequency]);
+
+  // Handle slider changes
+  const handlePrincipalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    setPrincipal(isNaN(value) ? 0 : value);
+  };
+
+  const handleInterestRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    setInterestRate(isNaN(value) ? 0 : value);
+  };
+
+  const handleTenureValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    setTenureValue(isNaN(value) ? 0 : value);
+  };
+
+  // Input change handlers
+  const handlePrincipalInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleInputChange('principal', e.target.value);
+  };
+
+  const handleInterestRateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleInputChange('interestRate', e.target.value);
+  };
+
+  const handleTenureValueInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleInputChange('tenureValue', e.target.value);
+  };
+
+  // Get display values with type safety
+  const getPrincipalDisplayValue = (): string => {
+    return principal === 0 ? '' : principal.toString();
+  };
+
+  const getInterestRateDisplayValue = (): string => {
+    return interestRate === 0 ? '' : interestRate.toString();
+  };
+
+  const getTenureValueDisplayValue = (): string => {
+    return tenureValue === 0 ? '' : tenureValue.toString();
+  };
+
+  // Get max values based on unit
+  const getTenureMax = (): number => {
+    return tenureUnit === 'years' ? 50 : 600; // 50 years or 600 months (50 years)
+  };
+
+  const getTenureStep = (): number => {
+    return tenureUnit === 'years' ? 1 : 1;
+  };
+
+  // Get appropriate tenure label
+  const getTenureLabel = (): string => {
+    return tenureUnit === 'years' ? 'Years' : 'Months';
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Compound Interest Calculator */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
+          <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
+            <h1 className="text-3xl font-bold mb-2">Compound Interest Calculator</h1>
+            <p className="text-blue-100">Calculate your investment growth with compounding</p>
+          </div>
+
+          <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
+            {/* Input Section */}
+            <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
+              
+              {/* Principal Amount */}
+              <div className="mb-6">
+                <label htmlFor="principal" className="block text-[#2076C7] font-semibold mb-2">
+                  Principal Amount (₹)
+                </label>
+                <div className="slider-container mb-2">
+                  <input
+                    ref={principalSliderRef}
+                    type="range"
+                    id="principal"
+                    min="1000"
+                    max="10000000"
+                    step="1000"
+                    value={principal}
+                    onChange={handlePrincipalChange}
+                    className="w-full h-2 rounded-lg cursor-pointer custom-slider"
+                    style={{
+                      background: getSliderBackground(principal, 1000, 10000000)
+                    }}
+                  />
+                  <div className="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>₹1,000</span>
+                    <span>₹1,00,00,000</span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="principalInput"
+                    value={getPrincipalDisplayValue()}
+                    onChange={handlePrincipalInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                    placeholder="Enter principal amount"
+                  />
+                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
+                </div>
+              </div>
+
+              {/* Interest Rate */}
+              <div className="mb-6">
+                <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2">
+                  Annual Interest Rate (%)
+                </label>
+                <div className="slider-container mb-2">
+                  <input
+                    ref={interestRateSliderRef}
+                    type="range"
+                    id="interestRate"
+                    min="1"
+                    max="25"
+                    step="0.1"
+                    value={interestRate}
+                    onChange={handleInterestRateChange}
+                    className="w-full h-2 rounded-lg cursor-pointer custom-slider"
+                    style={{
+                      background: getSliderBackground(interestRate, 1, 25)
+                    }}
+                  />
+                  <div className="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>1%</span>
+                    <span>25%</span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <input
+                    type="number"
+                    id="interestRateInput"
+                    min="1"
+                    max="25"
+                    step="0.1"
+                    value={getInterestRateDisplayValue()}
+                    onChange={handleInterestRateInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  />
+                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
+                </div>
+              </div>
+
+              {/* Tenure */}
+              <div className="mb-6">
+                <label htmlFor="tenureValue" className="block text-[#2076C7] font-semibold mb-2">
+                  Time Period ({getTenureLabel()})
+                </label>
+                <div className="slider-container mb-2">
+                  <input
+                    ref={tenureSliderRef}
+                    type="range"
+                    id="tenureValue"
+                    min="1"
+                    max={getTenureMax()}
+                    step={getTenureStep()}
+                    value={tenureValue}
+                    onChange={handleTenureValueChange}
+                    className="w-full h-2 rounded-lg cursor-pointer custom-slider"
+                    style={{
+                      background: getSliderBackground(tenureValue, 1, getTenureMax())
+                    }}
+                  />
+                  <div className="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>1 {tenureUnit}</span>
+                    <span>{getTenureMax()} {tenureUnit}</span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="number"
+                      id="tenureValueInput"
+                      min="1"
+                      max={getTenureMax()}
+                      value={getTenureValueDisplayValue()}
+                      onChange={handleTenureValueInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors text-gray-800 placeholder:text-gray-500"
+                    />
+                  </div>
+                  <select
+                    value={tenureUnit}
+                    onChange={(e) => setTenureUnit(e.target.value)}
+                    className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors text-gray-800"
+                  >
+                    <option value="years">Years</option>
+                    <option value="months">Months</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Compounding Frequency */}
+              <div className="mb-8">
+                <label className="block text-[#2076C7] font-semibold mb-3">
+                  Compounding Frequency
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { id: 'yearly', label: 'Yearly', color: 'bg-[#1CADA3] text-white' },
+                    { id: 'halfyearly', label: 'Half-Yearly', color: 'bg-[#1CADA3] text-white' },
+                    { id: 'quarterly', label: 'Quarterly', color: 'bg-[#1CADA3] text-white' },
+                    { id: 'monthly', label: 'Monthly', color: 'bg-[#1CADA3] text-white' }
+                  ].map((freq) => (
+                    <button
+                      key={freq.id}
+                      onClick={() => setFrequency(freq.id)}
+                      className={`py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
+                        frequency === freq.id 
+                          ? `${freq.color} border-white transform scale-[1.02] shadow-md` 
+                          : 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <div className="text-sm font-medium">{freq.label}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Results Section */}
+              <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
+                <div className="text-3xl font-bold text-[#1CADA3] font-sans text-center mb-6">
+                  {finalAmount > 0 ? formatCurrency(finalAmount) : '₹0'}
+                </div>
+                <div className="flex justify-between">
+                  <div className="text-center flex-1 px-4">
+                    <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                      {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                    </div>
+                    <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
+                  </div>
+                  <div className="text-center flex-1 px-4">
+                    <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                      {principal > 0 ? formatCurrency(principal) : '₹0'}
+                    </div>
+                    <div className="text-sm text-[#1CADA3] mt-1">Principal</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Visualization Section */}
+            <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0 space-y-6">
+              {/* Doughnut Chart */}
+              <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
+                <h5 className="text-[#2076C7] font-semibold mb-4 text-lg text-center">Investment Breakdown</h5>
+                <div className="chart-container h-64">
+                  <canvas ref={doughnutCanvasRef}></canvas>
+                </div>
+                <div className="flex justify-center space-x-6 mt-4">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full mr-2 bg-[#1CADA3]"></div>
+                    <span className="text-sm text-gray-600">Principal</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full mr-2 bg-[#2076C7]"></div>
+                    <span className="text-sm text-gray-600">Interest</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Line Chart */}
+              {/* <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
+                <h5 className="text-[#1CADA3] font-semibold mb-4 text-lg text-center">Growth Over Time</h5>
+                <div className="chart-container h-64">
+                  <canvas ref={lineCanvasRef}></canvas>
+                </div>
+              </div> */}
+
+              {/* Summary */}
+              <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
+                <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Investment Summary</h5>
+                <div className="space-y-4">
+                  <div className="flex justify-between pb-3 border-b border-gray-200">
+                    <span className="text-gray-600">Principal Amount</span>
+                    <span className="font-medium font-sans text-[#1CADA3]">
+                      {principal > 0 ? formatCurrency(principal) : '₹0'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between pb-3 border-b border-gray-200">
+                    <span className="text-gray-600">Total Interest Earned</span>
+                    <span className="font-medium font-sans text-[#1CADA3]">
+                      {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between pb-3 border-b border-gray-200">
+                    <span className="text-gray-600">Compounding Frequency</span>
+                    <span className="font-medium font-sans text-[#1CADA3] capitalize">
+                      {frequency}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Final Amount</span>
+                    <span className="font-medium font-sans text-[#1CADA3]">
+                      {finalAmount > 0 ? formatCurrency(finalAmount) : '₹0'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Formula Explanation */}
+        <div className="max-w-6xl mx-auto mt-8 bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+          <h3 className="text-lg font-semibold text-[#2076C7] mb-4">How Compound Interest Works</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-[#1CADA3] mb-2">Formula</h4>
+              <p className="text-sm text-gray-600">
+                A = P × (1 + r/n)^(n×t)<br />
+                Where:<br />
+                A = Final amount<br />
+                P = Principal<br />
+                r = Annual interest rate<br />
+                n = Compounding frequency per year<br />
+                t = Time in years
+              </p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-[#1CADA3] mb-2">Benefits of Compounding</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Interest earns interest over time</li>
+                <li>• Exponential growth potential</li>
+                <li>• Time is your greatest asset</li>
+                <li>• Ideal for long-term investments</li>
+              </ul>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-[#1CADA3] mb-2">Key Insights</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Starting early maximizes benefits</li>
+                <li>• Higher frequency = faster growth</li>
+                <li>• Time matters more than rate</li>
+                <li>• Consistency beats timing</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .custom-slider {
+          -webkit-appearance: none;
+          height: 8px;
+          border-radius: 4px;
+        }
+
+        .custom-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #2076C7;
+          cursor: pointer;
+          border: 3px solid white;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          transition: all 0.2s ease;
+        }
+
+        .custom-slider::-webkit-slider-thumb:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .custom-slider::-moz-range-thumb {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #2076C7;
+          cursor: pointer;
+          border: 3px solid white;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-slider::-moz-range-track {
+          background: transparent;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default CompoundInterestCalculator;
