@@ -8,8 +8,8 @@ import CibilSection from "../page/cibil/page";
 import EMICalculator from "../page/emi/page";
 
 import { useModal } from "../context/ModalContext";
-import { useRouter } from "next/navigation";
-import { useClientCookie } from "../hooks/useClientCookie";
+// import { useRouter } from "next/navigation";
+// import { useClientCookie } from "../hooks/useClientCookie";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,8 +17,8 @@ const Header = () => {
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const { openLogin, openPartner } = useModal();
 
-  const router = useRouter();
-  const token = useClientCookie("authToken");
+  // const router = useRouter();
+  // const token = useClientCookie("authToken");
 
   const navLinks = [
     { label: "Home", href: "/" },
@@ -151,13 +151,14 @@ const Header = () => {
           {/* Buttons */}
           <div className="flex items-center space-x-2 xl:space-x-3 pl-1 xl:pl-2">
             <motion.button
-              onClick={() => {
-                if (token) {
-                  router.push("/dashboard");
-                } else {
-                  openLogin();
-                }
-              }}
+              onClick={openLogin}
+              // onClick={() => {
+              // if (token) {
+              //   router.push("/dashboard");
+              // } else {
+              //   openLogin();
+              // }
+              // }}
               whileHover={{ scale: 1.07, y: -2 }}
               transition={{ type: "tween", ease: "easeOut", duration: 0.08 }}
               className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-3 xl:px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
@@ -244,14 +245,18 @@ const Header = () => {
               <div className="flex flex-col gap-3 pt-2 w-full justify-center items-center">
                 <button
                   onClick={() => {
-                    if (token) {
-                      router.push("/dashboard");
-                    } else {
-                      openLogin();
-                      setIsOpen(false);
-                    }
+                    openLogin();
+                    setIsOpen(false);
                   }}
-                  className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition w-[80%] max-w-xs mx-auto">
+                  // onClick={() => {
+                  //   if (token) {
+                  //     router.push("/dashboard");
+                  //   } else {
+                  //     openLogin();
+                  //     setIsOpen(false);
+                  //   }
+                  // }}
+                  className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition w-[80%] max-w-xs mx-auto" >
                   Login
                 </button>
                 <button
@@ -268,7 +273,7 @@ const Header = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </header >
   );
 };
 

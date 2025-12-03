@@ -99,11 +99,11 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
 
             if (data?.token) {
                 document.cookie = `authToken=${data.token}; path=/; max-age=86400; SameSite=Lax`;
-                if (data.role === "ADMIN") {
-                    router.push("/admin");
-                } else {
-                    router.push("/dashboard");
-                }
+                // if (data.role === "ADMIN") {
+                //     router.push("/admin");
+                // } else {
+                router.push("/dashboard");
+                // }
             }
             onClose();
 
@@ -240,7 +240,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                         />
                                     </div>
                                 )}
-                                
+
                                 {passwordUpdated && (
                                     <p className="text-green-600 text-sm mt-2">
                                         Password updated! Please login with your new password.
