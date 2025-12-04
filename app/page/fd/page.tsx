@@ -12,12 +12,24 @@ const FDCalculator: React.FC = () => {
   const [interestRate, setInterestRate] = useState<number>(7.5);
   const [tenure, setTenure] = useState<number>(5);
   const [tenureType, setTenureType] = useState<'years' | 'months'>('years');
-  const [interestPayout, setInterestPayout] = useState<'monthly' | 'quarterly' | 'cumulative'>('cumulative');
+  const [compoundingFrequency, setCompoundingFrequency] = useState<'monthly' | 'quarterly' | 'annually'>('quarterly');
+  const [isCalculating, setIsCalculating] = useState<boolean>(false);
 
   // State for calculated values
   const [maturityAmount, setMaturityAmount] = useState<number>(0);
   const [totalInterest, setTotalInterest] = useState<number>(0);
   const [estimatedReturns, setEstimatedReturns] = useState<number>(0);
+
+  // State for validation errors
+  const [errors, setErrors] = useState<{
+    principalAmount: string;
+    interestRate: string;
+    tenure: string;
+  }>({
+    principalAmount: '',
+    interestRate: '',
+    tenure: ''
+  });
 
   // Chart reference
   const chartRef = useRef<Chart<'doughnut'> | null>(null);
@@ -25,21 +37,57 @@ const FDCalculator: React.FC = () => {
 
   // Format currency for display
   const formatCurrency = (value: number): string => {
+    if (value === 0) return '₹0';
     return '₹' + value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
-  // Handle input changes
+  // Validate inputs
+  const validateInputs = () => {
+    const newErrors = {
+      principalAmount: '',
+      interestRate: '',
+      tenure: ''
+    };
+
+    if (!principalAmount || principalAmount < 10000) {
+      newErrors.principalAmount = 'Minimum deposit amount is ₹10,000';
+    } else if (principalAmount > 100000000) {
+      newErrors.principalAmount = 'Maximum deposit amount is ₹10,00,00,000';
+    }
+
+    if (!interestRate || interestRate < 1) {
+      newErrors.interestRate = 'Minimum interest rate is 1%';
+    } else if (interestRate > 15) {
+      newErrors.interestRate = 'Maximum interest rate is 15%';
+    }
+
+    if (!tenure || tenure <= 0) {
+      newErrors.tenure = tenureType === 'years' ? 'Minimum tenure is 1 years' : 'Minimum tenure is 1 month';
+    } else if (tenureType === 'years' && tenure > 30) {
+      newErrors.tenure = 'Maximum tenure is 30 years';
+    } else if (tenureType === 'months' && tenure > 360) {
+      newErrors.tenure = 'Maximum tenure is 360 months';
+    }
+
+    setErrors(newErrors);
+    return !newErrors.principalAmount && !newErrors.interestRate && !newErrors.tenure;
+  };
+
+  // Handle input changes with validation
   const handleInputChange = (field: string, value: string) => {
     if (value === '') {
       switch (field) {
         case 'principalAmount':
           setPrincipalAmount(0);
+          setErrors(prev => ({ ...prev, principalAmount: 'Please enter deposit amount' }));
           break;
         case 'interestRate':
           setInterestRate(0);
+          setErrors(prev => ({ ...prev, interestRate: 'Please enter interest rate' }));
           break;
         case 'tenure':
           setTenure(0);
+          setErrors(prev => ({ ...prev, tenure: `Please enter tenure in ${tenureType}` }));
           break;
       }
       return;
@@ -54,50 +102,81 @@ const FDCalculator: React.FC = () => {
       switch (field) {
         case 'principalAmount':
           setPrincipalAmount(numValue);
+          if (numValue >= 10000 && numValue <= 100000000) {
+            setErrors(prev => ({ ...prev, principalAmount: '' }));
+          }
           break;
         case 'interestRate':
-          setInterestRate(numValue);
+          const roundedRate = Math.round(numValue * 10) / 10; // Round to 1 decimal
+          setInterestRate(roundedRate);
+          if (roundedRate >= 1 && roundedRate <= 15) {
+            setErrors(prev => ({ ...prev, interestRate: '' }));
+          }
           break;
         case 'tenure':
-          setTenure(numValue);
+          // Round to 1 decimal for years, whole number for months
+          const roundedTenure = tenureType === 'years' 
+            ? Math.round(numValue * 10) / 10 
+            : Math.round(numValue);
+          setTenure(roundedTenure);
+          if (roundedTenure > 0) {
+            setErrors(prev => ({ ...prev, tenure: '' }));
+          }
           break;
       }
     }
   };
 
-  // Calculate FD returns (simplified calculation)
+  // Calculate FD returns with compounding frequency
   const calculateFDReturns = () => {
-    if (!principalAmount || principalAmount < 1000 || principalAmount === 0) {
+    if (!validateInputs()) {
+      // Reset to 0 if invalid
+      setMaturityAmount(0);
+      setTotalInterest(0);
+      setEstimatedReturns(0);
+      updateChart(0, 0);
       return;
     }
 
-    if (!interestRate || interestRate < 1 || interestRate === 0) {
-      return;
-    }
-
-    if (!tenure || tenure < 1 || tenure === 0) {
-      return;
-    }
+    setIsCalculating(true);
 
     // Convert tenure to years for calculation
     const tenureInYears = tenureType === 'months' ? tenure / 12 : tenure;
     
-    // Simple FD calculation formula: A = P(1 + r/n)^(nt)
-    // For simplicity, we'll use annual compounding
-    const annualRate = interestRate / 100;
-    const compoundFrequency = interestPayout === 'monthly' ? 12 : 
-                             interestPayout === 'quarterly' ? 4 : 1;
+    // Determine compounding periods per year
+    let periodsPerYear: number;
+    switch(compoundingFrequency) {
+      case 'monthly':
+        periodsPerYear = 12;
+        break;
+      case 'quarterly':
+        periodsPerYear = 4;
+        break;
+      case 'annually':
+        periodsPerYear = 1;
+        break;
+      default:
+        periodsPerYear = 4; // Default to quarterly
+    }
     
-    const amount = principalAmount * Math.pow(1 + annualRate / compoundFrequency, 
-                                             compoundFrequency * tenureInYears);
-    const interestEarned = amount - principalAmount;
+    // Standard FD calculation formula: A = P(1 + r/n)^(nt)
+    const ratePerPeriod = interestRate / (100 * periodsPerYear);
+    const totalPeriods = periodsPerYear * tenureInYears;
+    const amount = principalAmount * Math.pow(1 + ratePerPeriod, totalPeriods);
+    const totalInterestEarned = amount - principalAmount;
+
+    // Round to 2 decimal places
+    const roundedAmount = Math.round(amount * 100) / 100;
+    const roundedInterest = Math.round(totalInterestEarned * 100) / 100;
     
-    setMaturityAmount(amount);
-    setTotalInterest(interestEarned);
-    setEstimatedReturns(interestEarned);
+    setMaturityAmount(roundedAmount);
+    setTotalInterest(roundedInterest);
+    setEstimatedReturns(roundedInterest);
 
     // Update chart
-    updateChart(principalAmount, interestEarned);
+    updateChart(principalAmount, roundedInterest);
+
+    setIsCalculating(false);
   };
 
   // Update the chart with new data
@@ -120,7 +199,8 @@ const FDCalculator: React.FC = () => {
             datasets: [{
               data: [principalAmount, totalInterest],
               backgroundColor: ['#1CADA3', '#2076C7'],
-              borderWidth: 0
+              borderWidth: 0,
+              hoverOffset: 10
             }]
           },
           options: {
@@ -128,7 +208,15 @@ const FDCalculator: React.FC = () => {
             maintainAspectRatio: false,
             plugins: {
               legend: {
-                position: 'bottom' as const
+                position: 'bottom' as const,
+                labels: {
+                  padding: 20,
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                  font: {
+                    size: 12
+                  }
+                }
               },
               tooltip: {
                 callbacks: {
@@ -144,7 +232,8 @@ const FDCalculator: React.FC = () => {
                   }
                 }
               }
-            }
+            },
+            cutout: '65%'
           }
         });
       }
@@ -157,22 +246,41 @@ const FDCalculator: React.FC = () => {
     };
   }, []);
 
+  // Update chart when data changes
+  useEffect(() => {
+    if (chartRef.current && principalAmount > 0 && totalInterest >= 0) {
+      updateChart(principalAmount, totalInterest);
+    }
+  }, [principalAmount, totalInterest]);
+
   // Calculate FD returns when parameters change
   useEffect(() => {
     calculateFDReturns();
-  }, [principalAmount, interestRate, tenure, tenureType, interestPayout]);
+  }, [principalAmount, interestRate, tenure, tenureType, compoundingFrequency]);
 
   // Handle slider changes
   const handlePrincipalAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPrincipalAmount(Number(e.target.value));
+    const value = Number(e.target.value);
+    setPrincipalAmount(value);
+    if (value >= 10000 && value <= 10000000) {
+      setErrors(prev => ({ ...prev, principalAmount: '' }));
+    }
   };
 
   const handleInterestRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInterestRate(Number(e.target.value));
+    const value = Number(e.target.value);
+    setInterestRate(value);
+    if (value >= 1 && value <= 15) {
+      setErrors(prev => ({ ...prev, interestRate: '' }));
+    }
   };
 
   const handleTenureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTenure(Number(e.target.value));
+    const value = Number(e.target.value);
+    setTenure(value);
+    if (value > 0) {
+      setErrors(prev => ({ ...prev, tenure: '' }));
+    }
   };
 
   // Input change handlers
@@ -195,49 +303,93 @@ const FDCalculator: React.FC = () => {
 
   // Handle tenure type toggle with auto-conversion
   const handleTenureTypeToggle = (type: 'years' | 'months') => {
-    // If already in the requested type, do nothing
     if (type === tenureType) return;
     
     let convertedValue = tenure;
     
     if (type === 'months') {
       // Convert from years to months
-      convertedValue = Math.round(tenure * 12);
-      
-      // Handle edge cases
-      if (tenure === 0) convertedValue = 0;
-      else if (convertedValue < 1) convertedValue = 1; // Minimum 1 month
-      else if (convertedValue > 360) convertedValue = 360; // Maximum 360 months (30 years)
+      convertedValue = Math.max(1, Math.round(tenure * 12));
+      if (convertedValue > 360) convertedValue = 360;
     } else {
       // Convert from months to years
       convertedValue = tenure / 12;
-      
-      // Handle edge cases
-      if (tenure === 0) convertedValue = 0;
-      else if (convertedValue < 0.1) convertedValue = 0.1; // Minimum 0.1 years
-      else if (convertedValue > 30) convertedValue = 30; // Maximum 30 years
-      
-      // Round to 1 decimal place for better readability
-      convertedValue = Math.round(convertedValue * 10) / 10;
+      if (convertedValue < 0.1) convertedValue = 0.1;
+      if (convertedValue > 30) convertedValue = 30;
+      convertedValue = Math.round(convertedValue * 10) / 10; // Round to 1 decimal
     }
     
-    // Update the tenure value
     setTenure(convertedValue);
-    
-    // Update the tenure type
     setTenureType(type);
+    setErrors(prev => ({ ...prev, tenure: '' }));
   };
 
   // Prevent wheel event from changing input values
-  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+  const handleWheelPrevent = (e: React.WheelEvent<HTMLInputElement>) => {
+    e.preventDefault();
     e.currentTarget.blur();
   };
 
   const handleNumberInputWheel = (e: React.WheelEvent<HTMLInputElement>) => {
-    // Prevent the input value change
+    e.preventDefault();
     e.currentTarget.blur();
-    // Prevent the page/container from scrolling
     e.stopPropagation();
+  };
+
+  // Reset to default values
+  const handleReset = () => {
+    setPrincipalAmount(100000);
+    setInterestRate(7.5);
+    setTenure(5);
+    setTenureType('years');
+    setCompoundingFrequency('quarterly');
+    setErrors({
+      principalAmount: '',
+      interestRate: '',
+      tenure: ''
+    });
+  };
+
+  // Get minimum and maximum values for tenure
+  const getTenureMinMax = () => {
+    return {
+      min: tenureType === 'years' ? '1' : '1',
+      max: tenureType === 'years' ? '30' : '360'
+    };
+  };
+
+  const tenureLimits = getTenureMinMax();
+
+  // Calculate insights data
+  const calculateInsights = () => {
+    const insights = {
+      interestPercentageOfPrincipal: principalAmount > 0 ? ((totalInterest / principalAmount) * 100).toFixed(1) : '0',
+      averageAnnualInterest: principalAmount > 0 
+        ? (totalInterest / (tenureType === 'years' ? tenure : tenure / 12)).toFixed(0) 
+        : '0',
+      interestPerDay: totalInterest > 0 
+        ? (totalInterest / (tenure * (tenureType === 'years' ? 365 : 30.4))).toFixed(0) 
+        : '0',
+      doublingYears: interestRate > 0 ? (72 / interestRate).toFixed(1) : '0'
+    };
+
+    return insights;
+  };
+
+  const insights = calculateInsights();
+
+  // Get compounding frequency description
+  const getCompoundingDescription = () => {
+    switch(compoundingFrequency) {
+      case 'monthly':
+        return 'Compounded monthly (12 times a year)';
+      case 'quarterly':
+        return 'Compounded quarterly (4 times a year)';
+      case 'annually':
+        return 'Compounded annually (once a year)';
+      default:
+        return 'Compounded quarterly';
+    }
   };
 
   return (
@@ -247,7 +399,7 @@ const FDCalculator: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
           <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
             <h1 className="text-3xl font-bold mb-2">Fixed Deposit Calculator</h1>
-            <p className="text-blue-100">Calculate your Fixed Deposit returns</p>
+            <p className="text-blue-100">Calculate your Fixed Deposit returns with compounding interest</p>
           </div>
 
           <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
@@ -256,22 +408,27 @@ const FDCalculator: React.FC = () => {
               
               {/* Principal Amount */}
               <div className="mb-6">
-                <label htmlFor="principalAmount" className="block text-[#2076C7] font-semibold mb-2">
-                  Deposit Amount (₹)
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                  <label htmlFor="principalAmount" className="block text-[#2076C7] font-semibold">
+                    Deposit Amount (₹)
+                  </label>
+                  {errors.principalAmount && (
+                    <span className="text-red-500 text-sm font-medium">{errors.principalAmount}</span>
+                  )}
+                </div>
                 <div className="slider-container mb-2">
                   <input
                     type="range"
                     id="principalAmount"
-                    min="1000"
+                    min="10000"
                     max="10000000"
-                    step="1000"
+                    step="10000"
                     value={principalAmount}
                     onChange={handlePrincipalAmountChange}
                     className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                   />
                   <div className="flex justify-between text-sm text-gray-600 mt-1">
-                    <span>₹1,000</span>
+                    <span>₹10,000</span>
                     <span>₹1,00,00,000</span>
                   </div>
                 </div>
@@ -281,9 +438,13 @@ const FDCalculator: React.FC = () => {
                     id="principalAmountInput"
                     value={getPrincipalAmountDisplayValue()}
                     onChange={handlePrincipalAmountInputChange}
-                    onWheel={handleWheel}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
-                    placeholder="Enter deposit amount"
+                    onWheel={handleWheelPrevent}
+                    className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition-colors pr-12 text-gray-800 placeholder:text-gray-500 ${
+                      errors.principalAmount 
+                        ? 'border-red-500 focus:border-red-500 focus:ring-red-200 bg-red-50' 
+                        : 'border-gray-300 focus:border-[#1CADA3] focus:ring-teal-200 bg-gray-100 focus:bg-white'
+                    }`}
+                    placeholder="e.g., 100000"
                   />
                   <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
                 </div>
@@ -291,9 +452,14 @@ const FDCalculator: React.FC = () => {
 
               {/* Interest Rate */}
               <div className="mb-6">
-                <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2">
-                  Interest Rate (% per annum)
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                  <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold">
+                    Interest Rate (% per annum)
+                  </label>
+                  {errors.interestRate && (
+                    <span className="text-red-500 text-sm font-medium">{errors.interestRate}</span>
+                  )}
+                </div>
                 <div className="slider-container mb-2">
                   <input
                     type="range"
@@ -320,7 +486,12 @@ const FDCalculator: React.FC = () => {
                     value={interestRate === 0 ? '' : interestRate}
                     onChange={handleInterestRateInputChange}
                     onWheel={handleNumberInputWheel}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                    className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition-colors pr-12 text-gray-800 placeholder:text-gray-500 ${
+                      errors.interestRate 
+                        ? 'border-red-500 focus:border-red-500 focus:ring-red-200 bg-red-50' 
+                        : 'border-gray-300 focus:border-[#1CADA3] focus:ring-teal-200 bg-gray-100 focus:bg-white'
+                    }`}
+                    placeholder="e.g., 7.5"
                   />
                   <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
                 </div>
@@ -329,9 +500,14 @@ const FDCalculator: React.FC = () => {
               {/* Tenure */}
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-2">
-                  <label htmlFor="tenure" className="block text-[#2076C7] font-semibold">
-                    Deposit Tenure
-                  </label>
+                  <div className="flex items-center space-x-4">
+                    <label htmlFor="tenure" className="block text-[#2076C7] font-semibold">
+                      Deposit Tenure
+                    </label>
+                    {errors.tenure && (
+                      <span className="text-red-500 text-sm font-medium">{errors.tenure}</span>
+                    )}
+                  </div>
                   <div className="flex space-x-2">
                     <button
                       type="button"
@@ -353,9 +529,9 @@ const FDCalculator: React.FC = () => {
                   <input
                     type="range"
                     id="tenure"
-                    min={tenureType === 'years' ? '1' : '1'}
-                    max={tenureType === 'years' ? '30' : '360'}
-                    step={tenureType === 'years' ? '0.1' : '1'}
+                    min={tenureLimits.min}
+                    max={tenureLimits.max}
+                    step={tenureType === 'years' ? '1' : '1'}
                     value={tenure}
                     onChange={handleTenureChange}
                     className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
@@ -369,13 +545,18 @@ const FDCalculator: React.FC = () => {
                   <input
                     type="number"
                     id="tenureInput"
-                    min={tenureType === 'years' ? '0.1' : '1'}
-                    max={tenureType === 'years' ? '30' : '360'}
-                    step={tenureType === 'years' ? '0.1' : '1'}
+                    min={tenureLimits.min}
+                    max={tenureLimits.max}
+                    step={tenureType === 'years' ? '1' : '1'}
                     value={tenure === 0 ? '' : tenure}
                     onChange={handleTenureInputChange}
                     onWheel={handleNumberInputWheel}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-24 text-gray-800 placeholder:text-gray-500"
+                    className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition-colors pr-24 text-gray-800 placeholder:text-gray-500 ${
+                      errors.tenure 
+                        ? 'border-red-500 focus:border-red-500 focus:ring-red-200 bg-red-50' 
+                        : 'border-gray-300 focus:border-[#1CADA3] focus:ring-teal-200 bg-gray-100 focus:bg-white'
+                    }`}
+                    placeholder={tenureType === 'years' ? 'e.g., 5' : 'e.g., 60'}
                   />
                   <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                     {tenureType === 'years' ? 'Years' : 'Months'}
@@ -383,57 +564,72 @@ const FDCalculator: React.FC = () => {
                 </div>
               </div>
 
-              {/* Interest Payout Frequency */}
-              <div className="mb-8">
+              {/* Compounding Frequency */}
+              <div className="mb-6">
                 <label className="block text-[#2076C7] font-semibold mb-3">
-                  Interest Payout Frequency
+                  Compounding Frequency
                 </label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <button
                     type="button"
-                    onClick={() => setInterestPayout('cumulative')}
-                    className={`py-3 px-4 rounded-lg border transition-all ${interestPayout === 'cumulative' ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
-                  >
-                    <div className="font-medium">Cumulative</div>
-                    <div className="text-xs mt-1 opacity-75">At Maturity</div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInterestPayout('quarterly')}
-                    className={`py-3 px-4 rounded-lg border transition-all ${interestPayout === 'quarterly' ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
-                  >
-                    <div className="font-medium">Quarterly</div>
-                    <div className="text-xs mt-1 opacity-75">Every 3 Months</div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInterestPayout('monthly')}
-                    className={`py-3 px-4 rounded-lg border transition-all ${interestPayout === 'monthly' ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
+                    onClick={() => setCompoundingFrequency('monthly')}
+                    className={`py-3 px-4 rounded-lg border transition-all ${compoundingFrequency === 'monthly' ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
                   >
                     <div className="font-medium">Monthly</div>
-                    <div className="text-xs mt-1 opacity-75">Every Month</div>
+                    <div className="text-xs mt-1 opacity-75">12 times/year</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCompoundingFrequency('quarterly')}
+                    className={`py-3 px-4 rounded-lg border transition-all ${compoundingFrequency === 'quarterly' ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
+                  >
+                    <div className="font-medium">Quarterly</div>
+                    <div className="text-xs mt-1 opacity-75">4 times/year</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCompoundingFrequency('annually')}
+                    className={`py-3 px-4 rounded-lg border transition-all ${compoundingFrequency === 'annually' ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
+                  >
+                    <div className="font-medium">Annually</div>
+                    <div className="text-xs mt-1 opacity-75">Once a year</div>
                   </button>
                 </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  {getCompoundingDescription()}
+                </p>
               </div>
+
+              {/* Reset Button */}
+              <button
+                onClick={handleReset}
+                className="w-full mb-6 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              >
+                Reset to Default Values
+              </button>
 
               {/* Results Section */}
               <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
                 <div className="text-center mb-6">
                   <div className="text-sm text-[#2076C7] font-medium mb-1">Maturity Amount</div>
                   <div className="text-3xl font-bold text-[#1CADA3] font-sans">
-                    {maturityAmount > 0 ? formatCurrency(maturityAmount) : '₹0'}
+                    {isCalculating ? (
+                      <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"></div>
+                    ) : (
+                      maturityAmount > 0 ? formatCurrency(maturityAmount) : '₹0'
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-between">
                   <div className="text-center flex-1 px-4">
                     <div className="text-lg font-medium font-sans text-[#1CADA3]">
-                      {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                      {isCalculating ? '-' : totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                     </div>
                     <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
                   </div>
                   <div className="text-center flex-1 px-4">
                     <div className="text-lg font-medium font-sans text-[#1CADA3]">
-                      {estimatedReturns > 0 ? formatCurrency(estimatedReturns) : '₹0'}
+                      {isCalculating ? '-' : estimatedReturns > 0 ? formatCurrency(estimatedReturns) : '₹0'}
                     </div>
                     <div className="text-sm text-[#1CADA3] mt-1">Estimated Returns</div>
                   </div>
@@ -443,11 +639,16 @@ const FDCalculator: React.FC = () => {
 
             {/* Visualization Section */}
             <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0">
-              <div className="chart-container h-64 mb-6">
+              <div className="chart-container h-64 mb-6 relative">
                 <canvas ref={canvasRef}></canvas>
+                {principalAmount === 0 && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 rounded-lg">
+                    <p className="text-gray-500">Enter deposit amount to see chart</p>
+                  </div>
+                )}
               </div>
 
-              <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
+              <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-6">
                 <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">FD Summary</h5>
                 <div className="space-y-4">
                   <div className="flex justify-between pb-3 border-b border-gray-200">
@@ -459,7 +660,7 @@ const FDCalculator: React.FC = () => {
                   <div className="flex justify-between pb-3 border-b border-gray-200">
                     <span className="text-gray-600">Interest Rate</span>
                     <span className="font-medium font-sans text-[#1CADA3]">
-                      {interestRate > 0 ? `${interestRate}%` : '0%'}
+                      {interestRate > 0 ? `${interestRate.toFixed(1)}%` : '0%'}
                     </span>
                   </div>
                   <div className="flex justify-between pb-3 border-b border-gray-200">
@@ -469,31 +670,36 @@ const FDCalculator: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex justify-between pb-3 border-b border-gray-200">
-                    <span className="text-gray-600">Interest Payout</span>
+                    <span className="text-gray-600">Compounding</span>
                     <span className="font-medium font-sans text-[#1CADA3] capitalize">
-                      {interestPayout}
+                      {compoundingFrequency}
                     </span>
                   </div>
                   <div className="flex justify-between pt-2">
                     <span className="text-gray-600 font-semibold">Total Interest Earned</span>
                     <span className="font-bold font-sans text-[#1CADA3]">
-                      {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                      {isCalculating ? '-' : totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                     </span>
                   </div>
                 </div>
               </div>
 
               {/* Disclaimer */}
-              <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  <span className="font-semibold">Note:</span> This calculator provides an estimate of returns based on the inputs provided. Actual returns may vary depending on bank policies, compounding frequency, and applicable taxes.
+              <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg">
+                <p className="text-sm text-blue-800 mb-2">
+                  <span className="font-semibold">Note:</span> This calculator provides an estimate of returns based on the inputs provided. Actual returns may vary depending on bank policies and applicable taxes.
+                </p>
+                <p className="text-xs text-blue-700">
+                  • Interest is compounded {compoundingFrequency}<br/>
+                  • This is for estimation purposes only
                 </p>
               </div>
             </div>
           </div>
         </div>
       </div>
-            {/* KEY INSIGHTS SECTION - Fixed Deposit */}
+      
+      {/* KEY INSIGHTS SECTION - Fixed Deposit */}
       <div className="mt-8 mb-8">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-xl border shadow-md p-6">
@@ -513,7 +719,7 @@ const FDCalculator: React.FC = () => {
                   <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
                     {maturityAmount > 0 ? formatCurrency(maturityAmount) : '₹0'}
                   </span>{' '}
-                  in {tenure > 0 ? `${tenure} ${tenureType}` : '0'} at {interestRate > 0 ? interestRate : '0'}% interest
+                  in {tenure > 0 ? `${tenure} ${tenureType}` : '0'} at {interestRate > 0 ? interestRate.toFixed(1) : '0'}% interest
                 </li>
                 
                 <li>
@@ -523,7 +729,7 @@ const FDCalculator: React.FC = () => {
                   </span>{' '}
                   in interest, which is{' '}
                   <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {principalAmount > 0 ? ((totalInterest / principalAmount) * 100).toFixed(1) : '0'}%
+                    {insights.interestPercentageOfPrincipal}%
                   </span>{' '}
                   of your principal amount
                 </li>
@@ -531,7 +737,7 @@ const FDCalculator: React.FC = () => {
                 <li>
                   Your FD will generate{' '}
                   <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    ₹{principalAmount > 0 ? (totalInterest / (tenureType === 'years' ? tenure : tenure / 12)).toFixed(0) : '0'}
+                    ₹{insights.averageAnnualInterest}
                   </span>{' '}
                   average annual interest
                 </li>
@@ -540,12 +746,12 @@ const FDCalculator: React.FC = () => {
                   // Calculate impact of higher interest rate
                   if (interestRate > 1 && principalAmount > 0 && tenure > 0) {
                     const higherRate = interestRate + 1; // 1% higher rate
-                    const annualRate = higherRate / 100;
+                    const periodsPerYear = compoundingFrequency === 'monthly' ? 12 : 
+                                          compoundingFrequency === 'quarterly' ? 4 : 1;
+                    const ratePerPeriod = higherRate / (100 * periodsPerYear);
                     const tenureInYears = tenureType === 'months' ? tenure / 12 : tenure;
-                    const compoundFrequency = interestPayout === 'monthly' ? 12 : 
-                                             interestPayout === 'quarterly' ? 4 : 1;
-                    const higherAmount = principalAmount * Math.pow(1 + annualRate / compoundFrequency, 
-                                                                   compoundFrequency * tenureInYears);
+                    const totalPeriods = periodsPerYear * tenureInYears;
+                    const higherAmount = principalAmount * Math.pow(1 + ratePerPeriod, totalPeriods);
                     const extraEarnings = higherAmount - maturityAmount;
                     
                     if (extraEarnings > 0) {
@@ -555,6 +761,31 @@ const FDCalculator: React.FC = () => {
                           <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
                             {formatCurrency(extraEarnings)}
                           </span>
+                        </li>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
+                
+                {(() => {
+                  // Calculate impact of different compounding frequencies
+                  if (compoundingFrequency !== 'monthly' && principalAmount > 0 && interestRate > 0 && tenure > 0) {
+                    // Calculate with monthly compounding for comparison
+                    const monthlyRate = interestRate / (100 * 12);
+                    const tenureInYears = tenureType === 'months' ? tenure / 12 : tenure;
+                    const months = tenureInYears * 12;
+                    const monthlyAmount = principalAmount * Math.pow(1 + monthlyRate, months);
+                    const difference = monthlyAmount - maturityAmount;
+                    
+                    if (difference > 0) {
+                      return (
+                        <li>
+                          Monthly compounding would earn{' '}
+                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                            {formatCurrency(difference)}
+                          </span>{' '}
+                          more than {compoundingFrequency} compounding
                         </li>
                       );
                     }
@@ -607,48 +838,24 @@ const FDCalculator: React.FC = () => {
                 <li>
                   Your FD generates{' '}
                   <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    ₹{totalInterest > 0 ? (totalInterest / (tenure * (tenureType === 'years' ? 365 : 30.4))).toFixed(0) : '0'}
+                    ₹{insights.interestPerDay}
                   </span>{' '}
                   per day in interest income
                 </li>
 
-                {(() => {
-                  // Compare interest payout frequencies
-                  if (interestPayout === 'cumulative' && principalAmount > 0 && interestRate > 0 && tenure > 0) {
-                    // Calculate for monthly payout
-                    const monthlyPayout = (principalAmount * interestRate/100) / 12;
-                    const cumulativeBenefit = totalInterest - (monthlyPayout * 12 * (tenureType === 'months' ? tenure/12 : tenure));
-                    
-                    if (cumulativeBenefit > 0) {
-                      return (
-                        <li>
-                          Cumulative payout earns{' '}
-                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                            {formatCurrency(cumulativeBenefit)}
-                          </span>{' '}
-                          more than monthly payout due to compounding
-                        </li>
-                      );
-                    }
-                  }
-                  return null;
-                })()}
+                <li>
+                  At this rate, your money will double in{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {insights.doublingYears} years
+                  </span>{' '}
+                  (using the Rule of 72)
+                </li>
               </ul>
               
               <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-sm text-yellow-800">
                   <strong>💡 Investment Tip:</strong> Senior citizens (above 60 years) typically get 0.5% higher FD rates. 
                   Consider splitting large FDs into smaller ones to maintain liquidity and avoid breaking the entire FD for partial withdrawals.
-                </p>
-              </div>
-              
-              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-800">
-                  <strong>📈 Growth Comparison:</strong> At this rate, your money will double in approximately{' '}
-                  <span className="font-semibold">
-                    {(72 / interestRate).toFixed(1)} years
-                  </span>{' '}
-                  (using the Rule of 72)
                 </p>
               </div>
               
