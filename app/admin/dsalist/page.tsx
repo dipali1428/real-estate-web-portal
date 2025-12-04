@@ -81,65 +81,65 @@ export default function DSAManagementPage() {
     role: '',
     status: 'Pending',
   });
-// State for dropdown options from API data
+  // State for dropdown options from API data
   const [cities, setCities] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [heads, setHeads] = useState<string[]>([]);
   const [roles, setRoles] = useState<string[]>([]);
- // Loading and error states
+  // Loading and error states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-// Pagination state
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(50);
   const [activeTab, setActiveTab] = useState('All');
   const tabs = ['All', 'Active', 'Inactive', 'Pending'];
-// Fetch DSAs from API on component mount
+  // Fetch DSAs from API on component mount
   useEffect(() => {
     fetchDSAs();
   }, []);
- const fetchDSAs = async () => {
-  try {
-    setLoading(true);
-    setError(null);
-  const apiResponse = await AdminService.dsaList();
-   console.log("RAW API RESPONSE:", apiResponse);
-    console.log("TYPE OF RESPONSE:", typeof apiResponse);
-    console.log("IS ARRAY?:", Array.isArray(apiResponse));
-// Try every possible key
-    const apiData =
-      (Array.isArray(apiResponse) && apiResponse) ||
-      apiResponse.data ||
-      apiResponse.dsas ||
-      apiResponse.result ||
-      apiResponse.items ||
-      apiResponse.dsalist ||
-      [];
+  const fetchDSAs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const apiResponse = await AdminService.dsaList();
+      //  console.log("RAW API RESPONSE:", apiResponse);
+      // console.log("TYPE OF RESPONSE:", typeof apiResponse);
+      // console.log("IS ARRAY?:", Array.isArray(apiResponse));
+      // Try every possible key
+      const apiData =
+        (Array.isArray(apiResponse) && apiResponse) ||
+        apiResponse.data ||
+        apiResponse.dsas ||
+        apiResponse.result ||
+        apiResponse.items ||
+        apiResponse.dsalist ||
+        [];
 
-    console.log("Extracted apiData:", apiData);
-    console.log("Is apiData array?", Array.isArray(apiData));
+      // console.log("Extracted apiData:", apiData);
+      // console.log("Is apiData array?", Array.isArray(apiData));
 
-    if (!Array.isArray(apiData)) {
-      throw new Error("API did not return an array");
+      if (!Array.isArray(apiData)) {
+        throw new Error("API did not return an array");
+      }
+
+      const mappedDSAs = mapApiDataToDSA(apiData);
+      setDsas(mappedDSAs);
+
+      const options = extractOptionsFromData(mappedDSAs);
+      setCities(options.cities);
+      setCategories(options.categories);
+      setHeads(options.heads);
+      setRoles(options.roles);
+
+    } catch (err) {
+      console.error("Error fetching DSAs:", err);
+      setError("Failed to load DSAs");
+      setDsas([]);
+    } finally {
+      setLoading(false);
     }
-
-    const mappedDSAs = mapApiDataToDSA(apiData);
-    setDsas(mappedDSAs);
-
-    const options = extractOptionsFromData(mappedDSAs);
-    setCities(options.cities);
-    setCategories(options.categories);
-    setHeads(options.heads);
-    setRoles(options.roles);
-
-  } catch (err) {
-    console.error("Error fetching DSAs:", err);
-    setError("Failed to load DSAs");
-    setDsas([]);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
 
@@ -195,7 +195,7 @@ export default function DSAManagementPage() {
       'Date Joined': dsa.date_joined,
       'Updated At': dsa.updated_at,
       'Role': dsa.role,
-      'Status': dsa.status
+      // 'Status': dsa.status
     }));
 
     // Create workbook and worksheet
@@ -361,18 +361,18 @@ export default function DSAManagementPage() {
     return pageNumbers;
   };
 
-const [searchQuery, setSearchQuery] = useState("");
-const filteredDSAs = dsas.filter((dsa) => {
-  const query = searchQuery.toLowerCase();
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredDSAs = dsas.filter((dsa) => {
+    const query = searchQuery.toLowerCase();
 
-  return (
-    dsa.name.toLowerCase().includes(query) ||
-    dsa.email.toLowerCase().includes(query) ||
-    dsa.city.toLowerCase().includes(query) ||
-    (dsa.mobile?.toLowerCase().includes(query) ?? false)
-  );
-});
-// Format date for display
+    return (
+      dsa.name.toLowerCase().includes(query) ||
+      dsa.email.toLowerCase().includes(query) ||
+      dsa.city.toLowerCase().includes(query) ||
+      (dsa.mobile?.toLowerCase().includes(query) ?? false)
+    );
+  });
+  // Format date for display
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     try {
@@ -450,9 +450,9 @@ const filteredDSAs = dsas.filter((dsa) => {
             </svg>
             Refresh
           </button>
-           
+
         </div>
-         <div className="flex justify-end space-x-3 mb-4">
+        <div className="flex justify-end space-x-3 mb-4">
           {/* Add DSA Button */}
           <button
             onClick={() => setIsAddModalOpen(true)}
@@ -479,9 +479,9 @@ const filteredDSAs = dsas.filter((dsa) => {
             </svg>
           </button>
         </div>
-      
 
-        
+
+
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -546,7 +546,7 @@ const filteredDSAs = dsas.filter((dsa) => {
         <div className="mb-6 flex flex-wrap justify-end gap-4">
           {/* Download Excel Button */}
           <div className="relative group">
-            
+
 
             {/* Dropdown menu for download options */}
             <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -565,7 +565,7 @@ const filteredDSAs = dsas.filter((dsa) => {
             </div>
           </div>
 
-         
+
         </div>
 
         {/* Tabs */}
@@ -581,7 +581,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                       'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
                       selected
                         ? 'bg-white text-blue-700 shadow'
-                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
+                        : 'text-blue-100 hover:bg-white/12 hover:text-white'
                     )
                   }
                 >
@@ -590,39 +590,38 @@ const filteredDSAs = dsas.filter((dsa) => {
               ))}
             </Tab.List>
             <Tab.Panels>
-              
+
               {tabs.map((tab) => (
                 <Tab.Panel key={tab} className="rounded-xl bg-white p-6 shadow">
                   {/* Records per page selector */}
-                  
+
                   <div className="flex justify-between items-center mb-4">
-                   <div className="flex items-center mb-4">
-                   <div className="relative w-5/5">
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search by name, email, phone, or city"
-                      className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <svg
-                        className="w-5 h-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"
+                    <div className="flex items-center mb-4">
+                      <div className="relative w-5/5">
+                        <input
+                          type="text"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          placeholder="Search by name, email, phone, or city"
+                          className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
-                      </svg>
-                      
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                          <svg
+                            className="w-5 h-5 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"
+                            />
+                          </svg>
+
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  </div>
 
                     <div className="flex items-center space-x-2">
                       <label className="text-sm text-gray-600">Show:</label>
@@ -632,8 +631,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                           setItemsPerPage(Number(e.target.value));
                           setCurrentPage(1);
                         }}
-                        className="border border-gray-300 rounded-md px-2 py-1 text-sm"
-                      >
+                        className="border border-gray-300 rounded-md px-2 py-1 text-sm">
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
@@ -745,8 +743,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                                     : dsa.status === 'Pending'
                                       ? 'bg-yellow-100 text-yellow-800'
                                       : 'bg-red-100 text-red-800'
-                                    }`}
-                                >
+                                    }`}>
                                   {dsa.status}
                                 </span>
                               </td>
@@ -754,8 +751,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                                 <button
                                   onClick={() => handleEdit(dsa)}
                                   className="text-indigo-600 hover:text-indigo-900 mr-4"
-                                  title="Edit"
-                                >
+                                  title="Edit">
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2v-5m1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                   </svg>
@@ -763,8 +759,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                                 <button
                                   onClick={() => handleDelete(dsa.id)}
                                   className="text-red-600 hover:text-red-900"
-                                  title="Delete"
-                                >
+                                  title="Delete">
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                   </svg>
@@ -787,8 +782,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                           className={`relative inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium ${currentPage === 1
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                             : 'bg-white text-gray-700 hover:bg-gray-50'
-                            }`}
-                        >
+                            }`}>
                           Previous
                         </button>
                         <button
@@ -797,8 +791,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                           className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium ${currentPage === getTotalPages()
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                             : 'bg-white text-gray-700 hover:bg-gray-50'
-                            }`}
-                        >
+                            }`}>
                           Next
                         </button>
                       </div>
@@ -816,8 +809,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                               onClick={goToPrevPage}
                               disabled={currentPage === 1}
                               className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''
-                                }`}
-                            >
+                                }`}>
                               <span className="sr-only">Previous</span>
                               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                 <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
@@ -828,8 +820,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                               pageNumber === '...' ? (
                                 <span
                                   key={`dots-${index}`}
-                                  className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0"
-                                >
+                                  className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
                                   ...
                                 </span>
                               ) : (
@@ -838,10 +829,9 @@ const filteredDSAs = dsas.filter((dsa) => {
                                   onClick={() => goToPage(pageNumber as number)}
                                   aria-current={currentPage === pageNumber ? 'page' : undefined}
                                   className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${currentPage === pageNumber
-                                    ? 'z-10 bg-[#2076C7] text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2076C7]'
+                                    ? 'z-10 bg-[#2076C7] text-white focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#2076C7]'
                                     : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0'
-                                    }`}
-                                >
+                                    }`}>
                                   {pageNumber}
                                 </button>
                               )
@@ -851,8 +841,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                               onClick={goToNextPage}
                               disabled={currentPage === getTotalPages()}
                               className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${currentPage === getTotalPages() ? 'cursor-not-allowed opacity-50' : ''
-                                }`}
-                            >
+                                }`}>
                               <span className="sr-only">Next</span>
                               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                 <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
@@ -934,8 +923,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                 <select
                   value={editingDSA.city}
                   onChange={(e) => setEditingDSA({ ...editingDSA, city: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                   <option value="">Select City</option>
                   {cities.map(city => (
                     <option key={city} value={city}>{city}</option>
@@ -951,8 +939,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                 <select
                   value={editingDSA.head}
                   onChange={(e) => setEditingDSA({ ...editingDSA, head: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                   <option value="">Select Head</option>
                   {heads.map(head => (
                     <option key={head} value={head}>{head}</option>
@@ -968,8 +955,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                 <select
                   value={editingDSA.category}
                   onChange={(e) => setEditingDSA({ ...editingDSA, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                   <option value="">Select Category</option>
                   {categories.map(category => (
                     <option key={category} value={category}>{category}</option>
@@ -985,8 +971,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                 <select
                   value={editingDSA.role}
                   onChange={(e) => setEditingDSA({ ...editingDSA, role: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                   <option value="">Select Role</option>
                   {roles.map(role => (
                     <option key={role} value={role}>{role}</option>
@@ -1002,8 +987,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                 <select
                   value={editingDSA.status}
                   onChange={(e) => setEditingDSA({ ...editingDSA, status: e.target.value as 'Active' | 'Inactive' | 'Pending' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
                   <option value="Pending">Pending</option>
@@ -1014,8 +998,7 @@ const filteredDSAs = dsas.filter((dsa) => {
             <div className="mt-6 flex justify-end space-x-3">
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
-              >
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">
                 Cancel
               </button>
               <button
@@ -1097,8 +1080,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                 <select
                   value={newDSA.city}
                   onChange={(e) => setNewDSA({ ...newDSA, city: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                   <option value="">Select City</option>
                   {cities.map(city => (
                     <option key={city} value={city}>{city}</option>
@@ -1114,8 +1096,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                 <select
                   value={newDSA.head}
                   onChange={(e) => setNewDSA({ ...newDSA, head: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                   <option value="">Select Head</option>
                   {heads.map(head => (
                     <option key={head} value={head}>{head}</option>
@@ -1131,8 +1112,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                 <select
                   value={newDSA.category}
                   onChange={(e) => setNewDSA({ ...newDSA, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                   <option value="">Select Category</option>
                   {categories.map(category => (
                     <option key={category} value={category}>{category}</option>
@@ -1148,8 +1128,7 @@ const filteredDSAs = dsas.filter((dsa) => {
                 <select
                   value={newDSA.role}
                   onChange={(e) => setNewDSA({ ...newDSA, role: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                   <option value="">Select Role</option>
                   {roles.map(role => (
                     <option key={role} value={role}>{role}</option>
@@ -1162,14 +1141,12 @@ const filteredDSAs = dsas.filter((dsa) => {
             <div className="mt-6 flex justify-end space-x-3">
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
-              >
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">
                 Cancel
               </button>
               <button
                 onClick={handleAddDSA}
-                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-              >
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
                 Add DSA
               </button>
             </div>
