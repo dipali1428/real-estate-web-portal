@@ -35,8 +35,8 @@ const Header = () => {
     { label: "Home Loan Calculator", href: "/page/homeloan"},
     { label: "Personal Loan Calculator", href: "/page/personalloan"},
     { label: "Business Loan Calculator", href: "/page/businessloan"},
-    { label: "Fixed Deposit Calculator", href: "/page/fd"},
-    { label: "Compound Interest Calculator" , href:"/page/CompoundInterest"}
+    { label: "FD Calculator", href: "/page/fd"},
+    { label: "CI Calculator" , href:"/page/CompoundInterest"},
     
   ];
 
