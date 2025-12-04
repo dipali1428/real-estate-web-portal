@@ -28,7 +28,9 @@ export const sidebarLinks = {
     ],
 
     ADMIN: [
-        { label: "User Management", href: "/admin/dsalist", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "DSA Management", href: "/admin/dsalist", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Ticket Raised", href: "/admin/ticket", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },
+        { label: "Website Enquiry", href: "/admin/enquiry", icon: <Megaphone className="h-5 w-5 text-neutral-700" /> },
     ],
 
     GM: [],
