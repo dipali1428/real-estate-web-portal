@@ -18,27 +18,12 @@ type PaymentFrequency =
   | 'annually' 
   | 'continuous';
 
-interface LoanDetails {
-  loanAmount: number;
-  annualInterestRate: number;
-  loanTermMonths: number;
-  paymentFrequency: PaymentFrequency;
-}
-
 interface PaymentScheduleEntry {
   period: number;
   payment: number;
   principal: number;
   interest: number;
   balance: number;
-}
-
-interface LoanResults {
-  paymentAmount: number;
-  totalInterest: number;
-  totalPayment: number;
-  effectiveAnnualRate: number;
-  amortizationSchedule: PaymentScheduleEntry[];
 }
 
 const frequencyMap: Record<PaymentFrequency, number> = {
@@ -430,39 +415,13 @@ export default function LoanCalculator() {
     e.stopPropagation();
   };
 
-  // Function to export schedule to CSV
-  const exportToCSV = () => {
-    if (fullAmortizationSchedule.length === 0) return;
-    
-    const headers = ['Period', 'Payment', 'Principal', 'Interest', 'Balance'];
-    const csvRows = [
-      headers.join(','),
-      ...fullAmortizationSchedule.map(row => [
-        row.period,
-        row.payment.toFixed(2),
-        row.principal.toFixed(2),
-        row.interest.toFixed(2),
-        row.balance.toFixed(2)
-      ].join(','))
-    ];
-    
-    const csvContent = csvRows.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `loan_payment_schedule_${loanAmount}_${annualInterestRate}_${loanTermMonths}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Loan Calculator */}
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
           <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
-            <h1 className="text-3xl font-bold mb-2">Peraonal Loan Calculator</h1>
+            <h1 className="text-3xl font-bold mb-2">Personal Loan Calculator</h1>
             <p className="text-blue-100">Calculate your Loan EMI and Payment Schedule</p>
           </div>
 
@@ -713,9 +672,151 @@ export default function LoanCalculator() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-         
-          
+      {/* KEY INSIGHTS SECTION */}
+      <div className="mt-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-xl border shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <i className="fas fa-lightbulb text-yellow-500"></i>
+              Key Insights
+            </h2>
+
+            <div className="text-gray-700 leading-relaxed">
+              <ul className="list-disc pl-5 mb-4 space-y-2">
+                <li>
+                  Your monthly EMI of{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {paymentAmount > 0 ? formatCurrency(paymentAmount) : '₹0'}
+                  </span>{' '}
+                  will continue for {loanTermMonths > 0 ? formatLoanTerm(loanTermMonths) : '0 months'}
+                </li>
+                
+                <li>
+                  You'll pay{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                  </span>{' '}
+                  in interest, which is{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {loanAmount > 0 ? ((totalInterest / loanAmount) * 100).toFixed(1) : '0'}%
+                  </span>{' '}
+                  of your loan amount
+                </li>
+                
+                <li>
+                  For every ₹100 you repay,{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    ₹{totalPayment > 0 ? ((totalInterest / totalPayment) * 100).toFixed(0) : '0'}
+                  </span>{' '}
+                  goes towards interest and only{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    ₹{totalPayment > 0 ? ((loanAmount / totalPayment) * 100).toFixed(0) : '0'}
+                  </span>{' '}
+                  reduces your principal
+                </li>
+                
+                {(() => {
+                  // Calculate if tenure extension reduces EMI significantly
+                  if (loanTermMonths > 0 && loanAmount > 0 && annualInterestRate > 0) {
+                    const extendedTenure = loanTermMonths + 12;
+                    const extendedPayments = Math.ceil(extendedTenure / 12 * frequencyMap[paymentFrequency]);
+                    const periodicInterestRate = (annualInterestRate / 100) / frequencyMap[paymentFrequency];
+                    const rateFactor = Math.pow(1 + periodicInterestRate, extendedPayments);
+                    const extendedEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+                    const emiReduction = paymentAmount - extendedEMI;
+                    
+                    if (emiReduction > 0) {
+                      return (
+                        <li>
+                          Extending tenure by 1 year reduces your EMI by{' '}
+                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                            {formatCurrency(emiReduction)}
+                          </span>{' '}
+                          ({((emiReduction / paymentAmount) * 100).toFixed(1)}% reduction)
+                        </li>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
+                
+                {(() => {
+                  // Calculate impact of 1% lower interest rate
+                  if (annualInterestRate > 1 && loanAmount > 0 && loanTermMonths > 0) {
+                    const lowerRate = annualInterestRate - 1;
+                    if (lowerRate > 0) {
+                      const periodicInterestRate = (lowerRate / 100) / frequencyMap[paymentFrequency];
+                      const totalPayments = calculateTotalPayments();
+                      const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
+                      const lowerEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+                      const totalSavings = (paymentAmount - lowerEMI) * totalPayments;
+                      
+                      return (
+                        <li>
+                          A 1% lower interest rate would save you{' '}
+                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                            {formatCurrency(totalSavings)}
+                          </span>{' '}
+                          over the loan term
+                        </li>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
+                
+                {(() => {
+                  // Early repayment insight
+                  if (totalInterest > 0) {
+                    const earlyRepaymentSavings = totalInterest * 0.2; // Estimate 20% savings with one early payment
+                    return (
+                      <li>
+                        Making one extra payment early could save approximately{' '}
+                        <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                          {formatCurrency(earlyRepaymentSavings)}
+                        </span>{' '}
+                        in interest
+                      </li>
+                    );
+                  }
+                  return null;
+                })()}
+                
+                <li>
+                  Your effective annual rate is{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {effectiveAnnualRate > 0 ? effectiveAnnualRate.toFixed(2) : '0.00'}%
+                  </span>{' '}
+                  (higher than the nominal rate due to {paymentFrequency} compounding)
+                </li>
+
+                {/* Personal Loan Specific Insight */}
+                <li>
+                  Personal loans typically have{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    higher interest rates
+                  </span>{' '}
+                  than home loans because they are unsecured with no collateral
+                </li>
+              </ul>
+              
+              <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>💡 Pro Tip for Personal Loans:</strong> Consider making at least one extra payment each year. 
+                  Since personal loans have higher interest rates, early repayments can save significant interest costs.
+                  Even a single extra EMI payment can make a noticeable difference.
+                </p>
+              </div>
+              
+              <p className="text-sm text-gray-600 mt-4">
+                <strong>Note:</strong> Personal loans typically come with processing fees (1-3%), prepayment charges, 
+                and other costs. Actual terms may vary based on lender policies, credit score, and loan purpose.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

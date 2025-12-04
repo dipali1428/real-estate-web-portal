@@ -44,7 +44,6 @@ const SIPLumpsumCalculator: React.FC = () => {
     const months = years * 12;
     const monthlyRate = annualReturn / 100 / 12;
     
-    // Future Value of SIP formula: FV = P * [((1 + r)^n - 1) / r] * (1 + r)
     const futureValue = monthlyInvestment * 
       ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * 
       (1 + monthlyRate);
@@ -84,9 +83,9 @@ const SIPLumpsumCalculator: React.FC = () => {
     setLumpsumResults(results);
   }, [lumpsumAmount, lumpsumDuration, lumpsumReturn, calculateLumpsum]);
 
-  // Calculate bar heights for chart
+  // Calculate bar heights
   const getBarHeight = (value: number, maxValue: number): number => {
-    const chartHeight = 200; // Base height in pixels
+    const chartHeight = 200;
     return (value / maxValue) * chartHeight;
   };
 
@@ -97,6 +96,7 @@ const SIPLumpsumCalculator: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 text-white p-5">
       <div className="max-w-6xl mx-auto">
+        
         {/* Header */}
         <header className="text-center mb-10 p-8 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl shadow-lg">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -123,6 +123,7 @@ const SIPLumpsumCalculator: React.FC = () => {
             <i className="fas fa-chart-line"></i>
             <span>SIP Calculator</span>
           </button>
+
           <button
             className={`flex-1 py-4 px-5 text-center cursor-pointer rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
               activeTab === 'lumpsum' 
@@ -140,6 +141,7 @@ const SIPLumpsumCalculator: React.FC = () => {
         {activeTab === 'sip' && (
           <section className="animate-fade-in">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              
               {/* Input Card */}
               <div className="bg-white rounded-2xl shadow-lg p-8">
                 <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
@@ -245,7 +247,8 @@ const SIPLumpsumCalculator: React.FC = () => {
         {activeTab === 'lumpsum' && (
           <section className="animate-fade-in">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Input Card */}
+              
+              {/* Input */}
               <div className="bg-white rounded-2xl shadow-lg p-8">
                 <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
                   <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 text-xl mr-4">
@@ -257,7 +260,7 @@ const SIPLumpsumCalculator: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Investment Amount */}
+                {/* Investment */}
                 <div className="mb-6">
                   <div className="flex justify-between mb-3 font-sans">
                     <span className="font-semibold  text-gray-800">Investment Amount</span>
@@ -278,7 +281,7 @@ const SIPLumpsumCalculator: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Investment Period */}
+                {/* Duration */}
                 <div className="mb-6">
                   <div className="flex justify-between mb-3 font-sans">
                     <span className="font-semibold text-gray-800">Investment Period</span>
@@ -298,7 +301,7 @@ const SIPLumpsumCalculator: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Expected Return */}
+                {/* Return */}
                 <div className="mb-6">
                   <div className="flex justify-between mb-3 font-sans">
                     <span className="font-semibold text-gray-800">Expected Annual Return</span>
@@ -320,7 +323,7 @@ const SIPLumpsumCalculator: React.FC = () => {
                 </div>
               </div>
 
-              {/* Results Card */}
+              {/* Summary */}
               <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-lg">
                 <h3 className="text-xl font-bold mb-5 flex items-center gap-3">
                   <i className="fas fa-chart-pie"></i>
@@ -390,52 +393,125 @@ const SIPLumpsumCalculator: React.FC = () => {
           </div>
         </div>
 
-        {/* Insights Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-            <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
-              <i className="fas fa-rocket"></i>
+
+        {/* FIXED Insight + Key Insights Container */}
+        <div className="mt-8 space-y-8">
+
+          {/* 3 Insight Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+              <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
+                <i className="fas fa-rocket"></i>
+              </div>
+              <div className="text-gray-600 text-sm mb-2">Wealth Gain</div>
+              <div className="font-bold text-xl font-sans text-gray-800">
+                {formatCurrency(activeTab === 'sip' ? sipResults.estimatedReturns : lumpsumResults.estimatedReturns)}
+              </div>
             </div>
-            <div className="text-gray-600 text-sm mb-2">Wealth Gain</div>
-            <div className="font-bold text-xl font-sans text-gray-800">
-              {formatCurrency(activeTab === 'sip' ? sipResults.estimatedReturns : lumpsumResults.estimatedReturns)}
+
+            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+              <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
+                <i className="fas fa-percentage"></i>
+              </div>
+              <div className="text-gray-600 text-sm mb-2">Annualized Return</div>
+              <div className="font-bold text-xl font-sans text-gray-800">
+                {activeTab === 'sip' ? sipReturn : lumpsumReturn}%
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+              <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
+                <i className="fas fa-calendar-alt"></i>
+              </div>
+              <div className="text-gray-600 text-sm mb-2">Investment Period</div>
+              <div className="font-bold text-xl font-sans text-gray-800">
+                {activeTab === 'sip' ? sipDuration : lumpsumDuration} Years
+              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-            <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
-              <i className="fas fa-percentage"></i>
-            </div>
-            <div className="text-gray-600 text-sm mb-2">Annualized Return</div>
-            <div className="font-bold text-xl font-sans text-gray-800">
-              {activeTab === 'sip' ? sipReturn : lumpsumReturn}%
-            </div>
-          </div>
+          {/* ⭐ KEY INSIGHTS FIXED */}
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+              <i className="fas fa-lightbulb text-yellow-500 text-xl"></i>
+              Key Insights
+            </h2>
 
-          <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-            <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
-              <i className="fas fa-calendar-alt"></i>
-            </div>
-            <div className="text-gray-600 text-sm mb-2">Investment Period</div>
-            <div className="font-bold text-xl font-sans text-gray-800">
-              {activeTab === 'sip' ? sipDuration : lumpsumDuration} Years
-            </div>
+            <ul className="space-y-4 text-gray-700 text-base leading-relaxed">
+
+              <li className="flex gap-3">
+                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+                <span>
+                  Your total investment amounts to{" "}
+                  <strong className="font-sans">
+                    {formatCurrency(
+                      activeTab === "sip"
+                        ? sipResults.totalInvestment
+                        : lumpsumResults.totalInvestment
+                    )}
+                  </strong>
+                </span>
+              </li>
+
+              <li className="flex gap-3">
+                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+                <span>
+                  Your estimated returns are{" "}
+                  <strong className="font-sans">
+                    {formatCurrency(
+                      activeTab === "sip"
+                        ? sipResults.estimatedReturns
+                        : lumpsumResults.estimatedReturns
+                    )}
+                  </strong>.
+                </span>
+              </li>
+
+              <li className="flex gap-3">
+                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+                <span>
+                  Your total future value will be{" "}
+                  <strong className="font-sans">
+                    {formatCurrency(
+                      activeTab === "sip"
+                        ? sipResults.totalValue
+                        : lumpsumResults.totalValue
+                    )}
+                  </strong>.
+                </span>
+              </li>
+
+              <li className="flex gap-3">
+                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+                <span>
+                  SIP grows steadily due to <strong>monthly compounding</strong>.
+                </span>
+              </li>
+
+              <li className="flex gap-3">
+                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+                <span>
+                  Lumpsum investing benefits hugely from <strong>time in the market</strong>.
+                </span>
+              </li>
+
+              <li className="flex gap-3">
+                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+                <span>
+                  Higher returns dramatically increase wealth over <strong>10+ years</strong>.
+                </span>
+              </li>
+
+            </ul>
           </div>
         </div>
 
-        {/* Footer 
-        <footer className="text-center mt-12 py-6 text-gray-600 text-sm">
-          
-          <div className="bg-amber-50 border-l-4 border-amber-400 rounded px-4 py-3 mt-6 text-amber-800 text-sm">
-            <p><strong>Disclaimer:</strong> This calculator provides estimated returns based on the inputs provided. Actual returns may vary depending on market conditions and other factors. Please consult with a financial advisor before making investment decisions.</p>
-          </div>
-        </footer>*/}
       </div>
 
-      {/* Add Font Awesome for icons */}
+      {/* Font Awesome */}
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       
-      {/* Add custom animation */}
+      {/* Fade Animation */}
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }

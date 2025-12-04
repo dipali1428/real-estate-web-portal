@@ -493,6 +493,173 @@ const FDCalculator: React.FC = () => {
           </div>
         </div>
       </div>
+            {/* KEY INSIGHTS SECTION - Fixed Deposit */}
+      <div className="mt-8 mb-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-xl border shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <i className="fas fa-lightbulb text-yellow-500"></i>
+              Key Insights
+            </h2>
+
+            <div className="text-gray-700 leading-relaxed">
+              <ul className="list-disc pl-5 mb-4 space-y-2">
+                <li>
+                  Your investment of{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {principalAmount > 0 ? formatCurrency(principalAmount) : '₹0'}
+                  </span>{' '}
+                  will grow to{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {maturityAmount > 0 ? formatCurrency(maturityAmount) : '₹0'}
+                  </span>{' '}
+                  in {tenure > 0 ? `${tenure} ${tenureType}` : '0'} at {interestRate > 0 ? interestRate : '0'}% interest
+                </li>
+                
+                <li>
+                  You will earn{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                  </span>{' '}
+                  in interest, which is{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {principalAmount > 0 ? ((totalInterest / principalAmount) * 100).toFixed(1) : '0'}%
+                  </span>{' '}
+                  of your principal amount
+                </li>
+                
+                <li>
+                  Your FD will generate{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    ₹{principalAmount > 0 ? (totalInterest / (tenureType === 'years' ? tenure : tenure / 12)).toFixed(0) : '0'}
+                  </span>{' '}
+                  average annual interest
+                </li>
+                
+                {(() => {
+                  // Calculate impact of higher interest rate
+                  if (interestRate > 1 && principalAmount > 0 && tenure > 0) {
+                    const higherRate = interestRate + 1; // 1% higher rate
+                    const annualRate = higherRate / 100;
+                    const tenureInYears = tenureType === 'months' ? tenure / 12 : tenure;
+                    const compoundFrequency = interestPayout === 'monthly' ? 12 : 
+                                             interestPayout === 'quarterly' ? 4 : 1;
+                    const higherAmount = principalAmount * Math.pow(1 + annualRate / compoundFrequency, 
+                                                                   compoundFrequency * tenureInYears);
+                    const extraEarnings = higherAmount - maturityAmount;
+                    
+                    if (extraEarnings > 0) {
+                      return (
+                        <li>
+                          A 1% higher interest rate could earn you an extra{' '}
+                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                            {formatCurrency(extraEarnings)}
+                          </span>
+                        </li>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
+                
+                {(() => {
+                  // Calculate tax impact insight
+                  if (totalInterest > 0) {
+                    const taxableAmount = Math.max(0, totalInterest - 40000); // Assuming basic exemption
+                    const taxPayable = taxableAmount > 0 ? taxableAmount * 0.10 : 0; // 10% tax rate
+                    const netReturn = totalInterest - taxPayable;
+                    
+                    if (taxableAmount > 0) {
+                      return (
+                        <li>
+                          After TDS (10% tax on interest above ₹40,000), your net interest would be{' '}
+                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                            {formatCurrency(netReturn)}
+                          </span>
+                        </li>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
+                
+                {(() => {
+                  // Compare with inflation
+                  if (maturityAmount > 0 && totalInterest > 0) {
+                    const inflationRate = 6; // Assume 6% inflation
+                    const inflationAdjustedValue = maturityAmount / Math.pow(1 + inflationRate/100, 
+                                                                           tenureType === 'months' ? tenure/12 : tenure);
+                    const realReturn = inflationAdjustedValue - principalAmount;
+                    
+                    return (
+                      <li>
+                        Adjusted for 6% inflation, your real return would be{' '}
+                        <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                          {formatCurrency(realReturn)}
+                        </span>{' '}
+                        (in today's money value)
+                      </li>
+                    );
+                  }
+                  return null;
+                })()}
+                
+                <li>
+                  Your FD generates{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    ₹{totalInterest > 0 ? (totalInterest / (tenure * (tenureType === 'years' ? 365 : 30.4))).toFixed(0) : '0'}
+                  </span>{' '}
+                  per day in interest income
+                </li>
+
+                {(() => {
+                  // Compare interest payout frequencies
+                  if (interestPayout === 'cumulative' && principalAmount > 0 && interestRate > 0 && tenure > 0) {
+                    // Calculate for monthly payout
+                    const monthlyPayout = (principalAmount * interestRate/100) / 12;
+                    const cumulativeBenefit = totalInterest - (monthlyPayout * 12 * (tenureType === 'months' ? tenure/12 : tenure));
+                    
+                    if (cumulativeBenefit > 0) {
+                      return (
+                        <li>
+                          Cumulative payout earns{' '}
+                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                            {formatCurrency(cumulativeBenefit)}
+                          </span>{' '}
+                          more than monthly payout due to compounding
+                        </li>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
+              </ul>
+              
+              <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>💡 Investment Tip:</strong> Senior citizens (above 60 years) typically get 0.5% higher FD rates. 
+                  Consider splitting large FDs into smaller ones to maintain liquidity and avoid breaking the entire FD for partial withdrawals.
+                </p>
+              </div>
+              
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-800">
+                  <strong>📈 Growth Comparison:</strong> At this rate, your money will double in approximately{' '}
+                  <span className="font-semibold">
+                    {(72 / interestRate).toFixed(1)} years
+                  </span>{' '}
+                  (using the Rule of 72)
+                </p>
+              </div>
+              
+              <p className="text-sm text-gray-600 mt-4">
+                <strong>Note:</strong> FD interest is fully taxable. TDS is deducted at 10% if interest exceeds ₹40,000 
+                (₹50,000 for senior citizens). Interest rates vary between banks and change periodically.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

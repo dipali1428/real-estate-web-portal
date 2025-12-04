@@ -713,10 +713,134 @@ export default function LoanCalculator() {
               </div>
             </div>
           </div>
-
-          
-          
         </div>
+          {/* Key Insights Section */}
+          <div className="max-w-6xl mx-auto mt-8">
+            <div className="bg-white rounded-xl border shadow-md p-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i className="fas fa-lightbulb text-yellow-500"></i>
+                Key Insights
+              </h2>
+
+              <div className="text-gray-700 leading-relaxed">
+                <ul className="list-disc pl-5 mb-4 space-y-2">
+                  <li>
+                    Your monthly EMI of{' '}
+                    <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                      {formatCurrency(paymentAmount)}
+                    </span>{' '}
+                    will continue for {formatLoanTerm(loanTermMonths)}
+                  </li>
+                  
+                  <li>
+                    You'll pay{' '}
+                    <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                      {formatCurrency(totalInterest)}
+                    </span>{' '}
+                    in interest, which is{' '}
+                    <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                      {((totalInterest / loanAmount) * 100).toFixed(1)}%
+                    </span>{' '}
+                    of your loan amount
+                  </li>
+                  
+                  <li>
+                    For every ₹100 you repay,{' '}
+                    <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                      ₹{((totalInterest / totalPayment) * 100).toFixed(0)}
+                    </span>{' '}
+                    goes towards interest and only{' '}
+                    <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                      ₹{((loanAmount / totalPayment) * 100).toFixed(0)}
+                    </span>{' '}
+                    reduces your principal
+                  </li>
+                  
+                  {(() => {
+                    // Calculate if tenure extension reduces EMI significantly
+                    const extendedTenure = loanTermMonths + 12;
+                    const extendedPayments = Math.ceil(extendedTenure / 12 * frequencyMap[paymentFrequency]);
+                    const periodicInterestRate = (annualInterestRate / 100) / frequencyMap[paymentFrequency];
+                    const rateFactor = Math.pow(1 + periodicInterestRate, extendedPayments);
+                    const extendedEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+                    const emiReduction = paymentAmount - extendedEMI;
+                    
+                    if (emiReduction > 0) {
+                      return (
+                        <li>
+                          Extending tenure by 1 year reduces your EMI by{' '}
+                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                            {formatCurrency(emiReduction)}
+                          </span>{' '}
+                          ({((emiReduction / paymentAmount) * 100).toFixed(1)}% reduction)
+                        </li>
+                      );
+                    }
+                    return null;
+                  })()}
+                  
+                  {(() => {
+                    // Calculate impact of 1% lower interest rate
+                    const lowerRate = annualInterestRate - 1;
+                    if (lowerRate > 0) {
+                      const periodicInterestRate = (lowerRate / 100) / frequencyMap[paymentFrequency];
+                      const totalPayments = calculateTotalPayments();
+                      const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
+                      const lowerEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+                      const totalSavings = (paymentAmount - lowerEMI) * totalPayments;
+                      
+                      return (
+                        <li>
+                          A 1% lower interest rate would save you{' '}
+                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                            {formatCurrency(totalSavings)}
+                          </span>{' '}
+                          over the loan term
+                        </li>
+                      );
+                    }
+                    return null;
+                  })()}
+                  
+                  {(() => {
+                    // Early repayment insight
+                    const earlyRepaymentSavings = totalInterest * 0.2; // Estimate 20% savings with one early payment
+                    return (
+                      <li>
+                        Making one extra payment early could save approximately{' '}
+                        <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                          {formatCurrency(earlyRepaymentSavings)}
+                        </span>{' '}
+                        in interest
+                      </li>
+                    );
+                  })()}
+                  
+                  <li>
+                    Your effective annual rate is{' '}
+                    <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                      {effectiveAnnualRate.toFixed(2)}%
+                    </span>{' '}
+                    (higher than the nominal rate due to {paymentFrequency} compounding)
+                  </li>
+                </ul>
+                
+                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-800">
+                    <strong>💡 Pro Tip:</strong> Consider making at least one extra payment each year. 
+                    This can reduce your loan tenure by several months and save significant interest costs.
+                    Even a single extra EMI payment can make a noticeable difference.
+                  </p>
+                </div>
+                
+                <p className="text-sm text-gray-600 mt-4">
+                  <strong>Note:</strong> This calculation doesn't account for processing fees, prepayment charges, or insurance costs. 
+                  Actual terms may vary based on lender policies and your credit profile.
+                </p>
+              </div>
+            </div>
+          </div>
+
       </div>
     </div>
   );

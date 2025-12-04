@@ -18,27 +18,12 @@ type PaymentFrequency =
   | 'annually' 
   | 'continuous';
 
-interface LoanDetails {
-  loanAmount: number;
-  annualInterestRate: number;
-  loanTermMonths: number;
-  paymentFrequency: PaymentFrequency;
-}
-
 interface PaymentScheduleEntry {
   period: number;
   payment: number;
   principal: number;
   interest: number;
   balance: number;
-}
-
-interface LoanResults {
-  paymentAmount: number;
-  totalInterest: number;
-  totalPayment: number;
-  effectiveAnnualRate: number;
-  amortizationSchedule: PaymentScheduleEntry[];
 }
 
 const frequencyMap: Record<PaymentFrequency, number> = {
@@ -429,32 +414,7 @@ export default function LoanCalculator() {
     e.currentTarget.blur();
     e.stopPropagation();
   };
-
-  // Function to export schedule to CSV
-  const exportToCSV = () => {
-    if (fullAmortizationSchedule.length === 0) return;
-    
-    const headers = ['Period', 'Payment', 'Principal', 'Interest', 'Balance'];
-    const csvRows = [
-      headers.join(','),
-      ...fullAmortizationSchedule.map(row => [
-        row.period,
-        row.payment.toFixed(2),
-        row.principal.toFixed(2),
-        row.interest.toFixed(2),
-        row.balance.toFixed(2)
-      ].join(','))
-    ];
-    
-    const csvContent = csvRows.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `loan_payment_schedule_${loanAmount}_${annualInterestRate}_${loanTermMonths}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -713,9 +673,167 @@ export default function LoanCalculator() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-         
-        
+      {/* KEY INSIGHTS SECTION - Business Loan */}
+      <div className="mt-10 mb-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-xl border shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <i className="fas fa-lightbulb text-yellow-500"></i>
+              Key Insights
+            </h2>
+
+            <div className="text-gray-700 leading-relaxed">
+              <ul className="list-disc pl-5 mb-4 space-y-2">
+                <li>
+                  Your business will pay{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {paymentAmount > 0 ? formatCurrency(paymentAmount) : '₹0'}
+                  </span>{' '}
+                  monthly for {loanTermMonths > 0 ? formatLoanTerm(loanTermMonths) : '0 months'}
+                </li>
+                
+                <li>
+                  Total interest cost for your business will be{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                  </span>{' '}
+                  which is{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {loanAmount > 0 ? ((totalInterest / loanAmount) * 100).toFixed(1) : '0'}%
+                  </span>{' '}
+                  of the loan amount
+                </li>
+                
+                <li>
+                  For every ₹100 repaid,{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    ₹{totalPayment > 0 ? ((totalInterest / totalPayment) * 100).toFixed(0) : '0'}
+                  </span>{' '}
+                  goes towards interest and{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    ₹{totalPayment > 0 ? ((loanAmount / totalPayment) * 100).toFixed(0) : '0'}
+                  </span>{' '}
+                  reduces principal
+                </li>
+                
+                {(() => {
+                  // Calculate if shorter tenure saves interest
+                  if (loanTermMonths > 12 && loanAmount > 0 && annualInterestRate > 0) {
+                    const shorterTenure = Math.max(6, loanTermMonths - 12);
+                    const shorterPayments = Math.ceil(shorterTenure / 12 * frequencyMap[paymentFrequency]);
+                    const periodicInterestRate = (annualInterestRate / 100) / frequencyMap[paymentFrequency];
+                    const rateFactor = Math.pow(1 + periodicInterestRate, shorterPayments);
+                    const higherEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+                    const interestSaved = totalInterest - (higherEMI * shorterPayments - loanAmount);
+                    
+                    if (interestSaved > 0) {
+                      return (
+                        <li>
+                          Reducing tenure by 1 year could save your business{' '}
+                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                            {formatCurrency(interestSaved)}
+                          </span>{' '}
+                          in interest
+                        </li>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
+                
+                {(() => {
+                  // Calculate tax benefit insight for businesses
+                  if (totalInterest > 0) {
+                    const taxBenefit = totalInterest * 0.30; // Assuming 30% tax rate for businesses
+                    return (
+                      <li>
+                        Interest payments may be tax deductible, potentially saving your business{' '}
+                        <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                          {formatCurrency(taxBenefit)}
+                        </span>{' '}
+                        in taxes
+                      </li>
+                    );
+                  }
+                  return null;
+                })()}
+                
+                {(() => {
+                  // Calculate impact of better credit score/rate
+                  if (annualInterestRate > 1 && loanAmount > 0 && loanTermMonths > 0) {
+                    const betterRate = annualInterestRate - 2; // 2% better rate for good credit
+                    if (betterRate > 0) {
+                      const periodicInterestRate = (betterRate / 100) / frequencyMap[paymentFrequency];
+                      const totalPayments = calculateTotalPayments();
+                      const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
+                      const betterEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+                      const totalSavings = (paymentAmount - betterEMI) * totalPayments;
+                      
+                      return (
+                        <li>
+                          A 2% lower interest rate could save{' '}
+                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                            {formatCurrency(totalSavings)}
+                          </span>{' '}
+                          in financing costs
+                        </li>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
+                
+                {(() => {
+                  // Early repayment insight for business cash flow
+                  if (totalInterest > 0) {
+                    const quarterlyRepaymentSavings = totalInterest * 0.15; // 15% savings with quarterly extra payments
+                    return (
+                      <li>
+                        Making quarterly extra payments could reduce interest by{' '}
+                        <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                          {formatCurrency(quarterlyRepaymentSavings)}
+                        </span>
+                      </li>
+                    );
+                  }
+                  return null;
+                })()}
+                
+                <li>
+                  Effective annual borrowing cost is{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {effectiveAnnualRate > 0 ? effectiveAnnualRate.toFixed(2) : '0.00'}%
+                  </span>{' '}
+                  (considers {paymentFrequency} compounding)
+                </li>
+
+                {/* Business Loan Specific Insight */}
+                <li>
+                  Business loans often have{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    flexible repayment options
+                  </span>{' '}
+                  like EMI holidays during lean seasons
+                </li>
+              </ul>
+              
+              <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>💡 Business Strategy Tip:</strong> Match your loan repayment schedule with your business cash flow cycles. 
+                  Consider making larger payments during peak business months and smaller payments during lean periods. 
+                  Business loan interest is often tax deductible - consult your accountant.
+                </p>
+              </div>
+              
+              <p className="text-sm text-gray-600 mt-4">
+                <strong>Note for Businesses:</strong> Business loans typically require collateral, business plans, and financial statements. 
+                Rates vary based on business vintage, creditworthiness, and loan purpose. Processing fees (1-2.5%) and other charges apply.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

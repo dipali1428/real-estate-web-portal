@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://api.infinityarthvishva.com", // ✅ backend base URL
+  baseURL: "http://192.168.1.83:5000", // ✅ backend base URL
   // "http://192.168.1.83:5000"
   // "https://api.infinityarthvishva.com"
   headers: { "Content-Type": "application/json" },

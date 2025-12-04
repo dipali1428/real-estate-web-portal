@@ -687,43 +687,119 @@ const CompoundInterestCalculator: React.FC = () => {
             </div>
           </div>
         </div>
+        {/* Insights */}
+        <div className="max-w-6xl mx-auto mt-8">
+          <div className="bg-white rounded-xl border shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <i className="fas fa-lightbulb text-yellow-500"></i>
+              Key Insights
+            </h2>
 
-        {/* Formula Explanation */}
-        <div className="max-w-6xl mx-auto mt-8 bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-[#2076C7] mb-4">How Compound Interest Works</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-medium text-[#1CADA3] mb-2">Formula</h4>
-              <p className="text-sm text-gray-600">
-                A = P × (1 + r/n)^(n×t)<br />
-                Where:<br />
-                A = Final amount<br />
-                P = Principal<br />
-                r = Annual interest rate<br />
-                n = Compounding frequency per year<br />
-                t = Time in years
+            <div className="text-gray-700 leading-relaxed">
+              <ul className="list-disc pl-5 mb-4 space-y-3">
+                <li>
+                  <span className="font-medium">💡 The magic of interest earning interest</span> - Your investment grows from{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {formatCurrency(principal)}
+                  </span>{' '}
+                  to{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {formatCurrency(finalAmount)}
+                  </span>
+                </li>
+                
+                <li>
+                  <span className="font-medium">✅ Start early - Time is your biggest advantage</span> - If you started 5 years earlier, your investment would be worth{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {(() => {
+                      const years = tenureUnit === 'years' ? tenureValue : tenureValue / 12;
+                      const n = frequencyMap[frequency] || 1;
+                      const r = interestRate / 100;
+                      const extraYears = years + 5;
+                      const amountWithExtraTime = principal * Math.pow(1 + r / n, n * extraYears);
+                      return formatCurrency(amountWithExtraTime - finalAmount);
+                    })()}
+                  </span>{' '}
+                  more
+                </li>
+                
+                <li>
+                  <span className="font-medium">✅ Monthly compounding beats yearly significantly</span> - With{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">{frequency}</span>{' '}
+                  compounding, you earn{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {(() => {
+                      if (frequency !== 'yearly') {
+                        const years = tenureUnit === 'years' ? tenureValue : tenureValue / 12;
+                        const currentN = frequencyMap[frequency] || 1;
+                        const yearlyN = 1;
+                        const r = interestRate / 100;
+                        
+                        const currentAmount = finalAmount;
+                        const yearlyAmount = principal * Math.pow(1 + r / yearlyN, yearlyN * years);
+                        const extraEarnings = currentAmount - yearlyAmount;
+                        
+                        return formatCurrency(extraEarnings);
+                      }
+                      return '₹0';
+                    })()}
+                  </span>{' '}
+                  more than yearly compounding
+                </li>
+                
+                <li>
+                  <span className="font-medium">✅ The Rule of 72</span> - At{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">{interestRate}%</span>{' '}
+                  interest, your money doubles in approximately{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {(72 / interestRate).toFixed(1)} years
+                  </span>
+                </li>
+                
+                <li>
+                  <span className="font-medium">✅ Consistency matters more than timing</span> - Your investment earns{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {formatCurrency(totalInterest)}
+                  </span>{' '}
+                  in interest, which is{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {((totalInterest / principal) * 100).toFixed(1)}%
+                  </span>{' '}
+                  of your principal
+                </li>
+                
+                {/* Additional dynamic insight */}
+                <li>
+                  With simple interest, you would earn only{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {formatCurrency(
+                      principal * (interestRate / 100) * (tenureUnit === 'years' ? tenureValue : tenureValue / 12)
+                    )}
+                  </span>{' '}
+                  - that's{' '}
+                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                    {formatCurrency(
+                      totalInterest - (principal * (interestRate / 100) * (tenureUnit === 'years' ? tenureValue : tenureValue / 12))
+                    )}
+                  </span>{' '}
+                  less than compound interest!
+                </li>
+              </ul>
+              
+              <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>💡 Pro Tip:</strong> Start investing early, stay consistent, and let compounding work its magic over time.
+                  Even small, regular investments can grow into significant wealth.
+                </p>
+              </div>
+              
+              <p className="text-sm text-gray-600 mt-4">
+                <strong>Note:</strong> This calculation assumes consistent returns and doesn't account for inflation or taxes. 
+                Actual returns may vary based on market conditions.
               </p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-medium text-[#1CADA3] mb-2">Benefits of Compounding</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Interest earns interest over time</li>
-                <li>• Exponential growth potential</li>
-                <li>• Time is your greatest asset</li>
-                <li>• Ideal for long-term investments</li>
-              </ul>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-medium text-[#1CADA3] mb-2">Key Insights</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Starting early maximizes benefits</li>
-                <li>• Higher frequency = faster growth</li>
-                <li>• Time matters more than rate</li>
-                <li>• Consistency beats timing</li>
-              </ul>
-            </div>
           </div>
-        </div>
+        </div>       
       </div>
 
       <style jsx>{`
