@@ -71,7 +71,7 @@ export default function LoanCalculator() {
   // State for loan parameters
   const [loanAmount, setLoanAmount] = useState<number>(500000);
   const [annualInterestRate, setAnnualInterestRate] = useState<number>(8.5);
-  const [loanTermMonths, setLoanTermMonths] = useState<number>(60);
+  const [loanTermMonths, setLoanTermMonths] = useState<number>(360);
   const [paymentFrequency, setPaymentFrequency] = useState<PaymentFrequency>('monthly');
   
   // State for pagination
@@ -456,6 +456,22 @@ export default function LoanCalculator() {
     window.URL.revokeObjectURL(url);
   };
 
+  // Calculate EMI for a specific term (helper function for insights)
+  const calculateEMIForTerm = (months: number) => {
+    const paymentsPerYear = frequencyMap[paymentFrequency];
+    const annualRateDecimal = annualInterestRate / 100;
+    const loanTermYears = months / 12;
+    const totalPayments = Math.ceil(loanTermYears * paymentsPerYear);
+    const periodicInterestRate = annualRateDecimal / paymentsPerYear;
+    
+    if (periodicInterestRate === 0) {
+      return loanAmount / totalPayments;
+    }
+    
+    const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
+    return (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Loan Calculator */}
@@ -552,7 +568,7 @@ export default function LoanCalculator() {
                     type="range"
                     id="loanTerm"
                     min="1"
-                    max="120"
+                    max="360"
                     step="1"
                     value={loanTermMonths}
                     onChange={handleTenureChange}
@@ -560,7 +576,7 @@ export default function LoanCalculator() {
                   />
                   <div className="flex justify-between text-sm text-gray-600 mt-1">
                     <span>1 Month</span>
-                    <span>120 Months</span>
+                    <span>360 Months (30 Years)</span>
                   </div>
                 </div>
                 <div className="relative">
@@ -568,7 +584,7 @@ export default function LoanCalculator() {
                     type="number"
                     id="loanTermInput"
                     min="1"
-                    max="120"
+                    max="360"
                     step="1"
                     value={getTenureDisplayValue()}
                     onChange={handleTenureInputChange}
@@ -578,6 +594,9 @@ export default function LoanCalculator() {
                   <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                     Months
                   </span>
+                </div>
+                <div className="mt-2 text-sm text-gray-600">
+                  Current: {formatLoanTerm(loanTermMonths)}
                 </div>
               </div>
 
@@ -814,6 +833,61 @@ export default function LoanCalculator() {
                         in interest
                       </li>
                     );
+                  })()}
+                  
+                  {(() => {
+                    // 30-year loan specific insight
+                    if (loanTermMonths >= 360) {
+                      const tenYearEMI = calculateEMIForTerm(120);
+                      const thirtyYearEMI = paymentAmount;
+                      const emiDifference = thirtyYearEMI - tenYearEMI;
+                      const totalInterest10Year = (tenYearEMI * 120) - loanAmount;
+                      const interestDifference = totalInterest - totalInterest10Year;
+                      
+                      if (emiDifference < 0) {
+                        return (
+                          <li>
+                            Choosing a 30-year loan instead of 10-year reduces your monthly EMI by{' '}
+                            <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                              {formatCurrency(Math.abs(emiDifference))}
+                            </span>{' '}
+                            but increases total interest by{' '}
+                            <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                              {formatCurrency(interestDifference)}
+                            </span>
+                          </li>
+                        );
+                      }
+                    }
+                    return null;
+                  })()}
+                  
+                  {(() => {
+                    // 15-year vs 30-year comparison
+                    if (loanTermMonths >= 360) {
+                      const fifteenYearEMI = calculateEMIForTerm(180);
+                      const thirtyYearEMI = paymentAmount;
+                      const emiDifference = thirtyYearEMI - fifteenYearEMI;
+                      const totalInterest15Year = (fifteenYearEMI * 180) - loanAmount;
+                      const interestDifference = totalInterest - totalInterest15Year;
+                      
+                      if (emiDifference < 0) {
+                        return (
+                          <li>
+                            Compared to a 15-year loan, your 30-year loan saves{' '}
+                            <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                              {formatCurrency(Math.abs(emiDifference))}
+                            </span>{' '}
+                            per month but costs{' '}
+                            <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                              {formatCurrency(interestDifference)}
+                            </span>{' '}
+                            more in total interest
+                          </li>
+                        );
+                      }
+                    }
+                    return null;
                   })()}
                   
                   <li>
