@@ -88,9 +88,9 @@
 //     try {
 //       setLoading(true);
 //       setError(null);
-      
+
 //       const response: ApiResponse = await AdminService.contactusData();
-      
+
 //       if (response.success) {
 //         // Transform the API data to match our Enquiry interface
 //         const transformedData: Enquiry[] = response.contactus.map((item, index) => ({
@@ -105,7 +105,7 @@
 //           source: item.source || 'Website',
 //           subject: item.subject || 'General Inquiry'
 //         }));
-        
+
 //         setEnquiries(transformedData);
 //         setTotalCount(response.count || transformedData.length);
 //       } else {
@@ -127,9 +127,9 @@
 //   // Enhanced search function - Fixed version
 //   const searchEnquiries = (enquiry: Enquiry, term: string): boolean => {
 //     if (!term.trim()) return true;
-    
+
 //     const searchTermLower = term.toLowerCase().trim();
-    
+
 //     // Search in all relevant fields
 //     const searchableFields = [
 //       enquiry.enquiry_id,
@@ -163,10 +163,10 @@
 //     return enquiries.filter(enquiry => {
 //       // Filter by active tab
 //       const matchesTab = activeTab === 'All' || enquiry.status === activeTab;
-      
+
 //       // Filter by search term
 //       const matchesSearch = searchEnquiries(enquiry, searchTerm);
-      
+
 //       return matchesTab && matchesSearch;
 //     });
 //   }, [enquiries, activeTab, searchTerm]);
@@ -175,16 +175,16 @@
 //   const exportToExcel = () => {
 //     try {
 //       setIsExporting(true);
-      
+
 //       // Determine which data to export
 //       const dataToExport = getFilteredEnquiries;
-      
+
 //       if (dataToExport.length === 0) {
 //         alert('No data to export!');
 //         setIsExporting(false);
 //         return;
 //       }
-      
+
 //       // Prepare data for Excel
 //       const excelData = dataToExport.map(enquiry => ({
 //         'Enquiry ID': enquiry.enquiry_id,
@@ -201,15 +201,15 @@
 
 //       // Create worksheet
 //       const worksheet = XLSX.utils.json_to_sheet(excelData);
-      
+
 //       // Create workbook
 //       const workbook = XLSX.utils.book_new();
 //       XLSX.utils.book_append_sheet(workbook, worksheet, 'Enquiries');
-      
+
 //       // Generate Excel file
 //       const fileName = `enquiries_${activeTab.toLowerCase()}_${new Date().toISOString().split('T')[0]}.xlsx`;
 //       XLSX.writeFile(workbook, fileName);
-      
+
 //       console.log(`Exported ${excelData.length} enquiries to ${fileName}`);
 //     } catch (err) {
 //       console.error('Error exporting to Excel:', err);
@@ -288,16 +288,16 @@
 
 //       // Here you would typically make an API call to update the status on the server
 //       // Example: await AdminService.updateEnquiryStatus(enquiryToUpdate.enquiry_id, newStatus);
-      
+
 //       console.log(`Status updated for enquiry ${enquiryToUpdate.enquiry_id}: ${newStatus}`);
-      
+
 //       // Show success message
 //       alert(`Status updated to ${newStatus}`);
-      
+
 //     } catch (error) {
 //       console.error('Error updating status:', error);
 //       alert('Failed to update status. Please try again.');
-      
+
 //       // Revert optimistic update
 //       fetchEnquiries(); // Refetch data to revert changes
 //     }
@@ -316,7 +316,7 @@
 //   // Status badge component
 //   const StatusBadge = ({ status }: { status: Enquiry['status'] }) => {
 //     const baseClasses = "px-3 py-1 rounded-full text-sm font-medium";
-    
+
 //     switch (status) {
 //       case 'Pending':
 //         return <span className={`${baseClasses} bg-yellow-100 text-yellow-800`}>Pending</span>;
@@ -549,7 +549,7 @@
 //                 )}
 //               </div>
 //             </div>
-            
+
 //             {/* Export Info */}
 //             <div className="text-sm text-gray-600">
 //               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
@@ -816,3 +816,11 @@
 // };
 
 // export default EnquiryAdminPage;
+const EnquiryAdminPage = () => {
+    return (
+        <div className="min-h-screen flex items-center justify-center">
+            <h1 className="text-2xl font-bold text-gray-900">Enquiry Management Page Under Construction</h1>
+        </div>
+    );
+}
+export default EnquiryAdminPage;
