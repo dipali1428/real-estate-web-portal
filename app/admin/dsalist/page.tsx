@@ -808,12 +808,12 @@ export default function DSAManagementPage() {
                                 </button>
 
                                 {/* Delete Button */}
-                                <button
+                                {/* <button
                                   onClick={() => handleDelete(dsa.id)}
                                   className="text-red-600 hover:text-red-900 p-2"
                                   title="Delete">
                                   <Trash2 className="w-4 h-4" />
-                                </button>
+                                </button> */}
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.adv_id}
