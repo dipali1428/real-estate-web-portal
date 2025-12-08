@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { DashboardService } from "../services/dashboardService";
+import { AdminService } from '../services/adminService';
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -36,12 +36,12 @@ export default function Dashboard() {
                 if (!token) return router.push("/");
                 setLoading(true);
 
-                const data = await DashboardService.getProfile();
+                const data = await AdminService.getAdminProfile();
                 setUser(data.user);
 
             } catch (error: any) {
                 console.error("Profile fetch error:", error);
-
+                toast.error("Failed to fetch profile.");
                 // 🔥 If backend says token expired → logout user
                 if (error?.response?.status === 401) {
 
@@ -68,6 +68,13 @@ export default function Dashboard() {
         const cookie = document.cookie.includes("authToken=");
         if (!cookie) router.push("/");
     }, []);
+
+    if (loading || !user)
+        return (
+            <div className="flex justify-center items-center h-[60vh] text-[#1CADA3]">
+                Loading profile...
+            </div>
+        );
 
     return (
         <div className="flex-1 p-4 sm:p-6">

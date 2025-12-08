@@ -28,6 +28,7 @@ export const sidebarLinks = {
     ],
 
     ADMIN: [
+        { label: "Dashboard", href: "/admin", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "Profile", href: "/admin/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "DSA Management", href: "/admin/dsalist", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "Ticket Raised", href: "/admin/ticket", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },

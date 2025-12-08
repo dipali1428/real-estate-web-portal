@@ -12,7 +12,12 @@ export function middleware(req: NextRequest) {
             return NextResponse.redirect(loginUrl);
         }
     }
-
+    if (pathname.startsWith("/admin")) {
+        if (!token) {
+            const loginUrl = new URL("/", req.url);
+            return NextResponse.redirect(loginUrl);
+        }
+    }
     return NextResponse.next();
 }
 

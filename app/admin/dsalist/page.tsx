@@ -1,13 +1,15 @@
-// pages/dsa-management.tsx or app/dsa-management/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Tab } from '@headlessui/react';
 import * as XLSX from 'xlsx';
 import { AdminService } from '@/app/services/adminService';
+import { Pencil, Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 // Define types for Direct Selling Agent based on API response
 interface DSA {
+  password: string;
   id: string;
   adv_id: string;
   name: string;
@@ -44,7 +46,6 @@ const extractOptionsFromData = (dsas: DSA[]) => {
   return { cities, categories, heads, roles };
 };
 
-// Map API data to DSA interface with status
 const mapApiDataToDSA = (apiData: any[]): DSA[] => {
   return apiData.map(item => ({
     id: item.id?.toString() || '',
@@ -59,12 +60,15 @@ const mapApiDataToDSA = (apiData: any[]): DSA[] => {
     date_joined: item.date_joined || '',
     updated_at: item.updated_at || '',
     role: item.role || '',
-    status: 'Active' // Default status, you can modify based on your data
+    status: 'Active',
+    password: item.password || ''
   }));
 };
+
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
+
 export default function DSAManagementPage() {
   const [dsas, setDsas] = useState<DSA[]>(initialDSAs);
   const [editingDSA, setEditingDSA] = useState<DSA | null>(null);
@@ -81,32 +85,34 @@ export default function DSAManagementPage() {
     role: '',
     status: 'Pending',
   });
+
   // State for dropdown options from API data
   const [cities, setCities] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [heads, setHeads] = useState<string[]>([]);
   const [roles, setRoles] = useState<string[]>([]);
+
   // Loading and error states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(50);
   const [activeTab, setActiveTab] = useState('All');
   const tabs = ['All', 'Active', 'Inactive', 'Pending'];
+
   // Fetch DSAs from API on component mount
   useEffect(() => {
     fetchDSAs();
   }, []);
+
   const fetchDSAs = async () => {
     try {
       setLoading(true);
       setError(null);
       const apiResponse = await AdminService.dsaList();
-      //  console.log("RAW API RESPONSE:", apiResponse);
-      // console.log("TYPE OF RESPONSE:", typeof apiResponse);
-      // console.log("IS ARRAY?:", Array.isArray(apiResponse));
-      // Try every possible key
+
       const apiData =
         (Array.isArray(apiResponse) && apiResponse) ||
         apiResponse.data ||
@@ -140,8 +146,6 @@ export default function DSAManagementPage() {
       setLoading(false);
     }
   };
-
-
 
 
   // Filter DSAs based on selected tab
@@ -213,21 +217,20 @@ export default function DSAManagementPage() {
     XLSX.writeFile(workbook, filename);
   };
 
-  // Delete DSA
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this DSA?')) {
-      try {
-        // TODO: Implement delete API call
-        // await api.delete(`/api/admin/dsalist/${id}`);
+    if (!confirm("Are you sure you want to delete this DSA?")) return;
 
-        // Update local state
-        setDsas(dsas.filter(dsa => dsa.id !== id));
-      } catch (err) {
-        console.error('Error deleting DSA:', err);
-        alert('Failed to delete DSA. Please try again.');
-      }
+    try {
+      await AdminService.deleteDSA(id);
+
+      setDsas(prev => prev.filter(d => d.id !== id));
+      toast.success("DSA Deleted Successfully!");
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Failed to delete DSA");
     }
   };
+
 
   // Edit DSA
   const handleEdit = (dsa: DSA) => {
@@ -237,35 +240,40 @@ export default function DSAManagementPage() {
 
   // Save edited DSA
   const handleSaveEdit = async () => {
-    if (editingDSA) {
-      try {
-        // TODO: Implement update API call
-        // const response = await api.put(`/api/admin/dsalist/${editingDSA.id}`, editingDSA);
+    if (!editingDSA) return;
 
-        // Update local state
-        setDsas(dsas.map(dsa =>
-          dsa.id === editingDSA.id ? editingDSA : dsa
-        ));
-        setIsEditModalOpen(false);
-        setEditingDSA(null);
-      } catch (err) {
-        console.error('Error updating DSA:', err);
-        alert('Failed to update DSA. Please try again.');
-      }
+    try {
+      const payload = {
+        name: editingDSA.name,
+        email: editingDSA.email,
+        mobile: editingDSA.mobile,
+        pan: editingDSA.pan,
+        city: editingDSA.city,
+        password: editingDSA.password,
+        role: editingDSA.role,
+      };
+
+      const response = await AdminService.updateDSA(editingDSA.id, payload);
+      toast.success("DSA Updated Successfully!");
+
+      // Update UI
+      setDsas(dsas.map(dsa =>
+        dsa.id === editingDSA.id ? { ...dsa, ...payload, updated_at: new Date().toISOString() } : dsa
+      ));
+
+      setIsEditModalOpen(false);
+      setEditingDSA(null);
+
+    } catch (err) {
+      console.error("Error updating DSA:", err);
+      alert("Failed to update DSA");
     }
   };
+
 
   // Add new DSA
   const handleAddDSA = async () => {
     try {
-      // TODO: Implement create API call
-      // const payload = {
-      //   ...newDSA,
-      //   date_joined: new Date().toISOString(),
-      //   updated_at: new Date().toISOString(),
-      // };
-      // const response = await api.post('/api/admin/dsalist', payload);
-
       const dsa: DSA = {
         id: Date.now().toString(),
         adv_id: `ADV${String(Date.now()).slice(-6)}`,
@@ -280,6 +288,7 @@ export default function DSAManagementPage() {
         updated_at: new Date().toISOString(),
         role: newDSA.role || '',
         status: newDSA.status as 'Active' | 'Inactive' | 'Pending',
+        password: ''
       };
 
       // Update local state
@@ -362,16 +371,95 @@ export default function DSAManagementPage() {
   };
 
   const [searchQuery, setSearchQuery] = useState("");
+
+
+  // Auto Search 
+  // useEffect(() => {
+  //   const delayDebounce = setTimeout(() => {
+  //     if (searchQuery.trim() === "") {
+  //       fetchDSAs();
+  //     } else {
+  //       searchDSAFromAPI(searchQuery);
+  //     }
+  //   }, 400); // debounce 400ms
+
+  //   return () => clearTimeout(delayDebounce);
+  // }, [searchQuery]);
+
+  // // API search function
+  // const searchDSAFromAPI = async (query: string) => {
+  //   try {
+  //     const res = await AdminService.searchDSA({ search: query });
+
+  //     const apiData = res?.dsalist || res?.data || res || [];
+
+  //     if (!Array.isArray(apiData)) {
+  //       console.error("Search API did not return array:", apiData);
+  //       return;
+  //     }
+
+  //     const mapped = mapApiDataToDSA(apiData);
+  //     setDsas(mapped);
+
+  //   } catch (err) {
+  //     console.error("Search error:", err);
+  //   }
+  // };
+  // Search Optimization
+  useEffect(() => {
+    let abortController = new AbortController();
+
+    const delayDebounce = setTimeout(async () => {
+      if (searchQuery.trim() === "") {
+        fetchDSAs(); // load full list
+        return;
+      }
+
+      try {
+        const res = await AdminService.searchDSA(
+          { search: searchQuery.trim() },
+          { signal: abortController.signal }
+        );
+
+        const apiData =
+          res?.dsalist ||
+          res?.data ||
+          res ||
+          [];
+
+        if (Array.isArray(apiData)) {
+          setDsas(mapApiDataToDSA(apiData));
+        }
+
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Search error:", err);
+        }
+      }
+    }, 500); // ⏳ 500ms debounce delay
+
+    return () => {
+      abortController.abort();     // cancel previous request
+      clearTimeout(delayDebounce); // clear debounce
+    };
+
+  }, [searchQuery]);
+
+  const normalize = (str: string) =>
+    str?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
+
   const filteredDSAs = dsas.filter((dsa) => {
-    const query = searchQuery.toLowerCase();
+    const query = normalize(searchQuery);
 
     return (
-      dsa.name.toLowerCase().includes(query) ||
-      dsa.email.toLowerCase().includes(query) ||
-      dsa.city.toLowerCase().includes(query) ||
-      (dsa.mobile?.toLowerCase().includes(query) ?? false)
+      normalize(dsa.adv_id).includes(query) ||
+      normalize(dsa.name).includes(query) ||
+      normalize(dsa.email).includes(query) ||
+      normalize(dsa.mobile).includes(query)
     );
   });
+
+
   // Format date for display
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
@@ -417,8 +505,7 @@ export default function DSAManagementPage() {
             <p className="mt-2 text-red-700">{error}</p>
             <button
               onClick={handleRefresh}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-            >
+              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
               Retry
             </button>
           </div>
@@ -443,8 +530,7 @@ export default function DSAManagementPage() {
           <button
             onClick={handleRefresh}
             className="flex items-center text-[#2076C7] hover:text-[#2076C7] item-right"
-            title="Refresh Data"
-          >
+            title="Refresh Data">
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
@@ -454,22 +540,20 @@ export default function DSAManagementPage() {
         </div>
         <div className="flex justify-end space-x-3 mb-4">
           {/* Add DSA Button */}
-          <button
+          {/* <button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-[#2076C7] text-white px-4 py-2 rounded-lg hover:bg-[#2076C7] flex items-center"
-          >
+            className="bg-[#2076C7] text-white px-4 py-2 rounded-lg hover:bg-[#2076C7] flex items-center">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Add New DSA
-          </button>
+          </button> */}
 
           {/* Download Excel Button */}
           <button
             onClick={() => downloadExcel('all')}
             className="inline-flex items-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-            disabled={dsas.length === 0}
-          >
+            disabled={dsas.length === 0}>
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -554,8 +638,7 @@ export default function DSAManagementPage() {
                 <button
                   onClick={() => downloadExcel('all')}
                   className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={dsas.length === 0}
-                >
+                  disabled={dsas.length === 0}>
                   <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                   </svg>
@@ -582,9 +665,7 @@ export default function DSAManagementPage() {
                       selected
                         ? 'bg-white text-blue-700 shadow'
                         : 'text-blue-100 hover:bg-white/12 hover:text-white'
-                    )
-                  }
-                >
+                    )}>
                   {tab} ({getFilteredDSAs(tab).length})
                 </Tab>
               ))}
@@ -597,13 +678,13 @@ export default function DSAManagementPage() {
 
                   <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center mb-4">
-                      <div className="relative w-5/5">
+                      <div className="relative w-96">
                         <input
                           type="text"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          placeholder="Search by name, email, phone, or city"
-                          className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Search by adv_id, name, email or mobile"
+                          className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
                         />
                         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                           <svg
@@ -631,7 +712,7 @@ export default function DSAManagementPage() {
                           setItemsPerPage(Number(e.target.value));
                           setCurrentPage(1);
                         }}
-                        className="border border-gray-300 rounded-md px-2 py-1 text-sm">
+                        className="border border-gray-300 text-gray-500 rounded-md px-2 py-1 text-sm">
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
@@ -655,6 +736,9 @@ export default function DSAManagementPage() {
                           <tr>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               ID
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Actions
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Adv ID
@@ -692,9 +776,7 @@ export default function DSAManagementPage() {
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Status
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Actions
-                            </th>
+
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -702,6 +784,23 @@ export default function DSAManagementPage() {
                             <tr key={dsa.id} className="hover:bg-gray-50">
                               <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {dsa.id}
+                              </td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                {/* Edit Button */}
+                                <button
+                                  onClick={() => handleEdit(dsa)}
+                                  className="text-indigo-600 hover:text-indigo-900 p-2"
+                                  title="Edit">
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+
+                                {/* Delete Button */}
+                                <button
+                                  onClick={() => handleDelete(dsa.id)}
+                                  className="text-red-600 hover:text-red-900 p-2"
+                                  title="Delete">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.adv_id}
@@ -747,24 +846,7 @@ export default function DSAManagementPage() {
                                   {dsa.status}
                                 </span>
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                                <button
-                                  onClick={() => handleEdit(dsa)}
-                                  className="text-indigo-600 hover:text-indigo-900 mr-4"
-                                  title="Edit">
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2v-5m1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                  </svg>
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(dsa.id)}
-                                  className="text-red-600 hover:text-red-900"
-                                  title="Delete">
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                  </svg>
-                                </button>
-                              </td>
+
                             </tr>
                           ))}
                         </tbody>
@@ -861,150 +943,158 @@ export default function DSAManagementPage() {
 
       {/* Edit Modal */}
       {isEditModalOpen && editingDSA && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto border border-gray-200">
+
+            {/* Header */}
+            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
               Edit DSA Details
             </h3>
+            {/* Form Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Adv ID (Readonly) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Advisor ID
+                </label>
+                <input
+                  type="text"
+                  value={editingDSA.adv_id}
+                  disabled
+                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg  cursor-not-allowed"
+                />
+              </div>
+
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Name
                 </label>
                 <input
                   type="text"
                   value={editingDSA.name}
-                  onChange={(e) => setEditingDSA({ ...editingDSA, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  onChange={(e) =>
+                    setEditingDSA({ ...editingDSA, name: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
 
+              {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Email
                 </label>
                 <input
                   type="email"
                   value={editingDSA.email}
-                  onChange={(e) => setEditingDSA({ ...editingDSA, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  onChange={(e) =>
+                    setEditingDSA({ ...editingDSA, email: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
 
+              {/* Mobile */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Mobile
                 </label>
                 <input
                   type="tel"
                   value={editingDSA.mobile}
-                  onChange={(e) => setEditingDSA({ ...editingDSA, mobile: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  onChange={(e) =>
+                    setEditingDSA({ ...editingDSA, mobile: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
 
+              {/* PAN */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
                   PAN
                 </label>
                 <input
                   type="text"
                   value={editingDSA.pan}
-                  onChange={(e) => setEditingDSA({ ...editingDSA, pan: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  onChange={(e) =>
+                    setEditingDSA({ ...editingDSA, pan: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
 
+              {/* City */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
                   City
                 </label>
                 <select
                   value={editingDSA.city}
-                  onChange={(e) => setEditingDSA({ ...editingDSA, city: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  onChange={(e) =>
+                    setEditingDSA({ ...editingDSA, city: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                   <option value="">Select City</option>
-                  {cities.map(city => (
-                    <option key={city} value={city}>{city}</option>
+                  {cities.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
                   ))}
                   <option value="other">Other</option>
                 </select>
               </div>
 
+              {/* Role */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Head
-                </label>
-                <select
-                  value={editingDSA.head}
-                  onChange={(e) => setEditingDSA({ ...editingDSA, head: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <option value="">Select Head</option>
-                  {heads.map(head => (
-                    <option key={head} value={head}>{head}</option>
-                  ))}
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                </label>
-                <select
-                  value={editingDSA.category}
-                  onChange={(e) => setEditingDSA({ ...editingDSA, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <option value="">Select Category</option>
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Role
                 </label>
                 <select
                   value={editingDSA.role}
-                  onChange={(e) => setEditingDSA({ ...editingDSA, role: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <option value="">Select Role</option>
-                  {roles.map(role => (
-                    <option key={role} value={role}>{role}</option>
+                  onChange={(e) =>
+                    setEditingDSA({ ...editingDSA, role: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  {roles.map((role) => (
+                    <option key={role} value={role}>
+                      {role}
+                    </option>
                   ))}
-                  <option value="other">Other</option>
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
+              {/* Optional Password Reset */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  New Password (leave blank if unchanged)
                 </label>
-                <select
-                  value={editingDSA.status}
-                  onChange={(e) => setEditingDSA({ ...editingDSA, status: e.target.value as 'Active' | 'Inactive' | 'Pending' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  <option value="Pending">Pending</option>
-                </select>
+                <input
+                  type="password"
+                  placeholder="Enter new password"
+                  value={editingDSA.password || ""}
+                  onChange={(e) =>
+                    setEditingDSA({ ...editingDSA, password: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end space-x-3">
+            {/* Footer Buttons */}
+            <div className="mt-8 flex justify-end gap-3">
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                className="px-5 py-2 rounded-lg border border-gray-400 text-gray-800 hover:bg-gray-100 transition">
                 Cancel
               </button>
+
               <button
                 onClick={handleSaveEdit}
-                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-              >
+                className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
                 Save Changes
               </button>
             </div>
@@ -1012,9 +1102,11 @@ export default function DSAManagementPage() {
         </div>
       )}
 
+
+
       {/* Add DSA Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 shadow bg-opacity-100 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Add New DSA
@@ -1153,6 +1245,11 @@ export default function DSAManagementPage() {
           </div>
         </div>
       )}
+
     </div>
   );
+}
+
+function useRef(arg0: boolean) {
+  throw new Error('Function not implemented.');
 }
