@@ -6,6 +6,7 @@ import * as XLSX from 'xlsx';
 import { AdminService } from '@/app/services/adminService';
 import { Pencil, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { div } from 'framer-motion/client';
 
 // Define types for Direct Selling Agent based on API response
 interface DSA {
@@ -517,45 +518,64 @@ export default function DSAManagementPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header with Refresh Button */}
-        <div className="mb-8 flex justify-between items-center">
+
+        {/* Header Section */}
+        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          {/* Left: Title */}
           <div>
-            <h1 className="text-3xl font-bold font-sans text-slate-700 mb-2">
+            <h1 className="text-3xl font-bold font-sans text-slate-700 mb-1">
               DSA Management
             </h1>
             <p className="text-slate-800">
               Manage your Direct Selling Agents and their performance
             </p>
           </div>
+
+          {/* Right: Refresh */}
           <button
             onClick={handleRefresh}
-            className="flex items-center text-[#2076C7] hover:text-[#2076C7] item-right"
+            className="flex items-center text-[#2076C7] hover:text-[#2076C7]"
             title="Refresh Data">
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
             </svg>
             Refresh
           </button>
-
         </div>
-        <div className="flex justify-end space-x-3 mb-4">
-          {/* Add DSA Button */}
-          {/* <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="bg-[#2076C7] text-white px-4 py-2 rounded-lg hover:bg-[#2076C7] flex items-center">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add New DSA
-          </button> */}
+
+
+        {/* Action Buttons Section */}
+        <div className="flex flex-col sm:flex-row sm:justify-end items-stretch sm:items-center gap-3 mb-4">
+
+          {/* Add DSA Button — Uncomment if needed */}
+          {/*
+  <button
+    onClick={() => setIsAddModalOpen(true)}
+    className="bg-[#2076C7] text-white px-4 py-2 rounded-lg hover:bg-[#2076C7] flex items-center justify-center">
+    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+    </svg>
+    Add New DSA
+  </button>
+  */}
 
           {/* Download Excel Button */}
           <button
             onClick={() => downloadExcel('all')}
-            className="inline-flex items-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+            className="inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
             disabled={dsas.length === 0}>
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
             Download Excel
             <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -564,11 +584,8 @@ export default function DSAManagementPage() {
           </button>
         </div>
 
-
-
-
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -597,7 +614,7 @@ export default function DSAManagementPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          {/* <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="p-2 bg-orange-100 rounded-lg">
                 <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -609,7 +626,7 @@ export default function DSAManagementPage() {
                 <p className="text-2xl font-semibold text-gray-900">{stats.pending}</p>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
@@ -627,11 +644,9 @@ export default function DSAManagementPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="mb-6 flex flex-wrap justify-end gap-4">
+        <div className="flex flex-wrap justify-end gap-4">
           {/* Download Excel Button */}
           <div className="relative group">
-
-
             {/* Dropdown menu for download options */}
             <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
               <div className="py-1">
@@ -647,8 +662,6 @@ export default function DSAManagementPage() {
               </div>
             </div>
           </div>
-
-
         </div>
 
         {/* Tabs */}
@@ -676,7 +689,7 @@ export default function DSAManagementPage() {
                 <Tab.Panel key={tab} className="rounded-xl bg-white p-6 shadow">
                   {/* Records per page selector */}
 
-                  <div className="flex justify-between items-center mb-4">
+                  <div className="flex justify-between items-center">
                     <div className="flex items-center mb-4">
                       <div className="relative w-96">
                         <input
