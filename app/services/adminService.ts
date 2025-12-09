@@ -33,7 +33,7 @@ interface EnquiryPayload {
   phone?: string;
   message?: string;
   entry_time?: string;
-  status?: 'Pending' | 'Resolved' | 'Closed';
+  status?: 'Pending' | 'Closed';
   source?: string;
   subject?: string;
 }
@@ -83,6 +83,12 @@ export const AdminService = {
   contactusData: async (formData: EnquiryPayload = {}) => {
     const response = await api.get("/api/admin/contactus", { params: formData });
     return response.data;
+  },
+  
+    updateContactStatus: async (id: string, status: string) => {
+    // IMPORTANT: Use backticks (`) not single quotes (')
+    const res = await api.put(`/api/admin/contactus/status/${id}`, { status });
+    return res.data;
   },
 
   // Update a DSA user
