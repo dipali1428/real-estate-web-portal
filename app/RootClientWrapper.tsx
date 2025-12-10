@@ -15,9 +15,9 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
 
   return (
     <ModalProvider>
-      {!isDashboard && !isContactList && !isAdminDashboard && isRM && <Header />}
+      {!isDashboard && !isContactList && !isAdminDashboard && !isRM && <Header />}
       {children}
-      {!isDashboard && !isContactList && !isAdminDashboard && isRM && <Footer />}
+      {!isDashboard && !isContactList && !isAdminDashboard && !isRM && <Footer />}
     </ModalProvider>
   );
 }
