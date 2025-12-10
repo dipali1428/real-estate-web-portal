@@ -12,16 +12,15 @@ const TicketDetailsModal = ({
 }: { 
   ticket: any;
   onClose: () => void;
-  onStatusUpdate: (ticketId: string, status: string) => void;
+  onStatusUpdate: (ticketId: string, status: string, solution?: string) => void;
 }) => {
-  const [newComment, setNewComment] = useState('');
-  const [comments, setComments] = useState(ticket.comments || []);
-  const [sendingComment, setSendingComment] = useState(false);
+  const [newSolution, setNewSolution] = useState('');
+  const [sendingSolution, setSendingSolution] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     dsaInfo: true,
     ticketDetails: true,
     description: true,
-    comments: true,
+    adminSolution: true,
   });
   const [isMounted, setIsMounted] = useState(false);
   const [formattedDateTime, setFormattedDateTime] = useState('');
@@ -29,7 +28,12 @@ const TicketDetailsModal = ({
   useEffect(() => {
     setIsMounted(true);
     formatDateTime();
-  }, [ticket.created_at]);
+    
+    // If there's an existing admin solution, show it in the textarea
+    if (ticket.admin_solution) {
+      setNewSolution(ticket.admin_solution);
+    }
+  }, [ticket.created_at, ticket.admin_solution]);
 
   const formatDateTime = () => {
     if (!ticket.created_at) return;
@@ -58,42 +62,42 @@ const TicketDetailsModal = ({
     }));
   };
 
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return;
+  const handleAddSolution = async () => {
+    if (!newSolution.trim()) return;
     
-    setSendingComment(true);
+    setSendingSolution(true);
     
     try {
-      // Call API to add comment
-      const response = await AdminService.addComment(ticket._id, newComment);
+      // Call API to solve ticket
+      const response = await AdminService.solveTicket(ticket.id, newSolution);
       
-      // Update local comments
-      const newCommentObj = {
-        _id: response.id || `comment_${Date.now()}`,
-        text: newComment,
-        author: 'Admin User',
-        role: 'admin',
-        created_at: new Date().toISOString(),
-      };
+      // Update local ticket with the response
+      const updatedTicket = response.ticket;
       
-      setComments([...comments, newCommentObj]);
-      setNewComment('');
+      // Update the parent component's state through the onStatusUpdate callback
+      // Pass the solution along with the status update
+      onStatusUpdate(ticket._id, updatedTicket.status, newSolution);
+      
+      // Update the solution in local state
+      setNewSolution(updatedTicket.admin_solution || newSolution);
+      
+      console.log('Ticket solved successfully:', response);
     } catch (error) {
-      console.error('Error adding comment:', error);
-      alert('Failed to add comment');
+      console.error('Error solving ticket:', error);
+      alert('Failed to submit solution');
     } finally {
-      setSendingComment(false);
+      setSendingSolution(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-      handleAddComment();
+      handleAddSolution();
     }
   };
 
-  const formatCommentDate = (dateString: string) => {
-    if (!isMounted) return '';
+  const formatDate = (dateString: string) => {
+    if (!isMounted || !dateString) return '';
     
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, '0');
@@ -219,6 +223,14 @@ const TicketDetailsModal = ({
                           {formattedDateTime}
                         </span>
                       </div>
+                      {ticket.solved_at && (
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                          <span className="text-xs sm:text-sm text-gray-600 w-20 sm:w-auto">Solved:</span>
+                          <span className="font-medium text-gray-900 text-xs sm:text-sm">
+                            {formatDate(ticket.solved_at)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -230,7 +242,17 @@ const TicketDetailsModal = ({
                         <button
                           key={status}
                           onClick={() => {
-                            onStatusUpdate(ticket._id, status);
+                            // For Resolved/Closed, we need to provide a solution
+                            // So we'll prompt the user to add one
+                            if (!newSolution.trim() && !ticket.admin_solution) {
+                              alert(`Please add a solution before marking as ${status}`);
+                              toggleSection('adminSolution');
+                              return;
+                            }
+                            
+                            // Use existing solution or new solution
+                            const solutionToUse = newSolution.trim() || ticket.admin_solution;
+                            onStatusUpdate(ticket._id, status, solutionToUse);
                             onClose();
                           }}
                           className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
@@ -276,82 +298,71 @@ const TicketDetailsModal = ({
             )}
           </div>
 
-          {/* Comments */}
+          {/* Admin Solution */}
           <div>
             <button
-              onClick={() => toggleSection('comments')}
+              onClick={() => toggleSection('adminSolution')}
               className="w-full p-4 sm:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors border-b border-gray-200"
             >
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
                 <h3 className="font-semibold text-gray-900 text-base sm:text-lg">
-                  Comments ({comments.length})
+                  Admin Solution {ticket.admin_solution && '(Provided)'}
                 </h3>
               </div>
-              {expandedSections.comments ? (
+              {expandedSections.adminSolution ? (
                 <ChevronUp className="w-5 h-5 text-gray-500" />
               ) : (
                 <ChevronDown className="w-5 h-5 text-gray-500" />
               )}
             </button>
             
-            {expandedSections.comments && (
+            {expandedSections.adminSolution && (
               <div className="px-4 sm:px-6 pb-4 sm:pb-6">
-                {/* Comments List */}
-                <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
-                  {comments.map((comment: any) => (
-                    <div
-                      key={comment._id}
-                      className={`p-3 sm:p-4 rounded-lg ${
-                        comment.role === 'admin'
-                          ? 'bg-blue-50 border border-blue-100 ml-0 sm:ml-4'
-                          : 'bg-gray-50 border border-gray-100'
-                      }`}
-                    >
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900 text-sm sm:text-base">{comment.author}</span>
-                          <span className={`text-xs px-2 py-0.5 sm:py-1 rounded-full ${
-                            comment.role === 'admin'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {comment.role}
-                          </span>
-                        </div>
+                {/* Show existing solution if available */}
+                {ticket.admin_solution && (
+                  <div className="mb-4 sm:mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-medium text-gray-900 text-sm sm:text-base">Current Solution</h4>
+                      {ticket.solved_at && (
                         <span className="text-xs text-gray-500">
-                          {formatCommentDate(comment.created_at)}
+                          Solved on: {formatDate(ticket.solved_at)}
                         </span>
-                      </div>
-                      <p className="text-gray-700 text-sm sm:text-base">{comment.text}</p>
+                      )}
                     </div>
-                  ))}
-                  
-                  {comments.length === 0 && (
-                    <div className="text-center py-6 sm:py-8 text-gray-500 text-sm sm:text-base">
-                      No comments yet. Be the first to respond.
+                    <div className="bg-green-50 border border-green-100 p-3 sm:p-4 rounded-lg">
+                      <p className="text-gray-700 whitespace-pre-wrap text-sm sm:text-base">
+                        {ticket.admin_solution}
+                      </p>
+                      {ticket.admin_id && (
+                        <p className="text-xs text-gray-500 mt-2">
+                          Provided by Admin ID: {ticket.admin_id}
+                        </p>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
-                {/* Add Comment */}
+                {/* Add/Update Solution */}
                 <div className="border-t border-gray-200 pt-4 sm:pt-6 text-gray-700">
-                  <h4 className="font-medium text-gray-900 mb-3 text-sm sm:text-base">Add Comment</h4>
+                  <h4 className="font-medium text-gray-900 mb-3 text-sm sm:text-base">
+                    {ticket.admin_solution ? 'Update Solution' : 'Add Solution'}
+                  </h4>
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <textarea
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
+                      value={newSolution}
+                      onChange={(e) => setNewSolution(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      placeholder="Type your response here... (Ctrl+Enter to send)"
+                      placeholder="Type your solution here... (Ctrl+Enter to send)"
                       className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-sm sm:text-base min-h-[80px] sm:min-h-[100px]"
                       rows={3}
                     />
                     <button
-                      onClick={handleAddComment}
-                      disabled={sendingComment || !newComment.trim()}
+                      onClick={handleAddSolution}
+                      disabled={sendingSolution || !newSolution.trim()}
                       className="self-end sm:self-start px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 text-sm sm:text-base whitespace-nowrap"
                     >
-                      {sendingComment ? (
+                      {sendingSolution ? (
                         <>
                           <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white"></div>
                           <span>Sending...</span>
@@ -359,13 +370,15 @@ const TicketDetailsModal = ({
                       ) : (
                         <>
                           <Send className="w-3 h-3 sm:w-4 sm:h-4" />
-                          <span>Send</span>
+                          <span>{ticket.admin_solution ? 'Update' : 'Submit'}</span>
                         </>
                       )}
                     </button>
                   </div>
                   <p className="text-xs text-gray-500 mt-2 mb-10">
-                    Your comment will be visible to the DSA who raised this ticket.
+                    {ticket.admin_solution 
+                      ? 'Updating the solution will also update the ticket status to Closed.'
+                      : 'Submitting a solution will mark the ticket as Closed and notify the DSA.'}
                   </p>
                 </div>
               </div>
@@ -385,8 +398,19 @@ const TicketDetailsModal = ({
             {ticket.status === 'Open' && (
               <select
                 onChange={(e) => {
-                  onStatusUpdate(ticket._id, e.target.value);
-                  onClose();
+                  // For Resolved/Closed, require solution
+                  if (e.target.value === 'Resolved' || e.target.value === 'Closed') {
+                    if (!newSolution.trim() && !ticket.admin_solution) {
+                      alert(`Please add a solution before marking as ${e.target.value}`);
+                      toggleSection('adminSolution');
+                      return;
+                    }
+                    
+                    // Use existing solution or new solution
+                    const solutionToUse = newSolution.trim() || ticket.admin_solution;
+                    onStatusUpdate(ticket._id, e.target.value, solutionToUse);
+                    onClose();
+                  }
                 }}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 text-sm sm:text-base"
                 defaultValue=""

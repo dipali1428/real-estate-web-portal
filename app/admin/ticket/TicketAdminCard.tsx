@@ -10,7 +10,7 @@ const TicketAdminCard = ({
   onStatusUpdate
 }: { 
   ticket: any;
-  onStatusUpdate: (ticketId: string, status: string) => void;
+  onStatusUpdate: (ticketId: string, status: string, solution?: string) => void;
 }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);

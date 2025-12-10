@@ -94,8 +94,9 @@ const AdminSupportTicketsPage = () => {
 
       console.log("Total tickets received:", apiTickets.length);
 
-      // Transform API response
+      // Transform API response - IMPORTANT: Preserve numeric ID
       const formattedTickets = apiTickets.map((ticket: any) => ({
+        id: ticket.id, // Preserve the numeric ID for API calls
         _id: ticket.id?.toString() || ticket._id || `temp_${Date.now()}`,
         ticket_id: ticket.ticket_id || ticket.ticketId || `TKT${ticket.id}`,
         name: ticket.name || 'Unknown User',
@@ -110,9 +111,13 @@ const AdminSupportTicketsPage = () => {
         updated_at: ticket.updated_at || ticket.updatedAt || new Date().toISOString(),
         assigned_to: ticket.assigned_to || ticket.assignedTo || null,
         comments: Array.isArray(ticket.comments) ? ticket.comments : [],
+        admin_solution: ticket.admin_solution || ticket.adminSolution || '',
+        admin_id: ticket.admin_id || ticket.adminId || null,
+        solved_at: ticket.solved_at || ticket.solvedAt || null,
       }));
 
       console.log("Formatted tickets:", formattedTickets.length);
+      console.log("Sample ticket:", formattedTickets[0]);
       setAllTickets(formattedTickets);
 
     } catch (error) {
@@ -247,19 +252,45 @@ const AdminSupportTicketsPage = () => {
     fetchAllTickets();
   }, []);
 
-  // Handle status update
-  const handleStatusUpdate = async (ticketId: string, newStatus: string) => {
+  // Handle status update - Updated to use solveTicket instead
+  const handleStatusUpdate = async (ticketId: string, newStatus: string, solution?: string) => {
     try {
-      await AdminService.updateTicketStatus(ticketId, newStatus);
-
-      // Update local state
-      setAllTickets(prev =>
-        prev.map(ticket =>
-          ticket._id === ticketId ? { ...ticket, status: newStatus } : ticket
-        )
-      );
-
-      console.log(`Ticket ${ticketId} status updated to ${newStatus}`);
+      // Find the ticket by its _id to get the numeric ID
+      const ticket = allTickets.find(t => t._id === ticketId);
+      if (!ticket) {
+        console.error('Ticket not found:', ticketId);
+        return;
+      }
+      
+      // Use numeric ID for API calls
+      const numericId = ticket.id;
+      
+      if (newStatus === 'Resolved' || newStatus === 'Closed') {
+        // For Resolved/Closed status, use solveTicket with the provided solution
+        // If no solution is provided, use a default message
+        const finalSolution = solution || `Ticket marked as ${newStatus} by admin`;
+        
+        await AdminService.solveTicket(numericId, finalSolution);
+        
+        // Update local state
+        setAllTickets(prev =>
+          prev.map(t =>
+            t._id === ticketId ? { 
+              ...t, 
+              status: newStatus,
+              admin_solution: finalSolution,
+              solved_at: new Date().toISOString()
+            } : t
+          )
+        );
+        
+        console.log(`Ticket ${ticketId} marked as ${newStatus}`);
+      } else {
+        // For other statuses, you might need a different API endpoint
+        // Currently, we'll only handle Resolved and Closed
+        console.log(`Status update to ${newStatus} not supported through this method`);
+        return;
+      }
     } catch (error) {
       console.error('Error updating ticket status:', error);
       alert('Failed to update ticket status');

@@ -1,3 +1,4 @@
+// adminService.ts
 import api from "./api";
 
 interface DSAListPayload {
@@ -53,7 +54,9 @@ interface Ticket {
   updated_at: string;
   assigned_to?: string | null;
   comments?: Comment[];
-  priority?: 'High' | 'Medium' | 'Low';
+  admin_solution?: string;
+  admin_id?: number;
+  solved_at?: string;
 }
 
 interface Comment {
@@ -125,15 +128,13 @@ export const AdminService = {
     return response.data;
   },
   
-  updateTicketStatus: async (ticketId: string, status: string) => {
-    const response = await api.put(`/api/admin/tickets/${ticketId}/status`, { status });
+  // Solve ticket with admin solution - NEW METHOD
+  solveTicket: async (ticketId: string | number, solution: string) => {
+    const response = await api.put(`/api/admin/tickets/${ticketId}/solve`, {
+      solution: solution
+    });
     return response.data;
-  },
-  
-  addComment: async (ticketId: string, comment: string) => {
-    const response = await api.post(`/api/admin/tickets/${ticketId}/comments`, { text: comment });
-    return response.data;
-  },
+  }
 
 };
 

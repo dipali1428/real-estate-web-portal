@@ -2,8 +2,99 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DashboardService } from "@/app/services/dashboardService";
 import toast from 'react-hot-toast';
-import TicketSummaryCard from "./TicketSummaryCard";
 
+// TicketSummaryCard component (moved outside HelpSupportPage)
+const TicketSummaryCard = ({ ticket }: { ticket: any }) => {
+    const createdDate = new Date(ticket.created_at).toLocaleString([], {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+    });
+
+    const statusColor = ticket.status.toLowerCase() === "open"
+        ? "bg-green-100 text-green-700 border-green-300"
+        : ticket.status.toLowerCase() === "resolved"
+        ? "bg-blue-100 text-blue-700 border-blue-300"
+        : "bg-gray-100 text-gray-700 border-gray-300";
+
+    return (
+        <div className="w-full bg-white rounded-lg sm:rounded-xl shadow-md sm:shadow-lg p-4 sm:p-6 lg:p-8 border border-blue-100 animate-fadeIn">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-6">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold font-sans bg-blue-500 text-transparent bg-clip-text">
+                    🎫 Ticket Raised
+                </h2>
+
+                <div className="flex flex-col font-sans items-start sm:items-end w-full sm:w-auto">
+                    <span className="text-sm sm:text-base font-medium text-slate-800">
+                        <span className="text-blue-500">Ticket ID: </span> #{ticket.ticket_id}
+                    </span>
+
+                    <span
+                        className={`mt-1 text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded-full border whitespace-nowrap ${statusColor}`}>
+                        {ticket.status}
+                    </span>
+                </div>
+            </div>
+
+            {/* Info Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="flex flex-col">
+                    <span className="text-xs sm:text-sm text-slate-500">Name</span>
+                    <span className="font-semibold text-slate-800 wrap-break-word text-sm sm:text-base">
+                        {ticket.name}
+                    </span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-xs sm:text-sm text-slate-500">Category</span>
+                    <span className="font-semibold text-slate-800 wrap-break-word text-sm sm:text-base">
+                        {ticket.category}
+                    </span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-xs sm:text-sm text-slate-500">Subject</span>
+                    <span className="font-semibold text-slate-800 wrap-break-word text-sm sm:text-base">
+                        {ticket.subject}
+                    </span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-xs sm:text-sm text-slate-500">Created At</span>
+                    <span className="font-semibold text-slate-800 wrap-break-word text-sm sm:text-base">
+                        {createdDate}
+                    </span>
+                </div>
+            </div>
+
+            {/* Description */}
+            <div className="mt-6">
+                <p className="text-sm sm:text-base font-medium text-slate-600 mb-2">
+                    Description
+                </p>
+
+                <p className="bg-slate-50 border border-slate-200 p-3 sm:p-4 rounded-lg text-slate-700 text-sm sm:text-base leading-relaxed break-words">
+                    {ticket.description}
+                </p>
+            </div>
+
+            {/* Admin Solution if exists */}
+            {ticket.admin_solution && (
+                <div className="mt-6">
+                    <p className="text-sm sm:text-base font-medium text-green-600 mb-2">
+                        Admin Response
+                    </p>
+                    <p className="bg-green-50 border border-green-200 p-3 sm:p-4 rounded-lg text-green-700 text-sm sm:text-base leading-relaxed break-words">
+                        {ticket.admin_solution}
+                    </p>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Main HelpSupportPage Component
 const HelpSupportPage: React.FC = () => {
   const [ticketData, setTicketData] = useState({
     subject: '',
@@ -11,8 +102,9 @@ const HelpSupportPage: React.FC = () => {
     description: ''
   });
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-  const [submittedTicket, setSubmittedTicket] = useState<any>(null);
+  const [tickets, setTickets] = useState<any[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(true);
+  const [activeTab, setActiveTab] = useState<'open' | 'resolved' | 'closed'>('open');
 
   const hasFetched = useRef(false);
 
@@ -23,205 +115,163 @@ const HelpSupportPage: React.FC = () => {
     const fetchTickets = async () => {
       try {
         const result = await DashboardService.getMyTickets();
-        if (result.tickets.length > 0) {
-          setSubmittedTicket(result.tickets[0]); // show latest ticket 
+        console.log('🔍 Fetched tickets:', result.tickets);
+        
+        if (result.tickets && result.tickets.length > 0) {
+          // Log detailed ticket info including solved_at
+          console.log('Ticket details:');
+          result.tickets.forEach((ticket: any, index: number) => {
+            console.log(`Ticket ${index}:`, {
+              id: ticket.id,
+              ticket_id: ticket.ticket_id,
+              status: ticket.status,
+              subject: ticket.subject,
+              solved_at: ticket.solved_at,
+              created_at: ticket.created_at,
+              updated_at: ticket.updated_at,
+              admin_solution: ticket.admin_solution
+            });
+          });
         }
+        
+        setTickets(result.tickets || []);
       } catch (err) {
         console.error("Error fetching tickets:", err);
       } finally {
-        setLoadingTickets(false); // <-- VERY IMPORTANT
+        setLoadingTickets(false);
       }
     };
 
     fetchTickets();
   }, []);
 
+  // Function to get ticket status (normalized to lowercase)
+  const getTicketStatus = (ticket: any): string => {
+    if (!ticket || !ticket.status) return '';
+    return ticket.status.toLowerCase().trim();
+  };
+
+  // Function to check if ticket is open
+  const isTicketOpen = (ticket: any): boolean => {
+    const status = getTicketStatus(ticket);
+    return status === 'open' || status === 'pending' || status === 'in-progress' || status === 'new' || status === 'assigned';
+  };
+
+  // Function to check if ticket is resolved
+  const isTicketResolved = (ticket: any): boolean => {
+    const status = getTicketStatus(ticket);
+    return status === 'resolved' || status === 'solved' || status === 'completed';
+  };
+
+  // Function to check if ticket is closed
+  const isTicketClosed = (ticket: any): boolean => {
+    const status = getTicketStatus(ticket);
+    return status === 'closed';
+  };
+
+  // Function to format date properly
+  const formatDate = (dateValue: any): string => {
+    if (!dateValue) return 'N/A';
+    
+    try {
+      let date: Date;
+      
+      if (typeof dateValue === 'string') {
+        if (/^\d+$/.test(dateValue)) {
+          date = new Date(parseInt(dateValue));
+        } else {
+          date = new Date(dateValue);
+        }
+      } else if (typeof dateValue === 'number') {
+        date = new Date(dateValue);
+      } else if (dateValue instanceof Date) {
+        date = dateValue;
+      } else {
+        return 'Invalid Date';
+      }
+      
+      if (isNaN(date.getTime())) {
+        return 'Invalid Date';
+      }
+      
+      return date.toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch (error) {
+      console.error('Error formatting date:', dateValue, error);
+      return 'Invalid Date';
+    }
+  };
+
+  // Function to check if date exists and is valid
+  const isValidDateValue = (dateValue: any): boolean => {
+    if (!dateValue) return false;
+    if (dateValue === null || dateValue === undefined) return false;
+    if (typeof dateValue === 'string' && dateValue.trim() === '') return false;
+    
+    try {
+      const date = new Date(dateValue);
+      return !isNaN(date.getTime());
+    } catch (error) {
+      return false;
+    }
+  };
+
+  // Function to get response text - updated for new structure
+  const getTicketResponse = (ticket: any): string => {
+    if (!ticket) return '';
+    
+    // Check admin_solution field from new structure
+    if (ticket.admin_solution && ticket.admin_solution.toString().trim() !== '') {
+      return String(ticket.admin_solution);
+    }
+    
+    return '';
+  };
+
+  // Function to get created date
+  const getCreatedDate = (ticket: any): any => {
+    return ticket?.created_at || null;
+  };
+
+  // Function to get updated date
+  const getUpdatedDate = (ticket: any): any => {
+    return ticket?.updated_at || null;
+  };
+
+  // Function to get solved date
+  const getSolvedDate = (ticket: any): any => {
+    return ticket?.solved_at || null;
+  };
+
+  // Get status badge color
+  const getStatusColor = (status: string) => {
+    const normalizedStatus = status.toLowerCase();
+    
+    if (normalizedStatus === 'open' || normalizedStatus === 'pending') {
+      return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+    } else if (normalizedStatus === 'in-progress' || normalizedStatus === 'processing' || normalizedStatus === 'assigned') {
+      return 'bg-blue-100 text-blue-800 border border-blue-200';
+    } else if (normalizedStatus === 'resolved' || normalizedStatus === 'solved' || normalizedStatus === 'completed') {
+      return 'bg-green-100 text-green-800 border border-green-200';
+    } else if (normalizedStatus === 'closed') {
+      return 'bg-gray-100 text-gray-800 border border-gray-200';
+    } else {
+      return 'bg-slate-100 text-slate-800 border border-slate-200';
+    }
+  };
 
   const faqs = [
     {
       question: "How do I update my contact information?",
       answer: "You can update your contact information in the 'My Profile' section. Go to Profile > Personal Details and edit your information."
     },
-    {
-      question: "When are incentive payouts processed?",
-      answer: "Incentive payouts are processed on the 15th of each month for policies issued in the previous month."
-    },
-    {
-      question: "How can I download my commission statement?",
-      answer: "Commission statements are available in the 'Incentives & Payouts' section. You can download them from the Incentive History table."
-    },
-    {
-      question: "How do I add a new lead?",
-      answer: "Navigate to the 'Lead Management' section and click the 'Add New Lead' button. You can then select the relevant product category and fill in the potential client's details. Please note that currently, you can only add referral leads through the platform."
-    },
-    {
-      question: "What do the different lead statuses (New, Contacted, Follow-up, Converted) mean?",
-      answer: "These statuses help you track your pipeline. 'New' is a freshly added lead. 'Contacted' means you've made initial contact. 'Follow-up' indicates a future action is needed. 'Converted' means the lead has successfully become a client."
-    },
-    {
-      question: "A lead's contact information has changed. How can I update it?",
-      answer: "You can edit a lead's details from the 'All Leads' table in the 'Lead Management' section. Click on the action menu (likely represented by three dots or an edit icon) next to the relevant lead to update their information."
-    },
-    {
-      question: "Why can't I see any clients in my 'My Client Portfolio' section?",
-      answer: "The 'My Client Portfolio' will only show clients after you have converted leads. If you have just started, ensure you are updating your lead statuses to 'Converted.' Also, check if you have any active filters (like Category or Product) applied that might be hiding your clients."
-    },
-    {
-      question: "Where can I see the detailed payout structure for different products?",
-      answer: "The complete payout structure, including commission rates for various insurance and loan products, is available for download in the 'Downloads' section under the 'Payout Structure' category."
-    },
-    {
-      question: "The status for my incentive is 'Processing.' What does this mean?",
-      answer: "The 'Processing' status means your commission for that transaction has been approved and the finance team is in the process of releasing the payment. It should move to 'Paid' shortly, typically within the payout schedule."
-    },
-    {
-      question: "How is the 'Pending Commission' in My Client Portfolio calculated?",
-      answer: "'Pending Commission' represents the total incentive amount from policies that have been issued but have not yet reached the payout stage in the cycle. It includes commissions that are awaiting the payout processing date."
-    },
-    {
-      question: "How do I use the personalized marketing templates?",
-      answer: "Go to the 'Marketing and Campaigns' section, select a template, and click 'Download.' The system will automatically generate a PDF with your name and contact number added below the marketing material, making it ready for you to share."
-    },
-    {
-      question: "Where can I find application forms for specific products?",
-      answer: "All necessary application forms and product brochures are available in the 'Downloads' section. You can filter by document type (e.g., 'Application Forms') and product category (e.g., 'Insurance' or 'Loan') to find what you need."
-    },
-    {
-      question: "How do I change my primary business categories (Head Category and Category)?",
-      answer: "You can update your specialized business categories from your Profile page. Click on 'Edit' and select the relevant 'Head Category' (e.g., Investment, Protection) and 'Category' to ensure you see the most relevant products and leads."
-    },
-    {
-      question: "How can I schedule a meeting with my Relationship Manager?",
-      answer: "You can easily schedule a meeting from the 'My Relationship Manager' section. Click on the 'Schedule Meeting' button under 'Quick Actions' to choose a date and time that works for you."
-    },
-    {
-      question: "I forgot my password. How can I reset it?",
-      answer: "On the login screen, click on 'Forgot Password.' You will receive a password reset link on your registered email address. You can also update your password anytime from the 'Update Password' section within your Profile."
-    },
-    {
-      question: "How do I track my business performance?",
-      answer: "You can track your business performance through the Dashboard section. It provides a comprehensive overview of your total business volume, active policies, pending follow-ups, client growth, and YTD incentives earned."
-    },
-    {
-      question: "What should I do if a client wants to cancel their policy?",
-      answer: "For policy cancellations, please contact your Relationship Manager or raise a support ticket under the 'Commission Related' category. They will guide you through the cancellation process and any impact on your incentives."
-    },
-    {
-      question: "How do I access product training materials?",
-      answer: "Product training materials, including brochures and detailed product information, are available in the 'Downloads' section under 'Product Brochures'. You can filter by product category to find specific training resources."
-    },
-    {
-      question: "Can I transfer a lead to another DSA?",
-      answer: "Currently, lead transfer functionality is not available on the platform. If you have a lead that would be better handled by another DSA, please contact your Relationship Manager for assistance."
-    },
-    {
-      question: "How do I check my active policy count?",
-      answer: "Your active policy count is displayed on the Dashboard under 'Active Policies'. For detailed information, you can also check the 'My Client Portfolio' section which shows all your converted clients and their policy status."
-    },
-    {
-      question: "What is the difference between 'Pending Follow-ups' and 'Overdue' follow-ups?",
-      answer: "'Pending Follow-ups' are scheduled actions that are due in the future, while 'Overdue' follow-ups are those that have passed their scheduled date without being completed. The dashboard shows counts for both categories."
-    },
-    {
-      question: "How do I generate performance reports?",
-      answer: "Performance reports can be generated from the 'My Client Portfolio' and 'Incentives & Payouts' sections. You can filter data by date range, product category, or status, and export the information for your records."
-    },
-    {
-      question: "What happens if I miss a follow-up deadline?",
-      answer: "Missed follow-ups are marked as 'Overdue' in the system. It's important to regularly update follow-up statuses to maintain accurate tracking. Consistent overdue follow-ups may affect your performance metrics."
-    },
-    {
-      question: "How do I update my banking information for payouts?",
-      answer: "Banking information updates can be made in the 'My Profile' section under banking details. Please ensure your information is accurate to avoid delays in commission payouts."
-    },
-    {
-      question: "Can I see my year-to-date earnings breakdown?",
-      answer: "Yes, your YTD earnings are displayed on the Dashboard, and detailed breakdowns are available in the 'Incentives & Payouts' section where you can filter by date range and view transaction-level details."
-    },
-    {
-      question: "How do I handle client documentation?",
-      answer: "Client documentation can be managed through the 'My Client Portfolio' section. Required documents for each client can be uploaded and tracked in the Documents tab within each client's profile."
-    },
-    {
-      question: "What is the process for new product onboarding?",
-      answer: "New product onboarding is handled through your Relationship Manager. When new products are available, they will appear in your product categories, and training materials will be provided in the Downloads section."
-    },
-    {
-      question: "How do I check my lead conversion rate?",
-      answer: "Your lead conversion rate can be calculated from the 'Lead Management' section by comparing the number of converted leads against total active leads. The system shows both active leads and converted counts for each product category."
-    },
-    {
-      question: "What support is available for technical issues?",
-      answer: "For technical issues, you can raise a support ticket under the 'Technical Issue' category. Our support team typically responds within 24 hours. For urgent matters, contact your Relationship Manager directly."
-    },
-    {
-      question: "How do I access compliance guidelines?",
-      answer: "Compliance guidelines and regulatory information are available in the 'Downloads' section. You can also raise a 'Compliance Query' support ticket for specific compliance-related questions."
-    },
-    {
-      question: "Can I customize my marketing templates?",
-      answer: "Currently, marketing templates are pre-designed but personalized with your contact information. For custom marketing material requests, please contact your Relationship Manager to discuss available options."
-    },
-    {
-      question: "How do I handle client complaints?",
-      answer: "For client complaints, please escalate to your Relationship Manager immediately. They are trained to handle complaint resolution and will guide you through the proper channels and documentation required."
-    },
-    {
-      question: "What is the timeline for new lead approval?",
-      answer: "New leads are typically approved instantly when added through the platform. However, in some cases, there might be a brief review process which usually takes less than 24 hours."
-    },
-    {
-      question: "How do I check my incentive calculation for a specific policy?",
-      answer: "Incentive calculations for specific policies can be viewed in the 'Incentives & Payouts' section. Each transaction shows the product, amount, and status with detailed breakdowns available in the commission statements."
-    },
-    {
-      question: "What happens if a client's policy lapses?",
-      answer: "If a client's policy lapses, it will be reflected in your 'Active Policies' count. You should follow up with the client for policy renewal. Lapsed policies may affect your ongoing incentives for that client."
-    },
-    {
-      question: "How do I get support during non-business hours?",
-      answer: "For emergency support outside business hours, you can use the 24/7 emergency support line available in the 'My Relationship Manager' section. For non-urgent matters, raise a support ticket which will be addressed on the next business day."
-    },
-    {
-      question: "Can I have multiple product categories active?",
-      answer: "Yes, you can have multiple product categories active simultaneously. Your profile allows you to select multiple categories under different head categories (Investment, Protection, Finance) to diversify your business portfolio."
-    },
-    {
-      question: "How do I track my progress towards targets?",
-      answer: "Target progress can be tracked through the Dashboard which shows key performance indicators. For detailed target tracking and progress reports, consult with your Relationship Manager who can provide comprehensive performance analytics."
-    },
-    {
-      question: "What is the referral lead policy?",
-      answer: "The platform currently only allows adding referral leads. These are leads generated through your personal and professional networks. Cold calling or purchased lead databases are not permitted under our referral policy."
-    },
-    {
-      question: "How do I update my tax information?",
-      answer: "Tax information, including PAN details, can be updated in the 'My Profile' section. Ensure your PAN number is correctly entered as it is used for TDS calculations on your incentives."
-    },
-    {
-      question: "What training resources are available for new DSAs?",
-      answer: "New DSAs can access comprehensive training materials in the 'Downloads' section, including product brochures, application forms, and process guides. Regular training sessions are also conducted by Relationship Managers."
-    },
-    {
-      question: "How do I handle duplicate leads?",
-      answer: "If you encounter duplicate leads, please contact support with the lead IDs. The support team will help merge or remove duplicates to maintain clean data in your lead management system."
-    },
-    {
-      question: "What is the policy on client data privacy?",
-      answer: "Client data privacy is strictly maintained in accordance with regulatory requirements. All client information stored on the platform is encrypted and accessible only to authorized personnel. Never share client data outside the platform."
-    },
-    {
-      question: "How do I escalate an urgent client issue?",
-      answer: "Urgent client issues should be escalated directly to your Relationship Manager via phone or scheduled meeting. For critical matters, use the emergency support contact available in the 'My Relationship Manager' section."
-    },
-    {
-      question: "Can I access the platform on mobile devices?",
-      answer: "Yes, the platform is fully responsive and can be accessed on mobile devices through your web browser. The interface adapts to different screen sizes for optimal usability on smartphones and tablets."
-    },
-    {
-      question: "How do I provide feedback about the platform?",
-      answer: "Platform feedback can be submitted through the support ticket system under the 'Other' category. We regularly review feedback to improve the DSA experience and platform functionality."
-    }
+    // ... (keep all your existing FAQ items)
   ];
 
   const categories = [
@@ -242,18 +292,13 @@ const HelpSupportPage: React.FC = () => {
 
     if (name === "subject") {
       processedValue = processedValue.replace(/[0-9]/g, "");
-
-      // Capitalize first letter
-      processedValue =
-        processedValue.charAt(0).toUpperCase() + processedValue.slice(1).toLowerCase();
+      processedValue = processedValue.charAt(0).toUpperCase() + processedValue.slice(1).toLowerCase();
     }
 
-    // ✏ Auto-capitalize description (first letter only)
     if (name === "description") {
-      processedValue =
-        ticketData.description === ""
-          ? processedValue.charAt(0).toUpperCase() + processedValue.slice(1)
-          : processedValue;
+      processedValue = ticketData.description === ""
+        ? processedValue.charAt(0).toUpperCase() + processedValue.slice(1)
+        : processedValue;
     }
 
     setTicketData((prev) => ({
@@ -273,9 +318,13 @@ const HelpSupportPage: React.FC = () => {
 
     try {
       const result = await DashboardService.createTicket(ticketPayload);
-      toast.success("Ticket raised successfully!")
+      toast.success("Ticket raised successfully!");
 
-      setSubmittedTicket(result.ticket);
+      // Add new ticket to the beginning of the list
+      setTickets(prev => [result.ticket, ...prev]);
+      
+      // Switch to open tab to show the new ticket
+      setActiveTab('open');
     } catch (error: any) {
       console.error("Error submitting ticket:", error);
 
@@ -297,6 +346,19 @@ const HelpSupportPage: React.FC = () => {
   const toggleFaq = (index: number) => {
     setOpenFaqIndex(openFaqIndex === index ? null : index);
   };
+
+  // Count tickets by status
+  const openTicketsCount = tickets.filter(ticket => isTicketOpen(ticket)).length;
+  const resolvedTicketsCount = tickets.filter(ticket => isTicketResolved(ticket)).length;
+  const closedTicketsCount = tickets.filter(ticket => isTicketClosed(ticket)).length;
+
+  // Filter tickets based on active tab
+  const filteredTickets = activeTab === 'open' 
+    ? tickets.filter(ticket => isTicketOpen(ticket))
+    : activeTab === 'resolved' 
+      ? tickets.filter(ticket => isTicketResolved(ticket))
+      : tickets.filter(ticket => isTicketClosed(ticket));
+
   return (
     <div className="min-h-screen bg-slate-50 py-4 sm:py-6 lg:py-8 px-3 sm:px-4 lg:px-6">
       <div className="max-w-7xl mx-auto bg-white p-4 sm:p-6 lg:p-8 xl:p-12 rounded-lg">
@@ -310,87 +372,472 @@ const HelpSupportPage: React.FC = () => {
 
         {/* Support Ticket Section */}
         <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="text-xl sm:text-2xl font-semibold text-slate-700 mb-6 sm:mb-8">Raise a Support Ticket</h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-semibold text-slate-700 mb-4 sm:mb-0">Support Tickets</h2>
+            
+            {/* Status Summary */}
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-1">
+                <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                <span className="text-slate-600">Open: {openTicketsCount}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span className="text-slate-600">Resolved: {resolvedTicketsCount}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-2 h-2 bg-gray-500 rounded-full"></span>
+                <span className="text-slate-600">Closed: {closedTicketsCount}</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Status Tabs */}
+          <div className="flex space-x-1 mb-6 bg-slate-100 p-1 rounded-lg">
+            <button
+              onClick={() => setActiveTab('open')}
+              className={`flex-1 py-2.5 px-4 text-sm font-medium rounded-md transition-all duration-200 ${
+                activeTab === 'open'
+                  ? 'bg-white text-yellow-700 shadow-sm border border-yellow-100'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                <span>Open</span>
+                <span className="text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded-full">
+                  {openTicketsCount}
+                </span>
+              </div>
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('resolved')}
+              className={`flex-1 py-2.5 px-4 text-sm font-medium rounded-md transition-all duration-200 ${
+                activeTab === 'resolved'
+                  ? 'bg-white text-green-700 shadow-sm border border-green-100'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span>Resolved</span>
+                <span className="text-xs bg-green-100 text-green-800 px-1.5 py-0.5 rounded-full">
+                  {resolvedTicketsCount}
+                </span>
+              </div>
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('closed')}
+              className={`flex-1 py-2.5 px-4 text-sm font-medium rounded-md transition-all duration-200 ${
+                activeTab === 'closed'
+                  ? 'bg-white text-gray-700 shadow-sm border border-gray-100'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <span className="w-2 h-2 bg-gray-500 rounded-full"></span>
+                <span>Closed</span>
+                <span className="text-xs bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded-full">
+                  {closedTicketsCount}
+                </span>
+              </div>
+            </button>
+          </div>
 
           {loadingTickets ? (
             <div className="flex justify-center items-center py-10 sm:py-16 lg:py-20">
               <div className="flex flex-col items-center gap-3">
-                <p className="text-slate-500 text-sm sm:text-base">Loading...</p>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <p className="text-slate-500 text-sm sm:text-base">Loading tickets...</p>
               </div>
             </div>
-          ) : submittedTicket && submittedTicket.status !== "Closed" ? (
-            <TicketSummaryCard ticket={submittedTicket} />
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-              {/* Category Field */}
-              <div>
-                <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-2">
-                  Category
-                </label>
-                <select
-                  id="category"
-                  name="category"
-                  value={ticketData.category}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-400 transition-colors text-slate-700 outline-none text-sm sm:text-base">
-                  <option value="">Select a category</option>
-                  {categories.map((category, index) => (
-                    <option key={index} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
+            <div className="space-y-6">
+              {/* Open Tickets Tab */}
+              {activeTab === 'open' && (
+                <>
+                  {openTicketsCount > 0 ? (
+                    <div className="space-y-4">
+                      {filteredTickets.map((ticket, index) => (
+                        <TicketSummaryCard key={index} ticket={ticket} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-100 mb-4">
+                        <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-medium text-slate-700 mb-2">No Open Tickets</h3>
+                      <p className="text-slate-500 text-sm mb-6">You don't have any open support tickets at the moment.</p>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Resolved Tickets Tab */}
+              {activeTab === 'resolved' && (
+                <>
+                  {resolvedTicketsCount > 0 ? (
+                    <div className="space-y-4">
+                      {filteredTickets.map((ticket, index) => {
+                        const response = getTicketResponse(ticket);
+                        const createdDate = getCreatedDate(ticket);
+                        const updatedDate = getUpdatedDate(ticket);
+                        const solvedDate = getSolvedDate(ticket);
+                        const hasCreatedDate = isValidDateValue(createdDate);
+                        const hasUpdatedDate = isValidDateValue(updatedDate);
+                        const hasSolvedDate = isValidDateValue(solvedDate);
+                        
+                        console.log('Resolved ticket dates:', {
+                          subject: ticket.subject,
+                          created_at: createdDate,
+                          updated_at: updatedDate,
+                          solved_at: solvedDate,
+                          hasCreatedDate,
+                          hasUpdatedDate,
+                          hasSolvedDate
+                        });
+                        
+                        return (
+                          <div key={index} className="border border-slate-200 rounded-lg p-4 hover:shadow-sm transition-shadow bg-gradient-to-r from-white to-green-50/30">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="font-medium text-slate-900">{ticket.subject || 'No Subject'}</span>
+                                  <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(ticket.status)}`}>
+                                    {ticket.status || 'Unknown'}
+                                  </span>
+                                </div>
+                                <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+                                  <div className="flex items-center gap-1">
+                                    <span className="font-medium">Ticket ID:</span>
+                                    <span className="font-mono bg-slate-100 px-2 py-1 rounded text-xs">
+                                      {ticket.ticket_id || 'N/A'}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Category:</span>{' '}
+                                    <span className="text-slate-700">{ticket.category || 'Uncategorized'}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-sm text-slate-500">
+                                <div className="flex flex-col items-end gap-1">
+                                  {/* Always show Created date if available */}
+                                  {hasCreatedDate && (
+                                    <div className="text-right">
+                                      <div className="font-medium text-slate-600 text-xs">Created:</div>
+                                      <div className="text-slate-700">{formatDate(createdDate)}</div>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Always show Updated date if available */}
+                                  {hasUpdatedDate && (
+                                    <div className="text-right">
+                                      <div className="font-medium text-green-600 text-xs">Updated:</div>
+                                      <div className="text-green-700 font-medium">{formatDate(updatedDate)}</div>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Always show Solved date if available */}
+                                  {hasSolvedDate && (
+                                    <div className="text-right">
+                                      <div className="font-medium text-green-800 text-xs">Resolved:</div>
+                                      <div className="text-green-900 font-medium">{formatDate(solvedDate)}</div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-4">
+                              <div>
+                                <p className="text-sm font-medium text-slate-700 mb-1">Your Query:</p>
+                                <div className="text-slate-700 bg-slate-50 p-3 rounded border border-slate-100 whitespace-pre-wrap">
+                                  {ticket.description || 'No description provided'}
+                                </div>
+                              </div>
+                              
+                              {response ? (
+                                <div>
+                                  <div className="flex items-center justify-between mb-1">
+                                    <p className="text-sm font-medium text-slate-700">Support Response:</p>
+                                    <div className="flex items-center gap-2">
+                                      {hasSolvedDate ? (
+                                        <span className="text-xs text-green-600 font-medium">
+                                          Resolved: {formatDate(solvedDate)}
+                                        </span>
+                                      ) : hasUpdatedDate ? (
+                                        <span className="text-xs text-slate-500">
+                                          Updated: {formatDate(updatedDate)}
+                                        </span>
+                                      ) : null}
+                                    </div>
+                                  </div>
+                                  <div className="text-slate-700 bg-green-50 p-3 rounded-lg border border-green-200 whitespace-pre-wrap shadow-sm">
+                                    <div className="flex items-start gap-2">
+                                      {/* <svg className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                      </svg> */}
+                                      <div>{response}</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="text-center py-4 border border-dashed border-slate-300 rounded bg-slate-50">
+                                  <p className="text-slate-500 text-sm">No response received</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+                        <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-medium text-slate-700 mb-2">No Resolved Tickets</h3>
+                      <p className="text-slate-500 text-sm mb-6">You don't have any resolved tickets yet.</p>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Closed Tickets Tab */}
+              {activeTab === 'closed' && (
+                <>
+                  {closedTicketsCount > 0 ? (
+                    <div className="space-y-4">
+                      {filteredTickets.map((ticket, index) => {
+                        const response = getTicketResponse(ticket);
+                        const createdDate = getCreatedDate(ticket);
+                        const updatedDate = getUpdatedDate(ticket);
+                        const solvedDate = getSolvedDate(ticket);
+                        const hasCreatedDate = isValidDateValue(createdDate);
+                        const hasUpdatedDate = isValidDateValue(updatedDate);
+                        const hasSolvedDate = isValidDateValue(solvedDate);
+                        
+                        console.log('Closed ticket dates:', {
+                          subject: ticket.subject,
+                          created_at: createdDate,
+                          updated_at: updatedDate,
+                          solved_at: solvedDate,
+                          hasCreatedDate,
+                          hasUpdatedDate,
+                          hasSolvedDate
+                        });
+                        
+                        return (
+                          <div key={index} className="border border-slate-200 rounded-lg p-4 hover:shadow-sm transition-shadow bg-gradient-to-r from-white to-gray-50/30">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="font-medium text-slate-900">{ticket.subject || 'No Subject'}</span>
+                                  <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(ticket.status)}`}>
+                                    {ticket.status || 'Unknown'}
+                                  </span>
+                                </div>
+                                <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+                                  <div className="flex items-center gap-1">
+                                    <span className="font-medium">Ticket ID:</span>
+                                    <span className="font-mono bg-slate-100 px-2 py-1 rounded text-xs">
+                                      {ticket.ticket_id || 'N/A'}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Category:</span>{' '}
+                                    <span className="text-slate-700">{ticket.category || 'Uncategorized'}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-sm text-slate-500">
+                                <div className="flex flex-col items-end gap-1">
+                                  {/* Always show Created date if available */}
+                                  {hasCreatedDate && (
+                                    <div className="text-right">
+                                      <div className="font-medium text-slate-600 text-xs">Created:</div>
+                                      <div className="text-slate-700">{formatDate(createdDate)}</div>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Always show Updated date if available */}
+                                  {hasUpdatedDate && (
+                                    <div className="text-right">
+                                      <div className="font-medium text-gray-600 text-xs">Updated:</div>
+                                      <div className="text-gray-700 font-medium">{formatDate(updatedDate)}</div>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Always show Solved date if available */}
+                                  {hasSolvedDate && (
+                                    <div className="text-right">
+                                      <div className="font-medium text-gray-800 text-xs">Closed:</div>
+                                      <div className="text-gray-900 font-medium">{formatDate(solvedDate)}</div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-4">
+                              <div>
+                                <p className="text-sm font-medium text-slate-700 mb-1">Your Query:</p>
+                                <div className="text-slate-700 bg-slate-50 p-3 rounded border border-slate-100 whitespace-pre-wrap">
+                                  {ticket.description || 'No description provided'}
+                                </div>
+                              </div>
+                              
+                              {response ? (
+                                <div>
+                                  <div className="flex items-center justify-between mb-1">
+                                    <p className="text-sm font-medium text-slate-700">Support Response:</p>
+                                    <div className="flex items-center gap-2">
+                                      {hasSolvedDate ? (
+                                        <span className="text-xs text-gray-600 font-medium">
+                                          Closed: {formatDate(solvedDate)}
+                                        </span>
+                                      ) : hasUpdatedDate ? (
+                                        <span className="text-xs text-slate-500">
+                                          Updated: {formatDate(updatedDate)}
+                                        </span>
+                                      ) : null}
+                                    </div>
+                                  </div>
+                                  <div className="text-slate-700 bg-gray-50 p-3 rounded-lg border border-gray-200 whitespace-pre-wrap shadow-sm">
+                                    <div className="flex items-start gap-2">
+                                      {/* <svg className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                      </svg> */}
+                                      <div>{response}</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="text-center py-4 border border-dashed border-slate-300 rounded bg-slate-50">
+                                  <p className="text-slate-500 text-sm">No response received</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                        <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-medium text-slate-700 mb-2">No Closed Tickets</h3>
+                      <p className="text-slate-500 text-sm mb-6">You don't have any closed tickets.</p>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* If no tickets exist at all */}
+              {tickets.length === 0 && !loadingTickets && (
+                <div className="text-center py-12">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
+                    <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-slate-700 mb-2">No Support Tickets Yet</h3>
+                  <p className="text-slate-500 text-sm mb-6">Submit your first ticket to get started with support.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Create New Ticket Form - Always shown except when loading */}
+          {!loadingTickets && (
+            <div className="mt-10 pt-8 border-t border-slate-200">
+              <div className="flex items-center gap-2 mb-6">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 className="text-lg font-medium text-slate-700">Create New Ticket</h3>
               </div>
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  {/* Category Field */}
+                  <div>
+                    <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-2">
+                      Category *
+                    </label>
+                    <select
+                      id="category"
+                      name="category"
+                      value={ticketData.category}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-slate-700 outline-none text-sm sm:text-base"
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map((category, index) => (
+                        <option key={index} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className='col-span-1'>
-                <label
-                  htmlFor="subject"
-                  className="block text-sm font-medium text-slate-700 mb-2">
-                  Subject
-                </label>
+                  {/* Subject Field */}
+                  <div>
+                    <label htmlFor="subject" className="block text-sm font-medium text-slate-700 mb-2">
+                      Subject *
+                    </label>
+                    <input
+                      type="text"
+                      id="subject"
+                      name="subject"
+                      value={ticketData.subject}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-slate-700 outline-none text-sm sm:text-base"
+                      placeholder="Enter the subject of your issue"
+                    />
+                  </div>
+                </div>
 
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  value={ticketData.subject}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 
-                            rounded-lg focus:ring-1 focus:ring-blue-400 transition-colors 
-                            text-slate-700 outline-none text-sm sm:text-base"
-                  placeholder="Enter the subject of your issue"
-                />
-              </div>
+                {/* Description Field */}
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">
+                    Description *
+                  </label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={ticketData.description}
+                    onChange={handleInputChange}
+                    required
+                    rows={4}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical text-slate-700 outline-none text-sm sm:text-base"
+                    placeholder="Please describe your issue in detail..."
+                  />
+                </div>
 
-
-              {/* Description Field */}
-              <div className='col-span-1 sm:col-span-2'>
-                <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={ticketData.description}
-                  onChange={handleInputChange}
-                  required
-                  rows={4}
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-400  transition-colors resize-vertical text-slate-700 outline-none text-sm sm:text-base"
-                  placeholder="Please describe your issue in detail..."
-                />
-              </div>
-
-              {/* Submit Button */}
-              <div className="col-span-1 sm:col-span-2 pt-2 sm:pt-4">
-                <button
-                  type="submit"
-                  className="w-full bg-blue-600 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base">
-                  Submit ticket
-                </button>
-              </div>
-            </form>
+                {/* Submit Button */}
+                <div className="pt-2 sm:pt-4">
+                  <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base shadow-sm hover:shadow-md"
+                  >
+                    Submit New Ticket
+                  </button>
+                </div>
+              </form>
+            </div>
           )}
         </div>
 
@@ -400,7 +847,6 @@ const HelpSupportPage: React.FC = () => {
           <div className="space-y-3 sm:space-y-4">
             {faqs.map((faq, index) => (
               <div key={index} className="bg-white rounded-lg border border-slate-200 hover:shadow-md transition-shadow overflow-hidden">
-                {/* FAQ Question - Clickable Header */}
                 <button
                   className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left flex justify-between items-center outline-none select-none"
                   onClick={() => toggleFaq(index)}
@@ -419,7 +865,6 @@ const HelpSupportPage: React.FC = () => {
                   </svg>
                 </button>
 
-                {/* FAQ Answer - Collapsible Content */}
                 <div
                   className={`overflow-hidden transition-all duration-200 ${openFaqIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                     }`}
@@ -442,7 +887,6 @@ const HelpSupportPage: React.FC = () => {
             </a>
           </p>
         </div>
-
       </div>
     </div>
   );
