@@ -87,9 +87,8 @@ export const AdminService = {
     const response = await api.get("/api/admin/contactus", { params: formData });
     return response.data;
   },
-  
-    updateContactStatus: async (id: string, status: string) => {
-    // IMPORTANT: Use backticks (`) not single quotes (')
+
+  updateContactStatus: async (id: string, status: string) => {
     const res = await api.put(`/api/admin/contactus/status/${id}`, { status });
     return res.data;
   },
@@ -122,19 +121,13 @@ export const AdminService = {
     const response = await api.get("/api/admin/tickets", { params });
     return response.data;
   },
-  
-  getTicket: async (ticketId: string) => {
-    const response = await api.get(`/api/admin/tickets/${ticketId}`);
-    return response.data;
-  },
-  
-  // Solve ticket with admin solution - NEW METHOD
+
+  // Solve ticket with admin solution 
   solveTicket: async (ticketId: string | number, solution: string) => {
     const response = await api.put(`/api/admin/tickets/${ticketId}/solve`, {
       solution: solution
     });
     return response.data;
   }
-
 };
 
