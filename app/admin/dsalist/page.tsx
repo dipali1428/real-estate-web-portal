@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Tab } from '@headlessui/react';
 import * as XLSX from 'xlsx';
 import { AdminService } from '@/app/services/adminService';
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, FileUp, FileSpreadsheet } from "lucide-react";
 import toast from "react-hot-toast";
 import { div } from 'framer-motion/client';
 
@@ -217,6 +217,84 @@ export default function DSAManagementPage() {
     // Write workbook and trigger download
     XLSX.writeFile(workbook, filename);
   };
+
+  const requiredColumns = [
+    "ID",
+    "Adv ID",
+    "Name",
+    "Email",
+    "Mobile",
+    "PAN",
+    "City",
+    "Head",
+    "Category",
+    "Date Joined",
+    "Updated At",
+    "Role"
+  ];
+
+
+  const normalizeExcelRow = (row: any) => {
+    return {
+      id: row["ID"] || null,
+      adv_id: row["Adv ID"] || "",
+      name: row["Name"] || "",
+      email: row["Email"] || "",
+      mobile: row["Mobile"] || "",
+      pan: row["PAN"] || "",
+      city: row["City"] || "",
+      head: row["Head"] || "",
+      category: row["Category"] || "",
+      date_joined: row["Date Joined"] || null,
+      updated_at: row["Updated At"] || null,
+      role: row["Role"] || "DSA",
+    };
+  };
+
+  // Upload Excel function
+  // const handleUploadExcel = async (e: any) => {
+  //   const file = e.target.files[0];
+  //   if (!file) return;
+
+  //   try {
+  //     const reader = new FileReader();
+
+  //     reader.onload = async (evt) => {
+  //       const bstr = evt.target?.result;
+  //       const wb = XLSX.read(bstr, { type: "binary" });
+  //       const wsname = wb.SheetNames[0];
+  //       const ws = wb.Sheets[wsname];
+
+  //       const rawExcel = XLSX.utils.sheet_to_json(ws, { defval: "" });
+
+  //       // Validate presence of required Excel columns
+  //       const excelColumns = Object.keys(rawExcel[0] || {});
+  //       const missing = requiredColumns.filter(c => !excelColumns.includes(c));
+
+  //       if (missing.length > 0) {
+  //         toast.error(`Missing columns in Excel: ${missing.join(", ")}`);
+  //         return;
+  //       }
+
+  //       // Normalize each row to correct DB field format
+  //       const normalizedData = rawExcel.map(normalizeExcelRow);
+
+  //       // Send to backend
+  //       const res = await AdminService.uploadDSAExcel({ data: normalizedData });
+
+  //       toast.success(`${res.insertedCount} rows imported, ${res.skippedCount} skipped.`);
+
+  //       fetchDSAs();
+  //     };
+
+  //     reader.readAsBinaryString(file);
+
+  //   } catch (err) {
+  //     console.error("Excel Upload Error:", err);
+  //     toast.error("Failed to upload Excel");
+  //   }
+  // };
+
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this DSA?")) return;
@@ -564,19 +642,24 @@ export default function DSAManagementPage() {
   </button>
   */}
 
+          {/* Upload XLSX Sheet */}
+          <label className="inline-flex items-center justify-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 cursor-pointer">
+            <FileSpreadsheet className="w-5 h-5 mr-2" />
+            Upload Excel
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+            // onChange={handleUploadExcel}
+            />
+          </label>
+
           {/* Download Excel Button */}
           <button
             onClick={() => downloadExcel('all')}
             className="inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
             disabled={dsas.length === 0}>
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
+            <FileUp className="w-5 h-5 mr-2" />
             Download Excel
             <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -787,6 +870,9 @@ export default function DSAManagementPage() {
                               Role
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Password
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Status
                             </th>
 
@@ -847,6 +933,9 @@ export default function DSAManagementPage() {
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.role}
+                              </td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                                {dsa.password}
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap">
                                 <span

@@ -172,6 +172,8 @@ export default function ProfileSection() {
                                         password: profile.password || undefined,
                                     };
 
+                                    await AdminService.updateAdminProfile(payload);
+
                                     toast.success("Profile updated successfully!");
 
                                     const refreshed = await AdminService.getAdminProfile();
@@ -179,16 +181,12 @@ export default function ProfileSection() {
 
                                     setIsEditing(false);
                                 } catch (err: any) {
-                                    console.error(err);
-                                    toast.error(
-                                        err?.response?.data?.message || "Failed to update profile."
-                                    );
+                                    toast.error(err?.response?.data?.message || "Failed to update profile.");
                                 } finally {
                                     setSaving(false);
                                 }
                             }}
-                            className="px-6 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#169c91] transition"
-                        >
+                            className="px-6 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#169c91] transition">
                             {saving ? "Saving..." : "Save Changes"}
                         </button>
                     </div>

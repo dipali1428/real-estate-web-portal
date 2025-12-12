@@ -111,6 +111,13 @@ export const AdminService = {
     return res.data;
   },
 
+  // Update Admin Profile
+  updateAdminProfile: async (payload: any) => {
+    const res = await api.put("/api/admin/adminProfile/update", payload);
+    return res.data;
+  },
+
+  // Get all Tickets on Admin Dashboard
   getTickets: async (params?: {
     status?: string;
     category?: string;
