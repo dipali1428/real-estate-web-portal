@@ -101,6 +101,8 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                 document.cookie = `authToken=${data.token}; path=/; max-age=86400; SameSite=Lax`;
                 if (data.user.role === "ADMIN") {
                     router.push("/admin");
+                } else if (data.user.role === "LEADMANAGER") {
+                    router.push("/rm");
                 } else {
                     router.push("/dashboard");
                 }

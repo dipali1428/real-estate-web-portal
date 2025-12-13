@@ -35,4 +35,17 @@ export const DashboardService = {
         const response = await api.get("/api/support/my-tickets");
         return response.data;
     },
+
+    // 🔹 Create Lead
+    createReferralLead: async (payload: {
+        lead_name: string;
+        contact_number: string;
+        email: string;
+        department: string;
+        sub_category: string;
+        notes: string;
+    }) => {
+        const response = await api.post("/api/dsa/referral-lead", payload);
+        return response.data;
+    },
 };
