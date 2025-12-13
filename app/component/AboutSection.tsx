@@ -4,16 +4,44 @@ const AboutSection = () => (
         <div className="container mx-auto px-6">
             {/* Section Heading */}
             <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                    About Us
-                </h2>
-                <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
-                <p className="text-gray-700 max-w-3xl mx-auto text-lg leading-relaxed">
-                    At <span className="font-semibold text-[#1CADA3]">Infinity Arthvishva</span>,
-                    we blend technology and trust to simplify your financial journey.
-                    Our expert team provides transparent, unbiased, and goal-oriented financial guidance designed to help you achieve lasting success. By aligning every strategy with your unique investment goals, we ensure sustainable growth, informed decisions, and a secure financial future.
-                </p>
-            </div>
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                        About Us
+                    </h2>
+                    <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
+                    <p className="text-gray-700 max-w-3xl mx-auto text-lg leading-relaxed">
+                        At <span className="font-semibold text-[#1CADA3]">Infinity Arthvishva</span>,
+                        we believe that your financial success is our true achievement. We are a one-stop financial advisory firm offering end-to-end solutions in loans, investments, insurance, and wealth management. With a strong foundation of trust, expertise, and innovation, we strive to simplify finance and empower individuals and businesses to achieve their goals with confidence.
+                    </p>
+                    <p className="text-gray-700 max-w-3xl mx-auto text-lg leading-relaxed">
+                        At Infinity Arthvishva, we don’t just manage finances — we build lasting relationships and craft infinite possibilities for your financial future.
+                    </p>
+
+                    {/* GST and CIN Numbers */}
+                    <div className="max-w-3xl mx-auto mt-8">
+                        <div className="flex flex-col md:flex-row justify-center items-center gap-4 xl:gap-6">
+                            {/* GST Number */}
+                            <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-3 xl:px-4 py-2 rounded-lg font-semibold shadow-sm text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center">
+                                <div>
+                                    <div className="font-semibold">GST Number</div>
+                                    <div className="font-mono text-xs mt-1">27AAICI0723K1ZJ</div>
+                                </div>
+                            </div>
+
+                            {/* CIN Number */}
+                            <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-3 xl:px-4 py-2 rounded-lg font-semibold shadow-sm text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center">
+                                <div>
+                                    <div className="font-semibold">CIN Number</div>
+                                    <div className="font-mono text-xs mt-1 break-all">U66190PN2025PTC238981</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p className="text-gray-500 text-sm text-center mt-4 italic">
+                            Registered and compliant with all regulatory requirements
+                        </p>
+                    </div>
+
+                </div>
 
             {/* Content Grid */}
             <div className="grid md:grid-cols-2 gap-12 items-center">
