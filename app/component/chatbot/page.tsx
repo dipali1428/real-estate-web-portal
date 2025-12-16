@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { getCustomResponses } from './customeResponses';
+import { Bot } from "lucide-react";
 
 interface Message {
   id: number;
@@ -21,8 +22,8 @@ interface CustomResponseConfig {
 }
 export default function Home() {
   return (
-    <div className="font-poppins min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
- {/* Chatbot Widget Component */}
+    <div className="font-poppins min-h-screen bg-linear-to-br from-gray-50 to-blue-50">
+      {/* Chatbot Widget Component */}
       <ChatbotWidget />
 
       <style jsx global>{`
@@ -321,9 +322,9 @@ const getFinancialResponse = (userMessage: string): string => {
       return question.response;
     }
   }
-// ==== DEFAULT RESPONSE ====
+  // ==== DEFAULT RESPONSE ====
   const financialKeywords = [''];
- return `I'm ANITA, your specialized financial assistant. I focus on:\n\n**Core Areas**:\n• Loans & Credit\n• Investments & Wealth Management\n• Insurance & Risk Coverage\n• Financial Planning\n\n**Ask me about Infinity Arthvishva**:\n• "Tell me about Infinity Arthvishva"\n• "What services do you offer?"\n• "Who are the founders/leaders?"\n• "What is your business model?"\n• "Investment opportunities with you"\n• "Your future growth plans"\n\n**Quick Examples**:\n• "Calculate EMI for 30 lakhs"\n• "What is a good credit score?"\n• "Explain mutual funds"\n• "Health insurance plans"\n\nHow can I assist you today?`;
+  return `I'm ANITA, your specialized financial assistant. I focus on:\n\n**Core Areas**:\n• Loans & Credit\n• Investments & Wealth Management\n• Insurance & Risk Coverage\n• Financial Planning\n\n**Ask me about Infinity Arthvishva**:\n• "Tell me about Infinity Arthvishva"\n• "What services do you offer?"\n• "Who are the founders/leaders?"\n• "What is your business model?"\n• "Investment opportunities with you"\n• "Your future growth plans"\n\n**Quick Examples**:\n• "Calculate EMI for 30 lakhs"\n• "What is a good credit score?"\n• "Explain mutual funds"\n• "Health insurance plans"\n\nHow can I assist you today?`;
 };
 
 // Message Bubble Logo Component
@@ -530,7 +531,7 @@ const ChatbotWidget: React.FC = () => {
     if (messagesEndRef.current && shouldAutoScroll) {
       const container = messagesContainerRef.current;
       if (container) {
-        messagesEndRef.current.scrollIntoView({ 
+        messagesEndRef.current.scrollIntoView({
           behavior: 'smooth',
           block: 'end'
         });
@@ -641,37 +642,36 @@ const ChatbotWidget: React.FC = () => {
     <>
       {/* Enhanced Toggle Button with Message Bubble Logo */}
       <button
-  onClick={() => setIsOpen(!isOpen)}
-  className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-[#2076C7] to-[#1CADA3] text-white rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-all duration-300 z-50 animate-pulse-glow hover:animate-float group"
->
-  <div className="relative">
-    {/* Animated Message Bubble */}
-    <div className="w-10 h-10 relative">
-      {/* Main message bubble */}
-      <div className="absolute w-8 h-8 bg-white rounded-lg transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:rounded-2xl">
-        {/* Message lines */}
-        <div className="absolute top-2 left-2 right-2">
-          <div className="h-1 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-1.5 w-5 animate-pulse delay-100"></div>
-          <div className="h-1 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-1.5 w-4 animate-pulse delay-200"></div>
-          <div className="h-1 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full w-3 animate-pulse delay-300"></div>
-        </div>
-      </div>
-      
-      {/* Floating dots animation */}
-      <div className="absolute -top-1 -right-1">
-        <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce opacity-0 group-hover:opacity-100"></div>
-      </div>
-      <div className="absolute -bottom-1 -left-1">
-        <div className="w-1 h-1 bg-white rounded-full animate-bounce opacity-0 group-hover:opacity-100 delay-150"></div>
-      </div>
-    </div>
-  </div>
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed bottom-6 right-6 w-16 h-16 bg-linear-to-br from-[#2076C7] to-[#1CADA3] text-white rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-all duration-300 z-50 animate-pulse-glow hover:animate-float group">
+        <div className="relative">
+          {/* Animated Message Bubble */}
+          <div className="w-10 h-10 relative">
+            {/* Main message bubble */}
+            <div className="absolute w-8 h-8 bg-white rounded-lg transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:rounded-2xl">
+              {/* Message lines */}
+              <div className="absolute top-2 left-2 right-2">
+                <div className="h-1 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-1.5 w-5 animate-pulse delay-100"></div>
+                <div className="h-1 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-1.5 w-4 animate-pulse delay-200"></div>
+                <div className="h-1 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full w-3 animate-pulse delay-300"></div>
+              </div>
+            </div>
 
-  {/* Tooltip */}
-  <span className="absolute -top-8 right-0 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap shadow-lg">
-    Chat with ANITA
-  </span>
-</button>
+            {/* Floating dots animation */}
+            <div className="absolute -top-1 -right-1">
+              <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce opacity-0 group-hover:opacity-100"></div>
+            </div>
+            <div className="absolute -bottom-1 -left-1">
+              <div className="w-1 h-1 bg-white rounded-full animate-bounce opacity-0 group-hover:opacity-100 delay-150"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tooltip */}
+        <span className="absolute -top-8 right-0 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap shadow-lg">
+          Chat with ANITA
+        </span>
+      </button>
 
       {/* Medium Size Chatbot Container */}
       {isOpen && (
@@ -683,49 +683,47 @@ const ChatbotWidget: React.FC = () => {
                 <MessageBubbleLogo />
                 <div>
                   <h3 className="font-bold text-sm">ANITA</h3>
-                  <span className="text-xs opacity-90 font-medium">Automated Navigation and Interface Task Assistant</span>
+                  <span className="text-xs opacity-90 font-medium w-full whitespace-nowrap overflow-hidden text-ellipsis">
+                    Automated Navigation and Interface Task Assistant
+                  </span>
                 </div>
               </div>
               <div className="flex space-x-1">
                 <button
                   onClick={() => setIsSettingsOpen(true)}
                   className="p-1.5 hover:bg-white/20 rounded-lg transition-all duration-300 text-xs backdrop-blur-sm hover:scale-110"
-                  title="Settings"
-                >
+                  title="Settings">
                   <i className="fas fa-user-cog"></i>
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-1.5 hover:bg-white/20 rounded-lg transition-all duration-300 text-xs backdrop-blur-sm hover:scale-110"
-                  title="Close"
-                >
+                  title="Close">
                   <i className="fas fa-times"></i>
                 </button>
               </div>
             </div>
           </div>
-         {/* Messages Area - WhatsApp style (no auto-scroll) */}
-          <div 
+
+          <div
             ref={messagesContainerRef}
-            className="flex-1 p-3 overflow-y-auto bg-gradient-to-b from-gray-50 to-white"
-            style={{ scrollBehavior: 'smooth' }}
-          >
+            className="flex-1 p-3 overflow-y-auto bg-linear-to-b from-gray-50 to-white"
+            style={{ scrollBehavior: 'smooth' }}>
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex mb-3 ${message.type === 'user' 
-                  ? 'justify-end animate-slide-in-right' 
-                  : 'justify-start animate-slide-in-left'}`}
-              >
-                {message.type === 'bot' && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center mr-2 flex-shrink-0 shadow-md">
-                    <i className="fas fa-robot text-white text-xs"></i>
+                className={`flex mb-3 ${message.type === 'user'
+                  ? 'justify-end animate-slide-in-right'
+                  : 'justify-start animate-slide-in-left'}`}>
+                {message.type === "bot" && (
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600">
+                    <Bot className="w-4 h-4" />
                   </div>
                 )}
 
                 <div className={`max-w-[75%] ${message.type === 'user' ? 'order-1' : 'order-2'}`}>
-                  <div className={`rounded-lg p-2.5 text-sm ${message.type === 'user' 
-                    ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-br-none shadow-md' 
+                  <div className={`rounded-lg p-2.5 text-sm ${message.type === 'user'
+                    ? 'bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-br-none shadow-md'
                     : 'bg-white border border-gray-200 rounded-bl-none shadow-md google-style-response'}`}>
                     <div className={`${message.type === 'user' ? 'text-white' : 'text-gray-800'}`} style={{ whiteSpace: 'pre-line' }}>
                       {message.content.split('**').map((part, index) =>
@@ -739,8 +737,7 @@ const ChatbotWidget: React.FC = () => {
                           <button
                             key={index}
                             onClick={() => handleQuickReply(reply.msg)}
-                            className="px-2 py-1 bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 text-[#2076C7] text-xs rounded-lg hover:from-[#2076C7]/20 hover:to-[#1CADA3]/20 transition-all duration-300 border border-[#2076C7]/20"
-                          >
+                            className="px-2 py-1 bg-linear-to-r from-[#2076C7]/10 to-[#1CADA3]/10 text-[#2076C7] text-xs rounded-lg hover:from-[#2076C7]/20 hover:to-[#1CADA3]/20 transition-all duration-300 border border-[#2076C7]/20">
                             {reply.text}
                           </button>
                         ))}
@@ -753,7 +750,7 @@ const ChatbotWidget: React.FC = () => {
                 </div>
 
                 {message.type === 'user' && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center ml-2 flex-shrink-0 shadow-md">
+                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center ml-2 shrink-0 shadow-md">
                     <i className="fas fa-user text-gray-600 text-xs"></i>
                   </div>
                 )}
@@ -762,7 +759,7 @@ const ChatbotWidget: React.FC = () => {
 
             {isTyping && (
               <div className="flex mb-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center mr-2 animate-pulse-glow">
+                <div className="w-8 h-8 rounded-full bg-linear-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center mr-2 animate-pulse-glow">
                   <i className="fas fa-robot text-white text-xs"></i>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-lg rounded-bl-none p-2 shadow-md">
@@ -788,27 +785,24 @@ const ChatbotWidget: React.FC = () => {
                 onChange={(e) => setUserInput(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder="Type your message here..."
-                className="flex-1 bg-transparent border-none outline-none px-3 py-2 text-sm placeholder-gray-400"
+                className="flex-1 bg-transparent border-none outline-none px-3 py-2 text-sm text-gray-600 placeholder-gray-400"
               />
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={clearChat}
                   className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95"
-                  title="Clear Chat"
-                >
+                  title="Clear Chat">
                   <i className="fas fa-trash-alt text-sm"></i>
                 </button>
                 <button
                   onClick={handleSendMessage}
                   disabled={!userInput.trim()}
-                  className={`relative px-3.5 py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center min-w-[44px] ${
-                    userInput.trim()
-                      ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white hover:shadow-lg hover:scale-[1.03] active:animate-button-press'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
+                  className={`relative px-3.5 py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center min-w-11 ${userInput.trim()
+                    ? 'bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white hover:shadow-lg hover:scale-[1.03] active:animate-button-press'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    }`}>
                   {userInput.trim() && (
-                    <span className="absolute -inset-1 bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 rounded-xl blur-sm opacity-70 animate-send-glow"></span>
+                    <span className="absolute -inset-1 bg-linear-to-r from-[#2076C7]/20 to-[#1CADA3]/20 rounded-xl blur-sm opacity-70 animate-send-glow"></span>
                   )}
                   <span className="relative flex items-center">
                     <i className="fas fa-paper-plane mr-1.5 text-sm"></i>
@@ -817,18 +811,17 @@ const ChatbotWidget: React.FC = () => {
                 </button>
               </div>
             </div>
-            <div className="mt-2 flex justify-between items-center px-1"> 
-                {userInput.length > 0 && (
-                  <button
-                    onClick={() => setUserInput('')}
-                    className="ml-2 text-xs text-gray-400 hover:text-gray-600"
-                  >
-                    <i className="fas fa-times"></i>
-                  </button>
-                )}
-              </div>
+            <div className="mt-2 flex justify-between items-center px-1">
+              {userInput.length > 0 && (
+                <button
+                  onClick={() => setUserInput('')}
+                  className="ml-2 text-xs text-gray-400 hover:text-gray-600">
+                  <i className="fas fa-times"></i>
+                </button>
+              )}
             </div>
-          </div>   
+          </div>
+        </div>
       )}
       {/* Settings Modal */}
       {isSettingsOpen && (

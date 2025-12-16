@@ -7,11 +7,15 @@ import toast from "react-hot-toast";
 interface Profile {
     name: string;
     email: string;
+    rm_referral: string;
     mobile: string;
     role: string;
+    department: string;
+    city: string;
+    referral_code: string;
+    sub_category: string;
     password?: string;
 }
-
 export default function ProfileSection() {
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -78,6 +82,26 @@ export default function ProfileSection() {
                 {/* Form Container */}
                 <form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
+                    {/* REFERRAL CODE */}
+                    <div className="col-span-1">
+                        <label className="text-sm font-semibold text-[#1CADA3]">
+                            Referral Code
+                        </label>
+                        <input
+                            type="text"
+                            disabled
+                            value={profile.referral_code}
+                            className="w-full mt-1 px-3 py-2 
+                   bg-[#E6F7F5] 
+                   border-2 border-[#1CADA3] 
+                   rounded-lg 
+                   text-[#0F766E] 
+                   font-semibold 
+                   ring-1 ring-[#1CADA3]/30"
+                        />
+                    </div>
+
+
                     {/* NAME */}
                     <div className="col-span-1">
                         <label className="text-sm font-semibold text-gray-700">Name</label>
@@ -85,6 +109,39 @@ export default function ProfileSection() {
                             type="text"
                             disabled
                             value={profile.name}
+                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
+                        />
+                    </div>
+
+                    {/* DEPARTMENT */}
+                    <div className="col-span-1">
+                        <label className="text-sm font-semibold text-gray-700">Department</label>
+                        <input
+                            type="text"
+                            disabled
+                            value={profile.department}
+                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
+                        />
+                    </div>
+
+                    {/* SUB CATEGORY */}
+                    <div className="col-span-1">
+                        <label className="text-sm font-semibold text-gray-700">Sub Category</label>
+                        <input
+                            type="text"
+                            disabled
+                            value={profile.sub_category}
+                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
+                        />
+                    </div>
+
+                    {/* CITY */}
+                    <div className="col-span-1">
+                        <label className="text-sm font-semibold text-gray-700">City</label>
+                        <input
+                            type="text"
+                            disabled
+                            value={profile.city}
                             className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
                         />
                     </div>
@@ -172,12 +229,12 @@ export default function ProfileSection() {
                                         password: profile.password || undefined,
                                     };
 
-                                    await AdminService.updateAdminProfile(payload);
+                                    // await AdminService.updateAdminProfile(payload);
 
                                     toast.success("Profile updated successfully!");
 
-                                    const refreshed = await AdminService.getAdminProfile();
-                                    setProfile(refreshed.user);
+                                    // const refreshed = await AdminService.getAdminProfile();
+                                    // setProfile(refreshed.user);
 
                                     setIsEditing(false);
                                 } catch (err: any) {

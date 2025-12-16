@@ -18,7 +18,7 @@ export default function Home() {
       <PartnershipSection />
       <ContactSection />
       <CTASection />
-      <Chatbot/>
+      <Chatbot />
 
     </div>
   );
