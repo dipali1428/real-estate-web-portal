@@ -2,30 +2,18 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { AdminService } from "../services/adminService";
+import { RmService } from "../services/rmService";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import StatsCard from "../admin/components/DashboardStatsCard";
-import DashboardSectionHeader from "../admin/components/DashboardSectionHeader"
-
-import { Users, Mail, Clock, CheckCircle, LineChart, FolderOpen } from "lucide-react";
-
-interface Enquiry {
-  status: "Pending" | "Closed" | "Open";
-}
+import StatsCard from "../component/DashboardStatsCard";
+import DashboardSectionHeader from "../component/DashboardSectionHeader";
+import { Users, Mail } from "lucide-react";
 
 export default function Dashboard() {
-  const [user, setUser] = useState("");
   const [loading, setLoading] = useState(true);
-
-  const [dsaTotal, setDsaTotal] = useState(0);
-
-  const [enquiryStats, setEnquiryStats] = useState({
-    total: 0,
-    pending: 0,
-    closed: 0,
-    open: 0,
-  });
+  const [userName, setUserName] = useState("");
+  const [referralLeadTotal, setReferralLeadTotal] = useState(0);
+  const [myDsaTotal, setMyDsaTotal] = useState(0);
 
   const router = useRouter();
   const hasFetched = useRef(false);
@@ -33,26 +21,23 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
-      if (!token) return router.push("/");
+      if (!token) {
+        router.push("/");
+        return;
+      }
 
-      // Fetch Admin Profile
-      const profile = await AdminService.getAdminProfile();
-      setUser(profile.user.name);
+      // Fetch RM Profile
+      const rmProfile = await RmService.getRmProfile();
+      setUserName(rmProfile?.user?.name || "");
 
-      // Fetch DSA Count
-      const dsaResponse = await AdminService.dsaList();
-      setDsaTotal(dsaResponse?.count || 0);
+      // Fetch Referral Leads Count
+      const referralLeadsResponse = await RmService.getReferralLeads();
+      setReferralLeadTotal(referralLeadsResponse?.count || 0);
 
-      // Fetch Enquiries
-      const enquiryResponse = await AdminService.contactusData();
-      const enquiries = enquiryResponse?.contactus || [];
+      // Fetch My DSA Count
+      const myDsaCountResponse = await RmService.getYourDsaList();
+      setMyDsaTotal(myDsaCountResponse?.count || 0);
 
-      setEnquiryStats({
-        total: enquiryResponse.count || 0,
-        pending: enquiries.filter((e: Enquiry) => e.status === "Pending").length,
-        closed: enquiries.filter((e: Enquiry) => e.status === "Closed").length,
-        open: enquiries.filter((e: Enquiry) => e.status === "Open").length,
-      });
     } catch (error: any) {
       toast.error("Failed to fetch dashboard data.");
 
@@ -68,12 +53,13 @@ export default function Dashboard() {
     if (!hasFetched.current) {
       hasFetched.current = true;
       setLoading(true);
-      fetchDashboardData().then(() => setLoading(false));
+      fetchDashboardData().finally(() => setLoading(false));
     }
   }, []);
 
-  if (loading || !user)
+  if (loading) {
     return <div className="p-6 text-center text-lg">Loading Dashboard...</div>;
+  }
 
   return (
     <div className="flex-1 p-4 sm:p-6">
@@ -82,12 +68,44 @@ export default function Dashboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white shadow-lg">
-        <h2 className="text-xl sm:text-2xl font-bold">Welcome back,RM {} 👋</h2>
+        <h2 className="text-xl sm:text-2xl font-bold">
+          Welcome back, {userName} 👋
+        </h2>
         <p className="text-sm sm:text-base opacity-90 mt-1">
           Here&rsquo;s a quick snapshot of your business performance.
         </p>
       </motion.div>
-      
-      </div>
+
+      {/* Referral Leads Overview */}
+      <section className="mb-10">
+        <DashboardSectionHeader title="Referral Lead Count Overview" />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            title="Total Referral Leads"
+            value={referralLeadTotal}
+            icon={<Users size={26} />}
+            subtitle="All active & inactive DSAs"
+            color="blue"
+          />
+        </div>
+      </section>
+
+      {/* My DSA Overview */}
+      <section className="mb-10">
+        <DashboardSectionHeader title="My DSA's Total Count" />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            title="Total Enquiries"
+            value={myDsaTotal}
+            icon={<Mail size={26} />}
+            subtitle="All time enquiries"
+            delay={0.1}
+            color="blue"
+          />
+        </div>
+      </section>
+    </div>
   );
 }

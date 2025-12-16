@@ -1,7 +1,10 @@
 "use client";
-import { useState } from "react";
-import { X } from "lucide-react";
 
+import { useEffect, useState } from "react";
+import { X } from "lucide-react";
+import { DashboardService } from "@/app/services/dashboardService";
+
+/* ======================= COMPONENT ======================= */
 export default function AddLeadModal({
   isOpen,
   onClose,
@@ -18,229 +21,310 @@ export default function AddLeadModal({
     additionalNotes: "",
   });
 
-  const [error, setError] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>(
+    {}
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
+
+  // 🔥 Payload trigger for useEffect API call
+  const [submitPayload, setSubmitPayload] = useState<any>(null);
 
   const productKeyMap: Record<string, string> = {
-    "Finance": "finance",
-    "Protection": "protection",
-    "Investments": "investments",
+    Finance: "finance",
+    Protection: "protection",
+    Investments: "investments",
     "Real Estate": "real_estate",
     "Mutual Funds": "mutual_funds",
-    "Unlisted": "unlisted",
+    Unlisted: "unlisted",
   };
 
   const subProductOptions: Record<string, string[]> = {
-    finance: ["Home Loan", "Personal Loan", "Business Loan", "Education Loan", "Lap Loan", "Vehicle Loan", "SME Loan", "Loan Against Securities", "NRP Loan", "Credit Cards"],
-    protection: ["Health Insurance", "Life Insurance", "Travel Insurance", "Motor Insurance", "Property Insurance", "Cattle Insurance", "Marine Insurance"],
+    finance: [
+      "Home Loan",
+      "Personal Loan",
+      "Business Loan",
+      "Education Loan",
+      "Lap Loan",
+      "Vehicle Loan",
+      "SME Loan",
+      "Loan Against Securities",
+      "NRP Loan",
+      "Credit Cards",
+    ],
+    protection: [
+      "Health Insurance",
+      "Life Insurance",
+      "Travel Insurance",
+      "Motor Insurance",
+      "Property Insurance",
+      "Cattle Insurance",
+      "Marine Insurance",
+    ],
     investments: ["Wealth Management", "PMS/AIF", "Bonds", "Fixed Deposits"],
-    real_estate: ["Fractional Real Estate",],
+    real_estate: ["Fractional Real Estate"],
     mutual_funds: ["Mutual Funds"],
     unlisted: ["Unlisted"],
   };
 
-  // Update form values - matching Personal Loan behavior
+  /* ======================= HANDLERS ======================= */
   const handleChange = (key: string, value: string) => {
     setFormData({ ...formData, [key]: value });
+
+    if (validationErrors[key]) {
+      const updatedErrors = { ...validationErrors };
+      delete updatedErrors[key];
+      setValidationErrors(updatedErrors);
+    }
   };
 
-  // Validate before submit - matching Personal Loan behavior
-  const submitForm = (e: any) => {
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.leadName.trim()) {
+      errors.leadName = "Client name is required";
+    }
+
+    const cleanedContact = formData.contactNumber.replace(/\D/g, "");
+    if (!cleanedContact) {
+      errors.contactNumber = "Contact number is required";
+    } else if (cleanedContact.length !== 10) {
+      errors.contactNumber = "Contact number must be 10 digits";
+    }
+
+    if (!formData.product) {
+      errors.product = "Product selection is required";
+    }
+
+    if (
+      formData.emailAddress &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.emailAddress)
+    ) {
+      errors.emailAddress = "Enter a valid email address";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  /* ======================= SUBMIT ======================= */
+  const submitForm = (e: React.FormEvent) => {
     e.preventDefault();
     setError(false);
     setSuccess(false);
 
-    // Check all required fields
-    const requiredFields = [
-      formData.leadName,
-      formData.contactNumber,
-      formData.product,
-    ];
-
-    for (const field of requiredFields) {
-      if (!field) {
-        setError(true);
-        return;
-      }
-    }
-
-    // Validate phone number length
-    if (formData.contactNumber.length !== 10) {
+    if (!validateForm()) {
       setError(true);
       return;
     }
 
-    // If all good
-    setSuccess(true);
+    const payload = {
+      lead_name: formData.leadName.trim(),
+      contact_number: formData.contactNumber.replace(/\D/g, ""),
+      email: formData.emailAddress.trim() || "",
+      department: formData.product,
+      sub_category: formData.subProduct || "",
+      notes: formData.additionalNotes.trim() || "",
+    };
 
-    // Reset form and close after success
-    setTimeout(() => {
-      setSuccess(false);
-      onClose();
-      setFormData({
-        leadName: "",
-        contactNumber: "",
-        emailAddress: "",
-        product: "",
-        subProduct: "",
-        additionalNotes: "",
-      });
-    }, 1500);
+    setIsSubmitting(true);
+    setSubmitPayload(payload); // 🔥 Trigger API via useEffect
   };
+
+  /* ======================= API CALL ======================= */
+  useEffect(() => {
+    if (!submitPayload) return;
+
+    const createLead = async () => {
+      try {
+        await DashboardService.createReferralLead(submitPayload);
+
+        setSuccess(true);
+
+        setTimeout(() => {
+          setIsSubmitting(false);
+          setSuccess(false);
+          setSubmitPayload(null);
+          onClose();
+
+          setFormData({
+            leadName: "",
+            contactNumber: "",
+            emailAddress: "",
+            product: "",
+            subProduct: "",
+            additionalNotes: "",
+          });
+
+          setValidationErrors({});
+        }, 1500);
+      } catch (err: any) {
+        setIsSubmitting(false);
+        setSubmitPayload(null);
+        setError(true);
+
+        setValidationErrors({
+          apiError:
+            err?.response?.data?.message ||
+            "Failed to save lead. Please try again.",
+        });
+      }
+    };
+
+    createLead();
+  }, [submitPayload]);
 
   if (!isOpen) return null;
 
+  /* ======================= UI ======================= */
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto max-h-[90vh] flex flex-col">
-
-        {/* Header - Matching Personal Loan design */}
-        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0">
-          <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Add New Lead</h2>
-          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
-            <X size={20} className="sm:w-6 sm:h-6" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="bg-white rounded-xl w-full max-w-4xl shadow-xl">
+        {/* Header */}
+        <div className="flex justify-between items-center border-b px-6 py-4">
+          <h2 className="text-xl font-semibold text-[#1CADA3]">Add New Lead</h2>
+          <button onClick={onClose} disabled={isSubmitting}>
+            <X />
           </button>
         </div>
 
-        {/* Scrollable Form Body - Reduced bottom space */}
-        <div className="flex-1 overflow-y-auto">
-          <form onSubmit={submitForm} className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        {/* Body */}
+        <form onSubmit={submitForm} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input
+            label="Client Name"
+            value={formData.leadName}
+            onChange={(e: any) => handleChange("leadName", e.target.value)}
+            error={validationErrors.leadName}
+            required
+          />
 
-              <Input
-                label="Client Name"
-                placeholder="Enter client's full name"
-                value={formData.leadName}
-                onChange={(e: any) => handleChange("leadName", e.target.value)}
-              />
+          <Input
+            label="Contact Number"
+            onlyNumber
+            maxLength={10}
+            value={formData.contactNumber}
+            onChange={(e: any) => handleChange("contactNumber", e.target.value)}
+            error={validationErrors.contactNumber}
+            required
+          />
 
-              <Input
-                label="Contact Number"
-                type="tel"
-                maxLength={10}
-                onlyNumber
-                placeholder="Enter 10-digit contact number"
-                value={formData.contactNumber}
-                onChange={(e: any) => handleChange("contactNumber", e.target.value)}
-              />
+          <Input
+            label="Email Address"
+            value={formData.emailAddress}
+            onChange={(e: any) => handleChange("emailAddress", e.target.value)}
+            error={validationErrors.emailAddress}
+          />
 
-              <Input
-                label="Email Address"
-                type="email"
-                placeholder="Enter email address"
-                value={formData.emailAddress}
-                onChange={(e: any) => handleChange("emailAddress", e.target.value)}
-              />
+          <Select
+            label="Product"
+            value={formData.product}
+            options={Object.keys(productKeyMap)}
+            onChange={(val: string) => handleChange("product", val)}
+            error={validationErrors.product}
+            required
+          />
 
-              {/* Product Selection */}
-              <Select
-                label="Product"
-                options={["Finance", "Protection", "Investments", "Real Estate", "Mutual Funds", "Unlisted"]}
-                value={formData.product}
-                onChange={(value: string) => handleChange("product", value)}
-              />
+          {formData.product && (
+            <Select
+              label="Sub Product"
+              value={formData.subProduct}
+              options={subProductOptions[productKeyMap[formData.product]]}
+              onChange={(val: string) => handleChange("subProduct", val)}
+            />
+          )}
 
-              {/* Sub Product Selection */}
-              {formData.product && (
-                <Select
-                  label="Sub Product"
-                  options={subProductOptions[productKeyMap[formData.product]] || []}
-                  value={formData.subProduct}
-                  onChange={(value: string) => handleChange("subProduct", value)}
-                />
-              )}
+          <div className="md:col-span-2">
+            <label className="block text-sm mb-1">Additional Notes</label>
+            <textarea
+              rows={3}
+              value={formData.additionalNotes}
+              onChange={(e) => handleChange("additionalNotes", e.target.value)}
+              className="w-full border rounded-md p-2"
+            />
+          </div>
 
-              {/* Additional Notes - Full width */}
-              <div className="col-span-1 md:col-span-2">
-                <label className="block text-sm font-medium mb-1 text-gray-700">Additional Notes</label>
-                <textarea
-                  value={formData.additionalNotes}
-                  onChange={(e: any) => handleChange("additionalNotes", e.target.value)}
-                  placeholder="Enter any additional notes or comments..."
-                  rows={3}
-                  className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
-                />
-              </div>
-
-              {/* Error Message */}
-              {error && (
-                <div className="col-span-1 md:col-span-2 text-center text-red-600 font-semibold text-sm sm:text-base">
-                  ⚠ Please fill all required fields correctly.
-                </div>
-              )}
-
-              {/* Success Message */}
-              {success && (
-                <div className="col-span-1 md:col-span-2 text-center text-green-600 font-semibold text-sm sm:text-base">
-                  ✔ Lead saved successfully!
-                </div>
-              )}
-
-              {/* Action Buttons - Reduced top margin */}
-              <div className="col-span-1 md:col-span-2 flex justify-center gap-4">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="w-full sm:w-32 bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors text-sm sm:text-base">
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="w-full sm:w-32 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base">
-                  Save Lead
-                </button>
-              </div>
-
+          {validationErrors.apiError && (
+            <div className="md:col-span-2 text-center text-red-600">
+              ⚠ {validationErrors.apiError}
             </div>
-          </form>
-        </div>
+          )}
+
+          {success && (
+            <div className="md:col-span-2 text-center text-green-600">
+              ✔ Lead saved successfully
+            </div>
+          )}
+
+          <div className="md:col-span-2 flex justify-center gap-4">
+            <button type="button" onClick={onClose} className="px-6 py-2 bg-gray-200 rounded">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-6 py-2 bg-[#1CADA3] text-white rounded"
+            >
+              {isSubmitting ? "Saving..." : "Save Lead"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
 }
 
-/* ---------------- INPUT COMPONENT - Matching Personal Loan exactly ---------------- */
-function Input({ label, value, onChange, type = "text", onlyNumber, maxLength, placeholder }: any) {
-
-  const restrictNumber = (e: any) => {
-    if (!onlyNumber) return;
-
-    if (["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) return;
-
-    if (!/^[0-9]$/.test(e.key)) e.preventDefault();
-  };
-
+/* ======================= INPUT ======================= */
+function Input({
+  label,
+  value,
+  onChange,
+  onlyNumber,
+  maxLength,
+  error,
+  required,
+}: any) {
   return (
-    <div className="w-full">
-      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
+    <div>
+      <label className="block text-sm mb-1">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
       <input
         value={value}
-        type={type}
         maxLength={maxLength}
-        onKeyDown={restrictNumber}
         onChange={onChange}
-        placeholder={placeholder}
-        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
+        onKeyDown={(e) =>
+          onlyNumber && !/[0-9]|Backspace|Delete|Arrow/.test(e.key) && e.preventDefault()
+        }
+        className={`w-full border rounded-md p-2 ${
+          error ? "border-red-500" : "border-gray-300"
+        }`}
       />
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }
 
-/* ---------------- SELECT COMPONENT - With Personal Loan styling ---------------- */
-function Select({ label, options, value, onChange }: any) {
+/* ======================= SELECT ======================= */
+function Select({ label, value, options, onChange, error, required }: any) {
   return (
-    <div className="w-full">
-      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
+    <div>
+      <label className="block text-sm mb-1">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base"
+        className={`w-full border rounded-md p-2 ${
+          error ? "border-red-500" : "border-gray-300"
+        }`}
       >
         <option value="">Select {label}</option>
-        {options.map((option: string) => (
-          <option key={option} value={option}>{option}</option>
+        {options.map((opt: string) => (
+          <option key={opt}>{opt}</option>
         ))}
       </select>
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }

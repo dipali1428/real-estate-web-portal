@@ -45,7 +45,7 @@ export const DashboardService = {
         sub_category: string;
         notes: string;
     }) => {
-        const response = await api.post("/api/dsa/referral-lead", payload);
+        const response = await api.post("/api/rm/referral-lead", payload);
         return response.data;
     },
 };
