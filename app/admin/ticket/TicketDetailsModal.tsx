@@ -131,7 +131,7 @@ const TicketDetailsModal = ({
               Ticket #{ticket.ticket_id}
             </h2>
             <p className="text-sm sm:text-base text-gray-600 mt-1 truncate">
-              {ticket.subject}
+              DSA
             </p>
           </div>
           <button
@@ -238,7 +238,8 @@ const TicketDetailsModal = ({
                   <div className="space-y-3 lg:space-y-4">
                     <h4 className="font-medium text-gray-900 text-sm sm:text-base">Update Status</h4>
                     <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row flex-wrap gap-2">
-                      {['Resolved', 'Closed'].map((status) => (
+                      {/* {['Resolved', 'Closed'].map((status) => ( */}
+                      {['Closed'].map((status) => (
                         <button
                           key={status}
                           onClick={() => {
@@ -269,6 +270,15 @@ const TicketDetailsModal = ({
                 </div>
               </div>
             )}
+          </div>
+
+          <div className="border-b border-gray-200 w-full p-4 sm:p-6 flex items-center gap-3 hover:bg-gray-50 transition-colors">
+              <h3 className="font-semibold text-gray-900 text-base sm:text-lg">
+                Subject:
+              </h3>
+                  <p className="text-gray-700 whitespace-pre-wrap text-sm sm:text-base leading-relaxed">
+                    {ticket.subject}
+                  </p>
           </div>
 
           {/* Description */}

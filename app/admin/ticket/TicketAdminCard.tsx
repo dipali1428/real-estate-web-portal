@@ -100,7 +100,7 @@ const TicketAdminCard = ({
       <div className="hidden lg:block min-w-[1024px]">
         <div className="grid gap-4 p-4 md:p-6 hover:bg-gray-50 transition-colors"
              style={{
-               gridTemplateColumns: '130px 160px 140px minmax(150px, 1fr) 140px 100px 140px 80px'
+               gridTemplateColumns: '130px 160px 140px 140px minmax(150px, 1fr) 100px 140px 80px'
              }}
         >
           {/* Ticket ID */}
@@ -116,9 +116,9 @@ const TicketAdminCard = ({
           {/* DSA Info */}
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+              {/* <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                 <User className="w-4 h-4 text-blue-600" />
-              </div>
+              </div> */}
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-gray-900 text-sm truncate block" title={ticket.name}>
                   {ticket.name}
@@ -133,7 +133,7 @@ const TicketAdminCard = ({
           {/* Phone Number */}
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <Phone className="w-3 h-3 text-gray-500 flex-shrink-0" />
+              {/* <Phone className="w-3 h-3 text-gray-500 flex-shrink-0" /> */}
               {ticket.phone ? (
                 <a 
                   href={`tel:${ticket.phone}`}
@@ -148,26 +148,22 @@ const TicketAdminCard = ({
             </div>
           </div>
 
-          {/* Subject */}
-          <div className="min-w-0">
-            <div className="min-w-0">
-              <p className="font-medium text-gray-900 text-sm block" title={ticket.subject}>
-                {ticket.subject}
-              </p>
-              <div className="flex items-center gap-1 mt-1">
-                <MessageCircle className="w-3 h-3 text-gray-400 flex-shrink-0" />
-                <span className="text-xs text-gray-500 truncate">
-                  {ticket.comments?.length || 0} comments
-                </span>
-              </div>
-            </div>
-          </div>
+          
 
           {/* Category */}
           <div className="min-w-0">
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 truncate block max-w-full" title={ticket.category}>
               {ticket.category}
             </span>
+          </div>
+
+          {/* Subject */}
+          <div className="min-w-0">
+            <div className="min-w-0">
+              <p className="font-medium text-gray-900 text-sm block" title={ticket.subject}>
+                {ticket.subject}
+              </p>
+            </div>
           </div>
 
           {/* Status */}
@@ -219,7 +215,7 @@ const TicketAdminCard = ({
           {/* Mobile Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className={`w-2 h-2 rounded-full ${getPriorityColor(ticket.priority || 'Medium')}`} />
+              {/* <div className={`w-2 h-2 rounded-full ${getPriorityColor(ticket.priority || 'Medium')}`} /> */}
               
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 mb-1">
