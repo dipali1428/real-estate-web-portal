@@ -1,136 +1,191 @@
-import { PieChart, Shield, TrendingUp } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { PieChart, Shield, TrendingUp, ArrowRight } from "lucide-react";
+
+interface ServiceItem {
+  name: string;
+  slug: string;
+}
+
+interface ServiceCategory {
+  id: string;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  items: ServiceItem[];
+}
 
 const ServicesSection = () => {
-    const services = [
-        {
-            icon: <Shield className="w-12 h-12 text-white" />,
-            title: "Finance",
-            description: "Comprehensive loan solutions for all your financial needs.",
-            items: [
-                "Home Loan",
-                "Personal Loan",
-                "Business Loan",
-                "SME Loan",
-                "Auto Loan",
-                "Mortgage Loan",
-                "Education Loan",
-                "Vehicle Loan",
-                "Loan Against Securities",
-            ],
-        },
-        {
-            icon: <PieChart className="w-12 h-12 text-white" />,
-            title: "Protection",
-            description: "Insurance solutions to safeguard your future and assets.",
-            items: [
-                "Life Insurance",
-                "Health Insurance",
-                "Motor Insurance",
-                "Property Insurance",
-                "Travel Insurance",
-                "Cattle Insurance",
-                "Marine Insurance",
-                "Group Medi-Claim Cover",
-                "Group Personal Accident Cover",
-                "Worker Compensation Insurance",
-                "Corporate General Insurance",
-            ],
-        },
-        {
-            icon: <TrendingUp className="w-12 h-12 text-white" />,
-            title: "Investment",
-            description: "Strategic investment options to grow your wealth.",
-            items: [
-                "Mutual Funds",
-                "Wealth Management",
-                "Pension Funds",
-                "Stock & Securities",
-                "Demat Account",
-                "Real Estate Investments",
-                "Portfolio Management Service",
-                "Alternative Investment Fund",
-                "Fixed Deposit",
-                "Bonds",
-                "Tax Consultancy",
-                "Unlisted Shares",
-            ],
-        },
-    ];
+  const router = useRouter();
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
-    return (
-        <section
-            id="services"
-            className="relative py-20 bg-white text-white overflow-hidden">
-            {/* Subtle gradient overlay for readability */}
-            <div className="absolute inset-0 bg-white/5 mix-blend-overlay"></div>
+  const services: ServiceCategory[] = [
+    {
+      id: "finance",
+      icon: <Shield className="w-12 h-12 text-white" />,
+      title: "Finance",
+      description: "Comprehensive loan solutions for all your financial needs.",
+      items: [
+        { name: "Home Loan", slug: "home-loan" },
+        { name: "Personal Loan", slug: "personal-loan" },
+        { name: "Business Loan", slug: "business-loan" },
+        { name: "SME Loan", slug: "sme-loan" },
+        { name: "Auto Loan", slug: "auto-loan" },
+        { name: "Mortgage Loan", slug: "mortgage-loan" },
+        { name: "Education Loan", slug: "education-loan" },
+        { name: "Vehicle Loan", slug: "vehicle-loan" },
+        { name: "Loan Against Securities", slug: "loan-against-securities" },
+      ],
+    },
+    {
+      id: "protection",
+      icon: <PieChart className="w-12 h-12 text-white" />,
+      title: "Protection",
+      description: "Insurance solutions to safeguard your future and assets.",
+      items: [
+        { name: "Life Insurance", slug: "life-insurance" },
+        { name: "Health Insurance", slug: "health-insurance" },
+        { name: "Motor Insurance", slug: "motor-insurance" },
+        { name: "Property Insurance", slug: "property-insurance" },
+        { name: "Travel Insurance", slug: "travel-insurance" },
+        { name: "Cattle Insurance", slug: "cattle-insurance" },
+        { name: "Marine Insurance", slug: "marine-insurance" },
+        { name: "Group Medi-Claim Cover", slug: "group-medi-claim-cover" },
+        { name: "Group Personal Accident Cover", slug: "group-personal-accident-cover" },
+        { name: "Worker Compensation Insurance", slug: "worker-compensation-insurance" },
+        { name: "Corporate General Insurance", slug: "corporate-general-insurance" },
+      ],
+    },
+    {
+      id: "investment",
+      icon: <TrendingUp className="w-12 h-12 text-white" />,
+      title: "Investment",
+      description: "Strategic investment options to grow your wealth.",
+      items: [
+        { name: "Mutual Funds", slug: "mutual-funds" },
+        { name: "Wealth Management", slug: "wealth-management" },
+        { name: "Pension Funds", slug: "pension-funds" },
+        { name: "Stock & Securities", slug: "stock-securities" },
+        { name: "Demat Account", slug: "demat-account" },
+        { name: "Real Estate Investments", slug: "real-estate-investments" },
+        { name: "Portfolio Management Service", slug: "portfolio-management-service" },
+        { name: "Alternative Investment Fund", slug: "alternative-investment-fund" },
+        { name: "Fixed Deposit", slug: "fixed-deposit" },
+        { name: "Bonds", slug: "bonds" },
+        { name: "Tax Consultancy", slug: "tax-consultancy" },
+        { name: "Unlisted Shares", slug: "unlisted-shares" },
+      ],
+    },
+  ];
 
-            <div className="relative container mx-auto px-4">
-                {/* Section Heading */}
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                        Our Services
-                    </h2>
-                    <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
-                    <p className="text-lg text-white/90">
-                        <span className="bg-linear-to-r from-[#1CADA3] to-[#2076C7] bg-clip-text text-transparent font-medium">
-                            Comprehensive financial solutions under one roof
-                        </span>
-                    </p>
+  const handleServiceItemClick = (serviceCategory: string, itemSlug: string) => {
+    router.push(`/offers/${serviceCategory}/${itemSlug}`);
+  };
+
+  const handleServiceCardClick = (serviceId: string) => {
+    router.push(`/offers/${serviceId}`);
+  };
+
+  return (
+    <section
+      id="services"
+      className="relative py-16 bg-gradient-to-br from-gray-50 to-white text-white overflow-hidden"
+    >
+      {/* Background Pattern */}
+      <div 
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: "linear-gradient(to right, #f0f0f0 1px, transparent 1px), linear-gradient(to bottom, #f0f0f0 1px, transparent 1px)",
+          backgroundSize: "50px 50px"
+        }}
+      />
+      
+      {/* Gradient Orbs */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-r from-[#1CADA3]/20 to-[#2076C7]/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+
+      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Heading */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-3">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">
+              Our Offers
+            </span>
+          </h2>
+          <div className="w-24 h-1 mx-auto bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] rounded-full mb-4" />
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1CADA3] to-[#2076C7] font-medium">
+              Exclusive financial offers tailored to your unique needs
+            </span>
+          </p>
+        </div>
+
+        {/* Service Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {services.map((service, index) => (
+            <div
+              key={service.id}
+              className="group relative bg-white rounded-2xl shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-1 flex flex-col items-center text-center p-6 hover:shadow-xl hover:shadow-[#2076C7]/10 cursor-pointer border border-gray-100"
+              onClick={() => handleServiceCardClick(service.id)}
+            >
+              {/* Icon Section */}
+              <div className="relative mb-6">
+                <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-5 rounded-full flex justify-center items-center shadow-md">
+                  <div className="transform transition-transform duration-300 group-hover:scale-110">
+                    {service.icon}
+                  </div>
                 </div>
+              </div>
 
-                {/* Service Cards */}
-                <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {services.map((service, index) => (
-                        <div
-                            key={index}
-                            className="group relative bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg 
-                            transition-all duration-500 overflow-hidden 
-                            hover:-translate-y-2 flex flex-col items-center text-center p-6
-                            hover:shadow-[0_0_25px_6px_rgba(32,118,199,0.2)]
-                            transform hover:scale-[1.02] cursor-pointer">
-
-                            {/* Soft gradient overlay on hover */}
-                            <div className="absolute inset-0 bg-linear-to-br from-[#2076C7]/10 to-[#1CADA3]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                            {/* Animated glowing border */}
-                            <div className="absolute inset-0 rounded-2xl border border-transparent group-hover:border-[#1CADA3]/40 group-hover:animate-pulse-glow transition-all duration-700"></div>
-
-
-                            {/* Icon Section */}
-                            <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-6 rounded-full flex justify-center items-center mb-6 shadow-md">
-                                <div className="transform transition-transform duration-500 group-hover:scale-110">
-                                    {service.icon}
-                                </div>
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex flex-col items-center">
-                                <h3 className="text-xl md:text-2xl font-bold mb-3 text-[#2076C7] group-hover:text-[#1CADA3] transition-colors duration-300">
-                                    {service.title}
-                                </h3>
-                                <p className="text-gray-600 text-base md:text-lg mb-5 max-w-xs leading-relaxed">
-                                    {service.description}
-                                </p>
-                                <ul className="space-y-2 text-gray-700 text-sm md:text-base">
-                                    {service.items.map((item, idx) => (
-                                        <li key={idx} className="flex items-center justify-center">
-                                            <span className="text-[#1CADA3] mr-2 font-semibold">✓</span>
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+              {/* Content */}
+              <div className="relative flex flex-col items-center w-full z-10">
+                <h3 className="text-xl md:text-2xl font-bold mb-3 text-gray-800 group-hover:text-[#2076C7] transition-colors duration-300 text-center">
+                  {service.title}
+                </h3>
+                
+                <p className="text-gray-600 text-sm md:text-base mb-6 leading-relaxed text-center max-w-xs">
+                  {service.description}
+                </p>
+                
+                {/* Service Items List */}
+                <div className="w-full">
+                  <h4 className="text-base font-semibold text-gray-700 mb-3 text-center">
+                    Available Offers:
+                  </h4>
+                  <ul className="w-full">
+                    {service.items.map((item, idx) => (
+                      <li 
+                        key={idx}
+                        onMouseEnter={() => setHoveredItem(`${service.id}-${item.slug}`)}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleServiceItemClick(service.id, item.slug);
+                        }}
+                        className="flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r hover:from-[#2076C7]/5 hover:to-[#1CADA3]/5 transition-all duration-200 cursor-pointer group/item"
+                      >
+                        <div className="flex items-center space-x-2 justify-center w-full">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center group-hover/item:scale-105 transition-transform">
+                            <span className="text-[#1CADA3] font-bold text-sm">✓</span>
+                          </div>
+                          <span className="text-gray-700 text-sm group-hover/item:text-[#2076C7] transition-colors text-center">
+                            {item.name}
+                          </span>
+                          <ArrowRight className="w-3.5 h-3.5 text-[#1CADA3] opacity-0 transform -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
                         </div>
+                      </li>
                     ))}
+                  </ul>
                 </div>
+              </div>
             </div>
-
-            {/* Subtle floating shapes in background */}
-            <div className="absolute -top-32 -right-32 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
-            <div className="absolute -bottom-32 -left-32 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
-        </section>
-
-    );
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default ServicesSection;
