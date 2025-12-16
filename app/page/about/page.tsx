@@ -36,10 +36,6 @@ const AboutSection = () => (
                                 </div>
                             </div>
                         </div>
-
-                        <p className="text-gray-500 text-sm text-center mt-4 italic">
-                            Registered and compliant with all regulatory requirements
-                        </p>
                     </div>
 
                 </div>
