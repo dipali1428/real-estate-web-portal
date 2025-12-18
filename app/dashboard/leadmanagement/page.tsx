@@ -10,7 +10,7 @@ import LifeInsuranceForm from "./forms/lifeinsuranceform";
 import HealthInsuranceForm from "./forms/healthisurancform";
 import MotorInsuranceForm from "./forms/motorinsuranceform";
 import TravelInsuranceForm from "./forms/TravelInsuranceForm"
-import PropertyInsuranceForm from "./forms/propertyinsuranceform";
+import FireInsuranceForm from "./forms/fireinsuranceform";
 import CattleInsuranceForm from "./forms/cattleinsuranceform";
 import MarineInsuranceForm from "./forms/marineinsuranceform";
 import HomeLoanForm from "./forms/homeloanform";
@@ -29,6 +29,7 @@ import FixedDepositForm from "./forms/fineddf";
 import RealEstateForm from "./forms/realestate";
 import NrpLoanForm from "./forms/nrploanform";
 import LeadTable from "./components/LeadTable";
+import CorporateInsuranceForm from "./forms/corporateinsuranceform";
 
 export default function LeadManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,7 +48,7 @@ export default function LeadManagementPage() {
   const [showHealthInsuranceForm, setShowHealthInsuranceForm] = useState(false);
   const [showMotorInsuranceForm, setShowMotorInsuranceForm] = useState(false);
   const [showTravelInsuranceForm, setShowTravelInsuranceForm] = useState(false);
-  const [showPropertyInsuranceForm, setShowPropertyInsuranceForm] = useState(false);
+  const [showFireInsuranceForm, setShowFireInsuranceForm] = useState(false);
   const [showCattleInsuranceForm, setShowCattleInsuranceForm] = useState(false);
   const [showMarineInsuranceForm, setShowMarineInsuranceForm] = useState(false);
   const [showHomeLoanForm, setShowHomeLoanForm] = useState(false);
@@ -65,6 +66,7 @@ export default function LeadManagementPage() {
   const [showBondsForm, setShowBondsForm] = useState(false);
   const [showRealEstateForm, setShowRealEstateForm] = useState(false);
   const [showNrpLoanForm, setShowNrpLoanForm] = useState(false);
+  const [showCorporateInsuranceForm, setShowCorporateInsuranceForm] = useState(false);
 
   // Form handlers object for cleaner conditional rendering
   const formHandlers = {
@@ -72,7 +74,7 @@ export default function LeadManagementPage() {
     showHealthInsuranceForm,
     showMotorInsuranceForm,
     showTravelInsuranceForm,
-    showPropertyInsuranceForm,
+    showFireInsuranceForm,
     showCattleInsuranceForm,
     showMarineInsuranceForm,
     showHomeLoanForm,
@@ -89,7 +91,8 @@ export default function LeadManagementPage() {
     showFixedDepositForm,
     showBondsForm,
     showRealEstateForm,
-    showNrpLoanForm
+    showNrpLoanForm,
+    showCorporateInsuranceForm
   };
 
   // Enhanced product cards with actual click handlers
@@ -139,9 +142,10 @@ export default function LeadManagementPage() {
       "Health Insurance": () => setShowHealthInsuranceForm(true),
       "Motor Insurance": () => setShowMotorInsuranceForm(true),
       "Travel Insurance": () => setShowTravelInsuranceForm(true),
-      "Property Insurance": () => setShowPropertyInsuranceForm(true),
+      "Fire Insurance": () => setShowFireInsuranceForm(true),
       "Cattle Insurance": () => setShowCattleInsuranceForm(true),
       "Marine Insurance": () => setShowMarineInsuranceForm(true),
+      "Corporate Insurance": () => setShowCorporateInsuranceForm(true),
 
       // Mutual Fund
       "Mutual Fund": () => setShowMutualFundForm(true),
@@ -168,7 +172,7 @@ export default function LeadManagementPage() {
     if (showHealthInsuranceForm) return <HealthInsuranceForm onClose={() => setShowHealthInsuranceForm(false)} />;
     if (showMotorInsuranceForm) return <MotorInsuranceForm onClose={() => setShowMotorInsuranceForm(false)} />;
     if (showTravelInsuranceForm) return <TravelInsuranceForm onClose={() => setShowTravelInsuranceForm(false)} />;
-    if (showPropertyInsuranceForm) return <PropertyInsuranceForm onClose={() => setShowPropertyInsuranceForm(false)} />;
+    if (showFireInsuranceForm) return <FireInsuranceForm onClose={() => setShowFireInsuranceForm(false)} />;
     if (showCattleInsuranceForm) return <CattleInsuranceForm onClose={() => setShowCattleInsuranceForm(false)} />;
     if (showMarineInsuranceForm) return <MarineInsuranceForm onClose={() => setShowMarineInsuranceForm(false)} />;
     if (showHomeLoanForm) return <HomeLoanForm onClose={() => setShowHomeLoanForm(false)} />;
@@ -186,6 +190,7 @@ export default function LeadManagementPage() {
     if (showBondsForm) return <BondsForm onClose={() => setShowBondsForm(false)} />;
     if (showRealEstateForm) return <RealEstateForm onClose={() => setShowRealEstateForm(false)} />;
     if (showNrpLoanForm) return <NrpLoanForm onClose={() => setShowNrpLoanForm(false)} />;
+    if (showCorporateInsuranceForm) return <CorporateInsuranceForm onClose={() => setShowCorporateInsuranceForm(false)} />;
   }
 
   // Tabs list with counts

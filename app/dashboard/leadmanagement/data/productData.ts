@@ -96,8 +96,8 @@ export const productCards: ProductCards = {
       converted: 0
     },
     { 
-      title: "Property Insurance", 
-      description: "Property insurance protects your home and belongings from damage, theft, or loss.",
+      title: "Fire Insurance", 
+      description: "Compensates for damage to property (buildings, equipment, stock) from accidental fire and related risks",
       onClick: () => {},
       activeLeads: 0,
       converted: 0
@@ -112,6 +112,13 @@ export const productCards: ProductCards = {
     { 
       title: "Marine Insurance", 
       description: "Marine insurance protects ships, cargo, and goods against loss during transit by sea.",
+      onClick: () => {},
+      activeLeads: 0,
+      converted: 0
+    },
+    { 
+      title: "Corporate Insurance", 
+      description: "Corporate insurance provides coverage for businesses against various risks and liabilities.",
       onClick: () => {},
       activeLeads: 0,
       converted: 0
