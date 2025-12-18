@@ -4,7 +4,7 @@ import api from "./api";
 export const DashboardService = {
     // 🔹 Get current user's dashboard profile data
     getProfile: async () => {
-        const response = await api.get("/api/auth/profile");
+        const response = await api.get("/api/dashboard/profile");
         return response.data;
     },
 
@@ -16,7 +16,7 @@ export const DashboardService = {
         category: string;
         password: string;
     }) => {
-        const response = await api.put("/api/auth/profile", payload);
+        const response = await api.put("/api/dashboard/profile", payload);
         return response.data;
     },
 
@@ -26,13 +26,13 @@ export const DashboardService = {
         subject: string;
         description: string;
     }) => {
-        const response = await api.post("/api/support/ticket", payload);
+        const response = await api.post("/api/dashboard/support/ticket", payload);
         return response.data;
     },
 
     // 🔹 Get Tickets
     getMyTickets: async () => {
-        const response = await api.get("/api/support/my-tickets");
+        const response = await api.get("/api/dashboard/support/my-tickets");
         return response.data;
     },
 
@@ -45,7 +45,7 @@ export const DashboardService = {
         sub_category: string;
         notes: string;
     }) => {
-        const response = await api.post("/api/rm/referral-lead", payload);
+        const response = await api.post("/api/dashboard/create-referral-lead", payload);
         return response.data;
     },
 };

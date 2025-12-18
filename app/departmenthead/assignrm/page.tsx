@@ -154,53 +154,56 @@ export default function LeadManagerPage() {
           
         </div>
 
-        {/* Filter Section */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-            {/* Search Box */}
-            <div className="lg:col-span-2 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search DSAs..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+      {/* Filter Section */}
+<div className="bg-white rounded-xl shadow-md p-6 mb-6">
+  <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+    {/* Search Box */}
+    <div className="lg:col-span-2 relative">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+      <input
+        type="text"
+        placeholder="Search DSAs..."
+        /* Added text-gray-900 and placeholder-gray-400 for visibility */
+        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400 outline-none"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+    </div>
 
-            {/* Department Box */}
-            <div className="relative">
-              <select
-                value={selectedMainDept}
-                onChange={(e) => setSelectedMainDept(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
-              >
-                <option value="all">All Departments</option>
-                {Object.keys(CATEGORY_MAP).map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-              <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 rotate-90" />
-            </div>
+    {/* Department Box */}
+    <div className="relative">
+      <select
+        value={selectedMainDept}
+        onChange={(e) => setSelectedMainDept(e.target.value)}
+        /* Added text-gray-900 */
+        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 appearance-none bg-white text-gray-900 outline-none"
+      >
+        <option value="all" className="text-gray-900">All Departments</option>
+        {Object.keys(CATEGORY_MAP).map(cat => (
+          <option key={cat} value={cat} className="text-gray-900">{cat}</option>
+        ))}
+      </select>
+      <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 rotate-90 pointer-events-none" />
+    </div>
 
-            {/* Subcategory Box */}
-            <div className="relative">
-              <select
-                value={selectedSubDept}
-                onChange={(e) => setSelectedSubDept(e.target.value)}
-                disabled={selectedMainDept === 'all'}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 appearance-none bg-white disabled:bg-gray-50 disabled:text-gray-400"
-              >
-                <option value="all">All Subcategories</option>
-                {selectedMainDept !== 'all' && CATEGORY_MAP[selectedMainDept].map(sub => (
-                  <option key={sub} value={sub}>{sub}</option>
-                ))}
-              </select>
-              <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 rotate-90" />
-            </div>
-          </div>
-        </div>
+    {/* Subcategory Box */}
+    <div className="relative">
+      <select
+        value={selectedSubDept}
+        onChange={(e) => setSelectedSubDept(e.target.value)}
+        disabled={selectedMainDept === 'all'}
+        /* Added text-gray-900 and disabled:text-gray-400 */
+        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 appearance-none bg-white text-gray-900 disabled:bg-gray-50 disabled:text-gray-400 outline-none"
+      >
+        <option value="all" className="text-gray-900">All Subcategories</option>
+        {selectedMainDept !== 'all' && CATEGORY_MAP[selectedMainDept].map(sub => (
+          <option key={sub} value={sub} className="text-gray-900">{sub}</option>
+        ))}
+      </select>
+      <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 rotate-90 pointer-events-none" />
+    </div>
+  </div>
+</div>
 
         {/* Content */}
         <div className="grid lg:grid-cols-3 gap-6">

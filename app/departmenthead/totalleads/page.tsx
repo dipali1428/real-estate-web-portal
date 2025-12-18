@@ -873,64 +873,70 @@ export default function ReferralManagementDashboard() {
             </svg>
           </div>
         </div>
- {/* Filters and Stats */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-2 flex space-x-2">
-            <button
-              onClick={() => setMeetingView('upcoming')}
-              className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-                meetingView === 'upcoming'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Upcoming ({upcomingMeetings.length})
-            </button>
-            <button
-              onClick={() => setMeetingView('past')}
-              className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-                meetingView === 'past'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Past ({pastMeetings.length})
-            </button>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Meeting Type
-            </label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={meetingTypeFilter}
-              onChange={(e) => setMeetingTypeFilter(e.target.value)}
-            >
-              <option value="all">All Types</option>
-              <option value="in-person">In-Person</option>
-              <option value="virtual">Virtual</option>
-              <option value="phone">Phone</option>
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={meetingStatusFilter}
-              onChange={(e) => setMeetingStatusFilter(e.target.value)}
-            >
-              <option value="all">All Status</option>
-              <option value="scheduled">Scheduled</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-              <option value="postponed">Postponed</option>
-            </select>
-          </div>
-        </div>
+{/* Filters and Stats */}
+<div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+  {/* View Toggle Buttons */}
+  <div className="md:col-span-2 flex space-x-2">
+    <button
+      onClick={() => setMeetingView('upcoming')}
+      /* Forced bg-gray-100 text-gray-700 for inactive state to prevent fading */
+      className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all shadow-sm ${
+        meetingView === 'upcoming'
+          ? 'bg-blue-600 text-white shadow-blue-200'
+          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
+      }`}
+    >
+      Upcoming ({upcomingMeetings.length})
+    </button>
+    <button
+      onClick={() => setMeetingView('past')}
+      className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all shadow-sm ${
+        meetingView === 'past'
+          ? 'bg-blue-600 text-white shadow-blue-200'
+          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
+      }`}
+    >
+      Past ({pastMeetings.length})
+    </button>
+  </div>
+  
+  {/* Meeting Type Dropdown */}
+  <div>
+    <label className="block text-sm font-bold text-gray-700 mb-1">
+      Meeting Type
+    </label>
+    <select
+      /* Added bg-white text-gray-900 and explicitly styled options */
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 cursor-pointer"
+      value={meetingTypeFilter}
+      onChange={(e) => setMeetingTypeFilter(e.target.value)}
+    >
+      <option value="all" className="bg-white text-gray-900">All Types</option>
+      <option value="in-person" className="bg-white text-gray-900">In-Person</option>
+      <option value="virtual" className="bg-white text-gray-900">Virtual</option>
+      <option value="phone" className="bg-white text-gray-900">Phone</option>
+    </select>
+  </div>
+  
+  {/* Status Dropdown */}
+  <div>
+    <label className="block text-sm font-bold text-gray-700 mb-1">
+      Status
+    </label>
+    <select
+      /* Added bg-white text-gray-900 */
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 cursor-pointer"
+      value={meetingStatusFilter}
+      onChange={(e) => setMeetingStatusFilter(e.target.value)}
+    >
+      <option value="all" className="bg-white text-gray-900">All Status</option>
+      <option value="scheduled" className="bg-white text-gray-900">Scheduled</option>
+      <option value="completed" className="bg-white text-gray-900">Completed</option>
+      <option value="cancelled" className="bg-white text-gray-900">Cancelled</option>
+      <option value="postponed" className="bg-white text-gray-900">Postponed</option>
+    </select>
+  </div>
+</div>
  {/* Meetings List */}
         {displayedMeetings.length === 0 ? (
           <EmptyState 

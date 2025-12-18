@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { RmService } from '@/app/services/rmService';
 import * as XLSX from 'xlsx';
@@ -625,20 +624,14 @@ export default function ReferralManagementDashboard() {
                     <td className="px-3 py-3 md:px-6 md:py-4 text-sm">
                       <div className="flex flex-col">
                         <span className="font-bold text-gray-900">{lead.lead_name}</span>
-                        <div className="mt-1 space-y-1">
+                        <div className="space-y-1">
                           {lead.contact_number && (
-                            <a href={`tel:${lead.contact_number}`} className="flex items-center text-sm text-blue-600 hover:text-blue-800">
-                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                              </svg>
+                            <a href={`tel:${lead.contact_number}`} className="flex items-center text-sm text-blue-600 hover:text-blue-800"> 
                               {lead.contact_number}
                             </a>
                           )}
                           {lead.email && (
                             <a href={`mailto:${lead.email}`} className="flex items-center text-xs text-gray-600 hover:text-gray-800 truncate">
-                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                              </svg>
                               {lead.email}
                             </a>
                           )}
@@ -754,7 +747,7 @@ export default function ReferralManagementDashboard() {
           ) : (
             <>
               {activeTab === 'dsa' && renderDSAList()}
-              {activeTab === 'meetings' && renderMeetings()}
+              {/* {activeTab === 'meetings' && renderMeetings()} */}
               {activeTab === 'leads' && renderLeads()}
             </>
           )}

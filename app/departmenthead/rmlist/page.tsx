@@ -408,112 +408,118 @@ export default function DepartmentHeadPanel() {
       </div>
 
       {/* Search and Filter Section */}
-      <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-        <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
-          {/* Search Bar */}
-          <div className="relative flex-1 w-full lg:w-auto">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <input
-              type="text"
-              placeholder="Search RMs, email, department, or subcategory..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              value={searchTerm}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-            />
-          </div>
+<div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
+  <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+    
+    {/* Search Bar */}
+    <div className="relative flex-1 w-full lg:w-auto">
+      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+      <input
+        type="text"
+        placeholder="Search RMs, email, department..."
+        /* Added bg-white text-gray-900 and placeholder-gray-400 */
+        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white text-gray-900 placeholder-gray-400"
+        value={searchTerm}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+      />
+    </div>
 
-          {/* Date Range Filter */}
-          <div className="w-full lg:w-auto">
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              value={dateRange}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDateRange(e.target.value)}
-            >
-              <option value="all">All Time</option>
-              <option value="today">Today</option>
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="quarter">This Quarter</option>
-            </select>
-          </div>
+    {/* Date Range Filter */}
+    <div className="w-full lg:w-auto">
+      <select
+        /* Added bg-white text-gray-900 */
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white text-gray-900 cursor-pointer"
+        value={dateRange}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDateRange(e.target.value)}
+      >
+        <option value="all" className="bg-white text-gray-900">All Time</option>
+        <option value="today" className="bg-white text-gray-900">Today</option>
+        <option value="week" className="bg-white text-gray-900">This Week</option>
+        <option value="month" className="bg-white text-gray-900">This Month</option>
+        <option value="quarter" className="bg-white text-gray-900">This Quarter</option>
+      </select>
+    </div>
 
-          {/* Filter Button for Mobile */}
-          <button
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="lg:hidden flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
-          >
-            <Filter className="h-5 w-5" />
-            Filters
-            {isFilterOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </button>
+    {/* Filter Button for Mobile */}
+    <button
+      onClick={() => setIsFilterOpen(!isFilterOpen)}
+      className="lg:hidden flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition"
+    >
+      <Filter className="h-5 w-5" />
+      <span className="font-medium">Filters</span>
+      {isFilterOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+    </button>
 
-          {/* Export Button */}
-          <button
-            onClick={exportToCSV}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg transition shadow hover:shadow-lg"
-          >
-            <Download className="h-5 w-5" />
-            Export Report
-          </button>
-        </div>
+    {/* Export Button */}
+    <button
+      onClick={exportToCSV}
+      className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition shadow hover:shadow-lg font-medium"
+    >
+      <Download className="h-5 w-5" />
+      Export Report
+    </button>
+  </div>
 
-        {/* Filters - Visible on desktop, toggleable on mobile */}
-        <div className={`${isFilterOpen ? 'block' : 'hidden'} lg:block mt-6 lg:mt-4`}>
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Department Filter */}
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
-              <select
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                value={selectedDepartment}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                  setSelectedDepartment(e.target.value);
-                  setSelectedSubcategory('All');
-                }}
-              >
-                <option value="All">All Departments</option>
-                {categories.map((category: Category) => (
-                  <option key={category.id} value={category.name}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Subcategory Filter */}
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Subcategory</label>
-              <select
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                value={selectedSubcategory}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedSubcategory(e.target.value)}
-                disabled={selectedDepartment === 'All'}
-              >
-                {availableSubcategories.map((subcat: string, index: number) => (
-                  <option key={index} value={subcat}>
-                    {subcat}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Reset Filters */}
-            <div className="flex items-end">
-              <button
-                onClick={() => {
-                  setSelectedDepartment('All');
-                  setSelectedSubcategory('All');
-                  setSearchTerm('');
-                  setDateRange('all');
-                }}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition w-full"
-              >
-                Clear All Filters
-              </button>
-            </div>
-          </div>
-        </div>
+  {/* Filters - Visible on desktop, toggleable on mobile */}
+  <div className={`${isFilterOpen ? 'block' : 'hidden'} lg:block mt-6 lg:mt-4 pt-4 border-t border-gray-50 lg:border-none`}>
+    <div className="flex flex-col md:flex-row gap-4">
+      
+      {/* Department Filter */}
+      <div className="flex-1">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Department</label>
+        <select
+          /* Added bg-white text-gray-900 */
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white text-gray-900 cursor-pointer"
+          value={selectedDepartment}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+            setSelectedDepartment(e.target.value);
+            setSelectedSubcategory('All');
+          }}
+        >
+          <option value="All" className="bg-white text-gray-900">All Departments</option>
+          {categories.map((category: Category) => (
+            <option key={category.id} value={category.name} className="bg-white text-gray-900">
+              {category.name}
+            </option>
+          ))}
+        </select>
       </div>
+
+      {/* Subcategory Filter */}
+      <div className="flex-1">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Subcategory</label>
+        <select
+          /* Added bg-white text-gray-900 and disabled colors */
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white text-gray-900 disabled:bg-gray-50 disabled:text-gray-400 cursor-pointer"
+          value={selectedSubcategory}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedSubcategory(e.target.value)}
+          disabled={selectedDepartment === 'All'}
+        >
+          {availableSubcategories.map((subcat: string, index: number) => (
+            <option key={index} value={subcat} className="bg-white text-gray-900">
+              {subcat}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Reset Filters */}
+      <div className="flex items-end">
+        <button
+          onClick={() => {
+            setSelectedDepartment('All');
+            setSelectedSubcategory('All');
+            setSearchTerm('');
+            setDateRange('all');
+          }}
+          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition w-full border border-gray-200"
+        >
+          Clear All Filters
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Relationship Managers Table */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
