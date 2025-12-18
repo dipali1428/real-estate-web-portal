@@ -4,6 +4,16 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { DashboardService } from "@/app/services/dashboardService";
 
+// 🔥 1. Define the list of allowed domains here
+const ALLOWED_DOMAINS = [
+  "gmail.com",
+  "yahoo.com",
+  "outlook.com",
+  "hotmail.com",
+  "icloud.com",
+  "live.com",
+];
+
 /* ======================= COMPONENT ======================= */
 export default function AddLeadModal({
   isOpen,
@@ -28,7 +38,7 @@ export default function AddLeadModal({
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
 
-  // 🔥 Payload trigger for useEffect API call
+  // Payload trigger for useEffect API call
   const [submitPayload, setSubmitPayload] = useState<any>(null);
 
   const productKeyMap: Record<string, string> = {
@@ -97,11 +107,22 @@ export default function AddLeadModal({
       errors.product = "Product selection is required";
     }
 
-    if (
-      formData.emailAddress &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.emailAddress)
-    ) {
-      errors.emailAddress = "Enter a valid email address";
+    // 🔥 2. Enhanced Email Validation Logic
+    if (formData.emailAddress) {
+      // Basic regex for format (user@domain.com)
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      if (!emailRegex.test(formData.emailAddress)) {
+        errors.emailAddress = "Enter a valid email format";
+      } else {
+        // Extract the domain part (everything after @)
+        const domain = formData.emailAddress.split("@")[1];
+        
+        // Check if the domain is in our allowed list
+        if (!ALLOWED_DOMAINS.includes(domain)) {
+          errors.emailAddress = `Domain "@${domain}" is not supported. Please use a known provider (e.g., Gmail, Yahoo).`;
+        }
+      }
     }
 
     setValidationErrors(errors);
@@ -129,7 +150,7 @@ export default function AddLeadModal({
     };
 
     setIsSubmitting(true);
-    setSubmitPayload(payload); // 🔥 Trigger API via useEffect
+    setSubmitPayload(payload);
   };
 
   /* ======================= API CALL ======================= */
@@ -182,7 +203,7 @@ export default function AddLeadModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="bg-white rounded-xl w-full max-w-4xl shadow-xl">
         {/* Header */}
-        <div className="flex justify-between items-center border-b px-6 py-4">
+        <div className="flex justify-between items-center border-b px-6 py-4 text-gray-700">
           <h2 className="text-xl font-semibold text-[#1CADA3]">Add New Lead</h2>
           <button onClick={onClose} disabled={isSubmitting}>
             <X />
@@ -190,7 +211,7 @@ export default function AddLeadModal({
         </div>
 
         {/* Body */}
-        <form onSubmit={submitForm} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={submitForm} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
           <Input
             label="Client Name"
             value={formData.leadName}
@@ -212,7 +233,10 @@ export default function AddLeadModal({
           <Input
             label="Email Address"
             value={formData.emailAddress}
-            onChange={(e: any) => handleChange("emailAddress", e.target.value)}
+            // Forces lowercase on input
+            onChange={(e: any) => 
+              handleChange("emailAddress", e.target.value.toLowerCase())
+            }
             error={validationErrors.emailAddress}
           />
 
