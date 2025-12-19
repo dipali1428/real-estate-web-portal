@@ -33,7 +33,7 @@ export const sidebarLinks = {
         { label: "DSA Management", href: "/admin/dsalist", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "Ticket Raised", href: "/admin/ticket", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },
         { label: "Website Enquiry", href: "/admin/enquiry", icon: <Megaphone className="h-5 w-5 text-neutral-700" /> },
-        { label: "Lead Management", href: "/admin/leadmanagement", icon: <UserCheck className="h-5 w-5 text-neutral-700" /> },
+        { label: "Unassigned DSA's", href: "/admin/unassigneddsa", icon: <UserCheck className="h-5 w-5 text-neutral-700" /> },
     ],
 
     GM: [],

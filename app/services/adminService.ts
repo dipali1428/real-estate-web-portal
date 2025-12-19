@@ -135,6 +135,23 @@ export const AdminService = {
       solution: solution
     });
     return response.data;
-  }
+  },
+
+  // Add these to DashboardService in your service file
+  getRms: async () => {
+    const response = await api.get("/api/admin/rmlist");
+    return response.data;
+  },
+  
+  // 🔹 Get Unassigned DSAs/Leads
+  getUnassignedDsas: async () => {
+    const response = await api.get("/api/admin/unassigned-dsas");
+    return response.data;
+  },
+
+  assignDsaToRm: async (payload: { dsa_id: string; rm_id: string }) => {
+    const response = await api.put("/api/admin/assign-dsa-to-rm", payload);
+    return response.data;
+  },
 };
 
