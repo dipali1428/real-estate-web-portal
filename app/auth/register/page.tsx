@@ -73,6 +73,7 @@ export default function BecomePartnerForm() {
         mobile: "",
         pan: "",
         city: "",
+        rm_referral: "",
         head: "",
         category: "",
         password: "",
@@ -133,7 +134,6 @@ export default function BecomePartnerForm() {
             return () => clearTimeout(t);
         }
     }, [success, closeAll, openLogin]);
-
 
 
     const setField = (key: keyof typeof form, value: any) => {
@@ -207,6 +207,7 @@ export default function BecomePartnerForm() {
                 mobile: form.mobile,
                 pan: form.pan,
                 city: form.city,
+                rm_referral: form.rm_referral,
                 head: form.head,
                 category: form.category,
                 password: form.password,
@@ -226,6 +227,7 @@ export default function BecomePartnerForm() {
                 mobile: "",
                 pan: "",
                 city: "",
+                rm_referral: "",
                 head: "",
                 category: "",
                 password: "",
@@ -332,6 +334,20 @@ export default function BecomePartnerForm() {
                                 />
                                 {errors.city && <p className={errorClass}>{errors.city}</p>}
                             </div>
+
+                            <div>
+                                <label className={labelClass}>
+                                    RM Referral Code <span className="text-gray-400 text-sm">(Optional)</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={form.rm_referral}
+                                    onChange={(e) => setField("rm_referral", e.target.value)}
+                                    className={inputClass}
+                                    placeholder="If referred by an RM, ask them for their Referral Code" />
+                                {errors.rm_referral && <p className={errorClass}>{errors.rm_referral}</p>}
+                            </div>
+
 
                             {/* Head & Category Selection (Fixed Multi-Select) */}
                             <div className="md:col-span-2">
