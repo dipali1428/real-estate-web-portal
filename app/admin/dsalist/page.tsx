@@ -869,9 +869,9 @@ export default function DSAManagementPage() {
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Role
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Password
-                            </th>
+                            </th> */}
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Status
                             </th>
@@ -934,9 +934,9 @@ export default function DSAManagementPage() {
                               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.role}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              {/* <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.password}
-                              </td>
+                              </td> */}
                               <td className="px-4 py-3 whitespace-nowrap">
                                 <span
                                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${dsa.status === 'Active'
@@ -1159,8 +1159,7 @@ export default function DSAManagementPage() {
                   onChange={(e) =>
                     setEditingDSA({ ...editingDSA, role: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
+                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                   {roles.map((role) => (
                     <option key={role} value={role}>
                       {role}
