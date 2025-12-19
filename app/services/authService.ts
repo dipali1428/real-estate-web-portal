@@ -11,6 +11,7 @@ interface RegisterPayload {
     mobile: string;
     pan: string;
     city: string;
+    rm_referral: string;
     head: string;
     category: string;
     password: string;
