@@ -91,7 +91,7 @@ const ServicesSection = () => {
   return (
     <section
       id="services"
-      className="relative py-16 bg-gradient-to-br from-gray-50 to-white text-white overflow-hidden"
+      className="relative py-16 bg-linear-to-br from-gray-50 to-white text-white overflow-hidden"
     >
       {/* Background Pattern */}
       <div 
@@ -103,20 +103,20 @@ const ServicesSection = () => {
       />
       
       {/* Gradient Orbs */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-r from-[#1CADA3]/20 to-[#2076C7]/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+      {/* <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" /> */}
+      {/* <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-r from-[#1CADA3]/20 to-[#2076C7]/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" /> */}
 
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-3">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">
               Our Offers
             </span>
           </h2>
-          <div className="w-24 h-1 mx-auto bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] rounded-full mb-4" />
+          <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] rounded-full mb-4" />
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1CADA3] to-[#2076C7] font-medium">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-[#1CADA3] to-[#2076C7] font-medium">
               Exclusive financial offers tailored to your unique needs
             </span>
           </p>
@@ -132,7 +132,7 @@ const ServicesSection = () => {
             >
               {/* Icon Section */}
               <div className="relative mb-6">
-                <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-5 rounded-full flex justify-center items-center shadow-md">
+                <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-5 rounded-full flex justify-center items-center shadow-md">
                   <div className="transform transition-transform duration-300 group-hover:scale-110">
                     {service.icon}
                   </div>
@@ -164,10 +164,10 @@ const ServicesSection = () => {
                           e.stopPropagation();
                           handleServiceItemClick(service.id, item.slug);
                         }}
-                        className="flex items-center justify-center p-2 rounded-lg hover:bg-gradient-to-r hover:from-[#2076C7]/5 hover:to-[#1CADA3]/5 transition-all duration-200 cursor-pointer group/item"
+                        className="flex items-center justify-center p-2 rounded-lg hover:bg-linear-to-r hover:from-[#2076C7]/5 hover:to-[#1CADA3]/5 transition-all duration-200 cursor-pointer group/item"
                       >
                         <div className="flex items-center space-x-2 justify-center w-full">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center group-hover/item:scale-105 transition-transform">
+                          <div className="w-6 h-6 rounded-full bg-linear-to-r from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center group-hover/item:scale-105 transition-transform">
                             <span className="text-[#1CADA3] font-bold text-sm">✓</span>
                           </div>
                           <span className="text-gray-700 text-sm group-hover/item:text-[#2076C7] transition-colors text-center">
