@@ -177,26 +177,39 @@ export default function AdminLeadPanel() {
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
-            <div className="flex items-center">
-              <Users className="w-10 h-10 text-blue-500 bg-blue-50 p-2 rounded-md mr-4" />
-              <div><p className="text-gray-500 text-xs font-bold uppercase">Unassigned</p><p className="text-2xl font-bold">{leads.filter(l => !l.assignedTo).length}</p></div>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
-            <div className="flex items-center">
-              <CheckCircle className="w-10 h-10 text-green-500 bg-green-50 p-2 rounded-md mr-4" />
-              <div><p className="text-gray-500 text-xs font-bold uppercase">Assigned</p><p className="text-2xl font-bold">{leads.filter(l => l.assignedTo).length}</p></div>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
-            <div className="flex items-center">
-              <User className="w-10 h-10 text-purple-500 bg-purple-50 p-2 rounded-md mr-4" />
-              <div><p className="text-gray-500 text-xs font-bold uppercase">Total RMs</p><p className="text-2xl font-bold">{rms.length}</p></div>
-            </div>
-          </div>
-        </div>
+        {/* Statistics Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
+                  <div className="flex items-center">
+                    <Users className="w-10 h-10 text-blue-500 bg-blue-50 p-2 rounded-md mr-4" />
+                    <div>
+                      <p className="text-gray-500 text-xs font-bold uppercase">Unassigned</p>
+                      {/* Added text-gray-900 for dark mode visibility */}
+                      <p className="text-2xl font-bold text-gray-900">{leads.filter(l => !l.assignedTo).length}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
+                  <div className="flex items-center">
+                    <CheckCircle className="w-10 h-10 text-green-500 bg-green-50 p-2 rounded-md mr-4" />
+                    <div>
+                      <p className="text-gray-500 text-xs font-bold uppercase">Assigned</p>
+                      {/* Added text-gray-900 for dark mode visibility */}
+                      <p className="text-2xl font-bold text-gray-900">{leads.filter(l => l.assignedTo).length}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
+                  <div className="flex items-center">
+                    <User className="w-10 h-10 text-purple-500 bg-purple-50 p-2 rounded-md mr-4" />
+                    <div>
+                      <p className="text-gray-500 text-xs font-bold uppercase">Total RMs</p>
+                      {/* Added text-gray-900 for dark mode visibility */}
+                      <p className="text-2xl font-bold text-gray-900">{rms.length}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
         <Tab.Group onChange={(index) => { setActiveTab(index === 0 ? 'unassigned' : 'assigned'); setCurrentPage(1); }}>
           <Tab.List className="flex space-x-1 bg-blue-900/10 p-1 rounded-xl mb-6">

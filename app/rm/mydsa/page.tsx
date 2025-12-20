@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { RmService } from '@/app/services/rmService';
 import * as XLSX from 'xlsx';
-import { Pencil, FileUp } from "lucide-react";
+import { Pencil, FileUp, FileText } from "lucide-react";
 
 interface DSA {
   id: string;
@@ -38,6 +38,7 @@ interface ReferralLead {
   rm_name: string;
   rm_referral_code: string;
   last_follow_up?: string;
+  documents?: { name: string; url: string }[]; // Added for detailed view
 }
 
 interface Meeting {
@@ -92,7 +93,7 @@ const formatDate = (dateString: string) => {
 };
 
 export default function ReferralManagementDashboard() {
-  const [activeTab, setActiveTab] = useState<'dsa' | 'meetings' | 'leads'>('dsa');
+  const [activeTab, setActiveTab] = useState<'dsa' | 'meetings' | 'leads' | 'detailed-leads'>('dsa');
   const [dsaList, setDsaList] = useState<DSA[]>([]);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [leads, setLeads] = useState<ReferralLead[]>([]);
@@ -300,7 +301,7 @@ export default function ReferralManagementDashboard() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by adv_id, name, email or mobile"
-                className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -319,7 +320,7 @@ export default function ReferralManagementDashboard() {
                   setItemsPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
-                className="border border-gray-300 text-gray-500 rounded-md px-2 py-1 text-sm">
+                className="border border-gray-300 text-gray-500 rounded-md px-2 py-1 text-sm bg-white">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
@@ -440,7 +441,7 @@ export default function ReferralManagementDashboard() {
                   <button onClick={goToNextPage} disabled={currentPage === getTotalPages()} className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${currentPage === getTotalPages() ? 'cursor-not-allowed opacity-50' : ''}`}>
                     <span className="sr-only">Next</span>
                     <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                      <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
                     </svg>
                   </button>
                 </nav>
@@ -592,7 +593,7 @@ export default function ReferralManagementDashboard() {
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">Search Leads</label>
-              <input id="search" type="text" placeholder="Search by client name, contact, email, or DSA..." className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+              <input id="search" type="text" placeholder="Search by client name, contact, email, or DSA..." className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             </div>
           </div>
         </div>
@@ -614,9 +615,10 @@ export default function ReferralManagementDashboard() {
                   <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DSA</th>
                   <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
                   <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sub Category</th>
+                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Addtional Notes</th>
                   <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
-                </tr>
+                </tr> 
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {leads.map(lead => (
@@ -640,12 +642,13 @@ export default function ReferralManagementDashboard() {
                     </td>
                     <td className="px-3 py-3 md:px-6 md:py-4 text-sm">
                       <div className="flex flex-col">
-                        <span className="font-medium">{lead.dsa_name}</span>
+                        <span className="font-medium text-gray-900">{lead.dsa_name}</span>
                         <span className="text-xs text-gray-500">ID: {lead.dsa_adv_id}</span>
                       </div>
                     </td>
                     <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">{lead.department}</td>
                     <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">{lead.sub_category}</td>
+                     <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">{lead.notes}</td>
                     <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${lead.status === 'converted' ? 'bg-green-100 text-green-800' :
                           lead.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
@@ -662,12 +665,8 @@ export default function ReferralManagementDashboard() {
                         {new Date(lead.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </td>
+                    
                     <td className="px-3 py-3 md:px-6 md:py-4 text-sm">
-                      <div className="flex flex-col space-y-2">
-                        <button onClick={() => alert(`Add notes for ${lead.lead_name}`)} className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded hover:bg-gray-200">
-                          Add Notes
-                        </button>
-                      </div>
                     </td>
                   </tr>
                 ))}
@@ -675,6 +674,58 @@ export default function ReferralManagementDashboard() {
             </table>
           </div>
         )}
+      </div>
+    );
+  };
+
+  const renderDetailedLeads = () => {
+    if (loading.leads) return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+        <p className="text-gray-600">Loading detailed leads...</p>
+      </div>
+    );
+
+    return (
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lead Name</th>
+              <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact Number</th>
+              <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sub Category</th>
+              <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documents</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {leads.map(lead => (
+              <tr key={lead.id} className="hover:bg-gray-50">
+                <td className="px-3 py-3 md:px-6 md:py-4 text-sm font-bold text-gray-900">
+                  {lead.lead_name}
+                </td>
+                <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-900">
+                  {lead.contact_number}
+                </td>
+                <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-900">
+                  {lead.sub_category}
+                </td>
+                <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-900">
+                  <div className="flex flex-col space-y-1">
+                    {lead.documents && lead.documents.length > 0 ? (
+                      lead.documents.map((doc, idx) => (
+                        <a key={idx} href={doc.url} target="_blank" className="flex items-center text-blue-600 text-xs hover:underline">
+                          <FileText className="w-3 h-3 mr-1" /> {doc.name}
+                        </a>
+                      ))
+                    ) : (
+                      <span className="text-xs text-gray-400 italic">No documents uploaded</span>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   };
@@ -719,11 +770,11 @@ export default function ReferralManagementDashboard() {
             <button onClick={() => setActiveTab('dsa')} className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center ${activeTab === 'dsa' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
               DSA List <span className={`ml-2 py-0.5 px-2 rounded-full text-xs font-medium ${activeTab === 'dsa' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{dsaList.length}</span>
             </button>
-            <button onClick={() => setActiveTab('meetings')} className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center ${activeTab === 'meetings' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
-              Meetings <span className={`ml-2 py-0.5 px-2 rounded-full text-xs font-medium ${activeTab === 'meetings' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{meetings.filter(m => m.status === 'scheduled').length}</span>
-            </button>
             <button onClick={() => setActiveTab('leads')} className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center ${activeTab === 'leads' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
               Leads <span className={`ml-2 py-0.5 px-2 rounded-full text-xs font-medium ${activeTab === 'leads' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{leads.length}</span>
+            </button>
+            <button onClick={() => setActiveTab('detailed-leads')} className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center ${activeTab === 'detailed-leads' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+              Detailed Leads <span className={`ml-2 py-0.5 px-2 rounded-full text-xs font-medium ${activeTab === 'detailed-leads' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{leads.length}</span>
             </button>
           </nav>
         </div>
@@ -739,16 +790,16 @@ export default function ReferralManagementDashboard() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
               <p className="text-gray-600">Loading leads...</p>
             </div>
-          ) : isLoading && activeTab === 'meetings' && loading.meetings ? (
+          ) : isLoading && activeTab === 'detailed-leads' && loading.leads ? (
             <div className="flex flex-col items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-              <p className="text-gray-600">Loading meetings...</p>
+              <p className="text-gray-600">Loading details...</p>
             </div>
           ) : (
             <>
               {activeTab === 'dsa' && renderDSAList()}
-              {/* {activeTab === 'meetings' && renderMeetings()} */}
               {activeTab === 'leads' && renderLeads()}
+              {activeTab === 'detailed-leads' && renderDetailedLeads()}
             </>
           )}
         </div>
@@ -756,7 +807,7 @@ export default function ReferralManagementDashboard() {
         <div className="mt-6 text-sm text-gray-500 text-center">
           <p>Data last updated: {new Date().toLocaleString('en-IN', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
           })}</p>
-          <p className="mt-1">Total DSAs: {dsaList.length} | Total Leads: {leads.length} | Upcoming Meetings: {meetings.filter(m => m.status === 'scheduled').length}</p>
+          <p className="mt-1">Total DSAs: {dsaList.length} | Total Leads: {leads.length} </p>
         </div>
       </div>
     </div>

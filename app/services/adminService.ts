@@ -16,6 +16,30 @@ interface DSAListPayload {
   role?: string;
 }
 
+interface RolesListPayload {
+  id?: string;
+  name?: string;
+  email?: string;
+  mobile?: string;
+  city?: string;
+  date_joined?: string;
+  updated_at?: string;
+  role?: string;
+  department?: string;
+  sub_category?: string;
+  
+}
+interface UpdateRoleListPayload {
+  name: string;
+  email: string;
+  mobile: string;
+  city: string;
+  role: string;
+  department?: string;
+  sub_category?: string;
+ 
+}
+
 interface UpdateDSAPayload {
   name: string;
   email: string;
@@ -153,5 +177,18 @@ export const AdminService = {
     const response = await api.put("/api/admin/assign-dsa-to-rm", payload);
     return response.data;
   },
+
+   // Fetch DSA List 
+  rolesist: async (formData: RolesListPayload = {}) => {
+    const response = await api.get("/api/admin/rolelist", { params: formData });
+    return response.data;
+  },
+
+  /// Update a Role user
+  updaterolelist: async (id: string, payload: UpdateRoleListPayload) => {
+    const res = await api.put(`/api/admin/rolelist/${id}`, payload);
+    return res.data;
+  },
+
 };
 
