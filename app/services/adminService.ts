@@ -39,6 +39,18 @@ interface UpdateRoleListPayload {
   sub_category?: string;
  
 }
+interface AddRoleUserPayload {
+  adv_id: string;
+  name: string;
+  email: string;
+  mobile: string;
+  pan: string;
+  city: string;
+  role: string;
+  head?: string;
+  category?: string;
+  referral_code: string;
+}
 
 interface UpdateDSAPayload {
   name: string;
@@ -187,6 +199,11 @@ export const AdminService = {
   /// Update a Role user
   updaterolelist: async (id: string, payload: UpdateRoleListPayload) => {
     const res = await api.put(`/api/admin/rolelist/${id}`, payload);
+    return res.data;
+  },
+
+  addroleuser: async (id: string, payload: AddRoleUserPayload) => {
+    const res = await api.post("/api/admin/add-role-user", payload);
     return res.data;
   },
 
