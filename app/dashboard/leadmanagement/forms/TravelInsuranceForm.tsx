@@ -18,32 +18,15 @@ export default function TravelInsuranceForm({ onClose }: TravelInsuranceFormProp
     duration: "",
     transport: "",
     sumAssured: "",
-    companies: [] as string[],
     notRobot: false,
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [success, setSuccess] = useState("");
 
-  const companiesList = [
-    "Bajaj Allianz General Insurance Company",
-    "TATA AIG General Insurance",
-    "ICICI Lombard General Insurance Company Limited",
-    "Digit Insurance",
-  ];
-
   const handleInput = (field: string, value: string | boolean) => {
     setFormData({ ...formData, [field]: value });
     setErrors({ ...errors, [field]: "" });
-  };
-
-  const toggleCompany = (company: string) => {
-    const updated = formData.companies.includes(company)
-      ? formData.companies.filter((c) => c !== company)
-      : [...formData.companies, company];
-
-    setFormData({ ...formData, companies: updated });
-    setErrors({ ...errors, companies: "" });
   };
 
   const validateForm = () => {
@@ -58,9 +41,6 @@ export default function TravelInsuranceForm({ onClose }: TravelInsuranceFormProp
     if (!formData.duration) newErrors.duration = "Duration of travel is required";
     if (!formData.transport) newErrors.transport = "Transport mode is required";
     if (!formData.sumAssured) newErrors.sumAssured = "Sum assured is required";
-
-    if (formData.companies.length === 0)
-      newErrors.companies = "Please select at least one company";
 
     if (!formData.notRobot)
       newErrors.notRobot = "Please confirm you are not a robot";
@@ -215,29 +195,6 @@ export default function TravelInsuranceForm({ onClose }: TravelInsuranceFormProp
                   onChange={(e) => handleInput("sumAssured", e.target.value)}
                 />
                 {errors.sumAssured && <p className="text-red-500 text-xs mt-1">{errors.sumAssured}</p>}
-              </div>
-
-              {/* Company List */}
-              <div className="col-span-1 md:col-span-2">
-                <label className="font-medium block mb-2">Select Insurance Companies</label>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {companiesList.map((company, index) => (
-                    <label key={index} className="flex items-center gap-2 text-sm sm:text-base">
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4"
-                        checked={formData.companies.includes(company)}
-                        onChange={() => toggleCompany(company)}
-                      />
-                      {company}
-                    </label>
-                  ))}
-                </div>
-
-                {errors.companies && (
-                  <p className="text-red-500 text-xs mt-1">{errors.companies}</p>
-                )}
               </div>
 
               {/* Submit Button */}

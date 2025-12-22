@@ -1,216 +1,202 @@
 "use client";
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useState, useRef, useMemo } from "react";
+import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
+
+const STYLES = {
+  input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
+  label: "block text-sm font-medium mb-1 text-gray-700",
+  btn: "w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed",
+  err: "text-red-500 text-xs mt-1"
+};
+
+const BASE_DOCS = ["Aadhar Card", "PAN Card", "Address Proof", "1 Year Banking Statement", "Demat Account Statement", "Portfolio Reports", "ITR 3 Years", "Cancel Cheque", "Photograph"];
 
 export default function LoanAgainstSecuritiesForm({ onClose }: { onClose: () => void }) {
-  const [formData, setFormData] = useState({
-    clientName: "",
-    phone: "",
-    email: "",
-    dob: "",
-    location: "",
-    loanAmount: "",
-    otherDetails: "",
-    notRobot: false,
+  const [form, setForm] = useState<Record<string, string>>({
+    clientName: "", phone: "", email: "", dob: "", location: "",
+    loanAmount: "", hasOtherLoan: "", otherLoanAmount: ""
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  const [error, setError] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const requiredDocs = useMemo(() =>
+    form.hasOtherLoan === "Yes" ? [...BASE_DOCS, "Existing Loan Statement"] : BASE_DOCS
+    , [form.hasOtherLoan]);
 
-  // Update form values - matching Personal Loan behavior
-  const handleChange = (key: string, value: string | boolean) => {
-    setFormData({ ...formData, [key]: value });
+  const handleInputChange = (field: string, value: string) => {
+    setForm(p => ({ ...p, [field]: value, ...(field === "hasOtherLoan" && value === "No" ? { otherLoanAmount: "" } : {}) }));
+    if (errors[field]) setErrors(p => ({ ...p, [field]: "" }));
   };
 
-  // Validate before submit - matching Personal Loan behavior
-  const submitForm = (e: any) => {
+  const validate = () => {
+    const errs: Record<string, string> = {};
+    const req = (f: string, msg: string) => { if (!form[f]?.trim()) errs[f] = msg; };
+
+    req("clientName", "Client Name is required");
+    req("location", "Location is required");
+    req("dob", "Date of Birth is required");
+    req("loanAmount", "Loan Amount is required");
+
+    if (!form.phone) errs.phone = "Phone number is required";
+    else if (form.phone.length !== 10) errs.phone = "Phone number must be exactly 10 digits";
+
+    if (!form.email) errs.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email format";
+
+    if (!form.hasOtherLoan) errs.hasOtherLoan = "Select an option";
+    if (form.hasOtherLoan === "Yes" && !form.otherLoanAmount) errs.otherLoanAmount = "Existing loan amount is required";
+
+    requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(false);
-    setSuccess(false);
-
-    // Check all required fields
-    const requiredFields = [
-      formData.clientName,
-      formData.phone,
-      formData.email,
-      formData.dob,
-      formData.location,
-      formData.loanAmount,
-      formData.notRobot,
-    ];
-
-    for (const field of requiredFields) {
-      if (!field) {
-        setError(true);
-        return;
-      }
-    }
-
-    // Validate phone number length
-    if (formData.phone.length !== 10) {
-      setError(true);
-      return;
-    }
-
-    // If all good
-    setSuccess(true);
+    if (!validate()) return;
+    setIsSubmitting(true);
+    await new Promise(r => setTimeout(r, 1000));
+    setShowSuccess(true);
+    setIsSubmitting(false);
   };
+
+  const fProps = (id: string) => ({ value: form[id], onChange: (v: string) => handleInputChange(id, v), error: errors[id] });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col">
-        
-        {/* Header - Matching Personal Loan design */}
-        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col relative">
+        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white rounded-t-xl">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Loan Against Securities Form</h2>
-          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
-            <X size={20} className="sm:w-6 sm:h-6" />
-          </button>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors"><X size={20} className="sm:w-6 sm:h-6" /></button>
         </div>
 
-        {/* Scrollable Form Body - Matching Personal Loan structure */}
-        <div className="flex-1 overflow-y-auto">
-          <form onSubmit={submitForm} className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <Field label="Client Name" placeholder="Enter full name" {...fProps("clientName")} required />
+            <Field label="Phone Number" placeholder="10-digit mobile number" type="tel" maxLength={10} onlyNumber {...fProps("phone")} required />
+            <Field label="Email ID" placeholder="Enter email address" type="email" {...fProps("email")} required />
+            <Field label="Date of Birth" type="date" {...fProps("dob")} required />
+            <Field label="Location" placeholder="Enter city" {...fProps("location")} required />
+            <Field label="Loan Amount" placeholder="Desired amount" onlyNumber {...fProps("loanAmount")} required />
+            <Field label="Any Other Loan Obligations?" type="select" options={["Yes", "No"]} {...fProps("hasOtherLoan")} required />
+            {form.hasOtherLoan === "Yes" && <Field label="Existing Loan Amount" placeholder="Enter amount" onlyNumber {...fProps("otherLoanAmount")} required />}
 
-              <Input 
-                label="Client Name"
-                placeholder="Enter your full name"
-                value={formData.clientName}
-                onChange={(e: any) => handleChange("clientName", e.target.value)}
-              />
-
-              <Input
-                label="Phone Number"
-                type="tel"
-                maxLength={10}
-                onlyNumber
-                placeholder="Enter 10-digit mobile number"
-                value={formData.phone}
-                onChange={(e: any) => handleChange("phone", e.target.value)}
-              />
-
-              <Input 
-                label="Email ID"
-                type="email"
-                placeholder="Enter your email address"
-                value={formData.email}
-                onChange={(e: any) => handleChange("email", e.target.value)}
-              />
-
-              <Input 
-                label="Date of Birth"
-                type="date"
-                value={formData.dob}
-                onChange={(e: any) => handleChange("dob", e.target.value)}
-              />
-
-              <Input 
-                label="Location"
-                placeholder="Enter your city"
-                value={formData.location}
-                onChange={(e: any) => handleChange("location", e.target.value)}
-              />
-
-              <Input 
-                label="Loan Amount"
-                placeholder="Enter desired loan amount"
-                onlyNumber
-                value={formData.loanAmount}
-                onChange={(e: any) => handleChange("loanAmount", e.target.value)}
-              />
-
-              <Input 
-                label="Other Loan Obligation Details"
-                placeholder="Enter existing loan details"
-                value={formData.otherDetails}
-                onChange={(e: any) => handleChange("otherDetails", e.target.value)}
-              />
-
-
-
-              {/* File Uploads - Full width with Personal Loan styling */}
-              <div className="col-span-1 md:col-span-2">
-                <h3 className="text-md font-semibold mb-3 text-[#1CADA3]">Upload Documents</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  {[
-                    "Aadhar Card",
-                    "Pan Card",
-                    "Address Proof",
-                    "1 Year Banking Statement",
-                    "Demat Account Statement",
-                    "Portfolio Reports",
-                    "ITR 3 Years",
-                    "Cancel Cheque",
-                    "Photograph",
-                    "Existing Loan Statement",
-                  ].map((label, idx) => (
-                    <div key={idx} className="flex flex-col">
-                      <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
-                      <input 
-                        type="file" 
-                        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 text-sm" 
-                      />
-                    </div>
-                  ))}
-                </div>
+            <div className="col-span-1 md:col-span-2 mt-4">
+              <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Upload Documents <span className="text-sm font-normal text-gray-500 ml-2">(Max 180KB)</span></h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                {requiredDocs.map(lbl => (
+                  <FileUpload key={lbl} label={lbl} allowMultiple={!["Aadhar Card", "PAN Card"].includes(lbl)} onUpdate={(has: any) => {
+                    setUploadedDocs(p => ({ ...p, [lbl]: has }));
+                    if (has) setErrors(p => ({ ...p, [`doc_${lbl}`]: "" }));
+                  }} error={errors[`doc_${lbl}`]} />
+                ))}
               </div>
+            </div>
 
-              {/* Error Message - Matching Personal Loan styling */}
-              {error && (
-                <div className="col-span-1 md:col-span-2 text-center text-red-600 font-semibold mt-2 text-sm sm:text-base">
-                  ⚠ Please fill all fields before submitting.
-                </div>
-              )}
-
-              {/* Success Message - Matching Personal Loan styling */}
-              {success && (
-                <div className="col-span-1 md:col-span-2 text-center text-green-600 font-semibold mt-2 text-sm sm:text-base">
-                  ✔ Form submitted successfully!
-                </div>
-              )}
-
-              {/* Submit Button - Matching Personal Loan styling */}
-              <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
-                <button
-                  type="submit"
-                  className="w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base"
-                >
-                  Submit
-                </button>
-              </div>
-
+            <div className="col-span-1 md:col-span-2 flex justify-center mt-6 pb-2">
+              <button type="submit" disabled={isSubmitting} className={STYLES.btn}>{isSubmitting ? "Submitting..." : "Submit Application"}</button>
             </div>
           </form>
         </div>
+        {showSuccess && <SuccessModal onClose={onClose} />}
       </div>
     </div>
   );
 }
 
-/* ---------------- INPUT COMPONENT - Matching Personal Loan exactly ---------------- */
-function Input({ label, value, onChange, type = "text", onlyNumber, maxLength, placeholder }: any) {
+// --- Components ---
 
-  const restrictNumber = (e: any) => {
-    if (!onlyNumber) return;
+function Field({ label, value, onChange, type = "text", options, required, placeholder, onlyNumber, maxLength, error }: any) {
+  return (
+    <div className="w-full relative">
+      <label className={STYLES.label}>{label} {required && <span className="text-red-500">*</span>}</label>
+      <div className="relative">
+        {type === "select" ? (
+          <>
+            <select value={value} onChange={e => onChange(e.target.value)} className={`${STYLES.input(!!error)} cursor-pointer`}>
+              <option value="">Select {label}</option>
+              {options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
+          </>
+        ) : (
+          <input type={type} value={value} onChange={e => onChange(e.target.value)} onKeyDown={e => {
+            if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
+          }} maxLength={maxLength} placeholder={placeholder} className={STYLES.input(!!error)} />
+        )}
+      </div>
+      {error && <p className={STYLES.err}>{error}</p>}
+    </div>
+  );
+}
 
-    if (["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) return;
+function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
+  const [files, setFiles] = useState<File[]>([]);
+  const [fileError, setFileError] = useState("");
+  const ref = useRef<HTMLInputElement>(null);
 
-    if (!/^[0-9]$/.test(e.key)) e.preventDefault();
+  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newFiles = Array.from(e.target.files || []);
+    if (!newFiles.length) return;
+    if (newFiles.some(f => f.size > 184320)) return setFileError("Max file size: 180KB");
+    if (allowMultiple && files.length + newFiles.length > 8) return setFileError("Limit: 8 files.");
+    const updated = allowMultiple ? [...files, ...newFiles] : [newFiles[0]];
+    setFiles(updated);
+    onUpdate(true);
+    setFileError("");
+    e.target.value = "";
+  };
+
+  const removeFile = (idx: number) => {
+    const updated = files.filter((_, i) => i !== idx);
+    setFiles(updated);
+    onUpdate(updated.length > 0);
   };
 
   return (
-    <div className="w-full">
-      <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
-      <input
-        value={value}
-        type={type}
-        maxLength={maxLength}
-        onKeyDown={restrictNumber}
-        onChange={onChange}
-        placeholder={placeholder}
-        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
-      />
+    <div className="flex flex-col">
+      <label className={STYLES.label + " flex justify-between"}>
+        <span>{label} <span className="text-red-500">*</span></span>
+        <span className="text-[10px] text-gray-400 font-normal">{allowMultiple ? "(Multiple, <180KB)" : "(<180KB)"}</span>
+      </label>
+      <input type="file" ref={ref} multiple={allowMultiple} onChange={handleFiles} className="hidden" accept="image/*,application/pdf" />
+      <div className="flex flex-col gap-2">
+        {files.length === 0 && (
+          <div onClick={() => ref.current?.click()} className={`cursor-pointer border border-dashed rounded-md h-10 flex items-center justify-center gap-2 bg-gray-50 transition-colors group ${error ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-[#1CADA3]"}`}>
+            <UploadCloud size={16} className={error ? "text-red-400" : "text-gray-400 group-hover:text-[#1CADA3]"} />
+            <span className={`text-xs font-medium ${error ? "text-red-500" : "text-gray-500 group-hover:text-[#1CADA3]"}`}>{error ? "Upload Required" : "Choose File"}</span>
+          </div>
+        )}
+        {files.map((f, i) => (
+          <div key={i} className="flex items-center justify-between bg-gray-50 border border-gray-200 px-2 py-1.5 rounded-md text-xs">
+            <div className="flex items-center truncate max-w-[85%]">
+              <CheckCircle className="w-3.5 h-3.5 text-[#1CADA3] mr-2 shrink-0" />
+              <span className="truncate text-gray-700">{f.name}</span>
+            </div>
+            <button type="button" onClick={() => removeFile(i)} className="text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
+          </div>
+        ))}
+        {allowMultiple && files.length > 0 && files.length < 8 && (
+          <button type="button" onClick={() => ref.current?.click()} className="flex justify-center gap-1 text-[11px] font-medium text-[#1CADA3] border border-[#1CADA3] border-dashed rounded-md py-1.5 hover:bg-[#1CADA3]/10"><Plus size={12} /> Add more</button>
+        )}
+        {!allowMultiple && files.length > 0 && <button type="button" onClick={() => ref.current?.click()} className="text-[10px] text-blue-600 hover:underline text-right">Change file</button>}
+      </div>
+      {(fileError || (error && !fileError)) && <span className="text-xs text-red-500 mt-1">{fileError || error}</span>}
+    </div>
+  );
+}
+
+function SuccessModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 rounded-xl animate-in fade-in zoom-in duration-200">
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%]">
+        <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">Success!</h3>
+        <p className="text-gray-600 mb-6">Your application has been submitted successfully.</p>
+        <button onClick={onClose} className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:bg-[#178e86] font-medium transition-colors">Okay, Got it</button>
+      </div>
     </div>
   );
 }

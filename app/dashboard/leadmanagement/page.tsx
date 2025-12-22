@@ -30,6 +30,7 @@ import RealEstateForm from "./forms/realestate";
 import NrpLoanForm from "./forms/nrploanform";
 import LeadTable from "./components/LeadTable";
 import CorporateInsuranceForm from "./forms/corporateinsuranceform";
+import LoanProtectorForm from "./forms/loanprotectorform";
 
 export default function LeadManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,6 +68,7 @@ export default function LeadManagementPage() {
   const [showRealEstateForm, setShowRealEstateForm] = useState(false);
   const [showNrpLoanForm, setShowNrpLoanForm] = useState(false);
   const [showCorporateInsuranceForm, setShowCorporateInsuranceForm] = useState(false);
+  const [showLoanProtectorForm, setShowLoanProtectorForm] = useState(false);
 
   // Form handlers object for cleaner conditional rendering
   const formHandlers = {
@@ -92,7 +94,8 @@ export default function LeadManagementPage() {
     showBondsForm,
     showRealEstateForm,
     showNrpLoanForm,
-    showCorporateInsuranceForm
+    showCorporateInsuranceForm,
+    showLoanProtectorForm
   };
 
   // Enhanced product cards with actual click handlers
@@ -146,6 +149,7 @@ export default function LeadManagementPage() {
       "Cattle Insurance": () => setShowCattleInsuranceForm(true),
       "Marine Insurance": () => setShowMarineInsuranceForm(true),
       "Corporate Insurance": () => setShowCorporateInsuranceForm(true),
+      "Loan Protector": () => setShowLoanProtectorForm(true),
 
       // Mutual Fund
       "Mutual Fund": () => setShowMutualFundForm(true),
@@ -191,6 +195,7 @@ export default function LeadManagementPage() {
     if (showRealEstateForm) return <RealEstateForm onClose={() => setShowRealEstateForm(false)} />;
     if (showNrpLoanForm) return <NrpLoanForm onClose={() => setShowNrpLoanForm(false)} />;
     if (showCorporateInsuranceForm) return <CorporateInsuranceForm onClose={() => setShowCorporateInsuranceForm(false)} />;
+    if (showLoanProtectorForm) return <LoanProtectorForm onClose={() => setShowLoanProtectorForm(false)} />;
   }
 
   // Tabs list with counts

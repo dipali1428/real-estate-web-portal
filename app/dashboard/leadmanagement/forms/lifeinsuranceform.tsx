@@ -10,6 +10,9 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
 
+  // Investment option state
+  const [investmentOption, setInvestmentOption] = useState("investmentBudget");
+
   // ---------- Form State ----------
   const [formData, setFormData] = useState<any>({});
 
@@ -19,12 +22,18 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
   };
 
   // Conditions for showing sections
-  const showTermInsuranceFields = planType === "termInsurance";
+  const showTermInsuranceFields = planType === "termInsurance" || planType === "tulip";
   const showInvestmentFields =
-    planType === "ulip" || planType === "childPlan" || planType === "pensionPlan";
+    planType === "ulip" || 
+    planType === "childPlan" || 
+    planType === "pensionPlan" ||
+    planType === "savingPlan";
 
   // Check if income proof is selected (for showing upload field)
   const showUploadField = formData["Income Proof"] === "3 Years ITR" || formData["Income Proof"] === "Form 16";
+
+  // Check if it's pension or saving plan (both use similar fields)
+  const isPensionOrSavingPlan = planType === "pensionPlan" || planType === "savingPlan";
 
   // Submit Handler with VALIDATION
   const handleSubmit = () => {
@@ -60,8 +69,22 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
         "Income",
         "Policy Term",
         "Premium Paying Term (PPT)",
-        "Investment Budget (Yearly)",
       ];
+
+      // Add either investment budget or required maturity/pension based on selection
+      if (investmentOption === "investmentBudget") {
+        requiredFields.push("Investment Budget (Yearly)");
+      } else if (investmentOption === "requiredMaturity") {
+        if (isPensionOrSavingPlan) {
+          if (planType === "pensionPlan") {
+            requiredFields.push("Required Pension (Monthly)");
+          } else {
+            requiredFields.push("Required Maturity Amount");
+          }
+        } else {
+          requiredFields.push("Required Maturity Amount");
+        }
+      }
     }
 
     // Check if all required fields are filled
@@ -105,14 +128,20 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
 
           <select
             value={planType}
-            onChange={(e) => setPlanType(e.target.value)}
+            onChange={(e) => {
+              setPlanType(e.target.value);
+              // Reset investment option when plan type changes
+              setInvestmentOption("investmentBudget");
+            }}
             className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 text-gray-700"
           >
             <option value="">-- Select Plan --</option>
             <option value="termInsurance">Term Insurance</option>
             <option value="ulip">ULIP</option>
+            <option value="tulip">TULIP</option>
             <option value="childPlan">Child Plan</option>
             <option value="pensionPlan">Pension Plan</option>
+            <option value="savingPlan">Saving Plan</option>
           </select>
 
           {/* Term Insurance Fields */}
@@ -147,7 +176,7 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
             </div>
           )}
 
-          {/* Investment Plans */}
+          {/* Investment Plans (including Pension and Saving Plans) */}
           {showInvestmentFields && (
             <div className="space-y-3 mt-4">
               <Input label="Proposer Name" onChange={handleChange} placeholder="Enter proposer's full name" />
@@ -160,7 +189,69 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
               <Input label="Income (Yearly)" type="number" onChange={handleChange} placeholder="Enter annual income in ₹" />
               <Input label="Policy Term" onChange={handleChange} placeholder="Enter policy term in years" />
               <Input label="Premium Paying Term (PPT)" onChange={handleChange} placeholder="Enter premium paying term" />
-              <Input label="Investment Budget (Yearly)" type="number" onChange={handleChange} placeholder="Enter yearly investment amount in ₹" />
+              
+              {/* Investment Option Selection */}
+              <div className="mb-4 pt-2">
+                <label className="font-semibold text-sm block mb-2 text-gray-700">Select Investment Option:</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="investmentOption"
+                      value="investmentBudget"
+                      checked={investmentOption === "investmentBudget"}
+                      onChange={(e) => setInvestmentOption(e.target.value)}
+                      className="mr-2"
+                    />
+                    <span className="text-gray-700">Investment Budget</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="investmentOption"
+                      value="requiredMaturity"
+                      checked={investmentOption === "requiredMaturity"}
+                      onChange={(e) => setInvestmentOption(e.target.value)}
+                      className="mr-2"
+                    />
+                    <span className="text-gray-700">
+                      {planType === "pensionPlan" 
+                        ? "Required Pension" 
+                        : "Required Maturity"}
+                    </span>
+                  </label>
+                </div>
+              </div>
+              
+              {/* Dynamic field based on selection */}
+              {investmentOption === "investmentBudget" && (
+                <Input 
+                  label="Investment Budget (Yearly)" 
+                  type="number" 
+                  onChange={handleChange} 
+                  placeholder="Enter yearly investment amount in ₹" 
+                />
+              )}
+              
+              {investmentOption === "requiredMaturity" && (
+                <>
+                  {planType === "pensionPlan" ? (
+                    <Input 
+                      label="Required Pension (Monthly)" 
+                      type="number" 
+                      onChange={handleChange} 
+                      placeholder="Enter desired monthly pension amount in ₹" 
+                    />
+                  ) : (
+                    <Input 
+                      label="Required Maturity Amount" 
+                      type="number" 
+                      onChange={handleChange} 
+                      placeholder="Enter desired maturity amount in ₹" 
+                    />
+                  )}
+                </>
+              )}
             </div>
           )}
 

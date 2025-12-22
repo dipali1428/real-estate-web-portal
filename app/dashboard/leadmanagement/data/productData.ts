@@ -122,6 +122,13 @@ export const productCards: ProductCards = {
       onClick: () => {},
       activeLeads: 0,
       converted: 0
+    },
+    {
+      title: "Loan Protector",
+      description: "covers your outstanding loan repayments in case of unforeseen events like death, disability, or job loss.",
+      onClick: () => { },
+      activeLeads: 0,
+      converted: 0
     }
   ],
   mutual_fund: [
