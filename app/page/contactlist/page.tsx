@@ -45,13 +45,13 @@ const ContactPage = () => {
     },
     {
       product: "Education Loan",
-      name: "Prajakta Deshpande",
-      contactNo: "+91 70574 85583"
+      name: "Bhavana Rangari",
+      contactNo: "+91 7721998439"
     },
     {
       product: "Car Loan",
-      name: "Prajakta Deshpande",
-      contactNo: "+91 70574 85583"
+      name: "Nikita samudre",
+      contactNo: "+91 7774025342"
     }
   ];
 
