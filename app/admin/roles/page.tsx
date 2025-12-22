@@ -125,13 +125,13 @@ export default function AdminDashboard() {
         referral_code: newUser.referral_code
       };
 
-      await AdminService.addroleuser(newUser.adv_id, payload);
+      await AdminService.addroleuser(payload);
       
       toast.success("Role added successfully!");
       setIsAddModalOpen(false);
       setNewUser({
         adv_id: '', name: '', email: '', mobile: '', pan: '', city: '',
-        head: '', category: '', password: '', role: 'Admin',
+        head: '', category: '', password: '', role: '',
         department: '', sub_category: '', referral_code: ''
       });
       fetchRoles();
@@ -207,7 +207,6 @@ export default function AdminDashboard() {
           <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{user.city}</td>
           <td className="px-6 py-4">
             <div className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className={`w-1.5 h-1.5 rounded-full bg-[#2076C7]`} />
               <span className={`text-xs font-semibold uppercase tracking-wider text-[#2076C7]`}>
                 {user.role}
               </span>
@@ -273,8 +272,7 @@ export default function AdminDashboard() {
               className={`h-10 border border-gray-300 rounded-lg px-3 bg-white text-gray-700 outline-none font-medium focus:ring-2 focus:ring-[#2076C7] min-w-[160px] ${deptFilter === "All" ? 'opacity-50 cursor-not-allowed' : ''}`}
               value={subFilter}
               onChange={(e) => setSubFilter(e.target.value)}
-              disabled={deptFilter === "All"}
-            >
+              disabled={deptFilter === "All"}>
               <option value="All">{deptFilter === "All" ? "Sub-Category" : "All Sub-Categories"}</option>
               {availableSubCategories.map(s => (
                 <option key={s} value={s}>{s}</option>
@@ -285,8 +283,7 @@ export default function AdminDashboard() {
               <button 
                 onClick={() => { setSearchTerm(""); setDeptFilter("All"); setSubFilter("All"); }}
                 className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                title="Reset Filters"
-              >
+                title="Reset Filters">
                 <X size={20} />
               </button>
             )}

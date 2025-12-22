@@ -27,7 +27,7 @@ interface RolesListPayload {
   role?: string;
   department?: string;
   sub_category?: string;
-  
+
 }
 interface UpdateRoleListPayload {
   name: string;
@@ -37,7 +37,7 @@ interface UpdateRoleListPayload {
   role: string;
   department?: string;
   sub_category?: string;
- 
+
 }
 interface AddRoleUserPayload {
   adv_id: string;
@@ -178,7 +178,7 @@ export const AdminService = {
     const response = await api.get("/api/admin/rmlist");
     return response.data;
   },
-  
+
   // 🔹 Get Unassigned DSAs/Leads
   getUnassignedDsas: async () => {
     const response = await api.get("/api/admin/unassigned-dsas");
@@ -190,7 +190,7 @@ export const AdminService = {
     return response.data;
   },
 
-   // Fetch DSA List 
+  // Fetch Role List 
   rolesist: async (formData: RolesListPayload = {}) => {
     const response = await api.get("/api/admin/rolelist", { params: formData });
     return response.data;
@@ -202,7 +202,7 @@ export const AdminService = {
     return res.data;
   },
 
-  addroleuser: async (id: string, payload: AddRoleUserPayload) => {
+  addroleuser: async (payload: AddRoleUserPayload) => {
     const res = await api.post("/api/admin/add-role-user", payload);
     return res.data;
   },
