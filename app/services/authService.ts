@@ -39,17 +39,27 @@ export const AuthService = {
         return response.data;
     },
 
-    // 🔹 Verify user (check if email OR mobile exists)
-    verifyUser: async ({ identifier }: { identifier: string }) => {
-        const response = await api.post("/api/auth/verify", { identifier });
+    sendLoginOtp: async (data: any) => {
+        const response = await api.post("/api/auth/login/otp/send", data);
         return response.data;
     },
 
-    // 🔹 Update Password → /api/auth/update-password
-    updatePassword: async ({ identifier, newPassword }: { identifier: string; newPassword: string }) => {
-        const response = await api.post("/api/auth/update-password", { identifier, newPassword });
+    verifyLoginOtp: async (data: any) => {
+        const response = await api.post("/api/auth/login/otp/verify", data);
         return response.data;
     },
+
+    // // 🔹 Verify user (check if email OR mobile exists)  // NOOOOT USINGGGG
+    // verifyUser: async ({ identifier }: { identifier: string }) => {
+    //     const response = await api.post("/api/auth/verify", { identifier });
+    //     return response.data;
+    // },
+
+    // // 🔹 Update Password → /api/auth/update-password // NOOOOT USINGGGG
+    // updatePassword: async ({ identifier, newPassword }: { identifier: string; newPassword: string }) => {
+    //     const response = await api.post("/api/auth/update-password", { identifier, newPassword });
+    //     return response.data;
+    // },
 
     // 🔹 Check CIBIL score (placeholder)
     checkScore: async (payload: CibilPayload) => {
