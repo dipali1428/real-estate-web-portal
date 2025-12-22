@@ -180,16 +180,53 @@ export default function AdminDashboard() {
 
     for (const user of filteredData) {
       const formatDateTime = (dateTimeStr: string) => {
-        if (!dateTimeStr || dateTimeStr === '-') return '-';
-        const parts = dateTimeStr.includes('T') ? dateTimeStr.split('T') : dateTimeStr.split(' ');
-        if (parts.length < 2) return dateTimeStr;
-        return (
-          <div className="flex flex-col">
-            <span className="whitespace-nowrap">{parts[0]}</span>
-            <span className="text-[10px] text-gray-400 whitespace-nowrap">{parts[1].split('.')[0]}</span>
-          </div>
-        );
+  if (!dateTimeStr || dateTimeStr === '-') return '-';
+
+  const date = new Date(dateTimeStr);
+  
+  // Check if the date is actually valid
+  if (isNaN(date.getTime())) return dateTimeStr;
+
+  // Format Date: e.g., Oct 24, 2023
+  const formattedDate = date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  });
+
+  // Format Time: e.g., 02:30 PM
+  const formattedTime = date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+
+  return (
+    <div className="flex flex-col leading-tight">
+      <span className="whitespace-nowrap text-sm font-medium text-gray-700">
+        {formattedDate}
+      </span>
+      <span className="text-[10px] text-gray-400 whitespace-nowrap uppercase">
+        {formattedTime}
+      </span>
+    </div>
+  );
+};
+
+      // Role Styling Logic
+      const getRoleConfig = (role: string) => {
+        const r = role?.toLowerCase() || '';
+        if (r === 'admin') {
+          return { bg: 'bg-red-50', text: 'text-red-600',  border: 'border-red-100' };
+        } else if (r === 'rm') {
+          return { bg: 'bg-blue-50', text: 'text-blue-600',  border: 'border-blue-100' };
+        } else {
+          // Department Head or others
+          return { bg: 'bg-green-50', text: 'text-green-600', border: 'border-green-100' };
+        }
       };
+
+      const roleStyle = getRoleConfig(user.role);
 
       rows.push(
         <tr key={user.id} className="hover:bg-gray-50 transition-colors border-b border-gray-100">
@@ -206,8 +243,8 @@ export default function AdminDashboard() {
           <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{user.mobile}</td>
           <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{user.city}</td>
           <td className="px-6 py-4">
-            <div className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className={`text-xs font-semibold uppercase tracking-wider text-[#2076C7]`}>
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${roleStyle.bg} ${roleStyle.border}`}>
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${roleStyle.text}`}>
                 {user.role}
               </span>
             </div>
@@ -292,8 +329,8 @@ export default function AdminDashboard() {
 
         {/* Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+         <div className="overflow-x-auto scrollbar-thin">
+          <table className="w-full text-left border-collapse">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
@@ -317,7 +354,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Modals remain the same as in your existing code for consistency */}
       {isEditModalOpen && editingUser && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-200">
@@ -333,9 +369,9 @@ export default function AdminDashboard() {
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Role</label>
                 <select className={inputClass} value={editingUser.role} onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}>
-                  <option value="Admin">Admin</option>
+                  <option value="ADMIN">Admin</option>
                   <option value="RM">RM</option>
-                  <option value="Department">Department Head</option>
+                  <option value="DEPARTMENTHEAD">Department Head</option>
                 </select>
               </div>
               <div><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Department</label><input type="text" className={inputClass} value={editingUser.department} onChange={(e) => setEditingUser({...editingUser, department: e.target.value})} /></div>
@@ -369,9 +405,9 @@ export default function AdminDashboard() {
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Role</label>
                 <select className={inputClass} value={newUser.role} onChange={(e) => setNewUser({...newUser, role: e.target.value})}>
-                  <option value="Admin">Admin</option>
+                  <option value="ADMIN">Admin</option>
                   <option value="RM">RM</option>
-                  <option value="Department Head">Department Head</option>
+                  <option value="DEPARTMENTHEAD">Department Head</option>
                 </select>
               </div>
               <div><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Department</label><input type="text" placeholder="Enter Department" className={inputClass} value={newUser.department} onChange={(e) => setNewUser({...newUser, department: e.target.value})} /></div>
@@ -383,7 +419,7 @@ export default function AdminDashboard() {
               <button onClick={handleCreate} className="px-8 py-2 bg-[#2076C7] text-white rounded-lg text-sm font-bold shadow-md hover:bg-[#1a5da1]">Add Role</button>
             </div>
           </div>
-        </div>
+        </div>  
       )}
     </div>
   );
