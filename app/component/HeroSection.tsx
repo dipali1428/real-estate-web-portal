@@ -39,7 +39,7 @@ const HeroSection = () => {
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ backgroundColor: 'rgba(28, 202, 163, 0.2)', animationDelay: '2s' }}></div>
             </div>
 
-            <div className="relative container mx-auto px-4 py-24 md:py-32">
+            <div className="relative container mx-auto px-4 py-15 md:py-25 mb-5">
                 <div className="text-center max-w-4xl mx-auto">
                     {/* Main heading with typing effect */}
                     <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 min-h-16 md:min-h-20 leading-tight" style={{

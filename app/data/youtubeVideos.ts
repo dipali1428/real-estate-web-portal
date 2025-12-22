@@ -1,5 +1,6 @@
 export interface YouTubeVideo {
-  videoId: string;
+  videoId?: string; // Made optional
+  image?: string;   // Added for image-based stories
   title: string;
   description: string;
 }
@@ -9,5 +10,10 @@ export const featuredVideos: YouTubeVideo[] = [
     videoId: "GYC5b8OoK3I",
     title: "The wait is over! 🎧 Success Talk with Rajesh Parkhi & Rahul Kangane — out now!🔥",
     description: "Don’t forget to Like, Share & Subscribe for more inspiring stories!"
+  },
+  {
+    image: "/ET Business Award/ET Business Award.jpeg",
+    title: "🏆 Winner at ET Business Awards 2025 – Pune",
+    description: ""
   }
 ];

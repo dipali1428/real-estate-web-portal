@@ -14,10 +14,10 @@ interface LazyLoadProps {
   threshold?: number;
 }
 
-const LazyLoad: React.FC<LazyLoadProps> = ({ 
-  children, 
-  rootMargin = "50px", 
-  threshold = 0.1 
+const LazyLoad: React.FC<LazyLoadProps> = ({
+  children,
+  rootMargin = "50px",
+  threshold = 0.1
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -58,17 +58,17 @@ const LazyLoad: React.FC<LazyLoadProps> = ({
   );
 };
 
-// Lazy Image Carousel component - Only for images
+// Lazy Image Carousel component
 interface LazyImageCarouselProps {
   images: string[];
   alt: string;
   delay: number;
 }
 
-const LazyImageCarousel: React.FC<LazyImageCarouselProps> = ({ 
-  images, 
-  alt, 
-  delay 
+const LazyImageCarousel: React.FC<LazyImageCarouselProps> = ({
+  images,
+  alt,
+  delay
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -115,7 +115,6 @@ const LazyImageCarousel: React.FC<LazyImageCarouselProps> = ({
 interface YouTubeVideoProps {
   videoId: string;
   title: string;
-  thumbnail?: string;
 }
 
 const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ videoId, title }) => {
@@ -132,7 +131,7 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ videoId, title }) => {
         </div>
       )}
       <iframe
-        src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
+        src={`https://www.youtube.com/embed/${videoId}`}
         title={title}
         className="absolute top-0 left-0 w-full h-full"
         frameBorder="0"
@@ -159,8 +158,7 @@ const getMonthAndYearFromDate = (dateString: string): { month: string; year: num
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
-  
-  // Try to parse the date string
+
   const date = new Date(dateString);
   if (!isNaN(date.getTime())) {
     return {
@@ -168,19 +166,15 @@ const getMonthAndYearFromDate = (dateString: string): { month: string; year: num
       year: date.getFullYear()
     };
   }
-  
-  // Fallback: try to extract year from string
+
   const yearMatch = dateString.match(/\b(20\d{2})\b/);
   const year = yearMatch ? parseInt(yearMatch[0]) : new Date().getFullYear();
-  
-  // Fallback: try to extract month name from string
   const monthMatch = dateString.match(/(January|February|March|April|May|June|July|August|September|October|November|December)/i);
   const month = monthMatch ? monthMatch[0] : "Unknown Month";
-  
+
   return { month, year };
 };
 
-// Helper function to get month order for sorting
 const getMonthOrder = (month: string): number => {
   const months = [
     "January", "February", "March", "April", "May", "June",
@@ -189,39 +183,29 @@ const getMonthOrder = (month: string): number => {
   return months.indexOf(month);
 };
 
-// Sort events by date (most recent first)
 const sortEventsByDate = (events: Event[]): Event[] => {
   return events.sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
-    return dateB.getTime() - dateA.getTime(); // Descending order (most recent first)
+    return dateB.getTime() - dateA.getTime();
   });
 };
 
-// Group events by month across all years
 const groupEventsByMonth = (eventsByYear: { [year: string]: Event[] }) => {
   const allEvents: Event[] = [];
-  
-  // Flatten all events from all years
   Object.values(eventsByYear).forEach(events => {
     allEvents.push(...events);
   });
-  
-  // Sort all events by date (most recent first)
+
   const sortedEvents = sortEventsByDate(allEvents);
-  
-  // Group by month
   const grouped: { [month: string]: Event[] } = {};
-  
+
   sortedEvents.forEach(event => {
     const { month } = getMonthAndYearFromDate(event.date);
-    if (!grouped[month]) {
-      grouped[month] = [];
-    }
+    if (!grouped[month]) grouped[month] = [];
     grouped[month].push(event);
   });
-  
-  // Sort months in chronological order (January to December)
+
   return Object.entries(grouped)
     .sort(([monthA], [monthB]) => getMonthOrder(monthA) - getMonthOrder(monthB))
     .reduce((acc, [month, events]) => {
@@ -230,17 +214,10 @@ const groupEventsByMonth = (eventsByYear: { [year: string]: Event[] }) => {
     }, {} as { [month: string]: Event[] });
 };
 
-// Event Card Component with immediate card loading
-interface EventCardProps {
-  event: Event;
-  index: number;
-}
-
-const EventCard: React.FC<EventCardProps> = ({ event, index }) => {
+const EventCard: React.FC<{ event: Event; index: number }> = ({ event }) => {
   return (
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden transition-transform duration-300 hover:scale-105 w-full">
-      {/* Lazy Image Carousel for Events - Only images load lazily */}
-      <LazyImageCarousel 
+      <LazyImageCarousel
         images={getEventImages(event)}
         alt={`${event.city} Business Event`}
         delay={3500}
@@ -266,22 +243,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, index }) => {
   );
 };
 
-// Contest Card Component with immediate card loading
-interface ContestCardProps {
-  contest: typeof successContests[0];
-  index: number;
-}
-
-const ContestCard: React.FC<ContestCardProps> = ({ contest, index }) => {
+const ContestCard: React.FC<{ contest: typeof successContests[0]; index: number }> = ({ contest }) => {
   return (
     <div className="bg-white rounded-3xl shadow-2xl hover:shadow-3xl overflow-hidden transition-all duration-300 hover:scale-105 w-full">
-      {/* Lazy Image Carousel with actual multiple images - Only images load lazily */}
-      <LazyImageCarousel 
+      <LazyImageCarousel
         images={contest.images || [contest.img]}
         alt={contest.title}
         delay={4000}
       />
-      {/* Larger text container */}
       <div className="p-8 md:p-10">
         <h4 className="text-2xl md:text-3xl font-bold text-gray-700 mb-4">
           {contest.title}
@@ -292,34 +261,23 @@ const ContestCard: React.FC<ContestCardProps> = ({ contest, index }) => {
   );
 };
 
-// Component for displaying events with view more functionality
-interface EventMonthSectionProps {
-  month: string;
-  events: Event[];
-}
-
-const EventMonthSection: React.FC<EventMonthSectionProps> = ({ month, events }) => {
+const EventMonthSection: React.FC<{ month: string; events: Event[] }> = ({ month, events }) => {
   const [showAll, setShowAll] = useState(false);
   const eventsToShow = showAll ? events : events.slice(0, 3);
   const hasMoreEvents = events.length > 3;
 
   return (
     <div key={month} className="mb-12">
-      {/* Month Header */}
       <div className="mb-6">
         <h4 className="text-xl md:text-2xl font-semibold text-gray-600 border-l-4 border-teal-500 pl-4">
           {month} <span className="text-sm text-gray-500 font-normal">({events.length} events)</span>
         </h4>
       </div>
-
-      {/* Events Grid for this Month */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {eventsToShow.map((event, idx) => (
           <EventCard key={idx} event={event} index={idx} />
         ))}
       </div>
-
-      {/* View More Button */}
       {hasMoreEvents && (
         <div className="flex justify-center mt-8">
           <button
@@ -335,12 +293,11 @@ const EventMonthSection: React.FC<EventMonthSectionProps> = ({ month, events }) 
 };
 
 const EventSection: React.FC = () => {
-  // Group events by month across all years
   const eventsByMonth = groupEventsByMonth(eventsByYear);
 
   return (
     <section className="bg-gray-50">
-      <div className="container mx-auto px-4 py-20">
+      <div className="container mx-auto px-4 py-10">
 
         {/* ===== Success Contest Section ===== */}
         <div className="mb-20">
@@ -352,8 +309,6 @@ const EventSection: React.FC = () => {
               Celebrating our top achievers and innovators at <span className="font-semibold text-teal-600">Infinity Arthvishva</span>.
             </p>
           </div>
-
-          {/* Centered grid for 2 cards - Made larger */}
           <div className="flex justify-center">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 w-full max-w-7xl">
               {successContests.map((contest, idx) => (
@@ -363,7 +318,7 @@ const EventSection: React.FC = () => {
           </div>
         </div>
 
-        {/* ===== YouTube Video Section ===== */}
+        {/* ===== Success Stories Section (Updated for Videos & Images) ===== */}
         <div className="mb-20">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
@@ -374,34 +329,33 @@ const EventSection: React.FC = () => {
             </p>
           </div>
 
-          {/* YouTube Videos Grid - Centered based on number of videos */}
-          <div className={`flex justify-center ${
-            featuredVideos.length === 1 
-              ? 'max-w-2xl mx-auto' 
-              : featuredVideos.length === 2 
-                ? 'max-w-4xl mx-auto' 
-                : 'w-full'
-          }`}>
-            <div className={`grid gap-8 ${
-              featuredVideos.length === 1 
-                ? 'grid-cols-1 max-w-lg' 
-                : featuredVideos.length === 2 
-                  ? 'grid-cols-1 md:grid-cols-2' 
-                  : 'grid-cols-1 lg:grid-cols-3'
-            } w-full`}>
-              {featuredVideos.map((video, index) => (
-                <div key={index} className="group">
-                  <LazyYouTubeVideo 
-                    videoId={video.videoId}
-                    title={video.title}
-                  />
-                  <div className="mt-4">
-                    <h4 className="font-semibold text-gray-700 text-lg mb-2 group-hover:text-teal-600 transition-colors duration-300">
-                      {video.title}
+          <div className={`flex justify-center ${featuredVideos.length === 1 ? 'max-w-2xl mx-auto' :
+              featuredVideos.length === 2 ? 'max-w-4xl mx-auto' : 'w-full'
+            }`}>
+            <div className={`grid gap-8 w-full ${featuredVideos.length === 1 ? 'grid-cols-1' :
+                featuredVideos.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
+                  'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              }`}>
+              {featuredVideos.map((item, index) => (
+                <div key={index} className="group flex flex-col h-full">
+                  <div className="mb-4">
+                    {item.videoId ? (
+                      <LazyYouTubeVideo videoId={item.videoId} title={item.title} />
+                    ) : (
+                      <div className="rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105">
+                        <LazyImageCarousel
+                          images={[item.image || ""]}
+                          alt={item.title}
+                          delay={5000}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-2 flex-grow">
+                    <h4 className="font-semibold text-gray-700 text-lg mb-2">
+                      {item.title}
                     </h4>
-                    <p className="text-gray-600 text-sm">
-                      {video.description}
-                    </p>
+                    <p className="text-gray-600 text-sm">{item.description}</p>
                   </div>
                 </div>
               ))}
@@ -411,7 +365,6 @@ const EventSection: React.FC = () => {
 
         {/* ===== Events Section ===== */}
         <div>
-          {/* Header */}
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
               Business Events
@@ -420,30 +373,20 @@ const EventSection: React.FC = () => {
               Join <span className="font-semibold text-teal-600">Infinity Arthvishva</span> across India for networking, workshops, and business growth opportunities.
             </p>
           </div>
-
-          {/* Events by Month (combined across all years) */}
           {Object.keys(eventsByMonth).map((month) => (
-            <EventMonthSection
-              key={month}
-              month={month}
-              events={eventsByMonth[month]}
-            />
+            <EventMonthSection key={month} month={month} events={eventsByMonth[month]} />
           ))}
         </div>
 
         {/* Statistics Section */}
         <div className="mt-20 bg-white rounded-3xl shadow-2xl p-8">
           <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-700">
-              Our Event Reach
-            </h3>
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-700">Our Event Reach</h3>
             <p className="text-gray-600 mt-2">Across multiple cities in India</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-teal-600">
-                55+
-              </div>
+              <div className="text-3xl md:text-4xl font-bold text-teal-600">55+</div>
               <div className="text-gray-600">Total Events</div>
             </div>
             <div>
@@ -453,9 +396,7 @@ const EventSection: React.FC = () => {
               <div className="text-gray-600">Cities Covered</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-teal-600">
-                {Object.keys(eventsByYear).length}
-              </div>
+              <div className="text-3xl md:text-4xl font-bold text-teal-600">{Object.keys(eventsByYear).length}</div>
               <div className="text-gray-600">Years</div>
             </div>
             <div>

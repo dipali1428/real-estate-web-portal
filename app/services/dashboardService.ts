@@ -48,4 +48,11 @@ export const DashboardService = {
         const response = await api.post("/api/dashboard/create-referral-lead", payload);
         return response.data;
     },
+
+    // 🔹 NEW: Get Leads
+    getLeads: async () => {
+        const response = await api.get("/api/dashboard/get-leads");
+        return response.data;
+    },
+
 };
