@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; 
+import { DashboardService } from '../../services/dashboardService';
 
 // Types
 interface RelationshipManager {
@@ -34,15 +35,44 @@ interface ContactCard {
 const RelationshipManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'appointments' | 'performance'>('profile');
 
-  // Single Relationship Manager for the logged-in DSA
-  const relationshipManager: RelationshipManager = {
+  // Single Relationship Manager State - Initialized with placeholder
+  const [relationshipManager, setRelationshipManager] = useState<RelationshipManager>({
     id: '1',
     name: 'Your RM will be assigned soon',
     email: 'info@infinityarthvishva.com',
     phone: '1800-532-7600',
     position: 'Senior Relationship Manager',
     isAvailable: true
-  };
+  });
+
+ // 2. Fetch API Data
+  useEffect(() => {
+    const fetchRM = async () => {
+      try {
+        const response = await DashboardService.getAssignedRM();
+        console.log("API Response received:", response);
+
+        // Check the nested 'rm' object from your API response
+        if (response.success && response.assigned && response.rm) {
+          const rmData = response.rm;
+          setRelationshipManager({
+            id: 'assigned-rm',
+            name: rmData.name || 'Your RM will be assigned soon',
+            email: rmData.email || 'info@infinityarthvishva.com',
+            // Handle the 'null' string returned by your API
+            phone: (rmData.mobile && rmData.mobile !== 'null') ? rmData.mobile : '1800-532-7600',
+            position: rmData.department && rmData.sub_category 
+              ? `${rmData.department} - ${rmData.sub_category}` 
+              : 'Senior Relationship Manager',
+            isAvailable: true
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching RM data:", error);
+      }
+    };
+    fetchRM();
+  }, []);
 
   // DSA-specific appointments
   const appointments: ClientAppointment[] = [
@@ -129,16 +159,6 @@ const RelationshipManager: React.FC = () => {
       specialization: 'Home Loan'
     },
   ];
-
-  // DSA Performance Data
-  const dsaPerformance = {
-    totalClients: 23,
-    monthlyTarget: 50,
-    achievedTarget: 35,
-    commissionEarned: 12500,
-    pendingApplications: 5,
-    approvalRate: 85
-  };
 
   // Event handlers
   const handleScheduleMeeting = () => {

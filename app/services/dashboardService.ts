@@ -55,4 +55,10 @@ export const DashboardService = {
         return response.data;
     },
 
+     // 🔹 Get Assigned Relationship Manager
+    getAssignedRM: async () => {
+        const response = await api.get("/api/dashboard/get-assigned-rm");
+        return response.data;
+    },
+
 };
