@@ -1,363 +1,267 @@
 "use client";
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useState, useRef, useMemo } from "react";
+import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
+
+const STYLES = {
+  input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
+  label: "block text-sm font-medium mb-1 text-gray-700",
+  btn: "w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed",
+  err: "text-red-500 text-xs mt-1"
+};
+
+const PLAN_TYPES = ["Term Insurance", "ULIP", "TULIP", "Child Plan", "Pension Plan", "Saving Plan"];
+const PROFESSIONS = ["Salaried", "Self Employed"];
+const INCOME_PROOFS = ["3 Years ITR", "Form 16"];
 
 export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) {
-  // State for Insurance Plan Type
-  const [planType, setPlanType] = useState("");
+  const [form, setForm] = useState<Record<string, string>>({
+    planType: "", proposerName: "", dob: "", education: "", profession: "",
+    income: "", incomeProof: "", sumAssured: "", policyTerm: "", ppt: "",
+    smokerStatus: "", drinkerStatus: "", existingDisease: "", investmentOption: "Investment Budget",
+    investmentBudget: "", requiredMaturity: "", requiredPension: ""
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  // Success & Error message states
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(false);
+  const showTermFields = form.planType === "Term Insurance" || form.planType === "TULIP";
+  const showInvestmentFields = ["ULIP", "Child Plan", "Pension Plan", "Saving Plan"].includes(form.planType);
+  const showUploadField = INCOME_PROOFS.includes(form.incomeProof);
 
-  // Investment option state
-  const [investmentOption, setInvestmentOption] = useState("investmentBudget");
+  const requiredDocs = useMemo(() => {
+    if (showTermFields && showUploadField) return ["Income Proof Document"];
+    return [];
+  }, [showTermFields, showUploadField]);
 
-  // ---------- Form State ----------
-  const [formData, setFormData] = useState<any>({});
-
-  // Handle Input Change
-  const handleChange = (label: string, value: any) => {
-    setFormData({ ...formData, [label]: value });
+  const handleInputChange = (field: string, value: string) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
   };
 
-  // Conditions for showing sections
-  const showTermInsuranceFields = planType === "termInsurance" || planType === "tulip";
-  const showInvestmentFields =
-    planType === "ulip" || 
-    planType === "childPlan" || 
-    planType === "pensionPlan" ||
-    planType === "savingPlan";
+  const validate = () => {
+    const errs: Record<string, string> = {};
+    const req = (f: string, msg: string) => { if (!form[f]?.trim()) errs[f] = msg; };
 
-  // Check if income proof is selected (for showing upload field)
-  const showUploadField = formData["Income Proof"] === "3 Years ITR" || formData["Income Proof"] === "Form 16";
+    req("planType", "Select a plan type");
+    req("proposerName", "Proposer Name is required");
+    req("dob", "Date of birth is required");
+    req("profession", "Select profession");
+    req("income", "Annual income is required");
+    req("policyTerm", "Policy term is required");
+    req("ppt", "Premium paying term is required");
 
-  // Check if it's pension or saving plan (both use similar fields)
-  const isPensionOrSavingPlan = planType === "pensionPlan" || planType === "savingPlan";
-
-  // Submit Handler with VALIDATION
-  const handleSubmit = () => {
-    let requiredFields: string[] = [];
-
-    if (showTermInsuranceFields) {
-      requiredFields = [
-        "Proposer Name",
-        "Birthdate",
-        "Education",
-        "Profession",
-        "Income",
-        "ITR Filling",
-        "Sum Assured Amount",
-        "Policy Term",
-        "PPT (Premium Paying Term)",
-        "Smoker / Non-Smoker",
-        "Drinker / Non-Drinker",
-        "Any Existing Disease",
-      ];
-
-      // Add income proof document to required fields if income proof is selected
-      if (showUploadField && formData["Income Proof"]) {
-        requiredFields.push("Income Proof Document");
-      }
+    if (showTermFields) {
+      req("education", "Education is required");
+      req("incomeProof", "Select income proof");
+      req("sumAssured", "Sum assured is required");
+      req("smokerStatus", "Required");
+      req("drinkerStatus", "Required");
+      req("existingDisease", "Required");
     }
 
     if (showInvestmentFields) {
-      requiredFields = [
-        "Proposer Name",
-        "Birthdate",
-        "Profession",
-        "Income",
-        "Policy Term",
-        "Premium Paying Term (PPT)",
-      ];
-
-      // Add either investment budget or required maturity/pension based on selection
-      if (investmentOption === "investmentBudget") {
-        requiredFields.push("Investment Budget (Yearly)");
-      } else if (investmentOption === "requiredMaturity") {
-        if (isPensionOrSavingPlan) {
-          if (planType === "pensionPlan") {
-            requiredFields.push("Required Pension (Monthly)");
-          } else {
-            requiredFields.push("Required Maturity Amount");
-          }
-        } else {
-          requiredFields.push("Required Maturity Amount");
-        }
+      if (form.investmentOption === "Investment Budget") req("investmentBudget", "Budget is required");
+      else {
+        if (form.planType === "Pension Plan") req("requiredPension", "Required pension amount is required");
+        else req("requiredMaturity", "Required maturity amount is required");
       }
     }
 
-    // Check if all required fields are filled
-    const allFilled = requiredFields.every((field) => formData[field] && formData[field] !== "");
-
-    if (!allFilled || !planType) {
-      setError(true);
-      setSuccess(false);
-      return;
-    }
-
-    // If filled successfully
-    setError(false);
-    setSuccess(true);
-
-    setTimeout(() => setSuccess(false), 2000);
+    requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
   };
 
-  // Handle file upload
-  const handleFileUpload = (label: string, files: FileList | null) => {
-    if (files && files.length > 0) {
-      handleChange(label, files[0]);
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setIsSubmitting(true);
+    await new Promise(r => setTimeout(r, 1000));
+    setShowSuccess(true);
+    setIsSubmitting(false);
   };
+
+  const fieldProps = (name: string) => ({
+    value: form[name],
+    onChange: (v: string) => handleInputChange(name, v),
+    error: errors[name]
+  });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-y-auto max-h-[90vh]">
-
-        {/* Header */}
-        <div className="flex justify-between items-center border-b px-6 py-4">
-          <h2 className="text-xl font-semibold text-[#1CADA3]">Life Insurance Form</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
-            <X size={22} />
-          </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto my-auto flex flex-col relative max-h-[90vh]">
+        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white rounded-t-xl">
+          <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Life Insurance Form</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors"><X size={20} className="sm:w-6 sm:h-6" /></button>
         </div>
 
-        {/* Form Section */}
-        <div className="mb-5 p-6">
-          <label className="font-semibold text-sm block mb-2 text-gray-700">Select Insurance Type:</label>
-
-          <select
-            value={planType}
-            onChange={(e) => {
-              setPlanType(e.target.value);
-              // Reset investment option when plan type changes
-              setInvestmentOption("investmentBudget");
-            }}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 text-gray-700"
-          >
-            <option value="">-- Select Plan --</option>
-            <option value="termInsurance">Term Insurance</option>
-            <option value="ulip">ULIP</option>
-            <option value="tulip">TULIP</option>
-            <option value="childPlan">Child Plan</option>
-            <option value="pensionPlan">Pension Plan</option>
-            <option value="savingPlan">Saving Plan</option>
-          </select>
-
-          {/* Term Insurance Fields */}
-          {showTermInsuranceFields && (
-            <div className="space-y-3 mt-4">
-              <Input label="Proposer Name" onChange={handleChange} placeholder="Enter proposer's full name" />
-              <Input label="Birthdate" type="date" onChange={handleChange} />
-              <Input label="Education" onChange={handleChange} placeholder="Enter highest qualification" />
-              <Select 
-                label="Profession" 
-                options={["Salaried", "Self Employed"]} 
-                onChange={handleChange} 
-              />
-              <Input label="Income (Yearly)" type="number" onChange={handleChange} placeholder="Enter annual income in ₹" />
-              <Select label="Income Proof" options={["3 Years ITR", "Form 16"]} onChange={handleChange} />
-              
-              {/* Upload Document Field - Shows when Income Proof is selected */}
-              {showUploadField && (
-                <FileInput 
-                  label="Income Proof Document" 
-                  onChange={handleFileUpload}
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                />
-              )}
-              
-              <Input label="Sum Assured Amount" type="number" onChange={handleChange} placeholder="Enter sum assured amount in ₹" />
-              <Input label="Policy Term" onChange={handleChange} placeholder="Enter policy term in years" />
-              <Input label="PPT (Premium Paying Term)" onChange={handleChange} placeholder="Enter premium paying term" />
-              <Input label="Smoker / Non-Smoker" onChange={handleChange} placeholder="Enter smoking status" />
-              <Input label="Drinker / Non-Drinker" onChange={handleChange} placeholder="Enter drinking status" />
-              <Input label="Any Existing Disease" onChange={handleChange} placeholder="Enter any medical conditions" />
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <div className="col-span-1 md:col-span-2">
+              <Field label="Select Insurance Type" type="select" options={PLAN_TYPES} {...fieldProps("planType")} required />
             </div>
-          )}
 
-          {/* Investment Plans (including Pension and Saving Plans) */}
-          {showInvestmentFields && (
-            <div className="space-y-3 mt-4">
-              <Input label="Proposer Name" onChange={handleChange} placeholder="Enter proposer's full name" />
-              <Input label="Birthdate" type="date" onChange={handleChange} />
-              <Select 
-                label="Profession" 
-                options={["Salaried", "Self Employed"]} 
-                onChange={handleChange} 
-              />
-              <Input label="Income (Yearly)" type="number" onChange={handleChange} placeholder="Enter annual income in ₹" />
-              <Input label="Policy Term" onChange={handleChange} placeholder="Enter policy term in years" />
-              <Input label="Premium Paying Term (PPT)" onChange={handleChange} placeholder="Enter premium paying term" />
-              
-              {/* Investment Option Selection */}
-              <div className="mb-4 pt-2">
-                <label className="font-semibold text-sm block mb-2 text-gray-700">Select Investment Option:</label>
-                <div className="flex gap-4">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="investmentOption"
-                      value="investmentBudget"
-                      checked={investmentOption === "investmentBudget"}
-                      onChange={(e) => setInvestmentOption(e.target.value)}
-                      className="mr-2"
+            {form.planType && (
+              <>
+                <Field label="Proposer Name" placeholder="Enter full name" {...fieldProps("proposerName")} required />
+                <Field label="Birthdate" type="date" {...fieldProps("dob")} required />
+
+                {showTermFields && <Field label="Education" placeholder="Highest qualification" {...fieldProps("education")} required />}
+
+                <Field label="Profession" type="select" options={PROFESSIONS} {...fieldProps("profession")} required />
+                <Field label="Income (Yearly)" placeholder="Enter annual income" onlyNumber {...fieldProps("income")} required />
+
+                {showTermFields && (
+                  <>
+                    <Field label="Income Proof" type="select" options={INCOME_PROOFS} {...fieldProps("incomeProof")} required />
+                    <Field label="Sum Assured Amount" placeholder="Enter amount" onlyNumber {...fieldProps("sumAssured")} required />
+                  </>
+                )}
+
+                <Field label="Policy Term" placeholder="In years" onlyNumber {...fieldProps("policyTerm")} required />
+                <Field label="Premium Paying Term (PPT)" placeholder="Enter term" onlyNumber {...fieldProps("ppt")} required />
+
+                {showTermFields && (
+                  <>
+                    <Field label="Smoker / Non-Smoker" placeholder="e.g. Non-Smoker" {...fieldProps("smokerStatus")} required />
+                    <Field label="Drinker / Non-Drinker" placeholder="e.g. Non-Drinker" {...fieldProps("drinkerStatus")} required />
+                    <div className="col-span-1 md:col-span-2">
+                      <Field label="Any Existing Disease" placeholder="Enter medical conditions or 'None'" {...fieldProps("existingDisease")} required />
+                    </div>
+                  </>
+                )}
+
+                {showInvestmentFields && (
+                  <div className="col-span-1 md:col-span-2 space-y-4">
+                    <Field
+                      label="Select Investment Option"
+                      type="select"
+                      options={["Investment Budget", form.planType === "Pension Plan" ? "Required Pension" : "Required Maturity"]}
+                      {...fieldProps("investmentOption")}
+                      required
                     />
-                    <span className="text-gray-700">Investment Budget</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="investmentOption"
-                      value="requiredMaturity"
-                      checked={investmentOption === "requiredMaturity"}
-                      onChange={(e) => setInvestmentOption(e.target.value)}
-                      className="mr-2"
-                    />
-                    <span className="text-gray-700">
-                      {planType === "pensionPlan" 
-                        ? "Required Pension" 
-                        : "Required Maturity"}
-                    </span>
-                  </label>
-                </div>
-              </div>
-              
-              {/* Dynamic field based on selection */}
-              {investmentOption === "investmentBudget" && (
-                <Input 
-                  label="Investment Budget (Yearly)" 
-                  type="number" 
-                  onChange={handleChange} 
-                  placeholder="Enter yearly investment amount in ₹" 
-                />
-              )}
-              
-              {investmentOption === "requiredMaturity" && (
-                <>
-                  {planType === "pensionPlan" ? (
-                    <Input 
-                      label="Required Pension (Monthly)" 
-                      type="number" 
-                      onChange={handleChange} 
-                      placeholder="Enter desired monthly pension amount in ₹" 
-                    />
-                  ) : (
-                    <Input 
-                      label="Required Maturity Amount" 
-                      type="number" 
-                      onChange={handleChange} 
-                      placeholder="Enter desired maturity amount in ₹" 
-                    />
-                  )}
-                </>
-              )}
+
+                    {form.investmentOption === "Investment Budget" ? (
+                      <Field label="Investment Budget (Yearly)" placeholder="Enter yearly budget" onlyNumber {...fieldProps("investmentBudget")} required />
+                    ) : (
+                      <>
+                        {form.planType === "Pension Plan" ? (
+                          <Field label="Required Pension (Monthly)" placeholder="Enter monthly pension" onlyNumber {...fieldProps("requiredPension")} required />
+                        ) : (
+                          <Field label="Required Maturity Amount" placeholder="Enter maturity amount" onlyNumber {...fieldProps("requiredMaturity")} required />
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {requiredDocs.length > 0 && (
+                  <div className="col-span-1 md:col-span-2 mt-4">
+                    <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Upload Documents</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                      {requiredDocs.map(lbl => (
+                        <FileUpload key={lbl} label={lbl} onUpdate={(has: any) => {
+                          setUploadedDocs(p => ({ ...p, [lbl]: has }));
+                          if (has) setErrors(p => ({ ...p, [`doc_${lbl}`]: "" }));
+                        }} error={errors[`doc_${lbl}`]} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            <div className="col-span-1 md:col-span-2 flex justify-center mt-6 pb-2">
+              <button type="submit" disabled={isSubmitting} className={STYLES.btn}>{isSubmitting ? "Submitting..." : "Submit Application"}</button>
             </div>
-          )}
-
-          {/* ERROR MESSAGE */}
-          {error && (
-            <div className="mt-4 text-center text-red-600 font-semibold">
-              ⚠ Please fill all fields before submitting.
-            </div>
-          )}
-
-          {/* SUCCESS MESSAGE */}
-          {success && (
-            <div className="mt-4 text-center text-green-600 font-semibold">
-              ✔ Form submitted successfully!
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <div className="col-span-2 mt-4 flex justify-center">
-            <button
-              onClick={handleSubmit}
-              type="button"
-              className="mt-6 bg-[#1CADA3] text-white px-6 py-2 rounded-md w-50 hover:bg-[#16948d] transition"
-            >
-              Submit
-            </button>
-          </div>
+          </form>
         </div>
+        {showSuccess && <SuccessModal onClose={onClose} />}
       </div>
     </div>
   );
 }
 
-/* REUSABLE INPUT COMPONENT */
-function Input({
-  label,
-  type = "text",
-  onChange,
-  placeholder = ""
-}: {
-  label: string;
-  type?: string;
-  onChange: (label: string, value: any) => void;
-  placeholder?: string;
-}) {
+function Field({ label, value, onChange, type = "text", options, required, placeholder, onlyNumber, maxLength, error }: any) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
+  };
+
   return (
-    <div>
-      <label className="font-semibold text-sm block mb-1 text-gray-700">{label}</label>
-      <input
-        type={type}
-        onChange={(e) => onChange(label, e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 text-gray-700"
-        placeholder={placeholder}
-      />
+    <div className="w-full relative">
+      <label className={STYLES.label}>{label} {required && <span className="text-red-500">*</span>}</label>
+      <div className="relative">
+        {type === "select" ? (
+          <>
+            <select value={value} onChange={e => onChange(e.target.value)} className={`${STYLES.input(!!error)} cursor-pointer`}>
+              <option value="">Select {label}</option>
+              {options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
+          </>
+        ) : (
+          <input type={type} value={value} onChange={e => onChange(e.target.value)} onKeyDown={handleKeyDown} maxLength={maxLength} placeholder={placeholder} className={STYLES.input(!!error)} />
+        )}
+      </div>
+      {error && <p className={STYLES.err}>{error}</p>}
     </div>
   );
 }
 
-/* REUSABLE SELECT COMPONENT */
-function Select({
-  label,
-  options,
-  onChange,
-}: {
-  label: string;
-  options: string[];
-  onChange: (label: string, value: any) => void;
-}) {
+function FileUpload({ label, onUpdate, error }: any) {
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState("");
+  const ref = useRef<HTMLInputElement>(null);
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 184320) return setFileError("Max file size: 180KB");
+
+    setFile(f);
+    onUpdate(true);
+    setFileError("");
+    e.target.value = "";
+  };
+
   return (
-    <div>
-      <label className="font-semibold text-sm block mb-1 text-gray-700">{label}</label>
-      <select
-        onChange={(e) => onChange(label, e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 text-gray-700"
-      >
-        <option value="">Select</option>
-        {options.map((opt, i) => (
-          <option key={i} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
+    <div className="flex flex-col">
+      <label className="text-sm font-medium mb-1 text-gray-700 flex justify-between">
+        <span>{label} <span className="text-red-500">*</span></span>
+        <span className="text-[10px] text-gray-400 font-normal">(&lt;180KB)</span>
+      </label>
+      <input type="file" ref={ref} onChange={handleFile} className="hidden" accept="image/*,application/pdf" />
+      <div className="flex flex-col gap-2">
+        {!file ? (
+          <div onClick={() => ref.current?.click()} className={`cursor-pointer border border-dashed rounded-md h-10 flex items-center justify-center gap-2 bg-gray-50 hover:bg-[#1CADA3]/5 transition-colors group ${error ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-[#1CADA3]"}`}>
+            <UploadCloud size={16} className={error ? "text-red-400" : "text-gray-400 group-hover:text-[#1CADA3]"} />
+            <span className={`text-xs font-medium ${error ? "text-red-500" : "text-gray-500 group-hover:text-[#1CADA3]"}`}>{error ? "Upload Required" : "Choose File"}</span>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between bg-gray-50 border border-gray-200 px-2 py-1.5 rounded-md text-xs">
+            <div className="flex items-center truncate max-w-[85%]">
+              <CheckCircle className="w-3.5 h-3.5 text-[#1CADA3] mr-2 shrink-0" />
+              <span className="truncate text-gray-700">{file.name}</span>
+            </div>
+            <button type="button" onClick={() => { setFile(null); onUpdate(false); }} className="text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
+          </div>
+        )}
+      </div>
+      {(fileError || (error && !fileError)) && <span className="text-xs text-red-500 mt-1">{fileError || error}</span>}
     </div>
   );
 }
 
-/* REUSABLE FILE INPUT COMPONENT */
-function FileInput({
-  label,
-  onChange,
-  accept = "*/*"
-}: {
-  label: string;
-  onChange: (label: string, files: FileList | null) => void;
-  accept?: string;
-}) {
+function SuccessModal({ onClose }: { onClose: () => void }) {
   return (
-    <div>
-      <label className="font-semibold text-sm block mb-1 text-gray-700">{label}</label>
-      <input
-        type="file"
-        accept={accept}
-        onChange={(e) => onChange(label, e.target.files)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-      />
-      <p className="text-xs text-gray-500 mt-1">Supported formats: PDF, JPG, PNG, DOC</p>
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 rounded-xl animate-in fade-in zoom-in duration-200">
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%]">
+        <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">Success!</h3>
+        <p className="text-gray-600 mb-6">Your Life Insurance application has been submitted successfully.</p>
+        <button onClick={onClose} className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:bg-[#178e86] font-medium transition-colors">Okay, Got it</button>
+      </div>
     </div>
   );
 }
