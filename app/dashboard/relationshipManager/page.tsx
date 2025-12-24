@@ -8,6 +8,7 @@ interface RelationshipManager {
   name: string;
   email: string;
   phone: string;
+  city: string;
   position: string;
   profileImage?: string;
   isAvailable: boolean;
@@ -41,6 +42,7 @@ const RelationshipManager: React.FC = () => {
     name: 'Your RM will be assigned soon',
     email: 'info@infinityarthvishva.com',
     phone: '1800-532-7600',
+    city: 'Pune',
     position: 'Senior Relationship Manager',
     isAvailable: true
   });
@@ -61,8 +63,9 @@ const RelationshipManager: React.FC = () => {
             email: rmData.email || 'info@infinityarthvishva.com',
             // Handle the 'null' string returned by your API
             phone: (rmData.mobile && rmData.mobile !== 'null') ? rmData.mobile : '1800-532-7600',
-            position: rmData.department && rmData.sub_category 
-              ? `${rmData.department} - ${rmData.sub_category}` 
+            city: (rmData.city && rmData.city !== 'null') ? rmData.city : 'Pune',
+            position: rmData.department && rmData.sub_category
+              ? `Dept: ${rmData.department} - ${(rmData.sub_category)}` 
               : 'Senior Relationship Manager',
             isAvailable: true
           });
@@ -279,6 +282,30 @@ const RelationshipManager: React.FC = () => {
                         </svg>
                         <span className="hover:underline break-all">{relationshipManager.phone}</span>
                       </button>
+                                            <div className="flex items-center text-gray-600 transition-colors duration-200 w-full text-left text-sm sm:text-base">
+                        {/* City SVG (Map Pin) */}
+                        <svg 
+                          className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-gray-400 shrink-0" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" 
+                          />
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
+                          />
+                        </svg>
+                        <span className="break-all">{relationshipManager.city}</span>
+                      </div>
+                      
                     </div>
                   </div>
 

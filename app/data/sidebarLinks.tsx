@@ -35,6 +35,7 @@ export const sidebarLinks = {
         { label: "Ticket Raised", href: "/admin/ticket", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },
         { label: "Website Enquiry", href: "/admin/enquiry", icon: <Megaphone className="h-5 w-5 text-neutral-700" /> },
         { label: "Unassigned DSA's", href: "/admin/unassigneddsa", icon: <UserCheck className="h-5 w-5 text-neutral-700" /> },
+        { label: "Total Leads", href: "/admin/totalleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
     ],
 
     GM: [],
@@ -52,6 +53,6 @@ export const sidebarLinks = {
         { label: "Dashboard", href: "/rm", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "Profile", href: "/rm/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "My DSAs", href: "/rm/mydsa", icon: <Users className="h-5 w-5 text-neutral-700" /> },
-        { label: "Assigned DSAs", href: "/rm/assigneddsa", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "All leads", href: "/rm/assigneddsa", icon: <Users className="h-5 w-5 text-neutral-700" /> },
     ],
 };
