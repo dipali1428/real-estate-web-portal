@@ -5,7 +5,8 @@ import HeroSection from "./component/HeroSection";
 import LeadershipSection from "./component/LeaderShipSection";
 import PartnershipSection from "./component/PartnerShipSection";
 import ServicesSection from "./component/ServicesSection";
-import Chatbot from "./component/chatbot/page"
+// import Chatbot from "./component/chatbot/page"
+// import { AiAssistant } from "./component/AiAssistant";
 export default function Home() {
   return (
     <div className="min-h-screen w-full overflow-x-hidden">
@@ -19,7 +20,7 @@ export default function Home() {
       <ContactSection />
       <CTASection />
       {/* <Chatbot /> */}
-
+      {/* <AiAssistant /> */}
     </div>
   );
 }
