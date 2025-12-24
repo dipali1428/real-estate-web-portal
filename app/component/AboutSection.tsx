@@ -90,12 +90,17 @@ const AboutSection = () => (
                 </div>
 
                 {/* Right Side: Image */}
-                <div className="rounded-4xl overflow-hidden shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-500">
+                <div className="rounded-4xl overflow-hidden shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-500 bg-white">
                     <img
-                        src="/ET Business Award/ET Business Award.jpeg"
-                        alt="🏆 Winner at ET Business Awards 2025 – Pune"
+                        src="\ET Business Award\ET Business Award.jpeg"
+                        alt="Team collaboration at Infinity Arthviksha"
                         className="w-full h-90 object-cover"
                     />
+                    <div className="p-4 text-center">
+                        <p className="text-lg font-bold text-gray-800">
+                            🏆 Winner at ET Business Awards 2025 – Pune
+                        </p>
+                    </div>
                 </div>
 
             </div>

@@ -14,6 +14,6 @@ export const featuredVideos: YouTubeVideo[] = [
   {
     image: "/ET Business Award/ET Business Award.jpeg",
     title: "🏆 Winner at ET Business Awards 2025 – Pune",
-    description: ""
+    description: "A milestone achievement celebrating vision, execution, and excellence"
   }
 ];
