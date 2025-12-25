@@ -42,16 +42,16 @@ export default function AddLeadModal({
   const [submitPayload, setSubmitPayload] = useState<any>(null);
 
   const productKeyMap: Record<string, string> = {
-    Finance: "finance",
-    Protection: "protection",
-    Investments: "investments",
+    Loan: "loan",
+    Insurance: "insurance",
+    Investment: "investment",
     "Real Estate": "real_estate",
     "Mutual Funds": "mutual_funds",
     Unlisted: "unlisted",
   };
 
   const subProductOptions: Record<string, string[]> = {
-    finance: [
+    loan: [
       "Home Loan",
       "Personal Loan",
       "Business Loan",
@@ -63,7 +63,7 @@ export default function AddLeadModal({
       "NRP Loan",
       "Credit Cards",
     ],
-    protection: [
+    insurance: [
       "Health Insurance",
       "Life Insurance",
       "Travel Insurance",
@@ -72,7 +72,7 @@ export default function AddLeadModal({
       "Cattle Insurance",
       "Marine Insurance",
     ],
-    investments: ["Wealth Management", "PMS/AIF", "Bonds", "Fixed Deposits"],
+    investment: ["Wealth Management", "PMS/AIF", "Bonds", "Fixed Deposits"],
     real_estate: ["Fractional Real Estate"],
     mutual_funds: ["Mutual Funds"],
     unlisted: ["Unlisted"],
