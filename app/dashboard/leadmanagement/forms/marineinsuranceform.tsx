@@ -1,156 +1,143 @@
 "use client";
-
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, CheckCircle, ChevronDown } from "lucide-react";
 
-interface MarineInsuranceFormProps {
-  onClose: () => void;
-}
+const STYLES = {
+  input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
+  label: "block text-sm font-medium mb-1 text-gray-700",
+  btn: "w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed",
+  err: "text-red-500 text-xs mt-1"
+};
 
-export default function MarineInsuranceForm({ onClose }: MarineInsuranceFormProps) {
-  const [formData, setFormData] = useState({
-    proposer: "",
-    policyNo: "",
-    address: "",
-    business: "",
-    insurancePeriod: "",
-    subjectMatter: "",
-    packing: "",
-    transitFrom: "",
-    transitTo: "",
-    transitMode: "",
-    valuation: "",
-    sumAssured: "",
-    bottomLimit: "",
-    locationLimit: "",
-    notRobot: false,
+const TRANSIT_MODES = ["Rail", "Road", "Courier", "Sea", "Air"];
+
+export default function MarineInsuranceForm({ onClose }: { onClose: () => void }) {
+  const [form, setForm] = useState<Record<string, string>>({
+    proposer: "", policyNo: "", address: "", business: "", insurancePeriod: "",
+    subjectMatter: "", packing: "", transitFrom: "", transitTo: "",
+    transitMode: "", valuation: "", sumAssured: "", bottomLimit: "", locationLimit: ""
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleInputChange = (field: string, value: string) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
+  };
+
+  const validate = () => {
+    const errs: Record<string, string> = {};
+    const req = (f: string, msg: string) => { if (!form[f]?.trim()) errs[f] = msg; };
+
+    req("proposer", "Proposer name is required");
+    req("policyNo", "Policy number is required");
+    req("address", "Address is required");
+    req("business", "Business nature is required");
+    req("insurancePeriod", "Period is required");
+    req("subjectMatter", "Cargo details are required");
+    req("packing", "Packing nature is required");
+    req("transitFrom", "Transit from is required");
+    req("transitTo", "Transit to is required");
+    req("transitMode", "Select transit mode");
+    req("valuation", "Valuation basis is required");
+    req("sumAssured", "Sum assured is required");
+    req("bottomLimit", "Bottom limit is required");
+    req("locationLimit", "Location limit is required");
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setIsSubmitting(true);
+    await new Promise(r => setTimeout(r, 1000));
+    setShowSuccess(true);
+    setIsSubmitting(false);
+  };
+
+  const fieldProps = (name: string) => ({
+    value: form[name],
+    onChange: (v: string) => handleInputChange(name, v),
+    error: errors[name]
   });
 
-  const [errors, setErrors] = useState<any>({});
-
-  // Handle Input Change
-  const handleChange = (e: any) => {
-    const { name, value, type, checked } = e.target;
-    
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value,
-    });
-
-    setErrors({
-      ...errors,
-      [name]: "",
-    });
-  };
-
-  // Validation
-  const validate = () => {
-    let newErrors: Record<string, string> = {};
-
-    Object.entries(formData).forEach(([key, value]) => {
-      if ((value === "" || value === null || value === undefined) && key !== "notRobot") {
-        newErrors[key] = "This field is required";
-      }
-    });
-
-    if (!formData.notRobot) {
-      newErrors.notRobot = "Please confirm you are not a robot";
-    }
-
-    setErrors(newErrors);
-
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Submit Form
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-
-    if (!validate()) return;
-
-    alert("Form Submitted Successfully!");
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col">
-        
-        {/* Header */}
-        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
-          <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Marine Insurance</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
-            <X size={20} className="sm:w-6 sm:h-6" />
-          </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto my-auto flex flex-col relative max-h-[90vh]">
+        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white rounded-t-xl">
+          <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Marine Insurance Form</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors"><X size={20} className="sm:w-6 sm:h-6" /></button>
         </div>
 
-        {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto">
-          <form onSubmit={handleSubmit} className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <Field label="Name of Proposer" placeholder="Enter proposer name" {...fieldProps("proposer")} required />
+            <Field label="Expiring Policy No" placeholder="Enter policy number" {...fieldProps("policyNo")} required />
 
-              {/* Fields */}
-              {[
-                ["proposer", "Name of Proposer"],
-                ["policyNo", "Expiring Policy No"],
-                ["address", "Proposer Address"],
-                ["business", "Nature of Business"],
-                ["insurancePeriod", "Period of Insurance"],
-                ["subjectMatter", "Subject Matter (Cargo Details)"],
-                ["packing", "Nature of Packing"],
-                ["transitFrom", "Transit Location From"],
-                ["transitTo", "Transit Location To"],
-                ["valuation", "Basis of Valuation"],
-                ["sumAssured", "Sum Assured"],
-                ["bottomLimit", "Per Bottom Limit"],
-                ["locationLimit", "Per Location Limit"],
-              ].map(([name, label], index) => (
-                <div key={index} className="w-full">
-                  <label className="block mb-1 font-medium text-sm sm:text-base">{label}</label>
-                  <input
-                    name={name}
-                    type="text"
-                    value={(formData as any)[name]}
-                    onChange={handleChange}
-                    placeholder={`Enter ${label.toLowerCase()}`}
-                    className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
-                  />
-                  {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]}</p>}
-                </div>
-              ))}
+            <div className="col-span-1 md:col-span-2">
+              <Field label="Proposer Address" placeholder="Enter full address" {...fieldProps("address")} required />
+            </div>
 
-              {/* Mode of Transit */}
-              <div className="w-full">
-                <label className="block mb-1 font-medium text-sm sm:text-base">Mode Of Transit</label>
-                <select
-                  name="transitMode"
-                  value={formData.transitMode}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
-                >
-                  <option value="">Select Transit Mode</option>
-                  <option value="Rail">Rail</option>
-                  <option value="Road">Road</option>
-                  <option value="Courier">Courier</option>
-                  <option value="Sea">Sea</option>
-                  <option value="Air">Air</option>
-                </select>
-                {errors.transitMode && (
-                  <p className="text-red-500 text-xs mt-1">{errors.transitMode}</p>
-                )}
-              </div>
-              {/* Submit */}
-              <div className="col-span-1 md:col-span-2 mt-4 flex justify-center">
-                <button
-                  type="submit"
-                  className="w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base"
-                >
-                  Submit
-                </button>
-              </div>
+            <Field label="Nature of Business" placeholder="Enter business type" {...fieldProps("business")} required />
+            <Field label="Period of Insurance" placeholder="e.g. 12 Months" {...fieldProps("insurancePeriod")} required />
 
+            <Field label="Subject Matter (Cargo Details)" placeholder="Enter cargo details" {...fieldProps("subjectMatter")} required />
+            <Field label="Nature of Packing" placeholder="e.g. Wooden Crates, Bags" {...fieldProps("packing")} required />
+
+            <Field label="Transit Location From" placeholder="Origin location" {...fieldProps("transitFrom")} required />
+            <Field label="Transit Location To" placeholder="Destination location" {...fieldProps("transitTo")} required />
+
+            <Field label="Mode Of Transit" type="select" options={TRANSIT_MODES} {...fieldProps("transitMode")} required />
+            <Field label="Basis of Valuation" placeholder="e.g. Invoice Value + 10%" {...fieldProps("valuation")} required />
+
+            <Field label="Sum Assured" placeholder="Enter total amount" {...fieldProps("sumAssured")} required />
+            <Field label="Per Bottom Limit" placeholder="Limit per transit" {...fieldProps("bottomLimit")} required />
+            <Field label="Per Location Limit" placeholder="Limit per location" {...fieldProps("locationLimit")} required />
+
+            <div className="col-span-1 md:col-span-2 flex justify-center mt-6 pb-2">
+              <button type="submit" disabled={isSubmitting} className={STYLES.btn}>{isSubmitting ? "Submitting..." : "Submit Application"}</button>
             </div>
           </form>
         </div>
+        {showSuccess && <SuccessModal onClose={onClose} />}
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, value, onChange, type = "text", options, required, placeholder, error }: any) {
+  return (
+    <div className="w-full relative">
+      <label className={STYLES.label}>{label} {required && <span className="text-red-500">*</span>}</label>
+      <div className="relative">
+        {type === "select" ? (
+          <>
+            <select value={value} onChange={e => onChange(e.target.value)} className={`${STYLES.input(!!error)} cursor-pointer`}>
+              <option value="">Select {label}</option>
+              {options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
+          </>
+        ) : (
+          <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className={STYLES.input(!!error)} />
+        )}
+      </div>
+      {error && <p className={STYLES.err}>{error}</p>}
+    </div>
+  );
+}
+
+function SuccessModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 rounded-xl animate-in fade-in zoom-in duration-200">
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%]">
+        <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">Success!</h3>
+        <p className="text-gray-600 mb-6">Your Marine Insurance application has been submitted successfully.</p>
+        <button onClick={onClose} className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:bg-[#178e86] font-medium transition-colors">Okay, Got it</button>
       </div>
     </div>
   );

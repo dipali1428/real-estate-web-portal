@@ -1,300 +1,176 @@
 "use client";
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useState, useRef } from "react";
+import { X, CheckCircle, ChevronDown } from "lucide-react";
+
+const STYLES = {
+  input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
+  label: "block text-sm font-medium mb-1 text-gray-700",
+  btn: "w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed",
+  err: "text-red-500 text-xs mt-1"
+};
 
 export default function FixedDepositForm({ onClose }: { onClose: () => void }) {
-  const [formData, setFormData] = useState({
-    clientName: "",
-    phone: "",
-    email: "",
-    dob: "",
-    location: "",
-    depositAmount: "",
-    termValue: "",
-    termType: "months", // months or years
-    monthlyIncome: "",
-    gender: "", // male, female
+  const [form, setForm] = useState<Record<string, string>>({
+    clientName: "", phone: "", email: "", dob: "", gender: "",
+    location: "", monthlyIncome: "", termValue: "", termType: "months",
+    depositAmount: ""
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleInputChange = (field: string, value: string) => {
+    if (field === "termType") {
+      setForm(prev => ({ ...prev, termType: value, termValue: "" }));
+    } else {
+      setForm(prev => ({ ...prev, [field]: value }));
+    }
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
+  };
+
+  const validate = () => {
+    const errs: Record<string, string> = {};
+    const req = (f: string, msg: string) => { if (!form[f]?.trim()) errs[f] = msg; };
+
+    req("clientName", "Name is required");
+    req("dob", "DOB is required");
+    req("gender", "Select gender");
+    req("location", "Location is required");
+    req("monthlyIncome", "Income is required");
+    req("depositAmount", "Deposit amount is required");
+    req("termValue", "Term value is required");
+
+    if (!form.phone) errs.phone = "Phone is required";
+    else if (form.phone.length !== 10) errs.phone = "Must be 10 digits";
+
+    if (!form.email) errs.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email";
+
+    if (form.termValue && parseInt(form.termValue) <= 0) {
+      errs.termValue = "Value must be greater than 0";
+    }
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setIsSubmitting(true);
+    await new Promise(r => setTimeout(r, 1000));
+    setShowSuccess(true);
+    setIsSubmitting(false);
+  };
+
+  const fieldProps = (name: string) => ({
+    value: form[name],
+    onChange: (v: string) => handleInputChange(name, v),
+    error: errors[name]
   });
 
-  const [error, setError] = useState(false);
-  const [success, setSuccess] = useState(false);
-
-  // Update form values
-  const handleChange = (key: string, value: string | boolean) => {
-    setFormData({ ...formData, [key]: value });
-  };
-
-  // Handle term input with digit limits based on term type
-  const handleTermChange = (value: string) => {
-    let processedValue = value;
-    
-    if (formData.termType === "months") {
-      // Limit to 3 digits for months (max 999 months = ~83 years)
-      if (value.length > 3) {
-        processedValue = value.slice(0, 3);
-      }
-    } else {
-      // Limit to 2 digits for years (max 99 years)
-      if (value.length > 2) {
-        processedValue = value.slice(0, 2);
-      }
-    }
-    
-    handleChange("termValue", processedValue);
-  };
-
-  // Handle term type change separately
-  const handleTermTypeChange = (value: string) => {
-    // Clear term value when switching between months/years
-    setFormData({ ...formData, termType: value, termValue: "" });
-  };
-
-  // Validate before submit
-  const submitForm = (e: any) => {
-    e.preventDefault();
-    setError(false);
-    setSuccess(false);
-
-    // Check all required fields
-    const requiredFields = [
-      formData.clientName,
-      formData.phone,
-      formData.email,
-      formData.dob,
-      formData.location,
-      formData.depositAmount,
-      formData.termValue,
-      formData.monthlyIncome,
-      formData.gender,
-    ];
-
-    for (const field of requiredFields) {
-      if (!field) {
-        setError(true);
-        return;
-      }
-    }
-
-    // Validate phone number length
-    if (formData.phone.length !== 10) {
-      setError(true);
-      return;
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError(true);
-      return;
-    }
-
-    // Validate term value
-    if (!formData.termValue || parseInt(formData.termValue) <= 0) {
-      setError(true);
-      return;
-    }
-
-    // If all good
-    setSuccess(true);
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col">
-        
-        {/* Header */}
-        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto my-auto flex flex-col relative max-h-[90vh]">
+        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white rounded-t-xl">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Fixed Deposit Form</h2>
-          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
-            <X size={20} className="sm:w-6 sm:h-6" />
-          </button>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors"><X size={20} className="sm:w-6 sm:h-6" /></button>
         </div>
 
-        {/* Scrollable Form Body */}
-        <div className="flex-1 overflow-y-auto">
-          <form onSubmit={submitForm} className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
-              <Input 
-                label="Client Name"
-                placeholder="Enter your full name"
-                value={formData.clientName}
-                onChange={(e: any) => handleChange("clientName", e.target.value)}
-                required={true}
-              />
+            <Field label="Client Name" placeholder="Enter full name" {...fieldProps("clientName")} required />
+            <Field label="Phone Number" placeholder="10-digit mobile" onlyNumber maxLength={10} {...fieldProps("phone")} required />
+            <Field label="Email ID" type="email" placeholder="Enter email address" {...fieldProps("email")} required />
+            <Field label="Date of Birth" type="date" {...fieldProps("dob")} required />
 
-              <Input
-                label="Phone Number"
-                type="tel"
-                maxLength={10}
-                onlyNumber
-                placeholder="Enter 10-digit mobile number"
-                value={formData.phone}
-                onChange={(e: any) => handleChange("phone", e.target.value)}
-                required={true}
-              />
+            <Field label="Gender" type="select" options={["Male", "Female"]} {...fieldProps("gender")} required />
+            <Field label="Location" placeholder="Enter city" {...fieldProps("location")} required />
 
-              <Input 
-                label="Email ID"
-                type="email"
-                placeholder="Enter your email address"
-                value={formData.email}
-                onChange={(e: any) => handleChange("email", e.target.value)}
-                required={true}
-              />
+            <Field label="Total Monthly Income" placeholder="Enter monthly income" onlyNumber {...fieldProps("monthlyIncome")} required />
 
-              <Input 
-                label="Date of Birth"
-                type="date"
-                value={formData.dob}
-                onChange={(e: any) => handleChange("dob", e.target.value)}
-                required={true}
-              />
-
-              {/* Gender Selector */}
-              <div className="w-full">
-                <label className="block text-sm font-medium mb-1 text-gray-700">
-                  Gender <span className="text-red-500">*</span>
-                </label>
-                <div className="flex gap-4">
-                  {["Male", "Female"].map((option) => (
-                    <label key={option} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value={option.toLowerCase()}
-                        checked={formData.gender === option.toLowerCase()}
-                        onChange={(e) => handleChange("gender", e.target.value)}
-                        className="text-[#1CADA3] focus:ring-[#1CADA3]"
-                        required={true}
-                      />
-                      <span className="text-sm sm:text-base text-gray-700">{option}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <Input 
-                label="Location"
-                placeholder="Enter your city"
-                value={formData.location}
-                onChange={(e: any) => handleChange("location", e.target.value)}
-                required={true}
-              />
-
-              <Input 
-                label="Total Monthly Income"
-                placeholder="Enter your monthly income"
-                onlyNumber
-                value={formData.monthlyIncome}
-                onChange={(e: any) => handleChange("monthlyIncome", e.target.value)}
-                required={true}
-              />
-
-              {/* Term with Month/Year Selector */}
-              <div className="w-full">
-                <label className="block text-sm font-medium mb-1 text-gray-700">
-                  Term <span className="text-red-500">*</span>
-                </label>
-                <div className="flex gap-2">
+            <div className="w-full">
+              <label className={STYLES.label}>Term <span className="text-red-500">*</span></label>
+              <div className="flex gap-2">
+                <div className="flex-[2] relative">
                   <input
-                    value={formData.termValue}
-                    onChange={(e) => handleTermChange(e.target.value)}
-                    placeholder={formData.termType === "months" ? "Enter term in months" : "Enter term in years"}
-                    maxLength={formData.termType === "months" ? 3 : 2}
+                    value={form.termValue}
+                    onChange={(e) => handleInputChange("termValue", e.target.value)}
+                    placeholder={form.termType === "months" ? "Months" : "Years"}
+                    maxLength={form.termType === "months" ? 3 : 2}
+                    className={STYLES.input(!!errors.termValue)}
                     onKeyDown={(e) => {
-                      if (!/^[0-9]$/.test(e.key) && 
-                          !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) {
-                        e.preventDefault();
-                      }
+                      if (!/^[0-9]$/.test(e.key) && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) e.preventDefault();
                     }}
-                    className="flex-1 border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
-                    required={true}
                   />
+                  {errors.termValue && <p className={STYLES.err}>{errors.termValue}</p>}
+                </div>
+                <div className="flex-1 relative">
                   <select
-                    value={formData.termType}
-                    onChange={(e) => handleTermTypeChange(e.target.value)}
-                    className="border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base"
-                    required={true}
+                    value={form.termType}
+                    onChange={(e) => handleInputChange("termType", e.target.value)}
+                    className={`${STYLES.input(false)} cursor-pointer`}
                   >
                     <option value="months">Months</option>
                     <option value="years">Years</option>
                   </select>
+                  <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  {formData.termType === "months" 
-                    ? "Maximum 3 digits" 
-                    : "Maximum 2 digits"}
-                </p>
               </div>
+              <p className="text-[10px] text-gray-500 mt-1">
+                {form.termType === "months" ? "Maximum 3 digits" : "Maximum 2 digits"}
+              </p>
+            </div>
 
-              <Input 
-                label="Fixed Deposit Amount"
-                placeholder="Enter deposit amount"
-                onlyNumber
-                value={formData.depositAmount}
-                onChange={(e: any) => handleChange("depositAmount", e.target.value)}
-                required={true}
-              />
+            <Field label="Fixed Deposit Amount" placeholder="Enter deposit amount" onlyNumber {...fieldProps("depositAmount")} required />
 
-              {/* Error Message */}
-              {error && (
-                <div className="col-span-1 md:col-span-2 text-center text-red-600 font-semibold mt-2 text-sm sm:text-base">
-                  ⚠ Please fill all fields correctly before submitting.
-                </div>
-              )}
-
-              {/* Success Message */}
-              {success && (
-                <div className="col-span-1 md:col-span-2 text-center text-green-600 font-semibold mt-2 text-sm sm:text-base">
-                  ✔ Form submitted successfully!
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
-                <button
-                  type="submit"
-                  className="w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base"
-                >
-                  Submit
-                </button>
-              </div>
-
+            <div className="col-span-1 md:col-span-2 flex justify-center mt-6 pb-2">
+              <button type="submit" disabled={isSubmitting} className={STYLES.btn}>{isSubmitting ? "Submitting..." : "Submit Application"}</button>
             </div>
           </form>
         </div>
+        {showSuccess && <SuccessModal onClose={onClose} />}
       </div>
     </div>
   );
 }
 
-/* ---------------- INPUT COMPONENT ---------------- */
-function Input({ label, value, onChange, type = "text", onlyNumber, maxLength, placeholder, required = false }: any) {
-
-  const restrictNumber = (e: any) => {
-    if (!onlyNumber) return;
-
-    if (["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) return;
-
-    if (!/^[0-9]$/.test(e.key)) e.preventDefault();
+function Field({ label, value, onChange, type = "text", options, required, placeholder, onlyNumber, maxLength, error }: any) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
   };
 
   return (
-    <div className="w-full">
-      <label className="block text-sm font-medium mb-1 text-gray-700">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <input
-        value={value}
-        type={type}
-        maxLength={maxLength}
-        onKeyDown={restrictNumber}
-        onChange={onChange}
-        placeholder={placeholder}
-        className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
-        required={required}
-      />
+    <div className="w-full relative">
+      <label className={STYLES.label}>{label} {required && <span className="text-red-500">*</span>}</label>
+      <div className="relative">
+        {type === "select" ? (
+          <>
+            <select value={value} onChange={e => onChange(e.target.value)} className={`${STYLES.input(!!error)} cursor-pointer`}>
+              <option value="">Select {label}</option>
+              {options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
+          </>
+        ) : (
+          <input type={type} value={value} onChange={e => onChange(e.target.value)} onKeyDown={handleKeyDown} maxLength={maxLength} placeholder={placeholder} className={STYLES.input(!!error)} />
+        )}
+      </div>
+      {error && <p className={STYLES.err}>{error}</p>}
+    </div>
+  );
+}
+
+function SuccessModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 rounded-xl animate-in fade-in zoom-in duration-200">
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%]">
+        <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">Success!</h3>
+        <p className="text-gray-600 mb-6">Your Fixed Deposit application has been submitted successfully.</p>
+        <button onClick={onClose} className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:bg-[#178e86] font-medium transition-colors">Okay, Got it</button>
+      </div>
     </div>
   );
 }

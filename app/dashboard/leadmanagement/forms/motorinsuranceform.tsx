@@ -302,7 +302,7 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
     <div className="flex flex-col">
       <label className="text-sm font-medium mb-1 text-gray-700 flex justify-between">
         <span>{label} <span className="text-red-500">*</span></span>
-        <span className="text-[10px] text-gray-400 font-normal">{allowMultiple ? "(Multiple, &lt;180KB)" : "(&lt;180KB)"}</span>
+        <span className="text-[10px] text-gray-400 font-normal">{allowMultiple ? "(Multiple, <180KB)" : "(<180KB)"}</span>
       </label>
       <input type="file" ref={ref} multiple={allowMultiple} onChange={handleFiles} className="hidden" accept="image/*,application/pdf" />
       <div className="flex flex-col gap-2">
