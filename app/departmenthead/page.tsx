@@ -72,8 +72,8 @@ export default function Dashboard() {
     }
   }, []);
 
-  if (loading || !user)
-    return <div className="p-6 text-center text-lg">Loading Dashboard...</div>;
+  // if (loading || !user)
+  //   return <div className="p-6 text-center text-lg">Loading Dashboard...</div>;
 
   return (
     <div className="flex-1 p-4 sm:p-6">

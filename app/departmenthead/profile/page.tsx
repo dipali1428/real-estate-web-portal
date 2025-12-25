@@ -1,21 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { RmService } from "../../services/rmService";
+import { DepartmentHeadService } from "../../services/departmentHeadService";
 import toast from "react-hot-toast";
 
 interface Profile {
     name: string;
     email: string;
-    rm_referral: string;
     mobile: string;
     role: string;
     department: string;
     city: string;
-    referral_code: string;
     sub_category: string;
     password?: string;
 }
+
 export default function ProfileSection() {
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -25,7 +24,7 @@ export default function ProfileSection() {
 
     const hasFetched = useRef(false);
 
-    // FETCH ADMIN PROFILE
+    // FETCH PROFILE ON LOAD
     useEffect(() => {
         if (hasFetched.current) return;
         hasFetched.current = true;
@@ -33,8 +32,8 @@ export default function ProfileSection() {
         const fetchProfile = async () => {
             try {
                 setLoading(true);
-                const res = await RmService.getRmProfile();
-                setProfile(res.user);
+                const res = await DepartmentHeadService.getDepartmentProfile();
+                setProfile(res.user || res);
             } catch (err) {
                 console.error("Profile load error", err);
                 toast.error("Failed to fetch profile.");
@@ -55,10 +54,31 @@ export default function ProfileSection() {
         return setPasswordStrength("Strong");
     };
 
+    const handleSave = async () => {
+        if (!profile) return;
+        try {
+            setSaving(true);
+            const payload = {
+                email: profile.email,
+                mobile: profile.mobile,
+                password: profile.password || undefined,
+            };
+
+            await new Promise(resolve => setTimeout(resolve, 800));
+            toast.success("Profile updated successfully (Simulated)!");
+            setIsEditing(false);
+            setProfile(prev => prev ? { ...prev, password: "" } : null);
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message || "Failed to update profile.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
     if (loading || !profile)
         return (
             <div className="flex justify-center items-center h-[60vh] text-[#1CADA3]">
-                Loading profile...
+                <div className="animate-pulse">Loading profile...</div>
             </div>
         );
 
@@ -68,41 +88,30 @@ export default function ProfileSection() {
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-700">
-                        Department Head Profile
-                    </h2>
+                    <div>
+                        <h2 className="text-2xl md:text-3xl font-bold text-slate-700">
+                            Department Head Profile
+                        </h2>
+                        {/* DEPARTMENT SUBTITLE ADDED HERE */}
+                        <p className="text-[#1CADA3] font-semibold mt-1 text-xl">
+                            {profile.department}
+                        </p>
+                    </div>
 
                     <button
-                        onClick={() => setIsEditing(!isEditing)}
+                        onClick={() => {
+                            setIsEditing(!isEditing);
+                            if (isEditing) setProfile({ ...profile, password: "" });
+                        }}
                         className="px-4 py-2 text-[#1CADA3] border border-[#1CADA3] rounded-lg hover:bg-[#1CADA3] hover:text-white transition">
                         {isEditing ? "Cancel" : "Edit"}
                     </button>
                 </div>
 
                 {/* Form Container */}
-                <form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <form className="grid grid-cols-1 sm:grid-cols-2 gap-6" onSubmit={(e) => e.preventDefault()}>
 
-                    {/* REFERRAL CODE */}
-                    <div className="col-span-1">
-                        <label className="text-sm font-semibold text-[#1CADA3]">
-                            Referral Code
-                        </label>
-                        <input
-                            type="text"
-                            disabled
-                            value={profile.referral_code}
-                            className="w-full mt-1 px-3 py-2 
-                   bg-[#E6F7F5] 
-                   border-2 border-[#1CADA3] 
-                   rounded-lg 
-                   text-[#0F766E] 
-                   font-semibold 
-                   ring-1 ring-[#1CADA3]/30"
-                        />
-                    </div>
-
-
-                    {/* NAME */}
+                    {/* NAME (Read Only) */}
                     <div className="col-span-1">
                         <label className="text-sm font-semibold text-gray-700">Name</label>
                         <input
@@ -113,40 +122,37 @@ export default function ProfileSection() {
                         />
                     </div>
 
-                    {/* DEPARTMENT */}
+                    {/* EMAIL (Editable) */}
                     <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">Department</label>
+                        <label className="text-sm font-semibold text-gray-700">Email</label>
                         <input
-                            type="text"
-                            disabled
-                            value={profile.department}
-                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
+                            type="email"
+                            disabled={!isEditing}
+                            value={profile.email}
+                            onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                            className={`w-full mt-1 px-3 py-2 rounded-lg transition-all ${isEditing
+                                ? "border-2 border-[#1CADA3] bg-white text-gray-800 shadow-sm"
+                                : "bg-gray-100 text-gray-700 border border-gray-300"
+                                }`}
                         />
                     </div>
 
-                    {/* SUB CATEGORY */}
+                    {/* MOBILE (Editable) */}
                     <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">Sub Category</label>
+                        <label className="text-sm font-semibold text-gray-700">Mobile</label>
                         <input
-                            type="text"
-                            disabled
-                            value={profile.sub_category}
-                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
+                            type="tel"
+                            disabled={!isEditing}
+                            value={profile.mobile}
+                            onChange={(e) => setProfile({ ...profile, mobile: e.target.value })}
+                            className={`w-full mt-1 px-3 py-2 rounded-lg transition-all ${isEditing
+                                ? "border-2 border-[#1CADA3] bg-white text-gray-800 shadow-sm"
+                                : "bg-gray-100 text-gray-700 border border-gray-300"
+                                }`}
                         />
                     </div>
 
-                    {/* CITY */}
-                    <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">City</label>
-                        <input
-                            type="text"
-                            disabled
-                            value={profile.city}
-                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
-                        />
-                    </div>
-
-                    {/* ROLE */}
+                    {/* ROLE (Read Only) */}
                     <div className="col-span-1">
                         <label className="text-sm font-semibold text-gray-700">Role</label>
                         <input
@@ -157,37 +163,40 @@ export default function ProfileSection() {
                         />
                     </div>
 
-                    {/* EMAIL */}
+                    {/* DEPARTMENT (Read Only) */}
                     <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">Email</label>
+                        <label className="text-sm font-semibold text-gray-700">Department</label>
                         <input
-                            type="email"
-                            disabled={!isEditing}
-                            value={profile.email}
-                            onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                            className={`w-full mt-1 px-3 py-2 rounded-lg ${isEditing
-                                ? "border border-[#1CADA3] bg-white text-gray-800"
-                                : "bg-gray-100 text-gray-700 border border-gray-300"
-                                }`}
+                            type="text"
+                            disabled
+                            value={profile.department}
+                            className="w-full mt-1 px-3 py-2 bg-blue-50 border border-gray-300 rounded-lg text-gray-700"
                         />
                     </div>
 
-                    {/* MOBILE */}
+                    {/* SUB CATEGORY (Read Only) */}
                     <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">Mobile</label>
+                        <label className="text-sm font-semibold text-gray-700">Sub Category</label>
                         <input
-                            type="tel"
-                            disabled={!isEditing}
-                            value={profile.mobile}
-                            onChange={(e) => setProfile({ ...profile, mobile: e.target.value })}
-                            className={`w-full mt-1 px-3 py-2 rounded-lg ${isEditing
-                                ? "border border-[#1CADA3] bg-white text-gray-800"
-                                : "bg-gray-100 text-gray-700 border border-gray-300"
-                                }`}
+                            type="text"
+                            disabled
+                            value={profile.sub_category}
+                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
                         />
                     </div>
 
-                    {/* PASSWORD FIELD */}
+                    {/* CITY (Read Only) */}
+                    <div className="col-span-1">
+                        <label className="text-sm font-semibold text-gray-700">City</label>
+                        <input
+                            type="text"
+                            disabled
+                            value={profile.city}
+                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
+                        />
+                    </div>
+
+                    {/* PASSWORD FIELD (Editable) */}
                     <div className="col-span-1 sm:col-span-2">
                         <label className="text-sm font-semibold text-gray-700">
                             New Password
@@ -200,15 +209,18 @@ export default function ProfileSection() {
                                 evaluatePassword(e.target.value);
                                 setProfile({ ...profile, password: e.target.value });
                             }}
-                            placeholder="Enter new password"
-                            className={`w-full mt-1 px-3 py-2 rounded-lg ${isEditing
-                                ? "border border-[#1CADA3] bg-white text-gray-800"
+                            placeholder={isEditing ? "Enter new password" : "Enter new password"}
+                            className={`w-full mt-1 px-3 py-2 rounded-lg transition-all ${isEditing
+                                ? "border-2 border-[#1CADA3] bg-white text-gray-800 shadow-sm"
                                 : "bg-gray-100 text-gray-700 border border-gray-300"
                                 }`}
                         />
                         {isEditing && (
                             <p className="text-xs mt-1 font-medium text-gray-600">
-                                Password Strength: {passwordStrength}
+                                Password Strength: <span className={
+                                    passwordStrength === "Strong" ? "text-green-600" :
+                                        passwordStrength === "Medium" ? "text-yellow-600" : "text-red-500"
+                                }>{passwordStrength}</span>
                             </p>
                         )}
                     </div>
@@ -219,37 +231,13 @@ export default function ProfileSection() {
                     <div className="flex justify-end mt-8">
                         <button
                             disabled={saving}
-                            onClick={async () => {
-                                try {
-                                    setSaving(true);
-
-                                    const payload = {
-                                        email: profile.email,
-                                        mobile: profile.mobile,
-                                        password: profile.password || undefined,
-                                    };
-
-                                    // await AdminService.updateAdminProfile(payload);
-
-                                    toast.success("Profile updated successfully!");
-
-                                    // const refreshed = await AdminService.getAdminProfile();
-                                    // setProfile(refreshed.user);
-
-                                    setIsEditing(false);
-                                } catch (err: any) {
-                                    toast.error(err?.response?.data?.message || "Failed to update profile.");
-                                } finally {
-                                    setSaving(false);
-                                }
-                            }}
-                            className="px-6 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#169c91] transition">
+                            onClick={handleSave}
+                            className="px-6 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#169c91] transition disabled:opacity-50 shadow-md">
                             {saving ? "Saving..." : "Save Changes"}
                         </button>
                     </div>
                 )}
             </section>
         </main>
-
     );
 }

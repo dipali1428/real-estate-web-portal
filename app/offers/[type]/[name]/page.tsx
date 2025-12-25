@@ -227,10 +227,27 @@ export default function OfferDetailPage() {
       
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
         {/* Fixed Back to Offers Button */}
-        <div className="fixed top-25 left-4 z-50">
+        <div className="fixed z-50 
+/* Mobile position */
+top-17 left-1 
+/* Desktop position */
+md:top-23 md:left-4"
+        >
+          {/* MOBILE VIEW: Icon-only circular button (Hidden on desktop) */}
           <button
             onClick={handleBackToOffers}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-lg backdrop-blur-sm bg-white/90"
+            aria-label="Back to Offers"
+            className="md:hidden group flex items-center gap-2 p-2 text-gray-500 hover:text-gray-900 transition-colors"
+          >
+            <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+              <ArrowLeft className="w-4 h-4 text-gray-700" />
+            </div>
+          </button>
+
+          {/* DESKTOP VIEW: Full label button (Hidden on mobile) */}
+          <button
+            onClick={handleBackToOffers}
+            className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white hover:text-gray-900 transition-colors shadow-lg"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Offers

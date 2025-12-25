@@ -44,8 +44,8 @@ export const sidebarLinks = {
     DEPARTMENTHEAD: [
         { label: "Dashboard", href: "/departmenthead", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "Profile", href: "/departmenthead/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
-        { label: "Total Leads", href: "/departmenthead/totalleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
-        { label: "All RM's List", href: "/departmenthead/rmlist", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "RM's List", href: "/departmenthead/rmlist", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Leads", href: "/departmenthead/totalleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "Assign RMs", href: "/departmenthead/assignrm", icon: <Users className="h-5 w-5 text-neutral-700" /> },
 
     ],
