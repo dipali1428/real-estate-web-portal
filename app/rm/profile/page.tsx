@@ -229,14 +229,14 @@ export default function ProfileSection() {
                                         password: profile.password || undefined,
                                     };
 
-                                    // await AdminService.updateAdminProfile(payload);
+                                    await RmService.updateRmProfile(payload);
 
                                     toast.success("Profile updated successfully!");
 
-                                    // const refreshed = await AdminService.getAdminProfile();
-                                    // setProfile(refreshed.user);
+                                    const refreshed = await RmService. getRmProfile();
+                                     setProfile(refreshed.user);
 
-                                    setIsEditing(false);
+                                    setIsEditing(false);                    
                                 } catch (err: any) {
                                     toast.error(err?.response?.data?.message || "Failed to update profile.");
                                 } finally {

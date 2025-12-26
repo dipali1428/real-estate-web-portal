@@ -13,8 +13,17 @@ export const RmService = {
   },
 
   getRmProfile : async()=>{
-    const response = await api.get('api/rm/leadmanager/profile');
+    const response = await api.get('api/rm/get-rm-profile');
+    return response.data;
+  },
+  
+  updateRmProfile: async (payload: any) => {
+    const res = await api.put("/api/rm/update-profile", payload);
+    return res.data;
+  },
+  
+  getAssignedLeadsToRm: async () => {
+    const response = await api.get('/api/rm/get-assigned-leads-to-rm');
     return response.data;
   }
-  
 };

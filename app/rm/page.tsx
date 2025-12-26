@@ -63,18 +63,37 @@ export default function Dashboard() {
 
   return (
     <div className="flex-1 p-4 sm:p-6">
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white shadow-lg">
-        <h2 className="text-xl sm:text-2xl font-bold">
-          Welcome back, {userName} 👋
-        </h2>
-        <p className="text-sm sm:text-base opacity-90 mt-1">
-          Here&rsquo;s a quick snapshot of your business performance.
-        </p>
-      </motion.div>
+                <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+          >
+            {/* Left Side: Welcome Message */}
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold">
+                Welcome back, {userName} 👋
+              </h2>
+              <p className="text-sm sm:text-base opacity-90 mt-1">
+                Here&rsquo;s a quick snapshot of your business performance.
+              </p>
+            </div>
+
+            {/* Right Side: Name and Referral Code */}
+            <div className="text-left sm:text-right border-l-2 sm:border-l-0 sm:border-r-0 border-white/20 pl-4 sm:pl-0">
+              <p className="text-sm font-semibold opacity-80 uppercase tracking-wider">
+                {/* Rakhi Raut  */}
+              </p>
+              <p className="text-lg font-bold leading-none mt-1">
+                {userName}
+              </p>
+              <div className="mt-2 inline-block sm:block">
+                <span className="text-[10px] bg-white/20 px-2 py-1 rounded-md font-mono border border-white/10">
+                  Ref Code: <span className="text-white font-bold tracking-widest uppercase">LNSR01</span>
+                </span>
+              </div>
+            </div>
+          </motion.div>
 
       {/* Referral Leads Overview */}
       <section className="mb-10">
@@ -86,22 +105,6 @@ export default function Dashboard() {
             value={referralLeadTotal}
             icon={<Users size={26} />}
             subtitle="All active & inactive DSAs"
-            color="blue"
-          />
-        </div>
-      </section>
-
-      {/* My DSA Overview */}
-      <section className="mb-10">
-        <DashboardSectionHeader title="My DSA's Total Count" />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard
-            title="Total Enquiries"
-            value={myDsaTotal}
-            icon={<Mail size={26} />}
-            subtitle="All time enquiries"
-            delay={0.1}
             color="blue"
           />
         </div>

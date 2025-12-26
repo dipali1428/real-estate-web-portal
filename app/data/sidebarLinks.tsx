@@ -54,5 +54,6 @@ export const sidebarLinks = {
         { label: "Profile", href: "/rm/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "My DSAs", href: "/rm/mydsa", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "All leads", href: "/rm/assigneddsa", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Detailed leads", href: "/rm/assigneddsa", icon: <Users className="h-5 w-5 text-neutral-700" /> },
     ],
 };

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { RmService } from '@/app/services/rmService';
 import * as XLSX from 'xlsx';
-import { Pencil, FileUp, FileText } from "lucide-react";
+import { Pencil, FileUp, FileText, Calendar, Clock, Video, MapPin, Plus, X, ArrowRight, Share2, UserCheck, ClipboardList } from "lucide-react";
 
 interface DSA {
   id: string;
@@ -34,11 +34,11 @@ interface ReferralLead {
   dsa_id: number;
   dsa_name: string;
   dsa_adv_id: string;
-  rm_id: number;
-  rm_name: string;
+  assigned_rm_department: string;
+  assigned_rm_name: string;
   rm_referral_code: string;
   last_follow_up?: string;
-  documents?: { name: string; url: string }[]; // Added for detailed view
+  documents?: { name: string; url: string }[];
 }
 
 interface Meeting {
@@ -93,19 +93,35 @@ const formatDate = (dateString: string) => {
 };
 
 export default function ReferralManagementDashboard() {
-  const [activeTab, setActiveTab] = useState<'dsa' | 'meetings' | 'leads' | 'detailed-leads'>('dsa');
+  // Removed 'passed-leads' from the tab type
+  const [activeTab, setActiveTab] = useState<'dsa' | 'leads' | 'assigned-leads' | 'meetings'>('dsa');
   const [dsaList, setDsaList] = useState<DSA[]>([]);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [leads, setLeads] = useState<ReferralLead[]>([]);
+  const [assignedLeads, setAssignedLeads] = useState<ReferralLead[]>([]);
   const [loading, setLoading] = useState({
     dsa: true,
     meetings: true,
-    leads: true
+    leads: true,
+    assignedLeads: true
   });
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(50);
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newMeeting, setNewMeeting] = useState({
+    dsa_id: '',
+    title: '',
+    description: '',
+    scheduled_date: '',
+    scheduled_time: '',
+    duration: 30,
+    meeting_type: 'virtual' as 'virtual' | 'in-person',
+    platform: 'Google Meet',
+    location: ''
+  });
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -113,7 +129,8 @@ export default function ReferralManagementDashboard() {
         await Promise.allSettled([
           fetchDSAList(),
           fetchMeetings(),
-          fetchLeads()
+          fetchLeads(),
+          fetchAssignedLeads()
         ]);
       } catch (err) {
         console.error('Error in fetchAllData:', err);
@@ -140,9 +157,26 @@ export default function ReferralManagementDashboard() {
     }
   };
 
+  const fetchAssignedLeads = async () => {
+    try {
+      const res = await RmService.getAssignedLeadsToRm();
+      console.log('Assigned Leads Response:', res);
+      if (res?.success && Array.isArray(res.leads)) {
+        setAssignedLeads(res.leads);
+      } else {
+        setAssignedLeads([]);
+      }
+    } catch (err: any) {
+      console.error('Error fetching assigned leads:', err);
+    } finally {
+      setLoading(prev => ({ ...prev, assignedLeads: false }));
+    }
+  };
+
   const fetchDSAList = async () => {
     try {
       const dsaRes = await RmService.getYourDsaList();
+     
       if (dsaRes?.success && Array.isArray(dsaRes.dsas)) {
         const mappedDSAs = mapApiDataToDSA(dsaRes.dsas);
         setDsaList(mappedDSAs);
@@ -199,6 +233,35 @@ export default function ReferralManagementDashboard() {
     }
   };
 
+  const handleScheduleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const selectedDsa = dsaList.find(d => d.id === newMeeting.dsa_id);
+    
+    const meetingToAdd: Meeting = {
+      id: Date.now(),
+      dsa_id: Number(newMeeting.dsa_id),
+      dsa_name: selectedDsa?.name || 'Unknown DSA',
+      dsa_adv_id: selectedDsa?.adv_id,
+      title: newMeeting.title,
+      description: newMeeting.description,
+      scheduled_date: newMeeting.scheduled_date,
+      scheduled_time: newMeeting.scheduled_time,
+      duration: newMeeting.duration,
+      meeting_type: newMeeting.meeting_type,
+      status: 'scheduled',
+      platform: newMeeting.platform,
+      location: newMeeting.location,
+    };
+
+    setMeetings([meetingToAdd, ...meetings]);
+    setIsModalOpen(false);
+    setNewMeeting({
+      dsa_id: '', title: '', description: '', scheduled_date: '',
+      scheduled_time: '', duration: 30, meeting_type: 'virtual',
+      platform: 'Google Meet', location: ''
+    });
+  };
+
   const normalize = (str: string) =>
     str?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
 
@@ -242,7 +305,6 @@ export default function ReferralManagementDashboard() {
   const getPageNumbers = () => {
     const totalPages = getTotalPages();
     const pageNumbers = [];
-
     if (totalPages <= 5) {
       for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
     } else if (currentPage <= 3) {
@@ -252,36 +314,29 @@ export default function ReferralManagementDashboard() {
     } else {
       pageNumbers.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
     }
-
     return pageNumbers;
   };
 
   const downloadExcel = () => {
     const excelData = dsaList.map(dsa => ({
-      'ID': dsa.id,
-      'Adv ID': dsa.adv_id,
-      'Name': dsa.name,
-      'Email': dsa.email,
-      'Mobile': dsa.mobile,
-      'PAN': dsa.pan,
-      'City': dsa.city,
-      'Head': dsa.head,
-      'Category': dsa.category,
-      'Date Joined': dsa.date_joined,
-      'Status': dsa.status,
-      'Total Leads': dsa.total_leads || 0,
-      'Converted Leads': dsa.converted_leads || 0,
+      'ID': dsa.id, 'Adv ID': dsa.adv_id, 'Name': dsa.name, 'Email': dsa.email,
+      'Mobile': dsa.mobile, 'PAN': dsa.pan, 'City': dsa.city, 'Head': dsa.head,
+      'Category': dsa.category, 'Date Joined': dsa.date_joined, 'Status': dsa.status,
+      'Total Leads': dsa.total_leads || 0, 'Converted Leads': dsa.converted_leads || 0,
       'Pending Leads': dsa.pending_leads || 0,
     }));
-
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     XLSX.utils.book_append_sheet(workbook, worksheet, 'DSAs');
-
     const timestamp = new Date().toISOString().split('T')[0];
     const filename = `DSA_Report_${timestamp}.xlsx`;
     XLSX.writeFile(workbook, filename);
   };
+
+  const myReferralLeads = leads.filter(lead => {
+    const subCat = lead.sub_category?.toLowerCase() || "";
+    return subCat.includes("home loan") || subCat.includes("lap");
+  });
 
   const renderDSAList = () => {
     if (loading.dsa) return (
@@ -310,7 +365,6 @@ export default function ReferralManagementDashboard() {
               </div>
             </div>
           </div>
-
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <label className="text-sm text-gray-600">Show:</label>
@@ -327,7 +381,6 @@ export default function ReferralManagementDashboard() {
                 <option value="100">100</option>
               </select>
             </div>
-
             <button
               onClick={downloadExcel}
               className="inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
@@ -422,7 +475,6 @@ export default function ReferralManagementDashboard() {
                       <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
                     </svg>
                   </button>
-
                   {getPageNumbers().map((pageNumber, index) => (
                     pageNumber === '...' ? (
                       <span key={`dots-${index}`} className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300">
@@ -437,7 +489,6 @@ export default function ReferralManagementDashboard() {
                       </button>
                     )
                   ))}
-
                   <button onClick={goToNextPage} disabled={currentPage === getTotalPages()} className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${currentPage === getTotalPages() ? 'cursor-not-allowed opacity-50' : ''}`}>
                     <span className="sr-only">Next</span>
                     <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -467,25 +518,118 @@ export default function ReferralManagementDashboard() {
     return (
       <div>
         <div className="mb-6 flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-gray-900">Meetings</h3>
-          <button onClick={() => alert('Schedule Meeting functionality coming soon!')} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Schedule New Meeting
+          <h3 className="text-lg font-semibold text-gray-900">Meeting Schedules</h3>
+          <button 
+            onClick={() => setIsModalOpen(true)} 
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Schedule with DSA
           </button>
         </div>
 
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 relative">
+              <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <X className="w-6 h-6" />
+              </button>
+              <h2 className="text-xl font-bold mb-4 text-gray-900">Schedule Meeting with DSA</h2>
+              <form onSubmit={handleScheduleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Select DSA</label>
+                  <select 
+                    required
+                    value={newMeeting.dsa_id}
+                    onChange={e => setNewMeeting({...newMeeting, dsa_id: e.target.value})}
+                    className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-gray-900 bg-white"
+                  >
+                    <option value="">Choose a DSA from your list</option>
+                    {dsaList.map(d => (
+                      <option key={d.id} value={d.id}>{d.name} ({d.adv_id})</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Meeting Title</label>
+                  <input 
+                    required
+                    type="text" 
+                    value={newMeeting.title}
+                    onChange={e => setNewMeeting({...newMeeting, title: e.target.value})}
+                    className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-gray-900 bg-white" 
+                    placeholder="e.g. Quarterly Review"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Date</label>
+                    <input 
+                      required
+                      type="date" 
+                      value={newMeeting.scheduled_date}
+                      onChange={e => setNewMeeting({...newMeeting, scheduled_date: e.target.value})}
+                      className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-gray-900 bg-white" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Time</label>
+                    <input 
+                      required
+                      type="time" 
+                      value={newMeeting.scheduled_time}
+                      onChange={e => setNewMeeting({...newMeeting, scheduled_time: e.target.value})}
+                      className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-gray-900 bg-white" 
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Meeting Type</label>
+                  <select 
+                    value={newMeeting.meeting_type}
+                    onChange={e => setNewMeeting({...newMeeting, meeting_type: e.target.value as any})}
+                    className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-gray-900 bg-white"
+                  >
+                    <option value="virtual">Virtual (Online)</option>
+                    <option value="in-person">In-Person (Office)</option>
+                  </select>
+                </div>
+                {newMeeting.meeting_type === 'virtual' ? (
+                   <div>
+                   <label className="block text-sm font-medium text-gray-700">Platform</label>
+                   <input 
+                     type="text" 
+                     value={newMeeting.platform}
+                     onChange={e => setNewMeeting({...newMeeting, platform: e.target.value})}
+                     className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-gray-900 bg-white" 
+                     placeholder="Zoom, GMeet, etc."
+                   />
+                 </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Location</label>
+                    <input 
+                      type="text" 
+                      value={newMeeting.location}
+                      onChange={e => setNewMeeting({...newMeeting, location: e.target.value})}
+                      className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-gray-900 bg-white" 
+                      placeholder="Office Address"
+                    />
+                  </div>
+                )}
+                <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 font-medium transition-colors">
+                  Confirm Schedule
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
         {upcomingMeetings.length === 0 && pastMeetings.length === 0 ? (
           <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No data</h3>
-            <p className="mt-1 text-sm text-gray-500">No meetings scheduled</p>
-            <button onClick={() => alert('Schedule Meeting functionality coming soon!')} className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
-              Schedule Your First Meeting
-            </button>
+            <Calendar className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No meetings found</h3>
+            <p className="mt-1 text-sm text-gray-500">You haven't scheduled any meetings with your DSAs yet.</p>
           </div>
         ) : (
           <>
@@ -494,82 +638,46 @@ export default function ReferralManagementDashboard() {
                 <h4 className="text-md font-medium text-gray-900 mb-4">Upcoming Meetings ({upcomingMeetings.length})</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {upcomingMeetings.map(meeting => (
-                    <div key={meeting.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div key={meeting.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
                       <div className="flex justify-between items-start mb-3">
                         <div>
                           <h5 className="font-semibold text-gray-900">{meeting.title}</h5>
                           <p className="text-sm text-gray-600 mt-1">{meeting.description}</p>
                         </div>
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${meeting.meeting_type === 'virtual' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
+                          {meeting.meeting_type === 'virtual' ? <Video className="w-3 h-3 mr-1" /> : <MapPin className="w-3 h-3 mr-1" />}
                           {meeting.meeting_type}
                         </span>
                       </div>
                       <div className="space-y-2 text-sm">
-                        <div className="flex items-center text-gray-600">
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                          {meeting.dsa_name} ({meeting.dsa_adv_id})
+                        <div className="flex items-center text-gray-600 font-medium">
+                          <Plus className="w-4 h-4 mr-2 text-blue-500" />
+                          DSA: {meeting.dsa_name} ({meeting.dsa_adv_id})
                         </div>
                         <div className="flex items-center text-gray-600">
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          {new Date(meeting.scheduled_date).toLocaleDateString('en-IN')} at {meeting.scheduled_time}
+                          <Calendar className="w-4 h-4 mr-2" />
+                          {new Date(meeting.scheduled_date).toLocaleDateString('en-IN')}
                         </div>
-                        {meeting.meeting_type === 'virtual' && meeting.meeting_link && (
-                          <a href={meeting.meeting_link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-blue-600 hover:text-blue-800">
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                            Join Meeting
-                          </a>
+                        <div className="flex items-center text-gray-600">
+                          <Clock className="w-4 h-4 mr-2" />
+                          {meeting.scheduled_time} ({meeting.duration} mins)
+                        </div>
+                        {meeting.meeting_type === 'virtual' && (
+                          <div className="flex items-center text-blue-600 font-medium">
+                             <Video className="w-4 h-4 mr-2" />
+                             {meeting.platform} 
+                             {meeting.meeting_link && <a href={meeting.meeting_link} target="_blank" className="ml-2 underline">Join</a>}
+                          </div>
                         )}
-                      </div>
-                      <div className="mt-4 flex justify-end space-x-2">
-                        <button className="text-sm text-red-600 hover:text-red-800">Cancel</button>
-                        <button className="text-sm text-blue-600 hover:text-blue-800">Reschedule</button>
+                        {meeting.meeting_type === 'in-person' && (
+                          <div className="flex items-center text-gray-600">
+                             <MapPin className="w-4 h-4 mr-2" />
+                             {meeting.location}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
-                </div>
-              </div>
-            )}
-
-            {pastMeetings.length > 0 && (
-              <div>
-                <h4 className="text-md font-medium text-gray-900 mb-4">Past Meetings</h4>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DSA</th>
-                        <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meeting</th>
-                        <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                        <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {pastMeetings.map(meeting => (
-                        <tr key={meeting.id}>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-sm font-medium text-gray-900">{meeting.dsa_name}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">{meeting.title}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">{new Date(meeting.scheduled_date).toLocaleDateString('en-IN')} at {meeting.scheduled_time}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${meeting.meeting_type === 'virtual' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                              {meeting.meeting_type}
-                            </span>
-                          </td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${meeting.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                              {meeting.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
                 </div>
               </div>
             )}
@@ -586,7 +694,6 @@ export default function ReferralManagementDashboard() {
         <p className="text-gray-600">Loading leads...</p>
       </div>
     );
-
     return (
       <div>
         <div className="mb-6 bg-white p-4 rounded-lg border shadow-sm">
@@ -597,76 +704,169 @@ export default function ReferralManagementDashboard() {
             </div>
           </div>
         </div>
-
-        {leads.length === 0 ? (
+        {myReferralLeads.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <h3 className="mt-2 text-sm font-medium text-gray-900">No data</h3>
-            <p className="mt-1 text-sm text-gray-500">No leads found</p>
+            <p className="mt-1 text-sm text-gray-500">No primary referral leads found</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client Details</th>
                   <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DSA</th>
+                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client Details</th> 
                   <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
                   <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sub Category</th>
-                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Addtional Notes</th>
+                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"> Additional Notes</th>
                   <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
+                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
                 </tr> 
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {leads.map(lead => (
-                  <tr key={lead.id} className="hover:bg-gray-50">
-                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-gray-900">{lead.lead_name}</span>
-                        <div className="space-y-1">
-                          {lead.contact_number && (
-                            <a href={`tel:${lead.contact_number}`} className="flex items-center text-sm text-blue-600 hover:text-blue-800"> 
-                              {lead.contact_number}
-                            </a>
-                          )}
-                          {lead.email && (
-                            <a href={`mailto:${lead.email}`} className="flex items-center text-xs text-gray-600 hover:text-gray-800 truncate">
-                              {lead.email}
-                            </a>
-                          )}
+                {myReferralLeads.map(lead => {
+                  return (
+                    <tr key={lead.id} className="hover:bg-gray-50">
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-sm">
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900">{lead.dsa_name}</span>
+                          <span className="text-xs text-gray-500">{lead.dsa_adv_id}</span>
                         </div>
-                      </div>
-                    </td>
+                      </td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-sm">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-gray-900">{lead.lead_name}</span>
+                          <span className="text-blue-600">{lead.contact_number}</span>
+                          <span className="text-gray-600">{lead.email}</span>
+                        </div>
+                      </td>
+                      
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">{lead.department}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">{lead.sub_category}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500 max-w-xs truncate">{lead.notes}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${lead.status === 'converted' ? 'bg-green-100 text-green-800' :
+                            lead.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'
+                          }`}>
+                          {lead.status}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">
+                        {new Date(lead.created_at).toLocaleDateString('en-IN')}
+                      </td>  
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderAssignedLeads = () => {
+    if (loading.assignedLeads) return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+        <p className="text-gray-600">Loading assigned leads...</p>
+      </div>
+    );
+
+    return (
+      <div>
+        <div className="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-md">
+           <p className="text-sm text-indigo-700 font-medium flex items-center">
+             <ClipboardList className="w-4 h-4 mr-2" />
+             Leads specifically assigned to you from the central team.
+           </p>
+        </div>
+        {assignedLeads.length === 0 ? (
+          <div className="text-center py-12">
+            <ClipboardList className="mx-auto h-12 w-12 text-gray-300" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No leads assigned</h3>
+            <p className="mt-1 text-sm text-gray-500">You don't have any leads assigned to you yet.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DSA Details</th>
+                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referral ID</th>
+                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client Details</th>
+                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sub Category</th>
+                   <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned RM</th>
+                  <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {assignedLeads.map(lead => (
+                  <tr key={lead.id} className="hover:bg-gray-50">
+                    {/* DSA Details */}
                     <td className="px-3 py-3 md:px-6 md:py-4 text-sm">
                       <div className="flex flex-col">
                         <span className="font-medium text-gray-900">{lead.dsa_name}</span>
-                        <span className="text-xs text-gray-500">ID: {lead.dsa_adv_id}</span>
+                        <span className="text-xs text-gray-500">{lead.dsa_adv_id}</span>
                       </div>
                     </td>
-                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">{lead.department}</td>
-                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">{lead.sub_category}</td>
-                     <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">{lead.notes}</td>
-                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${lead.status === 'converted' ? 'bg-green-100 text-green-800' :
-                          lead.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            lead.status === 'contacted' ? 'bg-blue-100 text-blue-800' :
-                              lead.status === 'follow_up' ? 'bg-purple-100 text-purple-800' :
-                                'bg-red-100 text-red-800'
-                        }`}>
-                        {lead.status}
-                      </span>
+                    
+                    {/* Referral ID */}
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-900 font-medium">
+                      {lead.rm_referral_code || lead.id}
                     </td>
-                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">
-                      {new Date(lead.created_at).toLocaleDateString('en-IN')}
-                      <p className="text-xs text-gray-500 mt-1">
-                        {new Date(lead.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
+
+                    {/* Client Details */}
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-gray-900">{lead.lead_name}</span>
+                        <span className="text-blue-600 font-medium">{lead.contact_number}</span>
+                        <span className="text-gray-500 text-xs">{lead.email}</span>
+                      </div>
                     </td>
                     
+                    {/* Department */}
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-600">
+                      {lead.department}
+                    </td>
+
+                    {/* Sub Category */}
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-600">
+                      {lead.sub_category}
+                    </td>
+                    {/* Status */}
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-600">
+                      {lead.status}
+                    </td>
+                    {/* Assigned RM Name & Department */}
                     <td className="px-3 py-3 md:px-6 md:py-4 text-sm">
+                      <div className="flex flex-col">
+                        <span className="text-blue-600 font-semibold">{lead.assigned_rm_name || 'Unassigned'}</span>
+                        <span className="text-gray-500 text-xs">{lead.assigned_rm_department}</span>
+                      </div>
+                    </td>
+
+                    {/* Created At */}
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500">
+                      {new Date(lead.created_at).toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                      <div>
+                        <span className="text-xs text-gray-400">
+                      {new Date(lead.created_at).toLocaleTimeString('en-IN', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                      })}
+                      </span>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -678,84 +878,16 @@ export default function ReferralManagementDashboard() {
     );
   };
 
-  const renderDetailedLeads = () => {
-    if (loading.leads) return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-        <p className="text-gray-600">Loading detailed leads...</p>
-      </div>
-    );
+  const isLoading = loading.dsa || loading.leads || loading.meetings || loading.assignedLeads;
 
+  if (error && !isLoading) {
     return (
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lead Name</th>
-              <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact Number</th>
-              <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sub Category</th>
-              <th className="px-3 py-3 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documents</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {leads.map(lead => (
-              <tr key={lead.id} className="hover:bg-gray-50">
-                <td className="px-3 py-3 md:px-6 md:py-4 text-sm font-bold text-gray-900">
-                  {lead.lead_name}
-                </td>
-                <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-900">
-                  {lead.contact_number}
-                </td>
-                <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-900">
-                  {lead.sub_category}
-                </td>
-                <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-900">
-                  <div className="flex flex-col space-y-1">
-                    {lead.documents && lead.documents.length > 0 ? (
-                      lead.documents.map((doc, idx) => (
-                        <a key={idx} href={doc.url} target="_blank" className="flex items-center text-blue-600 text-xs hover:underline">
-                          <FileText className="w-3 h-3 mr-1" /> {doc.name}
-                        </a>
-                      ))
-                    ) : (
-                      <span className="text-xs text-gray-400 italic">No documents uploaded</span>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
-  if (error && !loading.dsa && !loading.leads && !loading.meetings) {
-    return (
-      <div className="p-4 md:p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{error}</p>
-                <button onClick={() => window.location.reload()} className="mt-2 text-red-800 hover:text-red-900 font-medium">
-                  Try again
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="p-4 md:p-6 text-center">
+        <p className="text-red-600 mb-4">{error}</p>
+        <button onClick={() => window.location.reload()} className="bg-blue-600 text-white px-4 py-2 rounded">Retry</button>
       </div>
     );
   }
-
-  const isLoading = loading.dsa || loading.leads || loading.meetings;
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
@@ -768,46 +900,38 @@ export default function ReferralManagementDashboard() {
         <div className="border-b border-gray-200 mb-6">
           <nav className="flex space-x-4 md:space-x-8 -mb-px overflow-x-auto">
             <button onClick={() => setActiveTab('dsa')} className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center ${activeTab === 'dsa' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
-              DSA List <span className={`ml-2 py-0.5 px-2 rounded-full text-xs font-medium ${activeTab === 'dsa' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{dsaList.length}</span>
+             My DSA List <span className={`ml-2 py-0.5 px-2 rounded-full text-xs font-medium ${activeTab === 'dsa' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{dsaList.length}</span>
             </button>
             <button onClick={() => setActiveTab('leads')} className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center ${activeTab === 'leads' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
-              Leads <span className={`ml-2 py-0.5 px-2 rounded-full text-xs font-medium ${activeTab === 'leads' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{leads.length}</span>
+             My Referral Leads <span className={`ml-2 py-0.5 px-2 rounded-full text-xs font-medium ${activeTab === 'leads' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{myReferralLeads.length}</span>
             </button>
-            <button onClick={() => setActiveTab('detailed-leads')} className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center ${activeTab === 'detailed-leads' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
-              Detailed Leads <span className={`ml-2 py-0.5 px-2 rounded-full text-xs font-medium ${activeTab === 'detailed-leads' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{leads.length}</span>
+            <button onClick={() => setActiveTab('assigned-leads')} className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center ${activeTab === 'assigned-leads' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+             Assigned Leads <span className={`ml-2 py-0.5 px-2 rounded-full text-xs font-medium ${activeTab === 'assigned-leads' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{assignedLeads.length}</span>
+            </button>
+            <button onClick={() => setActiveTab('meetings')} className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center ${activeTab === 'meetings' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+              DSA Meetings <span className={`ml-2 py-0.5 px-2 rounded-full text-xs font-medium ${activeTab === 'meetings' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{meetings.length}</span>
             </button>
           </nav>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border p-4 md:p-6">
-          {isLoading && activeTab === 'dsa' && loading.dsa ? (
+          {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-              <p className="text-gray-600">Loading DSA list...</p>
-            </div>
-          ) : isLoading && activeTab === 'leads' && loading.leads ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-              <p className="text-gray-600">Loading leads...</p>
-            </div>
-          ) : isLoading && activeTab === 'detailed-leads' && loading.leads ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-              <p className="text-gray-600">Loading details...</p>
+              <p className="text-gray-600">Loading data...</p>
             </div>
           ) : (
             <>
               {activeTab === 'dsa' && renderDSAList()}
               {activeTab === 'leads' && renderLeads()}
-              {activeTab === 'detailed-leads' && renderDetailedLeads()}
+              {activeTab === 'assigned-leads' && renderAssignedLeads()}
+              {activeTab === 'meetings' && renderMeetings()}
             </>
           )}
         </div>
 
         <div className="mt-6 text-sm text-gray-500 text-center">
-          <p>Data last updated: {new Date().toLocaleString('en-IN', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
-          })}</p>
-          <p className="mt-1">Total DSAs: {dsaList.length} | Total Leads: {leads.length} </p>
+          <p>Data last updated: {new Date().toLocaleString('en-IN')}</p>
         </div>
       </div>
     </div>
