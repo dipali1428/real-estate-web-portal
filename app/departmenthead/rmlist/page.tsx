@@ -129,30 +129,30 @@ export default function DepartmentHeadPanel() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50 border-b border-gray-200">
-                <th className="px-6 py-4 text-[11px] font-semibold text-gray-700 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-4 text-[11px] font-semibold text-gray-700 uppercase tracking-wider">RM</th>
-                <th className="px-6 py-4 text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Mobile</th>
-                <th className="px-6 py-4 text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Department</th>
-                <th className="px-6 py-4 text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Location</th>
-                <th className="px-6 py-4 text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Sub Categories</th>
-                <th className="px-6 py-4 text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Joined On</th>
+                <th className="px-6 py-4 text-[12px] font-semibold text-gray-700 uppercase tracking-wider">ID</th>
+                <th className="px-6 py-4 text-[12px] font-semibold text-gray-700 uppercase tracking-wider">RM</th>
+                <th className="px-6 py-4 text-[12px] font-semibold text-gray-700 uppercase tracking-wider">Mobile</th>
+                <th className="px-6 py-4 text-[12px] font-semibold text-gray-700 uppercase tracking-wider">Department</th>
+                <th className="px-6 py-4 text-[12px] font-semibold text-gray-700 uppercase tracking-wider">Location</th>
+                <th className="px-6 py-4 text-[12px] font-semibold text-gray-700 uppercase tracking-wider">Sub Categories</th>
+                <th className="px-6 py-4 text-[12px] font-semibold text-gray-700 uppercase tracking-wider">Joined On</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredManagers.map((rm) => (
                 <tr key={rm.id} className="hover:bg-blue-50/10 transition-colors">
-                  <td className="px-6 py-4 text-sm font-normal text-gray-600">{rm.id}</td>
+                  <td className="px-6 py-4 text-sm font-normal text-gray-700">{rm.id}</td>
 
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
                       <span className="text-sm font-normal text-gray-900">{rm.name}</span>
-                      <span className="text-[12px] text-gray-500 font-normal flex items-center gap-1">
+                      <span className="text-[12px] text-gray-700 font-normal flex items-center gap-1">
                         <Mail className="h-3 w-3" /> {rm.email}
                       </span>
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 text-sm font-normal text-gray-600">
+                  <td className="px-6 py-4 text-sm font-normal text-gray-700">
                     {rm.mobile === 'null' || !rm.mobile ? '—' : rm.mobile}
                   </td>
 
@@ -162,7 +162,7 @@ export default function DepartmentHeadPanel() {
                     </span>
                   </td>
 
-                  <td className="px-6 py-4 text-sm font-normal text-gray-600">
+                  <td className="px-6 py-4 text-sm font-normal text-gray-700">
                     <div className="flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5 text-red-400" />
                       {rm.city}
@@ -183,7 +183,7 @@ export default function DepartmentHeadPanel() {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 text-sm font-normal text-gray-500 whitespace-nowrap">
+                  <td className="px-6 py-4 text-sm font-normal text-gray-700 whitespace-nowrap">
                     {new Date(rm.date_joined).toLocaleDateString('en-IN', {
                       day: '2-digit', month: 'short', year: 'numeric'
                     })}
