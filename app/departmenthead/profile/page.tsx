@@ -24,25 +24,25 @@ export default function ProfileSection() {
 
     const hasFetched = useRef(false);
 
-    // FETCH PROFILE ON LOAD
+    // FETCH PROFILE DATA
+    const fetchProfileData = async () => {
+        try {
+            setLoading(true);
+            const res = await DepartmentHeadService.getDepartmentProfile();
+            // Handle cases where API returns { user: ... } or just the object
+            setProfile(res.user || res);
+        } catch (err: any) {
+            console.error("Profile load error", err);
+            toast.error("Failed to fetch profile.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (hasFetched.current) return;
         hasFetched.current = true;
-
-        const fetchProfile = async () => {
-            try {
-                setLoading(true);
-                const res = await DepartmentHeadService.getDepartmentProfile();
-                setProfile(res.user || res);
-            } catch (err) {
-                console.error("Profile load error", err);
-                toast.error("Failed to fetch profile.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProfile();
+        fetchProfileData();
     }, []);
 
     // Password strength checker
@@ -54,22 +54,49 @@ export default function ProfileSection() {
         return setPasswordStrength("Strong");
     };
 
+    // HANDLE SAVE (REAL API CALL)
     const handleSave = async () => {
         if (!profile) return;
+
         try {
             setSaving(true);
-            const payload = {
-                email: profile.email,
-                mobile: profile.mobile,
-                password: profile.password || undefined,
+
+            // 1. Start with the basic fields that we know are working
+            const payload: any = {
+                email: profile.email.trim(),
+                mobile: profile.mobile.trim(),
             };
 
-            await new Promise(resolve => setTimeout(resolve, 800));
-            toast.success("Profile updated successfully (Simulated)!");
-            setIsEditing(false);
+            // 2. ONLY add password if the user actually typed something
+            // We check for length and ensure it's not just whitespace
+            if (profile.password && profile.password.trim().length > 0) {
+                // NOTE: If your backend still gives 500, try changing 
+                // the key from 'password' to 'new_password' below.
+                payload.password = profile.password.trim();
+            }
+
+            console.log("Submitting Payload:", payload);
+
+            // 3. Call the API
+            await DepartmentHeadService.updateDepartmentProfile(payload);
+
+            toast.success("Profile updated successfully!");
+
+            // 4. Clear the password field in state so it doesn't get sent again 
+            // on a subsequent edit unless re-typed
             setProfile(prev => prev ? { ...prev, password: "" } : null);
+
+            // 5. Refresh data and exit edit mode
+            await fetchProfileData();
+            setIsEditing(false);
+            setPasswordStrength("");
+
         } catch (err: any) {
-            toast.error(err?.response?.data?.message || "Failed to update profile.");
+            console.error("Update error detail:", err.response?.data);
+
+            // Check if the backend sent a specific reason for the crash
+            const errorMessage = err?.response?.data?.message || "Server error: Password might not meet requirements.";
+            toast.error(errorMessage);
         } finally {
             setSaving(false);
         }
@@ -78,7 +105,10 @@ export default function ProfileSection() {
     if (loading || !profile)
         return (
             <div className="flex justify-center items-center h-[60vh] text-[#1CADA3]">
-                <div className="animate-pulse">Loading profile...</div>
+                <div className="flex flex-col items-center gap-2">
+                    <div className="w-8 h-8 border-4 border-[#1CADA3] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="font-medium">Loading profile...</p>
+                </div>
             </div>
         );
 
@@ -92,19 +122,23 @@ export default function ProfileSection() {
                         <h2 className="text-2xl md:text-3xl font-bold text-slate-700">
                             Department Head Profile
                         </h2>
-                        {/* DEPARTMENT SUBTITLE ADDED HERE */}
-                        <p className="text-[#1CADA3] font-semibold mt-1 text-xl">
+                        <p className="text-[#1CADA3] font-semibold mt-1 text-lg">
                             {profile.department}
                         </p>
                     </div>
 
                     <button
+                        type="button"
                         onClick={() => {
+                            if (isEditing) {
+                                // If canceling, reset password field and refresh data to discard changes
+                                setProfile({ ...profile, password: "" });
+                                fetchProfileData();
+                            }
                             setIsEditing(!isEditing);
-                            if (isEditing) setProfile({ ...profile, password: "" });
                         }}
-                        className="px-4 py-2 text-[#1CADA3] border border-[#1CADA3] rounded-lg hover:bg-[#1CADA3] hover:text-white transition">
-                        {isEditing ? "Cancel" : "Edit"}
+                        className="px-4 py-2 text-[#1CADA3] border border-[#1CADA3] rounded-lg hover:bg-[#1CADA3] hover:text-white transition duration-200">
+                        {isEditing ? "Cancel" : "Edit Profile"}
                     </button>
                 </div>
 
@@ -113,25 +147,36 @@ export default function ProfileSection() {
 
                     {/* NAME (Read Only) */}
                     <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">Name</label>
+                        <label className="text-sm font-semibold text-gray-600">Full Name</label>
                         <input
                             type="text"
                             disabled
                             value={profile.name}
-                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
+                            className="w-full mt-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
+                        />
+                    </div>
+
+                    {/* ROLE (Read Only) */}
+                    <div className="col-span-1">
+                        <label className="text-sm font-semibold text-gray-600">System Role</label>
+                        <input
+                            type="text"
+                            disabled
+                            value={profile.role}
+                            className="w-full mt-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
                         />
                     </div>
 
                     {/* EMAIL (Editable) */}
                     <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">Email</label>
+                        <label className="text-sm font-semibold text-gray-700">Email Address</label>
                         <input
                             type="email"
                             disabled={!isEditing}
                             value={profile.email}
                             onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                             className={`w-full mt-1 px-3 py-2 rounded-lg transition-all ${isEditing
-                                ? "border-2 border-[#1CADA3] bg-white text-gray-800 shadow-sm"
+                                ? "border-2 border-[#1CADA3] bg-white text-gray-800 shadow-sm outline-none"
                                 : "bg-gray-100 text-gray-700 border border-gray-300"
                                 }`}
                         />
@@ -139,67 +184,56 @@ export default function ProfileSection() {
 
                     {/* MOBILE (Editable) */}
                     <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">Mobile</label>
+                        <label className="text-sm font-semibold text-gray-700">Mobile Number</label>
                         <input
                             type="tel"
                             disabled={!isEditing}
                             value={profile.mobile}
                             onChange={(e) => setProfile({ ...profile, mobile: e.target.value })}
                             className={`w-full mt-1 px-3 py-2 rounded-lg transition-all ${isEditing
-                                ? "border-2 border-[#1CADA3] bg-white text-gray-800 shadow-sm"
+                                ? "border-2 border-[#1CADA3] bg-white text-gray-800 shadow-sm outline-none"
                                 : "bg-gray-100 text-gray-700 border border-gray-300"
                                 }`}
                         />
                     </div>
 
-                    {/* ROLE (Read Only) */}
-                    <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">Role</label>
-                        <input
-                            type="text"
-                            disabled
-                            value={profile.role}
-                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
-                        />
-                    </div>
-
                     {/* DEPARTMENT (Read Only) */}
                     <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">Department</label>
+                        <label className="text-sm font-semibold text-gray-600">Department</label>
                         <input
                             type="text"
                             disabled
                             value={profile.department}
-                            className="w-full mt-1 px-3 py-2 bg-blue-50 border border-gray-300 rounded-lg text-gray-700"
+                            className="w-full mt-1 px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-lg text-gray-500 cursor-not-allowed font-medium"
                         />
                     </div>
 
                     {/* SUB CATEGORY (Read Only) */}
                     <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">Sub Category</label>
+                        <label className="text-sm font-semibold text-gray-600">Sub Category</label>
                         <input
                             type="text"
                             disabled
                             value={profile.sub_category}
-                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
+                            className="w-full mt-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
                         />
                     </div>
 
                     {/* CITY (Read Only) */}
                     <div className="col-span-1">
-                        <label className="text-sm font-semibold text-gray-700">City</label>
+                        <label className="text-sm font-semibold text-gray-600">City</label>
                         <input
                             type="text"
                             disabled
                             value={profile.city}
-                            className="w-full mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700"
+                            className="w-full mt-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
                         />
                     </div>
 
                     {/* PASSWORD FIELD (Editable) */}
                     <div className="col-span-1 sm:col-span-2">
                         <label className="text-sm font-semibold text-gray-700">
-                            New Password
+                            New Password (Leave blank to keep current)
                         </label>
                         <input
                             type="password"
@@ -209,15 +243,15 @@ export default function ProfileSection() {
                                 evaluatePassword(e.target.value);
                                 setProfile({ ...profile, password: e.target.value });
                             }}
-                            placeholder={isEditing ? "Enter new password" : "Enter new password"}
+                            placeholder={isEditing ? "Enter new password" : "••••••••"}
                             className={`w-full mt-1 px-3 py-2 rounded-lg transition-all ${isEditing
-                                ? "border-2 border-[#1CADA3] bg-white text-gray-800 shadow-sm"
+                                ? "border-2 border-[#1CADA3] bg-white text-gray-800 shadow-sm outline-none"
                                 : "bg-gray-100 text-gray-700 border border-gray-300"
                                 }`}
                         />
-                        {isEditing && (
-                            <p className="text-xs mt-1 font-medium text-gray-600">
-                                Password Strength: <span className={
+                        {isEditing && profile.password && (
+                            <p className="text-xs mt-1 font-medium">
+                                Strength: <span className={
                                     passwordStrength === "Strong" ? "text-green-600" :
                                         passwordStrength === "Medium" ? "text-yellow-600" : "text-red-500"
                                 }>{passwordStrength}</span>
@@ -230,10 +264,16 @@ export default function ProfileSection() {
                 {isEditing && (
                     <div className="flex justify-end mt-8">
                         <button
+                            type="button"
                             disabled={saving}
                             onClick={handleSave}
-                            className="px-6 py-2 bg-[#1CADA3] text-white rounded-lg hover:bg-[#169c91] transition disabled:opacity-50 shadow-md">
-                            {saving ? "Saving..." : "Save Changes"}
+                            className="px-8 py-2.5 bg-[#1CADA3] text-white font-semibold rounded-lg hover:bg-[#169c91] active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none shadow-md">
+                            {saving ? (
+                                <span className="flex items-center gap-2">
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    Saving...
+                                </span>
+                            ) : "Save Changes"}
                         </button>
                     </div>
                 )}
