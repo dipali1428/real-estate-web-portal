@@ -162,13 +162,13 @@ export default function AdminLeadPanel() {
   if (loading) return <div className="p-20 text-center"><RefreshCw className="animate-spin mx-auto w-10 h-10 text-blue-500" /></div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+      <div className="max-w-full mx-auto">
 
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-slate-700">Unassigned DSA's</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Unassigned DSA's</h1>
             <p className="text-slate-500">Assign leads to relationship managers</p>
           </div>
           <button onClick={() => { fetchData(); fetchRMs(); }} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
@@ -177,39 +177,38 @@ export default function AdminLeadPanel() {
         </div>
 
         {/* Statistics Cards */}
-        {/* Statistics Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
-                  <div className="flex items-center">
-                    <Users className="w-10 h-10 text-blue-500 bg-blue-50 p-2 rounded-md mr-4" />
-                    <div>
-                      <p className="text-gray-500 text-xs font-bold uppercase">Unassigned</p>
-                      {/* Added text-gray-900 for dark mode visibility */}
-                      <p className="text-2xl font-bold text-gray-900">{leads.filter(l => !l.assignedTo).length}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
-                  <div className="flex items-center">
-                    <CheckCircle className="w-10 h-10 text-green-500 bg-green-50 p-2 rounded-md mr-4" />
-                    <div>
-                      <p className="text-gray-500 text-xs font-bold uppercase">Assigned</p>
-                      {/* Added text-gray-900 for dark mode visibility */}
-                      <p className="text-2xl font-bold text-gray-900">{leads.filter(l => l.assignedTo).length}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
-                  <div className="flex items-center">
-                    <User className="w-10 h-10 text-purple-500 bg-purple-50 p-2 rounded-md mr-4" />
-                    <div>
-                      <p className="text-gray-500 text-xs font-bold uppercase">Total RMs</p>
-                      {/* Added text-gray-900 for dark mode visibility */}
-                      <p className="text-2xl font-bold text-gray-900">{rms.length}</p>
-                    </div>
-                  </div>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
+            <div className="flex items-center">
+              <Users className="w-10 h-10 text-blue-500 bg-blue-50 p-2 rounded-md mr-4" />
+              <div>
+                <p className="text-gray-500 text-xs font-bold uppercase">Unassigned</p>
+                {/* Added text-gray-900 for dark mode visibility */}
+                <p className="text-2xl font-bold text-gray-900">{leads.filter(l => !l.assignedTo).length}</p>
               </div>
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
+            <div className="flex items-center">
+              <CheckCircle className="w-10 h-10 text-green-500 bg-green-50 p-2 rounded-md mr-4" />
+              <div>
+                <p className="text-gray-500 text-xs font-bold uppercase">Assigned</p>
+                {/* Added text-gray-900 for dark mode visibility */}
+                <p className="text-2xl font-bold text-gray-900">{leads.filter(l => l.assignedTo).length}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
+            <div className="flex items-center">
+              <User className="w-10 h-10 text-purple-500 bg-purple-50 p-2 rounded-md mr-4" />
+              <div>
+                <p className="text-gray-500 text-xs font-bold uppercase">Total RMs</p>
+                {/* Added text-gray-900 for dark mode visibility */}
+                <p className="text-2xl font-bold text-gray-900">{rms.length}</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <Tab.Group onChange={(index) => { setActiveTab(index === 0 ? 'unassigned' : 'assigned'); setCurrentPage(1); }}>
           <Tab.List className="flex space-x-1 bg-blue-900/10 p-1 rounded-xl mb-6">

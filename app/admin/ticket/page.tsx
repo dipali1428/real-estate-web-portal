@@ -150,7 +150,7 @@ const AdminSupportTicketsPage = () => {
         {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Support Ticket Management</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Support Ticket Management</h1>
             <p className="text-gray-600 mt-2">Manage and resolve tickets raised by DSAs</p>
           </div>
           <button onClick={fetchAllTickets} className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-fit">
@@ -242,8 +242,7 @@ const AdminSupportTicketsPage = () => {
                     <button
                       key={i + 1}
                       onClick={() => setCurrentPage(i + 1)}
-                      className={`px-3 py-1.5 rounded text-sm ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'border'}`}
-                    >
+                      className={`px-3 py-1.5 rounded text-sm ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'border'}`}>
                       {i + 1}
                     </button>
                   ))}

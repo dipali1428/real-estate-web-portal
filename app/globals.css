@@ -44,3 +44,22 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(28, 173, 163, 0.6);
 }
+
+/* Horizontal scrollbar only (height control) */
+.scrollbar-x-thin::-webkit-scrollbar {
+  height: 5px;
+  /* small horizontal scrollbar */
+}
+
+.scrollbar-x-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-x-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(28, 173, 163, 0.4);
+  border-radius: 9999px;
+}
+
+.scrollbar-x-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(28, 173, 163, 0.7);
+}

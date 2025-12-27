@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { Tab } from '@headlessui/react';
 import * as XLSX from 'xlsx';
 import { AdminService } from '@/app/services/adminService';
-import { Pencil, Trash2, FileUp, FileSpreadsheet } from "lucide-react";
+import { Pencil, RefreshCw, FileUp, FileSpreadsheet } from "lucide-react";
 import toast from "react-hot-toast";
-import { div } from 'framer-motion/client';
+import StatsCard from '../components/DashboardStatsCard';
+import { Users, UserCheck, UserX } from "lucide-react";
 
 // Define types for Direct Selling Agent based on API response
 interface DSA {
@@ -594,163 +595,95 @@ export default function DSAManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-6">
+      <div className="max-w-full mx-auto sm:px-4 lg:px-6">
 
         {/* Header Section */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          {/* Left: Title */}
+        <div className="mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold font-sans text-slate-700 mb-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">
               DSA Management
             </h1>
-            <p className="text-slate-800">
+            <p className="text-sm text-slate-600">
               Manage your Direct Selling Agents and their performance
             </p>
           </div>
 
-          {/* Right: Refresh */}
+          {/* Action Buttons Section */}
+          <div className="flex flex-col sm:flex-row sm:justify-end items-stretch sm:items-center gap-2 mb-4">
+
+            <button
+              onClick={handleRefresh}
+              className="flex items-center text-[#2076C7] hover:text-[#2076C7]"
+              title="Refresh Data">
+              <RefreshCw className='w-4 h-4' />
+              Refresh
+            </button>
+
+            {/* Add DSA Button — Uncomment if needed */}
+            {/*
           <button
-            onClick={handleRefresh}
-            className="flex items-center text-[#2076C7] hover:text-[#2076C7]"
-            title="Refresh Data">
-            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-[#2076C7] text-white px-4 py-2 rounded-lg hover:bg-[#2076C7] flex items-center justify-center">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Refresh
+            Add New DSA
           </button>
-        </div>
+          */}
 
+            {/* Upload Excel */}
+            <label className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 cursor-pointer text-sm">
+              <FileSpreadsheet className="w-4 h-4" />
+              Upload Excel
+              <input type="file" accept=".xlsx,.xls" className="hidden" />
+            </label>
 
-        {/* Action Buttons Section */}
-        <div className="flex flex-col sm:flex-row sm:justify-end items-stretch sm:items-center gap-3 mb-4">
+            {/* Download Excel */}
+            <button
+              onClick={() => downloadExcel('all')}
+              disabled={dsas.length === 0}
+              className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm disabled:opacity-50 cursor-pointer">
+              <FileUp className="w-4 h-4" />
+              Download Excel
+            </button>
+          </div>
 
-          {/* Add DSA Button — Uncomment if needed */}
-          {/*
-  <button
-    onClick={() => setIsAddModalOpen(true)}
-    className="bg-[#2076C7] text-white px-4 py-2 rounded-lg hover:bg-[#2076C7] flex items-center justify-center">
-    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-    </svg>
-    Add New DSA
-  </button>
-  */}
-
-          {/* Upload XLSX Sheet */}
-          <label className="inline-flex items-center justify-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 cursor-pointer">
-            <FileSpreadsheet className="w-5 h-5 mr-2" />
-            Upload Excel
-            <input
-              type="file"
-              accept=".xlsx,.xls"
-              className="hidden"
-            // onChange={handleUploadExcel}
-            />
-          </label>
-
-          {/* Download Excel Button */}
-          <button
-            onClick={() => downloadExcel('all')}
-            className="inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-            disabled={dsas.length === 0}>
-            <FileUp className="w-5 h-5 mr-2" />
-            Download Excel
-            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
         </div>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total DSAs</p>
-                <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
-              </div>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Active DSAs</p>
-                <p className="text-2xl font-semibold text-gray-900">{stats.active}</p>
-              </div>
-            </div>
-          </div>
+          <StatsCard
+            title="Total DSAs"
+            value={stats.total}
+            subtitle="Current Dsa total"
+            color="blue"
+            icon={<Users className="w-6 h-6" />}
+          />
 
-          {/* <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Pending DSAs</p>
-                <p className="text-2xl font-semibold text-gray-900">{stats.pending}</p>
-              </div>
-            </div>
-          </div> */}
+          <StatsCard
+            title="Active DSAs"
+            value={stats.active}
+            subtitle="Currently enabled users"
+            color="green"
+            icon={<UserCheck className="w-6 h-6" />}
+          />
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Inactive DSAs</p>
-                <p className="text-2xl font-semibold text-gray-900">{stats.inactive}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+          <StatsCard
+            title="Inactive DSAs"
+            value={stats.inactive}
+            subtitle="Currently inactive users"
+            color="red"
+            icon={<UserX className="w-6 h-6" />}
+          />
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap justify-end gap-4">
-          {/* Download Excel Button */}
-          <div className="relative group">
-            {/* Dropdown menu for download options */}
-            <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-              <div className="py-1">
-                <button
-                  onClick={() => downloadExcel('all')}
-                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={dsas.length === 0}>
-                  <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-                  </svg>
-                  Download All ({dsas.length} records)
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Tabs */}
         <div className="w-full max-w-7xl mx-auto">
           <Tab.Group onChange={(index) => setActiveTab(tabs[index])}>
-            <Tab.List className="flex space-x-1 rounded-xl bg-[#2076C7] p-1 mb-8">
+            <Tab.List className="flex space-x-1 rounded-xl bg-[#2076C7] p-1 mb-4">
               {tabs.map((tab) => (
                 <Tab
                   key={tab}
@@ -769,18 +702,18 @@ export default function DSAManagementPage() {
             <Tab.Panels>
 
               {tabs.map((tab) => (
-                <Tab.Panel key={tab} className="rounded-xl bg-white p-6 shadow">
+                <Tab.Panel key={tab} className="rounded-xl bg-white p-6 sm:p-6 shadow">
                   {/* Records per page selector */}
 
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <div className="flex items-center mb-4">
-                      <div className="relative w-96">
+                      <div className="relative w-full md:w-96">
                         <input
                           type="text"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Search by adv_id, name, email or mobile"
-                          className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                          className="w-full pl-10 pr-4 py-2 rounded-lg shadow-md focus:outline-none text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
                         />
                         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                           <svg
@@ -800,7 +733,7 @@ export default function DSAManagementPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-2 flex-wrap md:flex-nowrap">
                       <label className="text-sm text-gray-600">Show:</label>
                       <select
                         value={itemsPerPage}
@@ -818,7 +751,7 @@ export default function DSAManagementPage() {
                     </div>
                   </div>
 
-                  <div className="overflow-x-auto">
+                  <div className="max-h-[70vh] overflow-x-auto scrollbar-x-thin scrollbar-thumb-gray-300 scrollbar-track-transparent md:scrollbar-thumb-gray-400 font-sans">
                     {getCurrentPageDSAs().length === 0 ? (
                       <div className="text-center py-12">
                         <svg className="w-16 h-16 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -827,64 +760,63 @@ export default function DSAManagementPage() {
                         <p className="mt-4 text-gray-500">No DSAs found</p>
                       </div>
                     ) : (
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                      <table className="divide-y divide-gray-200 w-full text-left border-collapse min-w-[1100px] rounded-2xl">
+                        <thead className="bg-gray-100 border-b font-sans border-gray-200 sticky top-0 z-10">
                           <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               ID
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Actions
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              EDIT
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Adv ID
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Name
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Email
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Mobile
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               PAN
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               City
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Head
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Category
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Date Joined
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Updated At
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Role
                             </th>
                             {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Password
                             </th> */}
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Status
                             </th>
-
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                           {getCurrentPageDSAs().map((dsa) => (
                             <tr key={dsa.id} className="hover:bg-gray-50">
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {dsa.id}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                                 {/* Edit Button */}
                                 <button
                                   onClick={() => handleEdit(dsa)}
@@ -901,43 +833,43 @@ export default function DSAManagementPage() {
                                   <Trash2 className="w-4 h-4" />
                                 </button> */}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.adv_id}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.name}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {dsa.email}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.mobile}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.pan}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.city}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.head}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.category}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {formatDate(dsa.date_joined)}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {formatDate(dsa.updated_at)}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.role}
                               </td>
-                              {/* <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              {/* <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {dsa.password}
                               </td> */}
-                              <td className="px-4 py-3 whitespace-nowrap">
+                              <td className="px-4 py-4 whitespace-nowrap">
                                 <span
                                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${dsa.status === 'Active'
                                     ? 'bg-green-100 text-green-800'
@@ -1041,6 +973,7 @@ export default function DSAManagementPage() {
             </Tab.Panels>
           </Tab.Group>
         </div>
+
       </div>
 
       {/* Edit Modal */}
@@ -1203,8 +1136,6 @@ export default function DSAManagementPage() {
         </div>
       )}
 
-
-
       {/* Add DSA Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 shadow bg-opacity-100 flex items-center justify-center p-4 z-50">
@@ -1349,8 +1280,4 @@ export default function DSAManagementPage() {
 
     </div>
   );
-}
-
-function useRef(arg0: boolean) {
-  throw new Error('Function not implemented.');
 }
