@@ -43,7 +43,6 @@ const LeadTable: FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
 
-  // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
@@ -98,7 +97,6 @@ const LeadTable: FC = () => {
     fetchData();
   }, []);
 
-  // Reset page to 1 when filters or page size change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, categoryFilter, activeTab, pageSize]);
@@ -144,7 +142,6 @@ const LeadTable: FC = () => {
     });
   }, [leads, activeTab, searchTerm, categoryFilter]);
 
-  // Logic for Pagination
   const totalPages = Math.ceil(filteredLeads.length / pageSize);
   const paginatedLeads = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
@@ -166,7 +163,7 @@ const LeadTable: FC = () => {
 
   return (
     <div className="w-full max-w-[1600px] mx-auto px-4 py-6 font-sans relative">
-      <div className="mb-6 border-b flex gap-6">
+      <div className="mb-6 mt-4 border-b flex gap-6">
         {['referral', 'detailed'].map((tab) => (
           <button
             key={tab}
@@ -184,7 +181,6 @@ const LeadTable: FC = () => {
       <div className="flex justify-between items-center mb-6 text-gray-700">
         <h2 className="text-lg font-semibold text-gray-800 capitalize">{activeTab} Leads</h2>
         <div className="flex gap-3 items-center">
-          {/* MAX SELECTOR MOVED HERE */}
           <div className="flex items-center gap-2 mr-2">
             <span className="text-[13px] text-gray-600 font-medium">Show:</span>
             <select
@@ -217,20 +213,22 @@ const LeadTable: FC = () => {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left border-collapse">
-            <thead className="bg-gray-50 text-[12px] font-medium text-gray-700 border-b border-gray-200">
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col">
+        {/* INNER SCROLLBAR CONTAINER: Added max-h and overflow-y-auto */}
+        <div className="overflow-x-auto overflow-y-auto max-h-[450px]">
+          <table className="min-w-full text-left border-separate border-spacing-0">
+            {/* STICKY HEADER: Added sticky top-0 and z-10 */}
+            <thead className="bg-gray-50 text-[12px] font-medium text-gray-700 border-b border-gray-200 sticky top-0 z-10">
               <tr>
-                <th className="px-4 py-3">ID</th>
-                {activeTab === 'referral' && <th className="px-4 py-3">Ref ID</th>}
-                <th className="px-4 py-3">Client</th>
-                <th className="px-4 py-3">Product</th>
-                <th className="px-4 py-3">DSA</th>
-                <th className="px-4 py-3">Notes</th>
-                {activeTab === 'detailed' && <th className="px-4 py-3">Documents</th>}
-                <th className="px-4 py-3">Assigned RM</th>
-                <th className="px-4 py-3">Created</th>
+                <th className="px-4 py-3 bg-gray-50 border-b border-gray-200">ID</th>
+                {activeTab === 'referral' && <th className="px-4 py-3 bg-gray-50 border-b border-gray-200">Ref ID</th>}
+                <th className="px-4 py-3 bg-gray-50 border-b border-gray-200">Client</th>
+                <th className="px-4 py-3 bg-gray-50 border-b border-gray-200">Product</th>
+                <th className="px-4 py-3 bg-gray-50 border-b border-gray-200">DSA</th>
+                <th className="px-4 py-3 bg-gray-50 border-b border-gray-200">Notes</th>
+                {activeTab === 'detailed' && <th className="px-4 py-3 bg-gray-50 border-b border-gray-200">Documents</th>}
+                <th className="px-4 py-3 bg-gray-50 border-b border-gray-200">Assigned RM</th>
+                <th className="px-4 py-3 bg-gray-50 border-b border-gray-200">Created</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
@@ -303,9 +301,6 @@ const LeadTable: FC = () => {
                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       </div>
                       <p className="text-gray-500 font-medium">No leads found</p>
-                      {(searchTerm || categoryFilter) && (
-                        <button onClick={() => { setSearchTerm(""); setCategoryFilter(""); }} className="mt-2 text-blue-600 text-xs hover:underline">Clear filters</button>
-                      )}
                     </div>
                   </td>
                 </tr>

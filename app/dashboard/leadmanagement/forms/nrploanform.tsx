@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
-import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
+import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown, ShieldCheck } from "lucide-react";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -18,6 +18,9 @@ const DOC_MAP: Record<string, string[]> = {
 
 export default function NrpLoanForm({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState<Record<string, string>>({
+    isSelfLogin: "No", // Default to No to preserve original behavior
+    refId: "", fileId: "", bankName: "",
+    rmName: "", rmContact: "", rmEmail: "",
     name: "", phone: "", email: "", dob: "", location: "",
     loanCategory: "", loanAmount: "", useOfFund: "",
     employmentType: "", otherIncomeSource: "", otherIncomeAmount: ""
@@ -27,9 +30,12 @@ export default function NrpLoanForm({ onClose }: { onClose: () => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const requiredDocs = useMemo(() => 
-    DOC_MAP[form.employmentType === "Other" ? form.otherIncomeSource : form.employmentType] || []
-  , [form.employmentType, form.otherIncomeSource]);
+  const isSelfLoginActive = form.isSelfLogin === "Yes";
+
+  const requiredDocs = useMemo(() => {
+    if (isSelfLoginActive) return [];
+    return DOC_MAP[form.employmentType === "Other" ? form.otherIncomeSource : form.employmentType] || [];
+  }, [form.employmentType, form.otherIncomeSource, isSelfLoginActive]);
 
   const handleInputChange = (field: string, value: string) => {
     setForm(prev => ({
@@ -43,26 +49,46 @@ export default function NrpLoanForm({ onClose }: { onClose: () => void }) {
     const errs: Record<string, string> = {};
     const req = (f: string, msg: string) => { if (!form[f]?.trim()) errs[f] = msg; };
 
-    req("name", "Client Name is required");
-    req("location", "Location is required");
-    req("dob", "Date of Birth is required");
-    req("loanAmount", "Loan Amount is required");
-    req("loanCategory", "Select loan category");
-    req("useOfFund", "Use of fund is required");
-    req("employmentType", "Employment type is required");
+    req("isSelfLogin", "Selection required");
 
-    if (!form.phone) errs.phone = "Phone number is required";
-    else if (form.phone.length !== 10) errs.phone = "Phone number must be exactly 10 digits";
+    if (isSelfLoginActive) {
+      // req("refId", "Ref ID is required");
+      req("fileId", "File ID is required");
+      req("name", "Client Name is required");
+      req("location", "Location is required");
+      req("loanAmount", "Loan Amount is required");
+      req("bankName", "Bank Name is required");
+      req("rmName", "RM/SM Name is required");
 
-    if (!form.email) errs.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email format";
+      if (!form.rmContact) errs.rmContact = "Contact number required";
+      else if (form.rmContact.length !== 10) errs.rmContact = "Must be 10 digits";
 
-    if (form.employmentType === "Other") {
-      if (!form.otherIncomeSource) errs.otherIncomeSource = "Select income source";
-      else if (["Pensioner", "Rental"].includes(form.otherIncomeSource) && !form.otherIncomeAmount) errs.otherIncomeAmount = "Income amount is required";
+      if (!form.rmEmail) errs.rmEmail = "Email required";
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.rmEmail)) errs.rmEmail = "Invalid email";
+
+    } else {
+      req("name", "Client Name is required");
+      req("location", "Location is required");
+      req("dob", "Date of Birth is required");
+      req("loanAmount", "Loan Amount is required");
+      req("loanCategory", "Select loan category");
+      req("useOfFund", "Use of fund is required");
+      req("employmentType", "Employment type is required");
+
+      if (!form.phone) errs.phone = "Phone number is required";
+      else if (form.phone.length !== 10) errs.phone = "Phone number must be exactly 10 digits";
+
+      if (!form.email) errs.email = "Email is required";
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email format";
+
+      if (form.employmentType === "Other") {
+        if (!form.otherIncomeSource) errs.otherIncomeSource = "Select income source";
+        else if (["Pensioner", "Rental"].includes(form.otherIncomeSource) && !form.otherIncomeAmount) errs.otherIncomeAmount = "Income amount is required";
+      }
+
+      requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
     }
 
-    requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -87,45 +113,72 @@ export default function NrpLoanForm({ onClose }: { onClose: () => void }) {
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col relative">
         <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white rounded-t-xl">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">NRP Loan Form</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800"><X size={20} className="sm:w-6 sm:h-6" /></button>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800"><X size={20} /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <Field label="Client Name" placeholder="Enter full name" {...fProps("name")} required />
-            <Field label="Phone Number" placeholder="10-digit mobile number" type="tel" maxLength={10} onlyNumber {...fProps("phone")} required />
-            <Field label="Email ID" placeholder="Enter email address" type="email" {...fProps("email")} required />
-            <Field label="Date of Birth" type="date" {...fProps("dob")} required />
-            <Field label="Location" placeholder="Enter city" {...fProps("location")} required />
-            <Field label="Loan Category" type="select" options={["Fresh", "Resell", "BT"]} {...fProps("loanCategory")} required />
-            <Field label="Loan Amount" placeholder="Desired amount" onlyNumber {...fProps("loanAmount")} required />
-            <Field label="Use of Fund" placeholder="Enter purpose of loan" {...fProps("useOfFund")} required />
 
-            <div className="col-span-1 md:col-span-2 mt-2">
-              <Field label="Employment Type" type="select" options={["Salaried Person", "Self Employed", "Other"]} {...fProps("employmentType")} required />
+            {/* HIGHLIGHTED SELF LOGIN SELECTOR */}
+            <div className="col-span-1 md:col-span-2 bg-[#1CADA3]/5 border-l-4 border-[#1CADA3] p-4 rounded-r-lg shadow-sm mb-2">
+              <div className="flex items-center gap-2 mb-2">
+                <ShieldCheck className="text-[#1CADA3]" size={20} />
+                <span className="text-sm font-bold text-[#1CADA3] uppercase tracking-wide">Direct Submission</span>
+              </div>
+              <Field label="Self Login to Bank?" type="select" options={["No", "Yes"]} {...fProps("isSelfLogin")} required />
+              <p className="text-[11px] text-gray-500 mt-2 italic">Select "Yes" if you have already initiated the login process with the bank.</p>
             </div>
 
-            {form.employmentType === "Other" && (
+            {isSelfLoginActive ? (
               <>
-                <Field label="Other Income Source" type="select" options={["Pensioner", "Rental"]} {...fProps("otherIncomeSource")} required />
-                {["Pensioner", "Rental"].includes(form.otherIncomeSource) && <Field label="Approx Amount" placeholder="Enter amount" onlyNumber {...fProps("otherIncomeAmount")} required />}
-              </>
-            )}
-
-            {requiredDocs.length > 0 && (
-              <div className="col-span-1 md:col-span-2 mt-4">
-                <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">
-                  Upload Documents <span className="text-sm font-normal text-gray-500 ml-2">(for {form.employmentType === "Other" ? form.otherIncomeSource : form.employmentType})</span>
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  {requiredDocs.map(lbl => (
-                    <FileUpload key={lbl} label={lbl} allowMultiple={!["Aadhar Card", "PAN Card"].includes(lbl)} onUpdate={(has: any) => {
-                      setUploadedDocs(p => ({ ...p, [lbl]: has }));
-                      if (has) setErrors(p => ({ ...p, [`doc_${lbl}`]: "" }));
-                    }} error={errors[`doc_${lbl}`]} />
-                  ))}
+                <Field label="Ref ID" placeholder="Enter Reference ID" {...fProps("refId")} />
+                <Field label="File ID" placeholder="Enter File ID" {...fProps("fileId")} required />
+                <Field label="Client Name" placeholder="Enter full name" {...fProps("name")} required />
+                <Field label="Location" placeholder="Enter city" {...fProps("location")} required />
+                <Field label="Loan Amount" placeholder="Desired amount" onlyNumber {...fProps("loanAmount")} required />
+                <Field label="Bank Name" placeholder="Enter bank name" {...fProps("bankName")} required />
+                <Field label="RM/SM Name (Bank)" placeholder="Enter RM name" {...fProps("rmName")} required />
+                <Field label="RM/SM Contact (Bank)" placeholder="10-digit number" type="tel" maxLength={10} onlyNumber {...fProps("rmContact")} required />
+                <div className="col-span-1 md:col-span-2">
+                  <Field label="RM/SM Email (Bank)" placeholder="Enter RM email" type="email" {...fProps("rmEmail")} required />
                 </div>
-              </div>
+              </>
+            ) : (
+              <>
+                <Field label="Client Name" placeholder="Enter full name" {...fProps("name")} required />
+                <Field label="Phone Number" placeholder="10-digit mobile number" type="tel" maxLength={10} onlyNumber {...fProps("phone")} required />
+                <Field label="Email ID" placeholder="Enter email address" type="email" {...fProps("email")} required />
+                <Field label="Date of Birth" type="date" {...fProps("dob")} required />
+                <Field label="Location" placeholder="Enter city" {...fProps("location")} required />
+                <Field label="Loan Category" type="select" options={["Fresh", "Resell", "BT"]} {...fProps("loanCategory")} required />
+                <Field label="Loan Amount" placeholder="Desired amount" onlyNumber {...fProps("loanAmount")} required />
+                <Field label="Use of Fund" placeholder="Enter purpose of loan" {...fProps("useOfFund")} required />
+
+                <div className="col-span-1 md:col-span-2 mt-2">
+                  <Field label="Employment Type" type="select" options={["Salaried Person", "Self Employed", "Other"]} {...fProps("employmentType")} required />
+                </div>
+
+                {form.employmentType === "Other" && (
+                  <>
+                    <Field label="Other Income Source" type="select" options={["Pensioner", "Rental"]} {...fProps("otherIncomeSource")} required />
+                    {["Pensioner", "Rental"].includes(form.otherIncomeSource) && <Field label="Approx Amount" placeholder="Enter amount" onlyNumber {...fProps("otherIncomeAmount")} required />}
+                  </>
+                )}
+
+                {requiredDocs.length > 0 && (
+                  <div className="col-span-1 md:col-span-2 mt-4">
+                    <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Upload Documents</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                      {requiredDocs.map(lbl => (
+                        <FileUpload key={lbl} label={lbl} allowMultiple={!["Aadhar Card", "PAN Card"].includes(lbl)} onUpdate={(has: any) => {
+                          setUploadedDocs(p => ({ ...p, [lbl]: has }));
+                          if (has) setErrors(p => ({ ...p, [`doc_${lbl}`]: "" }));
+                        }} error={errors[`doc_${lbl}`]} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
             <div className="col-span-1 md:col-span-2 flex justify-center mt-6 pb-2">
@@ -169,27 +222,22 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState("");
   const ref = useRef<HTMLInputElement>(null);
-  
+
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = Array.from(e.target.files || []);
     if (!newFiles.length) return;
     if (newFiles.some(f => f.size > 184320)) return setFileError("Max file size: 180KB");
-    if (allowMultiple && files.length + newFiles.length > 8) return setFileError("Limit: 8 files.");
-    setFiles(p => {
-      const updated = allowMultiple ? [...p, ...newFiles] : [newFiles[0]];
-      onUpdate(true);
-      return updated;
-    });
+    const updated = allowMultiple ? [...files, ...newFiles] : [newFiles[0]];
+    setFiles(updated);
+    onUpdate(true);
     setFileError("");
     e.target.value = "";
   };
 
   const removeFile = (idx: number) => {
-    setFiles(p => {
-      const updated = p.filter((_, i) => i !== idx);
-      onUpdate(updated.length > 0);
-      return updated;
-    });
+    const updated = files.filter((_, i) => i !== idx);
+    setFiles(updated);
+    onUpdate(updated.length > 0);
   };
 
   return (
@@ -218,7 +266,6 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
         {allowMultiple && files.length > 0 && files.length < 8 && (
           <button type="button" onClick={() => ref.current?.click()} className="flex justify-center gap-1 text-[11px] font-medium text-[#1CADA3] border border-[#1CADA3] border-dashed rounded-md py-1.5 hover:bg-[#1CADA3]/10"><Plus size={12} /> Add more</button>
         )}
-        {!allowMultiple && files.length > 0 && <button type="button" onClick={() => ref.current?.click()} className="text-[10px] text-blue-600 hover:underline text-right">Change file</button>}
       </div>
       {(fileError || (error && !fileError)) && <span className="text-xs text-red-500 mt-1">{fileError || error}</span>}
     </div>
