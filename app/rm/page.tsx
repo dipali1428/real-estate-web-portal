@@ -89,7 +89,7 @@ export default function Dashboard() {
               </p>
               <div className="mt-2 inline-block sm:block">
                 <span className="text-[10px] bg-white/20 px-2 py-1 rounded-md font-mono border border-white/10">
-                  Ref Code: <span className="text-white font-bold tracking-widest uppercase">LNSR01</span>
+                   <span className="text-white font-bold tracking-widest uppercase">My Ref Code</span>
                 </span>
               </div>
             </div>

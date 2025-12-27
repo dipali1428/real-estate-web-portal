@@ -22,8 +22,13 @@ export const RmService = {
     return res.data;
   },
   
-  getAssignedLeadsToRm: async () => {
-    const response = await api.get('/api/rm/get-assigned-leads-to-rm');
+   getoutgoingLeadsToRm: async () => {
+     const response = await api.get('api/rm/get-outgoing-assigned-lead');
+     return response.data;
+   },
+
+  getIncomingAssignedLeads: async () => {
+    const response = await api.get('/api/rm/get-incoming-assigned-lead');
     return response.data;
   }
 };
