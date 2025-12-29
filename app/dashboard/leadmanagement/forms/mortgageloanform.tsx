@@ -53,7 +53,7 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
 
     if (isSelfLoginActive) {
       // req("refId", "Ref ID is required");
-      req("fileId", "File ID is required");
+      req("fileId", "File Number is required");
       req("name", "Client Name is required");
       req("location", "Location is required");
       req("loanAmount", "Loan Amount is required");
@@ -132,7 +132,7 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
             {isSelfLoginActive ? (
               <>
                 <Field label="Ref ID" placeholder="Enter Reference ID" {...fProps("refId")} />
-                <Field label="File ID" placeholder="Enter File ID" {...fProps("fileId")} required />
+                <Field label="File Number" placeholder="Enter File Number" {...fProps("fileId")} required />
                 <Field label="Client Name" placeholder="Enter full name" {...fProps("name")} required />
                 <Field label="Location" placeholder="Enter city" {...fProps("location")} required />
                 <Field label="Loan Amount" placeholder="Desired amount" onlyNumber {...fProps("loanAmount")} required />

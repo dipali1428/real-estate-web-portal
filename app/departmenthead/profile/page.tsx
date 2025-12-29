@@ -120,11 +120,8 @@ export default function ProfileSection() {
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h2 className="text-2xl md:text-3xl font-bold text-slate-700">
-                            Department Head Profile
+                            {profile.department} Profile
                         </h2>
-                        <p className="text-[#1CADA3] font-semibold mt-1 text-lg">
-                            {profile.department}
-                        </p>
                     </div>
 
                     <button
