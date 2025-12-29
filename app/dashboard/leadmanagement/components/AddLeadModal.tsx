@@ -56,7 +56,7 @@ export default function AddLeadModal({
       "Personal Loan",
       "Business Loan",
       "Education Loan",
-      "Lap Loan",
+      "Mortgage Loan",
       "Vehicle Loan",
       "SME Loan",
       "Loan Against Securities",
