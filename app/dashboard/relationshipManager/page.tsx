@@ -52,7 +52,6 @@ const RelationshipManager: React.FC = () => {
     const fetchRM = async () => {
       try {
         const response = await DashboardService.getAssignedRM();
-        console.log("API Response received:", response);
 
         // Check the nested 'rm' object from your API response
         if (response.success && response.assigned && response.rm) {

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Tab } from '@headlessui/react';
 import * as XLSX from 'xlsx';
 import { AdminService } from '@/app/services/adminService';
-import { Pencil, RefreshCw, FileUp, FileSpreadsheet } from "lucide-react";
+import { Pencil, RefreshCw, FileUp } from "lucide-react";
 import toast from "react-hot-toast";
 import StatsCard from '../components/DashboardStatsCard';
 import { Users, UserCheck, UserX } from "lucide-react";
@@ -87,6 +87,8 @@ export default function DSAManagementPage() {
     role: '',
     status: 'Pending',
   });
+  const hasFetched = useRef(false);
+  const isSearching = useRef(false);
 
   // State for dropdown options from API data
   const [cities, setCities] = useState<string[]>([]);
@@ -106,10 +108,13 @@ export default function DSAManagementPage() {
 
   // Fetch DSAs from API on component mount
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     fetchDSAs();
   }, []);
 
-  const fetchDSAs = async () => {
+  const fetchDSAs = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -123,9 +128,6 @@ export default function DSAManagementPage() {
         apiResponse.items ||
         apiResponse.dsalist ||
         [];
-
-      // console.log("Extracted apiData:", apiData);
-      // console.log("Is apiData array?", Array.isArray(apiData));
 
       if (!Array.isArray(apiData)) {
         throw new Error("API did not return an array");
@@ -147,7 +149,7 @@ export default function DSAManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
 
   // Filter DSAs based on selected tab
@@ -219,38 +221,38 @@ export default function DSAManagementPage() {
     XLSX.writeFile(workbook, filename);
   };
 
-  const requiredColumns = [
-    "ID",
-    "Adv ID",
-    "Name",
-    "Email",
-    "Mobile",
-    "PAN",
-    "City",
-    "Head",
-    "Category",
-    "Date Joined",
-    "Updated At",
-    "Role"
-  ];
+  // const requiredColumns = [
+  //   "ID",
+  //   "Adv ID",
+  //   "Name",
+  //   "Email",
+  //   "Mobile",
+  //   "PAN",
+  //   "City",
+  //   "Head",
+  //   "Category",
+  //   "Date Joined",
+  //   "Updated At",
+  //   "Role"
+  // ];
 
 
-  const normalizeExcelRow = (row: any) => {
-    return {
-      id: row["ID"] || null,
-      adv_id: row["Adv ID"] || "",
-      name: row["Name"] || "",
-      email: row["Email"] || "",
-      mobile: row["Mobile"] || "",
-      pan: row["PAN"] || "",
-      city: row["City"] || "",
-      head: row["Head"] || "",
-      category: row["Category"] || "",
-      date_joined: row["Date Joined"] || null,
-      updated_at: row["Updated At"] || null,
-      role: row["Role"] || "DSA",
-    };
-  };
+  // const normalizeExcelRow = (row: any) => {
+  //   return {
+  //     id: row["ID"] || null,
+  //     adv_id: row["Adv ID"] || "",
+  //     name: row["Name"] || "",
+  //     email: row["Email"] || "",
+  //     mobile: row["Mobile"] || "",
+  //     pan: row["PAN"] || "",
+  //     city: row["City"] || "",
+  //     head: row["Head"] || "",
+  //     category: row["Category"] || "",
+  //     date_joined: row["Date Joined"] || null,
+  //     updated_at: row["Updated At"] || null,
+  //     role: row["Role"] || "DSA",
+  //   };
+  // };
 
   // Upload Excel function
   // const handleUploadExcel = async (e: any) => {
@@ -485,45 +487,53 @@ export default function DSAManagementPage() {
   //     console.error("Search error:", err);
   //   }
   // };
+
   // Search Optimization
   useEffect(() => {
-    let abortController = new AbortController();
+    const query = searchQuery.trim();
+
+    // ✅ When search is cleared, restore full list ONCE
+    if (!query) {
+      if (isSearching.current) {
+        isSearching.current = false;
+        fetchDSAs(); // 🔥 restore original data
+      }
+      return;
+    }
+
+    isSearching.current = true;
+    const abortController = new AbortController();
 
     const delayDebounce = setTimeout(async () => {
-      if (searchQuery.trim() === "") {
-        fetchDSAs(); // load full list
-        return;
-      }
-
       try {
         const res = await AdminService.searchDSA(
-          { search: searchQuery.trim() },
+          { search: query },
           { signal: abortController.signal }
         );
 
-        const apiData =
-          res?.dsalist ||
-          res?.data ||
-          res ||
-          [];
+        const apiData = res?.dsalist || res?.data || res || [];
 
         if (Array.isArray(apiData)) {
           setDsas(mapApiDataToDSA(apiData));
         }
-
       } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Search error:", err);
+        // ✅ Ignore cancellation errors completely
+        if (
+          err?.name === "CanceledError" ||
+          err?.name === "AbortError"
+        ) {
+          return;
         }
+        console.error("Search error:", err);
       }
-    }, 500); // ⏳ 500ms debounce delay
+    }, 500);
 
     return () => {
-      abortController.abort();     // cancel previous request
-      clearTimeout(delayDebounce); // clear debounce
+      abortController.abort();
+      clearTimeout(delayDebounce);
     };
+  }, [searchQuery, fetchDSAs]);
 
-  }, [searchQuery]);
 
   const normalize = (str: string) =>
     str?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
@@ -557,6 +567,7 @@ export default function DSAManagementPage() {
 
   // Refresh data
   const handleRefresh = () => {
+    hasFetched.current = false;
     fetchDSAs();
   };
 
@@ -614,9 +625,8 @@ export default function DSAManagementPage() {
 
             <button
               onClick={handleRefresh}
-              className="flex items-center text-[#2076C7] hover:text-[#2076C7]"
-              title="Refresh Data">
-              <RefreshCw className='w-4 h-4' />
+              className="inline-flex items-center justify-center gap-2 bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-500 text-sm disabled:opacity-50 cursor-pointer">
+              <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
             </button>
 
@@ -631,13 +641,6 @@ export default function DSAManagementPage() {
             Add New DSA
           </button>
           */}
-
-            {/* Upload Excel */}
-            <label className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 cursor-pointer text-sm">
-              <FileSpreadsheet className="w-4 h-4" />
-              Upload Excel
-              <input type="file" accept=".xlsx,.xls" className="hidden" />
-            </label>
 
             {/* Download Excel */}
             <button
