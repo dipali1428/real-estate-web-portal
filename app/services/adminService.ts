@@ -104,6 +104,12 @@ interface Comment {
 }
 
 export const AdminService = {
+  // Fetch All Users (Admins, RMs, Department Heads, DSAs)
+  getAllUsers: async () => {
+    const response = await api.get("/api/admin/getalldata");
+    return response.data;
+  },
+
   // Fetch DSA List 
   dsaList: async (formData: DSAListPayload = {}) => {
     const response = await api.get("/api/admin/dsalist", { params: formData });

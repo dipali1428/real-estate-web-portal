@@ -36,6 +36,7 @@ export const sidebarLinks = {
         { label: "Website Enquiry", href: "/admin/enquiry", icon: <Megaphone className="h-5 w-5 text-neutral-700" /> },
         { label: "Unassigned DSA's", href: "/admin/unassigneddsa", icon: <UserCheck className="h-5 w-5 text-neutral-700" /> },
         { label: "Total Leads", href: "/admin/totalleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "All Users", href: "/admin/allusers", icon: <Users className="h-5 w-5 text-neutral-700" /> },
     ],
 
     GM: [],
