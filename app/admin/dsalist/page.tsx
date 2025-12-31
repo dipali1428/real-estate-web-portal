@@ -1,17 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Tab } from '@headlessui/react';
-import * as XLSX from 'xlsx';
-import { AdminService } from '@/app/services/adminService';
-import { Pencil, RefreshCw, FileUp } from "lucide-react";
-import toast from "react-hot-toast";
-import StatsCard from '../components/DashboardStatsCard';
-import { Users, UserCheck, UserX } from "lucide-react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { Tab } from "@headlessui/react";
+import * as XLSX from "xlsx";
+import { AdminService } from "@/app/services/adminService";
+import {
+  Pencil,
+  RefreshCw,
+  FileUp,
+  Users,
+  UserCheck,
+  UserX,
+  Search,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+} from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
 
-// Define types for Direct Selling Agent based on API response
+// --- TYPES & INTERFACES ---
 interface DSA {
-  password: string;
+  password?: string;
   id: string;
   adv_id: string;
   name: string;
@@ -24,1263 +34,324 @@ interface DSA {
   date_joined: string;
   updated_at: string;
   role: string;
-  status: 'Active' | 'Inactive' | 'Pending';
+  status: "Active" | "Inactive" | "Pending";
 }
 
-// Initial empty data
-const initialDSAs: DSA[] = [];
-
-// Extract unique values for dropdowns from API data
-const extractOptionsFromData = (dsas: DSA[]) => {
-  const cities = Array.from(new Set(dsas.map(dsa => dsa.city).filter(Boolean)));
-  const categories = Array.from(new Set(
-    dsas.flatMap(dsa =>
-      dsa.category?.split(',').map(cat => cat.trim()).filter(Boolean) || []
-    )
-  ));
-  const heads = Array.from(new Set(
-    dsas.flatMap(dsa =>
-      dsa.head?.split(',').map(h => h.trim()).filter(Boolean) || []
-    )
-  ));
-  const roles = Array.from(new Set(dsas.map(dsa => dsa.role).filter(Boolean)));
-
-  return { cities, categories, heads, roles };
-};
-
 const mapApiDataToDSA = (apiData: any[]): DSA[] => {
-  return apiData.map(item => ({
-    id: item.id?.toString() || '',
-    adv_id: item.adv_id || '',
-    name: item.name || '',
-    email: item.email || '',
-    mobile: item.mobile || '',
-    pan: item.pan || '',
-    city: item.city || '',
-    head: item.head || '',
-    category: item.category || '',
-    date_joined: item.date_joined || '',
-    updated_at: item.updated_at || '',
-    role: item.role || '',
-    status: 'Active',
-    password: item.password || ''
+  return apiData.map((item) => ({
+    id: item.id?.toString() || "",
+    adv_id: item.adv_id || "",
+    name: item.name || "",
+    email: item.email || "",
+    mobile: item.mobile || "",
+    pan: item.pan || "",
+    city: item.city || "",
+    head: item.head || "",
+    category: item.category || "",
+    date_joined: item.date_joined || "",
+    updated_at: item.updated_at || "",
+    role: item.role || "",
+    status: "Active", 
+    password: item.password || "",
   }));
 };
 
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
+const inputClass =
+  "w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#2076C7] bg-white text-gray-700 placeholder-gray-400 text-sm transition-all";
+
 export default function DSAManagementPage() {
-  const [dsas, setDsas] = useState<DSA[]>(initialDSAs);
+  const [dsas, setDsas] = useState<DSA[]>([]);
   const [editingDSA, setEditingDSA] = useState<DSA | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newDSA, setNewDSA] = useState<Partial<DSA>>({
-    name: '',
-    email: '',
-    mobile: '',
-    pan: '',
-    city: '',
-    head: '',
-    category: '',
-    role: '',
-    status: 'Pending',
-  });
-  const hasFetched = useRef(false);
-  const isSearching = useRef(false);
-
-  // State for dropdown options from API data
-  const [cities, setCities] = useState<string[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [heads, setHeads] = useState<string[]>([]);
-  const [roles, setRoles] = useState<string[]>([]);
-
-  // Loading and error states
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Pagination state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(50);
-  const [activeTab, setActiveTab] = useState('All');
-  const tabs = ['All', 'Active', 'Inactive', 'Pending'];
 
-  // Fetch DSAs from API on component mount
-  useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
+  const hasFetched = useRef(false);
+  const isSearching = useRef(false);
+  const tabs = ["All", "Active", "Inactive", "Pending"];
 
-    fetchDSAs();
-  }, []);
+  const [cities, setCities] = useState<string[]>([]);
+  const [roles, setRoles] = useState<string[]>([]);
 
   const fetchDSAs = useCallback(async () => {
     try {
       setLoading(true);
-      setError(null);
       const apiResponse = await AdminService.dsaList();
-
-      const apiData =
-        (Array.isArray(apiResponse) && apiResponse) ||
-        apiResponse.data ||
-        apiResponse.dsas ||
-        apiResponse.result ||
-        apiResponse.items ||
-        apiResponse.dsalist ||
-        [];
-
-      if (!Array.isArray(apiData)) {
-        throw new Error("API did not return an array");
-      }
-
+      const apiData = apiResponse?.dsalist || apiResponse?.dsas || apiResponse || [];
       const mappedDSAs = mapApiDataToDSA(apiData);
       setDsas(mappedDSAs);
-
-      const options = extractOptionsFromData(mappedDSAs);
-      setCities(options.cities);
-      setCategories(options.categories);
-      setHeads(options.heads);
-      setRoles(options.roles);
-
+      setCities(Array.from(new Set(mappedDSAs.map((d) => d.city).filter(Boolean))));
+      setRoles(Array.from(new Set(mappedDSAs.map((d) => d.role).filter(Boolean))));
     } catch (err) {
-      console.error("Error fetching DSAs:", err);
-      setError("Failed to load DSAs");
-      setDsas([]);
+      toast.error("Failed to load DSAs");
     } finally {
       setLoading(false);
     }
   }, []);
 
-
-  // Filter DSAs based on selected tab
-  const getFilteredDSAs = (tab: string) => {
-    if (tab === 'All') return dsas;
-    return dsas.filter(dsa => dsa.status === tab);
-  };
-
-  // Get current DSAs for the current page
-  const getCurrentPageDSAs = () => {
-    const filteredDSAs = getFilteredDSAs(activeTab);
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    return filteredDSAs.slice(indexOfFirstItem, indexOfLastItem);
-  };
-
-  // Calculate total pages for filtered DSAs
-  const getTotalPages = () => {
-    const filteredDSAs = getFilteredDSAs(activeTab);
-    return Math.ceil(filteredDSAs.length / itemsPerPage);
-  };
-
-  // Reset to first page when tab changes
   useEffect(() => {
-    setCurrentPage(1);
-  }, [activeTab]);
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    fetchDSAs();
+  }, [fetchDSAs]);
 
-  // Download Excel function
-  const downloadExcel = (type: 'all') => {
-    let dataToExport: DSA[];
-
-    switch (type) {
-      case 'all':
-      default:
-        // Export all data
-        dataToExport = dsas;
-        break;
-    }
-
-    // Prepare data for Excel
-    const excelData = dataToExport.map(dsa => ({
-      'ID': dsa.id,
-      'Adv ID': dsa.adv_id,
-      'Name': dsa.name,
-      'Email': dsa.email,
-      'Mobile': dsa.mobile,
-      'PAN': dsa.pan,
-      'City': dsa.city,
-      'Head': dsa.head,
-      'Category': dsa.category,
-      'Date Joined': dsa.date_joined,
-      'Updated At': dsa.updated_at,
-      'Role': dsa.role,
-      // 'Status': dsa.status
-    }));
-
-    // Create workbook and worksheet
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
-
-    // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'DSAs');
-
-    // Generate filename with timestamp
-    const timestamp = new Date().toISOString().split('T')[0];
-    const filename = `DSA_Report_${type}_${timestamp}.xlsx`;
-
-    // Write workbook and trigger download
-    XLSX.writeFile(workbook, filename);
-  };
-
-  // const requiredColumns = [
-  //   "ID",
-  //   "Adv ID",
-  //   "Name",
-  //   "Email",
-  //   "Mobile",
-  //   "PAN",
-  //   "City",
-  //   "Head",
-  //   "Category",
-  //   "Date Joined",
-  //   "Updated At",
-  //   "Role"
-  // ];
-
-
-  // const normalizeExcelRow = (row: any) => {
-  //   return {
-  //     id: row["ID"] || null,
-  //     adv_id: row["Adv ID"] || "",
-  //     name: row["Name"] || "",
-  //     email: row["Email"] || "",
-  //     mobile: row["Mobile"] || "",
-  //     pan: row["PAN"] || "",
-  //     city: row["City"] || "",
-  //     head: row["Head"] || "",
-  //     category: row["Category"] || "",
-  //     date_joined: row["Date Joined"] || null,
-  //     updated_at: row["Updated At"] || null,
-  //     role: row["Role"] || "DSA",
-  //   };
-  // };
-
-  // Upload Excel function
-  // const handleUploadExcel = async (e: any) => {
-  //   const file = e.target.files[0];
-  //   if (!file) return;
-
-  //   try {
-  //     const reader = new FileReader();
-
-  //     reader.onload = async (evt) => {
-  //       const bstr = evt.target?.result;
-  //       const wb = XLSX.read(bstr, { type: "binary" });
-  //       const wsname = wb.SheetNames[0];
-  //       const ws = wb.Sheets[wsname];
-
-  //       const rawExcel = XLSX.utils.sheet_to_json(ws, { defval: "" });
-
-  //       // Validate presence of required Excel columns
-  //       const excelColumns = Object.keys(rawExcel[0] || {});
-  //       const missing = requiredColumns.filter(c => !excelColumns.includes(c));
-
-  //       if (missing.length > 0) {
-  //         toast.error(`Missing columns in Excel: ${missing.join(", ")}`);
-  //         return;
-  //       }
-
-  //       // Normalize each row to correct DB field format
-  //       const normalizedData = rawExcel.map(normalizeExcelRow);
-
-  //       // Send to backend
-  //       const res = await AdminService.uploadDSAExcel({ data: normalizedData });
-
-  //       toast.success(`${res.insertedCount} rows imported, ${res.skippedCount} skipped.`);
-
-  //       fetchDSAs();
-  //     };
-
-  //     reader.readAsBinaryString(file);
-
-  //   } catch (err) {
-  //     console.error("Excel Upload Error:", err);
-  //     toast.error("Failed to upload Excel");
-  //   }
-  // };
-
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this DSA?")) return;
-
-    try {
-      await AdminService.deleteDSA(id);
-
-      setDsas(prev => prev.filter(d => d.id !== id));
-      toast.success("DSA Deleted Successfully!");
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("Failed to delete DSA");
-    }
-  };
-
-
-  // Edit DSA
-  const handleEdit = (dsa: DSA) => {
-    setEditingDSA({ ...dsa });
-    setIsEditModalOpen(true);
-  };
-
-  // Save edited DSA
-  const handleSaveEdit = async () => {
-    if (!editingDSA) return;
-
-    try {
-      const payload = {
-        name: editingDSA.name,
-        email: editingDSA.email,
-        mobile: editingDSA.mobile,
-        pan: editingDSA.pan,
-        city: editingDSA.city,
-        password: editingDSA.password,
-        role: editingDSA.role,
-      };
-
-      const response = await AdminService.updateDSA(editingDSA.id, payload);
-      toast.success("DSA Updated Successfully!");
-
-      // Update UI
-      setDsas(dsas.map(dsa =>
-        dsa.id === editingDSA.id ? { ...dsa, ...payload, updated_at: new Date().toISOString() } : dsa
-      ));
-
-      setIsEditModalOpen(false);
-      setEditingDSA(null);
-
-    } catch (err) {
-      console.error("Error updating DSA:", err);
-      alert("Failed to update DSA");
-    }
-  };
-
-
-  // Add new DSA
-  const handleAddDSA = async () => {
-    try {
-      const dsa: DSA = {
-        id: Date.now().toString(),
-        adv_id: `ADV${String(Date.now()).slice(-6)}`,
-        name: newDSA.name || '',
-        email: newDSA.email || '',
-        mobile: newDSA.mobile || '',
-        pan: newDSA.pan || '',
-        city: newDSA.city || '',
-        head: newDSA.head || '',
-        category: newDSA.category || '',
-        date_joined: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        role: newDSA.role || '',
-        status: newDSA.status as 'Active' | 'Inactive' | 'Pending',
-        password: ''
-      };
-
-      // Update local state
-      setDsas([...dsas, dsa]);
-
-      // Update dropdown options if new values are added
-      if (dsa.city && !cities.includes(dsa.city)) {
-        setCities([...cities, dsa.city]);
-      }
-      if (dsa.role && !roles.includes(dsa.role)) {
-        setRoles([...roles, dsa.role]);
-      }
-
-      setIsAddModalOpen(false);
-      setNewDSA({
-        name: '',
-        email: '',
-        mobile: '',
-        pan: '',
-        city: '',
-        head: '',
-        category: '',
-        role: '',
-        status: 'Pending',
-      });
-    } catch (err) {
-      console.error('Error adding DSA:', err);
-      alert('Failed to add DSA. Please try again.');
-    }
-  };
-
-  // Calculate statistics
-  const stats = {
-    total: dsas.length,
-    active: dsas.filter(d => d.status === 'Active').length,
-    inactive: dsas.filter(d => d.status === 'Inactive').length,
-    pending: dsas.filter(d => d.status === 'Pending').length,
-  };
-
-  // Pagination controls
-  const goToPage = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const goToNextPage = () => {
-    if (currentPage < getTotalPages()) {
-      setCurrentPage(prev => prev + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  const goToPrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  // Generate page numbers for pagination
-  const getPageNumbers = () => {
-    const totalPages = getTotalPages();
-    const pageNumbers = [];
-
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        pageNumbers.push(1, 2, 3, 4, '...', totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pageNumbers.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-      } else {
-        pageNumbers.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
-      }
-    }
-
-    return pageNumbers;
-  };
-
-  const [searchQuery, setSearchQuery] = useState("");
-
-
-  // Auto Search 
-  // useEffect(() => {
-  //   const delayDebounce = setTimeout(() => {
-  //     if (searchQuery.trim() === "") {
-  //       fetchDSAs();
-  //     } else {
-  //       searchDSAFromAPI(searchQuery);
-  //     }
-  //   }, 400); // debounce 400ms
-
-  //   return () => clearTimeout(delayDebounce);
-  // }, [searchQuery]);
-
-  // // API search function
-  // const searchDSAFromAPI = async (query: string) => {
-  //   try {
-  //     const res = await AdminService.searchDSA({ search: query });
-
-  //     const apiData = res?.dsalist || res?.data || res || [];
-
-  //     if (!Array.isArray(apiData)) {
-  //       console.error("Search API did not return array:", apiData);
-  //       return;
-  //     }
-
-  //     const mapped = mapApiDataToDSA(apiData);
-  //     setDsas(mapped);
-
-  //   } catch (err) {
-  //     console.error("Search error:", err);
-  //   }
-  // };
-
-  // Search Optimization
   useEffect(() => {
     const query = searchQuery.trim();
-
-    // ✅ When search is cleared, restore full list ONCE
     if (!query) {
       if (isSearching.current) {
         isSearching.current = false;
-        fetchDSAs(); // 🔥 restore original data
+        fetchDSAs();
       }
       return;
     }
-
     isSearching.current = true;
     const abortController = new AbortController();
-
     const delayDebounce = setTimeout(async () => {
       try {
-        const res = await AdminService.searchDSA(
-          { search: query },
-          { signal: abortController.signal }
-        );
-
-        const apiData = res?.dsalist || res?.data || res || [];
-
-        if (Array.isArray(apiData)) {
-          setDsas(mapApiDataToDSA(apiData));
-        }
+        const res = await AdminService.searchDSA({ search: query }, { signal: abortController.signal });
+        const apiData = res?.dsalist || res || [];
+        if (Array.isArray(apiData)) setDsas(mapApiDataToDSA(apiData));
       } catch (err: any) {
-        // ✅ Ignore cancellation errors completely
-        if (
-          err?.name === "CanceledError" ||
-          err?.name === "AbortError"
-        ) {
-          return;
-        }
-        console.error("Search error:", err);
+        if (err?.name === "CanceledError" || err?.name === "AbortError") return;
       }
     }, 500);
-
     return () => {
       abortController.abort();
       clearTimeout(delayDebounce);
     };
   }, [searchQuery, fetchDSAs]);
 
+  const filteredDSAs = useMemo(() => {
+    if (activeTab === "All") return dsas;
+    return dsas.filter((dsa) => dsa.status === activeTab);
+  }, [dsas, activeTab]);
 
-  const normalize = (str: string) =>
-    str?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
+  const totalPages = Math.max(1, Math.ceil(filteredDSAs.length / itemsPerPage));
+  const paginatedDSAs = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredDSAs.slice(start, start + itemsPerPage);
+  }, [filteredDSAs, currentPage, itemsPerPage]);
 
-  const filteredDSAs = dsas.filter((dsa) => {
-    const query = normalize(searchQuery);
+  const getPaginationGroup = useMemo(() => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) pages.push(1, 2, 3, 4, "...", totalPages);
+      else if (currentPage >= totalPages - 2)
+        pages.push(1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      else pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+    }
+    return pages;
+  }, [currentPage, totalPages]);
 
-    return (
-      normalize(dsa.adv_id).includes(query) ||
-      normalize(dsa.name).includes(query) ||
-      normalize(dsa.email).includes(query) ||
-      normalize(dsa.mobile).includes(query)
-    );
-  });
+  const handleEdit = (dsa: DSA) => {
+    setEditingDSA({ ...dsa });
+    setIsEditModalOpen(true);
+  };
 
-
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '';
+  const handleSaveEdit = async () => {
+    if (!editingDSA) return;
+    const loadId = toast.loading("Updating DSA...");
     try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-IN', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      });
-    } catch {
-      return dateString;
+      await AdminService.updateDSA(editingDSA.id, editingDSA);
+      toast.success("DSA Updated Successfully!", { id: loadId });
+      setDsas((prev) => prev.map((d) => (d.id === editingDSA.id ? { ...editingDSA, updated_at: new Date().toISOString() } : d)));
+      setIsEditModalOpen(false);
+    } catch (err) {
+      toast.error("Failed to update DSA", { id: loadId });
     }
   };
 
-  // Refresh data
-  const handleRefresh = () => {
-    hasFetched.current = false;
-    fetchDSAs();
+  const downloadExcel = () => {
+    if (dsas.length === 0) return toast.error("No data to export");
+    const worksheet = XLSX.utils.json_to_sheet(dsas);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DSAs");
+    XLSX.writeFile(workbook, `DSA_Report_${new Date().toISOString().split("T")[0]}.xlsx`);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2076C7] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading DSAs...</p>
-        </div>
-      </div>
-    );
-  }
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? dateString : date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+  };
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <div className="flex items-center">
-              <svg className="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <h3 className="text-lg font-medium text-red-800">Error Loading Data</h3>
-            </div>
-            <p className="mt-2 text-red-700">{error}</p>
-            <button
-              onClick={handleRefresh}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-              Retry
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const stats = {
+    total: dsas.length,
+    active: dsas.filter((d) => d.status === "Active").length,
+    inactive: dsas.filter((d) => d.status === "Inactive").length,
+    pending: dsas.filter((d) => d.status === "Pending").length,
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="bg-gray-50 py-6 min-h-screen">
+      <Toaster position="top-right" />
       <div className="max-w-full mx-auto sm:px-4 lg:px-6">
-
-        {/* Header Section */}
         <div className="mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">
-              DSA Management
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 flex items-center gap-2">
+              <Users className="h-6 w-6 text-[#2076C7]" /> DSA Management
             </h1>
-            <p className="text-sm text-slate-600">
-              Manage your Direct Selling Agents and their performance
-            </p>
+            <p className="text-sm text-slate-600">View and manage all Direct Selling Agents.</p>
           </div>
-
-          {/* Action Buttons Section */}
-          <div className="flex flex-col sm:flex-row sm:justify-end items-stretch sm:items-center gap-2 mb-4">
-
-            <button
-              onClick={handleRefresh}
-              className="inline-flex items-center justify-center gap-2 bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-500 text-sm disabled:opacity-50 cursor-pointer">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
+          <div className="flex items-center gap-2">
+            <button onClick={() => { hasFetched.current = false; fetchDSAs(); }} className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
+              <RefreshCw className={classNames("h-4 w-4", loading ? "animate-spin" : "")} /> Refresh
             </button>
-
-            {/* Add DSA Button — Uncomment if needed */}
-            {/*
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="bg-[#2076C7] text-white px-4 py-2 rounded-lg hover:bg-[#2076C7] flex items-center justify-center">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add New DSA
-          </button>
-          */}
-
-            {/* Download Excel */}
-            <button
-              onClick={() => downloadExcel('all')}
-              disabled={dsas.length === 0}
-              className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm disabled:opacity-50 cursor-pointer">
-              <FileUp className="w-4 h-4" />
-              Download Excel
+            <button onClick={downloadExcel} className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 shadow-sm transition-colors">
+              <FileUp className="h-4 w-4" /> Export Excel
             </button>
           </div>
-
         </div>
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
-
-          <StatsCard
-            title="Total DSAs"
-            value={stats.total}
-            subtitle="Current Dsa total"
-            color="blue"
-            icon={<Users className="w-6 h-6" />}
-          />
-
-          <StatsCard
-            title="Active DSAs"
-            value={stats.active}
-            subtitle="Currently enabled users"
-            color="green"
-            icon={<UserCheck className="w-6 h-6" />}
-          />
-
-          <StatsCard
-            title="Inactive DSAs"
-            value={stats.inactive}
-            subtitle="Currently inactive users"
-            color="red"
-            icon={<UserX className="w-6 h-6" />}
-          />
-
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          {[
+            { label: "Total DSAs", value: stats.total, icon: Users, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200" },
+            { label: "Active", value: stats.active, icon: UserCheck, color: "text-green-600", bg: "bg-green-50", border: "border-green-200" },
+            { label: "Inactive", value: stats.inactive, icon: UserX, color: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
+            { label: "Pending", value: stats.pending, icon: Clock, color: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200" },
+          ].map((stat, i) => (
+            <div key={i} className={`bg-white p-4 rounded-xl shadow-sm border ${stat.border} flex items-center gap-4`}>
+              <div className={`${stat.bg} p-3 rounded-lg`}>
+                <stat.icon className={`w-6 h-6 ${stat.color}`} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{stat.label}</p>
+                <p className="text-2xl font-bold text-slate-800">{stat.value}</p>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Tabs */}
-        <div className="w-full max-w-7xl mx-auto">
-          <Tab.Group onChange={(index) => setActiveTab(tabs[index])}>
-            <Tab.List className="flex space-x-1 rounded-xl bg-[#2076C7] p-1 mb-4">
+        <Tab.Group onChange={(index) => { setActiveTab(tabs[index]); setCurrentPage(1); }}>
+          <div className="flex flex-col gap-4 mb-4">
+            <Tab.List className="flex p-1 bg-gray-200/50 rounded-xl w-fit">
               {tabs.map((tab) => (
-                <Tab
-                  key={tab}
-                  className={({ selected }) =>
-                    classNames(
-                      'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
-                      'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
-                      selected
-                        ? 'bg-white text-blue-700 shadow'
-                        : 'text-blue-100 hover:bg-white/12 hover:text-white'
-                    )}>
-                  {tab} ({getFilteredDSAs(tab).length})
+                <Tab key={tab} className={({ selected }) => classNames("px-6 py-2 text-sm font-medium rounded-lg transition-all outline-none", selected ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-600 hover:text-gray-800")}>
+                  {tab}
                 </Tab>
               ))}
             </Tab.List>
-            <Tab.Panels>
 
-              {tabs.map((tab) => (
-                <Tab.Panel key={tab} className="rounded-xl bg-white p-6 sm:p-6 shadow">
-                  {/* Records per page selector */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div className="relative w-full md:w-96">
+                <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by ID, Name, or Email..." className="w-full pl-10 pr-4 py-2 rounded-lg shadow-md focus:outline-none text-gray-700 focus:ring-2 focus:ring-blue-500 bg-white" />
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <Search className="w-5 h-5 text-gray-400" />
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs sm:text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <span>Show</span>
+                  <select value={itemsPerPage} onChange={(e) => setItemsPerPage(Number(e.target.value))} className="border border-gray-300 rounded-md px-2 py-1 bg-white">
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                  <span>per page</span>
+                </div>
+                <p>Showing <span className="font-semibold">{filteredDSAs.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}</span> - <span className="font-semibold">{Math.min(currentPage * itemsPerPage, filteredDSAs.length)}</span> of <span className="font-semibold">{filteredDSAs.length}</span> DSAs</p>
+              </div>
+            </div>
+          </div>
 
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                    <div className="flex items-center mb-4">
-                      <div className="relative w-full md:w-96">
-                        <input
-                          type="text"
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          placeholder="Search by adv_id, name, email or mobile"
-                          className="w-full pl-10 pr-4 py-2 rounded-lg shadow-md focus:outline-none text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
-                        />
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                          <svg
-                            className="w-5 h-5 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"
-                            />
-                          </svg>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {loading ? (
+              <div className="py-12 text-center text-gray-500"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2076C7] mx-auto mb-3" /> Loading DSAs...</div>
+            ) : filteredDSAs.length === 0 ? (
+              <div className="py-12 text-center text-gray-500">No DSAs found.</div>
+            ) : (
+              <div className="max-h-[60vh] overflow-x-auto">
+                <table className="min-w-[1600px] w-full text-left border-collapse">
+                  <thead className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
+                    <tr>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide w-16">Edit</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide w-16">ID</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide w-32">Adv ID</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Email</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Mobile</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">PAN</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">City</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Head</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Category</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Role</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Joined Date</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Updated At</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {paginatedDSAs.map((dsa) => (
+                      <tr key={dsa.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-3">
+                          <button onClick={() => handleEdit(dsa)} className="p-1.5 text-gray-400 hover:text-[#2076C7] hover:bg-blue-50 rounded-md transition-colors"><Pencil size={16} /></button>
+                        </td>
+                        <td className="px-4 py-3 text-sm font-medium text-[#2076C7]">{dsa.id}</td>
+                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">{dsa.adv_id}</td>
+                        <td className="px-4 py-3 text-sm whitespace-nowrap font-medium text-gray-900">{dsa.name}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{dsa.email}</td>
+                        <td className="px-4 py-3 text-sm text-gray-700">{dsa.mobile}</td>
+                        <td className="px-4 py-3 text-sm text-gray-700 uppercase">{dsa.pan}</td>
+                        <td className="px-4 py-3 text-sm whitespace-nowrap text-gray-700">{dsa.city}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{dsa.head}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600 truncate max-w-[200px]" title={dsa.category}>{dsa.category}</td>
+                        <td className="px-4 py-3 text-sm font-bold text-[#2076C7] uppercase">{dsa.role}</td>
+                        <td className="px-4 py-3 text-sm whitespace-nowrap text-gray-600">{formatDate(dsa.date_joined)}</td>
+                        <td className="px-4 py-3 text-sm whitespace-nowrap text-gray-500">{formatDate(dsa.updated_at)}</td>
+                        <td className="px-4 py-3">
+                          <span className={classNames("inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase", dsa.status === "Active" ? "bg-green-100 text-green-700" : dsa.status === "Pending" ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700")}>{dsa.status}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </Tab.Group>
 
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 flex-wrap md:flex-nowrap">
-                      <label className="text-sm text-gray-600">Show:</label>
-                      <select
-                        value={itemsPerPage}
-                        onChange={(e) => {
-                          setItemsPerPage(Number(e.target.value));
-                          setCurrentPage(1);
-                        }}
-                        className="border border-gray-300 text-gray-500 rounded-md px-2 py-1 text-sm">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                      </select>
-                      <span className="text-sm text-gray-600">per page</span>
-                    </div>
-                  </div>
-
-                  <div className="max-h-[70vh] overflow-x-auto scrollbar-x-thin scrollbar-thumb-gray-300 scrollbar-track-transparent md:scrollbar-thumb-gray-400 font-sans">
-                    {getCurrentPageDSAs().length === 0 ? (
-                      <div className="text-center py-12">
-                        <svg className="w-16 h-16 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <p className="mt-4 text-gray-500">No DSAs found</p>
-                      </div>
-                    ) : (
-                      <table className="divide-y divide-gray-200 w-full text-left border-collapse min-w-[1100px] rounded-2xl">
-                        <thead className="bg-gray-100 border-b font-sans border-gray-200 sticky top-0 z-10">
-                          <tr>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              ID
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              EDIT
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Adv ID
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Name
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Email
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Mobile
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              PAN
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              City
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Head
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Category
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Date Joined
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Updated At
-                            </th>
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Role
-                            </th>
-                            {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Password
-                            </th> */}
-                            <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Status
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {getCurrentPageDSAs().map((dsa) => (
-                            <tr key={dsa.id} className="hover:bg-gray-50">
-                              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {dsa.id}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                                {/* Edit Button */}
-                                <button
-                                  onClick={() => handleEdit(dsa)}
-                                  className="text-indigo-600 hover:text-indigo-900 p-2"
-                                  title="Edit">
-                                  <Pencil className="w-4 h-4" />
-                                </button>
-
-                                {/* Delete Button */}
-                                {/* <button
-                                  onClick={() => handleDelete(dsa.id)}
-                                  className="text-red-600 hover:text-red-900 p-2"
-                                  title="Delete">
-                                  <Trash2 className="w-4 h-4" />
-                                </button> */}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {dsa.adv_id}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {dsa.name}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {dsa.email}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {dsa.mobile}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {dsa.pan}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {dsa.city}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {dsa.head}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {dsa.category}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {formatDate(dsa.date_joined)}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {formatDate(dsa.updated_at)}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {dsa.role}
-                              </td>
-                              {/* <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {dsa.password}
-                              </td> */}
-                              <td className="px-4 py-4 whitespace-nowrap">
-                                <span
-                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${dsa.status === 'Active'
-                                    ? 'bg-green-100 text-green-800'
-                                    : dsa.status === 'Pending'
-                                      ? 'bg-yellow-100 text-yellow-800'
-                                      : 'bg-red-100 text-red-800'
-                                    }`}>
-                                  {dsa.status}
-                                </span>
-                              </td>
-
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-                  </div>
-
-                  {/* Pagination Controls - Only show if there are records */}
-                  {getFilteredDSAs(tab).length > 0 && (
-                    <div className="mt-6 flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
-                      <div className="flex flex-1 justify-between sm:hidden">
-                        <button
-                          onClick={goToPrevPage}
-                          disabled={currentPage === 1}
-                          className={`relative inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium ${currentPage === 1
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : 'bg-white text-gray-700 hover:bg-gray-50'
-                            }`}>
-                          Previous
-                        </button>
-                        <button
-                          onClick={goToNextPage}
-                          disabled={currentPage === getTotalPages()}
-                          className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium ${currentPage === getTotalPages()
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : 'bg-white text-gray-700 hover:bg-gray-50'
-                            }`}>
-                          Next
-                        </button>
-                      </div>
-                      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                        <div>
-                          <p className="text-sm text-gray-700">
-                            Page <span className="font-medium">{currentPage}</span> of{' '}
-                            <span className="font-medium">{getTotalPages()}</span> |{' '}
-                            <span className="font-medium">{getFilteredDSAs(tab).length}</span> total DSAs
-                          </p>
-                        </div>
-                        <div>
-                          <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                            <button
-                              onClick={goToPrevPage}
-                              disabled={currentPage === 1}
-                              className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''
-                                }`}>
-                              <span className="sr-only">Previous</span>
-                              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
-                              </svg>
-                            </button>
-
-                            {getPageNumbers().map((pageNumber, index) => (
-                              pageNumber === '...' ? (
-                                <span
-                                  key={`dots-${index}`}
-                                  className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
-                                  ...
-                                </span>
-                              ) : (
-                                <button
-                                  key={pageNumber}
-                                  onClick={() => goToPage(pageNumber as number)}
-                                  aria-current={currentPage === pageNumber ? 'page' : undefined}
-                                  className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${currentPage === pageNumber
-                                    ? 'z-10 bg-[#2076C7] text-white focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#2076C7]'
-                                    : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0'
-                                    }`}>
-                                  {pageNumber}
-                                </button>
-                              )
-                            ))}
-
-                            <button
-                              onClick={goToNextPage}
-                              disabled={currentPage === getTotalPages()}
-                              className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${currentPage === getTotalPages() ? 'cursor-not-allowed opacity-50' : ''
-                                }`}>
-                              <span className="sr-only">Next</span>
-                              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                              </svg>
-                            </button>
-                          </nav>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </Tab.Panel>
+        {!loading && filteredDSAs.length > 0 && (
+          <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-gray-600">
+            <div>Page <span className="font-semibold">{currentPage}</span> of <span className="font-semibold">{totalPages}</span></div>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className={`px-3 py-1 rounded-md border ${currentPage === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"}`}><ChevronLeft className="w-4 h-4" /></button>
+              {getPaginationGroup.map((item, idx) => (
+                <button key={idx} onClick={() => typeof item === "number" && setCurrentPage(item)} disabled={item === "..."} className={`px-3 py-1 rounded-md border transition-colors ${currentPage === item ? "bg-[#2076C7] text-white border-[#2076C7]" : item === "..." ? "bg-transparent border-none cursor-default" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"}`}>{item}</button>
               ))}
-            </Tab.Panels>
-          </Tab.Group>
-        </div>
-
+              <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className={`px-3 py-1 rounded-md border ${currentPage === totalPages ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"}`}><ChevronRight className="w-4 h-4" /></button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Edit Modal */}
       {isEditModalOpen && editingDSA && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto border border-gray-200">
-
-            {/* Header */}
-            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
-              Edit DSA Details
-            </h3>
-            {/* Form Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-              {/* Adv ID (Readonly) */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Advisor ID
-                </label>
-                <input
-                  type="text"
-                  value={editingDSA.adv_id}
-                  disabled
-                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg  cursor-not-allowed"
-                />
-              </div>
-
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={editingDSA.name}
-                  onChange={(e) =>
-                    setEditingDSA({ ...editingDSA, name: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={editingDSA.email}
-                  onChange={(e) =>
-                    setEditingDSA({ ...editingDSA, email: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-              </div>
-
-              {/* Mobile */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Mobile
-                </label>
-                <input
-                  type="tel"
-                  value={editingDSA.mobile}
-                  onChange={(e) =>
-                    setEditingDSA({ ...editingDSA, mobile: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-              </div>
-
-              {/* PAN */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  PAN
-                </label>
-                <input
-                  type="text"
-                  value={editingDSA.pan}
-                  onChange={(e) =>
-                    setEditingDSA({ ...editingDSA, pan: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-              </div>
-
-              {/* City */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  City
-                </label>
-                <select
-                  value={editingDSA.city}
-                  onChange={(e) =>
-                    setEditingDSA({ ...editingDSA, city: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                  <option value="">Select City</option>
-                  {cities.map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              {/* Role */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Role
-                </label>
-                <select
-                  value={editingDSA.role}
-                  onChange={(e) =>
-                    setEditingDSA({ ...editingDSA, role: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                  {roles.map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Optional Password Reset */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  New Password (leave blank if unchanged)
-                </label>
-                <input
-                  type="password"
-                  placeholder="Enter new password"
-                  value={editingDSA.password || ""}
-                  onChange={(e) =>
-                    setEditingDSA({ ...editingDSA, password: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-              </div>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-100">
+            <div className="flex justify-between items-center p-5 border-b bg-gray-50"><h3 className="text-xl font-bold text-slate-800">Edit DSA Details</h3><button onClick={() => setIsEditModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={22} /></button></div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Advisor ID</label><input type="text" className={classNames(inputClass, "bg-gray-50")} value={editingDSA.adv_id} disabled /></div>
+              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Full Name</label><input type="text" className={inputClass} value={editingDSA.name} onChange={(e) => setEditingDSA({ ...editingDSA, name: e.target.value })} /></div>
+              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Email</label><input type="email" className={inputClass} value={editingDSA.email} onChange={(e) => setEditingDSA({ ...editingDSA, email: e.target.value })} /></div>
+              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Mobile</label><input type="text" className={inputClass} value={editingDSA.mobile} onChange={(e) => setEditingDSA({ ...editingDSA, mobile: e.target.value })} /></div>
+              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">PAN</label><input type="text" className={inputClass} value={editingDSA.pan} onChange={(e) => setEditingDSA({ ...editingDSA, pan: e.target.value })} /></div>
+              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">City</label><select className={inputClass} value={editingDSA.city} onChange={(e) => setEditingDSA({ ...editingDSA, city: e.target.value })}><option value="">Select City</option>{cities.map((city) => (<option key={city} value={city}>{city}</option>))}</select></div>
+              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Role</label><select className={inputClass} value={editingDSA.role} onChange={(e) => setEditingDSA({ ...editingDSA, role: e.target.value })}>{roles.map((role) => (<option key={role} value={role}>{role}</option>))}</select></div>
+              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">New Password (Optional)</label><input type="password" placeholder="Leave blank to keep current" className={inputClass} value={editingDSA.password} onChange={(e) => setEditingDSA({ ...editingDSA, password: e.target.value })} /></div>
             </div>
-
-            {/* Footer Buttons */}
-            <div className="mt-8 flex justify-end gap-3">
-              <button
-                onClick={() => setIsEditModalOpen(false)}
-                className="px-5 py-2 rounded-lg border border-gray-400 text-gray-800 hover:bg-gray-100 transition">
-                Cancel
-              </button>
-
-              <button
-                onClick={handleSaveEdit}
-                className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
-                Save Changes
-              </button>
-            </div>
+            <div className="p-5 border-t bg-gray-50 flex justify-end gap-3"><button onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 text-sm font-semibold text-gray-500">Cancel</button><button onClick={handleSaveEdit} className="px-6 py-2 bg-[#2076C7] text-white rounded-lg text-sm font-bold shadow-md hover:bg-[#1a5fa1]">Save Changes</button></div>
           </div>
         </div>
       )}
-
-      {/* Add DSA Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 shadow bg-opacity-100 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Add New DSA
-            </h3>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={newDSA.name}
-                  onChange={(e) => setNewDSA({ ...newDSA, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Enter full name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={newDSA.email}
-                  onChange={(e) => setNewDSA({ ...newDSA, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Enter email address"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mobile
-                </label>
-                <input
-                  type="tel"
-                  value={newDSA.mobile}
-                  onChange={(e) => setNewDSA({ ...newDSA, mobile: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Enter mobile number"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  PAN
-                </label>
-                <input
-                  type="text"
-                  value={newDSA.pan}
-                  onChange={(e) => setNewDSA({ ...newDSA, pan: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Enter PAN number"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  City
-                </label>
-                <select
-                  value={newDSA.city}
-                  onChange={(e) => setNewDSA({ ...newDSA, city: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <option value="">Select City</option>
-                  {cities.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Head
-                </label>
-                <select
-                  value={newDSA.head}
-                  onChange={(e) => setNewDSA({ ...newDSA, head: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <option value="">Select Head</option>
-                  {heads.map(head => (
-                    <option key={head} value={head}>{head}</option>
-                  ))}
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                </label>
-                <select
-                  value={newDSA.category}
-                  onChange={(e) => setNewDSA({ ...newDSA, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <option value="">Select Category</option>
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Role
-                </label>
-                <select
-                  value={newDSA.role}
-                  onChange={(e) => setNewDSA({ ...newDSA, role: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <option value="">Select Role</option>
-                  {roles.map(role => (
-                    <option key={role} value={role}>{role}</option>
-                  ))}
-                  <option value="other">Other</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                onClick={() => setIsAddModalOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">
-                Cancel
-              </button>
-              <button
-                onClick={handleAddDSA}
-                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-                Add DSA
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }

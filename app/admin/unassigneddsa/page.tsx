@@ -228,16 +228,17 @@ export default function AdminLeadPanel() {
             setCurrentPage(1);
           }}
         >
-          <Tab.List className="flex p-1 bg-gray-200/50 rounded-xl mb-6 w-full md:w-fit">
-            <Tab className={({ selected }) => classNames("px-6 py-2 text-sm font-medium rounded-lg transition-all", selected ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-600 hover:text-gray-800")}>
-              Unassigned Leads
-            </Tab>
-            <Tab className={({ selected }) => classNames("px-6 py-2 text-sm font-medium rounded-lg transition-all", selected ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-600 hover:text-gray-800")}>
-              Assigned Leads
-            </Tab>
-          </Tab.List>
 
           <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <Tab.List className="flex p-1 bg-gray-200/50 rounded-xl w-full md:w-fit">
+              <Tab className={({ selected }) => classNames("px-6 py-2 text-sm font-medium rounded-lg transition-all", selected ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-600 hover:text-gray-800")}>
+                Unassigned Leads
+              </Tab>
+              <Tab className={({ selected }) => classNames("px-6 py-2 text-sm font-medium rounded-lg transition-all", selected ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-600 hover:text-gray-800")}>
+                Assigned Leads
+              </Tab>
+            </Tab.List>
+
             <div className="relative w-full md:w-96">
               <input
                 type="text"
@@ -282,11 +283,11 @@ export default function AdminLeadPanel() {
             ) : filteredLeads.length === 0 ? (
               <div className="py-12 text-center text-gray-500">No leads found.</div>
             ) : (
-              <div className="max-h-[40vh] overflow-x-auto">
+              <div className="max-h-[60vh] overflow-x-auto">
                 <table className="min-w-[1000px] w-full text-left border-collapse">
                   <thead className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
                     <tr>
-                      <th className="px-4 py-3"><input type="checkbox" className="rounded border-gray-300 text-[#2076C7] focus:ring-[#2076C7]" onChange={(e) => setSelectedLeads(e.target.checked ? paginatedLeads.map((l) => l.id) : [])} /></th>
+                      {/* <th className="px-4 py-3"><input type="checkbox" className="rounded border-gray-300 text-[#2076C7] focus:ring-[#2076C7]" onChange={(e) => setSelectedLeads(e.target.checked ? paginatedLeads.map((l) => l.id) : [])} /></th> */}
                       <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">ADV ID</th>
                       <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">DSA Details</th>
                       <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Department</th>
@@ -298,10 +299,10 @@ export default function AdminLeadPanel() {
                   <tbody className="divide-y divide-gray-100">
                     {paginatedLeads.map((l) => (
                       <tr key={l.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3">
+                        {/* <td className="px-4 py-3">
                           <input type="checkbox" checked={selectedLeads.includes(l.id)} className="rounded border-gray-300 text-[#2076C7] focus:ring-[#2076C7]" onChange={() => setSelectedLeads((p) => (p.includes(l.id) ? p.filter((x) => x !== l.id) : [...p, l.id]))} />
-                        </td>
-                        <td className="px-4 py-3 text-sm font-bold text-[#2076C7] whitespace-nowrap">{l.dsa?.code}</td>
+                        </td> */}
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">{l.dsa?.code}</td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{l.name}</div>
                           <div className="text-xs text-gray-500">{l.phone}</div>
@@ -316,7 +317,7 @@ export default function AdminLeadPanel() {
                             </span>
                           ) : (
                             <select
-                              className="block w-full min-w-[160px] text-xs text-gray-700 border border-gray-300 rounded-lg focus:ring-[#2076C7] focus:border-[#2076C7] py-1 bg-white outline-none shadow-sm"
+                              className="block w-full min-w-40 text-xs text-gray-700 border border-gray-300 rounded-lg focus:ring-[#2076C7] focus:border-[#2076C7] py-1 bg-white outline-none shadow-sm"
                               value=""
                               onChange={(e) => {
                                 const rm = rms.find((r) => String(r.id) === e.target.value);
@@ -333,12 +334,12 @@ export default function AdminLeadPanel() {
                                   });
                               }}
                             >
-                              <option value="" className="text-gray-400">Select RM to Assign</option>
+                              <option value="" className="text-gray-600">Select RM to Assign</option>
                               {rmLoading ? (
                                 <option disabled>Loading RMs...</option>
                               ) : (
                                 getRMsForLead(l).map((rm) => (
-                                  <option key={rm.id} value={rm.id} className="text-gray-700">
+                                  <option key={rm.id} value={rm.id} className="text-gray-800 font-medium">
                                     {rm.name} ({rm.department})
                                   </option>
                                 ))
@@ -374,10 +375,10 @@ export default function AdminLeadPanel() {
                   onClick={() => typeof item === "number" && setCurrentPage(item)}
                   disabled={item === "..."}
                   className={`px-3 py-1 rounded-md border transition-colors ${currentPage === item
-                      ? "bg-[#2076C7] text-white border-[#2076C7]"
-                      : item === "..."
-                        ? "bg-transparent border-none cursor-default"
-                        : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
+                    ? "bg-[#2076C7] text-white border-[#2076C7]"
+                    : item === "..."
+                      ? "bg-transparent border-none cursor-default"
+                      : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
                     }`}
                 >
                   {item}

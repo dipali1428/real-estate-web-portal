@@ -225,5 +225,10 @@ export const AdminService = {
     return res.data;
   },
 
+  // Get CIBIL Requests
+  getCIBILRequests: async () => {
+    const response = await api.get("/api/admin/get-cibil-request");
+    return response.data;
+  },
 };
 

@@ -12,6 +12,7 @@ import {
     Building2,      // For DSA Management
     UserMinus,      // For Unassigned
     Layers,         // For Total Leads
+    CreditCard,     // For CIBIL
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -38,6 +39,7 @@ export const sidebarLinks = {
         { label: "DSA Management", href: "/admin/dsalist", icon: <Building2 className="h-5 w-5 text-neutral-700" /> },
         { label: "Ticket Raised", href: "/admin/ticket", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },
         { label: "Website Enquiry", href: "/admin/enquiry", icon: <Megaphone className="h-5 w-5 text-neutral-700" /> },
+        { label: "CIBIL Requests", href: "/admin/cibil", icon: <CreditCard className="h-5 w-5 text-neutral-700" /> },
         { label: "Unassigned DSA's", href: "/admin/unassigneddsa", icon: <UserMinus className="h-5 w-5 text-neutral-700" /> },
         { label: "Total Leads", href: "/admin/totalleads", icon: <Layers className="h-5 w-5 text-neutral-700" /> },
         { label: "All Users", href: "/admin/allusers", icon: <Users className="h-5 w-5 text-neutral-700" /> },
