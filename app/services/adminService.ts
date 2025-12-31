@@ -213,5 +213,17 @@ export const AdminService = {
     return res.data;
   },
 
+  uploadUsersCSV: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file); // The backend expects the file in the 'file' field
+
+    const res = await api.post("/api/admin/upload-users-csv", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  },
+
 };
 

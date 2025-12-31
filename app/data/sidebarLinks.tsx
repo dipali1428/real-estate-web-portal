@@ -8,6 +8,10 @@ import {
     Download,
     Users,
     HelpCircle,
+    ShieldCheck,    // For Roles
+    Building2,      // For DSA Management
+    UserMinus,      // For Unassigned
+    Layers,         // For Total Leads
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -30,12 +34,12 @@ export const sidebarLinks = {
     ADMIN: [
         { label: "Dashboard", href: "/admin", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "Profile", href: "/admin/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
-        { label: "Roles", href: "/admin/roles", icon: <User className="h-5 w-5 text-neutral-700" /> },
-        { label: "DSA Management", href: "/admin/dsalist", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Roles", href: "/admin/roles", icon: <ShieldCheck className="h-5 w-5 text-neutral-700" /> },
+        { label: "DSA Management", href: "/admin/dsalist", icon: <Building2 className="h-5 w-5 text-neutral-700" /> },
         { label: "Ticket Raised", href: "/admin/ticket", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },
         { label: "Website Enquiry", href: "/admin/enquiry", icon: <Megaphone className="h-5 w-5 text-neutral-700" /> },
-        { label: "Unassigned DSA's", href: "/admin/unassigneddsa", icon: <UserCheck className="h-5 w-5 text-neutral-700" /> },
-        { label: "Total Leads", href: "/admin/totalleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Unassigned DSA's", href: "/admin/unassigneddsa", icon: <UserMinus className="h-5 w-5 text-neutral-700" /> },
+        { label: "Total Leads", href: "/admin/totalleads", icon: <Layers className="h-5 w-5 text-neutral-700" /> },
         { label: "All Users", href: "/admin/allusers", icon: <Users className="h-5 w-5 text-neutral-700" /> },
     ],
 

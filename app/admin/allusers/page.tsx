@@ -132,34 +132,24 @@ export default function AllUsersPage() {
   const handleImportCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      try {
-        const text = event.target?.result as string;
-        const rows = text.split(/\r?\n/).filter(row => row.trim() !== "");
-        if (rows.length < 2) return toast.error("CSV is empty");
 
-        const headers = rows[0].split(",").map(h => h.trim().replace(/^"|"$/g, ''));
-        const jsonData = rows.slice(1).map(row => {
-          const values = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-          const obj: any = {};
-          headers.forEach((header, index) => {
-            let val = values[index] ? values[index].trim().replace(/^"|"$/g, '') : "null";
-            obj[header] = val === "null" ? null : val;
-          });
-          return obj;
-        });
+    // Check if file is actually a CSV
+    if (!file.name.endsWith('.csv')) {
+      return toast.error("Please upload a valid CSV file");
+    }
 
-        const loadId = toast.loading("Uploading users...");
-        // await AdminService.uploadUsers(jsonData);
-        toast.success("Upload successful", { id: loadId });
-        fetchAllUsers();
-      } catch (err: any) {
-        toast.error("Failed to parse CSV");
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = "";
+    const loadId = toast.loading("Uploading CSV file...");
+    try {
+      // Send the raw file object directly to the service
+      await AdminService.uploadUsersCSV(file); 
+      toast.success("Users imported successfully", { id: loadId });
+      fetchAllUsers(); // Refresh list
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      toast.error(err?.response?.data?.message || "Failed to upload CSV", { id: loadId });
+    } finally {
+      e.target.value = ""; // Reset input
+    }
   };
 
   const filteredUsers = useMemo(() => {
@@ -187,18 +177,24 @@ export default function AllUsersPage() {
     return filteredUsers.slice(startIndex, endIndex);
   }, [filteredUsers, currentPage, itemsPerPage]);
 
-  const pageNumbers = useMemo(() => {
-    const pages = [];
-    const maxVisible = 5;
-    let start = Math.max(1, currentPage - 2);
-    let end = Math.min(totalPages, start + maxVisible - 1);
-    if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
-    for (let i = start; i <= end; i++) pages.push(i);
+  const getPaginationGroup = useMemo(() => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, 4, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+      }
+    }
     return pages;
   }, [currentPage, totalPages]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="bg-gray-50 py-6">
       <div className="max-w-full mx-auto sm:px-4 lg:px-6">
         <div className="mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
@@ -211,9 +207,9 @@ export default function AllUsersPage() {
             <button onClick={handleExportCSV} className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
               <Download className="h-4 w-4" /> Download CSV
             </button>
-            {/* <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 px-3 py-2 bg-[#2076C7] text-white rounded-lg text-sm font-medium hover:bg-[#1a5fa1] shadow-sm transition-colors">
+            <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 px-3 py-2 bg-[#2076C7] text-white rounded-lg text-sm font-medium hover:bg-[#1a5fa1] shadow-sm transition-colors">
               <Upload className="h-4 w-4" /> Upload CSV
-            </button> */}
+            </button>
             <input type="file" ref={fileInputRef} className="hidden" accept=".csv" onChange={handleImportCSV} />
           </div>
         </div>
@@ -252,14 +248,14 @@ export default function AllUsersPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           {loading ? (
             <div className="py-12 text-center text-gray-500">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2076C7] mx-auto mb-3" /> Loading users...
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2076C7] mx-auto mb-3" /> Loading...
             </div>
           ) : error ? (
             <div className="py-10 text-center text-red-600 text-sm">{error}</div>
           ) : filteredUsers.length === 0 ? (
             <div className="py-12 text-center text-gray-500">No users found.</div>
           ) : (
-            <div className="max-h-[65vh] overflow-x-auto font-sans">
+            <div className="max-h-[63vh] overflow-x-auto font-sans">
               <table className="min-w-[900px] w-full text-left border-collapse">
                 <thead className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
                   <tr>
@@ -277,11 +273,11 @@ export default function AllUsersPage() {
                       <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{user.email}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.mobile}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.pan}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.city}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700 max-w-[180px] truncate">{user.city}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.head}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 max-w-[180px] truncate" title={user.category}>{user.category}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.department}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.sub_category}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700 max-w-[180px] truncate" title={user.sub_category}>{user.sub_category}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.referral_code ?? "-"}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.referred_by_rm ?? "-"}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.role}</td>
@@ -306,15 +302,23 @@ export default function AllUsersPage() {
               >
                 Previous
               </button>
-              {pageNumbers.map(pageNum => (
+
+              {getPaginationGroup.map((item, idx) => (
                 <button
-                  key={pageNum}
-                  onClick={() => setCurrentPage(pageNum)}
-                  className={`px-3 py-1 rounded-md border transition-colors ${currentPage === pageNum ? "bg-[#2076C7] text-white border-[#2076C7]" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"}`}
+                  key={idx}
+                  onClick={() => typeof item === "number" && setCurrentPage(item)}
+                  disabled={item === "..."}
+                  className={`px-3 py-1 rounded-md border transition-colors ${currentPage === item
+                      ? "bg-[#2076C7] text-white border-[#2076C7]"
+                      : item === "..."
+                        ? "bg-transparent border-none cursor-default"
+                        : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
+                    }`}
                 >
-                  {pageNum}
+                  {item}
                 </button>
               ))}
+
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}

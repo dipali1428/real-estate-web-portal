@@ -1,11 +1,17 @@
-'use client';
-import React, { useState, useEffect } from 'react';
+"use client";
+
+import React, { useState, useEffect, useMemo } from "react";
 import {
-  Search, User, Users, CheckCircle,
-  RefreshCw, ChevronLeft, ChevronRight
-} from 'lucide-react';
-import { AdminService } from '../../services/adminService';
-import { Tab } from '@headlessui/react';
+  Search,
+  User,
+  Users,
+  CheckCircle,
+  RefreshCw,
+} from "lucide-react";
+import { AdminService } from "../../services/adminService";
+import { Tab } from "@headlessui/react";
+import toast from "react-hot-toast";
+
 // --- INTERFACES ---
 interface Lead {
   id: string;
@@ -16,7 +22,7 @@ interface Lead {
   department: string;
   subCategory: string;
   assignedTo: string | null;
-  status: 'new' | 'contacted' | 'qualified' | 'converted';
+  status: "new" | "contacted" | "qualified" | "converted";
   dsa?: {
     id: number;
     name: string;
@@ -46,41 +52,30 @@ interface AssignConfirmation {
 }
 
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
-
-// const AdminService = {
-//   getRMList: async () => {
-//     const response = await api.get("/api/admin/rmlist");
-//     return response.data;
-//   },
-//   // Ensure this endpoint matches your Backend Route exactly (e.g., /api/admin/assign-rm)
-//   assignDsaToRm: async (payload: {
-//     dsa_id: string;
-//     rm_id: string;
-//     department: string;
-//     sub_category: string;
-//   }) => {
-//     const response = await api.post("/api/admin/assign-dsa-to-rm", payload);
-//     return response.data;
-//   },
-// };
 
 export default function AdminLeadPanel() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [rms, setRms] = useState<RelationshipManager[]>([]);
   const [loading, setLoading] = useState(true);
   const [rmLoading, setRmLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
-  const [showAssignModal, setShowAssignModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<'unassigned' | 'assigned'>('unassigned');
+  const [activeTab, setActiveTab] = useState<"unassigned" | "assigned">("unassigned");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(50);
+  const [itemsPerPage, setItemsPerPage] = useState(50);
 
   const [assignConfirmation, setAssignConfirmation] = useState<AssignConfirmation>({
-    show: false, leadId: '', leadName: '', rmId: '', rmName: '', rmSubCategories: '', department: '', subCategory: '',
+    show: false,
+    leadId: "",
+    leadName: "",
+    rmId: "",
+    rmName: "",
+    rmSubCategories: "",
+    department: "",
+    subCategory: "",
   });
 
   const fetchData = async () => {
@@ -93,14 +88,18 @@ export default function AdminLeadPanel() {
         email: item.email,
         phone: item.mobile,
         city: item.city,
-        department: item.head?.toLowerCase().replace(/\s+/g, '_') || '',
-        subCategory: item.category || '',
+        department: item.head?.toLowerCase().replace(/\s+/g, "_") || "",
+        subCategory: item.category || "",
         assignedTo: item.assigned_rm_name || null,
-        status: 'new',
-        dsa: { id: item.id, name: item.name, code: item.adv_id, phone: item.mobile }
+        status: "new",
+        dsa: { id: item.id, name: item.name, code: item.adv_id, phone: item.mobile },
       }));
       setLeads(mapped);
-    } catch (err) { console.error("Sync failed."); } finally { setLoading(false); }
+    } catch (err) {
+      toast.error("Failed to sync data");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchRMs = async () => {
@@ -108,219 +107,321 @@ export default function AdminLeadPanel() {
     try {
       const res = await AdminService.getRms();
       setRms(res.rms || []);
-    } finally { setRmLoading(false); }
+    } finally {
+      setRmLoading(false);
+    }
   };
 
-  useEffect(() => { fetchData(); fetchRMs(); }, []);
+  useEffect(() => {
+    fetchData();
+    fetchRMs();
+  }, []);
 
-  const normalize = (str: string) => str?.toLowerCase().replace(/[\s_]/g, '') || '';
+  const normalize = (str: string) => str?.toLowerCase().replace(/[\s_]/g, "") || "";
+
   const getRMsForLead = (lead: Lead) => {
-    const filtered = rms.filter(rm =>
-      normalize(rm.department) === normalize(lead.department) ||
-      rm.department?.toLowerCase() === 'all'
+    const filtered = rms.filter(
+      (rm) =>
+        normalize(rm.department) === normalize(lead.department) ||
+        rm.department?.toLowerCase() === "all"
     );
     return filtered.length > 0 ? filtered : rms;
   };
 
-  // --- API HANDLER FOR CONFIRM BUTTON ---
   const confirmAssignment = async () => {
+    const loadId = toast.loading("Assigning RM...");
     try {
       const { leadId, rmId } = assignConfirmation;
+      const res = await AdminService.assignDsaToRm({ dsa_id: leadId, rm_id: rmId });
 
-      const res = await AdminService.assignDsaToRm({
-        dsa_id: leadId,
-        rm_id: rmId
-      });
-
-      if (res.success || res.status === 'success') {
-        alert("RM Assigned successfully!");
-        setAssignConfirmation(prev => ({ ...prev, show: false }));
-        fetchData(); // Refresh the list
+      if (res.success || res.status === "success") {
+        toast.success("RM Assigned successfully!", { id: loadId });
+        setAssignConfirmation((prev) => ({ ...prev, show: false }));
+        fetchData();
       } else {
-        alert(res.message || "Assignment failed.");
+        toast.error(res.message || "Assignment failed.", { id: loadId });
       }
     } catch (error: any) {
-      console.error("Assignment error:", error);
-      if (error.response?.status === 404) {
-        alert("Error 404: The API endpoint was not found. Please check if the route '/api/admin/assign-dsa-to-rm' exists in your backend.");
-      } else {
-        alert("An error occurred during assignment.");
-      }
+      toast.error("An error occurred during assignment.", { id: loadId });
     }
   };
 
-  const filteredLeads = leads.filter(l => {
-    const matchesSearch = l.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      l.dsa?.code?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTab = activeTab === 'assigned' ? l.assignedTo !== null : l.assignedTo === null;
-    return matchesSearch && matchesTab;
-  });
+  const filteredLeads = useMemo(() => {
+    return leads.filter((l) => {
+      const matchesSearch =
+        l.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        l.dsa?.code?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesTab = activeTab === "assigned" ? l.assignedTo !== null : l.assignedTo === null;
+      return matchesSearch && matchesTab;
+    });
+  }, [leads, searchTerm, activeTab]);
 
-  const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
-  const currentLeadsSlice = filteredLeads.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredLeads.length / itemsPerPage));
+  const paginatedLeads = filteredLeads.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
-  if (loading) return <div className="p-20 text-center"><RefreshCw className="animate-spin mx-auto w-10 h-10 text-blue-500" /></div>;
+  // Consistency: Pagination Group logic from reference
+  const getPaginationGroup = useMemo(() => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, 4, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+      }
+    }
+    return pages;
+  }, [currentPage, totalPages]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="max-w-full mx-auto">
-
+    <div className="bg-gray-50 py-6">
+      <div className="max-w-full mx-auto sm:px-4 lg:px-6">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
+        <div className="mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Unassigned DSA's</h1>
-            <p className="text-slate-500">Assign leads to relationship managers</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 flex items-center gap-2">
+              <Users className="h-6 w-6 text-[#2076C7]" /> Lead Assignment
+            </h1>
+            <p className="text-sm text-slate-600">Assign leads to relationship managers efficiently.</p>
           </div>
-          <button onClick={() => { fetchData(); fetchRMs(); }} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <RefreshCw className="w-4 h-4 mr-2" /> Refresh Data
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                fetchData();
+                fetchRMs();
+              }}
+              className="flex items-center gap-2 px-3 py-2 bg-[#2076C7] text-white rounded-lg text-sm font-medium hover:bg-[#1a5fa1] shadow-sm transition-colors"
+            >
+              <RefreshCw className={classNames("h-4 w-4", loading ? "animate-spin" : "")} /> Refresh Data
+            </button>
+          </div>
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
-            <div className="flex items-center">
-              <Users className="w-10 h-10 text-blue-500 bg-blue-50 p-2 rounded-md mr-4" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {[
+            { label: "Unassigned", value: leads.filter((l) => !l.assignedTo).length, icon: Users, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200" },
+            { label: "Assigned", value: leads.filter((l) => l.assignedTo).length, icon: CheckCircle, color: "text-green-600", bg: "bg-green-50", border: "border-green-200" },
+            { label: "Total RMs", value: rms.length, icon: User, color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200" },
+          ].map((stat, i) => (
+            <div key={i} className={`bg-white p-4 rounded-xl shadow-sm border ${stat.border} flex items-center gap-4`}>
+              <div className={`${stat.bg} p-3 rounded-lg`}>
+                <stat.icon className={`w-6 h-6 ${stat.color}`} />
+              </div>
               <div>
-                <p className="text-gray-500 text-xs font-bold uppercase">Unassigned</p>
-                {/* Added text-gray-900 for dark mode visibility */}
-                <p className="text-2xl font-bold text-gray-900">{leads.filter(l => !l.assignedTo).length}</p>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{stat.label}</p>
+                <p className="text-2xl font-bold text-slate-800">{stat.value}</p>
               </div>
             </div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
-            <div className="flex items-center">
-              <CheckCircle className="w-10 h-10 text-green-500 bg-green-50 p-2 rounded-md mr-4" />
-              <div>
-                <p className="text-gray-500 text-xs font-bold uppercase">Assigned</p>
-                {/* Added text-gray-900 for dark mode visibility */}
-                <p className="text-2xl font-bold text-gray-900">{leads.filter(l => l.assignedTo).length}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow border-l-4 border-[#1CADA3]">
-            <div className="flex items-center">
-              <User className="w-10 h-10 text-purple-500 bg-purple-50 p-2 rounded-md mr-4" />
-              <div>
-                <p className="text-gray-500 text-xs font-bold uppercase">Total RMs</p>
-                {/* Added text-gray-900 for dark mode visibility */}
-                <p className="text-2xl font-bold text-gray-900">{rms.length}</p>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
 
-        <Tab.Group onChange={(index) => { setActiveTab(index === 0 ? 'unassigned' : 'assigned'); setCurrentPage(1); }}>
-          <Tab.List className="flex space-x-1 bg-blue-900/10 p-1 rounded-xl mb-6">
-            <Tab className={({ selected }) => classNames('w-full py-2.5 text-sm font-medium rounded-lg', selected ? 'bg-white text-blue-700 shadow' : 'text-blue-600 hover:text-blue-800')}>Unassigned Leads</Tab>
-            <Tab className={({ selected }) => classNames('w-full py-2.5 text-sm font-medium rounded-lg', selected ? 'bg-white text-blue-700 shadow' : 'text-blue-600 hover:text-blue-800')}>Assigned Leads</Tab>
+        <Tab.Group
+          onChange={(index) => {
+            setActiveTab(index === 0 ? "unassigned" : "assigned");
+            setCurrentPage(1);
+          }}
+        >
+          <Tab.List className="flex p-1 bg-gray-200/50 rounded-xl mb-6 w-full md:w-fit">
+            <Tab className={({ selected }) => classNames("px-6 py-2 text-sm font-medium rounded-lg transition-all", selected ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-600 hover:text-gray-800")}>
+              Unassigned Leads
+            </Tab>
+            <Tab className={({ selected }) => classNames("px-6 py-2 text-sm font-medium rounded-lg transition-all", selected ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-600 hover:text-gray-800")}>
+              Assigned Leads
+            </Tab>
           </Tab.List>
 
-          <Tab.Panel className="bg-white rounded-xl shadow p-6">
-            <div className="flex gap-4 mb-6">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
-                <input type="text" placeholder="Search by name or ADV ID..." className="w-full pl-10 pr-4 py-2 border rounded-lg text-gray-700 outline-none focus:ring-1 focus:ring-blue-400" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="relative w-full md:w-96">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by name or ADV ID..."
+                className="w-full pl-10 pr-4 py-2 rounded-lg shadow-md focus:outline-none text-gray-700 focus:ring-2 focus:ring-blue-500 bg-white"
+              />
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <Search className="w-5 h-5 text-gray-400" />
               </div>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr className="text-left text-xs text-gray-400 uppercase font-semibold">
-                    <th className="px-6 py-3"><input type="checkbox" onChange={(e) => setSelectedLeads(e.target.checked ? currentLeadsSlice.map(l => l.id) : [])} /></th>
-                    <th className="px-6 py-3">ADV_ID</th>
-                    <th className="px-6 py-3">DSA Details</th>
-                    <th className="px-6 py-3">Department</th>
-                    <th className="px-6 py-3">Sub-Category</th>
-                    <th className="px-6 py-3">City</th>
-                    <th className="px-6 py-3">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {currentLeadsSlice.map((l) => (
-                    <tr key={l.id} className="hover:bg-gray-50 text-sm text-gray-700 transition-colors">
-                      <td className="px-6 py-4"><input type="checkbox" checked={selectedLeads.includes(l.id)} onChange={() => setSelectedLeads(p => p.includes(l.id) ? p.filter(x => x !== l.id) : [...p, l.id])} /></td>
-                      <td className="px-6 py-4 font-bold text-blue-600">{l.dsa?.code}</td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-900">{l.name}</div>
-                        <div className="text-xs text-gray-500">{l.phone}</div>
-                      </td>
-                      <td className="px-6 py-4 capitalize">{l.department.replace('_', ' ')}</td>
-                      <td className="px-6 py-4 text-gray-500 whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]" title={l.subCategory}>
-                        {l.subCategory || '-'}
-                      </td>
-                      <td className="px-6 py-4">{l.city}</td>
-                      <td className="px-6 py-4">
-                        {l.assignedTo ? (
-                          <div className="text-green-600 font-semibold flex items-center"><CheckCircle className="w-4 h-4 mr-1" /> {l.assignedTo}</div>
-                        ) : (
-                          <select
-                            className="border rounded p-1.5 w-44 text-xs bg-white outline-none focus:border-blue-500"
-                            onChange={(e) => {
-                              const rm = rms.find(r => String(r.id) === e.target.value);
-                              if (rm) setAssignConfirmation({
-                                show: true,
-                                leadId: l.id,
-                                leadName: l.name,
-                                rmId: String(rm.id),
-                                rmName: rm.name,
-                                rmSubCategories: rm.sub_category || 'No categories listed',
-                                department: l.department,
-                                subCategory: l.subCategory
-                              });
-                            }}
-                            value=""
-                          >
-                            <option value="">Select RM</option>
-                            {rmLoading ? <option disabled>Loading...</option> :
-                              getRMsForLead(l).map(rm => (
-                                <option key={rm.id} value={rm.id}>{rm.name} ({rm.department})</option>
-                              ))
-                            }
-                          </select>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs sm:text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <span>Show</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                  className="border border-gray-300 rounded-md px-2 py-1 bg-white"
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span>per page</span>
+              </div>
+              <p>
+                Showing <span className="font-semibold">{filteredLeads.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}</span> -{" "}
+                <span className="font-semibold">{Math.min(currentPage * itemsPerPage, filteredLeads.length)}</span> of{" "}
+                <span className="font-semibold">{filteredLeads.length}</span> leads
+              </p>
             </div>
+          </div>
 
-            {totalPages > 1 && (
-              <div className="flex justify-end items-center mt-6 space-x-3">
-                <span className="text-xs text-gray-400 font-medium">Page {currentPage} of {totalPages}</span>
-                <div className="inline-flex rounded-md shadow-sm border bg-white overflow-hidden">
-                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2 border-r hover:bg-gray-50 disabled:opacity-30">
-                    <ChevronLeft className="w-4 h-4 text-gray-600" />
-                  </button>
-                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2 hover:bg-gray-50 disabled:opacity-30">
-                    <ChevronRight className="w-4 h-4 text-gray-600" />
-                  </button>
-                </div>
+          <Tab.Panel className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {loading ? (
+              <div className="py-12 text-center text-gray-500">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2076C7] mx-auto mb-3" /> Loading Leads...
+              </div>
+            ) : filteredLeads.length === 0 ? (
+              <div className="py-12 text-center text-gray-500">No leads found.</div>
+            ) : (
+              <div className="max-h-[40vh] overflow-x-auto">
+                <table className="min-w-[1000px] w-full text-left border-collapse">
+                  <thead className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
+                    <tr>
+                      <th className="px-4 py-3"><input type="checkbox" className="rounded border-gray-300 text-[#2076C7] focus:ring-[#2076C7]" onChange={(e) => setSelectedLeads(e.target.checked ? paginatedLeads.map((l) => l.id) : [])} /></th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">ADV ID</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">DSA Details</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Department</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Sub-Category</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">City</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Action / Assigned To</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {paginatedLeads.map((l) => (
+                      <tr key={l.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-3">
+                          <input type="checkbox" checked={selectedLeads.includes(l.id)} className="rounded border-gray-300 text-[#2076C7] focus:ring-[#2076C7]" onChange={() => setSelectedLeads((p) => (p.includes(l.id) ? p.filter((x) => x !== l.id) : [...p, l.id]))} />
+                        </td>
+                        <td className="px-4 py-3 text-sm font-bold text-[#2076C7] whitespace-nowrap">{l.dsa?.code}</td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{l.name}</div>
+                          <div className="text-xs text-gray-500">{l.phone}</div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-700 capitalize whitespace-nowrap">{l.department.replace("_", " ")}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600 max-w-[180px] truncate" title={l.subCategory}>{l.subCategory || "-"}</td>
+                        <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{l.city}</td>
+                        <td className="px-4 py-3 text-sm whitespace-nowrap">
+                          {l.assignedTo ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              <CheckCircle className="w-3 h-3 mr-1" /> {l.assignedTo}
+                            </span>
+                          ) : (
+                            <select
+                              className="block w-full min-w-[160px] text-xs text-gray-700 border border-gray-300 rounded-lg focus:ring-[#2076C7] focus:border-[#2076C7] py-1 bg-white outline-none shadow-sm"
+                              value=""
+                              onChange={(e) => {
+                                const rm = rms.find((r) => String(r.id) === e.target.value);
+                                if (rm)
+                                  setAssignConfirmation({
+                                    show: true,
+                                    leadId: l.id,
+                                    leadName: l.name,
+                                    rmId: String(rm.id),
+                                    rmName: rm.name,
+                                    rmSubCategories: rm.sub_category || "No categories listed",
+                                    department: l.department,
+                                    subCategory: l.subCategory,
+                                  });
+                              }}
+                            >
+                              <option value="" className="text-gray-400">Select RM to Assign</option>
+                              {rmLoading ? (
+                                <option disabled>Loading RMs...</option>
+                              ) : (
+                                getRMsForLead(l).map((rm) => (
+                                  <option key={rm.id} value={rm.id} className="text-gray-700">
+                                    {rm.name} ({rm.department})
+                                  </option>
+                                ))
+                              )}
+                            </select>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </Tab.Panel>
         </Tab.Group>
+
+        {/* Updated Pagination to match reference exactly */}
+        {!loading && filteredLeads.length > 0 && (
+          <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-gray-600">
+            <div>Page <span className="font-semibold">{currentPage}</span> of <span className="font-semibold">{totalPages}</span></div>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded-md border ${currentPage === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"}`}
+              >
+                Previous
+              </button>
+
+              {getPaginationGroup.map((item, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => typeof item === "number" && setCurrentPage(item)}
+                  disabled={item === "..."}
+                  className={`px-3 py-1 rounded-md border transition-colors ${currentPage === item
+                      ? "bg-[#2076C7] text-white border-[#2076C7]"
+                      : item === "..."
+                        ? "bg-transparent border-none cursor-default"
+                        : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
+                    }`}
+                >
+                  {item}
+                </button>
+              ))}
+
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded-md border ${currentPage === totalPages ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"}`}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Confirmation Modal */}
       {assignConfirmation.show && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl">
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Confirm Assignment</h3>
-            <p className="text-sm text-gray-500 mb-4">Assign RM <span className="text-blue-600 font-bold">{assignConfirmation.rmName}</span> to the DSA <span className="text-blue-600 font-bold">{assignConfirmation.leadName}</span>?</p>
-
-            <div className="mb-6 p-3 bg-gray-50 rounded border border-gray-100 overflow-hidden">
-              <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">RM Working In:</p>
-              <p className="text-xs text-gray-700 font-medium truncate whitespace-nowrap" title={assignConfirmation.rmSubCategories}>
-                {assignConfirmation.rmSubCategories}
-              </p>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-gray-100">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-blue-50 p-2 rounded-full">
+                <User className="w-6 h-6 text-[#2076C7]" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-800">Confirm Assignment</h3>
             </div>
-
-            <div className="flex gap-3">
-              <button onClick={() => setAssignConfirmation(p => ({ ...p, show: false }))} className="flex-1 py-2 text-gray-600 bg-gray-50 border rounded-lg hover:bg-gray-100 font-medium">Cancel</button>
-              <button onClick={confirmAssignment} className="flex-1 py-2 bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700">Confirm</button>
+            <p className="text-sm text-slate-600 mb-4 leading-relaxed">
+              Assign RM <span className="text-[#2076C7] font-bold">{assignConfirmation.rmName}</span> to DSA <span className="text-[#2076C7] font-bold">{assignConfirmation.leadName}</span>?
+            </p>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setAssignConfirmation((p) => ({ ...p, show: false }))}
+                className="flex-1 py-2.5 text-slate-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmAssignment}
+                className="flex-1 py-2.5 bg-[#2076C7] text-white rounded-xl font-bold shadow-lg hover:bg-[#1a5fa1]"
+              >
+                Confirm
+              </button>
             </div>
           </div>
         </div>
