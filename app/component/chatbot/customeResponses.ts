@@ -24,28 +24,33 @@ export const getCustomResponses = (): CustomResponseConfig => {
         category: "Conversational"
       },
       {
-        keywords: ["good morning"],
+        keywords: ["good morning", "morning"],
         response: "Good morning! ☀️ A great day to plan your financial future. How can I help you today?",
         category: "Conversational"
       },
       {
-        keywords: ["good afternoon"],
+        keywords: ["good afternoon", "afternoon"],
         response: "Good afternoon! 🌤️ Hope your day is going well. Need any help with financial advice?",
         category: "Conversational"
       },
       {
-        keywords: ["good evening"],
+        keywords: ["good evening", "evening"],
         response: "Good evening! 🌙 Reflecting on your financial goals? I'm here to help if you need anything.",
         category: "Conversational"
       },
       {
-        keywords: ["thank you", "thanks", "thx", "tysm"],
+        keywords: ["thank you", "thanks", "thx", "tysm", "thanku", "thankyou", "thank u", "thanks a lot", "many thanks", "thanks a ton", "thankx"],
         response: "You're very welcome! 😊 Is there anything else I can help you with regarding loans or investments?",
         category: "Conversational"
       },
       {
-        keywords: ["bye", "goodbye", "see ya", "by"],
+        keywords: ["bye", "goodbye", "see ya", "by", "see you", "catch you later", "talk to you later", ],
         response: "Goodbye! 👋 Have a financially secure day ahead. Feel free to return if you have more questions!",
+        category: "Conversational"
+      },
+      {
+        keywords: ["who trained you", "who developed you", "who built you"],
+        response: "I was created by a talented team at **Infinity Arthvishva** to assist you with your financial needs.",
         category: "Conversational"
       },
       {
@@ -186,7 +191,7 @@ export const getCustomResponses = (): CustomResponseConfig => {
         response: "Planning is the first step to success! We provide various financial calculators to help you estimate your Loan EMIs or Investment returns. You can access them via the 'Calculator' dropdown menu in our navigation bar.",
         category: "General"
       },
-       { keywords: ['what do you do', 'services', 'financial distribution', 'differential', 'what services do you provide', 'service', 'services offered', 'tell me about your services', 'your services', 'service details', 'information about your services',"offers"], 
+       { keywords: ['what do you do', 'services', 'financial distribution', 'differential','product','products', 'what services do you provide', 'service', 'services offered', 'tell me about your services', 'your services', 'service details', 'information about your services',"offers"], 
         response: "Comprehensive financial solutions under one roof\n\n**Finance:**\nComprehensive financial solutions under one roof\n✓Home Loan\n✓Personal Loan\n✓Business Loan\n✓SME Loan\n✓Auto Loan\n✓Mortgage Loan\n✓Education Loan\n✓Vehicle Loan\n✓Loan Against Securities\n\n**Protection**\nInsurance solutions to safeguard your future and assets.\n✓Life Insurance\n✓Health Insurance\n✓Motor Insurance\n✓Property Insurance\n✓Travel Insurance\n✓Cattle Insurance\n✓Marine Insurance\n✓Group Medi-Claim Cover\n✓Group Personal Accident Cover\n✓Worker Compensation Insurance\n✓Corporate General Insurance\n\n**Investment**\nStrategic investment options to grow your wealth.\n✓Mutual Funds\n✓Wealth Management\n✓Pension Funds\n✓Stock & Securities\n✓Demat Account\n✓Real Estate Investments\n✓Portfolio Management Service\n✓Alternative Investment Fund\n✓Fixed Deposit\n✓Bonds\n✓Tax Consultancy\n✓Unlisted Shares", 
         category: 'Services' },
         // =====  home loan =====
@@ -323,7 +328,7 @@ export const getCustomResponses = (): CustomResponseConfig => {
     },
     // =====  protection =====
     {
-        keywords: ['protection services', 'protection', 'only protection'],
+        keywords: ['protection services', 'protection', 'only protection','what is protection services'],
         response: `Protection Services\n
         Insurance solutions to safeguard your future and assets.
         ✓Life Insurance
@@ -341,7 +346,7 @@ export const getCustomResponses = (): CustomResponseConfig => {
     },
     // ===== Life Insurance =====
     {
-        keywords: ['Life Insurance', 'what is life insurance', 'life insurance', ''],
+        keywords: ['Life Insurance', 'what is life insurance', 'life insurance', 'what is Life Insurance'],
         response: `'Life insurance provides financial protection to your family in case of your untimely demise. It ensures that your loved ones can maintain their lifestyle, pay off debts, fund education, and meet other financial obligations even in your absence.',
     Features: 
       'Sum assured from ₹10 Lakhs to ₹50 Crores',
