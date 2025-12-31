@@ -1,4 +1,3 @@
-// customeResponses.ts
 
 interface CustomQuestion {
   keywords: string[];
@@ -62,7 +61,7 @@ export const getCustomResponses = (): CustomResponseConfig => {
         category: "General"
       },
       {
-        keywords: ["infinity arthvishva", "about the company", "what is this company"],
+        keywords: ["infinity arthvishva", "about the company", "what is this company", "tell me about infinity arthvishva", "information about infinity arthvishva"],
         response: "**Infinity Arthvishva** is a premier financial consultancy firm and a one-stop financial advisory powerhouse. We believe your financial success is our true achievement. We offer end-to-end solutions in loans, investments, insurance, and wealth management, built on a foundation of trust, expertise, and innovation. We don't just manage finances; we build lasting relationships.",
         category: "Company"
       },
@@ -74,38 +73,38 @@ export const getCustomResponses = (): CustomResponseConfig => {
         category: 'Leadership Team'
     },
       {
-        keywords: ["rahul kangane", "rahul", "who is rahul kangane", "tell me about rahul kangane"],
+        keywords: ["rahul kangane", "rahul", "who is rahul kangane", "tell me about rahul kangane","information about rahul kangane"],
         response: "**Mr. Rahul Kangane** is our **Chairman and Managing Director**. He brings 15 years of deep expertise in broking and wealth management. His sharp market insights and focus on portfolio strategy are the driving forces behind the company's growth and success.",
         category: "Leadership"
       },
       {
-        keywords: ["rajesh parkhi", "rajesh", "who is rajesh parkhi", "tell me about rajesh parkhi"],
+        keywords: ["rajesh parkhi", "rajesh", "who is rajesh parkhi", "tell me about rajesh parkhi"," information about rajesh parkhi"],
         response: "**Mr. Rajesh Parkhi** is our **Executive Director**. He has over 25 years of extensive experience in the retail finance sector and holds an MBA in Marketing. He is an expert in structuring retail loan portfolios and fostering sustainable business growth.",
         category: "Leadership"
       },
       {
-        keywords: ["pravin marathe", "pravin","who is pravin marathe","tell me about pravin marathe"],
+        keywords: ["pravin marathe", "pravin","who is pravin marathe","tell me about pravin marathe","information about pravin marathe"],
         response: "**Mr. Pravin Marathe** is a **Director** at Infinity Arthvishva. With over 18 years of experience in financial markets, he is known for his client-focused approach and strategic vision, specifically driving growth through Mutual Funds, Portfolio Management Services (PMS), and Alternative Investment Funds (AIFs).",
         category: "Leadership"
       },
 
       // ==== SERVICES: FINANCE & LOANS ====
       {
-        keywords: ["loan", "finance", "borrow", "emi"],
+        keywords: ["loan", "finance", "borrow", "emi", "loan services"],
         response: "We provide comprehensive loan solutions tailored to your needs:\n\n• **Residential:** Home Loans, Mortgage Loans (LAP).\n• **Business:** Business Loans, SME Loans, Loans Against Securities.\n• **Personal \u0026 Education:** Personal Loans, Education Loans.\n• **Vehicles:** Auto Loans, Vehicle Loans.\n\nOur goal is to provide the best interest rates and smooth processing for all your credit requirements.",
         category: "Finance"
       },
 
       // ==== SERVICES: PROTECTION & INSURANCE ====
       {
-        keywords: ["insurance", "protection", "safe", "policy"],
+        keywords: ["insurance", "protection", "safe", "policy","insurance services"],
         response: "Safeguard your future and assets with our wide range of insurance products:\n\n• **Personal:** Life Insurance, Health Insurance, Travel Insurance.\n• **Asset:** Motor Insurance, Property Insurance, Marine Insurance.\n• **Commercial:** Corporate General Insurance, Worker Compensation Insurance, Group Medi-Claim Cover, Group Personal Accident Cover.\n• **Specialized:** Cattle Insurance.",
         category: "Protection"
       },
 
       // ==== SERVICES: INVESTMENTS ====
       {
-        keywords: ["investment", "invest", "wealth", "mutual fund", "stock"],
+        keywords: ["investment", "invest", "wealth", "mutual fund", "stock","investment services"],
         response: "Grow your wealth strategically with our expert investment advisory:\n\n• **Market Instruments:** Mutual Funds, Stocks \u0026 Securities, Bonds, Unlisted Shares.\n• **Management:** Portfolio Management Service (PMS), Alternative Investment Fund (AIF), Wealth Management.\n• **Savings:** Fixed Deposits, Pension Funds.\n• **Real Estate:** Real Estate Investments.\n• **Services:** Demat Account opening, Tax Consultancy.",
         category: "Investment"
       },
@@ -121,6 +120,11 @@ export const getCustomResponses = (): CustomResponseConfig => {
       {
         keywords: ["gst", "cin", "registration", "tax number"],
         response: "Here are the official registration details for Infinity Arthvishva:\n\n• **GST Number:** 27AAICI0723K1ZJ\n• **CIN Number:** U66190PN2025PTC238981\n\nWe are a fully compliant and transparent financial advisory firm.",
+        category: "Company"
+      },
+      {
+        keywords: ["About Us", "About", "who we are"],
+        response: "At Infinity Arthvishva, we believe that your financial success is our true achievement. We are a one-stop financial advisory firm offering end-to-end solutions in loans, investments, insurance, and wealth management. With a strong foundation of trust, expertise, and innovation, we strive to simplify finance and empower individuals and businesses to achieve their goals with confidence\nAt Infinity Arthvishva, we don’t just manage finances — we build lasting relationships and craft infinite possibilities for your financial future.",
         category: "Company"
       },
       {
@@ -182,7 +186,7 @@ export const getCustomResponses = (): CustomResponseConfig => {
         response: "Planning is the first step to success! We provide various financial calculators to help you estimate your Loan EMIs or Investment returns. You can access them via the 'Calculator' dropdown menu in our navigation bar.",
         category: "General"
       },
-       { keywords: ['what do you do', 'services', 'financial distribution', 'differential', 'what services do you provide'], 
+       { keywords: ['what do you do', 'services', 'financial distribution', 'differential', 'what services do you provide', 'service', 'services offered', 'tell me about your services', 'your services', 'service details', 'information about your services',"offers"], 
         response: "Comprehensive financial solutions under one roof\n\n**Finance:**\nComprehensive financial solutions under one roof\n✓Home Loan\n✓Personal Loan\n✓Business Loan\n✓SME Loan\n✓Auto Loan\n✓Mortgage Loan\n✓Education Loan\n✓Vehicle Loan\n✓Loan Against Securities\n\n**Protection**\nInsurance solutions to safeguard your future and assets.\n✓Life Insurance\n✓Health Insurance\n✓Motor Insurance\n✓Property Insurance\n✓Travel Insurance\n✓Cattle Insurance\n✓Marine Insurance\n✓Group Medi-Claim Cover\n✓Group Personal Accident Cover\n✓Worker Compensation Insurance\n✓Corporate General Insurance\n\n**Investment**\nStrategic investment options to grow your wealth.\n✓Mutual Funds\n✓Wealth Management\n✓Pension Funds\n✓Stock & Securities\n✓Demat Account\n✓Real Estate Investments\n✓Portfolio Management Service\n✓Alternative Investment Fund\n✓Fixed Deposit\n✓Bonds\n✓Tax Consultancy\n✓Unlisted Shares", 
         category: 'Services' },
         // =====  home loan =====

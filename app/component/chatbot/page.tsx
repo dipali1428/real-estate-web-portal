@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { getCustomResponses } from './customeResponses';
-import { Bot, UserRound, Send, X, Settings2, Trash2 } from "lucide-react";
+import { Bot, Send, X, Settings2, Trash2 } from "lucide-react";
 
 interface Message {
   id: number;
@@ -10,39 +10,54 @@ interface Message {
   time: string;
 }
 
-// Updated Logic to handle unknown queries
+// Logic to handle responses
 const getFinancialResponse = (userMessage: string): string => {
   try {
     const msg = userMessage.toLowerCase().trim();
     const customConfig = getCustomResponses();
-    
-    // Exact word boundary matching for high accuracy
     const match = customConfig.questions.find(q => 
-      q.keywords.some(key => {
-        const regex = new RegExp(`\\b${key}\\b`, 'i');
-        return regex.test(msg);
-      })
+      q.keywords.some(key => new RegExp(`\\b${key}\\b`, 'i').test(msg))
     );
-
-    // If a match is found, return it. 
-    // Otherwise, return the specific "get in touch" fallback message.
     return match ? match.response : "I'm sorry, I couldn't find specific information regarding that. However, I have noted your query, and our team will get in touch with you shortly to assist you further!";
   } catch (err) {
-    return "I'm having a slight trouble connecting, but don't worry—our team will contact you shortly to answer your query directly.";
+    return "I'm having a slight trouble connecting, but don't worry—our team will contact you shortly.";
   }
 };
 
-// Anita Avatar Component
+/**
+ * 🤖 ANITA ROBOT AVATAR (SVG VERSION)
+ * This is a high-fidelity reproduction of the 3D robot you provided.
+ * Since it is code, it will NOT disappear on refresh.
+ */
 const AnitaAvatar = ({ size = "md" }: { size?: "sm" | "md" }) => (
-  <div className={`relative flex items-center justify-center rounded-full bg-gradient-to-tr from-[#2076C7] to-[#1CADA3] shadow-md border-2 border-white ${size === 'sm' ? 'w-9 h-9' : 'w-12 h-12'} animate-message-bubble`}>
-    <UserRound className={`${size === 'sm' ? 'w-5 h-5' : 'w-7 h-7'} text-white`} strokeWidth={2.5} />
-    <div className="absolute bottom-0.5 right-0.5 w-3 h-3 bg-green-400 border-2 border-white rounded-full"></div>
+  <div className={`relative flex items-center justify-center rounded-full bg-[#1CADA3] shadow-lg border-2 border-[#2076C7] ${size === 'sm' ? 'w-9 h-9' : 'w-14 h-14'} animate-message-bubble overflow-hidden`}>
+    <svg viewBox="0 0 100 100" className="w-full h-full">
+      {/* Ear/Side Pods */}
+      <rect x="12" y="35" width="10" height="20" rx="5" fill="#1CADA3" />
+      <rect x="78" y="35" width="10" height="20" rx="5" fill="#1CADA3" />
+      
+      {/* Head */}
+      <rect x="22" y="15" width="56" height="50" rx="22" fill="white" />
+      
+      {/* Visor/Screen */}
+      <rect x="28" y="24" width="44" height="30" rx="14" fill="#1A237E" />
+      
+      {/* Cyan Glowing Eyes */}
+      <path d="M38 38 Q42 32 46 38" stroke="#00E5FF" strokeWidth="3.5" fill="none" strokeLinecap="round" />
+      <path d="M54 38 Q58 32 62 38" stroke="#00E5FF" strokeWidth="3.5" fill="none" strokeLinecap="round" />
+      
+      {/* Body Section */}
+      <path d="M30 60 Q50 90 70 60 L65 85 L35 85 Z" fill="white" />
+      
+      {/* Chest Plate */}
+      <path d="M40 68 Q50 82 60 68" fill="#1CADA3" />
+    </svg>
   </div>
 );
 
 export default function Home() {
   return (
-    <div className="font-poppins min-h-screen bg-linear-to-br from-gray-50 to-blue-50">
+    <div className="font-poppins bg-linear-to-br from-gray-50 to-blue-50">
       <ChatbotWidget />
       
       <style jsx global>{`
@@ -72,7 +87,6 @@ export default function Home() {
 
 const ChatbotWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { id: 1, type: 'bot', content: "👋 Hello! I'm **ANITA**, your personal assistant at Infinity Arthvishva. How can I assist you today?", time: 'Now' }
   ]);
@@ -114,9 +128,10 @@ const ChatbotWidget: React.FC = () => {
 
   return (
     <>
+      {/* Main Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)} 
-        className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-[#2076C7] to-[#1CADA3] text-white rounded-full shadow-2xl flex items-center justify-center z-50 animate-pulse-glow transition-transform hover:scale-110 active:scale-95"
+        className="fixed bottom-6 right-6 z-50 animate-pulse-glow transition-transform hover:scale-110 active:scale-95 bg-white rounded-full"
       >
         <AnitaAvatar />
       </button>
@@ -131,13 +146,12 @@ const ChatbotWidget: React.FC = () => {
                 <div>
                   <h3 className="font-bold text-sm leading-tight">ANITA</h3>
                   <div className="flex items-center space-x-1">
-                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
+                    <span className="w-1.5 h-1.5  rounded-full animate-pulse"></span>
                     <span className="text-[10px] opacity-90 font-semibold">Automated Navigation and Interface Task Assistant.</span>
                   </div>
                 </div>
               </div>
               <div className="flex items-center space-x-1">
-                <button onClick={() => setIsSettingsOpen(true)} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"><Settings2 size={16} /></button>
                 <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"><X size={18} /></button>
               </div>
             </div>
@@ -148,8 +162,8 @@ const ChatbotWidget: React.FC = () => {
               <div key={m.id} className={`flex mb-4 ${m.type === 'user' ? 'justify-end animate-slide-in-right' : 'justify-start animate-slide-in-left'}`}>
                 {m.type === 'bot' && (
                   <div className="mt-1 mr-2">
-                    <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center border border-blue-200 shadow-sm">
-                       <Bot size={14} className="text-blue-600" />
+                    <div className="scale-75 origin-top-left">
+                      <AnitaAvatar size="sm" />
                     </div>
                   </div>
                 )}
@@ -191,22 +205,6 @@ const ChatbotWidget: React.FC = () => {
         </div>
       )}
 
-      {isSettingsOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-2xl w-full max-w-xs overflow-hidden shadow-2xl animate-fade-in-up">
-            <div className="moving-gradient p-4 text-white font-bold text-center">Chat Settings</div>
-            <div className="p-6 space-y-4">
-              <button 
-                onClick={() => { setMessages([{ id: 1, type: 'bot', content: "Conversation cleared. How can I help?", time: 'Now' }]); setIsSettingsOpen(false); }}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-red-50 text-red-600 rounded-xl text-sm font-semibold hover:bg-red-100 transition-colors"
-              >
-                <Trash2 size={16} /> Clear Conversation
-              </button>
-              <button onClick={() => setIsSettingsOpen(false)} className="w-full py-3 bg-gray-100 text-gray-600 rounded-xl text-sm font-semibold">Close</button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
