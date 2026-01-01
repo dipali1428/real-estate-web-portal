@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation'; // Import the router
 
 export default function TermsConditions() {
+  const router = useRouter(); // Initialize the router
   const [activeSection, setActiveSection] = useState('');
 
   useEffect(() => {
@@ -31,7 +33,29 @@ export default function TermsConditions() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8 relative">
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="fixed top-25 left-4 z-50 flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md hover:shadow-lg hover:bg-gray-50 transition-all duration-200 text-[#2076C7] font-medium border border-gray-100 group"
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="20" 
+          height="20" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          className="group-hover:-translate-x-1 transition-transform duration-200"
+        >
+          <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+        </svg>
+        <span>Back</span>
+      </button>
+
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col max-h-[calc(100vh-4rem)]">
           {/* Header Section - Fixed */}

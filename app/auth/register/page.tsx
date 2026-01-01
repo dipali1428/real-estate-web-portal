@@ -552,11 +552,11 @@ export default function BecomePartnerForm() {
                                         className="h-4 w-4 rounded border-gray-300 text-[#1CADA3] focus:ring-[#1CADA3]"
                                     />
                                     I agree to the{" "}
-                                    <a href="#" className="underline text-sm sm:text-sm" onClick={(e) => e.preventDefault()}>
+                                    <a href="/page/termsconditions" className="underline text-sm sm:text-sm">
                                         Terms
-                                    </a>{" "}
-                                    &{" "}
-                                    <a href="#" className="underline text-sm sm:text-sm" onClick={(e) => e.preventDefault()}>
+                                    </a>
+                                    {" "} & {" "}
+                                    <a href="/page/privacypolicy" className="underline text-sm sm:text-sm">
                                         Privacy Policy.
                                     </a>
                                 </label>
