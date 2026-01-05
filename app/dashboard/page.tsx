@@ -21,6 +21,8 @@ interface UserProfile {
 export default function Dashboard() {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    // ✅ ADDED STATE FOR CLIENT COUNT
+    const [clientCount, setClientCount] = useState<number>(0);
     const router = useRouter();
     const hasFetched = useRef(false);
 
@@ -33,7 +35,6 @@ export default function Dashboard() {
             .split(' ')
             .filter(word => word.length > 0) // Remove empty strings
             .map(word => {
-                // Handle hyphenated names (e.g., "Smith-Jones")
                 if (word.includes('-')) {
                     return word
                         .split('-')
@@ -45,9 +46,8 @@ export default function Dashboard() {
             .join(' ');
     };
 
-    // ✅ Fetch profile data from API
+    // ✅ Fetch profile data and client count from API
     useEffect(() => {
-        // Hit API Once
         if (hasFetched.current) return;
         hasFetched.current = true;
 
@@ -57,9 +57,15 @@ export default function Dashboard() {
                 if (!token) return router.push("/");
                 setLoading(true);
 
+                // Fetch Profile
                 const data = await DashboardService.getProfile();
                 
-                // Capitalize the user's name before setting state
+                // ✅ FETCH CLIENT DETAILS AND SET COUNT
+                const clientsData = await DashboardService.getAllClientDetails();
+                // Assuming clientsData is an array or has a property containing the list
+                const count = Array.isArray(clientsData) ? clientsData.length : (clientsData?.data?.length || 0);
+                setClientCount(count);
+
                 const userData = data.user;
                 const formattedUser = {
                     ...userData,
@@ -71,15 +77,11 @@ export default function Dashboard() {
             } catch (error: any) {
                 console.error("Profile fetch error:", error);
 
-                // 🔥 If backend says token expired → logout user
                 if (error?.response?.status === 401) {
-                    // Show toast for 2 seconds
                     toast.error("Login session expired! Please login again.", {
                         duration: 2000,
                     });
-
                     document.cookie = `authToken=; path=/; expires=${new Date(0).toUTCString()}`;
-
                     setTimeout(() => {
                         router.push("/");
                     }, 500);
@@ -101,9 +103,30 @@ export default function Dashboard() {
         <div className="flex-1 p-4 sm:p-6">
             {/* Dashboard Header */}
             <section className="animate-fade-in">
+                 {/* Welcome Message */}
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                   
+                    className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white"
+                >
+                    <div className="absolute bottom-4 right-6 text-xs sm:text-sm font-mono text-white/90 bg-black/20 px-2 py-1 rounded-md border border-white/10">
+                        ID: <span className="text-white-400 font-bold ml-1">
+                            {loading ? "..." : (user?.adv_id || "N/A")}
+                        </span>
+                    </div>
+
+                    <h2 className="text-xl sm:text-2xl font-bold mb-2 pr-20">
+                        {loading ? "Loading..." : `Welcome back, ${user?.name || "Partner"}.`}
+                    </h2>
+                    <p className="text-sm sm:text-base mb-4">
+                        Here&apos;s a snapshot of your business performance.
+                    </p>
+                </motion.div>
+
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center space-x-4">
-                        {/* Notifications */}
                         <div className="relative group">
                             <div className="absolute right-0 top-full mt-2 w-64 sm:w-80 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
                                 <div className="p-4">
@@ -128,17 +151,7 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Welcome Message */}
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4 }}
-                    className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white">
-                    <h2 className="text-xl sm:text-2xl font-bold mb-2">
-                        {loading ? "Loading..." : `Welcome back, ${user?.name || "Partner"}.`}
-                    </h2>
-                    <p className="text-sm sm:text-base mb-4">Here&apos;s a snapshot of your business performance.</p>
-                </motion.div>
+                
 
                 {/* KPI Cards Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -215,7 +228,10 @@ export default function Dashboard() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <div className="text-2xl font-bold font-sans text-gray-800">0</div>
+                            {/* ✅ UPDATED TO DISPLAY DYNAMIC CLIENT COUNT */}
+                            <div className="text-2xl font-bold font-sans text-gray-800">
+                                {loading ? "..." : clientCount}
+                            </div>
                             <div className="text-gray-600 mt-1">Total Clients</div>
                             <div className="flex items-center text-green-500 text-sm mt-2">
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -250,7 +266,6 @@ export default function Dashboard() {
 
                 {/* Visual Data Widgets */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                    {/* Business Portfolio Widget */}
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                         <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">
                             <svg className="w-5 h-5 text-blue-500 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,7 +280,6 @@ export default function Dashboard() {
                         <PortfolioChart />
                     </div>
 
-                    {/* Recent Activity Widget */}
                     <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
                         <h3 className="text-lg font-semibold text-gray-800 mb-2">
                             <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">

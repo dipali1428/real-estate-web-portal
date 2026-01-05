@@ -2,16 +2,12 @@
 import React from 'react';
 import { ActiveTab } from '../types';
 
+type TabId = 'clients' | 'applications' | 'documents';
+
 interface NavigationTabsProps {
     activeTab: ActiveTab;
     setActiveTab: (tab: ActiveTab) => void;
-    tabCounts: {
-        clients: number;
-        leads: number;
-        applications: number;
-        documents: number;
-        earnings: number;
-    };
+    tabCounts: Record<TabId, number>;
 }
 
 const NavigationTabs: React.FC<NavigationTabsProps> = ({
@@ -19,12 +15,10 @@ const NavigationTabs: React.FC<NavigationTabsProps> = ({
     setActiveTab,
     tabCounts
 }) => {
-    const tabs: { id: ActiveTab; name: string }[] = [
+    const tabs: { id: TabId; name: string }[] = [
         { id: 'clients', name: 'Clients' },
-        { id: 'leads', name: 'Leads' },
         { id: 'applications', name: 'Applications' },
-        { id: 'documents', name: 'Documents' },
-        { id: 'earnings', name: 'Earnings' }
+        { id: 'documents', name: 'Documents' }
     ];
 
     return (

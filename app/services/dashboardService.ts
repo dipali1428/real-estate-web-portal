@@ -61,4 +61,9 @@ export const DashboardService = {
         return response.data;
     },
 
+     getAllClientDetails: async () => {
+        const response = await api.get("/api/dashboard/all-client-detail");
+        return response.data;
+    },
+
 };

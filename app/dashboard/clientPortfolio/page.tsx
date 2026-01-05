@@ -2,10 +2,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
     clients,
-    leads,
+    // leads,
     applications,
-    documents,
-    commissions
+    documents
+    // commissions
 } from '../data/clientData';
 
 // Components
@@ -14,10 +14,10 @@ import QuickStats from './components/QuickStats';
 import ProductDistribution from './components/ProductDistribution';
 import NavigationTabs from './components/NavigationTabs';
 import ClientDetails from './components/ClientDetails';
-import LeadManagement from './components/LeadManagement';
+// import LeadManagement from './components/LeadManagement';
 import ApplicationStatus from './components/ApplicationStatus';
 import Documents from './components/Documents';
-import Earnings from './components/Earnings';
+// import Earnings from './components/Earnings';
 import BenefitsSection from './components/BenefitsSection';
 
 // Utils & Types
@@ -78,11 +78,11 @@ const ClientPortfolio: React.FC = () => {
         return filtered;
     }, [selectedCategory, selectedSubcategory]);
 
-    const filteredLeads = useMemo(() => {
-        if (selectedCategory === 'All') return leads;
-        const clientIds = filteredClients.map(client => client.id);
-        return leads.filter(lead => clientIds.includes(lead.clientId));
-    }, [selectedCategory, filteredClients]);
+    // const filteredLeads = useMemo(() => {
+    //     if (selectedCategory === 'All') return leads;
+    //     const clientIds = filteredClients.map(client => client.id);
+    //     return leads.filter(lead => clientIds.includes(lead.clientId));
+    // }, [selectedCategory, filteredClients]);
 
     const filteredApplications = useMemo(() => {
         if (selectedCategory === 'All') return applications;
@@ -96,18 +96,14 @@ const ClientPortfolio: React.FC = () => {
         return documents.filter(doc => clientIds.includes(doc.clientId));
     }, [selectedCategory, filteredClients]);
 
-    const filteredCommissions = useMemo(() => {
-        if (selectedCategory === 'All') return commissions;
-        const clientIds = filteredClients.map(client => client.id);
-        return commissions.filter(commission => clientIds.includes(commission.clientId));
-    }, [selectedCategory, filteredClients]);
+   
 
     // Get paginated data for each tab
     const clientsPagination = getPaginatedData(filteredClients, clientsPage, itemsPerPage);
-    const leadsPagination = getPaginatedData(filteredLeads, leadsPage, itemsPerPage);
+    // const leadsPagination = getPaginatedData(filteredLeads, leadsPage, itemsPerPage);
     const applicationsPagination = getPaginatedData(filteredApplications, applicationsPage, itemsPerPage);
     const documentsPagination = getPaginatedData(filteredDocuments, documentsPage, itemsPerPage);
-    const earningsPagination = getPaginatedData(filteredCommissions, earningsPage, itemsPerPage);
+    // const earningsPagination = getPaginatedData(filteredCommissions, earningsPage, itemsPerPage);
 
     // Get product distribution
     const productDistribution = useMemo(() => {
@@ -121,15 +117,12 @@ const ClientPortfolio: React.FC = () => {
     // Get tab counts
     const tabCounts = {
         clients: filteredClients.length,
-        leads: filteredLeads.length,
         applications: filteredApplications.length,
-        documents: filteredDocuments.length,
-        earnings: filteredCommissions.length
+        documents: filteredDocuments.length
     };
 
     // Calculate commission totals
-    const pendingCommissionTotal = filteredCommissions.reduce((sum, comm) => sum + comm.pendingCommission, 0);
-    const paidCommissionTotal = filteredCommissions.reduce((sum, comm) => sum + comm.paidCommission, 0);
+ 
 
     return (
         <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
@@ -150,12 +143,7 @@ const ClientPortfolio: React.FC = () => {
                 />
 
                 {/* Quick Stats */}
-                <QuickStats
-                    totalClients={filteredClients.length}
-                    totalLeads={filteredLeads.length}
-                    pendingCommission={pendingCommissionTotal}
-                    paidCommission={paidCommissionTotal}
-                />
+                
 
                 {/* Product Distribution */}
                 {selectedCategory !== 'All' && (
@@ -184,7 +172,7 @@ const ClientPortfolio: React.FC = () => {
                     )}
 
                     {/* Lead Management */}
-                    {activeTab === 'leads' && (
+                    {/* {activeTab === 'leads' && (
                         <LeadManagement
                             leads={filteredLeads}
                             clients={clients}
@@ -194,7 +182,7 @@ const ClientPortfolio: React.FC = () => {
                             itemsPerPage={itemsPerPage}
                             setItemsPerPage={setItemsPerPage}
                         />
-                    )}
+                    )} */}
 
                     {/* Application Status */}
                     {activeTab === 'applications' && (
@@ -223,7 +211,7 @@ const ClientPortfolio: React.FC = () => {
                     )}
 
                     {/* Earnings */}
-                    {activeTab === 'earnings' && (
+                    {/* {activeTab === 'earnings' && (
                         <Earnings
                             commissions={filteredCommissions}
                             clients={clients}
@@ -233,7 +221,7 @@ const ClientPortfolio: React.FC = () => {
                             itemsPerPage={itemsPerPage}
                             setItemsPerPage={setItemsPerPage}
                         />
-                    )}
+                    )} */}
                 </div>
 
                 {/* Benefits Section */}
