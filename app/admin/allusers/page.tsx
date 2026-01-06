@@ -255,7 +255,7 @@ export default function AllUsersPage() {
           ) : filteredUsers.length === 0 ? (
             <div className="py-12 text-center text-gray-500">No users found.</div>
           ) : (
-            <div className="max-h-[63vh] overflow-x-auto font-sans">
+            <div className="max-h-[65vh] overflow-y-auto overflow-x-auto scrollbar-x-thin scrollbar-thumb-gray-300 scrollbar-track-transparent md:scrollbar-thumb-gray-400">
               <table className="min-w-[900px] w-full text-left border-collapse">
                 <thead className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
                   <tr>
@@ -298,8 +298,7 @@ export default function AllUsersPage() {
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className={`px-3 py-1 rounded-md border ${currentPage === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"}`}
-              >
+                className={`px-3 py-1 rounded-md border ${currentPage === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"}`}>
                 Previous
               </button>
 
@@ -313,8 +312,7 @@ export default function AllUsersPage() {
                       : item === "..."
                         ? "bg-transparent border-none cursor-default"
                         : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"
-                    }`}
-                >
+                    }`}>
                   {item}
                 </button>
               ))}
@@ -322,8 +320,7 @@ export default function AllUsersPage() {
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className={`px-3 py-1 rounded-md border ${currentPage === totalPages ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"}`}
-              >
+                className={`px-3 py-1 rounded-md border ${currentPage === totalPages ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300"}`}>
                 Next
               </button>
             </div>

@@ -115,7 +115,7 @@ const Footer = () => (
         {/* Left Side */}
         <div className="text-center md:text-center">
           <p className="text-sm text-gray-400 mb-2">
-            © 2025{" "}
+            © 2026{" "}
             <span className="font-medium">
               Infinity Arthvishva
             </span>{" "}— All Rights Reserved.
