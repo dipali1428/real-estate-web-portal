@@ -2,6 +2,7 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown, Search } from "lucide-react";
 import { RTO_LIST } from "../data/rtoData";
+import { DashboardService } from "../../../services/dashboardService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -111,9 +112,45 @@ export default function MotorInsuranceForm({ onClose }: { onClose: () => void })
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setShowSuccess(true);
-    setIsSubmitting(false);
+
+    try {
+      const payload = {
+        department: "Insurance",
+        product_type: "Motor Insurance",
+        sub_category: "Motor Insurance",
+        client: {
+          name: form.clientName,
+          mobile: form.phone || "",
+          email: form.email || "",
+        },
+        meta: {
+          is_self_login: false,
+        },
+        form_data: {
+          vehicleType: form.vehicleType,
+          isNew: form.isNew,
+          fuelType: form.fuelType,
+          vehicleReg: form.vehicleReg,
+          rto: form.rto,
+          manufacturer: form.manufacturer,
+          vehicleModel: form.vehicleModel,
+          gvw: form.gvw,
+          cc: form.cc,
+          requirement: form.requirement,
+          idv: form.idv,
+          claimTaken: form.claimTaken,
+          hasPrev: form.hasPrev
+        }
+      };
+
+      await DashboardService.createLead(payload);
+      setShowSuccess(true);
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const fieldProps = (name: string) => ({

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
+import { DashboardService } from "../../../services/dashboardService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -21,7 +22,7 @@ export default function EducationLoanForm({ onClose }: { onClose: () => void }) 
   const [form, setForm] = useState<Record<string, string>>({
     clientName: "", phone: "", email: "", dob: "", location: "",
     loanAmount: "", courseName: "", institutionName: "", countryName: "",
-    hasOtherLoan: "", otherLoanAmount: "", coApplicantType: ""
+    hasOtherLoan: "", otherLoanAmount: "", coApplicantEmploymentType: ""
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
@@ -29,7 +30,7 @@ export default function EducationLoanForm({ onClose }: { onClose: () => void }) 
   const [showSuccess, setShowSuccess] = useState(false);
 
   const studentDocs = useMemo(() => form.hasOtherLoan === "Yes" ? [...STUDENT_BASE_DOCS, "Existing Loan Statement"] : STUDENT_BASE_DOCS, [form.hasOtherLoan]);
-  const coApplicantDocs = useMemo(() => CO_APPLICANT_DOC_MAP[form.coApplicantType] || [], [form.coApplicantType]);
+  const coApplicantDocs = useMemo(() => CO_APPLICANT_DOC_MAP[form.coApplicantEmploymentType] || [], [form.coApplicantEmploymentType]);
 
   const handleInputChange = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value, ...(field === "hasOtherLoan" && value === "No" ? { otherLoanAmount: "" } : {}) }));
@@ -57,7 +58,7 @@ export default function EducationLoanForm({ onClose }: { onClose: () => void }) 
 
     if (!form.hasOtherLoan) errs.hasOtherLoan = "Select an option";
     if (form.hasOtherLoan === "Yes" && !form.otherLoanAmount) errs.otherLoanAmount = "Existing loan amount is required";
-    if (!form.coApplicantType) errs.coApplicantType = "Select employment type";
+    if (!form.coApplicantEmploymentType) errs.coApplicantEmploymentType = "Select employment type";
 
     studentDocs.forEach(d => { if (!uploadedDocs[`student_${d}`]) errs[`doc_student_${d}`] = `Upload ${d}`; });
     coApplicantDocs.forEach(d => { if (!uploadedDocs[`co_${d}`]) errs[`doc_co_${d}`] = `Upload ${d}`; });
@@ -70,9 +71,41 @@ export default function EducationLoanForm({ onClose }: { onClose: () => void }) 
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setShowSuccess(true);
-    setIsSubmitting(false);
+
+    try {
+      const payload = {
+        department: "Loan",
+        product_type: "Education Loan",
+        sub_category: "Education Loan",
+        client: {
+          name: form.clientName,
+          mobile: form.phone,
+          email: form.email,
+        },
+        meta: {
+          is_self_login: false,
+        },
+        form_data: {
+          dob: form.dob,
+          location: form.location,
+          loanAmount: form.loanAmount,
+          courseName: form.courseName,
+          institutionName: form.institutionName,
+          countryName: form.countryName,
+          hasOtherLoan: form.hasOtherLoan,
+          otherLoanAmount: form.otherLoanAmount || "0",
+          coApplicantEmploymentType: form.coApplicantEmploymentType
+        }
+      };
+
+      await DashboardService.createLead(payload);
+      setShowSuccess(true);
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const fProps = (id: string) => ({ value: form[id], onChange: (v: string) => handleInputChange(id, v), error: errors[id] });
@@ -108,11 +141,11 @@ export default function EducationLoanForm({ onClose }: { onClose: () => void }) 
               </div>
             </div>
 
-            <div className="col-span-1 md:col-span-2 mt-4"><Field label="Co-Applicant Employment Type" type="select" options={["Salaried Person", "Self Employed", "Retired"]} {...fProps("coApplicantType")} required /></div>
+            <div className="col-span-1 md:col-span-2 mt-4"><Field label="Co-Applicant Employment Type" type="select" options={["Salaried Person", "Self Employed", "Retired"]} {...fProps("coApplicantEmploymentType")} required /></div>
 
-            {form.coApplicantType && (
+            {form.coApplicantEmploymentType && (
               <div className="col-span-1 md:col-span-2 mt-2">
-                <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Co-Applicant Documents ({form.coApplicantType})</h3>
+                <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Co-Applicant Documents ({form.coApplicantEmploymentType})</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   {coApplicantDocs.map(lbl => (
                     <FileUpload key={`co_${lbl}`} label={lbl} allowMultiple={!["Aadhar Card", "PAN Card"].includes(lbl)} onUpdate={(has: boolean) => handleDocUpdate("co", lbl, has)} error={errors[`doc_co_${lbl}`]} />

@@ -66,4 +66,34 @@ export const DashboardService = {
         return response.data;
     },
 
+
+    createLead: async (payload: {
+        department: string;
+        product_type: string;
+        sub_category: string;
+        client: {
+            name: string;
+            mobile: string;
+            email: string;
+        };
+        meta: {
+            is_self_login: boolean;
+        };
+        form_data: any;
+    }) => {
+        const response = await api.post("/api/dashboard/create-detail-lead", payload);
+        return response.data;
+    },
+
+    // 🔹 Get Detailed Leads
+    getMyLeads: async () => {
+        const response = await api.get("/api/dashboard/get-my-detail-leads");
+        return response.data;
+    },
+
+    getLeadDocuments: async (leadId: string) => {
+        const response = await api.get(`/api/dashboard/detail-lead/${leadId}/all-documents`);
+        return response.data;
+    },
+
 };

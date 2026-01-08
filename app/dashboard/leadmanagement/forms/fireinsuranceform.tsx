@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
+import { DashboardService } from "../../../services/dashboardService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -66,9 +67,37 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setShowSuccess(true);
-    setIsSubmitting(false);
+
+    try {
+      const payload = {
+        department: "Insurance",
+        product_type: "Fire Insurance",
+        sub_category: "Fire Insurance",
+        client: {
+          name: form.name,
+          mobile: form.phone || "",
+          email: form.email || "",
+        },
+        meta: {
+          is_self_login: false,
+        },
+        form_data: {
+          insuranceType: form.insuranceType,
+          address: form.address,
+          pincode: form.pincode,
+          sumInsured: form.sumInsured,
+          tenure: form.tenure
+        }
+      };
+
+      await DashboardService.createLead(payload);
+      setShowSuccess(true);
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const fieldProps = (name: string) => ({

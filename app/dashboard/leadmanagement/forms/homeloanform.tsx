@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown, ShieldCheck } from "lucide-react";
+import { DashboardService } from "../../../services/dashboardService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -10,9 +11,9 @@ const STYLES = {
 };
 
 const DOC_MAP: Record<string, string[]> = {
-  "Salaried Person": ["Aadhar Card", "Pan Card", "3 Months Salary Slip", "2 Years Form 16", "6 Months Banking Statement", "Address Proof", "Photograph", "Property Cost Sheet / Index II", "Own Contribution Proof"],
-  "Self Employed": ["Aadhar Card", "Pan Card", "Udyam Registration", "Shop Act Licence", "1 Current Banking Statement", "Saving Bank Account", "Address Proof", "3 Years ITR", "GST Certificate", "Last 12 Months GST Returns", "Photograph", "Property Cost Sheet / Index II", "Own Contribution Proof"],
-  "Pension": ["Aadhar Card", "Pan Card", "PPO (Pension Payment Order)", "1 Year Pension Credit Statement"],
+  "Salaried Person": ["Aadhaar Card", "Pan Card", "3 Months Salary Slip", "2 Years Form 16", "6 Months Banking Statement", "Address Proof", "Photograph", "Property Cost Sheet / Index II", "Own Contribution Proof"],
+  "Self Employed": ["Aadhaar Card", "Pan Card", "Udyam Registration", "Shop Act Licence", "1 Current Banking Statement", "Saving Bank Account", "Address Proof", "3 Years ITR", "GST Certificate", "Last 12 Months GST Returns", "Photograph", "Property Cost Sheet / Index II", "Own Contribution Proof"],
+  "Pension": ["Aadhaar Card", "Pan Card", "PPO (Pension Payment Order)", "1 Year Pension Credit Statement"],
   "Rental": ["Rent Agreement", "1 Year Rent Credit Statement"],
 };
 
@@ -52,23 +53,15 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
     const errs: Record<string, string> = {};
     const req = (f: string, msg: string) => { if (!form[f]?.trim()) errs[f] = msg; };
 
-    req("isSelfLogin", "Please select an option");
-
     if (isSelfLoginActive) {
-      // req("refId", "Ref ID is required");
       req("fileId", "File Number is required");
       req("clientName", "Name is required");
       req("location", "Location is required");
       req("loanAmount", "Loan Amount is required");
       req("bankName", "Bank Name is required");
       req("rmName", "RM/SM Name is required");
-
-      if (!form.rmContact) errs.rmContact = "Contact number is required";
-      else if (form.rmContact.length !== 10) errs.rmContact = "Must be 10 digits";
-
-      if (!form.rmEmail) errs.rmEmail = "Email is required";
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.rmEmail)) errs.rmEmail = "Invalid email";
-
+      if (!form.rmContact || form.rmContact.length !== 10) errs.rmContact = "Invalid contact";
+      if (!form.rmEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.rmEmail)) errs.rmEmail = "Invalid email";
     } else {
       req("loanType", "Select a loan type");
       req("clientName", "Client Name is required");
@@ -76,16 +69,9 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
       req("dob", "Date of Birth is required");
       req("loanAmount", "Loan Amount is required");
       req("employmentType", "Employment Type is required");
-
-      if (!form.phone) errs.phone = "Phone number is required";
-      else if (form.phone.length !== 10) errs.phone = "Phone number must be 10 digits";
-
-      if (!form.email) errs.email = "Email is required";
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email";
-
-      if (!form.hasOtherLoan) errs.hasOtherLoan = "Select an option";
+      if (!form.phone || form.phone.length !== 10) errs.phone = "Invalid phone";
+      if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email";
       if (form.hasOtherLoan === "Yes" && !form.otherLoanAmount) errs.otherLoanAmount = "Amount required";
-
       requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
     }
 
@@ -93,13 +79,60 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
     return Object.keys(errs).length === 0;
   };
 
+  // Inside homeloanform.tsx -> handleSubmit function
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setShowSuccess(true);
-    setIsSubmitting(false);
+
+    try {
+      const isSelfLoginActive = form.isSelfLogin === "Yes";
+
+      // Transform the data to match the new structure
+      const payload = {
+        department: "Loan", // Categorized under Loan
+        product_type: "Home Loan", // Matches the CORPORATE_INSURANCE logic
+        sub_category: "Home Loan",
+        client: {
+          name: form.clientName,
+          // Using RM details for contact if Self Login, else Client details
+          mobile: isSelfLoginActive ? form.rmContact : form.phone,
+          email: isSelfLoginActive ? form.rmEmail : form.email,
+        },
+        meta: {
+          is_self_login: isSelfLoginActive,
+        },
+        form_data: isSelfLoginActive ? {
+          // Fields specific to Self Login
+          refId: form.refId,
+          fileId: form.fileId,
+          bankName: form.bankName,
+          rmName: form.rmName,
+          location: form.location,
+          loanAmount: form.loanAmount,
+        } : {
+          // Fields specific to Normal Referral
+          loanType: form.loanType,
+          dob: form.dob,
+          location: form.location,
+          loanAmount: form.loanAmount,
+          employmentType: form.employmentType,
+          hasOtherLoan: form.hasOtherLoan,
+          otherLoanAmount: form.otherLoanAmount,
+          otherIncome: form.otherIncome || "N/A",
+          otherIncomeAmount: form.otherIncomeAmount || "0"
+        }
+      };
+
+      await DashboardService.createLead(payload);
+      setShowSuccess(true);
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const fieldProps = (name: string) => ({
@@ -118,23 +151,13 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-
-            {/* HIGHLIGHTED SELF LOGIN SECTION */}
+            
             <div className="col-span-1 md:col-span-2 bg-[#1CADA3]/5 border-l-4 border-[#1CADA3] p-4 rounded-r-lg shadow-sm mb-2">
               <div className="flex items-center gap-2 mb-2">
                 <ShieldCheck className="text-[#1CADA3]" size={20} />
                 <span className="text-sm font-bold text-[#1CADA3] uppercase tracking-wide">Direct Submission</span>
               </div>
-              <Field
-                label="Self Login to Bank?"
-                type="select"
-                options={["No", "Yes"]}
-                {...fieldProps("isSelfLogin")}
-                required
-              />
-              <p className="text-[11px] text-gray-500 mt-2 italic">
-                Select "Yes" if you have already initiated the login process with the bank and have a Reference ID.
-              </p>
+              <Field label="Self Login to Bank?" type="select" options={["No", "Yes"]} {...fieldProps("isSelfLogin")} required />
             </div>
 
             {isSelfLoginActive ? (
@@ -180,7 +203,7 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
                     <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Upload Documents</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       {requiredDocs.map(lbl => (
-                        <FileUpload key={lbl} label={lbl} allowMultiple={!["Aadhar Card", "Pan Card"].includes(lbl)} onUpdate={(has: any) => {
+                        <FileUpload key={lbl} label={lbl} allowMultiple={!["Aadhaar Card", "Pan Card"].includes(lbl)} onUpdate={(has: any) => {
                           setUploadedDocs(p => ({ ...p, [lbl]: has }));
                           if (has) setErrors(p => ({ ...p, [`doc_${lbl}`]: "" }));
                         }} error={errors[`doc_${lbl}`]} />
@@ -202,7 +225,6 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
   );
 }
 
-// Helper components (Field, FileUpload, SuccessModal) remain the same
 function Field({ label, value, onChange, type = "text", options, required, placeholder, onlyNumber, maxLength, error }: any) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
@@ -232,6 +254,7 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState("");
   const ref = useRef<HTMLInputElement>(null);
+  
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = Array.from(e.target.files || []);
     if (!newFiles.length) return;
@@ -242,11 +265,13 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
     setFileError("");
     e.target.value = "";
   };
+
   const removeFile = (idx: number) => {
     const updated = files.filter((_, i) => i !== idx);
     setFiles(updated);
     onUpdate(updated.length > 0);
   };
+
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium mb-1 text-gray-700 flex justify-between">

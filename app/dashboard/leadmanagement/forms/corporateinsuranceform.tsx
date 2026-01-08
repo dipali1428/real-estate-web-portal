@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, ChevronDown, Download, Info, AlertCircle, Loader2 } from "lucide-react";
+import { DashboardService } from "../../../services/dashboardService";
 
 /**
  * CSS Fix to hide number input spinners globally for this component
@@ -134,9 +135,40 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
-    await new Promise(r => setTimeout(r, 1500));
-    setIsSubmitting(false);
-    setShowSuccess(true);
+
+    try {
+      const payload = {
+        department: "Insurance",
+        product_type: "Corporate Insurance",
+        sub_category: "Corporate Insurance",
+        client: {
+          name: form.insuredName,
+          mobile: form.contactMobile || "",
+          email: form.contactEmail || "",
+        },
+        meta: {
+          is_self_login: false,
+        },
+        form_data: {
+          insuranceType: form.insuranceType,
+          insuredAddress: form.insuredAddress,
+          businessNature: form.businessNature,
+          pincode: form.pincode,
+          riskLocation: form.riskLocation,
+          contactName: form.contactName,
+          policyType: form.policyType,
+          sumInsured: form.sumInsured
+        }
+      };
+
+      await DashboardService.createLead(payload);
+      setShowSuccess(true);
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

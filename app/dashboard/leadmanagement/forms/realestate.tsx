@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { X } from "lucide-react";
+import { DashboardService } from "../../../services/dashboardService";
 
 export default function RealEstateForm({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ export default function RealEstateForm({ onClose }: { onClose: () => void }) {
   };
 
   // Validate before submit - matching Personal Loan behavior
-  const submitForm = (e: any) => {
+  const submitForm = async (e: any) => {
     e.preventDefault();
     setError(false);
     setSuccess(false);
@@ -56,7 +57,34 @@ export default function RealEstateForm({ onClose }: { onClose: () => void }) {
     }
 
     // If all good
-    setSuccess(true);
+    try {
+      const payload = {
+        department: "Investment",
+        product_type: "Real Estate",
+        sub_category: "Real Estate",
+        client: {
+          name: formData.clientName,
+          mobile: formData.phone,
+          email: formData.email,
+        },
+        meta: {
+          is_self_login: false,
+        },
+        form_data: {
+          dob: formData.dob,
+          location: formData.location,
+          capitalAvailable: formData.capitalAvailable,
+          appointmentDate: formData.appointmentDate,
+          realestateType: formData.realestateType
+        }
+      };
+
+      await DashboardService.createLead(payload);
+      setSuccess(true);
+    } catch (err) {
+      console.error("Submission error:", err);
+      setError(true);
+    }
   };
 
   return (

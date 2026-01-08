@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
+import { DashboardService } from "../../../services/dashboardService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -48,7 +49,8 @@ export default function LoanAgainstSecuritiesForm({ onClose }: { onClose: () => 
     if (!form.hasOtherLoan) errs.hasOtherLoan = "Select an option";
     if (form.hasOtherLoan === "Yes" && !form.otherLoanAmount) errs.otherLoanAmount = "Existing loan amount is required";
 
-    requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
+    // DOCUMENT VALIDATION REMOVED HERE
+    
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -57,9 +59,37 @@ export default function LoanAgainstSecuritiesForm({ onClose }: { onClose: () => 
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setShowSuccess(true);
-    setIsSubmitting(false);
+
+    try {
+      const payload = {
+        department: "Loan",
+        product_type: "Loan Against Securities",
+        sub_category: "Loan Against Securities",
+        client: {
+          name: form.clientName,
+          mobile: form.phone,
+          email: form.email,
+        },
+        meta: {
+          is_self_login: false,
+        },
+        form_data: {
+          dob: form.dob,
+          location: form.location,
+          loanAmount: form.loanAmount,
+          hasOtherLoan: form.hasOtherLoan,
+          otherLoanAmount: form.otherLoanAmount || "0"
+        }
+      };
+
+      await DashboardService.createLead(payload);
+      setShowSuccess(true);
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const fProps = (id: string) => ({ value: form[id], onChange: (v: string) => handleInputChange(id, v), error: errors[id] });
@@ -84,13 +114,12 @@ export default function LoanAgainstSecuritiesForm({ onClose }: { onClose: () => 
             {form.hasOtherLoan === "Yes" && <Field label="Existing Loan Amount" placeholder="Enter amount" onlyNumber {...fProps("otherLoanAmount")} required />}
 
             <div className="col-span-1 md:col-span-2 mt-4">
-              <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Upload Documents <span className="text-sm font-normal text-gray-500 ml-2">(Max 180KB)</span></h3>
+              <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Upload Documents <span className="text-sm font-normal text-gray-500 ml-2">(Max 180KB - Optional)</span></h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {requiredDocs.map(lbl => (
                   <FileUpload key={lbl} label={lbl} allowMultiple={!["Aadhar Card", "PAN Card"].includes(lbl)} onUpdate={(has: any) => {
                     setUploadedDocs(p => ({ ...p, [lbl]: has }));
-                    if (has) setErrors(p => ({ ...p, [`doc_${lbl}`]: "" }));
-                  }} error={errors[`doc_${lbl}`]} />
+                  }} />
                 ))}
               </div>
             </div>
@@ -132,7 +161,7 @@ function Field({ label, value, onChange, type = "text", options, required, place
   );
 }
 
-function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
+function FileUpload({ label, allowMultiple, onUpdate }: any) {
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState("");
   const ref = useRef<HTMLInputElement>(null);
@@ -158,15 +187,15 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
   return (
     <div className="flex flex-col">
       <label className={STYLES.label + " flex justify-between"}>
-        <span>{label} <span className="text-red-500">*</span></span>
+        <span>{label}</span>
         <span className="text-[10px] text-gray-400 font-normal">{allowMultiple ? "(Multiple, <180KB)" : "(<180KB)"}</span>
       </label>
       <input type="file" ref={ref} multiple={allowMultiple} onChange={handleFiles} className="hidden" accept="image/*,application/pdf" />
       <div className="flex flex-col gap-2">
         {files.length === 0 && (
-          <div onClick={() => ref.current?.click()} className={`cursor-pointer border border-dashed rounded-md h-10 flex items-center justify-center gap-2 bg-gray-50 transition-colors group ${error ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-[#1CADA3]"}`}>
-            <UploadCloud size={16} className={error ? "text-red-400" : "text-gray-400 group-hover:text-[#1CADA3]"} />
-            <span className={`text-xs font-medium ${error ? "text-red-500" : "text-gray-500 group-hover:text-[#1CADA3]"}`}>{error ? "Upload Required" : "Choose File"}</span>
+          <div onClick={() => ref.current?.click()} className="cursor-pointer border border-dashed rounded-md h-10 flex items-center justify-center gap-2 bg-gray-50 transition-colors group border-gray-300 hover:border-[#1CADA3]">
+            <UploadCloud size={16} className="text-gray-400 group-hover:text-[#1CADA3]" />
+            <span className="text-xs font-medium text-gray-500 group-hover:text-[#1CADA3]">Choose File</span>
           </div>
         )}
         {files.map((f, i) => (
@@ -183,7 +212,7 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
         )}
         {!allowMultiple && files.length > 0 && <button type="button" onClick={() => ref.current?.click()} className="text-[10px] text-blue-600 hover:underline text-right">Change file</button>}
       </div>
-      {(fileError || (error && !fileError)) && <span className="text-xs text-red-500 mt-1">{fileError || error}</span>}
+      {fileError && <span className="text-xs text-red-500 mt-1">{fileError}</span>}
     </div>
   );
 }

@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, CheckCircle, ChevronDown, Loader2 } from "lucide-react";
+import { DashboardService } from "../../../services/dashboardService";
+
+const STYLES = {
+  input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
+  label: "block text-sm font-medium mb-1 text-gray-700",
+  btn: "w-full sm:w-60 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center",
+  err: "text-red-500 text-xs mt-1"
+};
 
 interface TravelInsuranceFormProps {
   onClose: () => void;
@@ -18,204 +26,255 @@ export default function TravelInsuranceForm({ onClose }: TravelInsuranceFormProp
     duration: "",
     transport: "",
     sumAssured: "",
-    notRobot: false,
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleInput = (field: string, value: string | boolean) => {
-    setFormData({ ...formData, [field]: value });
-    setErrors({ ...errors, [field]: "" });
+  const handleInput = (field: string, value: string) => {
+    const finalValue = field === "email" ? value.toLowerCase() : value;
+    setFormData({ ...formData, [field]: finalValue });
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const validateForm = () => {
     const newErrors: any = {};
+    const req = (f: string, msg: string) => { if (!formData[f as keyof typeof formData]) newErrors[f] = msg; };
 
-    if (!formData.name) newErrors.name = "Client name is required";
-    if (!formData.phone) newErrors.phone = "Phone number is required";
-    else if (formData.phone.length !== 10) newErrors.phone = "Phone number must be 10 digits";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.dob) newErrors.dob = "Date of birth is required";
-    if (!formData.location) newErrors.location = "Location is required";
-    if (!formData.duration) newErrors.duration = "Duration of travel is required";
-    if (!formData.transport) newErrors.transport = "Transport mode is required";
-    if (!formData.sumAssured) newErrors.sumAssured = "Sum assured is required";
+    req("name", "Client name is required");
+    req("email", "Email is required");
+    req("dob", "Date of birth is required");
+    req("location", "Location is required");
+    req("duration", "Duration of travel is required");
+    req("transport", "Transport mode is required");
+    req("sumAssured", "Sum assured is required");
 
-    if (!formData.notRobot)
-      newErrors.notRobot = "Please confirm you are not a robot";
+    if (!formData.phone) {
+        newErrors.phone = "Phone number is required";
+    } else if (formData.phone.length !== 10) {
+        newErrors.phone = "Phone number must be 10 digits";
+    }
 
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
-  const submitForm = (e: any) => {
+  const submitForm = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
-      setSuccess("Form submitted successfully! 🎉");
-    } else {
-      setSuccess("");
+      setLoading(true);
+      try {
+        // Updated payload to match HomeLoanForm / createLead structure
+        const payload = {
+          department: "Insurance",
+          product_type: "Travel Insurance",
+          sub_category: "Travel Insurance",
+          client: {
+            name: formData.name,
+            mobile: formData.phone,
+            email: formData.email,
+          },
+          meta: {
+            is_self_login: false,
+          },
+          form_data: {
+            dob: formData.dob,
+            location: formData.location,
+            designation: formData.designation,
+            duration: formData.duration,
+            transport: formData.transport,
+            sumAssured: `${formData.sumAssured}.00`,
+          }
+        };
+
+        // Using the same generic createLead API used in HomeLoanForm
+        await DashboardService.createLead(payload);
+        setShowSuccess(true);
+      } catch (error: any) {
+        setErrors({ api: error.response?.data?.message || "Something went wrong. Please try again." });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto my-auto flex flex-col relative max-h-[90vh]">
         
-        {/* Header */}
-        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
+        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white rounded-t-xl">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Travel Insurance Form</h2>
-          <button className="text-gray-500 hover:text-gray-800" onClick={onClose}>
+          <button className="text-gray-500 hover:text-gray-800 transition-colors" onClick={onClose} disabled={loading}>
             <X size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto">
-          <form className="p-4 sm:p-6" onSubmit={submitForm}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 text-gray-700">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <form className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6" onSubmit={submitForm}>
+            
+            <Field 
+              label="Client Name" 
+              placeholder="Enter client name" 
+              value={formData.name} 
+              onChange={(v: string) => handleInput("name", v)} 
+              error={errors.name} 
+              required 
+            />
 
-              {/* Name */}
-              <div className="w-full">
-                <label className="font-medium block mb-1">Client Name</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
-                  placeholder="Enter client name"
-                  value={formData.name}
-                  onChange={(e) => handleInput("name", e.target.value)}
-                />
-                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-              </div>
+            <Field 
+              label="Phone Number" 
+              placeholder="Enter 10-digit phone number" 
+              value={formData.phone} 
+              onChange={(v: string) => handleInput("phone", v.replace(/\D/g, ""))} 
+              maxLength={10}
+              onlyNumber
+              error={errors.phone} 
+              required 
+            />
 
-              {/* Phone */}
-              <div className="w-full">
-                <label className="font-medium block mb-1">Phone Number</label>
-                <input
-                  type="tel"
-                  maxLength={10}
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
-                  placeholder="Enter 10-digit phone number"
-                  value={formData.phone}
-                  onChange={(e) => handleInput("phone", e.target.value.replace(/\D/g, ""))}
-                />
-                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-              </div>
+            <Field 
+              label="Email ID" 
+              type="email"
+              placeholder="enter email address" 
+              value={formData.email} 
+              onChange={(v: string) => handleInput("email", v)} 
+              error={errors.email} 
+              required 
+            />
 
-              {/* Email */}
-              <div className="w-full">
-                <label className="font-medium block mb-1">Email ID</label>
-                <input
-                  type="email"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
-                  placeholder="Enter email address"
-                  value={formData.email}
-                  onChange={(e) => handleInput("email", e.target.value)}
-                />
-                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-              </div>
+            <Field 
+              label="Date of Birth" 
+              type="date"
+              value={formData.dob} 
+              onChange={(v: string) => handleInput("dob", v)} 
+              error={errors.dob} 
+              required 
+            />
 
-              {/* DOB */}
-              <div className="w-full">
-                <label className="font-medium block mb-1">Date of Birth</label>
-                <input
-                  type="date"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
-                  value={formData.dob}
-                  onChange={(e) => handleInput("dob", e.target.value)}
-                />
-                {errors.dob && <p className="text-red-500 text-xs mt-1">{errors.dob}</p>}
-              </div>
+            <Field 
+              label="Location" 
+              placeholder="Enter your location" 
+              value={formData.location} 
+              onChange={(v: string) => handleInput("location", v)} 
+              error={errors.location} 
+              required 
+            />
 
-              {/* Location */}
-              <div className="w-full">
-                <label className="font-medium block mb-1">Location</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
-                  placeholder="Enter your location"
-                  value={formData.location}
-                  onChange={(e) => handleInput("location", e.target.value)}
-                />
-                {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location}</p>}
-              </div>
+            <Field 
+              label="Designation" 
+              placeholder="Enter designation" 
+              value={formData.designation} 
+              onChange={(v: string) => handleInput("designation", v)} 
+              error={errors.designation} 
+            />
 
-              {/* Designation */}
-              <div className="w-full">
-                <label className="font-medium block mb-1">Designation</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
-                  placeholder="Enter designation"
-                  value={formData.designation}
-                  onChange={(e) => handleInput("designation", e.target.value)}
-                />
-                {errors.designation && <p className="text-red-500 text-xs mt-1">{errors.designation}</p>}
-              </div>
+            <Field 
+              label="Duration Of Travel" 
+              placeholder="Enter duration (e.g. 15 days)" 
+              value={formData.duration} 
+              onChange={(v: string) => handleInput("duration", v)} 
+              error={errors.duration} 
+              required 
+            />
 
-              {/* Duration */}
-              <div className="w-full">
-                <label className="font-medium block mb-1">Duration Of Travel</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
-                  placeholder="Enter duration of travel"
-                  value={formData.duration}
-                  onChange={(e) => handleInput("duration", e.target.value)}
-                />
-                {errors.duration && <p className="text-red-500 text-xs mt-1">{errors.duration}</p>}
-              </div>
+            <Field 
+              label="Mode Of Transport" 
+              type="select"
+              options={["Air", "Sea", "Land"]}
+              value={formData.transport} 
+              onChange={(v: string) => handleInput("transport", v)} 
+              error={errors.transport} 
+              required 
+            />
 
-              {/* Transport */}
-              <div className="w-full">
-                <label className="font-medium block mb-1">Mode Of Transport</label>
-                <select
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
-                  value={formData.transport}
-                  onChange={(e) => handleInput("transport", e.target.value)}
-                >
-                  <option value="">Select transport mode</option>
-                  <option value="Air">Air</option>
-                  <option value="Sea">Sea</option>
-                  <option value="Land">Land</option>
-                </select>
-                {errors.transport && <p className="text-red-500 text-xs mt-1">{errors.transport}</p>}
-              </div>
+            <Field 
+              label="Sum Assured Amount" 
+              type="number"
+              placeholder="Enter amount" 
+              value={formData.sumAssured} 
+              onlyNumber
+              onChange={(v: string) => handleInput("sumAssured", v)} 
+              error={errors.sumAssured} 
+              required 
+            />
 
-              {/* Sum Assured */}
-              <div className="w-full">
-                <label className="font-medium block mb-1">Sum Assured Amount</label>
-                <input
-                  type="number"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm sm:text-base focus:ring-2 focus:ring-[#1CADA3] focus:border-transparent"
-                  placeholder="Enter sum assured amount"
-                  value={formData.sumAssured}
-                  onChange={(e) => handleInput("sumAssured", e.target.value)}
-                />
-                {errors.sumAssured && <p className="text-red-500 text-xs mt-1">{errors.sumAssured}</p>}
-              </div>
+            <div className="col-span-1 md:col-span-2 mt-4 flex flex-col items-center pb-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className={STYLES.btn}
+              >
+                {loading ? <Loader2 className="animate-spin mr-2" size={18} /> : "Submit Application"}
+              </button>
 
-              {/* Submit Button */}
-              <div className="col-span-1 md:col-span-2 mt-4 flex justify-center">
-                <button
-                  type="submit"
-                  className="w-full sm:w-50 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base"
-                >
-                  Submit
-                </button>
-              </div>
-
-              {/* Success Message */}
-              {success && (
-                <p className="col-span-1 md:col-span-2 text-green-600 text-center font-medium mt-2 text-sm sm:text-base">
-                  {success}
-                </p>
-              )}
+              {errors.api && <p className={STYLES.err}>{errors.api}</p>}
             </div>
           </form>
         </div>
+
+        {showSuccess && <SuccessModal onClose={onClose} />}
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, value, onChange, type = "text", options, required, placeholder, onlyNumber, maxLength, error, disabled }: any) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
+  };
+
+  return (
+    <div className={`w-full relative ${disabled ? 'opacity-70' : ''}`}>
+      <label className={STYLES.label}>
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      <div className="relative">
+        {type === "select" ? (
+          <>
+            <select
+              value={value}
+              onChange={e => onChange(e.target.value)}
+              disabled={disabled}
+              className={`${STYLES.input(!!error)} cursor-pointer`}
+            >
+              <option value="">{placeholder || `Select ${label}`}</option>
+              {options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
+          </>
+        ) : (
+          <input
+            type={type}
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            maxLength={maxLength}
+            placeholder={placeholder}
+            disabled={disabled}
+            className={STYLES.input(!!error)}
+          />
+        )}
+      </div>
+      {error && <p className={STYLES.err}>{error}</p>}
+    </div>
+  );
+}
+
+function SuccessModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 rounded-xl animate-in fade-in zoom-in duration-200 p-4">
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full">
+        <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">Success!</h3>
+        <p className="text-gray-600 mb-6">Your Travel Insurance lead has been submitted successfully.</p>
+        <button 
+          onClick={onClose} 
+          className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:bg-[#178e86] font-medium transition-colors"
+        >
+          Okay, Got it
+        </button>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
+import { DashboardService } from "../../../services/dashboardService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -77,9 +78,66 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setShowSuccess(true);
-    setIsSubmitting(false);
+
+    try {
+      // Create a dynamic form data object to avoid sending NA to backend
+      const dynamicFormData: Record<string, any> = {
+        planType: form.planType,
+        proposerName: form.proposerName,
+        dob: form.dob,
+        profession: form.profession,
+        income: form.income,
+        policyTerm: form.policyTerm,
+        ppt: form.ppt,
+      };
+
+      // Add Term-specific fields ONLY if applicable
+      if (showTermFields) {
+        dynamicFormData.education = form.education;
+        dynamicFormData.incomeProof = form.incomeProof;
+        dynamicFormData.sumAssured = form.sumAssured;
+        dynamicFormData.smokerStatus = form.smokerStatus;
+        dynamicFormData.drinkerStatus = form.drinkerStatus;
+        dynamicFormData.existingDisease = form.existingDisease;
+      }
+
+      // Add Investment-specific fields ONLY if applicable
+      if (showInvestmentFields) {
+        dynamicFormData.investmentOption = form.investmentOption;
+        if (form.investmentOption === "Investment Budget") {
+          dynamicFormData.investmentBudget = form.investmentBudget;
+        } else {
+          if (form.planType === "Pension Plan") {
+            dynamicFormData.requiredPension = form.requiredPension;
+          } else {
+            dynamicFormData.requiredMaturity = form.requiredMaturity;
+          }
+        }
+      }
+
+      const payload = {
+        department: "Insurance",
+        product_type: "Life Insurance",
+        sub_category: "Life Insurance",
+        client: {
+          name: form.proposerName,
+          mobile: (form as any).phone || "NA",
+          email: (form as any).email || "NA",
+        },
+        meta: {
+          is_self_login: false,
+        },
+        form_data: dynamicFormData // Sends only the filtered data
+      };
+
+      await DashboardService.createLead(payload);
+      setShowSuccess(true);
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const fieldProps = (name: string) => ({

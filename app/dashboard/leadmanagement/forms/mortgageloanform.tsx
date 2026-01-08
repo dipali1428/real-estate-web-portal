@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown, ShieldCheck } from "lucide-react";
+import { DashboardService } from "../../../services/dashboardService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -97,9 +98,47 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setShowSuccess(true);
-    setIsSubmitting(false);
+
+    try {
+      const isSelfLoginActive = form.isSelfLogin === "Yes";
+      const payload = {
+        department: "Loan",
+        product_type: "Mortgage Loan",
+        sub_category: "Mortgage Loan",
+        client: {
+          name: form.name,
+          mobile: isSelfLoginActive ? form.rmContact : form.phone,
+          email: isSelfLoginActive ? form.rmEmail : form.email,
+        },
+        meta: {
+          is_self_login: isSelfLoginActive,
+        },
+        form_data: isSelfLoginActive ? {
+          fileId: form.fileId,
+          bankName: form.bankName,
+          rmName: form.rmName,
+          location: form.location,
+          loanAmount: form.loanAmount,
+        } : {
+          dob: form.dob,
+          location: form.location,
+          loanAmount: form.loanAmount,
+          useOfFund: form.useOfFund,
+          applicationType: form.applicationType,
+          employmentType: form.employmentType,
+          otherIncomeSource: form.otherIncomeSource || "N/A",
+          otherIncomeAmount: form.otherIncomeAmount || "0"
+        }
+      };
+
+      await DashboardService.createLead(payload);
+      setShowSuccess(true);
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const fProps = (id: string) => ({

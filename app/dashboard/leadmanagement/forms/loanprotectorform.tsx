@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { X, CheckCircle, ChevronDown } from "lucide-react";
+import { DashboardService } from "../../../services/dashboardService";
 
 const STYLES = {
     input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -68,9 +69,38 @@ export default function LoanProtectorForm({ onClose }: { onClose: () => void }) 
         e.preventDefault();
         if (!validate()) return;
         setIsSubmitting(true);
-        await new Promise(r => setTimeout(r, 1200));
+
+      try {
+        const payload = {
+          department: "Insurance",
+          product_type: "Loan Protector",
+          sub_category: "Loan Protector",
+          client: {
+            name: form.name,
+            mobile: form.phone || "",
+            email: form.email || "",
+          },
+          meta: {
+            is_self_login: false,
+          },
+          form_data: {
+            dob: form.dob,
+            pincode: form.pincode,
+            loanAmount: form.loanAmount,
+            loanAccountNumber: form.loanAccountNumber,
+            loanType: form.loanType,
+            loanTenure: form.loanTenure
+          }
+        };
+
+        await DashboardService.createLead(payload);
         setShowSuccess(true);
+      } catch (err) {
+        console.error("Submission error:", err);
+        alert("Something went wrong. Please try again.");
+      } finally {
         setIsSubmitting(false);
+      }
     };
 
     const fieldProps = (name: string) => ({
