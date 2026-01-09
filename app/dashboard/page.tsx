@@ -109,8 +109,7 @@ export default function Dashboard() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
                    
-                    className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white"
-                >
+                    className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white">
                     <div className="absolute bottom-4 right-6 text-xs sm:text-sm font-mono text-white/90 bg-black/20 px-2 py-1 rounded-md border border-white/10">
                         ID: <span className="text-white-400 font-bold ml-1">
                             {loading ? "..." : (user?.adv_id || "N/A")}
@@ -125,7 +124,7 @@ export default function Dashboard() {
                     </p>
                 </motion.div>
 
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-4">
                         <div className="relative group">
                             <div className="absolute right-0 top-full mt-2 w-64 sm:w-80 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
