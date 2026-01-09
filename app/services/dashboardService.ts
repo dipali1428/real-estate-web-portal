@@ -55,17 +55,16 @@ export const DashboardService = {
         return response.data;
     },
 
-     // 🔹 Get Assigned Relationship Manager
+    // 🔹 Get Assigned Relationship Manager
     getAssignedRM: async () => {
         const response = await api.get("/api/dashboard/get-assigned-rm");
         return response.data;
     },
 
-    //  getAllClientDetails: async () => {
-    //     const response = await api.get("/api/dashboard/all-client-detail");
-    //     return response.data;
-    // },
-
+    getAllClientDetails: async () => {
+        const response = await api.get("/api/dashboard/all-client-detail");
+        return response.data;
+    },
 
     createLead: async (payload: {
         department: string;
