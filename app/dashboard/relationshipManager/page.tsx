@@ -134,7 +134,7 @@ const RelationshipManager: React.FC = () => {
     },
     {
       id: '7',
-      name: 'Rakhi Wankhade',
+      name: 'Rakhi Raut',
       phone: '+91 80107 12260',
       designation: 'Operation Manager',
       specialization: 'Home Loan & LAP Loan '

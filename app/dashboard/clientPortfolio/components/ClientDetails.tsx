@@ -114,10 +114,19 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                                 <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-slate-600">
                                     {item.lead_id}
                                 </td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-slate-900">{item.source}</div>
-                                    
-                                </td>
+                               <td className="px-4 py-4 whitespace-nowrap">
+                                        {item.source?.toLowerCase() === 'detail lead' ? (
+                                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-green-100 text-green-700">
+                                                {item.source}
+                                            </span>
+                                        ) : item.source?.toLowerCase() === 'referral lead' ? (
+                                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-blue-100 text-blue-700">
+                                                {item.source}
+                                            </span>
+                                        ) : (
+                                            <div className="text-sm text-slate-900">{item.source}</div>
+                                        )}
+                                    </td>
                                 <td className="px-4 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
                                        
