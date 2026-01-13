@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
-import { DashboardService } from "../../../services/dashboardService";
+import { AuthService } from "@/app/services/authService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -13,12 +13,32 @@ const STYLES = {
 const BASE_DOCS = ["Aadhar Card", "PAN Card", "Udyam Aadhar Registration", "Shop Act Licence", "1 Year Banking Statement", "Address Proof", "ITR 3 Years", "Photograph"];
 const BIZ_TYPES = ["Proprietorship", "Partnership", "Pvt. Ltd."];
 
-export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
+interface BusinessLoanFormProps {
+  onClose: () => void;
+  prefilledData?: {
+    name: string;
+    email: string;
+    mobile: string;
+  };
+}
+
+export default function BusinessLoanForm({ onClose, prefilledData }: BusinessLoanFormProps) {
   const [form, setForm] = useState<Record<string, string>>({
-    name: "", phone: "", email: "", dob: "", location: "", loanAmount: "",
-    deduction: "", companyName: "", companyAddress: "", businessStartDate: "",
-    loanType: "", hasOtherLoan: "", otherLoanAmount: ""
+    name: prefilledData?.name || "", 
+    phone: prefilledData?.mobile || "", 
+    email: prefilledData?.email || "", 
+    dob: "", 
+    location: "", 
+    loanAmount: "",
+    deduction: "", 
+    companyName: "", 
+    companyAddress: "", 
+    businessStartDate: "",
+    loanType: "", 
+    hasOtherLoan: "", 
+    otherLoanAmount: ""
   });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,16 +70,12 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
     req("deduction", "Deduction details are required");
     req("companyAddress", "Company Address is required");
 
-    if (!form.phone) errs.phone = "Phone number is required";
-    else if (form.phone.length !== 10) errs.phone = "Phone number must be exactly 10 digits";
-
-    if (!form.email) errs.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email format";
+    if (!form.phone || form.phone.length !== 10) errs.phone = "Invalid phone number";
+    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email";
 
     if (!form.hasOtherLoan) errs.hasOtherLoan = "Select an option";
-    if (form.hasOtherLoan === "Yes" && !form.otherLoanAmount) errs.otherLoanAmount = "Existing loan amount is required";
+    if (form.hasOtherLoan === "Yes" && !form.otherLoanAmount) errs.otherLoanAmount = "Required";
 
-    // requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -79,24 +95,11 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
           mobile: form.phone,
           email: form.email,
         },
-        meta: {
-          is_self_login: false,
-        },
-        form_data: {
-          dob: form.dob,
-          location: form.location,
-          loanAmount: form.loanAmount,
-          deduction: form.deduction,
-          companyName: form.companyName,
-          companyAddress: form.companyAddress,
-          businessStartDate: form.businessStartDate,
-          loanType: form.loanType,
-          hasOtherLoan: form.hasOtherLoan,
-          otherLoanAmount: form.otherLoanAmount || "0"
-        }
+        meta: { is_self_login: false },
+        form_data: { ...form }
       };
 
-      await DashboardService.createLead(payload);
+      await AuthService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
       console.error("Submission error:", err);
@@ -117,7 +120,7 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col relative">
         <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white rounded-t-xl">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Business Loan Form</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800"><X size={20} className="sm:w-6 sm:h-6" /></button>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors"><X size={20} /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
@@ -131,7 +134,7 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
             <Field label="Location" placeholder="Enter city" {...fieldProps("location")} required />
             <Field label="Loan Amount" placeholder="Desired amount" onlyNumber {...fieldProps("loanAmount")} required />
             <Field label="Company Name" placeholder="Enter company name" {...fieldProps("companyName")} required />
-            <Field label="Deduction Details" placeholder="Salary deduction details" {...fieldProps("deduction")} required />
+            <Field label="Deduction Details" placeholder="Business details" {...fieldProps("deduction")} required />
             
             <div className="col-span-1 md:col-span-2">
               <Field label="Company Address" placeholder="Enter company address" {...fieldProps("companyAddress")} required />
@@ -141,7 +144,7 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
             {form.hasOtherLoan === "Yes" && <Field label="Existing Loan Amount" placeholder="Enter amount" onlyNumber {...fieldProps("otherLoanAmount")} required />}
 
             <div className="col-span-1 md:col-span-2 mt-4">
-              <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Upload Documents <span className="text-sm font-normal text-gray-500 ml-2">(Max 180KB)</span></h3>
+              <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Upload Documents</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {requiredDocs.map(lbl => (
                   <FileUpload key={lbl} label={lbl} allowMultiple={!["Aadhar Card", "PAN Card"].includes(lbl)} onUpdate={(has: any) => {
@@ -157,13 +160,12 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
             </div>
           </form>
         </div>
+        
         {showSuccess && <SuccessModal onClose={onClose} />}
       </div>
     </div>
   );
 }
-
-// --- Sub-components (Optimized) ---
 
 function Field({ label, value, onChange, type = "text", options, required, placeholder, onlyNumber, maxLength, error }: any) {
   return (
@@ -172,9 +174,9 @@ function Field({ label, value, onChange, type = "text", options, required, place
       <div className="relative">
         {type === "select" ? (
           <>
-            <select value={value} onChange={e => onChange(e.target.value)} className={`${STYLES.input(!!error)} cursor-pointer`}>
+            <select value={value} onChange={e => onChange(e.target.value)} className={`${STYLES.input(!!error)} cursor-pointer font-medium text-[#1CADA3]`}>
               <option value="">Select {label}</option>
-              {options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
+              {options?.map((opt: string) => <option key={opt} value={opt} className="text-gray-700">{opt}</option>)}
             </select>
             <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
           </>
@@ -198,8 +200,6 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
     const newFiles = Array.from(e.target.files || []);
     if (!newFiles.length) return;
     if (newFiles.some(f => f.size > 184320)) return setFileError("Max file size: 180KB");
-    if (allowMultiple && files.length + newFiles.length > 8) return setFileError("Limit: 8 files.");
-    
     const updated = allowMultiple ? [...files, ...newFiles] : [newFiles[0]];
     setFiles(updated);
     onUpdate(true);
@@ -216,7 +216,7 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium mb-1 text-gray-700 flex justify-between">
-        <span>{label} <span className="text-red-500"></span></span>
+        <span>{label}</span>
         <span className="text-[10px] text-gray-400 font-normal">{allowMultiple ? "(Multiple, <180KB)" : "(<180KB)"}</span>
       </label>
       <input type="file" ref={ref} multiple={allowMultiple} onChange={handleFiles} className="hidden" accept="image/*,application/pdf" />
@@ -239,7 +239,6 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
         {allowMultiple && files.length > 0 && files.length < 8 && (
           <button type="button" onClick={() => ref.current?.click()} className="flex justify-center gap-1 text-[11px] font-medium text-[#1CADA3] border border-[#1CADA3] border-dashed rounded-md py-1.5 hover:bg-[#1CADA3]/10"><Plus size={12} /> Add more</button>
         )}
-        {!allowMultiple && files.length > 0 && <button type="button" onClick={() => ref.current?.click()} className="text-[10px] text-blue-600 hover:underline text-right">Change file</button>}
       </div>
       {(fileError || (error && !fileError)) && <span className="text-xs text-red-500 mt-1">{fileError || error}</span>}
     </div>
@@ -249,7 +248,7 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
 function SuccessModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 rounded-xl animate-in fade-in zoom-in duration-200">
-      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%]">
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%] mx-auto">
         <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
         <h3 className="text-2xl font-bold text-gray-800 mb-2">Success!</h3>
         <p className="text-gray-600 mb-6">Your Business Loan application has been submitted successfully.</p>

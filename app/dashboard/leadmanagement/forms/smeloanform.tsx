@@ -52,7 +52,7 @@ export default function SMELoanForm({ onClose }: { onClose: () => void }) {
     if (!form.hasOtherLoan) errs.hasOtherLoan = "Select an option";
     if (form.hasOtherLoan === "Yes" && !form.otherLoanAmount) errs.otherLoanAmount = "Existing loan amount is required";
 
-    requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
+    // requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -199,7 +199,7 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
   return (
     <div className="flex flex-col">
       <label className={STYLES.label + " flex justify-between"}>
-        <span>{label} <span className="text-red-500">*</span></span>
+        <span>{label} <span className="text-red-500"></span></span>
         <span className="text-[10px] text-gray-400 font-normal">{allowMultiple ? "(Multiple, <180KB)" : "(<180KB)"}</span>
       </label>
       <input type="file" ref={ref} multiple={allowMultiple} onChange={handleFiles} className="hidden" accept="image/*,application/pdf" />

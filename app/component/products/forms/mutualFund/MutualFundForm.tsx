@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
-import { DashboardService } from "../../../services/dashboardService";
+import { AuthService } from "@/app/services/authService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -17,14 +17,40 @@ const GUARDIAN_REL_CLIENT = ["Father", "Mother", "Legal Guardian", "Other"];
 const GUARDIAN_REL_NOMINEE = ["Parent", "Legal Guardian", "Grandparent", "Other"];
 const INVESTMENT_TYPES = ["SIP", "Lumpsum", "SWP", "STP"];
 
-export default function MutualFundForm({ onClose }: { onClose: () => void }) {
+interface MutualFundFormProps {
+  onClose: () => void;
+  prefilledData?: {
+    name: string;
+    email: string;
+    mobile: string;
+  };
+}
+
+export default function MutualFundForm({ onClose, prefilledData }: MutualFundFormProps) {
   const [form, setForm] = useState<any>({
-    clientName: "", mobile: "", email: "", pan: "", occupation: "", incomeRange: "", mothersName: "",
-    nomineeName: "", nomineeDob: "", nomineeRelation: "", nomineeMobile: "", nomineeEmail: "",
-    guardianName: "", guardianMobile: "", guardianEmail: "", guardianRelationClient: "", guardianRelationNominee: "",
-    investmentType: "SIP", investmentAmount: "", sipDate: "",
+    clientName: prefilledData?.name || "", 
+    mobile: prefilledData?.mobile || "", 
+    email: prefilledData?.email || "", 
+    pan: "", 
+    occupation: "", 
+    incomeRange: "", 
+    mothersName: "",
+    nomineeName: "", 
+    nomineeDob: "", 
+    nomineeRelation: "", 
+    nomineeMobile: "", 
+    nomineeEmail: "",
+    guardianName: "", 
+    guardianMobile: "", 
+    guardianEmail: "", 
+    guardianRelationClient: "", 
+    guardianRelationNominee: "",
+    investmentType: "SIP", 
+    investmentAmount: "", 
+    sipDate: "",
     schemes: [{ schemeName: "", schemeAmount: "", schemeId: "1" }]
   });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,8 +116,6 @@ export default function MutualFundForm({ onClose }: { onClose: () => void }) {
       if (!form.sipDate || +form.sipDate < 1 || +form.sipDate > 31) errs.sipDate = "Invalid Date (1-31)";
     }
 
-    // requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
-
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -103,33 +127,19 @@ export default function MutualFundForm({ onClose }: { onClose: () => void }) {
 
     try {
       const payload = {
-        department: "Investment",
+        department: "Mutual Funds",
         product_type: "Mutual Fund",
-        sub_category: "Mutual Fund",
+        sub_category: "Mutual Funds",
         client: {
           name: form.clientName,
           mobile: form.mobile,
           email: form.email,
         },
-        meta: {
-          is_self_login: false,
-        },
-        form_data: {
-          pan: form.pan,
-          occupation: form.occupation,
-          incomeRange: form.incomeRange,
-          mothersName: form.mothersName,
-          nomineeName: form.nomineeName,
-          nomineeDob: form.nomineeDob,
-          nomineeRelation: form.nomineeRelation,
-          nomineeMobile: form.nomineeMobile,
-          nomineeEmail: form.nomineeEmail,
-          investmentType: form.investmentType,
-          investmentAmount: form.investmentAmount
-        }
+        meta: { is_self_login: false },
+        form_data: { ...form }
       };
 
-      await DashboardService.createLead(payload);
+      await AuthService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
       console.error("Submission error:", err);
@@ -147,7 +157,7 @@ export default function MutualFundForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700 overflow-y-auto">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto my-auto flex flex-col relative max-h-[90vh]">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto my-auto flex flex-col relative max-h-[95vh]">
         <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white rounded-t-xl">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Mutual Fund Onboarding</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors"><X size={20} className="sm:w-6 sm:h-6" /></button>
@@ -230,7 +240,6 @@ export default function MutualFundForm({ onClose }: { onClose: () => void }) {
                     </div>
                   </div>
                 ))}
-                {/* MOVED TO RIGHT SIDE */}
                 <div className="flex justify-end">
                   <button type="button" onClick={addScheme} className="flex items-center gap-2 text-sm font-medium text-[#1CADA3] hover:text-[#18998f] transition-colors py-2 px-1">
                     <Plus size={16} /> Add Another Fund
@@ -276,28 +285,14 @@ function Field({ label, value, onChange, type = "text", options, required, place
       <div className="relative">
         {type === "select" ? (
           <>
-            <select
-              value={value}
-              onChange={e => onChange(e.target.value)}
-              disabled={disabled}
-              className={`${STYLES.input(!!error)} cursor-pointer ${disabled ? 'bg-gray-50 text-gray-400' : ''}`}
-            >
+            <select value={value} onChange={e => onChange(e.target.value)} disabled={disabled} className={`${STYLES.input(!!error)} cursor-pointer ${disabled ? 'bg-gray-50' : ''}`}>
               <option value="">{placeholder || `Select ${label}`}</option>
               {options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
             </select>
-            <ChevronDown className={`absolute right-3 top-3 ${disabled ? 'text-gray-300' : 'text-gray-400'} pointer-events-none`} size={16} />
+            <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
           </>
         ) : (
-          <input
-            type={type}
-            value={value}
-            onChange={e => onChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            maxLength={maxLength}
-            placeholder={placeholder}
-            disabled={disabled}
-            className={`${STYLES.input(!!error)} ${disabled ? 'bg-gray-50 text-gray-400' : ''}`}
-          />
+          <input type={type} value={value} onChange={e => onChange(e.target.value)} onKeyDown={handleKeyDown} maxLength={maxLength} placeholder={placeholder} disabled={disabled} className={`${STYLES.input(!!error)} ${disabled ? 'bg-gray-50' : ''}`} />
         )}
       </div>
       {error && <p className={STYLES.err}>{error}</p>}
@@ -314,7 +309,6 @@ function FileUpload({ label, onUpdate, error }: any) {
     const f = e.target.files?.[0];
     if (!f) return;
     if (f.size > 184320) return setFileError("Max file size: 180KB");
-
     setFile(f);
     onUpdate(true);
     setFileError("");
@@ -324,7 +318,7 @@ function FileUpload({ label, onUpdate, error }: any) {
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium mb-1 text-gray-700 flex justify-between">
-        <span>{label} <span className="text-red-500"></span></span>
+        <span>{label} <span className="text-red-500">*</span></span>
         <span className="text-[10px] text-gray-400 font-normal">(&lt;180KB)</span>
       </label>
       <input type="file" ref={ref} onChange={handleFile} className="hidden" accept="image/*,application/pdf" />

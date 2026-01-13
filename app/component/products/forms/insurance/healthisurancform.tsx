@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
-import { DashboardService } from "../../../services/dashboardService";
+import { AuthService } from "@/app/services/authService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -14,12 +14,34 @@ const POLICY_TYPES = ["Fresh", "Port", "Renewal"];
 const PLAN_TYPES = ["Individual", "Family Floater"];
 const TENURES = ["1 Year", "2 Years", "3 Years", "4 Years", "5 Years"];
 
-export default function HealthInsuranceForm({ onClose }: { onClose: () => void }) {
+interface HealthInsuranceFormProps {
+  onClose: () => void;
+  prefilledData?: {
+    name: string;
+    email: string;
+    mobile: string;
+  };
+}
+
+export default function HealthInsuranceForm({ onClose, prefilledData }: HealthInsuranceFormProps) {
   const [form, setForm] = useState<Record<string, string>>({
-    policyType: "", planType: "", proposer: "", city: "", pin: "",
-    PSA: "", policyTenure: "", dob: "", disease: "",
-    FirstAdultDob: "", SecondAdultDob: "", child1Dob: "", child2Dob: ""
+    policyType: "", 
+    planType: "", 
+    proposer: prefilledData?.name || "", 
+    phone: prefilledData?.mobile || "",
+    email: prefilledData?.email || "",
+    city: "", 
+    pin: "",
+    PSA: "", 
+    policyTenure: "", 
+    dob: "", 
+    disease: "",
+    FirstAdultDob: "", 
+    SecondAdultDob: "", 
+    child1Dob: "", 
+    child2Dob: ""
   });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,27 +68,22 @@ export default function HealthInsuranceForm({ onClose }: { onClose: () => void }
     req("policyType", "Select policy type");
     req("planType", "Select plan type");
     req("proposer", "Proposer Name is required");
+    req("phone", "Phone number is required");
+    req("email", "Email is required");
     req("city", "City is required");
 
-    if (!form.pin) errs.pin = "Pin code is required";
-    else if (form.pin.length !== 6) errs.pin = "Pin code must be 6 digits";
+    if (form.phone && form.phone.length !== 10) errs.phone = "Must be 10 digits";
+    if (form.pin && form.pin.length !== 6) errs.pin = "Must be 6 digits";
 
     req("PSA", "Sum Assured is required");
     req("policyTenure", "Select tenure");
-    req("disease", "Enter medical conditions or 'None'");
+    req("disease", "Required");
 
-    if (isIndividual) {
-      req("dob", "Date of Birth is required");
-    }
-
+    if (isIndividual) req("dob", "Date of Birth required");
     if (isFamily) {
       req("FirstAdultDob", "DOB required");
       req("SecondAdultDob", "DOB required");
-      req("child1Dob", "DOB required");
-      req("child2Dob", "DOB required");
     }
-
-    // requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -84,25 +101,14 @@ export default function HealthInsuranceForm({ onClose }: { onClose: () => void }
         sub_category: "Health Insurance",
         client: {
           name: form.proposer,
-          mobile: form.phone || "NA",
-          email: form.email || "",
+          mobile: form.phone,
+          email: form.email,
         },
-        meta: {
-          is_self_login: false,
-        },
-        form_data: {
-          policyType: form.policyType,
-          planType: form.planType,
-          city: form.city,
-          pin: form.pin,
-          psa: form.PSA,
-          policyTenure: form.policyTenure,
-          dob: form.dob,
-          disease: form.disease
-        }
+        meta: { is_self_login: false },
+        form_data: { ...form }
       };
 
-      await DashboardService.createLead(payload);
+      await AuthService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
       console.error("Submission error:", err);
@@ -119,11 +125,11 @@ export default function HealthInsuranceForm({ onClose }: { onClose: () => void }
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700 overflow-y-auto">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto my-auto flex flex-col relative max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col relative">
         <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white rounded-t-xl">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Health Insurance Form</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors"><X size={20} className="sm:w-6 sm:h-6" /></button>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors"><X size={20} /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
@@ -131,8 +137,11 @@ export default function HealthInsuranceForm({ onClose }: { onClose: () => void }
             <Field label="Policy Type" type="select" options={POLICY_TYPES} {...fieldProps("policyType")} required />
             <Field label="Types of Plan" type="select" options={PLAN_TYPES} {...fieldProps("planType")} required />
 
+            <Field label="Proposer Name" placeholder="Enter full name" {...fieldProps("proposer")} required />
+            <Field label="Phone Number" placeholder="10-digit number" type="tel" maxLength={10} onlyNumber {...fieldProps("phone")} required />
+            
             <div className="col-span-1 md:col-span-2">
-              <Field label="Proposer Name" placeholder="Enter full name" {...fieldProps("proposer")} required />
+               <Field label="Email ID" placeholder="Enter email address" type="email" {...fieldProps("email")} required />
             </div>
 
             {(isIndividual || isFamily) && (
@@ -150,8 +159,8 @@ export default function HealthInsuranceForm({ onClose }: { onClose: () => void }
                   <>
                     <Field label="DOB of First Adult Member" type="date" {...fieldProps("FirstAdultDob")} required />
                     <Field label="DOB of Second Adult Member" type="date" {...fieldProps("SecondAdultDob")} required />
-                    <Field label="DOB of 1st Child" type="date" {...fieldProps("child1Dob")} required />
-                    <Field label="DOB of 2nd Child" type="date" {...fieldProps("child2Dob")} required />
+                    <Field label="DOB of 1st Child" type="date" {...fieldProps("child1Dob")} />
+                    <Field label="DOB of 2nd Child" type="date" {...fieldProps("child2Dob")} />
                   </>
                 )}
 
@@ -163,9 +172,7 @@ export default function HealthInsuranceForm({ onClose }: { onClose: () => void }
 
             {requiredDocs.length > 0 && (
               <div className="col-span-1 md:col-span-2 mt-4">
-                <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">
-                  Upload Documents <span className="text-sm font-normal text-gray-500 ml-2">(Required for {form.policyType})</span>
-                </h3>
+                <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Upload Documents</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   {requiredDocs.map(lbl => (
                     <FileUpload key={lbl} label={lbl} allowMultiple={true} onUpdate={(has: any) => {
@@ -182,7 +189,21 @@ export default function HealthInsuranceForm({ onClose }: { onClose: () => void }
             </div>
           </form>
         </div>
+        
         {showSuccess && <SuccessModal onClose={onClose} />}
+      </div>
+    </div>
+  );
+}
+
+function SuccessModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 rounded-xl animate-in fade-in zoom-in duration-200">
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%] mx-auto">
+        <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">Success!</h3>
+        <p className="text-gray-600 mb-6">Your Health Insurance application has been submitted successfully.</p>
+        <button onClick={onClose} className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:bg-[#178e86] font-medium transition-colors">Okay, Got it</button>
       </div>
     </div>
   );
@@ -192,14 +213,13 @@ function Field({ label, value, onChange, type = "text", options, required, place
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
   };
-
   return (
     <div className="w-full relative">
       <label className={STYLES.label}>{label} {required && <span className="text-red-500">*</span>}</label>
       <div className="relative">
         {type === "select" ? (
           <>
-            <select value={value} onChange={e => onChange(e.target.value)} className={`${STYLES.input(!!error)} cursor-pointer`}>
+            <select value={value} onChange={e => onChange(e.target.value)} className={`${STYLES.input(!!error)} cursor-pointer font-medium text-[#1CADA3]`}>
               <option value="">Select {label}</option>
               {options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
             </select>
@@ -223,8 +243,6 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
     const newFiles = Array.from(e.target.files || []);
     if (!newFiles.length) return;
     if (newFiles.some(f => f.size > 184320)) return setFileError("Max file size: 180KB");
-    if (allowMultiple && files.length + newFiles.length > 8) return setFileError("Limit: 8 files.");
-
     const updated = allowMultiple ? [...files, ...newFiles] : [newFiles[0]];
     setFiles(updated);
     onUpdate(true);
@@ -240,8 +258,8 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
 
   return (
     <div className="flex flex-col">
-      <label className="text-sm font-medium mb-1 text-gray-700 flex justify-between">
-        <span>{label} <span className="text-red-500"></span></span>
+      <label className={STYLES.label + " flex justify-between"}>
+        <span>{label}</span>
         <span className="text-[10px] text-gray-400 font-normal">{allowMultiple ? "(Multiple, <180KB)" : "(<180KB)"}</span>
       </label>
       <input type="file" ref={ref} multiple={allowMultiple} onChange={handleFiles} className="hidden" accept="image/*,application/pdf" />
@@ -261,24 +279,8 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
             <button type="button" onClick={() => removeFile(i)} className="text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
           </div>
         ))}
-        {allowMultiple && files.length > 0 && files.length < 8 && (
-          <button type="button" onClick={() => ref.current?.click()} className="flex justify-center gap-1 text-[11px] font-medium text-[#1CADA3] border border-[#1CADA3] border-dashed rounded-md py-1.5 hover:bg-[#1CADA3]/10"><Plus size={12} /> Add more</button>
-        )}
       </div>
       {(fileError || (error && !fileError)) && <span className="text-xs text-red-500 mt-1">{fileError || error}</span>}
-    </div>
-  );
-}
-
-function SuccessModal({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 rounded-xl animate-in fade-in zoom-in duration-200">
-      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%]">
-        <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">Success!</h3>
-        <p className="text-gray-600 mb-6">Your Health Insurance application has been submitted successfully.</p>
-        <button onClick={onClose} className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:bg-[#178e86] font-medium transition-colors">Okay, Got it</button>
-      </div>
     </div>
   );
 }

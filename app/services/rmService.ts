@@ -30,5 +30,26 @@ export const RmService = {
   getIncomingAssignedLeads: async () => {
     const response = await api.get('/api/rm/get-incoming-assigned-lead');
     return response.data;
-  }
+  },
+
+  // getIncomingDetailedLeads: async () => {
+  //   const response = await api.get('/api/rm/get-incoming-detailed-lead');
+  //   return response.data; // Returns { success: boolean, count: number, leads: [] }
+  // },
+
+  // getOutgoingDetailedLeads: async () => {
+  //   const response = await api.get('/api/rm/get-outgoing-detailed-lead');
+  //   return response.data;
+  // },
+
+  getConsumerDetailedLeads: async () => {
+    const response = await api.get('/api/rm/customer-detail-leads');
+    return response.data;
+  },
+
+  getLeadDocuments: async (leadId: number) => {
+    const response = await api.get(`/api/rm/customer-detail-lead-documents/${leadId}`);
+    return response.data;
+  },
+
 };

@@ -94,5 +94,14 @@ export const DashboardService = {
         const response = await api.get(`/api/dashboard/detail-lead/${leadId}/all-documents`);
         return response.data;
     },
+    
+    uploadLeadDocument: async (leadId: number, formData: FormData) => {
+        const response = await api.post(`/api/dashboard/detail-leads/${leadId}/documents`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        return response.data;
+      },
 
 };

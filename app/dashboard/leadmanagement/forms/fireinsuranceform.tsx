@@ -46,6 +46,7 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
 
     req("insuranceType", "Select insurance type");
 
+    // Name is only required if it's NOT stock
     if (isProperty) {
       req("name", "Name is required");
       req("address", "Address is required");
@@ -69,25 +70,32 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
     setIsSubmitting(true);
 
     try {
+      // Build form_data dynamically based on type
+      const formData: Record<string, any> = {
+        insuranceType: form.insuranceType
+      };
+
+      if (isProperty) {
+        formData.address = form.address;
+        formData.pincode = form.pincode;
+        formData.sumInsured = form.sumInsured;
+        formData.tenure = form.tenure;
+      }
+
       const payload = {
         department: "Insurance",
         product_type: "Fire Insurance",
         sub_category: "Fire Insurance",
         client: {
-          name: form.name,
-          mobile: form.phone || "",
-          email: form.email || "",
+          // Send "NA" for name if it's stock
+          name: isStock ? "NA" : form.name,
+          mobile: "NA",
+          email: "NA",
         },
         meta: {
           is_self_login: false,
         },
-        form_data: {
-          insuranceType: form.insuranceType,
-          address: form.address,
-          pincode: form.pincode,
-          sumInsured: form.sumInsured,
-          tenure: form.tenure
-        }
+        form_data: formData
       };
 
       await DashboardService.createLead(payload);
@@ -133,23 +141,25 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
 
             {isProperty && (
               <>
-                <Field label="Name" placeholder="Enter full name" {...fieldProps("name")} required />
+                <div className="col-span-1 md:col-span-2">
+                  <Field label="Name / Entity Name" placeholder="Enter full name" {...fieldProps("name")} required />
+                </div>
                 <Field label="Pincode" placeholder="6-digit pincode" onlyNumber maxLength={6} {...fieldProps("pincode")} required />
+                <Field label="Sum Insured (₹)" placeholder="Enter amount" onlyNumber {...fieldProps("sumInsured")} required />
                 <div className="col-span-1 md:col-span-2">
                   <Field label="Address for Insurance Location" placeholder="Enter full property address" {...fieldProps("address")} required />
                 </div>
-                <Field label="Sum Insured (₹)" placeholder="Enter amount" onlyNumber {...fieldProps("sumInsured")} required />
                 <Field label="Tenure" type="select" options={TENURES} {...fieldProps("tenure")} required />
               </>
             )}
 
             {isStock && (
               <div className="col-span-1 md:col-span-2 mt-2">
-                <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Stock Insurance Details</h3>
+                <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Stock Insurance Documents</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <FileUpload
                     label="Stock Inventory Sheet"
-                    accept=".xlsx,.xls,.csv"
+                    accept=".xlsx,.xls,.csv,.pdf"
                     allowMultiple={true}
                     onUpdate={(has: any) => {
                       setUploadedDocs(p => ({ ...p, ["Stock Inventory Sheet"]: has }));
@@ -163,7 +173,9 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
 
             {form.insuranceType && (
               <div className="col-span-1 md:col-span-2 flex justify-center mt-6 pb-2">
-                <button type="submit" disabled={isSubmitting} className={STYLES.btn}>{isSubmitting ? "Submitting..." : "Submit Application"}</button>
+                <button type="submit" disabled={isSubmitting} className={STYLES.btn}>
+                  {isSubmitting ? "Submitting..." : "Submit Application"}
+                </button>
               </div>
             )}
           </form>
@@ -224,7 +236,7 @@ function FileUpload({ label, allowMultiple, accept, onUpdate, error }: any) {
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = Array.from(e.target.files || []);
     if (!newFiles.length) return;
-    if (newFiles.some(f => f.size > 184320)) return setFileError("Max size: 180KB");
+    if (newFiles.some(f => f.size > 5 * 1024 * 1024)) return setFileError("Max size: 5MB");
     if (allowMultiple && files.length + newFiles.length > 8) return setFileError("Limit: 8 files.");
 
     const updated = allowMultiple ? [...files, ...newFiles] : [newFiles[0]];
@@ -245,7 +257,7 @@ function FileUpload({ label, allowMultiple, accept, onUpdate, error }: any) {
       <label className="text-sm font-medium mb-1 text-gray-700 flex justify-between">
         <span>{label} <span className="text-red-500">*</span></span>
         <span className="text-[10px] text-gray-400 font-normal">
-          {allowMultiple ? "(Multiple, <180KB)" : "(<180KB)"}
+          {allowMultiple ? "(Multiple, <5MB)" : "(<5MB)"}
         </span>
       </label>
       <input type="file" ref={ref} multiple={allowMultiple} onChange={handleFiles} className="hidden" accept={accept || "image/*,application/pdf"} />

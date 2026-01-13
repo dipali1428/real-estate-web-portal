@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { X, CheckCircle, ChevronDown } from "lucide-react";
-import { DashboardService } from "../../../services/dashboardService";
+import { AuthService } from "@/app/services/authService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -12,12 +12,35 @@ const STYLES = {
 
 const TRANSIT_MODES = ["Rail", "Road", "Courier", "Sea", "Air"];
 
-export default function MarineInsuranceForm({ onClose }: { onClose: () => void }) {
+interface MarineInsuranceFormProps {
+  onClose: () => void;
+  prefilledData?: {
+    name: string;
+    email: string;
+    mobile: string;
+  };
+}
+
+export default function MarineInsuranceForm({ onClose, prefilledData }: MarineInsuranceFormProps) {
   const [form, setForm] = useState<Record<string, string>>({
-    proposer: "", policyNo: "", address: "", business: "", insurancePeriod: "",
-    subjectMatter: "", packing: "", transitFrom: "", transitTo: "",
-    transitMode: "", valuation: "", sumAssured: "", bottomLimit: "", locationLimit: ""
+    proposer: prefilledData?.name || "", 
+    phone: prefilledData?.mobile || "",
+    email: prefilledData?.email || "",
+    policyNo: "", 
+    address: "", 
+    business: "", 
+    insurancePeriod: "",
+    subjectMatter: "", 
+    packing: "", 
+    transitFrom: "", 
+    transitTo: "",
+    transitMode: "", 
+    valuation: "", 
+    sumAssured: "", 
+    bottomLimit: "", 
+    locationLimit: ""
   });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -65,25 +88,11 @@ export default function MarineInsuranceForm({ onClose }: { onClose: () => void }
           mobile: form.phone || "NA",
           email: form.email || "NA",
         },
-        meta: {
-          is_self_login: false,
-        },
-        form_data: {
-          policyNo: form.policyNo,
-          address: form.address,
-          business: form.business,
-          insurancePeriod: form.insurancePeriod,
-          subjectMatter: form.subjectMatter,
-          packing: form.packing,
-          transitFrom: form.transitFrom,
-          transitTo: form.transitTo,
-          transitMode: form.transitMode,
-          valuation: form.valuation,
-          sumAssured: form.sumAssured
-        }
+        meta: { is_self_login: false },
+        form_data: { ...form }
       };
 
-      await DashboardService.createLead(payload);
+      await AuthService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
       console.error("Submission error:", err);
@@ -100,11 +109,11 @@ export default function MarineInsuranceForm({ onClose }: { onClose: () => void }
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700 overflow-y-auto">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto my-auto flex flex-col relative max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col relative">
         <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white rounded-t-xl">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Marine Insurance Form</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors"><X size={20} className="sm:w-6 sm:h-6" /></button>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors"><X size={20} /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
@@ -125,6 +134,7 @@ export default function MarineInsuranceForm({ onClose }: { onClose: () => void }
             <Field label="Transit Location From" placeholder="Origin location" {...fieldProps("transitFrom")} required />
             <Field label="Transit Location To" placeholder="Destination location" {...fieldProps("transitTo")} required />
 
+            {/* FIXED: Using correct variable name TRANSIT_MODES */}
             <Field label="Mode Of Transit" type="select" options={TRANSIT_MODES} {...fieldProps("transitMode")} required />
             <Field label="Basis of Valuation" placeholder="e.g. Invoice Value + 10%" {...fieldProps("valuation")} required />
 
@@ -137,6 +147,7 @@ export default function MarineInsuranceForm({ onClose }: { onClose: () => void }
             </div>
           </form>
         </div>
+        
         {showSuccess && <SuccessModal onClose={onClose} />}
       </div>
     </div>
@@ -168,7 +179,7 @@ function Field({ label, value, onChange, type = "text", options, required, place
 function SuccessModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 rounded-xl animate-in fade-in zoom-in duration-200">
-      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%]">
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%] mx-auto">
         <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
         <h3 className="text-2xl font-bold text-gray-800 mb-2">Success!</h3>
         <p className="text-gray-600 mb-6">Your Marine Insurance application has been submitted successfully.</p>

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { X, CheckCircle, ChevronDown } from "lucide-react";
-import { DashboardService } from "../../../services/dashboardService";
+import { AuthService } from "@/app/services/authService";
 
 const STYLES = {
     input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -24,9 +24,20 @@ const LOAN_TYPES = [
 
 const TENURE_OPTIONS = ["1 Year", "2 Years", "3 Years", "5 Years", "10 Years", "15 Years", "20 Years", "25 Years", "30 Years"];
 
-export default function LoanProtectorForm({ onClose }: { onClose: () => void }) {
+interface LoanProtectorFormProps {
+    onClose: () => void;
+    prefilledData?: {
+        name: string;
+        email: string;
+        mobile: string;
+    };
+}
+
+export default function LoanProtectorForm({ onClose, prefilledData }: LoanProtectorFormProps) {
     const [form, setForm] = useState<Record<string, string>>({
-        name: "",
+        name: prefilledData?.name || "NA",
+        phone: prefilledData?.mobile || "NA",
+        email: prefilledData?.email || "NA",
         dob: "",
         pincode: "",
         loanAmount: "",
@@ -77,8 +88,8 @@ export default function LoanProtectorForm({ onClose }: { onClose: () => void }) 
           sub_category: "Loan Protector",
           client: {
             name: form.name,
-            mobile: form.phone || "NA",
-            email: form.email || "NA",
+            mobile: form.phone,
+            email: form.email,
           },
           meta: {
             is_self_login: false,
@@ -93,7 +104,7 @@ export default function LoanProtectorForm({ onClose }: { onClose: () => void }) 
           }
         };
 
-        await DashboardService.createLead(payload);
+        await AuthService.createLead(payload);
         setShowSuccess(true);
       } catch (err) {
         console.error("Submission error:", err);

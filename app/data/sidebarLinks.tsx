@@ -7,12 +7,14 @@ import {
     Megaphone,
     Download,
     Users,
+    Proportions,
+    UserPlus,
     HelpCircle,
     ShieldCheck,    // For Roles
     Building2,      // For DSA Management
     UserMinus,      // For Unassigned
     Layers,         // For Total Leads
-    CreditCard,     // For CIBIL
+    CreditCard,    // For CIBIL
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -30,6 +32,8 @@ export const sidebarLinks = {
         { label: "Downloads", href: "/dashboard/pdf-download", icon: <Download className="h-5 w-5 text-neutral-700" /> },
         { label: "Relationship Manager", href: "/dashboard/relationshipManager", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "Help & Support", href: "/dashboard/helpSupport", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },
+        { label: "Our Products", href: "/dashboard/products", icon: <Proportions className="h-5 w-5 text-neutral-700" /> },
+        { label: "Co-Partners", href: "/dashboard/copartners", icon: <UserPlus className="h-5 w-5 text-neutral-700" /> },
     ],
 
     ADMIN: [
@@ -53,13 +57,16 @@ export const sidebarLinks = {
         { label: "Profile", href: "/departmenthead/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "RM's List", href: "/departmenthead/rmlist", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "Leads", href: "/departmenthead/totalleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Consumer detailed lead", href: "/departmenthead/consumerdetailedlead", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+
 
     ],
     RM: [
         { label: "Dashboard", href: "/rm", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "Profile", href: "/rm/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "My DSAs", href: "/rm/mydsa", icon: <Users className="h-5 w-5 text-neutral-700" /> },
-        { label: "All leads", href: "/rm/assigneddsa", icon: <Users className="h-5 w-5 text-neutral-700" /> },
-        { label: "Detailed leads", href: "/rm/assigneddsa", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Referal leads", href: "/rm/referralleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Detailed leads", href: "/rm/detailedleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Consumer Detailed leads", href: "/rm/consumerdetailedleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
     ],
 };

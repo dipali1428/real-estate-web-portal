@@ -780,8 +780,8 @@ export const offerData: Record<string, Offer> = {
     }
   },
 
-  'property-insurance': {
-    title: 'Property Insurance',
+  'fire-insurance': {
+    title: 'fire Insurance',
     category: 'Protection',
     icon: 'Home',
     description: 'Protection for your home and property assets',
@@ -1036,6 +1036,69 @@ export const offerData: Record<string, Offer> = {
     }
   },
 
+  'loan-protector-plan': {
+    title: 'Loan Protector Plan',
+    category: 'Protection',
+    icon: 'ShieldCheck',
+    description: 'Secure your family against outstanding loan liabilities',
+    overview: 'A Loan Protector Plan is a specialized insurance policy designed to cover your outstanding loan balance in the event of the borrower’s untimely demise, disability, or critical illness. It ensures that your family retains ownership of assets (like a home or car) without the burden of debt repayment.',
+    features: [
+      'Decreasing Sum Assured (matches your reducing loan balance)',
+      'Coverage for Home, Personal, Car, and Business loans',
+      'Single premium or limited pay options',
+      'Joint life coverage available for co-borrowers',
+      'Coverage for Accidental Total Permanent Disability',
+      'Critical Illness add-on options',
+      'Tax benefits under Section 80C'
+    ],
+    benefits: [
+      {
+        title: 'Asset Protection',
+        description: 'Prevents the bank from seizing your home or asset if the borrower is no longer there.'
+      },
+      {
+        title: 'Financial Independence',
+        description: 'Ensures your family or legal heirs are not burdened with EMIs during a crisis.'
+      },
+      {
+        title: 'Comprehensive Security',
+        description: 'Covers not just death, but also disability and terminal illnesses.'
+      },
+      {
+        title: 'Peace of Mind',
+        description: 'The insurance tenure and cover amount are perfectly synced with your loan schedule.'
+      },
+      {
+        title: 'One-Time Premium',
+        description: 'Can be added to the loan amount itself so you don’t feel the upfront cost.'
+      }
+    ],
+    eligibility: [
+      'Age at Entry: 18 - 65 years',
+      'Maximum Maturity Age: 70 - 75 years',
+      'Loan Status: New loan or existing outstanding loan',
+      'Nationality: Resident Indian',
+      'Loan Types: Home, Education, LAP, or Business loans',
+      'Employment: Salaried and Self-employed individuals'
+    ],
+    documents: [
+      'Loan Sanction Letter or Account Statement',
+      'Identity Proof (Aadhaar / PAN Card)',
+      'Income Proof (Salary slips or ITR)',
+      'Address Proof (Electricity bill / Passport)',
+      'Age Proof (Birth certificate / 10th Marksheet)',
+      'Medical Reports (Depending on age and sum assured)'
+    ],
+    offerDetails: {
+      sumInsured: 'Up to 100% of Loan Amount',
+      tenure: '1 to 30 years (matches loan term)',
+      premiumType: 'Single / Regular / Limited Pay',
+      disabilityCover: 'Included in comprehensive plans',
+      claimRatio: 'Provider specific',
+      specialFeature: 'Surrender value available for single premium'
+    }
+  },
+
   'group-medi-claim-cover': {
     title: 'Group Medi-Claim Cover',
     category: 'Protection',
@@ -1226,7 +1289,7 @@ export const offerData: Record<string, Offer> = {
     }
   },
 
-  'corporate-general-insurance': {
+  'corporate-insurance': {
     title: 'Corporate General Insurance',
     category: 'Protection',
     icon: 'Building',

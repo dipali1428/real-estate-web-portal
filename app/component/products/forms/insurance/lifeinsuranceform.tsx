@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
-import { DashboardService } from "../../../services/dashboardService";
+import { AuthService } from "@/app/services/authService";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -14,9 +14,22 @@ const PLAN_TYPES = ["Term Insurance", "ULIP", "TULIP", "Child Plan", "Pension Pl
 const PROFESSIONS = ["Salaried", "Self Employed"];
 const INCOME_PROOFS = ["3 Years ITR", "Form 16"];
 
-export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) {
+interface LifeInsuranceFormProps {
+  onClose: () => void;
+  prefilledData?: {
+    name: string;
+    email: string;
+    mobile: string;
+  };
+}
+
+export default function LifeInsuranceForm({ onClose, prefilledData }: LifeInsuranceFormProps) {
   const [form, setForm] = useState<Record<string, string>>({
-    planType: "", proposerName: "", dob: "", education: "", profession: "",
+    planType: "", 
+    proposerName: prefilledData?.name || "", 
+    phone: prefilledData?.mobile || "",
+    email: prefilledData?.email || "",
+    dob: "", education: "", profession: "",
     income: "", incomeProof: "", sumAssured: "", policyTerm: "", ppt: "",
     smokerStatus: "", drinkerStatus: "", existingDisease: "", investmentOption: "Investment Budget",
     investmentBudget: "", requiredMaturity: "", requiredPension: ""
@@ -69,7 +82,6 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
       }
     }
 
-    // requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -80,7 +92,6 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
     setIsSubmitting(true);
 
     try {
-      // Create a dynamic form data object to avoid sending NA to backend
       const dynamicFormData: Record<string, any> = {
         planType: form.planType,
         proposerName: form.proposerName,
@@ -91,7 +102,6 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
         ppt: form.ppt,
       };
 
-      // Add Term-specific fields ONLY if applicable
       if (showTermFields) {
         dynamicFormData.education = form.education;
         dynamicFormData.incomeProof = form.incomeProof;
@@ -101,7 +111,6 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
         dynamicFormData.existingDisease = form.existingDisease;
       }
 
-      // Add Investment-specific fields ONLY if applicable
       if (showInvestmentFields) {
         dynamicFormData.investmentOption = form.investmentOption;
         if (form.investmentOption === "Investment Budget") {
@@ -121,16 +130,16 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
         sub_category: "Life Insurance",
         client: {
           name: form.proposerName,
-          mobile: (form as any).phone || "NA",
-          email: (form as any).email || "NA",
+          mobile: form.phone || "NA",
+          email: form.email || "NA",
         },
         meta: {
           is_self_login: false,
         },
-        form_data: dynamicFormData // Sends only the filtered data
+        form_data: dynamicFormData 
       };
 
-      await DashboardService.createLead(payload);
+      await AuthService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
       console.error("Submission error:", err);

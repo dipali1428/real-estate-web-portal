@@ -18,4 +18,17 @@ export const DepartmentHeadService = {
         const response = await api.get('/api/department/getdeptLeads');
         return response.data;
     },
+    getCustomerDetailLeads: async () => {
+        const response = await api.get('/api/department/getcustomer-detail-lead');
+        return response.data;
+    },
+
+    getConsumerDetailedLeads: async () => {
+        const response = await api.get('/api/rm/customer-detail-leads');
+        return response.data;
+    },
+    getLeadDocuments: async (leadId: number) => {
+        const response = await api.get(`/api/rm/customer-detail-lead-documents/${leadId}`);
+        return response.data;
+    },
 };

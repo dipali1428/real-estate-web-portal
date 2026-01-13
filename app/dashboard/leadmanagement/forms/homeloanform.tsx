@@ -29,8 +29,12 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
     hasOtherLoan: "", otherLoanAmount: "",
     employmentType: "", otherIncome: "", otherIncomeAmount: ""
   });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
+  
+  // 🔹 Store actual File objects for upload
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, File[]>>({});
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -72,14 +76,14 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
       if (!form.phone || form.phone.length !== 10) errs.phone = "Invalid phone";
       if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email";
       if (form.hasOtherLoan === "Yes" && !form.otherLoanAmount) errs.otherLoanAmount = "Amount required";
-      requiredDocs.forEach(d => { if (!uploadedDocs[d]) errs[`doc_${d}`] = `Upload ${d}`; });
+      
+      // Validation for mandatory documents (optional: uncomment to force upload)
+      // requiredDocs.forEach(d => { if (!uploadedFiles[d] || uploadedFiles[d].length === 0) errs[`doc_${d}`] = `Upload ${d}`; });
     }
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
-
-  // Inside homeloanform.tsx -> handleSubmit function
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,24 +91,18 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
     setIsSubmitting(true);
 
     try {
-      const isSelfLoginActive = form.isSelfLogin === "Yes";
-
-      // Transform the data to match the new structure
+      // 1. Prepare Lead Payload
       const payload = {
-        department: "Loan", // Categorized under Loan
-        product_type: "Home Loan", // Matches the CORPORATE_INSURANCE logic
+        department: "Loan",
+        product_type: "Home Loan",
         sub_category: "Home Loan",
         client: {
           name: form.clientName,
-          // Using RM details for contact if Self Login, else Client details
           mobile: isSelfLoginActive ? form.rmContact : form.phone,
           email: isSelfLoginActive ? form.rmEmail : form.email,
         },
-        meta: {
-          is_self_login: isSelfLoginActive,
-        },
+        meta: { is_self_login: isSelfLoginActive },
         form_data: isSelfLoginActive ? {
-          // Fields specific to Self Login
           refId: form.refId,
           fileId: form.fileId,
           bankName: form.bankName,
@@ -112,7 +110,6 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
           location: form.location,
           loanAmount: form.loanAmount,
         } : {
-          // Fields specific to Normal Referral
           loanType: form.loanType,
           dob: form.dob,
           location: form.location,
@@ -125,11 +122,32 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
         }
       };
 
-      await DashboardService.createLead(payload);
+      // 2. Call Create Lead API
+      const result = await DashboardService.createLead(payload);
+      const leadId = result.data?.id;
+
+      // 3. Upload Documents if lead creation was successful
+      if (leadId && Object.keys(uploadedFiles).length > 0) {
+        const uploadPromises: Promise<any>[] = [];
+
+        for (const [docLabel, files] of Object.entries(uploadedFiles)) {
+          files.forEach((file) => {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("document_type", docLabel); // Identifying the doc category
+            uploadPromises.push(DashboardService.uploadLeadDocument(leadId, formData));
+          });
+        }
+
+        if (uploadPromises.length > 0) {
+          await Promise.all(uploadPromises);
+        }
+      }
+
       setShowSuccess(true);
     } catch (err) {
       console.error("Submission error:", err);
-      alert("Something went wrong. Please try again.");
+      alert("Failed to submit application. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -203,10 +221,16 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
                     <h3 className="text-md font-semibold mb-3 text-[#1CADA3] border-b pb-2">Upload Documents</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       {requiredDocs.map(lbl => (
-                        <FileUpload key={lbl} label={lbl} allowMultiple={!["Aadhaar Card", "Pan Card"].includes(lbl)} onUpdate={(has: any) => {
-                          setUploadedDocs(p => ({ ...p, [lbl]: has }));
-                          if (has) setErrors(p => ({ ...p, [`doc_${lbl}`]: "" }));
-                        }} error={errors[`doc_${lbl}`]} />
+                        <FileUpload 
+                          key={lbl} 
+                          label={lbl} 
+                          allowMultiple={!["Aadhaar Card", "Pan Card"].includes(lbl)} 
+                          onUpdate={(files: File[]) => {
+                            setUploadedFiles(prev => ({ ...prev, [lbl]: files }));
+                            if (files.length > 0) setErrors(prev => ({ ...prev, [`doc_${lbl}`]: "" }));
+                          }} 
+                          error={errors[`doc_${lbl}`]} 
+                        />
                       ))}
                     </div>
                   </div>
@@ -215,7 +239,9 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
             )}
 
             <div className="col-span-1 md:col-span-2 flex justify-center mt-6 pb-2">
-              <button type="submit" disabled={isSubmitting} className={STYLES.btn}>{isSubmitting ? "Submitting..." : "Submit Application"}</button>
+              <button type="submit" disabled={isSubmitting} className={STYLES.btn}>
+                {isSubmitting ? "Processing..." : "Submit Application"}
+              </button>
             </div>
           </form>
         </div>
@@ -258,10 +284,13 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = Array.from(e.target.files || []);
     if (!newFiles.length) return;
-    if (newFiles.some(f => f.size > 184320)) return setFileError("Max file size: 180KB");
+    
+    // Check for file size (2MB limit recommended for stability)
+    if (newFiles.some(f => f.size > 2 * 1024 * 1024)) return setFileError("Max file size: 2MB");
+
     const updated = allowMultiple ? [...files, ...newFiles] : [newFiles[0]];
     setFiles(updated);
-    onUpdate(true);
+    onUpdate(updated); // Send File objects to parent
     setFileError("");
     e.target.value = "";
   };
@@ -269,14 +298,14 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
   const removeFile = (idx: number) => {
     const updated = files.filter((_, i) => i !== idx);
     setFiles(updated);
-    onUpdate(updated.length > 0);
+    onUpdate(updated);
   };
 
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium mb-1 text-gray-700 flex justify-between">
-        <span>{label} <span className="text-red-500">*</span></span>
-        <span className="text-[10px] text-gray-400 font-normal">{allowMultiple ? "(Multiple, <180KB)" : "(<180KB)"}</span>
+        <span>{label}</span>
+        <span className="text-[10px] text-gray-400 font-normal">{allowMultiple ? "(Multiple, <2MB)" : "(<2MB)"}</span>
       </label>
       <input type="file" ref={ref} multiple={allowMultiple} onChange={handleFiles} className="hidden" accept="image/*,application/pdf" />
       <div className="flex flex-col gap-2">
@@ -310,7 +339,7 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
       <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%]">
         <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
         <h3 className="text-2xl font-bold text-gray-800 mb-2">Success!</h3>
-        <p className="text-gray-600 mb-6">Your Home Loan application has been submitted successfully.</p>
+        <p className="text-gray-600 mb-6">Your Home Loan application and documents have been submitted successfully.</p>
         <button onClick={onClose} className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:bg-[#178e86] font-medium transition-colors">Okay, Got it</button>
       </div>
     </div>

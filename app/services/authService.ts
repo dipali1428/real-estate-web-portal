@@ -72,4 +72,24 @@ export const AuthService = {
         const response = await api.post("/api/contact", formData);
         return response.data;
     },
+
+    createLead: async (payload: {
+        department: string;
+        product_type: string;
+        sub_category: string;
+        client: {
+            name: string;
+            mobile: string;
+            email: string;
+        };
+        meta: {
+            is_self_login: boolean;
+        };
+        form_data: any;
+    }) => {
+        const response = await api.post("/api/public/create-customer-detail-lead", payload);
+        return response.data;
+    },
+
+
 };
