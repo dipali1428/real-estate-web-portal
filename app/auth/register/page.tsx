@@ -180,7 +180,7 @@ export default function BecomePartnerForm() {
         if (!NAME_REGEX.test(form.name)) e.name = "Enter a valid name.";
         if (!EMAIL_REGEX.test(form.email)) e.email = "Enter a valid email.";
         if (!MOBILE_REGEX.test(form.mobile)) e.mobile = "Enter a valid 10-digit mobile.";
-        if (!PAN_REGEX.test(form.pan)) e.pan = "Enter a valid PAN (AAAAA9999A).";
+        // if (!PAN_REGEX.test(form.pan)) e.pan = "Enter a valid PAN (AAAAA9999A).";
         if (!form.city || form.city.trim().length < 2) e.city = "Enter a valid city.";
         if (!form.head) e.head = "Choose head category.";
         if (!form.category) e.category = "Choose category.";
@@ -205,7 +205,7 @@ export default function BecomePartnerForm() {
                 name: form.name,
                 email: form.email,
                 mobile: form.mobile,
-                pan: form.pan,
+                pan: form.pan?.trim() || "UNKNOWN",
                 city: form.city,
                 rm_referral: form.rm_referral,
                 head: form.head,
@@ -310,7 +310,9 @@ export default function BecomePartnerForm() {
 
                             {/* PAN */}
                             <div>
-                                <label className={labelClass}>PAN Number</label>
+                                <label className={labelClass}>
+                                    PAN Number <span className="text-gray-400 text-sm">(Optional)</span>
+                                </label>
                                 <input
                                     type="text"
                                     value={form.pan}
