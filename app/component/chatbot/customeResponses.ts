@@ -8,7 +8,6 @@ interface CustomQuestion {
 interface CustomResponseConfig {
   questions: CustomQuestion[];
 }
-
 export const getCustomResponses = (): CustomResponseConfig => {
   return {
     questions: [
@@ -61,12 +60,12 @@ export const getCustomResponses = (): CustomResponseConfig => {
 
       // ==== CORE BUSINESS RESPONSES ====
       {
-        keywords: ["who are you", "what is anita", "your name"],
+        keywords: ["who are you", "what is anita", "your name","who is anita","tell me about anita","about anita"],
         response: "I am **ANITA**, your **Automated Navigation and Interface Task Assistant**. I specialize in providing guidance on Loans, Investments, and Insurance for Infinity Arthvishva.",
         category: "General"
       },
       {
-        keywords: ["infinity arthvishva", "about the company", "what is this company", "tell me about infinity arthvishva", "information about infinity arthvishva"],
+        keywords: ["infinity arthvishva", "about the company", "what is this company", "tell me about infinity arthvishva", "information about infinity arthvishva","about company"],
         response: "**Infinity Arthvishva** is a premier financial consultancy firm and a one-stop financial advisory powerhouse. We believe your financial success is our true achievement. We offer end-to-end solutions in loans, investments, insurance, and wealth management, built on a foundation of trust, expertise, and innovation. We don't just manage finances; we build lasting relationships.",
         category: "Company"
       },

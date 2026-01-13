@@ -15,8 +15,8 @@ const LeadershipSection = () => {
     },
     {
       name: "Mr. Pravin Marathe",
-      title: "Director",
-      description: "Mr. Pravin Marathe is a Director at Infinity Arthvishva with over 18 years of experience in financial markets. Known for his client-focused approach and strategic vision, he drives growth through expertise in mutual funds, PMS, and AIFs.",
+      title: "Chief Financial Officer ",
+      description: "Mr. Pravin Marathe is a Chief Financial Officer at Infinity Arthvishva with over 18 years of experience in financial markets. Known for his client-focused approach and strategic vision, he drives growth through expertise in mutual funds, PMS, and AIFs.",
       image: "/leader/Img3.jpeg"
     }
   ];
