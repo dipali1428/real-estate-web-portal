@@ -68,7 +68,7 @@ export default function AddLeadModal({
       "Life Insurance",
       "Travel Insurance",
       "Motor Insurance",
-      "Property Insurance",
+      "Fire Insurance",
       "Cattle Insurance",
       "Marine Insurance",
     ],
