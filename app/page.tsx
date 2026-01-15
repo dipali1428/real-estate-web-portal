@@ -8,7 +8,7 @@ import ServicesSection from "./component/ServicesSection";
 import Chatbot from "./component/chatbot/page"
 export default function Home() {
   return (
-    <div className="min-h-screen w-full overflow-x-hidden">
+    <div className="min-h-screen w-full overflow-x-hidden font-sans">
 
       {/* Responsive container */}
       <HeroSection />
