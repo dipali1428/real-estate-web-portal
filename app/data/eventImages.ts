@@ -29,9 +29,9 @@ export const getEventImages = (event: Event): string[] => {
       "/sangli Event 5 june 2024/image-4.jpeg",
     ],
     "Sambhajinagar 17 jun 24": [
-      "/Sambhajinagar 1 nov 2025/image-1.jpeg",
-      "/Sambhajinagar 1 nov 2025/image-2.jpeg",
-      "/Sambhajinagar 1 nov 2025/image-3.jpeg"
+      "/Sambhajinagar 1 nov 2025/Image-1.jpeg",
+      "/Sambhajinagar 1 nov 2025/Image-2.jpeg",
+      "/Sambhajinagar 1 nov 2025/Image-3.jpeg"
     ],
     "Sambhajinagar 16 jul 24": [
         "/Remaining/Image-20.jpeg",
@@ -258,9 +258,9 @@ export const getEventImages = (event: Event): string[] => {
       "/Kolhapur event 4 aug 2025/image-4.jpeg"
     ],
     "Bhopal 7 aug 25": [
-      "/Sambhajinagar 1 nov 2025/image-1.jpeg",
-      "/Sambhajinagar 1 nov 2025/image-2.jpeg",
-      "/Sambhajinagar 1 nov 2025/image-3.jpeg"
+      "/Sambhajinagar 1 nov 2025/Image-2.jpeg",
+      "/Sambhajinagar 1 nov 2025/Image-1.jpeg",
+      "/Sambhajinagar 1 nov 2025/Image-3.jpeg"
     ],
     "Assam 13 aug 25": [
       "/kol secound event 7 Nov 2024/image-1.jpeg",
@@ -296,10 +296,10 @@ export const getEventImages = (event: Event): string[] => {
       "/Sambhajinagar 1 nov 2025/Image-5.jpeg"
     ],
     "Kanpur 26 nov 25": [
-      "/kanpur 26 nov 2025/Image-1.jpg",
-      "/kanpur 26 nov 2025/Image-2.jpg",
-      "/kanpur 26 nov 2025/Image-3.jpg",
-      "/kanpur 26 nov 2025/Image-4.jpg"
+      "/Kanpur 26 nov 2025/Image-1.jpg",
+      "/Kanpur 26 nov 2025/Image-2.jpg",
+      "/Kanpur 26 nov 2025/Image-3.jpg",
+      "/Kanpur 26 nov 2025/Image-4.jpg"
     ],
     "Surat 21 nov 25": [
       "/Surat 21 nov 2025/Image-1.jpg",
