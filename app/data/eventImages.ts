@@ -16,7 +16,7 @@ export const getEventImages = (event: Event): string[] => {
       "/Yavatmal 14 feb 2025/Image-3.jpg",
       "/Yavatmal 14 feb 2025/Image-4.jpg",
       "/Yavatmal 14 feb 2025/Image-5.jpg"
-    ],
+    ], 
     "Kolhapur 22 may 24": [
       "/kol first event 22 may 2024/image-1.jpeg",
       "/kol first event 22 may 2024/image-2.jpeg",
