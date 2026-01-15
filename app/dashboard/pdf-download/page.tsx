@@ -44,10 +44,34 @@ export default function Downloads() {
       subCategory: 'motor-insurance',
       filePath: '/pdfs/motorinsurancepdf/Motor_Insurance_IA_Payout_OCT.pdf'
     },
+    {
+      id: '2',
+      name: 'Motor_Insurance_JAN_2026_DSA_GRID.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'motor-insurance',
+      filePath: '/pdfs/motorinsurancepdf/JAN_2026_DSA_GRID.pdf'
+    },
+     {
+      id: '3',
+      name: 'Motor_Insurance_MAHARASHTRA_DSA_JANUARY_2026.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'motor-insurance',
+      filePath: '/pdfs/motorinsurancepdf/MAHARASHTRA_DSA_JANUARY_2026.pdf'
+    },
 
     // Insurance - Life Insurance
     {
-      id: '2',
+      id: '4',
       name: 'ABSLI_FESTIVE_FLIGHTS_CONTEST.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -59,7 +83,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/ABSLI_FESTIVE_FLIGHTS_CONTEST.pdf'
     },
     {
-      id: '3',
+      id: '5',
       name: 'AXIS_MAX_FESTIVE_FLIGHTS_CONTEST.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -71,7 +95,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/AXIS_MAX_FESTIVE_FLIGHTS_CONTEST.pdf'
     },
     {
-      id: '4',
+      id: '6',
       name: 'BAJAJ_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -83,7 +107,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/BAJAJ_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf'
     },
     {
-      id: '5',
+      id: '7',
       name: 'DIGIT_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -95,7 +119,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/DIGIT_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf'
     },
     {
-      id: '6',
+      id: '8',
       name: 'HDFC_LIFE_GRID_FESTIVE_FLIGHTS_CONTEST.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -107,7 +131,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE_GRID_FESTIVE_FLIGHTS_CONTEST.pdf'
     },
     {
-      id: '7',
+      id: '9',
       name: 'ICICI_PRUDENTIAL_FESTIVE_FLIGHTS_CONTEST.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -119,7 +143,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/ICICI_PRUDENTIAL_FESTIVE_FLIGHTS_CONTEST.pdf'
     },
     {
-      id: '8',
+      id: '10',
       name: 'TATA_AIA_FESTIVE_FLIGHTS_CONTEST.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -130,10 +154,141 @@ export default function Downloads() {
       subCategory: 'life-insurance',
       filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_FESTIVE_FLIGHTS_CONTEST.pdf'
     },
-
+{
+      id: '11',
+      name: 'AXIS_LIFE_GRID.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/AXIS_LIFE_GRID.pdf'
+    },
+    {
+      id: '12',
+      name: 'AXIS_MAX_GRID_50%.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/AXIS_MAX_GRID_50%.pdf'
+    },
+    {
+      id: '13',
+      name: 'BAJAJ_LIFE_GRID_50 %.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/BAJAJ_LIFE_GRID_50 %.pdf'
+    },
+    {
+      id: '14',
+      name: 'DIGIT_GRID.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/DIGIT_GRID.pdf'
+    },
+    {
+      id: '15',
+      name: 'DIGIT_GRID_50 %.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/DIGIT_GRID_50 %.pdf'
+    },
+    {
+      id: '16',
+      name: 'HDFC_LIFE.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE.pdf'
+    },
+    {
+      id: '17',
+      name: 'HDFC_LIFE_GRID_50 %.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE_GRID_50 %.pdf'
+    },
+    {
+      id: '18',
+      name: 'ICICI_LIFE.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/ICICI_LIFE.pdf'
+    },
+    {
+      id: '19',
+      name: 'ICICI_LIFE_GRID_50%.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/ICICI_LIFE_GRID_50%.pdf'
+    },
+    {
+      id: '20',
+      name: 'TATA_AIA_GRID.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_GRID.pdf'
+    },
+    {
+      id: '21',
+      name: 'TATA_AIA_GRID_50 %.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'life-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_GRID_50 %.pdf'
+    },
     // Insurance - Health Insurance
     {
-      id: '9',
+      id: '22',
       name: 'HEALTH_FINAL_PAYOUT_FESTIVE_FLIGHTS_2025.pdf',
       type: 'pdf',
       size: '2.8 MB',
@@ -144,10 +299,33 @@ export default function Downloads() {
       subCategory: 'health-insurance',
       filePath: '/pdfs/healthinsurancepdf/HEALTH_FINAL_PAYOUT_FESTIVE_FLIGHTS_2025.pdf'
     },
-
+     {
+      id: '23',
+      name: 'HEALTH_GRID_JANUARY_(50%).pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/HEALTH_GRID_JANUARY_(50%).pdf'
+    },
+    {
+      id: '24',
+      name: 'HEALTH_GRID_MONTH_OF_JANUARY_80%.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'health-insurance',
+      filePath: '/pdfs/lifeinsurancepdf/HEALTH_GRID_MONTH_OF_JANUARY_80%.pdf'
+    },
     // Loan - Home Loan
     {
-      id: '10',
+      id: '25',
       name: 'IA_Festive_Flights_Home_Loan_Payout.pdf',
       type: 'pdf',
       size: '2.2 MB',
@@ -161,7 +339,7 @@ export default function Downloads() {
 
     // Loan - Business Loan
     {
-      id: '11',
+      id: '26',
       name: 'IA_Festive_Flights_Business_Loan_Payout.pdf',
       type: 'xlsx',
       size: '1.7 MB',
@@ -175,7 +353,7 @@ export default function Downloads() {
 
     // Loan - LAP Loan
     {
-      id: '12',
+      id: '27',
       name: 'IA_Festive_Flights_LAP_Loan_Payout.pdf',
       type: 'xlsx',
       size: '1.7 MB',
@@ -189,7 +367,7 @@ export default function Downloads() {
 
     // Loan - Personal Loan
     {
-      id: '14',
+      id: '28',
       name: 'IA_Festive_Flights_Personal_Loan_Payout.pdf',
       type: 'pdf',
       size: '2.1 MB',
@@ -203,7 +381,7 @@ export default function Downloads() {
 
     // Product Brochures
     {
-      id: '15',
+      id: '29',
       name: 'HDFC_Life_Sanchay_Plus_V24_.pdf',
       type: 'pdf',
       size: '4.2 MB',
@@ -213,7 +391,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/HDFC_Life_Sanchay_Plus_V24_.pdf'
     },
     {
-      id: '16',
+      id: '30',
       name: 'HDFC_Life_Click.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -223,7 +401,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/HDFC_Life_Click.pdf'
     },
     {
-      id: '17',
+      id: '31',
       name: 'Bajaj-Allianz-Term-Insurance-Brochure_.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -233,7 +411,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/Bajaj-Allianz-Term-Insurance-Brochure_.pdf'
     },
     {
-      id: '18',
+      id: '32',
       name: 'Bajaj_Etouch_Brochure.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -243,7 +421,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/Bajaj_Etouch_Brochure.pdf'
     },
     {
-      id: '19',
+      id: '33',
       name: 'ACE_Variants_One.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -253,7 +431,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/ACE_Variants_One.pdf'
     },
     {
-      id: '20',
+      id: '34',
       name: 'HDFC_Life-_Systematic_Pension_Plan.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -263,7 +441,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/HDFC_Life-_Systematic_Pension_Plan.pdf'
     },
     {
-      id: '21',
+      id: '35',
       name: 'Health_insurance_Medicare_Select_One_Pager.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -273,7 +451,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/health/Health_insurance_Medicare_Select_One_Pager.pdf'
     },
     {
-      id: '22',
+      id: '36',
       name: 'Health_Insurance_Creative_Brief_MediCare_Select_Launch.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -283,7 +461,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/health/Health_Insurance_Creative_Brief_MediCare_Select_Launch.pdf'
     },
     {
-      id: '23',
+      id: '37',
       name: 'Elevate_One_Page.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -293,7 +471,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/health/Elevate_One_Page.pdf'
     },
     {
-      id: '24',
+      id: '38',
       name: 'Broc_New_Elevate.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -303,7 +481,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/Broc_New_Elevate.pdf'
     },
     {
-      id: '25',
+      id: '39',
       name: 'Fabing_One_Pager_MAX_Sept2023.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -313,7 +491,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/Fabing_One_Pager_MAX_Sept2023.pdf'
     },
     {
-      id: '26',
+      id: '40',
       name: 'Star_Flexi_One Pager_Preferred_R10.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -323,7 +501,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/Star_Flexi_One_Pager_Preferred_R10.pdf'
     },
     {
-      id: '27',
+      id: '41',
       name: 'One_pager_Super_Star_Classic_R10.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -333,7 +511,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/One_pager_Super_Star_Classic_R10.pdf'
     },
     {
-      id: '28',
+      id: '42',
       name: 'Star_Health_Assure_One_pager_Version_1.0.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -343,7 +521,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/Star_Health_Assure_One_pager_Version_1.0.pdf'
     },
     {
-      id: '29',
+      id: '43',
       name: 'Star_Women_Care_One_Pager_version_1.0.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -353,7 +531,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/Star_Women_Care_One_Pager_version_1.0.pdf'
     },
     {
-      id: '30',
+      id: '44',
       name: 'SBI_General_Health_Alpha_Leaflet_Alpha_Select_Alpha_Ultimate.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -363,7 +541,7 @@ export default function Downloads() {
       filePath: '/pdfs/productbroucher/SBI_General_Health_Alpha_Leaflet_Alpha_Select_Alpha_Ultimate.pdf'
     },
     {
-      id: '31',
+      id: '45',
       name: 'SBI_General_Health_Alpha_Brochure.pdf',
       type: 'pdf',
       size: '3.8 MB',
@@ -374,7 +552,7 @@ export default function Downloads() {
     },
     // Application Forms
     {
-      id: '32',
+      id: '46',
       name: 'New Client Application Form.pdf',
       type: 'pdf',
       size: '1.5 MB',
@@ -383,7 +561,7 @@ export default function Downloads() {
       filePath: '/pdfs/forms/New_Client_Application_Form.pdf'
     },
     {
-      id: '33',
+      id: '47',
       name: 'Policy Renewal Form.docx',
       type: 'doc',
       size: '0.8 MB',
