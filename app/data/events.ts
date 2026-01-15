@@ -57,7 +57,10 @@ export const events: Event[] = [
   { id: "Bhubaneswar 10 sep 25", title: "Business Event", date: "Sep 10, 2025", desc: "Synergy at its best", city: "Bhubaneswar" },
   { id: "Kolhapur 23 sep 25", title: "Business Event", date: "Sep 23, 2025", desc: "Minds aligned, goals defined", city: "Kolhapur" },
   { id: "Nashik 27 oct 25", title: "Business Event", date: "Oct 27, 2025", desc: "Progress. Partnership. Purpose", city: "Nashik" },
-  { id: "Sambhajinagar 1 nov 25", title: "Business Event", date: "Nov 1, 2025", desc: "Powerful minds. Purposeful meetings", city: "Sambhajinagar" },
+  { id: "Sambhajinagar 1 nov 25", title: "Business Event", date: "Nov 1, 2025", desc: "Powerful minds. Purposeful meetings", city: "Surat" },
+  { id: "Surat 21 nov 25", title: "Business Event", date: "Nov 21, 2025", desc: "A successful day of ideas and inspiration", city: "Kolkata" },
+  { id: "Kanpur 26 nov 25", title: "Business Event", date: "Nov 26, 2024", desc: "One meet, many milestones", city: "Kanpur" },
+  { id: "Solapur 14 nov 25", title: "Business Event", date: "Nov 14, 2025", desc: "Teamwork makes the vision work", city: "Solapur" },
 ];
 
 // Sort events by date

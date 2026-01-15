@@ -81,7 +81,7 @@ export const offerData: Record<string, Offer> = {
   'personal-loan': {
     title: 'Personal Loan',
     category: 'Finance',
-    icon: 'DollarSign',
+    icon: 'IndianRupee',
     description: 'Instant personal loan with minimal documentation for urgent financial needs',
     overview: 'A personal loan is an unsecured loan that can be used for various personal expenses without requiring collateral. It offers quick disbursal and flexible usage for emergencies, celebrations, travel, medical expenses, debt consolidation, or home improvement.',
     features: [
@@ -781,7 +781,7 @@ export const offerData: Record<string, Offer> = {
   },
 
   'fire-insurance': {
-    title: 'fire Insurance',
+    title: 'Fire Insurance',
     category: 'Protection',
     icon: 'Home',
     description: 'Protection for your home and property assets',
@@ -1735,6 +1735,68 @@ export const offerData: Record<string, Offer> = {
       returns: 'Rental yield + Capital appreciation',
       taxBenefits: 'As per property investment rules',
       specialFeature: 'NRI investment options available'
+    }
+  },
+
+  'pms-aif': {
+    title: 'PMS & AIF Investments',
+    category: 'Investment',
+    icon: 'Briefcase',
+    description: 'Sophisticated investment vehicles for high-alpha wealth creation',
+    overview: 'This segment caters to HNI and Ultra-HNI investors through two distinct professional routes: Portfolio Management Services (PMS) and Alternative Investment Funds (AIF). While PMS offers direct ownership of a concentrated stock portfolio in your own demat account, AIFs provide access to private equity, hedge funds, and structured debt. Both are designed for long-term wealth creation by outperforming traditional benchmarks through expert-led strategies.',
+    features: [
+      'Access to specialized Discretionary & Non-Discretionary PMS',
+      'Participation in Category I, II, and III Alternative Funds',
+      'Concentrated equity portfolios (typically 15-25 high-conviction stocks)',
+      'Exposure to private equity, venture capital, and distressed assets',
+      'Dynamic asset allocation and long-short trading strategies',
+      'Regular interaction with fund managers and research teams',
+      'Transparent digital tracking of holdings and performance'
+    ],
+    benefits: [
+      {
+        title: 'Professional Alpha Generation',
+        description: 'Benefit from specialized research and active management aimed at delivering superior returns over the long term.'
+      },
+      {
+        title: 'Portfolio Diversification',
+        description: 'Reduce correlation with the broader market by investing in unlisted shares, private debt, and complex hedge strategies.'
+      },
+      {
+        title: 'Direct Ownership & Transparency',
+        description: 'In PMS, securities are held in your individual name, providing full visibility and control over every transaction.'
+      },
+      {
+        title: 'Customizable Strategies',
+        description: 'Tailor-made solutions to align with specific risk profiles, avoiding certain sectors or focusing on niche themes like ESG or Mid-caps.'
+      },
+      {
+        title: 'Tax & Cost Efficiency',
+        description: 'Structured to manage capital gains efficiently with institutional-grade cost structures for high-value portfolios.'
+      }
+    ],
+    eligibility: [
+      'Minimum Investment: ₹50 Lakhs (for PMS) and ₹1 Crore (for AIF)',
+      'Investor Profile: Resident Indians, NRIs, HUFs, and Family Offices',
+      'Net Worth: High Net-worth certification required for certain AIF categories',
+      'Risk Appetite: Moderate to High',
+      'Investment Horizon: 3 to 10 years (typically long-term lock-ins for AIF)'
+    ],
+    documents: [
+      'KYC documents (PAN, Aadhaar/Passport)',
+      'CA certified Wealth Certificate (mandatory for AIF)',
+      'Latest 6 months Bank Statements & ITR copies',
+      'PMS Agreement & Power of Attorney (POA)',
+      'PPM (Private Placement Memorandum) acknowledgment',
+      'Cancelled Cheque from a linked bank account'
+    ],
+    offerDetails: {
+      minInvestment: '₹50 Lakhs to ₹1 Crore+',
+      feeStructure: '1.5% - 2.5% p.a. Management Fee',
+      performanceFee: '10% - 20% over a defined Hurdle Rate',
+      tenure: 'Open-ended (PMS) / 3-10 years (AIF)',
+      reporting: 'Monthly/Quarterly Portfolio Statements',
+      exitLoad: '1% - 3% (typically for early exits)'
     }
   },
 

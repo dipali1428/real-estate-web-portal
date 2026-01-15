@@ -11,9 +11,11 @@ export const getEventImages = (event: Event): string[] => {
       "/Akola 13 feb 2024/Image-4.jpeg"
     ],
     "Yavatmal 14 feb 24": [
-      "/Remaining/Image-1.jpeg",
-      "/Remaining/Image-2.jpeg",
-      "/Remaining/Image-3.jpeg"
+      "/Yavatmal 14 feb 2025/Image-1.jpg",
+      "/Yavatmal 14 feb 2025/Image-2.jpg",
+      "/Yavatmal 14 feb 2025/Image-3.jpg",
+      "/Yavatmal 14 feb 2025/Image-4.jpg",
+      "/Yavatmal 14 feb 2025/Image-5.jpg"
     ],
     "Kolhapur 22 may 24": [
       "/kol first event 22 may 2024/image-1.jpeg",
@@ -27,9 +29,9 @@ export const getEventImages = (event: Event): string[] => {
       "/sangli Event 5 june 2024/image-4.jpeg",
     ],
     "Sambhajinagar 17 jun 24": [
-      "/Sambhajinagar/image-1.jpeg",
-      "/Sambhajinagar/image-2.jpeg",
-      "/Sambhajinagar/image-3.jpeg"
+      "/Sambhajinagar 1 nov 2025/image-1.jpeg",
+      "/Sambhajinagar 1 nov 2025/image-2.jpeg",
+      "/Sambhajinagar 1 nov 2025/image-3.jpeg"
     ],
     "Sambhajinagar 16 jul 24": [
         "/Remaining/Image-20.jpeg",
@@ -84,10 +86,11 @@ export const getEventImages = (event: Event): string[] => {
       "/Nashik Event 19 oct 2024/image-4.jpeg"
     ],
     "Kolhapur 7 nov 24": [
-      "/kol secound event 7 Nov 2024/image-1.jpeg",
-      "/kol secound event 7 Nov 2024/image-2.jpeg",
-      "/kol secound event 7 Nov 2024/image-3.jpeg",
-      "/kol secound event 7 Nov 2024/image-4.jpeg"
+      "/Kolhapur 7 nov 2024/Image-1.jpg",
+      "/Kolhapur 7 nov 2024/Image-2.jpg",
+      "/Kolhapur 7 nov 2024/Image-3.jpg",
+      "/Kolhapur 7 nov 2024/Image-4.jpg",
+      "/Kolhapur 7 nov 2024/Image-5.jpg"
     ],
     "Hyderabad 13 nov 24": [
       "/HYD 13 Nov 2024/image-1.jpeg",
@@ -96,9 +99,10 @@ export const getEventImages = (event: Event): string[] => {
       "/HYD 13 Nov 2024/image-4.jpeg"
     ],
     "Indore 29 nov 24": [
-      "/19 jul 2024/Image-1.jpeg",
-      "/19 jul 2024/Image-2.jpeg",
-      "/19 jul 2024/Image-3.jpeg"
+      "/Indore 29 nov 2024/Image-1.jpg",
+      "/Indore 29 nov 2024/Image-2.jpg",
+      "/Indore 29 nov 2024/Image-3.jpg",
+      "/Indore 29 nov 2024/Image-4.jpg"
     ],
     "Pune 4 dec 24": [
       "/Pune 4 dec 2024/Image-1.jpeg",
@@ -112,9 +116,11 @@ export const getEventImages = (event: Event): string[] => {
       "/Pune event 11 dec 2024/image-3.jpeg"
     ],
     "Kolhapur 17 dec 24": [
-      "/kol first event 22 may 2024/image-1.jpeg",
-      "/kol first event 22 may 2024/image-2.jpeg",
-      "/kol first event 22 may 2024/image-3.jpeg"
+      "/Kolhapur 17 dec 2024/Image-1.jpg",
+      "/Kolhapur 17 dec 2024/Image-2.jpg",
+      "/Kolhapur 17 dec 2024/Image-3.jpg",
+      "/Kolhapur 17 dec 2024/Image-4.jpg",
+      "/Kolhapur 17 dec 2024/Image-5.jpg",
     ],
 
     // 2025 Events
@@ -124,9 +130,11 @@ export const getEventImages = (event: Event): string[] => {
       "/Nashik Event 19 oct 2024/image-3.jpeg"
     ],
     "Gurgaon 6 feb 25": [
-      "/HYD 13 Nov 2024/image-1.jpeg",
-      "/HYD 13 Nov 2024/image-2.jpeg",
-      "/HYD 13 Nov 2024/image-3.jpeg"
+      "/Gurgaon 6 feb 2025/Image-1.jpg",
+      "/Gurgaon 6 feb 2025/Image-2.jpg",
+      "/Gurgaon 6 feb 2025/Image-3.jpg",
+      "/Gurgaon 6 feb 2025/Image-4.jpg",
+      "/Gurgaon 6 feb 2025/Image-5.jpg"    
     ],
     "14 aug 24": [
       "/14 aug 2024/image-1.jpeg",
@@ -196,19 +204,24 @@ export const getEventImages = (event: Event): string[] => {
       "/Remaining/Image-40.jpeg"
     ],
     "Pune 21 mar 25": [
-      "/Remaining/Image-41.jpeg",
-      "/Remaining/Image-42.jpeg",
-      "/Remaining/Image-43.jpeg"
+      "/Pune 21 mar 2025/Image-1.jpg",
+      "/Pune 21 mar 2025/Image-2.jpg",
+      "/Pune 21 mar 2025/Image-3.jpg",
+      "/Pune 21 mar 2025/Image-4.jpg",
+      "/Pune 21 mar 2025/Image-5.jpg"
     ],
     "Nashik 9 apr 25": [
-      "/Remaining/Image-44.jpeg",
-      "/Remaining/Image-45.jpeg",
-      "/Remaining/Image-46.jpeg"
+      "/Nashik event 9 apr 2025/Image-1.jpeg",
+      "/Nashik event 9 apr 2025/Image-2.jpeg",
+      "/Nashik event 9 apr 2025/Image-3.jpeg",
+      "/Nashik event 9 apr 2025/Image-4.jpeg",
+      "/Nashik event 9 apr 2025/Image-6.jpeg"
     ],
     "Goa 18 apr 25": [
-      "/Remaining/Image-56.jpeg",
-      "/Remaining/Image-57.jpeg",
-      "/Remaining/Image-58.jpeg"
+      "/Goa 18 april 2025/Image-1.jpeg",
+      "/Goa 18 april 2025/Image-2.jpeg",
+      "/Goa 18 april 2025/Image-3.jpeg",
+      "/Goa 18 april 2025/Image-4.jpeg"
     ],
     "Kolkata 23 may 25": [
       "/Kolkata 23 may 2025/Image-1.jpeg",
@@ -222,9 +235,11 @@ export const getEventImages = (event: Event): string[] => {
       "/Nashik event 24 jun 2025/image-3.jpeg"
     ],
     "Jaipur 11 jul 25": [
-      "/Remaining/Image-47.jpeg",
-      "/Remaining/Image-48.jpeg",
-      "/Remaining/Image-49.jpeg"
+      "/Jaipur 11 jul 2025/Image-1.jpeg",
+      "/Jaipur 11 jul 2025/Image-2.jpeg",
+      "/Jaipur 11 jul 2025/Image-3.jpeg",
+      "/Jaipur 11 jul 2025/Image-4.jpeg",
+      "/Jaipur 11 jul 2025/Image-5.jpeg"
     ],
     "Gurgaon 12 jul 25": [
       "/Remaining/Image-59.jpeg",
@@ -243,9 +258,9 @@ export const getEventImages = (event: Event): string[] => {
       "/Kolhapur event 4 aug 2025/image-4.jpeg"
     ],
     "Bhopal 7 aug 25": [
-      "/Sambhajinagar/image-1.jpeg",
-      "/Sambhajinagar/image-2.jpeg",
-      "/Sambhajinagar/image-3.jpeg"
+      "/Sambhajinagar 1 nov 2025/image-1.jpeg",
+      "/Sambhajinagar 1 nov 2025/image-2.jpeg",
+      "/Sambhajinagar 1 nov 2025/image-3.jpeg"
     ],
     "Assam 13 aug 25": [
       "/kol secound event 7 Nov 2024/image-1.jpeg",
@@ -253,9 +268,10 @@ export const getEventImages = (event: Event): string[] => {
       "/kol secound event 7 Nov 2024/image-3.jpeg"
     ],
     "Gurgaon 8 sep 25": [
-      "/HYD 13 Nov 2024/image-1.jpeg",
-      "/HYD 13 Nov 2024/image-2.jpeg",
-      "/HYD 13 Nov 2024/image-3.jpeg"
+      "/Gurgaon 8 sep 2025/Image-1.jpeg",
+      "/Gurgaon 8 sep 2025/Image-2.jpeg",
+      "/Gurgaon 8 sep 2025/Image-3.jpeg",
+      "/Gurgaon 8 sep 2025/Image-4.jpeg"
     ],
     "Bhubaneswar 10 sep 25": [
       "/30 july 2024/Image-4.jpeg",
@@ -268,14 +284,35 @@ export const getEventImages = (event: Event): string[] => {
       "/kol first event 22 may 2024/image-3.jpeg"
     ],
     "Nashik 27 oct 25": [
-      "/Nashik event 27 oct 2025/image-1.jpeg",
-      "/Nashik event 27 oct 2025/image-2.jpeg",
-      "/Nashik event 27 oct 2025/image-3.jpeg"
+      "/Remaining/Image-44.jpeg",
+      "/Remaining/Image-45.jpeg",
+      "/Remaining/Image-46.jpeg"
     ],
     "Sambhajinagar 1 nov 25": [
-      "/Sambhajinagar/image-1.jpeg",
-      "/Sambhajinagar/image-2.jpeg",
-      "/Sambhajinagar/image-3.jpeg"
+      "/Sambhajinagar 1 nov 2025/Image-1.jpeg",
+      "/Sambhajinagar 1 nov 2025/Image-2.jpeg",
+      "/Sambhajinagar 1 nov 2025/Image-3.jpeg",
+      "/Sambhajinagar 1 nov 2025/Image-4.jpeg",
+      "/Sambhajinagar 1 nov 2025/Image-5.jpeg"
+    ],
+    "Kanpur 26 nov 25": [
+      "/kanpur 26 nov 2025/Image-1.jpg",
+      "/kanpur 26 nov 2025/Image-2.jpg",
+      "/kanpur 26 nov 2025/Image-3.jpg",
+      "/kanpur 26 nov 2025/Image-4.jpg"
+    ],
+    "Surat 21 nov 25": [
+      "/Surat 21 nov 2025/Image-1.jpg",
+      "/Surat 21 nov 2025/Image-2.jpg",
+      "/Surat 21 nov 2025/Image-3.jpg",
+      "/Surat 21 nov 2025/Image-4.jpg",
+      "/Surat 21 nov 2025/Image-5.jpg"
+    ],
+    "Solapur 14 nov 25": [
+      "/Solapur 14 nov 2025/Image-1.jpg",
+      "/Solapur 14 nov 2025/Image-2.jpg",
+      "/Solapur 14 nov 2025/Image-3.jpg",
+      "/Solapur 14 nov 2025/Image-4.jpg"
     ]
   };
   

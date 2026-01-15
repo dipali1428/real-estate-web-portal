@@ -1,10 +1,10 @@
 "use client";
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useState, lazy, Suspense, useRef } from 'react';
 import { 
   CheckCircle, Clock, ShieldCheck, FileText, Users, 
-  TrendingUp, ArrowLeft, Home, DollarSign, Briefcase, 
+  TrendingUp, ArrowLeft, Home, IndianRupee, Briefcase, 
   Factory, Car, Landmark, GraduationCap, Building, 
   Globe, Heart, Shield, Banknote, Award, Zap, Star, Plane, PieChart, X,
   ArrowRight, User, Mail, Smartphone
@@ -57,7 +57,7 @@ const offerToFormMap: Record<string, string> = {
   'fixed-deposit': 'fixeddeposit',
 };
 
-// Lazy load form components with the new FormProps interface
+// Lazy load form components
 const formComponents: Record<string, React.ComponentType<FormProps>> = {
   'homeloanform': lazy(() => import('@/app/component/products/forms/loan/homeloanform')),
   'personaloanform': lazy(() => import('@/app/component/products/forms/loan/personaloanform')),
@@ -88,7 +88,7 @@ const formComponents: Record<string, React.ComponentType<FormProps>> = {
 
 const iconMap: Record<string, React.ReactNode> = {
   'Home': <Home className="w-8 h-8" />,
-  'DollarSign': <DollarSign className="w-8 h-8" />,
+  'IndianRupee': <IndianRupee className="w-8 h-8" />,
   'Briefcase': <Briefcase className="w-8 h-8" />,
   'Factory': <Factory className="w-8 h-8" />,
   'Car': <Car className="w-8 h-8" />,
@@ -120,7 +120,6 @@ export default function OfferDetailPage() {
   const router = useRouter();
   const name = params.name as string;
 
-  // New States for Verification Flow and Data Storage
   const [isVerifying, setIsVerifying] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [verifiedUserData, setVerifiedUserData] = useState({ name: "", email: "", mobile: "" });
@@ -140,9 +139,8 @@ export default function OfferDetailPage() {
     offerDetails: { interestRate: 'Contact for details', maxLoanAmount: 'As per eligibility', processingFee: 'Standard' }
   };
 
-  const iconComponent = iconMap[offer.icon] || <DollarSign className="w-8 h-8" />;
+  const iconComponent = iconMap[offer.icon] || <IndianRupee className="w-8 h-8" />;
 
-  // SEO LOGIC
   useEffect(() => {
     const title = `${offer.title} - ${offer.category} | Financial Services`;
     document.title = title;
@@ -196,17 +194,10 @@ export default function OfferDetailPage() {
   };
 
   const handleBackToOffers = () => router.push('/#services');
-  
-  // Verification Trigger
-  // const handleApply = () => setIsVerifying(true);
-  const handleApply = () => {
-    // Skipping verification for now
-    setIsFormOpen(true);
-  };
+  const handleApply = () => setIsVerifying(true);
 
-  // Success Callback from Verification Popup - Captures Data
   const handleVerificationSuccess = (userData: { name: string, email: string, mobile: string }) => {
-    setVerifiedUserData(userData); // Store verified data
+    setVerifiedUserData(userData); 
     setIsVerifying(false);
     setIsFormOpen(true);
   };
@@ -335,7 +326,7 @@ export default function OfferDetailPage() {
             </section>
           </div>
 
-          {/* Process Overview (Restored All Steps) */}
+          {/* Process Overview */}
           <section className="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-12">
             <div className="flex items-center gap-3 mb-8">
               <div className="p-2 rounded-lg bg-blue-100"><Clock className="w-6 h-6 text-blue-600" /></div>
@@ -399,13 +390,13 @@ export default function OfferDetailPage() {
         </main>
 
         {/* VERIFICATION MODAL */}
-        {/* {isVerifying && (
+        {isVerifying && (
           <VerificationPopup 
             offerTitle={offer.title}
             onSuccess={handleVerificationSuccess}
             onCancel={() => setIsVerifying(false)}
           />
-        )} */}
+        )}
 
         {/* PRODUCT FORM MODAL */}
         {isFormOpen && (() => {
@@ -418,7 +409,6 @@ export default function OfferDetailPage() {
                 </button>
                 {FormComponent ? (
                   <Suspense fallback={<div className="flex justify-center items-center py-12">Loading form...</div>}>
-                    {/* 🔹 Passing the verified user data as a prop */}
                     <FormComponent 
                         onClose={() => setIsFormOpen(false)} 
                         prefilledData={verifiedUserData} 
@@ -440,16 +430,18 @@ export default function OfferDetailPage() {
 
 /**
  * 🔹 Verification Component (Internal Modal)
- * Features: Manual Details Entry, OTP Step, 30s Countdown Timer
+ * Features: Manual Details Entry, 6-Digit Box OTP Step, 30s Countdown Timer
  */
 function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
   const [step, setStep] = useState<"details" | "otp">("details");
   const [formData, setFormData] = useState({ name: "", email: "", mobile: "" });
-  const [otp, setOtp] = useState("");
+  
+  // States for 6-digit box OTP
+  const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  
-  // Resend Timer logic
   const [timer, setTimer] = useState(0);
 
   useEffect(() => {
@@ -459,6 +451,28 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
     }
     return () => clearInterval(interval);
   }, [timer]);
+
+  // Logic for digit box changes
+  const handleOtpChange = (value: string, index: number) => {
+    if (isNaN(Number(value))) return;
+
+    const newOtp = [...otp];
+    // Take only the last character entered
+    newOtp[index] = value.substring(value.length - 1);
+    setOtp(newOtp);
+
+    // Auto focus next box
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    // Move focus back on backspace if current box is empty
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
 
   const handleSendOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -471,7 +485,7 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
     try {
       await AuthService.sendLoginOtp({ identifier: formData.mobile });
       setStep("otp");
-      setTimer(30); // Start 30s countdown
+      setTimer(30); 
     } catch (err) {
       setError("Failed to send OTP. Please try again.");
     } finally {
@@ -480,13 +494,13 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
   };
 
   const handleVerifyOtp = async () => {
-    if (otp.length < 4) return setError("Enter the 6-digit OTP code.");
+    const otpString = otp.join("");
+    if (otpString.length < 6) return setError("Enter the 6-digit OTP code.");
+    
     setIsLoading(true);
     setError("");
     try {
-      await AuthService.verifyLoginOtp({ identifier: formData.mobile, otp });
-      
-      // 🔹 IMPORTANT: Pass the formData back on success
+      await AuthService.verifyLoginOtp({ identifier: formData.mobile, otp: otpString });
       onSuccess(formData); 
     } catch (err) {
       setError("Invalid OTP code. Please try again.");
@@ -550,12 +564,23 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
           ) : (
             <div className="space-y-6 text-center animate-in slide-in-from-bottom-4 duration-300">
               <div>
-                <p className="text-sm text-gray-500 mb-4">Enter the code sent to <br/> <span className="text-gray-800 font-bold tracking-wide">{formData.mobile}</span></p>
-                <input 
-                  type="text" maxLength={6} autoFocus placeholder="0 0 0 0 0 0"
-                  className="w-full border-2 border-gray-100 rounded-2xl p-4 text-center text-3xl tracking-[12px] focus:border-[#1CADA3] outline-none font-bold text-gray-700"
-                  value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ""))}
-                />
+                <p className="text-sm text-gray-500 mb-6">Enter the code sent to <br/> <span className="text-gray-800 font-medium tracking-wide">{formData.mobile}</span></p>
+                
+                {/* 6 DIGIT BOXES */}
+                <div className="flex justify-between gap-2 mb-2">
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      maxLength={1}
+                      ref={(el) => { inputRefs.current[index] = el; }}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(e.target.value, index)}
+                      onKeyDown={(e) => handleKeyDown(e, index)}
+                      className="w-12 h-14 border-2 border-gray-100 rounded-xl text-center text-2xl font-medium text-gray-700 focus:border-[#1CADA3] focus:ring-1 focus:ring-[#1CADA3] outline-none transition-all"
+                    />
+                  ))}
+                </div>
               </div>
 
               {error && <p className="text-red-500 text-xs font-medium bg-red-50 p-2 rounded-lg">{error}</p>}
@@ -570,7 +595,7 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
                 
                 <div className="flex flex-col gap-2 pt-2">
                   {timer > 0 ? (
-                    <p className="text-xs text-gray-400 font-medium">Resend OTP in {timer}s</p>
+                    <p className="text-xs text-red-400 font-medium">Resend OTP in {timer}s</p>
                   ) : (
                     <button onClick={() => handleSendOtp()} className="text-xs text-[#1CADA3] hover:text-[#178e86] font-bold underline">Resend OTP</button>
                   )}
