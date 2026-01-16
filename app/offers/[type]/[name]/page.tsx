@@ -1,13 +1,16 @@
 "use client";
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState, lazy, Suspense, useRef } from 'react';
+import { useEffect, useState, lazy, Suspense, useRef, cloneElement } from 'react';
 import { 
   CheckCircle, Clock, ShieldCheck, FileText, Users, 
   TrendingUp, ArrowLeft, Home, IndianRupee, Briefcase, 
   Factory, Car, Landmark, GraduationCap, Building, 
   Globe, Heart, Shield, Banknote, Award, Zap, Star, Plane, PieChart, X,
-  ArrowRight, User, Mail, Smartphone
+  ArrowRight, User, Mail, Smartphone, Wallet, CreditCard, Ship, Anchor,
+  Flame, HardHat, Building2, Trees, Gem, Landmark as Bank, Key, ShoppingBag, 
+  Stethoscope, Activity, Truck, MapPin, Search, Warehouse, Coins, BadgePercent,
+  PiggyBank, BarChart3, Receipt, Scale, UserCheck
 } from 'lucide-react';
 
 // Import services and data
@@ -15,8 +18,156 @@ import { getOfferByKey } from '@/app/data/offers';
 import { AuthService } from "@/app/services/authService";
 
 /**
+ * 🔹 COMPREHENSIVE HERO GRAPHIC COMPONENT
+ * Renders unique animated graphics for every single offer type.
+ */
+const ComprehensiveHeroGraphic = ({ slug }: { slug: string }) => {
+  const getGraphicConfig = () => {
+    switch (slug) {
+      // LOANS
+      case 'home-loan':
+        return { main: <Home />, orbs: [<Key />, <Bank />, <MapPin />, <FileText />], theme: "blue", accessory: <Key />, accColor: "cyan" };
+      case 'personal-loan':
+        return { main: <Wallet />, orbs: [<ShoppingBag />, <Plane />, <Smartphone />, <Zap />], theme: "sky", accessory: <IndianRupee />, accColor: "gold" };
+      case 'vehicle-loan':
+        return { main: <Car />, orbs: [<Key />, <Shield />, <MapPin />, <Zap />], theme: "indigo", accessory: <Zap />, accColor: "orange" };
+      case 'business-loan':
+        return { main: <Building2 />, orbs: [<TrendingUp />, <Users />, <Briefcase />, <Banknote />], theme: "blue", accessory: <TrendingUp />, accColor: "blue" };
+      case 'sme-loan':
+        return { main: <Factory />, orbs: [<BarChart3 />, <Users />, <Truck />, <ShieldCheck />], theme: "slate", accessory: <Truck />, accColor: "slate" };
+      case 'mortgage-loan':
+        return { main: <Landmark />, orbs: [<Home />, <Scale />, <FileText />, <Key />], theme: "indigo", accessory: <Home />, accColor: "blue" };
+      case 'education-loan':
+        return { main: <GraduationCap />, orbs: [<Globe />, <Award />, <BookIcon />, <Zap />], theme: "violet", accessory: <Award />, accColor: "purple" };
+      case 'loan-against-securities':
+        return { main: <Coins />, orbs: [<PieChart />, <TrendingUp />, <Shield />, <Banknote />], theme: "emerald", accessory: <BarChart3 />, accColor: "emerald" };
+
+      // INSURANCE
+      case 'life-insurance':
+        return { main: <Heart />, orbs: [<Users />, <Shield />, <Star />, <FileText />], theme: "pink", accessory: <Shield />, accColor: "rose" };
+      case 'health-insurance':
+        return { main: <Stethoscope />, orbs: [<Activity />, <Heart />, <ShieldCheck />, <PlusIcon />], theme: "green", accessory: <Activity />, accColor: "red" };
+      case 'motor-insurance':
+        return { main: <Car />, orbs: [<Shield />, <Zap />, <Truck />, <Clock />], theme: "blue", accessory: <ShieldCheck />, accColor: "indigo" };
+      case 'travel-insurance':
+        return { main: <Plane />, orbs: [<Globe />, <MapPin />, <Briefcase />, <Shield />], theme: "indigo", accessory: <Globe />, accColor: "cyan" };
+      case 'fire-insurance':
+        return { main: <Flame />, orbs: [<Home />, <Shield />, <Warehouse />, <Zap />], theme: "orange", accessory: <Shield />, accColor: "red" };
+      case 'cattle-insurance':
+        return { main: <Trees />, orbs: [<Heart />, <Shield />, <Activity />, <Zap />], theme: "emerald", accessory: <Heart />, accColor: "green" };
+      case 'marine-insurance':
+        return { main: <Ship />, orbs: [<Anchor />, <Globe />, <Shield />, <Warehouse />], theme: "blue", accessory: <Anchor />, accColor: "blue" };
+      case 'corporate-insurance':
+        return { main: <Building2 />, orbs: [<Briefcase />, <HardHat />, <Users />, <ShieldCheck />], theme: "slate", accessory: <Briefcase />, accColor: "slate" };
+      case 'loan-protector-plan':
+        return { main: <ShieldCheck />, orbs: [<Banknote />, <Home />, <Users />, <Clock />], theme: "teal", accessory: <Shield />, accColor: "teal" };
+
+      // MUTUAL FUNDS & INVESTMENTS
+      case 'mutual-fund':
+        return { main: <PieChart />, orbs: [<TrendingUp />, <Coins />, <Search />, <Shield />], theme: "teal", accessory: <TrendingUp />, accColor: "emerald" };
+      case 'wealth-management':
+        return { main: <Gem />, orbs: [<Award />, <TrendingUp />, <BarChart3 />, <Bank />], theme: "amber", accessory: <Star />, accColor: "gold" };
+      case 'pms-aif':
+        return { main: <Briefcase />, orbs: [<TrendingUp />, <Gem />, <Building2 />, <Search />], theme: "purple", accessory: <Gem />, accColor: "violet" };
+      case 'fixed-deposit':
+        return { main: <PiggyBank />, orbs: [<Clock />, <ShieldCheck />, <Banknote />, <BadgePercent />], theme: "blue", accessory: <Clock />, accColor: "indigo" };
+      case 'bonds':
+        return { main: <Receipt />, orbs: [<Award />, <Landmark />, <Shield />, <Banknote />], theme: "slate", accessory: <Award />, accColor: "slate" };
+
+      // REAL ESTATE
+      case 'real-estate-investments':
+        return { main: <Building />, orbs: [<Home />, <MapPin />, <Building2 />, <Key />], theme: "blue", accessory: <MapPin />, accColor: "emerald" };
+
+      default:
+        return { main: <IndianRupee />, orbs: [<Zap />, <Shield />, <Star />, <TrendingUp />], theme: "blue", accessory: <IndianRupee />, accColor: "blue" };
+    }
+  };
+
+  const config = getGraphicConfig();
+  
+  const themeColors: any = {
+    blue: "from-blue-500 to-blue-700", sky: "from-sky-400 to-sky-600",
+    indigo: "from-indigo-500 to-indigo-700", slate: "from-slate-500 to-slate-700",
+    violet: "from-violet-500 to-violet-700", emerald: "from-emerald-500 to-emerald-700",
+    pink: "from-pink-400 to-pink-600", green: "from-green-500 to-green-700",
+    orange: "from-orange-400 to-orange-600", teal: "from-teal-400 to-teal-600",
+    amber: "from-amber-400 to-amber-600", purple: "from-purple-500 to-purple-700"
+  };
+
+  // Specific colors for the accessory circle
+  const accColors: any = {
+    indigo: "from-indigo-600 to-cyan-600",
+    gold: "from-amber-400 to-yellow-600",
+    orange: "from-orange-500 to-red-600",
+    blue: "from-blue-600 to-cyan-500",
+    slate: "from-slate-600 to-gray-700",
+    purple: "from-purple-600 to-violet-600",
+    emerald: "from-emerald-500 to-teal-600",
+    rose: "from-rose-500 to-pink-600",
+    red: "from-red-500 to-rose-600",
+    cyan: "from-cyan-500 to-blue-500",
+    green: "from-green-500 to-emerald-600",
+    teal: "from-teal-500 to-cyan-600",
+    violet: "from-violet-600 to-fuchsia-600"
+  };
+
+  return (
+    <div className="relative w-full h-[400px] md:h-[500px] flex items-center justify-center select-none">
+      {/* Background Pulse Glow */}
+      <div className={`absolute w-64 h-64 bg-linear-to-br ${themeColors[config.theme]} opacity-10 rounded-full blur-3xl animate-pulse`}></div>
+
+      {/* Dotted path SVG */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20" viewBox="0 0 500 500">
+        <path d="M100,250 Q100,100 250,100 T400,250 T250,400 T100,250" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="6,6" className="text-gray-400" />
+      </svg>
+
+      {/* Floating Satellite Orbs */}
+      {[
+        { pos: "top-10 left-10 md:top-20 md:left-20", delay: "0s" },
+        { pos: "top-0 right-10 md:top-10 md:right-32", delay: "1.5s" },
+        { pos: "bottom-10 left-0 md:bottom-20 md:left-10", delay: "3s" },
+        { pos: "bottom-0 right-10 md:bottom-10 md:right-20", delay: "4.5s" },
+      ].map((style, idx) => (
+        <div key={idx} className={`absolute ${style.pos} z-30 animate-float`} style={{ animationDelay: style.delay }}>
+          <div className="bg-white p-4 md:p-5 rounded-full shadow-2xl border border-gray-100 flex items-center justify-center transition-transform hover:scale-110">
+            <div className="text-gray-500">
+              {cloneElement(config.orbs[idx] as React.ReactElement, { size: 28 } as any)}
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* Central Illustration Area */}
+      <div className="relative z-20">
+        <div className={`w-40 h-40 md:w-56 md:h-56 bg-linear-to-br ${themeColors[config.theme]} rounded-3xl shadow-2xl flex items-center justify-center text-white rotate-6 transition-transform hover:rotate-0 duration-500`}>
+          <div className="-rotate-6">
+            {cloneElement(config.main as React.ReactElement, { size: 80, strokeWidth: 1.5 } as any)}
+          </div>
+        </div>
+        
+        {/* Dynamic Accessory Circle with Unique Colors per case */}
+        <div className={`absolute -bottom-4 -right-4 md:-bottom-8 md:-right-8 w-20 h-20 md:w-28 md:h-28 bg-linear-to-br ${accColors[config.accColor] || accColors.blue} rounded-full border-4 md:border-8 border-white shadow-xl flex items-center justify-center animate-bounce`}>
+          {cloneElement(config.accessory as React.ReactElement, { className: "text-white", size: 40 } as any)}
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotate(0); }
+          50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+      `}</style>
+    </div>
+  );
+};
+
+// Sub-icons for graphics
+const PlusIcon = () => <div className="font-bold text-xl text-green-500">+</div>;
+const BookIcon = () => <FileText />;
+
+/**
  * 🔹 Define the interface for the dynamic Product Forms 
- * to ensure they can accept prefilled data.
  */
 interface FormProps {
   onClose: () => void;
@@ -86,29 +237,6 @@ const formComponents: Record<string, React.ComponentType<FormProps>> = {
   'fixeddeposit': lazy(() => import('@/app/component/products/forms/investments/fixedDeposit')),
 };
 
-const iconMap: Record<string, React.ReactNode> = {
-  'Home': <Home className="w-8 h-8" />,
-  'IndianRupee': <IndianRupee className="w-8 h-8" />,
-  'Briefcase': <Briefcase className="w-8 h-8" />,
-  'Factory': <Factory className="w-8 h-8" />,
-  'Car': <Car className="w-8 h-8" />,
-  'Landmark': <Landmark className="w-8 h-8" />,
-  'GraduationCap': <GraduationCap className="w-8 h-8" />,
-  'TrendingUp': <TrendingUp className="w-8 h-8" />,
-  'Heart': <Heart className="w-8 h-8" />,
-  'Shield': <Shield className="w-8 h-8" />,
-  'Building': <Building className="w-8 h-8" />,
-  'Globe': <Globe className="w-8 h-8" />,
-  'Users': <Users className="w-8 h-8" />,
-  'FileText': <FileText className="w-8 h-8" />,
-  'Banknote': <Banknote className="w-8 h-8" />,
-  'Award': <Award className="w-8 h-8" />,
-  'Zap': <Zap className="w-8 h-8" />,
-  'Star': <Star className="w-8 h-8" />,
-  'Plane': <Plane className="w-8 h-8" />,
-  'PieChart': <PieChart className="w-8 h-8" />,
-};
-
 function getFormComponent(offerName: string): React.ComponentType<FormProps> | null {
   const formName = offerToFormMap[offerName];
   if (formName && formComponents[formName]) return formComponents[formName];
@@ -138,8 +266,6 @@ export default function OfferDetailPage() {
     documents: ['Identity proof', 'Address proof', 'Income proof'],
     offerDetails: { interestRate: 'Contact for details', maxLoanAmount: 'As per eligibility', processingFee: 'Standard' }
   };
-
-  const iconComponent = iconMap[offer.icon] || <IndianRupee className="w-8 h-8" />;
 
   useEffect(() => {
     const title = `${offer.title} - ${offer.category} | Financial Services`;
@@ -227,25 +353,51 @@ export default function OfferDetailPage() {
           </button>
         </div>
 
-        <main className="container mx-auto px-4 py-4 pt-24 md:pt-32">
-          {/* Header Section */}
-          <header className="mb-12 text-center">
-            <div className="inline-flex items-center justify-center p-4 rounded-full bg-linear-to-r from-[#2076C7]/10 to-[#1CADA3]/10 mb-6">
-              <div className="p-4 rounded-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white">
-                {iconComponent}
-              </div>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">{offer.title}</h1>
-            <div className="inline-block px-4 py-1 rounded-full bg-linear-to-r from-[#2076C7]/10 to-[#1CADA3]/10 text-[#2076C7] font-medium mb-6">{offer.category}</div>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">{offer.description}</p>
-            
-            <div className="flex justify-center">
-              <button onClick={handleApply} className="group flex items-center gap-3 px-10 py-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold text-lg rounded-2xl shadow-xl hover:scale-105 transition-all">
-                Apply for {offer.title} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          </header>
+        {/* --- MAIN HEADER SECTION (RE-DESIGNED TO MATCH IMAGE) --- */}
+        <header className="relative w-full overflow-hidden pt-24 md:pt-32 pb-16 bg-linear-to-b from-[#e1f0ff] via-[#f7faff] to-white">
+            <div className="container mx-auto px-6 relative z-10">
+                
+                {/* Custom Breadcrumb matching reference image style */}
+                <div className="flex items-center gap-2 text-sm font-medium mb-8">
+                    <span className="text-gray-500">Home</span>
+                    <span className="text-gray-400">&gt;</span>
+                    <span className="text-[#1CADA3]">{offer.title}</span>
+                </div>
 
+                <div className="flex flex-col lg:flex-row items-center gap-12">
+                    {/* Left Column: Text & CTA */}
+                    <div className="w-full lg:w-1/2 text-left space-y-8">
+                        <h1 className="text-5xl md:text-7xl font-bold text-gray-700 leading-[1.1]">
+                            Get Closer to Your Goals with a <span className="text-[#2076C7]">Instant {offer.title}</span>
+                        </h1>
+                        
+                        <p className="text-xl md:text-2xl text-gray-600 max-w-xl leading-relaxed">
+                            {offer.description || `Explore flexible ${offer.title} options tailored to meet your unique financial needs.`}
+                        </p>
+                        
+                        <div className="flex flex-wrap gap-5 pt-4">
+                           <button onClick={handleApply} className="flex items-center gap-3 px-6 py-3 md:px-8 md:py-4 text-sm md:text-base font-bold text-white bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full md:rounded-lg shadow-lg hover:opacity-90 active:scale-95 transition-all">
+                            Apply Now 
+                          </button>
+                        </div>
+                    </div>
+
+                    {/* Right Column: Visual Graphic (The floating character/icon logic) */}
+                    <div className="w-full lg:w-1/2">
+                        <ComprehensiveHeroGraphic slug={name} />
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom Wave Transition Shape */}
+            <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
+                <svg className="relative block w-full h-[80px]" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#FFFFFF"></path>
+                </svg>
+            </div>
+        </header>
+
+        <main className="container mx-auto px-4 py-4 pt-12">
           {/* Quick Stats */}
           <section className="mb-12">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -430,13 +582,11 @@ export default function OfferDetailPage() {
 
 /**
  * 🔹 Verification Component (Internal Modal)
- * Features: Manual Details Entry, 6-Digit Box OTP Step, 30s Countdown Timer
  */
 function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
   const [step, setStep] = useState<"details" | "otp">("details");
   const [formData, setFormData] = useState({ name: "", email: "", mobile: "" });
   
-  // States for 6-digit box OTP
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -452,23 +602,17 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
     return () => clearInterval(interval);
   }, [timer]);
 
-  // Logic for digit box changes
   const handleOtpChange = (value: string, index: number) => {
     if (isNaN(Number(value))) return;
-
     const newOtp = [...otp];
-    // Take only the last character entered
     newOtp[index] = value.substring(value.length - 1);
     setOtp(newOtp);
-
-    // Auto focus next box
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-    // Move focus back on backspace if current box is empty
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -565,8 +709,6 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
             <div className="space-y-6 text-center animate-in slide-in-from-bottom-4 duration-300">
               <div>
                 <p className="text-sm text-gray-500 mb-6">Enter the code sent to <br/> <span className="text-gray-800 font-medium tracking-wide">{formData.mobile}</span></p>
-                
-                {/* 6 DIGIT BOXES */}
                 <div className="flex justify-between gap-2 mb-2">
                   {otp.map((digit, index) => (
                     <input
@@ -592,7 +734,6 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
                 >
                   {isLoading ? "Verifying..." : "Verify & Open Application"}
                 </button>
-                
                 <div className="flex flex-col gap-2 pt-2">
                   {timer > 0 ? (
                     <p className="text-xs text-red-400 font-medium">Resend OTP in {timer}s</p>

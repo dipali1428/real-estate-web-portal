@@ -32,20 +32,10 @@ export default function Downloads() {
 
   // Sample data for downloads with actual file paths
   const downloadData: DownloadItem[] = [
+
+    // Insurance - Motor Insurance
     {
       id: '1',
-      name: 'Motor_Insurance_IA_Payout_OCT.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'motor-insurance',
-      filePath: '/pdfs/motorinsurancepdf/Motor_Insurance_IA_Payout_OCT.pdf'
-    },
-    {
-      id: '2',
       name: 'Motor_Insurance_JAN_2026_DSA_GRID.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -57,7 +47,7 @@ export default function Downloads() {
       filePath: '/pdfs/motorinsurancepdf/JAN_2026_DSA_GRID.pdf'
     },
      {
-      id: '3',
+      id: '2',
       name: 'Motor_Insurance_MAHARASHTRA_DSA_JANUARY_2026.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -70,92 +60,8 @@ export default function Downloads() {
     },
 
     // Insurance - Life Insurance
-    {
-      id: '4',
-      name: 'ABSLI_FESTIVE_FLIGHTS_CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/ABSLI_FESTIVE_FLIGHTS_CONTEST.pdf'
-    },
-    {
-      id: '5',
-      name: 'AXIS_MAX_FESTIVE_FLIGHTS_CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/AXIS_MAX_FESTIVE_FLIGHTS_CONTEST.pdf'
-    },
-    {
-      id: '6',
-      name: 'BAJAJ_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/BAJAJ_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf'
-    },
-    {
-      id: '7',
-      name: 'DIGIT_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/DIGIT_LIFE_FESTIVE_FLIGHTS_CONTEST.pdf'
-    },
-    {
-      id: '8',
-      name: 'HDFC_LIFE_GRID_FESTIVE_FLIGHTS_CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE_GRID_FESTIVE_FLIGHTS_CONTEST.pdf'
-    },
-    {
-      id: '9',
-      name: 'ICICI_PRUDENTIAL_FESTIVE_FLIGHTS_CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/ICICI_PRUDENTIAL_FESTIVE_FLIGHTS_CONTEST.pdf'
-    },
-    {
-      id: '10',
-      name: 'TATA_AIA_FESTIVE_FLIGHTS_CONTEST.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2025-11-15',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_FESTIVE_FLIGHTS_CONTEST.pdf'
-    },
-{
-      id: '11',
+  {
+      id: '3',
       name: 'AXIS_LIFE_GRID.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -167,7 +73,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/AXIS_LIFE_GRID.pdf'
     },
     {
-      id: '12',
+      id: '4',
       name: 'AXIS_MAX_GRID_50%.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -179,7 +85,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/AXIS_MAX_GRID_50%.pdf'
     },
     {
-      id: '13',
+      id: '5',
       name: 'BAJAJ_LIFE_GRID_50 %.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -191,7 +97,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/BAJAJ_LIFE_GRID_50 %.pdf'
     },
     {
-      id: '14',
+      id: '6',
       name: 'DIGIT_GRID.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -203,7 +109,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/DIGIT_GRID.pdf'
     },
     {
-      id: '15',
+      id: '7',
       name: 'DIGIT_GRID_50 %.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -215,7 +121,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/DIGIT_GRID_50 %.pdf'
     },
     {
-      id: '16',
+      id: '8',
       name: 'HDFC_LIFE.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -227,7 +133,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE.pdf'
     },
     {
-      id: '17',
+      id: '9',
       name: 'HDFC_LIFE_GRID_50 %.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -239,7 +145,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE_GRID_50 %.pdf'
     },
     {
-      id: '18',
+      id: '10',
       name: 'ICICI_LIFE.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -251,7 +157,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/ICICI_LIFE.pdf'
     },
     {
-      id: '19',
+      id: '11',
       name: 'ICICI_LIFE_GRID_50%.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -263,7 +169,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/ICICI_LIFE_GRID_50%.pdf'
     },
     {
-      id: '20',
+      id: '12',
       name: 'TATA_AIA_GRID.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -275,7 +181,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_GRID.pdf'
     },
     {
-      id: '21',
+      id: '13',
       name: 'TATA_AIA_GRID_50 %.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -287,20 +193,8 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_GRID_50 %.pdf'
     },
     // Insurance - Health Insurance
-    {
-      id: '22',
-      name: 'HEALTH_FINAL_PAYOUT_FESTIVE_FLIGHTS_2025.pdf',
-      type: 'pdf',
-      size: '2.8 MB',
-      uploadDate: '2025-11-01',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'health-insurance',
-      filePath: '/pdfs/healthinsurancepdf/HEALTH_FINAL_PAYOUT_FESTIVE_FLIGHTS_2025.pdf'
-    },
      {
-      id: '23',
+      id: '14',
       name: 'HEALTH_GRID_JANUARY_(50%).pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -312,7 +206,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/HEALTH_GRID_JANUARY_(50%).pdf'
     },
     {
-      id: '24',
+      id: '15',
       name: 'HEALTH_GRID_MONTH_OF_JANUARY_80%.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -324,60 +218,15 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/HEALTH_GRID_MONTH_OF_JANUARY_80%.pdf'
     },
     // Loan - Home Loan
-    {
-      id: '25',
-      name: 'IA_Festive_Flights_Home_Loan_Payout.pdf',
-      type: 'pdf',
-      size: '2.2 MB',
-      uploadDate: '2025-11-05',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'home-loan',
-      filePath: '/pdfs/loans/IA_Festive_Flights_Home_Loan_Payout.pdf'
-    },
-
+    
     // Loan - Business Loan
-    {
-      id: '26',
-      name: 'IA_Festive_Flights_Business_Loan_Payout.pdf',
-      type: 'xlsx',
-      size: '1.7 MB',
-      uploadDate: '2025-10-25',
-      category: 'payout',
-      month: 'october-2025',
-      year: '2025',
-      subCategory: 'business-loan',
-      filePath: '/pdfs/loans/IA_Festive_Flights_Business_Loan_Payout.pdf'
-    },
+    
 
     // Loan - LAP Loan
-    {
-      id: '27',
-      name: 'IA_Festive_Flights_LAP_Loan_Payout.pdf',
-      type: 'xlsx',
-      size: '1.7 MB',
-      uploadDate: '2025-10-25',
-      category: 'payout',
-      month: 'october-2025',
-      year: '2025',
-      subCategory: 'lap-loan',
-      filePath: '/pdfs/loans/IA_Festive_Flights_LAP_Loan_Payout.pdf'
-    },
+    
 
     // Loan - Personal Loan
-    {
-      id: '28',
-      name: 'IA_Festive_Flights_Personal_Loan_Payout.pdf',
-      type: 'pdf',
-      size: '2.1 MB',
-      uploadDate: '2025-11-05',
-      category: 'payout',
-      month: 'november-2025',
-      year: '2025',
-      subCategory: 'personal-loan',
-      filePath: '/pdfs/loans/IA_Festive_Flights_Personal_Loan_Payout.pdf'
-    },
+    
 
     // Product Brochures
     {
