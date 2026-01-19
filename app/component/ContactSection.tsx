@@ -131,7 +131,7 @@ const ContactSection = () => {
               </div>
             </div>
 
-            <div className="rounded-lg h-64 overflow-hidden">
+            {/* <div className="rounded-lg h-64 overflow-hidden">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3782.567683154472!2d73.83634507516995!3d18.543631682537887!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2c06cb7e90001%3A0x2c2f8f5e4e4e4e4e!2s7%20Business%20Square%20by%20Naiknavare%2C%20Ganeshkhind%20Road!5e0!3m2!1sen!2sin!4v1699000000000!5m2!1sen!2sin"
                 width="100%"
@@ -142,7 +142,20 @@ const ContactSection = () => {
                 referrerPolicy="no-referrer-when-downgrade"
               // title="Office Location"
               ></iframe>
+            </div> */}
+            <div className="rounded-lg h-64 overflow-hidden">
+              <iframe
+                src="https://www.google.com/maps?q=18.534151,73.839525&z=16&output=embed"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Office Location"
+              ></iframe>
             </div>
+
           </div>
 
           {/* Right - Form */}
