@@ -9,13 +9,10 @@ interface RegisterPayload {
     name: string;
     email: string;
     mobile: string;
-    pan: string;
-    city: string;
     rm_referral: string;
-    head: string;
-    category: string;
     password: string;
     confirm_password: string;
+    registerToken: string; // 🔐 REQUIRED AFTER OTP VERIFY
 }
 
 interface CibilPayload {
@@ -33,9 +30,21 @@ export const AuthService = {
         return response.data;
     },
 
-    // 🔹 Register endpoint → /api/auth/register
+    // 🔹 REGISTER (FINAL STEP)
     register: async (formData: RegisterPayload) => {
         const response = await api.post("/api/auth/register", formData);
+        return response.data;
+    },
+
+    // 🔹 SEND OTP FOR REGISTER
+    sendRegisterOtp: async (data: { mobile: string; email: string }) => {
+        const response = await api.post("/api/auth/register/send-otp", data);
+        return response.data;
+    },
+
+    // 🔹 VERIFY OTP FOR REGISTER
+    verifyRegisterOtp: async (data: { mobile: string; otp: string; email: string }) => {
+        const response = await api.post("/api/auth/register/verify-otp", data);
         return response.data;
     },
 
@@ -48,12 +57,6 @@ export const AuthService = {
         const response = await api.post("/api/auth/login/otp/verify", data);
         return response.data;
     },
-
-    // // 🔹 Verify user (check if email OR mobile exists)  // NOOOOT USINGGGG
-    // verifyUser: async ({ identifier }: { identifier: string }) => {
-    //     const response = await api.post("/api/auth/verify", { identifier });
-    //     return response.data;
-    // },
 
     // // 🔹 Update Password → /api/auth/update-password // NOOOOT USINGGGG
     // updatePassword: async ({ identifier, newPassword }: { identifier: string; newPassword: string }) => {
