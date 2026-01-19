@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react"; // Added useMemo
+import { useEffect, useRef, useState } from "react";
 import { DashboardService } from "@/app/services/dashboardService";
 import toast from "react-hot-toast";
 import CardTemplateImage from "@/app/assets/Bussiness_Card.png";
+// Ensure this path points to your actual logo file
+import LogoImage from "@/public/logo.png"; 
 
 // --- Types & Constants ---
 interface Profile {
@@ -35,6 +37,7 @@ export default function ProfileSection() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [profile, setProfile] = useState<Profile | null>(null);
+    const originalPassword = useRef<string>(""); 
     const hasFetched = useRef(false);
 
     // Verification States
@@ -50,37 +53,9 @@ export default function ProfileSection() {
     const [uploadingAadhaar, setUploadingAadhaar] = useState(false);
     const [uploadingGst, setUploadingGst] = useState(false);
 
-    // --- PROFILE COMPLETION LOGIC ---
-    const completionData = useMemo(() => {
-        if (!profile) return { percentage: 0, color: "bg-slate-200" };
-
-        const fields = [
-            { key: profile.email, weight: 10 },
-            { key: profile.mobile, weight: 10 },
-            { key: profile.city, weight: 5 },
-            { key: profile.pan, weight: 10 },
-            { key: profile.aadhaar, weight: 10 },
-            { key: profile.gst_number, weight: 5 },
-            { key: profile.head, weight: 10 },
-            { key: profile.category, weight: 10 },
-            { key: profile.password, weight: 5 },
-            { key: profile.bank_name, weight: 5 },
-            { key: profile.bank_account, weight: 10 },
-            { key: profile.ifsc, weight: 10 },
-        ];
-
-        // Name and Adv_ID are assumed present from initial registration (Base 10%)
-        let score = 0;
-        fields.forEach(f => { if (f.key && f.key.toString().trim() !== "") score += f.weight; });
-        
-        const percentage = Math.min(score, 100);
-        let color = "bg-rose-500";
-        if (percentage > 40) color = "bg-[#2076C7]";
-        if (percentage > 75) color = "bg-[#2076C7]";
-        if (percentage === 100) color = "bg-[#2076C7]";
-
-        return { percentage, color };
-    }, [profile]);
+    // Loader States for Downloads
+    const [isDownloadingCard, setIsDownloadingCard] = useState(false);
+    const [isDownloadingDSACard, setIsDownloadingDSACard] = useState(false);
 
     useEffect(() => {
         if (hasFetched.current) return;
@@ -90,6 +65,7 @@ export default function ProfileSection() {
                 setLoading(true);
                 const res = await DashboardService.getProfile();
                 setProfile(res.user);
+                originalPassword.current = res.user.password;
             } finally {
                 setLoading(false);
             }
@@ -97,7 +73,7 @@ export default function ProfileSection() {
         fetchProfile();
     }, []);
 
-    // --- Logic Handlers (Unchanged) ---
+    // --- Logic Handlers ---
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'pan' | 'aadhaar' | 'gst') => {
         const file = e.target.files?.[0];
         if (file) {
@@ -138,31 +114,13 @@ export default function ProfileSection() {
         setProfile({ ...profile, category: updated.join(",") });
     };
 
-    const handleAccountChange = (val: string, index: number) => {
-        if (!profile) return;
-        const digits = val.replace(/\D/g, "");
-        if (val !== "" && digits === "") return;
-        if (digits.length > 1) {
-            const fullNumber = digits.slice(0, 12);
-            setProfile({ ...profile, bank_account: fullNumber });
-            const nextIdx = Math.min(fullNumber.length, 11);
-            document.getElementById(`acc-${nextIdx}`)?.focus();
-            return;
-        }
-        const currentAcc = (profile.bank_account || "").padEnd(12, " ").split("");
-        currentAcc[index] = digits;
-        const newAcc = currentAcc.join("").trimEnd();
-        setProfile({ ...profile, bank_account: newAcc });
-        if (digits && index < 11) document.getElementById(`acc-${index + 1}`)?.focus();
-    };
-
     const downloadCardAsPhoto = async () => {
         if (!profile) return;
+        setIsDownloadingCard(true);
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-        const cvWidth = 1200;
-        const cvHeight = 675;
+        if (!ctx) return setIsDownloadingCard(false);
+        const cvWidth = 1200; const cvHeight = 675;
         canvas.width = cvWidth; canvas.height = cvHeight;
         try {
             const templateImg = new Image();
@@ -184,239 +142,364 @@ export default function ProfileSection() {
             ctx.font = "500 26px sans-serif"; ctx.fillText(profile.email.toLowerCase(), leftPadding + textXOffset, startY + gap - 5);
             drawIcon("M12 21C12 21 20 13 20 8C20 3.58172 16.4183 0 12 0C7.58172 0 4 3.58172 4 8C4 13 12 21 12 21ZM12 11C10.3431 11 9 9.65685 9 8C9 6.34315 10.3431 5 12 5C13.6569 5 15 6.34315 15 8C15 9.65685 13.6569 11 12 11Z", leftPadding, startY + (gap * 2));
             ctx.font = "bold 28px sans-serif"; ctx.fillText(profile.city, leftPadding + textXOffset, startY + (gap * 2) - 5);
-            ctx.fillStyle = iconColor; ctx.font = "bold 20px sans-serif"; ctx.fillText("AUTHORIZED PARTNER", leftPadding, cvHeight - 80);
             const link = document.createElement("a"); link.download = `${profile.name}_BusinessCard.jpg`;
             link.href = canvas.toDataURL("image/jpeg", 1.0); link.click();
             toast.success("Card downloaded successfully!");
-        } catch (e) { toast.error("Template failed to load."); }
+        } catch (e) { 
+            toast.error("Template failed to load."); 
+        } finally {
+            setIsDownloadingCard(false);
+        }
     };
 
-    if (loading || !profile) return (
-        <div className="flex flex-col gap-4 justify-center items-center h-[60vh]">
-            <div className="w-12 h-12 border-4 border-[#1CADA3] border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-slate-500 font-medium animate-pulse">Loading your profile...</p>
-        </div>
-    );
+    const downloadDSACardAsPhoto = async () => {
+        if (!profile) return;
+        setIsDownloadingDSACard(true);
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return setIsDownloadingDSACard(false);
+
+        const cvWidth = 1000;
+        const cvHeight = 570;
+        canvas.width = cvWidth;
+        canvas.height = cvHeight;
+
+        try {
+            // Background & Quality settings
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.roundRect(0, 0, cvWidth, cvHeight, 40);
+            ctx.fill();
+
+            // Decorative Elements
+            ctx.globalAlpha = 0.08;
+            ctx.fillStyle = "#1CADA3";
+            ctx.beginPath(); ctx.arc(cvWidth, 0, 220, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "#3b82f6";
+            ctx.beginPath(); ctx.arc(0, cvHeight, 220, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 1.0;
+
+            // Proper Logo Placement (Top Right with padding)
+            const logo = new Image();
+            logo.src = LogoImage.src; logo.crossOrigin = "anonymous";
+            await new Promise((res) => { logo.onload = res; logo.onerror = res; });
+            if (logo.complete && logo.naturalWidth > 0) {
+                const logoSize = 90;
+                const padding = 50;
+                ctx.drawImage(logo, cvWidth - logoSize - padding, padding, logoSize, logoSize);
+            }
+
+            // Header Content
+            ctx.fillStyle = "#1CADA3";
+            ctx.font = "bold 22px sans-serif";
+            ctx.fillText("INFINITY ARTHVISHVA", 60, 80);
+
+            ctx.fillStyle = "#1e293b";
+            ctx.font = "900 52px sans-serif";
+            ctx.fillText(profile.name.toUpperCase(), 60, 150);
+
+            ctx.fillStyle = "#64748b";
+            ctx.font = "bold 18px sans-serif";
+            ctx.fillText("CERTIFIED ADVISOR", 60, 190);
+
+            // Information Grid
+            const gridY = 280;
+            const col1 = 60;
+            const col2 = 520;
+            const rowGap = 90;
+
+            const drawInfo = (label: string, value: string, x: number, y: number) => {
+                ctx.fillStyle = "#94a3b8";
+                ctx.font = "bold 14px sans-serif";
+                ctx.fillText(label.toUpperCase(), x, y);
+                ctx.fillStyle = "#334155";
+                ctx.font = "bold 24px sans-serif";
+                ctx.fillText(value, x, y + 35);
+            };
+
+            drawInfo("Advisor ID", profile.adv_id, col1, gridY);
+            drawInfo("Contact Number", `+91 ${profile.mobile}`, col2, gridY);
+            drawInfo("Email Address", profile.email, col1, gridY + rowGap);
+            drawInfo("Location", profile.city, col2, gridY + rowGap);
+
+            // Footer Section
+            ctx.fillStyle = "#1CADA3";
+            ctx.beginPath(); ctx.roundRect(60, 510, 80, 10, 5); ctx.fill();
+            
+            ctx.textAlign = "right";
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "italic 15px serif";
+            ctx.fillText("Authorized Digital Signature Protected", cvWidth - 60, 520);
+
+            const link = document.createElement("a");
+            link.download = `${profile.name}_DSA_IdentityCard.png`;
+            link.href = canvas.toDataURL("image/png", 1.0);
+            link.click();
+            toast.success("Identity Card saved!");
+        } catch (e) {
+            toast.error("Failed to generate high-quality image.");
+        } finally {
+            setIsDownloadingDSACard(false);
+        }
+    };
+
+    if (loading || !profile) return <div className="flex justify-center items-center h-[60vh]"><div className="w-10 h-10 border-4 border-[#1CADA3] border-t-transparent rounded-full animate-spin" /></div>;
 
     const selectedHeads = profile.head ? profile.head.split(",") : [];
     const selectedCats = profile.category ? profile.category.split(",") : [];
 
     return (
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen bg-[#f8fafc]">
-            {/* --- TOP HEADER & PROGRESS BAR --- */}
-            <div className="flex flex-col gap-6 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Profile Settings</h1>
-                        <p className="text-slate-500 text-sm mt-1">Manage your advisor identity and professional credentials.</p>
-                    </div>
-                    <button 
-                        onClick={() => setIsEditing(!isEditing)} 
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all ${
-                            isEditing ? "bg-rose-50 text-rose-600 border border-rose-100" : "bg-[#1CADA3] text-white shadow-md shadow-[#1cada340]"
-                        }`}
-                    >
-                        {isEditing ? "✕ Cancel" : "Edit Profile"}
-                    </button>
+        <main className="max-w-[1440px] mx-auto px-4 md:px-8 py-8 bg-[#F8FAFC] min-h-screen">
+            {/* --- HEADER --- */}
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+                <div>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">Profile Settings</h1>
+                    <p className="text-slate-500 mt-1 sm:mt-2 text-sm sm:text-base">Manage your basic identity, banking, and professional credentials.</p>
                 </div>
-
-                {/* --- PROFESSIONAL COMPLETION BAR --- */}
-                <div className="space-y-2 pt-4 border-t border-slate-50">
-                    <div className="flex justify-between items-end">
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Profile Completion</span>
-                        <span className={`text-sm font-black ${completionData.percentage === 100 ? "text-emerald-500" : "text-slate-600"}`}>
-                            {completionData.percentage}%
-                        </span>
-                    </div>
-                    <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex">
-                        <div 
-                            className={`h-full transition-all duration-700 ease-out rounded-full ${completionData.color}`} 
-                            style={{ width: `${completionData.percentage}%` }}
-                        />
-                    </div>
-                    {completionData.percentage < 100 && (
-                        <p className="text-[10px] text-slate-400 font-medium">
-                            Complete your bank details and GST to reach 100% visibility.
-                        </p>
-                    )}
-                </div>
-            </div>
+                <button onClick={() => setIsEditing(!isEditing)} className={`px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg transition-all ${isEditing ? "bg-rose-500 text-white" : "bg-[#1CADA3] text-white"}`}>
+                    {isEditing ? "✕ Cancel Editing" : "✎ Edit Profile"}
+                </button>
+            </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* --- LEFT COLUMN: FORM SECTIONS --- */}
-                <div className="lg:col-span-8 space-y-6">
-                    
-                    {/* BASIC IDENTITY */}
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <div className="flex items-center gap-2 mb-6 pb-2 border-b border-slate-50">
-                            <h3 className="font-bold text-slate-800">Basic Information</h3>
+                
+                {/* --- LEFT COLUMN --- */}
+                <div className="lg:col-span-4 space-y-6">
+                    <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100">
+                        <div className="h-28 bg-[#1CADA3] relative mb-14">
+                            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
+                                <div className="w-24 h-24 rounded-2xl bg-slate-100 border-4 border-white overflow-hidden shadow-md flex items-center justify-center text-slate-300">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                </div>
+                            </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div className="space-y-1.5"><label className="text-[13px] font-semibold text-slate-500 ml-1">Advisor ID</label><input disabled value={profile.adv_id} className="w-full px-4 py-2.5 bg-slate-50 border-none text-slate-600 rounded-xl font-medium" /></div>
-                            <div className="space-y-1.5"><label className="text-[13px] font-semibold text-slate-500 ml-1">Full Name</label><input readOnly value={profile.name} className="w-full px-4 py-2.5 bg-slate-50 border-none text-slate-600 rounded-xl font-bold" /></div>
-                            <div className="space-y-1.5"><label className="text-[13px] font-semibold text-slate-500 ml-1">Email</label><input disabled={!isEditing} value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} className={`w-full px-4 py-2.5 text-slate-700 rounded-xl transition-all ${isEditing ? "bg-white border-2  border-[#1CADA3]" : "bg-slate-50"}`} /></div>
-                            <div className="space-y-1.5"><label className="text-[13px] font-semibold text-slate-500 ml-1">Mobile</label><input disabled={!isEditing} value={profile.mobile} onChange={(e) => setProfile({ ...profile, mobile: e.target.value })} className={`w-full px-4 py-2.5 text-slate-700 rounded-xl transition-all ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} /></div>
-                            <div className="space-y-1.5 md:col-span-2"><label className="text-[13px] font-semibold text-slate-500 ml-1">City</label><input readOnly value={profile.city} className="w-full px-4 py-2.5 bg-slate-50 text-slate-800 rounded-xl font-medium" /></div>
+                        <div className="px-6 pb-8 text-center">
+                            <h2 className="text-xl font-extrabold text-[#0f172a] uppercase">{profile.name}</h2>
+                            <p className="text-slate-400 text-[10px] font-bold tracking-widest mt-1">ADV ID: {profile.adv_id}</p>
+                            
+                            <div className="mt-8 space-y-4 text-left">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
+                                    <input disabled={!isEditing} value={profile.mobile} onChange={(e) => setProfile({...profile, mobile: e.target.value})} className={`w-full px-4 py-2.5 rounded-xl font-bold text-slate-700 text-sm outline-none transition-all ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50 border border-transparent"}`} />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email-ID</label>
+                                    <input disabled={!isEditing} value={profile.email} onChange={(e) => setProfile({...profile, email: e.target.value})} className={`w-full px-4 py-2.5 rounded-xl font-bold text-slate-700 text-sm outline-none transition-all ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50 border border-transparent"}`} />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">City</label>
+                                    <input readOnly value={profile.city} className="w-full px-4 py-2.5 rounded-xl font-bold text-slate-700 text-sm bg-slate-50 outline-none" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Update Password</label>
+                                    <input type="password" disabled={!isEditing} value={profile.password} onChange={(e) => setProfile({...profile, password: e.target.value})} className={`w-full px-4 py-2.5 rounded-xl font-bold text-slate-700 text-sm outline-none transition-all ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50 border border-transparent"}`} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                                </svg>
+                            </div>
+                            <h3 className="font-bold text-[#0f172a]">Bank Details (Coming Soon)</h3>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Bank Name</label>
+                                <input disabled={!isEditing} value={profile.bank_name || ""} onChange={(e) => setProfile({...profile, bank_name: e.target.value})} className={`w-full px-4 py-2.5 rounded-xl font-bold text-slate-700 text-sm outline-none transition-all uppercase ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50 border border-transparent"}`} placeholder="Enter Bank Name" />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Bank Account Number</label>
+                                <input disabled={!isEditing} value={profile.bank_account || ""} onChange={(e) => setProfile({...profile, bank_account: e.target.value.replace(/\D/g, "")})} className={`w-full px-4 py-2.5 rounded-xl font-bold text-slate-700 text-sm outline-none transition-all ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50 border border-transparent"}`} placeholder="Enter Account Number" />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">IFSC Code</label>
+                                <input disabled={!isEditing} value={profile.ifsc || ""} onChange={(e) => setProfile({...profile, ifsc: e.target.value.toUpperCase()})} className={`w-full px-4 py-2.5 rounded-xl font-bold text-slate-700 text-sm outline-none transition-all tracking-widest ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50 border border-transparent"}`} placeholder="IFSC Code" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* --- RIGHT COLUMN --- */}
+                <div className="lg:col-span-8 space-y-8">
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Digital Visiting Card */}
+                        <div className="space-y-3">
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Digital Visiting Card</h4>
+                            <div className="aspect-[1.75/1] rounded-2xl shadow-xl overflow-hidden relative border border-slate-200 bg-slate-900 group">
+                                <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${CardTemplateImage.src})` }} />
+                                <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                                    <div><h4 className="text-xl font-black text-slate-800 uppercase leading-none truncate">{profile.name}</h4><p className="text-[8px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Certified Financial Advisor</p></div>
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-center gap-2"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg><span className="text-[9px] font-bold text-slate-700">+91 {profile.mobile}</span></div>
+                                        <div className="flex items-center gap-2"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span className="text-[9px] font-medium text-slate-800 truncate">{profile.email}</span></div>
+                                        <div className="flex items-center gap-2"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span className="text-[9px] font-bold text-slate-700">{profile.city}</span></div>
+                                    </div>
+                                    <button 
+                                        disabled={isDownloadingCard}
+                                        onClick={downloadCardAsPhoto} 
+                                        className="opacity-0 group-hover:opacity-100 transition-all duration-300 w-fit bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-bold shadow-lg flex items-center gap-2 hover:bg-black disabled:opacity-70"
+                                    >
+                                        {isDownloadingCard && <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                                        {isDownloadingCard ? "Generating..." : "Download Card"}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* DSA Identity Card */}
+                        <div className="space-y-3">
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">DSA Identity Card</h4>
+                            <div className="aspect-[1.75/1] rounded-2xl bg-white border border-blue-100 shadow-2xl p-6 relative overflow-hidden group">
+                                <div className="absolute -right-10 -top-10 w-40 h-40 bg-[#1CADA3] opacity-10 rounded-full blur-3xl"></div>
+                                <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-500 opacity-10 rounded-full blur-3xl"></div>
+
+                                <div className="relative h-full flex flex-col justify-between">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="text-[10px] font-bold text-[#1CADA3] tracking-[0.2em] uppercase">Infinity Arthvishva</p>
+                                            <h4 className="text-xl font-black text-gray-700 uppercase tracking-tight mt-1">{profile.name}</h4>
+                                        </div>
+                                        {/* Minimal Logo in UI */}
+                                        <div className="w-10 h-10 bg-white rounded-xl shadow-sm border border-slate-50 flex items-center justify-center p-1">
+                                            <img src={LogoImage.src} alt="logo" className="w-full h-full object-contain" />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-slate-100 pt-4">
+                                        <div>
+                                            <p className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">Advisor ID</p>
+                                            <p className="text-[8px] font-bold text-gray-500">{profile.adv_id}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">Contact Number</p>
+                                            <p className="text-[8px] font-bold text-gray-500">+91 {profile.mobile}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">Email Address</p>
+                                            <p className="text-[8px] font-bold text-gray-500 truncate">{profile.email}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">Location</p>
+                                            <p className="text-[8px] font-bold text-gray-500">{profile.city}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-between items-end pt-2">
+                                        <button 
+                                            disabled={isDownloadingDSACard}
+                                            onClick={downloadDSACardAsPhoto} 
+                                            className="opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 bg-[#1CADA3] text-white px-3 py-1.5 rounded-lg text-[9px] font-bold shadow-lg flex items-center gap-2 hover:bg-emerald-600 uppercase tracking-tighter disabled:opacity-70"
+                                        >
+                                            {isDownloadingDSACard && <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                                            {isDownloadingDSACard ? "Generating..." : "Download Card"}
+                                        </button>
+                                        <p className="text-[6px] text-slate-600 uppercase font-medium serif">Authorized Digital Signature Protected</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     {/* PROFESSIONAL EXPERTISE */}
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <div className="flex items-center gap-2 mb-6 pb-2 border-b border-slate-50">
-                            <h3 className="font-bold text-slate-800">Professional Expertise</h3>
-                        </div>
+                    <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-bold text-[#0f172a]">Professional Expertise</h3>
+                        </div>                        
                         <div className="space-y-6">
-                            <div>
-                                <label className="text-[13px] font-bold text-slate-400 uppercase mb-3 block">Head Categories</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {Object.keys(CATEGORY_MAP).map((head) => (
-                                        <button key={head} type="button" disabled={!isEditing} onClick={() => toggleHead(head)} className={`px-4 py-2 text-sm font-bold rounded-xl border-2 transition-all ${selectedHeads.includes(head) ? "bg-green-50 border-[#1CADA3] text-[#1CADA3]" : "bg-slate-50 border-transparent text-slate-400"}`}>{head}</button>
-                                    ))}
-                                </div>
+                            <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Head Categories</label>
+                                <div className="flex flex-wrap gap-3">{Object.keys(CATEGORY_MAP).map((head) => (
+                                    <button key={head} disabled={!isEditing} onClick={() => toggleHead(head)} className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all border-2 ${selectedHeads.includes(head) ? "bg-[#1CADA3] border-[#1CADA3] text-white shadow-md shadow-[#1cada330]" : "bg-white border-slate-100 text-slate-500"}`}>{head}</button>
+                                ))}</div>
                             </div>
-                            <div>
-                                <label className="text-[13px] font-bold text-slate-400 uppercase mb-3 block">Sub Categories</label>
-                                {selectedHeads.length === 0 ? <div className="p-4 bg-slate-50 rounded-xl text-slate-400 text-sm">Select head category first.</div> : (
-                                    <div className="space-y-5">
-                                        {selectedHeads.map((head) => (
-                                            <div key={head} className="p-4 bg-slate-50/50 rounded-2xl border border-slate-100">
-                                                <p className="font-bold text-slate-700 text-xs uppercase mb-3 px-1">{head}</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {(CATEGORY_MAP[head] ?? []).map((cat) => (
-                                                        <button key={cat} type="button" disabled={!isEditing} onClick={() => toggleCategory(cat)} className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all ${selectedCats.includes(cat) ? "bg-white border-[#1CADA3] text-[#1CADA3] shadow-sm" : "bg-white border-slate-200 text-slate-500"}`}>{cat}</button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
+                            {selectedHeads.length > 0 && (
+                                <div className="grid gap-4">{selectedHeads.map(head => (
+                                    <div key={head} className="p-5 border border-slate-100 rounded-2xl bg-white shadow-sm">
+                                        <p className="text-[10px] font-black text-[#1CADA3] uppercase mb-4 px-1">Sub Categories</p>
+                                        <div className="flex flex-wrap gap-2">{(CATEGORY_MAP[head] || []).map(cat => (
+                                            <button key={cat} disabled={!isEditing} onClick={() => toggleCategory(cat)} className={`px-4 py-2 rounded-lg text-[11px] font-bold transition-all ${selectedCats.includes(cat) ? "bg-[#1CADA3] text-white shadow-md" : "bg-slate-50 text-slate-500 hover:bg-slate-100"}`}>{cat}</button>
+                                        ))}</div>
                                     </div>
-                                )}
-                            </div>
+                                ))}</div>
+                            )}
                         </div>
                     </div>
 
-                    {/* IDENTITY VERIFICATION */}
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <div className="flex items-center gap-2 mb-6 pb-2 border-b border-slate-50">
-                            <h3 className="font-bold text-slate-800">Identity Verification</h3>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div className="space-y-1.5"><label className="text-[13px] font-semibold text-slate-500 ml-1">PAN Card</label><div className="relative"><input disabled value={profile.pan} className="w-full px-4 py-2.5 bg-slate-50 text-slate-800 rounded-xl font-bold uppercase tracking-widest" /><div className={`absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 rounded-md text-[10px] font-black uppercase ${panVerified ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-600"}`}>{panVerified ? "Verified ✓" : "Pending"}</div></div></div>
-                            <div className="space-y-1.5"><label className="text-[13px] font-semibold text-slate-500 ml-1">Aadhaar</label><div className="relative"><input disabled={!isEditing} maxLength={12} value={profile.aadhaar || ""} onChange={(e) => setProfile({ ...profile, aadhaar: e.target.value })} className={`w-full px-4 py-2.5 rounded-xl font-bold tracking-[0.2em] ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} /><div className={`absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 rounded-md text-[10px] font-black uppercase ${aadhaarVerified ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-600"}`}>{aadhaarVerified ? "Verified ✓" : "Pending"}</div></div></div>
-                            <div className="space-y-1.5"><label className="text-[13px] font-semibold text-slate-500 ml-1">GST Number</label><div className="relative"><input disabled={!isEditing} maxLength={15} value={profile.gst_number || ""} onChange={(e) => setProfile({ ...profile, gst_number: e.target.value.toUpperCase() })} placeholder="" className={`w-full px-4 py-2.5 text-gray-700 rounded-xl font-bold tracking-widest ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} /><div className={`absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 rounded-md text-[10px] font-black uppercase ${gstVerified ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-500"}`}>{gstVerified ? "Verified ✓" : "Not Verified"}</div></div></div>
-                            <div className="md:col-span-2 lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-                                <div className={`p-4 rounded-2xl border-2 border-dashed transition-all ${panFile ? "border-emerald-200 bg-emerald-50/30" : "border-slate-100 text-gray-500 bg-slate-50/30"}`}>
-                                    <p className="text-[11px] font-black text-slate-600 uppercase mb-3">PAN Document</p>
-                                    <input type="file" disabled={!isEditing || uploadingPan} accept="image/*,.pdf" onChange={(e) => handleFileChange(e, 'pan')} className="text-xs w-full cursor-pointer" />
-                                    {panFile && !panVerified && isEditing && <button onClick={() => handleUploadAndVerify('pan')} className="mt-4 w-full py-2.5 bg-slate-800 text-white text-xs font-bold rounded-xl">{uploadingPan ? "Processing..." : "Verify PAN"}</button>}
-                                </div>
-                                <div className={`p-4 rounded-2xl border-2 border-dashed transition-all ${aadhaarFile ? "border-emerald-200 bg-emerald-50/30" : "border-slate-100 text-gray-500 bg-slate-50/30"}`}>
-                                    <p className="text-[11px] font-black text-slate-600 uppercase mb-3">Aadhaar Document</p>
-                                    <input type="file" disabled={!isEditing || uploadingAadhaar} accept="image/*,.pdf" onChange={(e) => handleFileChange(e, 'aadhaar')} className="text-xs w-full cursor-pointer" />
-                                    {aadhaarFile && !aadhaarVerified && isEditing && <button onClick={() => handleUploadAndVerify('aadhaar')} className="mt-4 w-full py-2.5 bg-slate-800 text-white text-xs font-bold rounded-xl">{uploadingAadhaar ? "Processing..." : "Verify Aadhaar"}</button>}
-                                </div>
-                                <div className={`p-4 rounded-2xl border-2 border-dashed transition-all ${gstFile ? "border-emerald-200 bg-emerald-50/30" : "border-slate-100 text-gray-500 bg-slate-50/30"}`}>
-                                    <p className="text-[11px] font-black text-slate-600 uppercase mb-3">GST Certificate</p>
-                                    <input type="file" disabled={!isEditing || uploadingGst} accept="image/*,.pdf" onChange={(e) => handleFileChange(e, 'gst')} className="text-xs w-full cursor-pointer" />
-                                    {gstFile && !gstVerified && isEditing && <button onClick={() => handleUploadAndVerify('gst')} className="mt-4 w-full py-2.5 bg-slate-800 text-white text-xs font-bold rounded-xl">{uploadingGst ? "Processing..." : "Verify GST"}</button>}
-                                </div>
+                    {/* KYC & VERIFICATION HUB */}
+                    <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="p-2.5 bg-emerald-50 text-emerald-500 rounded-xl">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
                             </div>
+                            <h3 className="text-xl font-bold text-[#0f172a]">KYC & Verification (Coming Soon)</h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {[
+                                { title: 'PAN Card', value: profile.pan, verified: panVerified, type: 'pan', file: panFile, uploading: uploadingPan },
+                                { title: 'Aadhar Card', value: `•••• •••• ${profile.aadhaar?.slice(-4) || '1234'}`, verified: aadhaarVerified, type: 'aadhaar', file: aadhaarFile, uploading: uploadingAadhaar },
+                                { title: 'GST Registration', value: profile.gst_number || 'NOT LINKED', verified: gstVerified, type: 'gst', file: gstFile, uploading: uploadingGst },
+                            ].map((item) => (
+                                <div key={item.title} className="p-5 bg-slate-50/50 border border-slate-100 rounded-2xl flex flex-col gap-4 group hover:border-slate-200 transition-all">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex gap-4 items-center">
+                                            <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-[#1CADA3] transition-colors">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+                                            </div>
+                                            <div>
+                                                <h5 className="text-xs font-bold text-[#0f172a]">{item.title}</h5>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.value}</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-lg ${item.verified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>
+                                                {item.verified ? "Verified" : "Pending"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {isEditing && !item.verified && (
+                                        <div className="pt-3 border-t border-dashed border-slate-200 flex flex-col gap-2">
+                                            <div className="flex items-center justify-between bg-white p-2 rounded-xl border border-slate-100">
+                                                <label className="cursor-pointer flex-1">
+                                                    <span className="text-[10px] font-bold text-slate-500 flex items-center gap-2">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                                        {item.file ? <span className="text-[#1CADA3] truncate max-w-[120px]">{item.file.name}</span> : "Choose Document"}
+                                                    </span>
+                                                    <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => handleFileChange(e, item.type as any)} />
+                                                </label>
+                                                {item.file && (
+                                                    <button onClick={() => handleUploadAndVerify(item.type as any)} disabled={item.uploading} className="bg-[#1CADA3] text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-tighter disabled:opacity-50 transition-all">{item.uploading ? "Verifying..." : "Verify Now"}</button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     </div>
-
-                    {/* BANK DETAILS */}
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-    <div className="flex items-center gap-2 mb-6 pb-2 border-b border-slate-50">
-        <h3 className="font-bold text-slate-800">Bank Details</h3>
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Bank Name */}
-        <div className="space-y-1.5">
-            <label className="text-[13px] font-semibold text-slate-500 ml-1">Bank Name</label>
-            <input 
-                disabled={!isEditing} 
-                value={profile.bank_name || ""} 
-                placeholder="" 
-                onChange={(e) => setProfile({ ...profile, bank_name: e.target.value })} 
-                className={`w-full px-4 py-2.5 rounded-xl text-gray-700 transition-all font-bold ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50 border border-transparent"}`} 
-            />
-        </div>
-
-        {/* Branch Name - Added Here */}
-        <div className="space-y-1.5">
-            <label className="text-[13px] font-semibold text-slate-500 ml-1">Branch Name</label>
-            <input 
-                disabled={!isEditing} 
-                value={profile.branch_name || ""} 
-                placeholder="" 
-                onChange={(e) => setProfile({ ...profile, branch_name: e.target.value })} 
-                className={`w-full px-4 py-2.5 rounded-xl text-gray-700 transition-all font-bold ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50 border border-transparent"}`} 
-            />
-        </div>
-
-        {/* Account Number */}
-        <div>
-            <label className="text-[13px] font-semibold text-slate-500 mb-2 block ml-1">Account Number</label>
-            <div className={`flex items-center w-fit border-2 rounded-xl overflow-hidden ${isEditing ? "border-[#1CADA3]" : "border-slate-100 bg-slate-50"}`}>
-                {Array.from({ length: 12 }).map((_, i) => (
-                    <input 
-                        key={i} 
-                        id={`acc-${i}`} 
-                        type="text" 
-                        inputMode="numeric" 
-                        maxLength={i === 0 ? 12 : 1} 
-                        disabled={!isEditing} 
-                        value={profile.bank_account?.[i] || ""} 
-                        onChange={(e) => handleAccountChange(e.target.value, i)} 
-                        onKeyDown={(e) => { if (e.key === "Backspace" && !profile.bank_account?.[i] && i > 0) document.getElementById(`acc-${i - 1}`)?.focus(); }} 
-                        className={`w-7 h-10 sm:w-8 sm:h-11 text-center text-sm font-mono font-bold outline-none border-r border-slate-100 last:border-r-0 ${isEditing ? "text-[#1CADA3]" : "text-slate-500"} bg-transparent`} 
-                    />
-                ))}
-            </div>
-        </div>
-
-        {/* IFSC Code */}
-        <div className="space-y-1.5">
-            <label className="text-[13px] font-semibold text-slate-500 ml-1">IFSC Code</label>
-            <input 
-                disabled={!isEditing} 
-                value={profile.ifsc || ""} 
-                placeholder="" 
-                onChange={(e) => setProfile({ ...profile, ifsc: e.target.value.toUpperCase() })} 
-                className={`w-full px-4 py-2.5 h-[44px] rounded-xl text-gray-700 transition-all font-bold tracking-widest ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50 border border-transparent"}`} 
-            />
-        </div>
-    </div>
-</div>
 
                     {isEditing && (
                         <div className="flex justify-end pt-4">
-                            <button disabled={saving} onClick={async () => {
-                                try { setSaving(true); await DashboardService.editProfile(profile); toast.success("Profile updated!"); setIsEditing(false); } catch (err: any) { toast.error("Failed to update."); } finally { setSaving(false); }
-                            }} className="px-10 py-4 bg-[#1CADA3] text-white rounded-2xl shadow-xl hover:bg-[#168b83] font-bold">
+                            <button disabled={saving} onClick={async () => { try { setSaving(true); const passwordChanged = profile.password !== originalPassword.current; await DashboardService.editProfile(profile); if (passwordChanged) { toast.success("Security credentials updated successfully!"); originalPassword.current = profile.password; } else { toast.success("Profile information updated!"); } setIsEditing(false); } catch (err) { toast.error("Failed to update changes."); } finally { setSaving(false); } }} className="px-12 py-4 bg-[#1CADA3] text-white rounded-2xl shadow-xl shadow-[#1cada340] font-bold transition-all active:scale-95">
                                 {saving ? "Saving Changes..." : "Save All Changes"}
                             </button>
                         </div>
                     )}
-                </div>
-
-                {/* --- RIGHT COLUMN: ID CARD PREVIEW --- */}
-                <div className="lg:col-span-4 lg:sticky lg:top-8 self-start">
-                    <div className="bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100">
-                        <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Digital Visiting Card</h4>
-                        <div className="w-full aspect-[1.75/1] rounded-2xl shadow-2xl overflow-hidden relative border border-slate-200 bg-slate-900 group select-none">
-                            <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" style={{ backgroundImage: `url(${CardTemplateImage.src})` }} />
-                            <div className="absolute inset-0 p-6 flex flex-col justify-between">
-                                <div><h4 className="text-[1.1rem] font-black text-slate-800 uppercase leading-none tracking-tight truncate">{profile.name || "YOUR NAME"}</h4><p className="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-wider">Certified Financial Advisor</p></div>
-                                <div className="space-y-2 mt-4">
-                                    <div className="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg><span className="text-[11px] font-bold text-slate-700 tracking-wide">+91 {profile.mobile}</span></div>
-                                    <div className="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span className="text-[9px] font-medium text-slate-800 truncate">{profile.email.toLowerCase()}</span></div>
-                                    <div className="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span className="text-[11px] font-bold text-slate-700">{profile.city}</span></div>
-                                </div>
-                                <div className="pt-2 border-t border-slate-200/50"><span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Authorized Partner</span></div>
-                            </div>
-                        </div>
-                        <button onClick={downloadCardAsPhoto} className="w-full mt-6 flex items-center justify-center gap-3 px-6 py-4 bg-slate-900 text-white rounded-2xl hover:bg-black font-bold text-sm transition-all shadow-lg active:scale-95">Download Card</button>
-                    </div>
                 </div>
             </div>
         </main>

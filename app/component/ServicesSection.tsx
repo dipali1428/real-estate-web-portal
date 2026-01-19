@@ -67,7 +67,7 @@ const ServicesSection = () => {
         { name: "Mutual Funds", slug: "mutual-funds" },
         { name: "Wealth Management", slug: "wealth-management" },
         { name: "Pension Funds", slug: "pension-funds" },
-        { name: "Stock & Securities", slug: "stock-securities" },
+        // { name: "Stock & Securities", slug: "stock-securities" },
         { name: "Demat Account", slug: "demat-account" },
         { name: "Real Estate Investments", slug: "real-estate-investments" },
         { name: "Portfolio Management Service", slug: "portfolio-management-service" },

@@ -1,841 +1,354 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { IndianRupee } from 'lucide-react';
-import { DashboardService } from '@/app/services/dashboardService';
-import toast, { Toaster } from 'react-hot-toast';
+import { useState, useMemo } from 'react';
+import { 
+  IndianRupee, Search, Filter, Download, Eye, 
+  Wallet, Clock, FileText, Info, Calculator, 
+  ArrowUpRight, ChevronRight, TrendingUp,
+  Building2, ShieldCheck, PieChart, Briefcase, Landmark,
+  Inbox
+} from 'lucide-react';
+import { Toaster } from 'react-hot-toast';
 
-// Types
-interface Incentive {
-  id: string;
-  product: string;
-  amount: string;
-  status: 'paid' | 'processing' | 'pending';
+// --- Types ---
+type TabType = 'payout-history' | 'commission-structure' | 'earnings-calculator';
+type CategoryType = 'loans' | 'insurance' | 'mutual-funds' | 'investments' | 'real-estate';
+
+interface PayoutRecord {
+  payoutId: string;
   date: string;
-  paymentMethod: 'Bank Transfer' | 'Direct Deposit' | 'Wire Transfer';
-  narration: string;
-  policyNumber?: string;
-  clientName?: string;
+  clientName: string;
+  leadId: string;
+  product: string;
+  category: string;
+  paymentMode: string;
+  refNumber: string;
+  netPayout: string;
+  status: 'Processed' | 'Pending';
 }
-
-interface IncentivesSummary {
-  totalPayouts: string;
-  pendingPayouts: string;
-  ytdEarnings: string;
-}
-
-interface UserProfile {
-  name: string;
-  contactNumber: string;
-  adv_id?: string;
-}
-
-// Constants
-const STATUS_CONFIG = {
-  paid: {
-    label: 'Paid',
-    color: 'bg-green-50 text-green-700 border-green-200',
-    icon: '✓'
-  },
-  processing: {
-    label: 'Processing',
-    color: 'bg-blue-50 text-blue-700 border-blue-200',
-    icon: '⟳'
-  },
-  pending: {
-    label: 'Pending',
-    color: 'bg-amber-50 text-amber-700 border-amber-200',
-    icon: '⋯'
-  },
-} as const;
-
-const PAYMENT_METHOD_CONFIG = {
-  'Bank Transfer': { color: 'bg-purple-50 text-purple-700', icon: '🏦' },
-  'Direct Deposit': { color: 'bg-indigo-50 text-indigo-700', icon: '💳' },
-  'Wire Transfer': { color: 'bg-cyan-50 text-cyan-700', icon: '🔗' },
-} as const;
-
-// PDF Generation Function
-const generatePDF = (invoice: Incentive) => {
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) return;
-
-  const invoiceDate = new Date().toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
-  });
-
-  const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
-  });
-
-  // Calculate amounts safely
-  const amountNumber = parseInt(invoice.amount.replace(/,/g, '')) || 0;
-  const tdsAmount = (amountNumber * 0.1).toLocaleString('en-IN');
-  const netAmount = (amountNumber * 0.9).toLocaleString('en-IN');
-
-  const pdfContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Invoice ${invoice.id}</title>
-      <style>
-        body { 
-          font-family: 'Arial', sans-serif; 
-          margin: 0; 
-          padding: 20px; 
-          color: #333;
-          background: #fff;
-          font-size: 14px;
-        }
-        .header { 
-          border-bottom: 2px solid #4f46e5; 
-          padding-bottom: 15px; 
-          margin-bottom: 20px;
-        }
-        .company-name { 
-          font-size: 22px; 
-          font-weight: bold; 
-          color: #4f46e5;
-          margin-bottom: 5px;
-        }
-        .invoice-title { 
-          font-size: 24px; 
-          font-weight: bold; 
-          color: #1f2937;
-          margin: 15px 0;
-          text-align: center;
-        }
-        .section { 
-          margin: 15px 0; 
-        }
-        .grid-2 { 
-          display: grid; 
-          grid-template-columns: 1fr; 
-          gap: 20px; 
-          margin-bottom: 20px;
-        }
-        .grid-3 { 
-          display: grid; 
-          grid-template-columns: 1fr; 
-          gap: 15px; 
-          margin-bottom: 20px;
-        }
-        @media (min-width: 768px) {
-          body { padding: 40px; }
-          .grid-2 { grid-template-columns: 1fr 1fr; gap: 30px; }
-          .grid-3 { grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-        }
-        .label { 
-          font-weight: 600; 
-          color: #6b7280; 
-          font-size: 12px;
-          margin-bottom: 4px;
-        }
-        .value { 
-          font-size: 14px; 
-          color: #1f2937;
-          margin-bottom: 10px;
-        }
-        .amount { 
-          font-size: 20px; 
-          font-weight: bold; 
-          color: #059669;
-        }
-        .table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 20px 0;
-          font-size: 12px;
-        }
-        .table th {
-          background: #f8fafc;
-          padding: 8px;
-          text-align: left;
-          border-bottom: 2px solid #e5e7eb;
-          font-weight: 600;
-          color: #374151;
-        }
-        .table td {
-          padding: 8px;
-          border-bottom: 1px solid #e5e7eb;
-        }
-        .total-section {
-          background: #f8fafc;
-          padding: 15px;
-          border-radius: 6px;
-          margin-top: 20px;
-        }
-        .footer {
-          margin-top: 30px;
-          padding-top: 15px;
-          border-top: 1px solid #e5e7eb;
-          text-align: center;
-          color: #6b7280;
-          font-size: 12px;
-        }
-        .status-badge {
-          display: inline-block;
-          padding: 3px 8px;
-          border-radius: 12px;
-          font-size: 11px;
-          font-weight: 600;
-        }
-        .status-paid { background: #dcfce7; color: #166534; }
-        .status-processing { background: #dbeafe; color: #1e40af; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        @media print {
-          body { padding: 15px; }
-          .no-print { display: none; }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <div class="company-name">Infinity Arthvishva Pvt Ltd.</div>
-        <div style="color: #6b7280; font-size: 12px;">
-          7 Business Square by Naiknavare, Ganeshkhind Rd, Near Datta Mandir, 
-          Model Colony, Shivajinagar, Pune, Maharashtra 411016<br>
-          GSTIN: 27AABCU9603R1ZM
-        </div>
-      </div>
-
-      <div class="invoice-title">COMMISSION INVOICE</div>
-
-      <div class="grid-2">
-        <div>
-          <div class="label">BILLED TO</div>
-          <div class="value">
-            <strong>Infinity Arthvishva</strong><br>
-            Finance Department<br>
-            info@infinityarthvishva.com<br>
-            1800-532-7600
-          </div>
-        </div>
-        <div>
-          <div class="label">INVOICE DETAILS</div>
-          <div class="value">
-            <strong>Invoice No:</strong> ${invoice.id}<br>
-            <strong>Issue Date:</strong> ${invoiceDate}<br>
-            <strong>Due Date:</strong> ${dueDate}<br>
-            <strong>Status:</strong> 
-            <span class="status-badge status-${invoice.status}">
-              ${STATUS_CONFIG[invoice.status].label}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid-3">
-        <div>
-          <div class="label">AGENT DETAILS</div>
-          <div class="value">
-            <strong>Rajesh Kumar</strong><br>
-            DSA Partner ID: DSA-789456<br>
-            rajesh.kumar@email.com<br>
-            +91-9876543210
-          </div>
-        </div>
-        <div>
-          <div class="label">POLICY INFORMATION</div>
-          <div class="value">
-            <strong>Product:</strong> ${invoice.product}<br>
-            <strong>Policy No:</strong> ${invoice.policyNumber || 'N/A'}<br>
-            <strong>Client:</strong> ${invoice.clientName || 'N/A'}
-          </div>
-        </div>
-        <div>
-          <div class="label">PAYMENT METHOD</div>
-          <div class="value">
-            ${invoice.paymentMethod}<br>
-            <strong>Narration:</strong><br>
-            ${invoice.narration}
-          </div>
-        </div>
-      </div>
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Description</th>
-            <th>Policy Number</th>
-            <th>Commission Type</th>
-            <th>Amount (₹)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>${invoice.product}</td>
-            <td>${invoice.policyNumber || 'N/A'}</td>
-            <td>Sales Commission</td>
-            <td style="font-weight: bold;">₹${invoice.amount}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="total-section">
-        <div style="text-align: right;">
-          <div style="margin-bottom: 8px;">
-            <span style="font-weight: 600; margin-right: 15px;">Subtotal:</span>
-            <span>₹${invoice.amount}</span>
-          </div>
-          <div style="margin-bottom: 8px;">
-            <span style="font-weight: 600; margin-right: 15px;">TDS (10%):</span>
-            <span>₹${tdsAmount}</span>
-          </div>
-          <div style="font-size: 18px; font-weight: bold;">
-            <span style="margin-right: 15px;">Net Amount:</span>
-            <span class="amount">₹${netAmount}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer">
-        <p>
-          <strong>Terms & Conditions:</strong><br>
-          1. This is a computer-generated invoice and does not require a physical signature.<br>
-          2. Payment will be processed within 7-10 working days from the invoice date.<br>
-          3. For any queries, please contact the finance department.
-        </p>
-        <p style="margin-top: 15px;">
-          Insurance Partners Ltd. • Registered with IRDAI • Member of Insurance Association
-        </p>
-      </div>
-
-      <div class="no-print" style="margin-top: 20px; text-align: center;">
-        <button onclick="window.print()" style="
-          background: #4f46e5;
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 5px;
-          font-size: 14px;
-          cursor: pointer;
-          margin-right: 8px;
-        ">Print Invoice</button>
-        <button onclick="window.close()" style="
-          background: #6b7280;
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 5px;
-          font-size: 14px;
-          cursor: pointer;
-        ">Close</button>
-      </div>
-    </body>
-    </html>
-  `;
-
-  printWindow.document.write(pdfContent);
-  printWindow.document.close();
-};
 
 export default function IncentivesPayouts() {
-  const [activeTab, setActiveTab] = useState<'all' | 'paid' | 'processing' | 'pending'>('all');
-  const [selectedPeriod, setSelectedPeriod] = useState<'30days' | '90days' | 'ytd'>('30days');
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [summaryData, setSummaryData] = useState<IncentivesSummary | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>('payout-history');
+  const [leadCategory, setLeadCategory] = useState<CategoryType>('loans');
+  const [selectedProduct, setSelectedProduct] = useState('');
+  const [amount, setAmount] = useState<string>('');
 
-  // Fetch profile and incentives data on mount
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  // --- Empty Payout Data (Mock data removed) ---
+  const [payoutData, setPayoutData] = useState<PayoutRecord[]>([]);
 
-        // Fetch user profile
-        const profileRes = await DashboardService.getProfile();
-        setUserProfile(profileRes.user);
+  // --- Category Mappings ---
+  const productMapping: Record<CategoryType, string[]> = {
+    'loans': ['Home Loan', 'Personal Loan', 'Vehicle Loan', 'SME Loan', 'Mortgage Loan', 'Business Loan', 'Loan Against Securities', 'Education Loan'],
+    'insurance': ['Life Insurance', 'Health Insurance', 'Motor Insurance', 'Travel Insurance', 'Fire Insurance', 'Cattle Insurance', 'Marine Insurance', 'Corporate Insurance', 'Loan Protector'],
+    'mutual-funds': ['Mutual Fund'],
+    'investments': ['Wealth Management', 'PMS / AIF', 'Fixed Deposit', 'Bonds'],
+    'real-estate': ['Real Estate']
+  };
 
-      } catch (err: any) {
-        console.error('Error fetching data:', err);
-        setError(err?.response?.data?.message || 'Failed to load incentives data');
-        toast.error('Failed to load incentives data');
-      } finally {
-        setLoading(false);
-      }
+  const commissionStructure = {
+    'loans': [
+      { name: 'Personal Loan', rate: '1.5% - 2.5%' },
+      { name: 'Home Loan', rate: '0.4% - 0.75%' },
+      { name: 'Business Loan', rate: '1.0% - 2.0%' },
+      { name: 'SME / Mortgage', rate: '0.5% - 1.2%' }
+    ],
+    'insurance': [
+      { name: 'Life Insurance', rate: '25% - 40% (FYP)' },
+      { name: 'Health Insurance', rate: '15% - 20%' },
+      { name: 'Motor Insurance', rate: '10% - 15% (OD)' },
+      { name: 'Corporate/Marine', rate: '5% - 12%' }
+    ],
+    'mutual-funds': [
+      { name: 'Equity Funds', rate: '0.5% - 1.2%' },
+      { name: 'Debt Funds', rate: '0.1% - 0.4%' },
+      { name: 'Hybrid Funds', rate: '0.3% - 0.8%' }
+    ],
+    'investments': [
+      { name: 'Wealth Management', rate: '1.0% - 2.5%' },
+      { name: 'PMS / AIF', rate: '1.5% - 3.0%' },
+      { name: 'Bonds / FD', rate: '0.2% - 0.6%' }
+    ],
+    'real-estate': [
+      { name: 'Residential', rate: '1.5% - 2.0%' },
+      { name: 'Commercial', rate: '2.0% - 3.0%' },
+      { name: 'Plots/Land', rate: '1.0% - 1.5%' }
+    ]
+  };
+
+  // --- Calculation Logic ---
+  const calculation = useMemo(() => {
+    const numAmount = parseFloat(amount) || 0;
+    const gross = numAmount * 0.02; // Assuming 2.00% avg commission
+    const tds = gross * 0.05;      // 5% TDS
+    const net = gross - tds;
+    return {
+      gross: gross.toLocaleString('en-IN'),
+      tds: tds.toLocaleString('en-IN'),
+      net: net.toLocaleString('en-IN'),
+      percent: (numAmount > 0) ? "2.00%" : "0.00%"
     };
-
-    fetchData();
-  }, []);
-
-  // Sample data
-  const incentiveData: Incentive[] = [
-    
-   // {
-   //   id: 'INV-2023-0012',
-    //  product: 'Life Insurance - New Business',
-    //amount: '12,500',
-    //  status: 'paid',
-    //  date: '15 Oct 2023',
-    //  paymentMethod: 'Bank Transfer',
-    //  narration: 'New policy commission - LIC Jeevan Anand',
-   //  policyNumber: 'POL-789456',
-    //  clientName: 'Amit Sharma'
-   // },
-     
-  ];
-
-  const filteredData = activeTab === 'all'
-    ? incentiveData
-    : incentiveData.filter(item => item.status === activeTab);
-
-  const totalPayouts = "3,42,500";
-  const pendingPayouts = "45,800";
-  const ytdEarnings = "4,12,300";
-
-  const handleDownloadInvoice = (invoice: Incentive) => {
-    generatePDF(invoice);
-  };
-
-  const handleViewInvoice = (invoice: Incentive) => {
-    generatePDF(invoice);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Loading incentives data...</p>
-        </div>
-      </div>
-    );
-  }
+  }, [amount]);
 
   return (
-    <div className="min-h-screen bg-slate-50 p-3 sm:p-4 md:p-6">
+    <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 font-sans">
       <Toaster position="top-right" />
 
-      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 md:space-y-8">
-
-        {/* Header */}
-        <div className="space-y-3 sm:space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-700 tracking-tight">
-                Incentives & Payouts
-              </h1>
-              <p className="text-slate-600 mt-1 sm:mt-2 text-sm sm:text-base">
-                Track your earnings and commission payouts with complete transparency
-              </p>
-            </div>
-            <div className="flex items-center justify-start sm:justify-end">
-              <select
-                value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value as any)}
-                className="w-full sm:w-auto px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="30days">Last 30 Days</option>
-                <option value="90days">Last 90 Days</option>
-                <option value="ytd">Year to Date</option>
-              </select>
-            </div>
+      <div className="max-w-7xl mx-auto space-y-6">
+        
+        {/* Header & Main Tabs */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">Incentives & Payouts</h1>
+            <p className="text-slate-500 mt-1 sm:mt-2 text-sm sm:text-base">Track your earnings, commissions, and payment status.</p>
+          </div>
+          <div className="flex bg-white border border-slate-200 p-1 rounded-xl shadow-sm overflow-x-auto">
+            {['Payout History', 'Commission Structure', 'Earnings Calculator'].map((label) => {
+              const id = label.toLowerCase().replace(' ', '-') as TabType;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setActiveTab(id)}
+                  className={`px-4 py-2 text-sm font-semibold transition-all rounded-lg whitespace-nowrap ${
+                    activeTab === id ? 'bg-[#1CADA3] text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-          {/* Total Payouts */}
-          <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1 sm:space-y-2 md:space-y-3">
-                <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Total Payouts</p>
-                <p className="text-xl sm:text-2xl md:text-3xl font-sans text-slate-800">₹{0}</p>
-                <div className="flex items-center text-emerald-600 text-xs sm:text-sm font-medium">
-                  <IndianRupee className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                  +15% from last period
-                </div>
-              </div>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-emerald-500 rounded-xl flex items-center justify-center shrink-0">
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 4h12M6 8h12M12 20l-6-8h3a6 6 0 016-6"
-                  />
-                </svg>
-              </div>
+        {/* Top Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-green-50 p-2 rounded-lg"><Wallet className="w-5 h-5 text-green-500" /></div>
+              <span className="font-medium text-slate-600 text-sm">Total Earnings</span>
             </div>
+            <div className="text-3xl font-bold text-slate-800">₹ 0</div>
+            
           </div>
 
-          {/* Pending Payouts */}
-          <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1 sm:space-y-2 md:space-y-3">
-                <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Pending Payouts</p>
-                <p className="text-xl sm:text-2xl md:text-3xl font-sans text-slate-800">₹{0}</p>
-                <div className="flex items-center text-blue-600 text-xs font-medium">
-                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                  </svg>
-                  Expected by 30 Nov
-                </div>
-              </div>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-blue-500 rounded-xl flex items-center justify-center shrink-0">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-orange-50 p-2 rounded-lg"><Clock className="w-5 h-5 text-orange-500" /></div>
+              <span className="font-medium text-slate-600 text-sm">Pending Payouts</span>
             </div>
+            <div className="text-3xl font-bold text-slate-800">₹ 0</div>
+            
           </div>
 
-          {/* YTD Earnings */}
-          <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1 sm:space-y-2 md:space-y-3">
-                <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">YTD Earnings</p>
-                <p className="text-xl sm:text-2xl md:text-3xl font-sans text-slate-800">₹{0}</p>
-                <div className="flex items-center text-slate-600 text-xs font-medium">
-                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-                  </svg>
-                  Current fiscal year
-                </div>
-              </div>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-slate-600 rounded-xl flex items-center justify-center shrink-0">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
+          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-blue-50 p-2 rounded-lg"><FileText className="w-5 h-5 text-blue-500" /></div>
+              <span className="font-medium text-slate-600 text-sm">Processed This Month</span>
             </div>
+            <div className="text-3xl font-bold text-slate-800">₹ 0</div>
+            
           </div>
         </div>
 
-        {/* Incentive History Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-
-          {/* Section Header */}
-         {/* Filter Tabs */}
-              <div className="flex flex-wrap gap-1 sm:gap-2">
-                {(['all', 'paid', 'processing', 'pending'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-4 sm:px-1 py-1 sm:py-1 text-sm font-medium rounded-lg transition-all duration-200 capitalize min-w-16 sm:min-w-20 ${
-                      activeTab === tab
-                        ? 'bg-blue-50 text-blue-700 border-blue-200'
-                        : 'text-slate-600 hover:text-slate-700 hover:bg-slate-200 rounded-4xl'
-                    }`}
-                  >
-                    {tab === 'all' ? 'All' : STATUS_CONFIG[tab].label}
-                  </button>
-                ))}
+        {/* --- Payout History Table View --- */}
+        {activeTab === 'payout-history' && (
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mt-8 animate-in fade-in duration-500">
+            {/* Dark Search Bar / Action Header */}
+            <div className="p-4 flex flex-col md:flex-row gap-4">
+              <div className="flex-grow relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input 
+                  type="text" 
+                  placeholder="Search by Lead ID, Client or Payout ID..." 
+                  className="w-full pl-12 pr-4 py-3 bg-white text-slate-500  border border-slate-200 rounded-lg outline-none text-sm placeholder:text-slate-400" 
+                />
               </div>
+              <div className="flex gap-2">
+                <button className="flex items-center gap-2 px-5 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-all">
+                  <Filter className="w-4 h-4" /> Filter
+                </button>
+                <button className="flex items-center gap-2 px-5 py-2 border border-[#10b981] rounded-lg text-sm font-bold text-[#10b981] bg-white hover:bg-emerald-50 transition-all">
+                  <Download className="w-4 h-4" /> Export Report
+                </button>
+              </div>
+            </div>
 
-          {/* Desktop Table View - Hidden on mobile */}
-              <div className="hidden md:block">
-                <div className="min-w-full max-w-30 inline-block align-middle">
-                  <div className="overflow-x-auto border border-slate-200 rounded-lg">
-                    <table className="w-full min-w-[600px]">
-                      <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
-                        <tr>
-                          {['Invoice ID', 'Product', 'Amount', 'Status', 'Payment', 'Narration', 'Date', 'Actions'].map((header) => (
-                            <th
-                              key={header}
-                              className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap"
-                            >
-                              {header}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-200 bg-white">
-                        {filteredData.map((item) => (
-                          <tr
-                            key={item.id}
-                            className="hover:bg-slate-50/80 transition-colors duration-150"
-                          >
-                            {/* Invoice ID */}
-                            <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-slate-900 font-mono">
-                                {item.id}
-                              </div>
-                              {item.policyNumber && (
-                                <div className="text-xs text-slate-500 mt-1">
-                                  {item.policyNumber}
-                                </div>
-                              )}
-                            </td>
+            {/* Table Area */}
+            <div className="overflow-x-auto min-h-[300px]">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-slate-50 border-y border-slate-100 uppercase text-[11px] font-bold text-slate-500 tracking-wider">
+                    <th className="px-6 py-4">Payout ID / Date</th>
+                    <th className="px-6 py-4">Client Details</th>
+                    <th className="px-6 py-4">Product</th>
+                    <th className="px-6 py-4 text-center">Payment Mode</th>
+                    <th className="px-6 py-4">Ref Number</th>
+                    <th className="px-6 py-4">Net Payout</th>
+                    <th className="px-6 py-4 text-center">Status</th>
+                    <th className="px-6 py-4 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-sm">
+                  {payoutData.length > 0 ? (
+                    payoutData.map((row, i) => (
+                      <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="px-6 py-5">
+                          <div className="font-bold text-slate-700">{row.payoutId}</div>
+                          <div className="text-xs text-slate-400 mt-1">{row.date}</div>
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="font-bold text-slate-700">{row.clientName}</div>
+                          <div className="inline-block mt-1 px-2 py-0.5 bg-[#e6fcf5] text-[#0d9488] rounded text-[10px] font-bold border border-[#c3fae8]">
+                            {row.leadId}
+                          </div>
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="font-medium text-slate-700">{row.product}</div>
+                          <div className="text-xs text-slate-400">{row.category}</div>
+                        </td>
+                        <td className="px-6 py-5 text-center">
+                          <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold uppercase">
+                            {row.paymentMode}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 font-mono text-xs text-slate-500 uppercase">{row.refNumber}</td>
+                        <td className="px-6 py-5 font-bold text-[#0d9488]">₹{row.netPayout}</td>
+                        <td className="px-6 py-5 text-center">
+                          <span className={`px-4 py-1.5 rounded-full text-[11px] font-bold ${row.status === 'Processed' ? 'bg-[#e6fcf5] text-[#0d9488] border border-[#c3fae8]' : 'bg-[#fff9db] text-[#f08c00] border border-[#fff3bf]'}`}>
+                            {row.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-center">
+                          <div className="flex justify-center gap-3">
+                            <button className="text-slate-400 hover:text-slate-600 transition-all"><Eye className="w-5 h-5" /></button>
+                            <button className="text-slate-400 hover:text-slate-600 transition-all"><Download className="w-4 h-4" /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={8} className="py-20 text-center">
+                        <div className="flex flex-col items-center justify-center opacity-40">
+                          <Inbox className="w-12 h-12 text-slate-300 mb-3" />
+                          <p className="text-slate-500 font-medium">No payout transactions found</p>
+                          <p className="text-[11px] text-slate-400">Your recent earnings will appear here once processed.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-              {/* Product */}
-              <td className="px-4 sm:px-6 py-4">
-                <div
-                  className="text-sm text-slate-900 max-w-[150px] sm:max-w-xs truncate"
-                  title={item.product}
-                >
-                  {item.product}
-                </div>
-                {item.clientName && (
-                  <div className="text-xs text-slate-500 mt-1 truncate">
-                    {item.clientName}
+            {/* Pagination / Info Footer */}
+            <div className="p-4 flex items-center justify-between border-t border-slate-100">
+              <span className="text-xs font-medium text-slate-400">Showing {payoutData.length} entries</span>
+              <div className="flex gap-2">
+                <button disabled className="px-4 py-1.5 text-xs font-bold border border-slate-200 rounded text-slate-300 cursor-not-allowed">Previous</button>
+                <button disabled className="px-4 py-1.5 text-xs font-bold border border-slate-200 rounded text-slate-300 cursor-not-allowed">Next</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- Commission Structure View --- */}
+        {activeTab === 'commission-structure' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-8 animate-in slide-in-from-bottom-4 duration-500">
+            {/* Category Cards */}
+            {(Object.keys(commissionStructure) as CategoryType[]).map((catKey) => {
+              const Icon = catKey === 'loans' ? Landmark : catKey === 'insurance' ? ShieldCheck : catKey === 'mutual-funds' ? PieChart : catKey === 'investments' ? Briefcase : Building2;
+              const colorClass = catKey === 'loans' ? 'blue' : catKey === 'insurance' ? 'purple' : catKey === 'mutual-funds' ? 'emerald' : catKey === 'investments' ? 'indigo' : 'orange';
+              
+              return (
+                <div key={catKey} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-fit">
+                  <div className="p-5 border-b border-slate-50 flex items-center gap-3">
+                    <div className={`p-2 bg-${colorClass}-50 rounded-lg`}><Icon className={`w-5 h-5 text-${colorClass}-600`} /></div>
+                    <h3 className="font-bold text-slate-800 capitalize">{catKey.replace('-', ' ')} Commission</h3>
                   </div>
-                )}
-              </td>
-
-              {/* Amount */}
-              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium font-sans text-slate-900">
-                  ₹{item.amount}
-                </div>
-              </td>
-
-              {/* Status */}
-              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center space-x-2">
-                  <span
-                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${STATUS_CONFIG[item.status].color}`}
-                  >
-                    <span className="mr-1">
-                      {STATUS_CONFIG[item.status].icon}
-                    </span>
-                    {STATUS_CONFIG[item.status].label}
-                  </span>
-                </div>
-              </td>
-
-              {/* Payment Method */}
-              <td className="px-4 sm:px-6 py-4">
-                <div className="text-xs text-slate-500 font-medium">Payment</div>
-                <div className="flex flex-col gap-1">
-                  <span
-                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${PAYMENT_METHOD_CONFIG[item.paymentMethod].color}`}
-                  >
-                    <span className="mr-1">
-                      {PAYMENT_METHOD_CONFIG[item.paymentMethod].icon}
-                    </span>
-                    {item.paymentMethod}
-                  </span>
-                </div>
-              </td>
-
-              {/* Narration */}
-              <td className="px-4 sm:px-6 py-4">
-                <div className="text-sm text-slate-900 max-w-[120px] sm:max-w-[150px] truncate"
-                     title={item.narration || 'No narration'}>
-                  {item.narration || '-'}
-                </div>
-              </td>
-
-              {/* Date */}
-              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-slate-500">
-                  {item.date}
-                </div>
-              </td>
-
-              {/* Actions */}
-              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleViewInvoice(item)}
-                    className="text-slate-600 hover:text-slate-800 transition-colors duration-200 p-1 rounded hover:bg-slate-100"
-                    title="View Invoice"
-                    type="button"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => handleDownloadInvoice(item)}
-                    className="text-blue-600 hover:text-blue-700 transition-colors duration-200 p-1 rounded hover:bg-blue-50"
-                    title="Download PDF"
-                    type="button"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-          {/* Mobile Card View - Visible only on mobile */}
-          <div className="md:hidden space-y-4">
-            {filteredData.map((item) => (
-              <div key={item.id} className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
-                {/* Header Section */}
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex-1">
-                    <div className="text-sm font-medium text-slate-900 font-mono">
-                      {item.id}
-                    </div>
-                    {item.policyNumber && (
-                      <div className="text-xs text-slate-500 mt-1">
-                        {item.policyNumber}
+                  <div className="p-6 space-y-3">
+                    {commissionStructure[catKey].map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                        <span className="text-slate-600 font-medium text-sm">{item.name}</span>
+                        <span className="font-bold text-slate-800 text-sm">{item.rate}</span>
+                      </div>
+                    ))}
+                    {catKey === 'loans' && (
+                      <div className="mt-4 flex gap-3 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                        <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                        <p className="text-[10px] text-blue-800 leading-relaxed italic">Rates may vary based on bank tie-ups. Tiered incentives apply for volumes {'>'} 1Cr.</p>
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2 ml-2">
-                    <button
-                      onClick={() => handleViewInvoice(item)}
-                      className="text-slate-600 hover:text-slate-800 transition-colors duration-200 p-1 rounded hover:bg-slate-100"
-                      title="View Invoice"
-                      type="button"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => handleDownloadInvoice(item)}
-                      className="text-blue-600 hover:text-blue-700 transition-colors duration-200 p-1 rounded hover:bg-blue-50"
-                      title="Download PDF"
-                      type="button"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* --- Earnings Calculator View --- */}
+        {activeTab === 'earnings-calculator' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8 animate-in fade-in duration-500">
+            <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="p-2.5 bg-emerald-50 rounded-xl"><Calculator className="w-6 h-6 text-emerald-600" /></div>
+                <div><h3 className="font-bold text-slate-800 text-lg">Earnings Estimator</h3><p className="text-sm text-slate-400">Plan your next lead conversion</p></div>
+              </div>
+              <div className="space-y-8">
+                {/* Lead Category Toggle */}
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase mb-4 block tracking-wider">Lead Category</label>
+                  <div className="flex flex-wrap gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+                    {(['loans', 'insurance', 'mutual-funds', 'investments', 'real-estate'] as CategoryType[]).map((cat) => (
+                      <button key={cat} onClick={() => { setLeadCategory(cat); setSelectedProduct(''); }} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all capitalize ${leadCategory === cat ? 'bg-white text-[#10b981] shadow-md border border-emerald-50' : 'text-slate-500 hover:text-slate-700'}`}>{cat.replace('-', ' ')}</button>
+                    ))}
                   </div>
                 </div>
-
-                {/* Product & Client */}
-                <div className="mb-3">
-                  <div className="text-sm font-medium text-slate-900 truncate">
-                    {item.product}
-                  </div>
-                  {item.clientName && (
-                    <div className="text-xs text-slate-500 mt-1 truncate">
-                      {item.clientName}
-                    </div>
-                  )}
+                {/* Product Dropdown */}
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase mb-2 block tracking-wider">Select Product</label>
+                  <select value={selectedProduct} onChange={(e) => setSelectedProduct(e.target.value)} className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px] bg-[right_16px_center] bg-no-repeat text-gray-700 transition-all">
+                    <option value="">-- Choose Product --</option>
+                    {productMapping[leadCategory].map((prod) => <option key={prod} value={prod}>{prod}</option>)}
+                  </select>
                 </div>
-
-                {/* Details Grid */}
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  {/* Amount */}
-                  <div>
-                    <div className="text-xs text-slate-500 font-medium">Amount</div>
-                    <div className="text-sm font-medium text-slate-900">₹{item.amount}</div>
-                  </div>
-
-                  {/* Status */}
-                  <div>
-                    <div className="text-xs text-slate-500 font-medium">Status</div>
-                    <div className="flex items-center">
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${STATUS_CONFIG[item.status].color}`}
-                      >
-                        <span className="mr-1">
-                          {STATUS_CONFIG[item.status].icon}
-                        </span>
-                        {STATUS_CONFIG[item.status].label}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Payment Method */}
-                  <div>
-                    <div className="text-xs text-slate-500 font-medium">Payment</div>
-                    <div className="flex flex-col gap-1">
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${PAYMENT_METHOD_CONFIG[item.paymentMethod].color}`}
-                      >
-                        <span className="mr-1">
-                          {PAYMENT_METHOD_CONFIG[item.paymentMethod].icon}
-                        </span>
-                        {item.paymentMethod}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Date */}
-                  <div>
-                    <div className="text-xs text-slate-500 font-medium">Date</div>
-                    <div className="text-sm text-slate-900">{item.date}</div>
+                {/* Input Amount */}
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase mb-2 block tracking-wider">{leadCategory === 'insurance' ? 'Annual Premium (₹)' : 'Amount (₹)'}</label>
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-all"><IndianRupee className="w-5 h-5" /></div>
+                    <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 5,00,000" className="w-full pl-12 pr-4 py-4 bg-white text-slate-500 border border-slate-200 rounded-2xl font-bold text-lg focus:ring-4 focus:ring-emerald-500/20 focus:border-[#10b981] outline-none transition-all placeholder:text-slate-500" />
                   </div>
                 </div>
+                <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex items-start gap-3"><Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" /><p className="text-[11px] text-blue-700 leading-relaxed italic">Calculations based on average commission rates. Payouts may vary based on financial institution and profile.</p></div>
+              </div>
+            </div>
 
-                {/* Narration if exists */}
-                {item.narration && (
-                  <div className="mt-3 pt-3 border-t border-slate-100">
-                    <div className="text-xs text-slate-500 font-medium">Narration</div>
-                    <div className="text-xs text-slate-600 truncate" title={item.narration}>
-                      {item.narration}
-                    </div>
+            {/* --- Conditional Pop-up Result Card --- */}
+            <div className="lg:col-span-5 flex flex-col gap-6 min-h-[400px]">
+              {amount ? (
+                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col h-full animate-in zoom-in-95 duration-300">
+                  <div className="bg-[#1CADA3] p-8 text-white relative">
+                    <div className="relative z-10"><p className="text-[11px] font-bold uppercase tracking-widest opacity-80 mb-2">Estimated Net Payout</p><div className="text-5xl font-extrabold flex items-start gap-1"><span className="text-3xl mt-1.5 font-bold">₹</span>{calculation.net}</div><div className="mt-4 inline-flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-lg text-xs font-bold backdrop-blur-sm"><TrendingUp className="w-4 h-4" />@ {calculation.percent} avg commission</div></div>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-         
-
-          {/* Table Footer */}
-          <div className="px-3 sm:px-4 md:px-6 py-4 border-t border-slate-200 bg-slate-50">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-slate-600">
-              <div className="flex items-center space-x-2 mb-3 sm:mb-0">
-                <span className="text-xs">Showing</span>
-                <span className="font-semibold text-slate-900 text-xs">{filteredData.length}</span>
-                <span className="text-xs">of</span>
-                <span className="font-semibold text-slate-900 text-xs">{incentiveData.length}</span>
-                <span className="text-xs">transactions</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button className="px-3 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors duration-200 disabled:opacity-50">
-                  Previous
-                </button>
-                <button className="px-3 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors duration-200">
-                  Next
-                </button>
-              </div>
+                  <div className="p-8 space-y-8 flex-grow">
+                    <div className="flex justify-between items-end border-b border-slate-100 pb-6">
+                      <div><p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Gross Earnings</p><p className="text-2xl font-bold text-slate-800">₹{calculation.gross}</p></div>
+                      <div className="text-right"><p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">TDS (5%)</p><p className="text-xl font-bold text-[#ef4444]">-₹{calculation.tds}</p></div>
+                    </div>
+                    <div><div className="flex justify-between items-center mb-3"><p className="text-sm font-bold text-slate-700">Projected Milestone</p><span className="text-xs font-bold text-[#1CADA3]">65%</span></div><div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-[#1CADA3] rounded-full" style={{ width: '65%' }}></div></div><p className="text-[11px] text-slate-400 italic mt-3">This deal covers 65% of your weekly target!</p></div>
+                    <button className="w-full bg-[#1e293b] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-lg">Apply for this Lead Now <ChevronRight className="w-5 h-5" /></button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 p-12 text-center opacity-60">
+                   <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mb-4"><Calculator className="w-8 h-8 text-slate-300" /></div>
+                   <h3 className="text-lg font-bold text-slate-700 mb-2">Ready to Calculate?</h3>
+                   <p className="text-slate-400 text-sm max-w-[240px]">Enter the transaction amount on the left to see your potential earnings instantly.</p>
+                </div>
+              )}
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Additional Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-          <div className="bg-blue-50 rounded-xl p-4 sm:p-5 md:p-6 border border-blue-200">
-            <div className="flex items-start space-x-3 sm:space-x-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-blue-900 mb-2">Payout Schedule</h3>
-                <p className="text-blue-800 text-xs sm:text-sm leading-relaxed">
-                  Commission payouts are processed twice monthly on the 15th and last day. Please ensure your banking information is current to avoid delays.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-slate-100 rounded-xl p-4 sm:p-5 md:p-6 border border-slate-300">
-            <div className="flex items-start space-x-3 sm:space-x-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-200 rounded-xl flex items-center justify-center shrink-0">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-slate-900 mb-2">Invoice Generation</h3>
-                <p className="text-slate-700 text-xs sm:text-sm leading-relaxed">
-                  Download professional PDF invoices for all your commission transactions. Includes detailed breakdown with TDS calculations and payment terms.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
