@@ -18,9 +18,9 @@ const AboutSection = () => (
                     </p>
 
                     {/* GST and CIN Numbers */}
-                    <div className="max-w-3xl mx-auto mt-8">
+                    {/* <div className="max-w-3xl mx-auto mt-8">
                         <div className="flex flex-col md:flex-row justify-center items-center gap-4 xl:gap-6">
-                            {/* GST Number */}
+                            
                             <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-3 xl:px-4 py-2 rounded-lg font-semibold shadow-sm text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center">
                                 <div>
                                     <div className="font-semibold">GST Number</div>
@@ -28,7 +28,7 @@ const AboutSection = () => (
                                 </div>
                             </div>
 
-                            {/* CIN Number */}
+                       
                             <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-3 xl:px-4 py-2 rounded-lg font-semibold shadow-sm text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center">
                                 <div>
                                     <div className="font-semibold">CIN Number</div>
@@ -36,7 +36,7 @@ const AboutSection = () => (
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* PROFESSIONAL REGISTRATION DETAILS LAYOUT (NEW) */}
                    <div className="mt-20 max-w-6xl mx-auto px-4">
