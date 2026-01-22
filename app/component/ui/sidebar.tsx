@@ -121,7 +121,7 @@ export const MobileSidebar = ({
             {/* Menu Icon */}
             <div className="p-2">
                 <IconMenu2
-                    className="h-7 w-7 text-neutral-800"
+                    className="h-7 w-7 text-neutral-700"
                     onClick={() => setOpen(true)}
                 />
             </div>
@@ -137,7 +137,7 @@ export const MobileSidebar = ({
                         className="fixed inset-0 bg-white z-50 p-6 flex flex-col">
                         {/* Close Button */}
                         <IconX
-                            className="absolute right-6 top-6 h-7 w-7 text-gray-800"
+                            className="absolute right-6 top-6 h-7 w-7 text-gray-700"
                             onClick={() => setOpen(false)}
                         />
 
@@ -164,15 +164,15 @@ export const MobileSidebar = ({
                             ))}
                         </div>
                         
-                        <div className="p-1 pt-2">
+                        <div className="p-0.5 pt-2">
                             <SidebarLink
                                 link={{
                                     label: "Logout",
                                     href: "/",
-                                    icon: <LogOut className="h-5 w-5 text-neutral-800" />,
+                                    icon: <LogOut className="h-5 w-5 text-neutral-700" />,
                                     onClick: handleLogout
                                 }}
-                                className="text-red-600 font-medium"
+                                className="text-gray-700"
                             />
                         </div>
                     </motion.div>

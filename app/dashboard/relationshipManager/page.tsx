@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import { DashboardService } from '../../services/dashboardService';
 
 // Types
@@ -47,7 +47,7 @@ const RelationshipManager: React.FC = () => {
     isAvailable: true
   });
 
- // 2. Fetch API Data
+  // 2. Fetch API Data
   useEffect(() => {
     const fetchRM = async () => {
       try {
@@ -64,7 +64,7 @@ const RelationshipManager: React.FC = () => {
             phone: (rmData.mobile && rmData.mobile !== 'null') ? rmData.mobile : '1800-532-7600',
             city: (rmData.city && rmData.city !== 'null') ? rmData.city : 'Pune',
             position: rmData.department && rmData.sub_category
-              ? `Dept: ${rmData.department} - ${(rmData.sub_category)}` 
+              ? `Dept: ${rmData.department} - ${(rmData.sub_category)}`
               : 'Senior Relationship Manager',
             isAvailable: true
           });
@@ -250,7 +250,29 @@ const RelationshipManager: React.FC = () => {
                   <div className="flex items-start justify-between mb-4 sm:mb-6">
                     <div className="flex-1 min-w-0">
                       <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-700 truncate">{relationshipManager.name}</h2>
-                      <p className="text-slate-600 text-sm sm:text-base md:text-lg truncate">{relationshipManager.position}</p>
+                      {(() => {
+                        const [deptPart, subPart] = relationshipManager.position.split(" - ");
+                        const department = deptPart?.replace("Dept:", "").trim();
+                        const subcategories = subPart?.split(",").map(item => item.trim()) || [];
+
+                        return (
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            {/* Department */}
+                            <span className="text-xs sm:text-sm font-semibold bg-indigo-50 text-blue-500 px-3 py-1 rounded-full">
+                              Department : {department}
+                            </span>
+
+                            {/* Subcategories */}
+                            {subcategories.map((item, idx) => (
+                              <span
+                                key={idx}
+                                className="text-xs sm:text-sm bg-indigo-50 text-blue-500 font-semibold px-3 py-1 rounded-full">
+                                {item}
+                              </span>
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </div>
                     <div className="flex items-center ml-2 shrink-0">
                       <div
@@ -281,30 +303,29 @@ const RelationshipManager: React.FC = () => {
                         </svg>
                         <span className="hover:underline break-all">{relationshipManager.phone}</span>
                       </button>
-                                            <div className="flex items-center text-gray-600 transition-colors duration-200 w-full text-left text-sm sm:text-base">
+                      <div className="flex items-center text-gray-600 transition-colors duration-200 w-full text-left text-sm sm:text-base">
                         {/* City SVG (Map Pin) */}
-                        <svg 
-                          className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-gray-400 shrink-0" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth={2} 
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" 
+                        <svg
+                          className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-gray-400 shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
                           />
-                          <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth={2} 
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                           />
                         </svg>
                         <span className="break-all">{relationshipManager.city}</span>
                       </div>
-                      
+
                     </div>
                   </div>
 
@@ -330,8 +351,7 @@ const RelationshipManager: React.FC = () => {
                       <div className="space-y-2 sm:space-y-3">
                         <button
                           onClick={handleScheduleMeeting}
-                          className="w-full bg-[#2076C7] text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-[#0a66bb] transition-colors duration-200 font-medium flex items-center justify-center text-sm sm:text-base"
-                        >
+                          className="w-full bg-[#2076C7] text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-[#0a66bb] transition-colors duration-200 font-medium flex items-center justify-center text-sm sm:text-base">
                           <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
@@ -339,8 +359,7 @@ const RelationshipManager: React.FC = () => {
                         </button>
                         <button
                           onClick={handleSendMessage}
-                          className="w-full border border-gray-300 text-gray-700 py-2 sm:py-3 px-3 sm:px-4 rounded-lg bg-gray-50 hover:bg-[#00e4d5] transition-colors duration-200 font-medium flex items-center justify-center text-sm sm:text-base"
-                        >
+                          className="w-full border border-gray-300 text-gray-700 py-2 sm:py-3 px-3 sm:px-4 rounded-lg bg-gray-50 hover:bg-[#00e4d5] transition-colors duration-200 font-medium flex items-center justify-center text-sm sm:text-base">
                           <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                           </svg>
@@ -473,10 +492,10 @@ const RelationshipManager: React.FC = () => {
                           </span>
                           <span
                             className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs rounded-full ${appointment.status === 'scheduled'
-                                ? 'bg-green-100 text-green-800'
-                                : appointment.status === 'completed'
-                                  ? 'bg-gray-100 text-gray-800'
-                                  : 'bg-red-100 text-red-800'
+                              ? 'bg-green-100 text-green-800'
+                              : appointment.status === 'completed'
+                                ? 'bg-gray-100 text-gray-800'
+                                : 'bg-red-100 text-red-800'
                               }`}>
                             {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                           </span>
@@ -490,8 +509,7 @@ const RelationshipManager: React.FC = () => {
                           </button>
                           <button
                             onClick={() => handleCancelAppointment(appointment.id)}
-                            className="flex-1 bg-red-50 text-red-700 py-1.5 sm:py-2 px-2 sm:px-3 rounded text-xs sm:text-sm font-medium hover:bg-red-100 transition-colors"
-                          >
+                            className="flex-1 bg-red-50 text-red-700 py-1.5 sm:py-2 px-2 sm:px-3 rounded text-xs sm:text-sm font-medium hover:bg-red-100 transition-colors">
                             Cancel
                           </button>
                         </div>
@@ -518,10 +536,10 @@ const RelationshipManager: React.FC = () => {
                                 </span>
                                 <span
                                   className={`px-2 py-1 text-xs rounded-full ${appointment.status === 'scheduled'
-                                      ? 'bg-green-100 text-green-800'
-                                      : appointment.status === 'completed'
-                                        ? 'bg-gray-100 text-gray-800'
-                                        : 'bg-red-100 text-red-800'
+                                    ? 'bg-green-100 text-green-800'
+                                    : appointment.status === 'completed'
+                                      ? 'bg-gray-100 text-gray-800'
+                                      : 'bg-red-100 text-red-800'
                                     }`}>
                                   {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                                 </span>
@@ -574,10 +592,10 @@ const RelationshipManager: React.FC = () => {
                             </span>
                             <span
                               className={`px-2  sm:px-3 py-1 text-xs sm:text-sm rounded-full  ${appointment.status === 'scheduled'
-                                  ? 'bg-green-100 text-green-800'
-                                  : appointment.status === 'completed'
-                                    ? 'bg-gray-100 text-gray-800'
-                                    : 'bg-red-100 text-red-800'
+                                ? 'bg-green-100 text-green-800'
+                                : appointment.status === 'completed'
+                                  ? 'bg-gray-100 text-gray-800'
+                                  : 'bg-red-100 text-red-800'
                                 }`}>
                               {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                             </span>

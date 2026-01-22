@@ -733,7 +733,7 @@ export default function BecomePartnerForm() {
     try {
       await AuthService.sendRegisterOtp({ mobile: form.mobile, email: form.email });
       setOtpSent(true);
-      setOtpTimer(30);
+      setOtpTimer(45);
       setOtpVerified(false);
       setRegisterToken(null);
       setOtp("");

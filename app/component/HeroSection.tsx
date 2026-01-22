@@ -30,7 +30,7 @@ const HeroSection = () => {
     }, []);
 
     return (
-        <section className="relative bg-linear-to-br from-blue-50 via-teal-50 to-emerald-50 overflow-hidden" style={{ background: 'linear-gradient(to bottom right, #79c2f7ff, #ffffffff, #e5f8e5ff)' }}>
+        <section id='home' className="relative bg-linear-to-br from-blue-50 via-teal-50 to-emerald-50 overflow-hidden" style={{ background: 'linear-gradient(to bottom right, #79c2f7ff, #ffffffff, #e5f8e5ff)' }}>
 
             {/* Animated background shapes */}
             <div className="absolute inset-0 overflow-hidden">

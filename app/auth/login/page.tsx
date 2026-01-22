@@ -131,7 +131,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
             if (!otpSent) {
                 await AuthService.sendLoginOtp({ identifier: emailOrPhone });
                 setOtpSent(true);
-                setOtpTimer(30);
+                setOtpTimer(45);
                 setLoading(false);
                 return;
             }
@@ -371,7 +371,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                                 disabled={otpTimer > 0}
                                                 onClick={async () => {
                                                     await AuthService.sendLoginOtp({ identifier: emailOrPhone });
-                                                    setOtpTimer(30);
+                                                    setOtpTimer(45);
                                                 }}
                                                 className={`text-sm font-medium transition-colors duration-200 
                                                     ${otpTimer > 0 ? "text-red-400 cursor-not-allowed" : "text-[#2076C7] hover:underline"}`}>
