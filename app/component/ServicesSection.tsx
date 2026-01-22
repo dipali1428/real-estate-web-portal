@@ -55,7 +55,7 @@ const ServicesSection = () => {
         // { name: "Group Medi-Claim Cover", slug: "group-medi-claim-cover" },
         // { name: "Group Personal Accident Cover", slug: "group-personal-accident-cover" },
         // { name: "Worker Compensation Insurance", slug: "worker-compensation-insurance" },
-        { name: "Corporate General Insurance", slug: "corporate-general-insurance" },
+        { name: "Corporate Insurance", slug: "corporate-insurance" },
       ],
     },
     {

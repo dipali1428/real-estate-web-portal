@@ -5,7 +5,7 @@ interface TemplateItem {
   name: string;
   type: 'image';
   uploadDate: string;
-  category: 'insurance' | 'loan';
+  category: 'insurance' | 'loan' | 'contest'; // Added contest
   subCategory: string;
   description: string;
   imageUrl: string;
@@ -28,7 +28,10 @@ const subCategoryLabels: Record<string, string> = {
   business: 'Business Loan',
   lap: 'LAP Loan',
   personal: 'Personal Loan',
-  educational: 'Educational Loan'
+  educational: 'Educational Loan',
+  current: 'Current Contest', // Added
+  upcoming: 'Upcoming Contest', // Added
+  closed: 'Closed Contest' // Added
 };
 
 export default function TemplateGrid({ 
@@ -73,55 +76,10 @@ export default function TemplateGrid({
         </div>
       )}
 
-      {/* Custom CSS for grid responsiveness */}
       <style jsx>{`
-        .custom-template-grid {
-          display: grid;
-          width: 100%;
-        }
-
-        /* Custom breakpoints matching your reference code */
-        @media (min-width: 460px) and (max-width: 767px) {
-          .custom-template-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-        }
-
-        @media (min-width: 768px) and (max-width: 819px) {
-          .custom-template-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-        }
-
-        @media (min-width: 820px) and (max-width: 1023px) {
-          .custom-template-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-        }
-
-        @media (min-width: 1024px) and (max-width: 1159px) {
-          .custom-template-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-        }
-
-        @media (min-width: 1160px) and (max-width: 1279px) {
-          .custom-template-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-        }
-
-        @media (min-width: 1280px) and (max-width: 1359px) {
-          .custom-template-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-        }
-
-        @media (min-width: 1360px) {
-          .custom-template-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-        }
+        .custom-template-grid { display: grid; width: 100%; }
+        @media (min-width: 460px) { .custom-template-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+        @media (min-width: 1160px) { .custom-template-grid { grid-template-columns: repeat(3, 1fr) !important; } }
       `}</style>
     </div>
   );

@@ -1,9 +1,9 @@
 interface CategoryDropdownProps {
-  type: 'insurance' | 'loan';
+  type: 'insurance' | 'loan' | 'contest'; // Added contest
   isOpen: boolean;
-  activeCategory: 'insurance' | 'loan';
+  activeCategory: 'insurance' | 'loan' | 'contest'; // Added contest
   activeSubCategory: string;
-  onToggle: (type: 'insurance' | 'loan', event: React.MouseEvent) => void;
+  onToggle: (type: 'insurance' | 'loan' | 'contest', event: React.MouseEvent) => void;
   onSubCategorySelect: (subCategory: string, event: React.MouseEvent) => void;
 }
 
@@ -16,7 +16,10 @@ const subCategoryLabels: Record<string, string> = {
   business: 'Business Loan',
   lap: 'LAP Loan',
   personal: 'Personal Loan',
-  educational: 'Educational Loan'
+  educational: 'Educational Loan',
+  current: 'Current Contests', // Added
+  upcoming: 'Upcoming Contests', // Added
+  closed: 'Closed Contests' // Added
 };
 
 export default function CategoryDropdown({
@@ -28,13 +31,23 @@ export default function CategoryDropdown({
   onSubCategorySelect
 }: CategoryDropdownProps) {
   const isActive = activeCategory === type;
-  const bgColor = type === 'insurance' ? 'blue' : 'green';
+  
+  // Define colors based on type
+  const colorConfig = {
+    insurance: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-300' },
+    loan: { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-300' },
+    contest: { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-300' }
+  };
+
+  const currentColors = colorConfig[type];
 
   const getSubCategories = () => {
     if (type === 'insurance') {
       return ['all', 'life', 'health', 'motor'];
-    } else {
+    } else if (type === 'loan') {
       return ['all', 'home', 'business', 'lap', 'personal', 'educational'];
+    } else {
+      return ['all', 'current', 'upcoming',]; // Contest subcategories
     }
   };
 
@@ -44,7 +57,7 @@ export default function CategoryDropdown({
         onClick={(e) => onToggle(type, e)}
         className={`flex items-center justify-between w-full sm:w-auto space-x-2 px-4 sm:px-6 py-3 rounded-lg transition-all duration-200 font-semibold ${
           isActive 
-            ? `bg-${bgColor}-100 text-${bgColor}-700 border-2 border-${bgColor}-300 shadow-sm` 
+            ? `${currentColors.bg} ${currentColors.text} border-2 ${currentColors.border} shadow-sm` 
             : 'text-slate-700 hover:text-[#2076C7] hover:bg-slate-50 border-2 border-transparent'
         }`}
       >
@@ -70,7 +83,7 @@ export default function CategoryDropdown({
               onClick={(e) => onSubCategorySelect(subCategory, e)}
               className="block w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 border-b border-slate-100 last:border-b-0"
             >
-              <div className="font-medium">{subCategoryLabels[subCategory]}</div>
+              <div className="font-medium">{subCategoryLabels[subCategory] || subCategory}</div>
             </button>
           ))}
         </div>
