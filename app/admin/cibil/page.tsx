@@ -183,7 +183,7 @@ const CIBILPage = () => {
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+            <div className="bg-white rounded-lg shadow-sm overflow-x-auto scrollbar-x-thin scrollbar-thumb-gray-300 scrollbar-track-transparent md:scrollbar-thumb-gray-400">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-50">

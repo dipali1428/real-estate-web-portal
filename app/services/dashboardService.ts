@@ -95,13 +95,14 @@ export const DashboardService = {
         return response.data;
     },
     
-    uploadLeadDocument: async (leadId: number, formData: FormData) => {
-        const response = await api.post(`/api/dashboard/detail-leads/${leadId}/documents`, formData, {
+    uploadLeadDocument: async (leadId: string, formData: FormData) => {
+        // Encode the ID here
+        const encodedId = encodeURIComponent(leadId);
+        const response = await api.post(`/api/dashboard/detail-leads/${encodedId}/documents`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
         return response.data;
       },
-
 };

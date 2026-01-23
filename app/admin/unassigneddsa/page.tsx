@@ -283,7 +283,7 @@ export default function AdminLeadPanel() {
             ) : filteredLeads.length === 0 ? (
               <div className="py-12 text-center text-gray-500">No leads found.</div>
             ) : (
-              <div className="max-h-[60vh] overflow-x-auto">
+              <div className="max-h-[60vh] overflow-x-auto scrollbar-x-thin scrollbar-thumb-gray-300 scrollbar-track-transparent md:scrollbar-thumb-gray-400">
                 <table className="min-w-[1000px] w-full text-left border-collapse">
                   <thead className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
                     <tr>
