@@ -53,7 +53,7 @@ export default function RolesManagementPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [activeRoleTab, setActiveRoleTab] = useState<
-    "ALL" | "ADMIN" | "RM" | "DEPARTMENTHEAD"
+    "ALL" | "ADMIN" | "RM" | "DEPARTMENTHEAD" | "ACCOUNTS"
   >("ALL");
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -181,17 +181,16 @@ export default function RolesManagementPage() {
               { key: "ALL", label: "All Roles" },
               { key: "ADMIN", label: "Admins" },
               { key: "RM", label: "RMs" },
-              { key: "DEPARTMENTHEAD", label: "Dept Heads" },
+              { key: "DEPARTMENTHEAD", label: "Departments" },
+              { key: "ACCOUNTS", label: "Account" },
             ].map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveRoleTab(tab.key as any)}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                  activeRoleTab === tab.key
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${activeRoleTab === tab.key
                     ? "bg-white text-[#2076C7] shadow-sm"
                     : "text-gray-600 hover:text-gray-800"
-                }`}
-              >
+                  }`}>
                 {tab.label}
               </button>
             ))}
@@ -293,6 +292,7 @@ export default function RolesManagementPage() {
                   <option value="ADMIN">Admin</option>
                   <option value="RM">RM</option>
                   <option value="DEPARTMENTHEAD">Department Head</option>
+                  <option value="ACCOUNTS">Account</option>
                 </select>
               </div>
               <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Department</label><input type="text" className={inputClass} value={editingUser.department} onChange={(e) => setEditingUser({ ...editingUser, department: e.target.value })} /></div>
@@ -331,6 +331,7 @@ export default function RolesManagementPage() {
                   <option value="ADMIN">Admin</option>
                   <option value="RM">RM</option>
                   <option value="DEPARTMENTHEAD">Department Head</option>
+                  <option value="ACCOUNTS">Account</option>
                 </select>
               </div>
               <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Department</label><input type="text" className={inputClass} value={newUser.department} onChange={(e) => setNewUser({ ...newUser, department: e.target.value })} /></div>

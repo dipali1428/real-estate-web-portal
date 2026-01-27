@@ -11,13 +11,14 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
   const isAdminDashboard = pathname?.startsWith("/admin");
   const isRM = pathname?.startsWith("/rm");
   const isdepartmenthead = pathname?.startsWith("/departmenthead");
+  const isaccountProfile = pathname?.startsWith("/accounts");
 
   const isContactList = pathname?.startsWith("/page/contactlist");
   return (
     <ModalProvider>
-      {!isDashboard && !isContactList && !isAdminDashboard && !isRM && !isdepartmenthead && <Header />}
+      {!isDashboard && !isContactList && !isAdminDashboard && !isRM && !isdepartmenthead && !isaccountProfile && <Header />}
       {children}
-      {!isDashboard && !isContactList && !isAdminDashboard && !isRM && !isdepartmenthead && <Footer />}
+      {!isDashboard && !isContactList && !isAdminDashboard && !isRM && !isdepartmenthead && !isaccountProfile && <Footer />}
     </ModalProvider>
   );
 }

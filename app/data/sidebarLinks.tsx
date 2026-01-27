@@ -52,13 +52,19 @@ export const sidebarLinks = {
     GM: [],
     AVP: [],
 
+    ACCOUNTS: [
+        { label: "Dashboard", href: "/accounts", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
+        { label: "Profile", href: "/accounts/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
+        // { label: "RM's List", href: "//rmlist", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        // { label: "Leads", href: "//totalleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+    ],
+
     DEPARTMENTHEAD: [
         { label: "Dashboard", href: "/departmenthead", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "Profile", href: "/departmenthead/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "RM's List", href: "/departmenthead/rmlist", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "Leads", href: "/departmenthead/totalleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "Consumer detailed lead", href: "/departmenthead/consumerdetailedlead", icon: <Users className="h-5 w-5 text-neutral-700" /> },
-
 
     ],
     RM: [
