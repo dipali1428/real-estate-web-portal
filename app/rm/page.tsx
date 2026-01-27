@@ -7,47 +7,66 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import StatsCard from "../component/DashboardStatsCard";
 import DashboardSectionHeader from "../component/DashboardSectionHeader";
-import { Users, Mail } from "lucide-react";
+import { Users, Mail,FileText} from "lucide-react";
+
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState("");
   const [referralLeadTotal, setReferralLeadTotal] = useState(0);
   const [myDsaTotal, setMyDsaTotal] = useState(0);
+ const [totalReferralLeads, setTotalReferralLeads] = useState(0);
+ const [incomingReferralLeads, setIncomingReferralLeads] = useState(0);
+ const [outgoingReferralLeads, setOutgoingReferralLeads] = useState(0);
+ const [customerDetailLeadTotal, setCustomerDetailLeadTotal] = useState(0);
+
 
   const router = useRouter();
   const hasFetched = useRef(false);
 
   const fetchDashboardData = async () => {
-    try {
-      const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
-      if (!token) {
-        router.push("/");
-        return;
-      }
-
-      // Fetch RM Profile
-      const rmProfile = await RmService.getRmProfile();
-      setUserName(rmProfile?.user?.name || "");
-
-      // Fetch Referral Leads Count
-      const referralLeadsResponse = await RmService.getReferralLeads();
-      setReferralLeadTotal(referralLeadsResponse?.count || 0);
-
-      // Fetch My DSA Count
-      const myDsaCountResponse = await RmService.getYourDsaList();
-      setMyDsaTotal(myDsaCountResponse?.count || 0);
-
-    } catch (error: any) {
-      toast.error("Failed to fetch dashboard data.");
-
-      if (error?.response?.status === 401) {
-        toast.error("Session expired! Please login again.");
-        document.cookie = `authToken=; path=/; expires=${new Date(0).toUTCString()}`;
-        router.push("/");
-      }
+  try {
+    const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
+    if (!token) {
+      router.push("/");
+      return;
     }
-  };
+
+    // RM Profile
+    const rmProfile = await RmService.getRmProfile();
+    setUserName(rmProfile?.user?.name || "");
+
+    // 🔹 Total Referral Leads
+    const referralLeadsRes = await RmService.getReferralLeads();
+    setTotalReferralLeads(referralLeadsRes?.count || 0);
+
+    // 🔹 Incoming Leads
+    const incomingRes = await RmService.getIncomingAssignedLeads();
+    setIncomingReferralLeads(incomingRes?.count || 0);
+
+    // 🔹 Outgoing Leads
+    const outgoingRes = await RmService.getoutgoingLeadsToRm();
+    setOutgoingReferralLeads(outgoingRes?.count || 0);
+
+    // Optional: My DSA
+    const myDsaRes = await RmService.getYourDsaList();
+    setMyDsaTotal(myDsaRes?.count || 0);
+
+    // Fetch Customer Detail Leads Count
+    const customerDetailLeadsResponse = await RmService.getConsumerDetailedLeads();
+    setCustomerDetailLeadTotal(customerDetailLeadsResponse?.count || 0);
+
+
+  } catch (error: any) {
+    toast.error("Failed to fetch dashboard data.");
+
+    if (error?.response?.status === 401) {
+      toast.error("Session expired! Please login again.");
+      document.cookie = `authToken=; path=/; expires=${new Date(0).toUTCString()}`;
+      router.push("/");
+    }
+  }
+};
 
   useEffect(() => {
     if (!hasFetched.current) {
@@ -102,13 +121,43 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             title="Total Referral Leads"
-            value={referralLeadTotal}
+            value={totalReferralLeads}
             icon={<Users size={26} />}
-            subtitle="All active & inactive DSAs"
+            subtitle="All referral leads"
             color="blue"
           />
+         <StatsCard
+          title="Incoming Referral Leads"
+          value={incomingReferralLeads}
+          icon={<Mail size={26} />}
+          subtitle="Leads assigned to you"
+          color="green"
+        />
+          <StatsCard
+          title="Outgoing Referral Leads"
+          value={outgoingReferralLeads}
+          icon={<Mail size={26} />}
+          subtitle="Leads assigned by you"
+          color="purple"
+        />
         </div>
+
+      
       </section>
+      <section className="mb-10">
+          <DashboardSectionHeader title="Customer Detail Leads Overview" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatsCard
+              title="Total Customer Detail Leads"
+              value={customerDetailLeadTotal}
+              icon={<FileText size={26} />}
+              subtitle="Leads with full customer details & documents"
+              color="green"
+            />
+          </div>
+        </section>
     </div>
+    
   );
 }

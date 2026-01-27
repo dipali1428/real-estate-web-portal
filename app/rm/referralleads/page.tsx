@@ -67,6 +67,7 @@ export default function ReferralLeadsDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
+
   useEffect(() => {
     setCurrentPage(1);
   }, [activeTab, searchTerm]);
@@ -240,6 +241,7 @@ export default function ReferralLeadsDashboard() {
     }
 
     return (
+      
       <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6 mt-4">
         <div className="flex justify-between flex-1 sm:hidden">
           <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</button>

@@ -32,15 +32,21 @@ export const RmService = {
     return response.data;
   },
 
-  // getIncomingDetailedLeads: async () => {
-  //   const response = await api.get('/api/rm/get-incoming-detailed-lead');
-  //   return response.data; // Returns { success: boolean, count: number, leads: [] }
-  // },
-
-  // getOutgoingDetailedLeads: async () => {
-  //   const response = await api.get('/api/rm/get-outgoing-detailed-lead');
-  //   return response.data;
-  // },
+    getMyDetailLeads: async () => {
+    const response = await api.get('/api/rm/get-my-detail-lead');
+    return response.data; // Returns { success: boolean, count: number, leads: [] }
+  },
+   
+   getIncomingDetailLeads: async () => {
+    const response = await api.get('/api/rm/get-incoming-detail-lead');
+    return response.data; // Returns { success: boolean, count: number, leads: [] }
+  },
+  
+   getOutgoingDetailLeads: async () => {
+    const response = await api.get('/api/rm/get-outgoing-detail-lead');
+    return response.data; // Returns { success: boolean, count: number, leads: [] }
+  },
+  
 
   getConsumerDetailedLeads: async () => {
     const response = await api.get('/api/rm/customer-detail-leads');
@@ -51,5 +57,13 @@ export const RmService = {
     const response = await api.get(`/api/rm/customer-detail-lead-documents/${leadId}`);
     return response.data;
   },
+   acceptDetailLead: async (leadId:number) => {
+    const response = await api.post(`/api/rm/detail-leads/${leadId}/accept`);
+    return response.data;
+  },
 
+  rejectDetailLead: async (leadId: number) => {
+    const response = await api.post(`/api/rm/detail-leads/${leadId}/reject`);
+    return response.data;
+  },
 };

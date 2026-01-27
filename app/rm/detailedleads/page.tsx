@@ -10,7 +10,7 @@ import {
   IndianRupee, 
   FileText, 
   Info,
-  ExternalLink,
+  ExternalLink, 
   FileUp,
   ChevronLeft,
   ChevronRight,
@@ -18,80 +18,142 @@ import {
   UserCheck,
   Clock,
   ShieldCheck,
-  Calendar
+  Calendar,
+  Smartphone,
+  Building,
+  Files,
+  CheckCircle2,
+  AlertCircle,
+  Check,      
+  XCircle     
 } from 'lucide-react';
 
 // --- Types ---
 interface Lead {
   id: number;
-  travel_insurance_id: string;
-  name: string;
-  phone: string;
+  detail_lead_id: string;
+  lead_name: string;
+  contact_number: string;
   email: string;
-  location: string;
-  duration: string;
-  transport: string;
-  sum_assured: string;
-  status: string; 
+  department: string;
+  product_type: string;
+  sub_category: string;
   lead_status: string;
+  status: string;
   created_at: string;
-  updated_at: string;
   dsa_id: number;
   dsa_name: string;
-  dsa_adv_id: string;
   dsa_mobile: string;
-  assigned_rm_id?: number;
-  assigned_rm_name?: string;
-  assigned_rm_department?: string;
-  assigned_rm_sub_category?: string;
+  rm_id: number;
+  rm_name: string;
+  rm_acceptance_status: string;
+  rm_action_deadline: string;
+  referred_rm?: string;
+  is_self_login: boolean;
+  uploaded_documents?: {
+    document_key: string;
+    document_label: string;
+    file_url: string;
+    uploaded_at: string;
+  }[];
+  pending_documents?: any[]; 
+  form_data?: {
+    dob?: string;
+    employmentType?: string;
+    hasOtherLoan?: string | boolean;
+    loanAmount?: string;
+    loanType?: string;
+    location?: string;
+    otherIncome?: string | boolean;
+    otherIncomeAmount?: string;
+    otherLoanAmount?: string;
+    bankName?: string;
+    fileId?: string;
+    refId?: string;
+    rmName?: string;
+  };
 }
 
 export default function LeadDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // "My Lead" as default first tab
-  const [leadType, setLeadType] = useState<'my_insurance' | 'incoming' | 'outgoing'>('my_insurance');
-  
+  const [leadType, setLeadType] = useState<'my_lead' | 'incoming' | 'outgoing'>('incoming');
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [docModalLead, setDocModalLead] = useState<Lead | null>(null);
+  const [processingId, setProcessingId] = useState<number | null>(null);
+
+  // --- Pagination States ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const fetchLeads = async () => {
-    setLoading(false);
-    // setLoading(true);
-    // try {
-    //   let response;
-    //   // if (leadType === 'my_insurance') {
-    //   //   // response = await RmService.getMyTravelInsuranceDetailedLeads();
-    //   // } else if (leadType === 'incoming') {
-    //   //   response = await RmService.getIncomingDetailedLeads();
-    //   // } else {
-    //   //   response = await RmService.getOutgoingDetailedLeads();
-    //   // }
+    setLoading(true);
+    try {
+      let response;
+      if (leadType === 'my_lead') {
+        response = await RmService.getMyDetailLeads();
+      } else if (leadType === 'incoming') {
+        response = await RmService.getIncomingDetailLeads();
+      } else if (leadType === 'outgoing') {
+        response = await RmService.getOutgoingDetailLeads();
+      }
       
-    //   // LOG STATEMENT TO SEE DATA IN CONSOLE
-    //   console.log(`DEBUG: Data for ${leadType}:`, response);
-
-    //   if (response && response.success) {
-    //     setLeads(response.leads || []);
-    //   }
-    // } catch (error) {
-    //   console.error("Error fetching leads:", error);
-    // } finally {
-    //   setLoading(false);
-    // }
+      if (response && response.success) {
+        setLeads(response.leads || []);
+      } else {
+        setLeads([]);
+      }
+    } catch (error) {
+      console.error("Error fetching leads:", error);
+      setLeads([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchLeads();
+    setCurrentPage(1); 
   }, [leadType]);
 
+  useEffect(() => {
+    setCurrentPage(1); 
+  }, [searchTerm]);
+
+  const handleAction = async (id: number, action: 'accept' | 'reject') => {
+    if (action === 'reject' && !confirm("Are you sure you want to reject this lead?")) return;
+    
+    setProcessingId(id);
+    try {
+      const response = action === 'accept' 
+        ? await RmService.acceptDetailLead(id) 
+        : await RmService.rejectDetailLead(id);    
+      if (response.success) {
+        fetchLeads(); 
+      } else {
+        alert(response.message || `Failed to ${action} lead`);
+      }
+    } catch (error: any) {
+      console.error(`Error during ${action}:`, error);
+      alert(error.response?.data?.message || `Server error during ${action}`);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
   const filteredLeads = leads.filter(lead => 
-    lead.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.travel_insurance_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.phone?.includes(searchTerm)
+    lead.lead_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    lead.detail_lead_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    lead.contact_number?.includes(searchTerm)
   );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentLeads = filteredLeads.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen font-sans">
@@ -102,7 +164,7 @@ export default function LeadDashboard() {
           <div>
             <h1 className="text-xl md:text-2xl font-bold text-gray-900">Lead Management</h1>
             <p className="text-sm text-gray-600 mt-1">
-              Viewing {leadType === 'my_insurance' ? 'My Leads' : leadType}
+              Viewing {leadType === 'my_lead' ? 'My Leads' : leadType === 'incoming' ? 'Incoming Leads' : 'Outgoing Leads'}
             </p>
           </div>
         </div>
@@ -119,156 +181,309 @@ export default function LeadDashboard() {
             />
             <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
           </div>
-          <button className="inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium transition-colors shadow-sm">
-            <FileUp className="w-4 h-4 mr-2" /> Export Excel
-          </button>
+          
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="flex items-center gap-2 bg-white border px-3 py-2 rounded-lg shadow-sm">
+              <span className="text-xs text-gray-500 font-bold whitespace-nowrap">Show:</span>
+              <select 
+                value={itemsPerPage} 
+                onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+                className="text-xs bg-transparent focus:outline-none text-gray-900 font-bold cursor-pointer"
+              >
+                {[5, 10, 25, 50, 100].map(val => (
+                  <option key={val} value={val}>{val}</option>
+                ))}
+              </select>
+            </div>
+            <button className="flex-1 md:flex-none inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium transition-colors shadow-sm">
+              <FileUp className="w-4 h-4 mr-2" /> Export Excel
+            </button>
+          </div>
         </div>
 
         {/* TABS SECTION */}
         <div className="flex bg-gray-200 p-1 rounded-xl w-fit overflow-x-auto mb-6">
-          <button onClick={() => setLeadType('my_insurance')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${leadType === 'my_insurance' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>My Lead</button>
+          <button onClick={() => setLeadType('my_lead')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${leadType === 'my_lead' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>My Lead</button>
           <button onClick={() => setLeadType('incoming')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${leadType === 'incoming' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>Incoming</button>
           <button onClick={() => setLeadType('outgoing')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${leadType === 'outgoing' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>Outgoing</button>
         </div>
 
         {/* MAIN TABLE CONTAINER */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto scrollbar-x-thin scrollbar-thumb-gray-300 scrollbar-track-transparent md:scrollbar-thumb-gray-400">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden">
+          <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20">
                 <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
                 <p className="text-gray-500 font-medium">Loading Data...</p>
               </div>
             ) : (
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 table-auto">
+                <thead className="bg-gray-50 sticky top-0 z-30">
                   <tr>
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">Lead ID</th>
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">Client Name</th>
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-700 uppercase whitespace-nowrap tracking-wider">Phone</th>
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">Email</th>
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">Location</th>
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">Transport</th>
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">Duration</th>
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">Sum Assured</th>
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">Lead Status</th>
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">DSA Name</th>
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">DSA ID</th>
-                    {leadType === 'outgoing' && (
-                      <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">Assigned rm</th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ID</th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Lead ID</th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">DSA Name & Phone</th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Client Details</th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Referred RM</th>
+                    {leadType !== 'my_lead' && (
+                        <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Assigned RM</th>
                     )}
-                    <th className="px-4 py-4 text-left text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">Created Date</th>
-                    <th className="px-4 py-4 text-right text-sm font-bold text-gray-600 uppercase whitespace-nowrap tracking-wider">Actions</th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Self Login</th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50">Acceptance</th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Created At</th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Documents</th>
+                    <th className="px-4 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredLeads.length > 0 ? (
-                    filteredLeads.map((lead) => (
-                      <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-4 whitespace-nowrap text-sm font-bold text-gray-600">{lead.travel_insurance_id}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">{lead.name}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">{lead.phone}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">{lead.email}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">{lead.location}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-blue-600 font-bold">{lead.transport}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">{lead.duration} Days</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm font-bold text-gray-700">₹{parseFloat(lead.sum_assured).toLocaleString('en-IN')}</td>
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 rounded-full text-xs font-bold border ${lead.lead_status === 'OPEN' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
-                            {lead.lead_status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{lead.dsa_name}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{lead.dsa_adv_id}</td>
-                        {leadType === 'outgoing' && (
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{lead.assigned_rm_name || 'N/A'}</td>
-                        )}
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{new Date(lead.created_at).toLocaleDateString()}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-right text-sm">
-                          <button onClick={() => setSelectedLead(lead)} className="text-blue-600 hover:text-blue-900 font-bold underline decoration-2 underline-offset-4">
-                            Details
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                  {currentLeads.length > 0 ? (
+                    currentLeads.map((lead) => {
+                      const isPending = lead.rm_acceptance_status === 'PENDING';
+                      return (
+                        <tr key={lead.id} className="hover:bg-gray-50 transition-colors relative group">
+                          {/* 1. ID - VISIBLE */}
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 font-bold bg-white z-20">
+                            {lead.id}
+                            {isPending && (
+                              <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none w-[1200px]">
+                                <span className="text-red-600 font-bold text-[10px] sm:text-xs bg-white/80 px-3 py-1 rounded-full border border-red-200 backdrop-blur-sm shadow-sm whitespace-nowrap">
+                                  Deadline: {new Date(lead.rm_action_deadline).toLocaleDateString('en-GB')} / {new Date(lead.rm_action_deadline).toLocaleTimeString('en-GB', { 
+                                    hour: '2-digit', minute: '2-digit', hour12: true 
+                                  })}
+                                </span>
+                              </div>
+                            )}
+                          </td>
+
+                          {/* 2. Lead ID - VISIBLE */}
+                          <td className="px-4 py-4 whitespace-nowrap text-sm font-bold text-gray-700 bg-white z-20">
+                            {lead.detail_lead_id}
+                          </td>
+                          
+                          {/* 3. Status - BLURRED */}
+                          <td className={`px-4 py-4 whitespace-nowrap transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${lead.lead_status === 'NEW' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                              {lead.lead_status}
+                            </span>
+                          </td>
+
+                          {/* 4. DSA Info - BLURRED */}
+                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-700 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                            <div className="font-bold">{lead.dsa_name}</div>
+                            <div className="text-[10px] text-gray-500">{lead.dsa_mobile || 'N/A'}</div>
+                          </td>
+
+                          {/* 5. Client Info - BLURRED */}
+                          <td className={`px-4 py-4 whitespace-nowrap text-sm transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                            <div className="font-bold text-gray-800">{lead.lead_name}</div>
+                            <div className="text-[11px] text-gray-600">{lead.email}</div>
+                            <div className="text-[10px] text-gray-500">{lead.contact_number}</div>
+                          </td>
+
+                          {/* 6. Referred RM - BLURRED */}
+                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                            {lead.referred_rm || 'N/A'}
+                          </td>
+
+                          {/* 7. Assigned RM - BLURRED */}
+                          {leadType !== 'my_lead' && (
+                            <td className={`px-4 py-4 whitespace-nowrap text-sm text-purple-600 font-medium transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                                {lead.rm_name}
+                            </td>
+                          )}
+
+                          {/* 8. Self Login - BLURRED */}
+                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                            {lead.is_self_login ? <span className="text-green-600 font-bold">Yes</span> : 'No'}
+                          </td>
+
+                          {/* 9. Acceptance - VISIBLE */}
+                          <td className="px-4 py-4 whitespace-nowrap text-sm font-bold z-20 bg-white">
+                            {isPending ? (
+                              <div className="flex items-center gap-2">
+                                {processingId === lead.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                ) : (
+                                  <>
+                                    <button onClick={() => handleAction(lead.id, 'accept')} className="p-1.5 bg-green-50 text-green-600 rounded-md hover:bg-green-100 transition-colors border border-green-100" title="Accept"><Check size={16} /></button>
+                                    <button onClick={() => handleAction(lead.id, 'reject')} className="p-1.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors border border-red-100" title="Reject"><XCircle size={16} /></button>
+                                  </>
+                                )}
+                              </div>
+                            ) : (
+                              <span className={`${lead.rm_acceptance_status === 'ACCEPTED' ? 'text-green-600' : 'text-red-500'} text-[10px] tracking-wider uppercase`}>{lead.rm_acceptance_status}</span>
+                            )}
+                          </td>
+
+                          {/* 10. Created At - BLURRED */}
+                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                            {new Date(lead.created_at).toLocaleDateString('en-GB')}
+                          </td>
+
+                          {/* 11. Documents - BLURRED */}
+                          <td className={`px-4 py-4 whitespace-nowrap transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                            <button onClick={() => setDocModalLead(lead)} className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-700 px-3 py-1 rounded-md font-bold hover:bg-gray-200 transition-colors text-xs">
+                              <Files size={14} /> Docs
+                            </button>
+                          </td>
+
+                          {/* 12. Actions - BLURRED */}
+                          <td className={`px-4 py-4 whitespace-nowrap text-right text-sm transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                            <button onClick={() => setSelectedLead(lead)} className="bg-blue-50 text-blue-600 px-3 py-1 rounded-md font-bold transition-colors hover:bg-blue-100">
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
-                    <tr><td colSpan={leadType === 'outgoing' ? 14 : 13} className="px-6 py-10 text-center text-gray-500 italic">No leads found.</td></tr>
+                    <tr><td colSpan={13} className="px-6 py-10 text-center text-gray-500 italic">No leads found.</td></tr>
                   )}
                 </tbody>
               </table>
             )}
           </div>
+
+          {/* ORIGINAL PAGINATION Logic - ALIGNED TO RIGHT CORNER */}
+          <div className="px-4 py-4 border-t border-gray-100 flex items-center justify-end bg-gray-50/50">
+            <div className="flex items-center gap-4 mr-6">
+              <span className="text-xs text-gray-500 font-medium">
+                Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredLeads.length)} of {filteredLeads.length} leads
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <button 
+                onClick={() => paginate(currentPage - 1)} 
+                disabled={currentPage === 1}
+                className="p-1.5 rounded-lg border bg-white text-gray-600 disabled:opacity-50 hover:bg-gray-100 transition-colors"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              
+              {[...Array(totalPages)].map((_, i) => {
+                 if (totalPages > 5 && i + 1 !== 1 && i + 1 !== totalPages && Math.abs(currentPage - (i + 1)) > 1) {
+                   if (i + 1 === 2 || i + 1 === totalPages - 1) return <span key={i} className="px-1 text-gray-400">...</span>;
+                   return null;
+                 }
+                 return (
+                  <button
+                    key={i}
+                    onClick={() => paginate(i + 1)}
+                    className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${currentPage === i + 1 ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-gray-600 border hover:bg-gray-50'}`}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              })}
+
+              <button 
+                onClick={() => paginate(currentPage + 1)} 
+                disabled={currentPage === totalPages || totalPages === 0}
+                className="p-1.5 rounded-lg border bg-white text-gray-600 disabled:opacity-50 hover:bg-gray-100 transition-colors"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* MODAL SECTION */}
+        {/* --- DOCS MODAL --- */}
+        <div className={`fixed inset-0 z-[60] flex items-center justify-center p-4 transition-all duration-300 ${docModalLead ? 'visible opacity-100' : 'invisible opacity-0'}`}>
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setDocModalLead(null)} />
+          <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[85vh] overflow-hidden flex flex-col transition-all duration-300 transform ${docModalLead ? 'scale-100' : 'scale-95'}`}>
+            {docModalLead && (
+              <>
+                <div className="p-5 border-b flex items-center justify-between bg-white">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-50 rounded-lg text-blue-600"><Files size={20} /></div>
+                    <div><h3 className="text-lg font-bold text-gray-900">Lead Documents</h3><p className="text-xs text-gray-500 font-medium">{docModalLead.detail_lead_id} • {docModalLead.lead_name}</p></div>
+                  </div>
+                  <button onClick={() => setDocModalLead(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors"><X size={20} /></button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-6">
+                  {docModalLead.is_self_login ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <UserCheck className="w-16 h-16 text-green-600 mb-4" />
+                      <h4 className="text-lg font-bold text-gray-900">Self Login Lead</h4>
+                      <p className="text-sm text-gray-500 mt-2">Documents not required for self-login leads.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-8">
+                      <div>
+                        <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-4"><CheckCircle2 className="w-4 h-4 text-green-500" /> Uploaded Documents</h4>
+                        <div className="space-y-2">
+                          {docModalLead.uploaded_documents && docModalLead.uploaded_documents.length > 0 ? (
+                            docModalLead.uploaded_documents.map((doc, idx) => (
+                              <div key={idx} className="flex items-center justify-between p-3 bg-green-50 border border-green-100 rounded-xl">
+                                <span className="text-sm text-green-700 font-medium">{doc.document_label}</span>
+                                <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-blue-600 flex items-center gap-1 hover:underline">View <ExternalLink size={12} /></a>
+                              </div>
+                            ))
+                          ) : (<div className="p-3 bg-gray-50 border border-dashed rounded-xl text-center text-xs text-gray-400">No documents uploaded yet</div>)}
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-4"><Clock className="w-4 h-4 text-orange-500" /> Pending Documents</h4>
+                        <div className="space-y-2">
+                          {docModalLead.pending_documents && docModalLead.pending_documents.length > 0 ? (
+                            docModalLead.pending_documents.map((doc, idx) => (
+                              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 border border-dashed rounded-xl"><span className="text-sm text-gray-700 font-medium">{typeof doc === 'string' ? doc : (doc.document_label || 'Required Document')}</span><span className="text-[10px] font-bold text-orange-600 uppercase">Pending</span></div>
+                            ))
+                          ) : (<div className="p-3 bg-gray-50 border border-dashed rounded-xl text-center text-xs text-gray-400">No pending documents</div>)}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 border-t bg-gray-50 flex justify-end">
+                  <button onClick={() => setDocModalLead(null)} className="px-6 py-2 bg-white border rounded-lg text-sm hover:bg-gray-100 transition-colors">Close</button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* --- LEAD VIEW FORM (MINIMAL) --- */}
         <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${selectedLead ? 'visible opacity-100' : 'invisible opacity-0'}`}>
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedLead(null)} />
           <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transition-all duration-300 transform ${selectedLead ? 'scale-100' : 'scale-95'}`}>
             {selectedLead && (
               <>
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+                <div className="p-6 border-b flex items-center justify-between bg-white">
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">Lead Details</h3>
-                    <p className="text-xs text-blue-600 font-bold uppercase tracking-widest mt-0.5">{selectedLead.travel_insurance_id}</p>
+                    <h3 className="text-xl font-bold text-gray-900">Lead Detail View</h3>
+                    <p className="text-xs text-gray-500 font-medium mt-1">{selectedLead.detail_lead_id} • {selectedLead.lead_name}</p>
                   </div>
-                  <button onClick={() => setSelectedLead(null)} className="p-2 hover:bg-white rounded-full text-gray-400 hover:text-gray-900 border border-transparent hover:border-gray-200"><X size={20} /></button>
+                  <button onClick={() => setSelectedLead(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors"><X size={20} /></button>
                 </div>
-
-                <div className="flex-1 overflow-y-auto p-8 space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                      <div className="h-12 w-12 bg-white rounded-lg flex items-center justify-center border border-gray-200 text-blue-600 text-lg font-bold">{selectedLead.name?.charAt(0)}</div>
-                      <div>
-                        <p className="font-bold text-gray-900">{selectedLead.name}</p>
-                        <p className="text-sm text-gray-700">{selectedLead.phone}</p>
+                
+                <div className="flex-1 overflow-y-auto p-8">
+                  <div className="grid grid-cols-2 gap-y-8 gap-x-12">
+                    {[
+                      { label: 'DOB', value: selectedLead.form_data?.dob || 'N/A' },
+                      { label: 'Employment Type', value: selectedLead.form_data?.employmentType || 'N/A' },
+                      { label: 'Has Other Loan', value: selectedLead.form_data?.hasOtherLoan ? 'Yes' : 'No' },
+                      { label: 'Loan Amount', value: selectedLead.form_data?.loanAmount ? `₹${parseFloat(selectedLead.form_data.loanAmount).toLocaleString('en-IN')}` : 'N/A' },
+                      { label: 'Loan Type', value: selectedLead.form_data?.loanType || 'N/A' },
+                      { label: 'Location', value: selectedLead.form_data?.location || 'N/A' },
+                      { label: 'Other Income', value: selectedLead.form_data?.otherIncome ? 'Yes' : 'No' },
+                      { label: 'Other Income Amount', value: selectedLead.form_data?.otherIncomeAmount ? `₹${parseFloat(selectedLead.form_data.otherIncomeAmount).toLocaleString('en-IN')}` : 'N/A' },
+                      { label: 'Other Loan Amount', value: selectedLead.form_data?.otherLoanAmount ? `₹${parseFloat(selectedLead.form_data.otherLoanAmount).toLocaleString('en-IN')}` : 'N/A' },
+                    ].map((item, i) => (
+                      <div key={i} className="space-y-1">
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{item.label}</p>
+                        <p className="text-sm font-bold text-gray-800">{item.value}</p>
                       </div>
-                    </div>
-                    <div className="space-y-2 text-sm text-gray-700">
-                      <div className="flex items-center gap-2"><Mail size={14} /> {selectedLead.email}</div>
-                      <div className="flex items-center gap-2"><MapPin size={14} /> {selectedLead.location}</div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
-                      <p className="text-[10px] font-bold text-blue-600 uppercase mb-1">Sum Assured</p>
-                      <p className="text-lg font-medium text-gray-700">₹{parseFloat(selectedLead.sum_assured).toLocaleString('en-IN')}</p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                      <p className="text-[10px] font-bold text-gray-700 uppercase mb-1">Transport</p>
-                      <p className="font-medium text-gray-700">{selectedLead.transport}</p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                      <p className="text-[10px] font-bold text-gray-700 uppercase mb-1">Duration</p>
-                      <p className="font-medium text-gray-700">{selectedLead.duration} Days</p>
-                    </div>
-                  </div>
-
-                  {selectedLead.assigned_rm_name && (
-                    <div className="p-4 bg-purple-50/50 border border-purple-100 rounded-xl">
-                      <h4 className="text-[11px] font-bold text-purple-600 uppercase mb-3">Assigned rm</h4>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <ShieldCheck className="text-purple-600" />
-                          <div>
-                            <p className="text-sm font-bold text-gray-900">{selectedLead.assigned_rm_name}</p>
-                            <p className="text-[10px] text-gray-900 font-bold">{selectedLead.assigned_rm_department}</p>
-                          </div>
-                        </div>
-                        <span className="text-[10px] bg-white px-2 py-1 rounded border text-gray-900 font-medium">ID: {selectedLead.assigned_rm_id}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="p-4 bg-green-50/50 border border-green-100 rounded-xl text-xs text-gray-700">
-                    <p><strong>Created:</strong> {new Date(selectedLead.created_at).toLocaleString()}</p>
-                    <p><strong>Updated:</strong> {new Date(selectedLead.updated_at).toLocaleString()}</p>
+                    ))}
                   </div>
                 </div>
 
-                <div className="p-6 border-t border-gray-100 bg-white flex gap-4">
-                  <button onClick={() => setSelectedLead(null)} className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50">Close</button>
-                  <button className="flex-[2] bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-lg">Process Lead</button>
+                <div className="p-6 border-t bg-gray-50 flex gap-3">
+                  <button className="flex-1 bg-[#1CADA3] text-white font-bold py-2.5 rounded-xl text-sm hover:shadow-lg transition-all">Process Lead</button>
+                  <button onClick={() => setSelectedLead(null)} className="px-6 py-2.5 bg-white border text-gray-600 font-bold rounded-xl text-sm hover:bg-gray-100 transition-all">Close</button>
+
                 </div>
               </>
             )}
