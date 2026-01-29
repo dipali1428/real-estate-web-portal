@@ -14,7 +14,9 @@ interface AllUserApiItem {
   email?: string;
   mobile?: string;
   pan?: string;
+  pan_verified?: string;
   city?: string;
+  state?: string;
   head?: string;
   category?: string;
   password?: string;
@@ -69,6 +71,7 @@ export default function AllUsersPage() {
       setLoading(true);
       setError(null);
       const res = await AdminService.getAllUsers();
+      console.log("Fetched users:", res);
       const rawList: AllUserApiItem[] =
         (Array.isArray(res?.dsalist) && res.dsalist) ||
         (Array.isArray(res) && res) ||
@@ -107,14 +110,17 @@ export default function AllUsersPage() {
     const headers = [
       "id", "adv_id", "name", "email", "mobile", "pan", "city", "head",
       "category", "password", "date_joined", "updated_at", "role",
-      "department", "sub_category", "referral_code", "referred_by_rm"
+      "department", "sub_category", "referral_code", "referred_by_rm","pan_verified","state"
     ];
 
     const csvRows = users.map(user => {
       return headers.map(header => {
-        const val = (user as any)[header];
+        let val = (user as any)[header];
+         if (header === "pan_verified") {
+            val = String(val).toLowerCase() === "true";
+          }
         const finalVal = (val === null || val === undefined || val === "") ? "null" : val;
-        return `"${finalVal.toString().replace(/"/g, '""')}"`;
+        return `"${header === "pan_verified" ? String(finalVal).toLowerCase() : finalVal.toString().replace(/"/g, '""')}"`;
       }).join(",");
     });
 
@@ -259,7 +265,7 @@ export default function AllUsersPage() {
               <table className="min-w-[900px] w-full text-left border-collapse">
                 <thead className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
                   <tr>
-                    {["ID", "Adv ID", "Name", "Email", "Mobile", "PAN", "City", "Head", "Category", "Department", "Sub Category", "Referral Code", "Referred By RM", "Role", "Date Joined", "Last Updated"].map((h) => (
+                    {["ID", "Adv ID", "Name", "Email", "Mobile", "PAN","Pan Verified", "State","City", "Head", "Category", "Department", "Sub Category", "Referral Code", "Referred By RM", "Role", "Date Joined", "Last Updated"].map((h) => (
                       <th key={h} className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
                     ))}
                   </tr>
@@ -273,6 +279,8 @@ export default function AllUsersPage() {
                       <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{user.email}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.mobile}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.pan}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.pan_verified}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700 max-w-[180px] truncate">{user.state}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 max-w-[180px] truncate">{user.city}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{user.head}</td>
                       <td className="px-4 py-3 text-sm text-gray-700 max-w-[180px] truncate" title={user.category}>{user.category}</td>
