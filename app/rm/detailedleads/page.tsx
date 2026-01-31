@@ -223,7 +223,7 @@ export default function LeadDashboard() {
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ID</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Lead ID</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">DSA Name & Phone</th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">DSA Details</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Client Details</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Referred RM</th>
                     {leadType !== 'my_lead' && (

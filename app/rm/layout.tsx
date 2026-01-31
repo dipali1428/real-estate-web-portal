@@ -13,7 +13,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     const role = "RM";
 
     return (
-        <div className="flex h-screen bg-gray-50">
+        <div className="flex h-screen bg-gray-50 font-sans">
 
             <Toaster position="top-right" />
 

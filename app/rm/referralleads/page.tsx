@@ -319,15 +319,15 @@ export default function ReferralLeadsDashboard() {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedLeads.map(lead => (
                 <tr key={lead.id} className="hover:bg-gray-50">
-                 <td className="px-6 py-4 text-sm text-gray-500">{lead.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{lead.ref_id}</td>
-                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-medium text-gray-900">{lead.dsa_name}</span><span className="text-xs text-blue-500">{lead.dsa_mobile}</span><span className="text-xs text-gray-500">{lead.dsa_adv_id}</span></div></td>
-                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.lead_name}</span><span className="text-blue-500">{lead.contact_number}</span><span className="text-blue-500">{lead.email}</span></div></td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{lead.department}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{lead.sub_category}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{lead.notes || '--'} </td>
+                 <td className="px-6 py-4 text-sm text-gray-700">{lead.id}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{lead.ref_id}</td>
+                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-medium text-gray-800">{lead.dsa_name}</span><span className="text-xs text-blue-500">{lead.dsa_mobile}</span><span className="text-xs text-gray-700">{lead.dsa_adv_id}</span></div></td>
+                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-semibold text-gray-800">{lead.lead_name}</span><span className="text-blue-500">{lead.contact_number}</span><span className="text-gray-700">{lead.email}</span></div></td>
+                  <td className="px-6 py-4 text-sm text-gray-800">{lead.department}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800">{lead.sub_category}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800 max-w-xs truncate">{lead.notes || '--'} </td>
                   <td className="px-6 py-4 text-sm"><span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{lead.status}</span></td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{formatDate(lead.created_at)}<div className="text-xs text-gray-400">{formatTime(lead.created_at)}</div></td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{formatDate(lead.created_at)}<div className="text-xs text-gray-600">{formatTime(lead.created_at)}</div></td>
                 </tr>
               ))}
             </tbody>
@@ -378,16 +378,16 @@ export default function ReferralLeadsDashboard() {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedLeads.map(lead => (
                 <tr key={lead.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-500">{lead.id}</td>
-                  <td className="px-6 py-4 text-sm"><span className="font-bold text-gray-600">{lead.ref_id}</span></td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{lead.id}</td>
+                  <td className="px-6 py-4 text-sm"><span className="font-bold text-gray-700">{lead.ref_id}</span></td>
                   <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-600">{lead.rm_name}</span><span className="text-blue-600">{lead.rm_mobile}</span></div></td>
                   <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-medium text-gray-900">{lead.dsa_name}</span><span className="text-xs text-gray-500">{lead.dsa_adv_id}</span></div></td>
                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.lead_name}</span><span className="text-blue-600">{lead.contact_number}</span><span className="text-gray-600">{lead.email}</span></div></td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{lead.department}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{lead.sub_category}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{lead.notes || '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800">{lead.department}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800">{lead.sub_category}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800 max-w-xs truncate">{lead.notes || '-'}</td>
                   <td className="px-6 py-4 text-sm"><span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${lead.status === 'converted' ? 'bg-green-100 text-green-800' : lead.status === 'new' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>{lead.status}</span></td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{formatDate(lead.created_at)}<div className="text-xs text-gray-400">{formatTime(lead.created_at)}</div></td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{formatDate(lead.created_at)}<div className="text-xs text-gray-600">{formatTime(lead.created_at)}</div></td>
                 </tr>
               ))}
             </tbody>

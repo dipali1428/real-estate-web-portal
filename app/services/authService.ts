@@ -10,6 +10,8 @@ interface RegisterPayload {
     email: string;
     mobile: string;
     rm_referral: string;
+    state: string;
+    city: string;
     password: string;
     confirm_password: string;
     registerToken: string; // 🔐 REQUIRED AFTER OTP VERIFY

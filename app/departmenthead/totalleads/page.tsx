@@ -64,7 +64,7 @@ const DetailedHeader = () => (
     <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Notes</th>
     <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Status</th>
     <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Self-Login</th>
-    <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Acceptance</th>
+    <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Acceptance Status</th>
     <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Assigned RM</th>
     <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Current RM</th>
     <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Previous RM</th>
@@ -316,14 +316,13 @@ const LeadTable: FC = () => {
   if (loading) return <div className="p-20 text-center text-gray-500">Loading...</div>;
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-4 py-6 font-sans text-gray-700 relative">
+    <div className="w-full max-w-[1600px] mx-auto px-4 py-6 font-sans text-gray-300 relative">
       <div className="mb-6 mt-4 border-b flex gap-6">
         {['referral', 'detailed'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab as any)}
-            className={`pb-3 text-sm font-medium capitalize transition-all ${activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-          >
+            className={`pb-3 text-sm font-medium capitalize transition-all ${activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 hover:text-gray-700'}`}>
             {tab} Leads
           </button>
         ))}

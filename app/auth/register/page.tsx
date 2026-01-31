@@ -3,7 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { AuthService } from "@/app/services/authService";
 import { useModal } from "../../context/ModalContext";
-import { Eye, EyeOff, CheckCircle, ArrowRight, ArrowLeft, Smartphone, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, CheckCircle, ArrowRight, ArrowLeft, Smartphone, ShieldCheck, AlertCircle } from "lucide-react";
+import { STATES_CITIES } from "@/app/data/statesCities";
+
+const states = Object.keys(STATES_CITIES);
 
 // --- Regex rules ---
 const NAME_REGEX = /^[A-Za-z ]{2,60}$/;
@@ -34,16 +37,23 @@ export default function BecomePartnerForm() {
   const { openLogin, closeAll } = useModal();
 
   // --- Form State ---
-  const [step, setStep] = useState(1); // 1: Basic Details, 2: Verification
+  const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     name: "",
     email: "",
     mobile: "",
+    state: "",
+    city: "",
     rm_referral: "",
     password: "",
     confirmPassword: "",
     agree: false,
   });
+
+  const cities = useMemo(() => {
+    return form.state ? STATES_CITIES[form.state] || [] : [];
+  }, [form.state]);
+
 
   // --- OTP & Auth State ---
   const [otp, setOtp] = useState("");
@@ -84,7 +94,7 @@ export default function BecomePartnerForm() {
       const t = setTimeout(() => {
         closeAll();
         openLogin();
-      }, 2000);
+      }, 4000);
       return () => clearTimeout(t);
     }
   }, [success, closeAll, openLogin]);
@@ -121,6 +131,16 @@ export default function BecomePartnerForm() {
       }
     }
 
+    // ✅ IMPORTANT: State → City dependency
+    if (key === "state") {
+      setForm((prev) => ({
+        ...prev,
+        state: newValue,
+        city: "", // reset city
+      }));
+      setErrors((prev) => ({ ...prev, state: "", city: "" }));
+      return;
+    }
     setForm((prev) => ({ ...prev, [key]: newValue }));
     setErrors((prev) => ({ ...prev, [key]: "" }));
     setServerError(null);
@@ -131,11 +151,16 @@ export default function BecomePartnerForm() {
   // Validate Step 1 (Basic Info)
   const validateStep1 = () => {
     const e: Record<string, string> = {};
+
     if (!NAME_REGEX.test(form.name)) e.name = "Enter a valid name (2-60 chars).";
     if (!EMAIL_REGEX.test(form.email)) e.email = "Enter a valid email address.";
     if (!MOBILE_REGEX.test(form.mobile)) e.mobile = "Enter a valid 10-digit mobile number.";
+
     if (form.password.length < 8) e.password = "Min 8 characters required.";
     if (form.password !== form.confirmPassword) e.confirmPassword = "Passwords do not match.";
+
+    if (!form.state) e.state = "Please select a state.";
+    if (!form.city) e.city = "Please select a city.";
 
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -229,6 +254,8 @@ export default function BecomePartnerForm() {
         name: form.name,
         email: form.email,
         mobile: form.mobile,
+        state: form.state,
+        city: form.city,
         rm_referral: form.rm_referral,
         password: form.password,
         confirm_password: form.confirmPassword,
@@ -351,6 +378,82 @@ export default function BecomePartnerForm() {
                       />
                     </div>
 
+                    <div>
+                      <label className={labelClass}>State</label>
+                      <select
+                        value={form.state}
+                        onChange={(e) => setField("state", e.target.value)}
+                        className={`${inputClass} ios-select`}>
+                        <option value="">Select State</option>
+                        {states.map((state) => (
+                          <option key={state} value={state}>
+                            {state}
+                          </option>
+                        ))}
+                      </select>
+
+                      {errors.state && <p className={errorClass}>{errors.state}</p>}
+                    </div>
+
+
+                    {/* <div>
+                      <label className={labelClass}>State</label>
+                      <input
+                        list="state-list"
+                        value={form.state}
+                        onChange={(e) => setField("state", e.target.value.trim())}
+                        className={inputClass}
+                        placeholder="Type to search state"
+                      />
+
+                      <datalist id="state-list">
+                        {states.map((state) => (
+                          <option key={state} value={state} />
+                        ))}
+                      </datalist>
+
+                      {errors.state && <p className={errorClass}>{errors.state}</p>}
+                    </div> */}
+
+
+                    <div>
+                      <label className={labelClass}>City</label>
+                      <select
+                        value={form.city}
+                        onChange={(e) => setField("city", e.target.value)}
+                        disabled={!form.state}
+                        className={inputClass}>
+                        <option value="">
+                          {form.state ? "Select City" : "Select State first"}
+                        </option>
+                        {cities.map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.city && <p className={errorClass}>{errors.city}</p>}
+                    </div>
+
+                    {/* <div>
+                      <label className={labelClass}>City</label>
+                      <input
+                        list="city-list"
+                        value={form.city}
+                        onChange={(e) => setField("city", e.target.value.trim())}
+                        disabled={!form.state}
+                        className={inputClass}
+                        placeholder={form.state ? "Type to search city" : "Select state first"}
+                      />
+                      <datalist id="city-list">
+                        {cities.map((city) => (
+                          <option key={city} value={city} />
+                        ))}
+                      </datalist>
+
+                      {errors.city && <p className={errorClass}>{errors.city}</p>}
+                    </div> */}
+
                     {/* Password */}
                     <div>
                       <label className={labelClass}>Password</label>
@@ -455,11 +558,9 @@ export default function BecomePartnerForm() {
                           type="button"
                           onClick={onSendOtp}
                           disabled={otpSubmitting}
-                          className="w-full bg-white border border-[#1CADA3] text-[#1CADA3] hover:bg-[#1CADA3]/5 px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-60"
-                        >
+                          className="w-full bg-white border border-[#1CADA3] text-[#1CADA3] hover:bg-[#1CADA3]/5 px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-60">
                           {otpSubmitting ? "Sending OTP..." : "Send OTP"}
                         </button>
-                        {serverError && <p className="text-xs text-red-600 text-center">{serverError}</p>}
                       </div>
                     )}
 
@@ -479,8 +580,7 @@ export default function BecomePartnerForm() {
                             type="button"
                             onClick={onVerifyOtp}
                             disabled={otpSubmitting}
-                            className="px-4 py-2 bg-[#1CADA3] text-white rounded-lg text-sm whitespace-nowrap hover:bg-[#178f87] disabled:opacity-70"
-                          >
+                            className="px-4 py-2 bg-[#1CADA3] text-white rounded-lg text-sm whitespace-nowrap hover:bg-[#178f87] disabled:opacity-70">
                             {otpSubmitting ? "..." : "Verify"}
                           </button>
                         </div>
@@ -497,7 +597,15 @@ export default function BecomePartnerForm() {
                             {otpTimer > 0 ? `Resend in ${otpTimer}s` : "Resend OTP"}
                           </button>                        </div>
                         {errors.otp && <p className={errorClass}>{errors.otp}</p>}
-                        {serverError && <p className={errorClass}>{serverError}</p>}
+
+                        {/* Global Server Error Message */}
+                        {serverError && (
+                          <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-100 flex items-center gap-2 text-red-700 text-sm animate-shake">
+                            <AlertCircle className="w-4 h-4" />
+                            <p className="font-medium">{serverError}</p>
+                          </div>
+                        )}
+
                       </div>
                     )}
                   </div>
@@ -546,6 +654,14 @@ export default function BecomePartnerForm() {
                     </label>
                     {errors.agree && <p className={errorClass}>{errors.agree}</p>}
                   </div>
+
+                  {/* Global Server Error Message */}
+                  {serverError && (
+                    <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-100 flex items-center gap-2 text-red-700 text-sm animate-shake">
+                      <AlertCircle className="w-4 h-4" />
+                      <p className="font-medium">{serverError}</p>
+                    </div>
+                  )}
 
                   <p className="text-xs text-gray-400 mt-2 italic">
                     *Please ensure your Name, Email, and Mobile Number are entered correctly during registration.
