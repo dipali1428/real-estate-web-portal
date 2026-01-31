@@ -105,6 +105,7 @@ export default function ReferralLeadsDashboard() {
   const fetchIncomingLeads = async () => {
     try {
       const res = await RmService.getIncomingAssignedLeads();
+     
       if (res?.success && Array.isArray(res.leads)) {
         setIncomingLeads(res.leads);
       } else {
@@ -310,7 +311,7 @@ export default function ReferralLeadsDashboard() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {['DSA', 'Client Details', 'Department', 'Sub Category', 'Additional Notes', 'Status', 'Created At'].map(h => (
+                {['ID','Ref_iD','DSA', 'Client Details', 'Department', 'Sub Category', 'Notes', 'Status', 'Created At'].map(h => (
                   <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -318,11 +319,13 @@ export default function ReferralLeadsDashboard() {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedLeads.map(lead => (
                 <tr key={lead.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-medium text-gray-900">{lead.dsa_name}</span><span className="text-xs text-gray-500">{lead.dsa_adv_id}</span></div></td>
-                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.lead_name}</span><span className="text-blue-600">{lead.contact_number}</span><span className="text-blue-600">{lead.email}</span></div></td>
+                 <td className="px-6 py-4 text-sm text-gray-500">{lead.id}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{lead.ref_id}</td>
+                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-medium text-gray-900">{lead.dsa_name}</span><span className="text-xs text-blue-500">{lead.dsa_mobile}</span><span className="text-xs text-gray-500">{lead.dsa_adv_id}</span></div></td>
+                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.lead_name}</span><span className="text-blue-500">{lead.contact_number}</span><span className="text-blue-500">{lead.email}</span></div></td>
                   <td className="px-6 py-4 text-sm text-gray-500">{lead.department}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{lead.sub_category}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{lead.notes}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{lead.notes || '--'} </td>
                   <td className="px-6 py-4 text-sm"><span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{lead.status}</span></td>
                   <td className="px-6 py-4 text-sm text-gray-500">{formatDate(lead.created_at)}<div className="text-xs text-gray-400">{formatTime(lead.created_at)}</div></td>
                 </tr>
@@ -367,7 +370,7 @@ export default function ReferralLeadsDashboard() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {['DSA', 'Referral ID', 'Client Details', 'Department', 'Sub Category', 'Notes', 'Status', 'Created At'].map(h => (
+                {[ 'ID','Referral ID','Lead From', 'DSA', 'Client Details', 'Department', 'Sub Category', 'Notes', 'Status', 'Created At'].map(h => (
                   <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -375,9 +378,11 @@ export default function ReferralLeadsDashboard() {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedLeads.map(lead => (
                 <tr key={lead.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-medium text-gray-900">{lead.dsa_name}</span><span className="text-xs text-gray-500">{lead.dsa_adv_id}</span></div></td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{lead.id}</td>
                   <td className="px-6 py-4 text-sm"><span className="font-bold text-gray-600">{lead.ref_id}</span></td>
-                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.lead_name}</span><span className="text-blue-600">{lead.contact_number}</span><span className="text-gray-600">{lead.email}</span></div></td>
+                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-600">{lead.rm_name}</span><span className="text-blue-600">{lead.rm_mobile}</span></div></td>
+                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-medium text-gray-900">{lead.dsa_name}</span><span className="text-xs text-gray-500">{lead.dsa_adv_id}</span></div></td>
+                 <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.lead_name}</span><span className="text-blue-600">{lead.contact_number}</span><span className="text-gray-600">{lead.email}</span></div></td>
                   <td className="px-6 py-4 text-sm text-gray-500">{lead.department}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{lead.sub_category}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{lead.notes || '-'}</td>
@@ -428,7 +433,7 @@ export default function ReferralLeadsDashboard() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {['DSA Details', 'Client Details', 'Department', 'Status', 'Assigned RM', 'Created At'].map(h => (
+                {['ID','Ref_ID','DSA Details', 'Client Details', 'Department', 'Sub-Category','Notes','Status', 'Assigned RM', 'Created At'].map(h => (
                   <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -436,11 +441,15 @@ export default function ReferralLeadsDashboard() {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedLeads.map(lead => (
                 <tr key={lead.id} className="hover:bg-gray-50">
+                 <td className="px-6 py-4 text-sm text-gray-600">{lead.id}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{lead.ref_id}</td>
                   <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-medium text-gray-900">{lead.dsa_name}</span><span className="text-xs text-gray-500">{lead.dsa_adv_id}</span></div></td>
                   <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.lead_name}</span><span className="text-blue-600 font-medium">{lead.contact_number}</span><span className="text-gray-600 font-medium">{lead.email}</span></div></td>
                   <td className="px-6 py-4 text-sm text-gray-600">{lead.department}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{lead.sub_category}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{lead.notes}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{lead.status}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-blue-600">{lead.assigned_rm_name || 'Unassigned'}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-blue-600"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.assigned_rm_name || 'Unassigned'}</span><span className="text-blue-500 font-medium">{lead.assigned_rm_sub_category}</span></div></td>
                   <td className="px-6 py-4 text-sm text-gray-500">{formatDate(lead.created_at)}</td>
                 </tr>
               ))}

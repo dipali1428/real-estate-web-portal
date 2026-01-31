@@ -1418,41 +1418,45 @@ export const offerData: Record<string, Offer> = {
     }
   },
 
-  'wealth-management': {
-    title: 'Wealth Management',
+  'unlisted': {
+    title: 'Unlisted',
     category: 'Investment',
     icon: 'Briefcase',
-    description: 'Personalized investment solutions for high net-worth individuals',
-    overview: 'Wealth management provides comprehensive financial planning and investment management services for high net-worth individuals. It includes investment advisory, portfolio management, estate planning, tax planning, and retirement planning.',
+    description: 'Equity shares of a company that are not listed on any recognized stock exchange.',
+    overview: 'Unlisted shares are equity shares of private or public companies not traded on formal stock exchanges (like NSE or BSE). They are often held by founders or early investors, offering high-growth potential, particularly with pre-IPO companies, but carry higher risks, lower liquidity, and limited regulatory transparency compared to listed shares.',
     features: [
-      'Personalized financial planning',
-      'Portfolio management services',
-      'Tax optimization strategies',
-      'Estate and succession planning',
-      'Retirement planning',
-      'Insurance planning',
-      'Regular portfolio reviews'
+      'No Public Trading',
+      'Limited Liquidity',
+      'Higher Growth Potential',
+      'Valuation Challenges',
+      'Information Asymmetry',
+      'Lower Volatility',
+      'Unique Types'
     ],
     benefits: [
       {
-        title: 'Holistic Planning',
-        description: 'Integrated approach covering all aspects of financial life and goals.'
+        title: 'High Growth Potential',
+        description: 'Investors can gain early access to companies with high growth potential, potentially leading to significant long-term capital appreciation.'
       },
       {
-        title: 'Expert Guidance',
-        description: 'Access to experienced wealth managers and financial planners.'
+        title: 'Early-Stage Valuation Advantage',
+        description: 'Unlisted shares are often priced lower than they will be post-IPO, allowing investors to enter at an advantageous, lower valuation.'
       },
       {
-        title: 'Customized Solutions',
-        description: 'Tailored investment strategies based on individual risk profile and goals.'
+        title: 'Portfolio Diversification',
+        description: 'Unlisted shares enable investors to diversify beyond traditional, public markets into unique industries and sectors.'
       },
       {
-        title: 'Tax Efficiency',
-        description: 'Structured investments to optimize tax liabilities and enhance returns.'
+        title: 'Lower Market Volatility',
+        description: 'Unlisted shares are not traded on public exchanges, making them less susceptible to daily market speculation, panic selling, or high-frequency trading fluctuations.'
       },
       {
-        title: 'Time Saving',
+        title: 'Pre-IPO Gains',
         description: 'Professional management frees up time for other pursuits.'
+      },
+      {
+        title: 'Negotiable Pricing',
+        description: 'Due to limited buyers and sellers, prices for unlisted shares can sometimes be negotiated. '
       }
     ],
     eligibility: [
@@ -1618,7 +1622,7 @@ export const offerData: Record<string, Offer> = {
     overview: 'Demat (Dematerialized) account is an electronic account that holds securities like shares, bonds, mutual funds, and government securities in digital format. It\'s mandatory for trading in Indian stock markets and offers secure, convenient holding of investments.',
     features: [
       'Electronic holding of securities',
-      'Single account for multiple securities',
+      'Single account for multiple securities', 
       'Easy transfer and pledging',
       'Consolidated account statement',
       'Nomination facility',

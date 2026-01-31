@@ -11,13 +11,14 @@ export const DepartmentHeadService = {
         return response.data;
     },
     getRelationshipManagers: async () => {
-        const response = await api.get('/api/department/getrm');
+        const response = await api.get('/api/department/getrmlist');
         return response.data;
     },
     getDepartmentLeads: async () => {
         const response = await api.get('/api/department/getdeptLeads');
         return response.data;
     },
+    
     getCustomerDetailLeads: async () => {
         const response = await api.get('/api/department/getcustomer-detail-lead');
         return response.data;
@@ -29,6 +30,10 @@ export const DepartmentHeadService = {
     },
     getLeadDocuments: async (leadId: number) => {
         const response = await api.get(`/api/rm/customer-detail-lead-documents/${leadId}`);
+        return response.data;
+    },
+     getDetailedLeadsPaged: async (page: number, limit: number) => {
+        const response = await api.get(`/api/department/getdept-detail-leads?page=${page}&limit=${limit}`);
         return response.data;
     },
 };
