@@ -105,7 +105,7 @@ const Header = () => {
         </motion.div>
 
         {/* Desktop Menu */}
-        <div className="hidden lg:flex items-center space-x-0 xl:space-x-0.5 2xl:space-x-1">
+        <div className="hidden lg:flex items-center space-x-0 xl:space-x-0.5 2xl:space-x-1 font-sans">
           {/* Home Link */}
           {navLinks.slice(0, 1).map((link, i) => (
             <motion.div
@@ -495,7 +495,7 @@ const Header = () => {
               onClick={openLogin}
               whileHover={{ scale: 1.07, y: -2 }}
               transition={{ type: "tween", ease: "easeOut", duration: 0.08 }}
-              className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-3 xl:px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
+              className="font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-3 xl:px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
               Login
             </motion.button>
 
@@ -503,7 +503,7 @@ const Header = () => {
               onClick={openPartner}
               whileHover={{ scale: 1.07, y: -2 }}
               transition={{ type: "tween", ease: "easeOut", duration: 0.04 }}
-              className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-3 xl:px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-[#E8F6FA] transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
+              className="font-sans bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-3 xl:px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-[#E8F6FA] transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
               Become A Partner
             </motion.button>
 
