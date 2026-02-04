@@ -218,7 +218,18 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/HEALTH_GRID_MONTH_OF_JANUARY_80%.pdf'
     },
     // Loan - Home Loan
-    
+    {
+      id: '16',
+      name: 'IA_Jan_Payout_Structure.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-1-14',
+      category: 'payout',
+      month: 'january-2026',
+      year: '2026',
+      subCategory: 'home-loan',
+      filePath: '/pdfs/homeloan/IA_Jan_Payout_Structure.pdf'
+    },
     // Loan - Business Loan
     
 
