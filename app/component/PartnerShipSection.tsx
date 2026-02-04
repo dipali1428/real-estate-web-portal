@@ -1,5 +1,5 @@
 "use client";
-import { Users, Building2, Briefcase } from "lucide-react";
+import { Users, Building2, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import { useModal } from "../context/ModalContext";
 
@@ -17,7 +17,7 @@ const stats = [
     subtitle: "Branches Across India",
   },
   {
-    icon: <Briefcase className="w-14 h-14 text-[#1CADA3]" />,
+    icon: <MapPin className="w-14 h-14 text-[#1CADA3]" />,
     title: "Cities Covered",
     value: "127+",
     subtitle: "Across India",
