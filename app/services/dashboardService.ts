@@ -20,6 +20,16 @@ export const DashboardService = {
         return response.data;
     },
 
+    // 🔹 Bank Verification (Penny Drop)
+    verifyBankDetails: async (payload: {
+        bank_name?: string;
+        bank_account_number: string;
+        ifsc_code: string;
+    }) => {
+        const response = await api.post("/api/dashboard/verify-bank", payload);
+        return response.data;
+    },
+
     // 🔹 Create Tciket
     createTicket: async (payload: {
         category: string;
@@ -94,15 +104,15 @@ export const DashboardService = {
         const response = await api.get(`/api/dashboard/detail-lead/${leadId}/all-documents`);
         return response.data;
     },
-    
+
     uploadLeadDocument: async (leadId: string, formData: FormData) => {
         // Encode the ID here
         const encodedId = encodeURIComponent(leadId);
         const response = await api.post(`/api/dashboard/detail-leads/${encodedId}/documents`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
         });
         return response.data;
-      },
+    },
 };
