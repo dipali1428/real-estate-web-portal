@@ -61,6 +61,9 @@ export const events: Event[] = [
   { id: "Surat 21 nov 25", title: "Business Event", date: "Nov 21, 2025", desc: "A successful day of ideas and inspiration", city: "Kolkata" },
   { id: "Kanpur 26 nov 25", title: "Business Event", date: "Nov 26, 2024", desc: "One meet, many milestones", city: "Kanpur" },
   { id: "Solapur 14 nov 25", title: "Business Event", date: "Nov 14, 2025", desc: "Teamwork makes the vision work", city: "Solapur" },
+
+  // 2026 Events
+  { id: "Sangli 20 jan 25", title: "Business Event", date: "Jan 20, 2026", desc: "Meeting success, exceeding goals", city: "Sangli" },
 ];
 
 // Sort events by date

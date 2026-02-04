@@ -7,7 +7,7 @@ const stats = [
   {
     icon: <Users className="w-14 h-14 text-[#1CADA3]" />,
     title: "Trusted Partnerships",
-    value: "2600+",
+    value: "2700+",
     subtitle: "Active DSA & Partners",
   },
   {
@@ -18,9 +18,9 @@ const stats = [
   },
   {
     icon: <Briefcase className="w-14 h-14 text-[#1CADA3]" />,
-    title: "Assets Managed",
-    value: "500Cr+",
-    subtitle: "in Total Loan Book",
+    title: "Cities Covered",
+    value: "127+",
+    subtitle: "Across India",
   },
 ];
 

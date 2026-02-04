@@ -313,6 +313,12 @@ export const getEventImages = (event: Event): string[] => {
       "/Solapur 14 nov 2025/Image-2.jpg",
       "/Solapur 14 nov 2025/Image-3.jpg",
       "/Solapur 14 nov 2025/Image-4.jpg"
+    ],
+    "Sangli 20 jan 25": [
+      "/Sangli 20 Jan 2026/Image-1.jpeg",
+      "/Sangli 20 Jan 2026/Image-2.jpeg",
+      "/Sangli 20 Jan 2026/Image-3.jpeg",
+      "/Sangli 20 Jan 2026/Image-4.jpeg"
     ]
   };
   

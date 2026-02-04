@@ -277,7 +277,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
           </div>
         </div>
 
-      <div className="overflow-x-auto bg-white shadow-md rounded-lg border border-gray-200">
+      <div className="overflow-x-auto scrollbar-x-thin bg-white shadow-md rounded-lg border border-gray-200">
         {loading && data.length === 0 ? (
           <div className="p-12 text-center text-gray-500">Loading data...</div>
         ) : (

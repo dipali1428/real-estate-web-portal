@@ -71,6 +71,8 @@ export default function AddLeadModal({
       "Fire Insurance",
       "Cattle Insurance",
       "Marine Insurance",
+      "Corporate Insurance",
+      "Loan Protector",
     ],
     investment: ["Wealth Management", "PMS/AIF", "Bonds", "Fixed Deposits"],
     real_estate: ["Fractional Real Estate"],
