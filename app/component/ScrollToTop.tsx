@@ -1,35 +1,28 @@
 "use client";
-import React, { useEffect, useState, RefObject } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
-interface ScrollToTopProps {
-  // CHANGE: Add "| null" here to match how useRef works in React
-  containerRef: RefObject<HTMLDivElement | null>;
-}
-
-const ScrollToTop = ({ containerRef }: ScrollToTopProps) => {
+const ScrollToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
+    // Show the button when the user scrolls down 400px
     const toggleVisibility = () => {
-      // Show button when user scrolls down 400px
-      if (container.scrollTop > 400) {
+      if (window.scrollY > 400) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
       }
     };
 
-    container.addEventListener("scroll", toggleVisibility);
-    return () => container.removeEventListener("scroll", toggleVisibility);
-  }, [containerRef]);
+    window.addEventListener("scroll", toggleVisibility);
+    
+    // Cleanup the listener when the component unmounts
+    return () => window.removeEventListener("scroll", toggleVisibility);
+  }, []);
 
   const scrollToTop = () => {
-    // The ?. (optional chaining) safely handles the case if containerRef.current is null
-    containerRef.current?.scrollTo({
+    window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
@@ -38,9 +31,10 @@ const ScrollToTop = ({ containerRef }: ScrollToTopProps) => {
   return (
     <button
       onClick={scrollToTop}
-      className={`fixed bottom-18 right-6 z-50 p-2 bg-[#2076C7] text-white rounded-full shadow-2xl transition-all duration-300 hover:bg-blue-600 active:scale-50 ${
+      className={`fixed bottom-6 right-18 z-50 p-2 bg-[#2076C7] text-white rounded-full shadow-2xl transition-all duration-300 hover:bg-blue-700 active:scale-90 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
       }`}
+      aria-label="Scroll to top"
     >
       <ArrowUp size={24} strokeWidth={2.5} />
     </button>

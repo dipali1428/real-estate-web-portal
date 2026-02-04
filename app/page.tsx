@@ -8,16 +8,11 @@ import GroupOfCompaniesPage from "./component/GroupOfCompanies";
 import PartnershipSection from "./component/PartnerShipSection";
 import ServicesSection from "./component/ServicesSection";
 import Chatbot from "./component/chatbot/page";
-// import ScrollToTop from "./component/ScrollToTop";
+import ScrollToTop from "./component/ScrollToTop";
 
 export default function Home() {
-  // 1. Create the reference
-  // const scrollContainerRef = useRef<HTMLDivElement>(null);
-
   return (
-    <div 
-      // ref={scrollContainerRef} // 2. Attach the reference
-      // className="h-screen w-full overflow-x-hidden overflow-y-auto font-sans home-scrollbar scroll-smooth"
+    <div className="min-h-screen w-full overflow-x-hidden font-sans"
       >
       {/* Sections */}
       <HeroSection />
@@ -27,12 +22,8 @@ export default function Home() {
       <PartnershipSection />
       <ContactSection />
       <CTASection />
-      
-      {/* Components that stay floating */}
       <Chatbot />
-      
-      {/* 3. Pass the reference to the button */}
-      {/* <ScrollToTop containerRef={scrollContainerRef} /> */}
+      <ScrollToTop/>
     </div>
   );
 }
