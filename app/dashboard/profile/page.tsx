@@ -753,7 +753,7 @@ export default function ProfileSection() {
                             <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Digital Visiting Card</h4>
                             <div className="aspect-[1.75/1] rounded-2xl shadow-1xl overflow-hidden relative border border-slate-200 bg-slate-900 group">
                                 <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${CardTemplateImage.src})` }} />
-                                <div className="absolute inset-0 pl-15 pt-11 p-8 flex flex-col justify-between">
+                                <div className="absolute inset-0 pl-15 pt-16 p-8 flex flex-col justify-between">
                                     <div className="">
                                         <h4 className="text-2xl font-black text-slate-700 uppercase leading-none truncate">{profile.name}</h4>
                                         <p className="text-[8px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Authorized Partner </p>
