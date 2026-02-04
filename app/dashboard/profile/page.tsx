@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { DashboardService } from "@/app/services/dashboardService";
 import toast from "react-hot-toast";
-import CardTemplateImage from "@/app/assets/Bussiness_Card.png";
+import CardTemplateImage from "@/app/assets/Bussiness_Card2.png";
 import { Phone, Mail, MapPin, Globe } from "lucide-react";
 import LogoImage from "@/public/logo.png";
 import { Landmark, Pencil, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
@@ -207,39 +207,168 @@ export default function ProfileSection() {
         setProfile({ ...profile, category: updated.join(",") });
     };
 
+    // const downloadCardAsPhoto = async () => {
+    //     if (!profile) return;
+    //     setIsDownloadingCard(true);
+    //     const canvas = document.createElement("canvas");
+    //     const ctx = canvas.getContext("2d");
+    //     if (!ctx) return setIsDownloadingCard(false);
+    //     const cvWidth = 1200; const cvHeight = 675;
+    //     canvas.width = cvWidth; canvas.height = cvHeight;
+    //     try {
+    //         const templateImg = new Image();
+    //         templateImg.src = CardTemplateImage.src; templateImg.crossOrigin = "anonymous";
+    //         await new Promise((resolve, reject) => { templateImg.onload = resolve; templateImg.onerror = reject; });
+    //         ctx.drawImage(templateImg, 0, 0, cvWidth, cvHeight);
+    //         const leftPadding = 90; const iconColor = "#94a3b8"; const textColor = "#1e293b";
+    //         ctx.fillStyle = textColor; ctx.font = "bold 52px sans-serif"; ctx.textBaseline = "top";
+    //         ctx.fillText(profile.name.toUpperCase(), leftPadding, 180);
+    //         ctx.fillStyle = "#64748b"; ctx.font = "20px sans-serif"; ctx.fillText("Authorized Partner", leftPadding, 240);
+    //         const drawIcon = (path: string, x: number, y: number) => {
+    //             ctx.save(); ctx.translate(x, y); ctx.strokeStyle = iconColor; ctx.lineWidth = 2.5;
+    //             ctx.lineCap = "round"; ctx.lineJoin = "round"; const p = new Path2D(path); ctx.stroke(p); ctx.restore();
+    //         };
+    //         const startY = 320; const gap = 75; const textXOffset = 60;
+    //         drawIcon("M17 2H7C5.89543 2 5 2.89543 5 4V20C5 21.1046 5.89543 22 7 22H17C18.1046 22 19 21.1046 19 20V4C19 2.89543 18.1046 2  17 2ZM12 18H12.01", leftPadding, startY);
+    //         ctx.fillStyle = textColor; ctx.font = "bold 28px sans-serif"; ctx.fillText(`+91 ${profile.mobile}`, leftPadding + textXOffset, startY - 5);
+    //         drawIcon("M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4ZM22 7L12 13L2 7", leftPadding, startY + gap);
+    //         ctx.font = "500 26px sans-serif"; ctx.fillText(profile.email.toLowerCase(), leftPadding + textXOffset, startY + gap - 5);
+    //         drawIcon("M12 21C12 21 20 13 20 8C20 3.58172 16.4183 0 12 0C7.58172 0 4 3.58172 4 8C4 13 12 21 12 21ZM12 11C10.3431 11 9 9.65685 9 8C9 6.34315 10.3431 5 12 5C13.6569 5 15 6.34315 15 8C15 9.65685 13.6569 11 12 11Z", leftPadding, startY + (gap * 2));
+    //         ctx.font = "bold 28px sans-serif"; ctx.fillText(profile.city, leftPadding + textXOffset, startY + (gap * 2) - 5);
+    //         const link = document.createElement("a"); link.download = `${profile.name}_BusinessCard.jpg`;
+    //         link.href = canvas.toDataURL("image/jpeg", 1.0); link.click();
+    //         toast.success("Card downloaded successfully!");
+    //     } catch (e) {
+    //         toast.error("Template failed to load.");
+    //     } finally {
+    //         setIsDownloadingCard(false);
+    //     }
+    // };
     const downloadCardAsPhoto = async () => {
         if (!profile) return;
+
         setIsDownloadingCard(true);
+
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
         if (!ctx) return setIsDownloadingCard(false);
-        const cvWidth = 1200; const cvHeight = 675;
-        canvas.width = cvWidth; canvas.height = cvHeight;
+
+        const cvWidth = 1200;
+        const cvHeight = 675;
+        canvas.width = cvWidth;
+        canvas.height = cvHeight;
+
         try {
+            // Load template
             const templateImg = new Image();
-            templateImg.src = CardTemplateImage.src; templateImg.crossOrigin = "anonymous";
-            await new Promise((resolve, reject) => { templateImg.onload = resolve; templateImg.onerror = reject; });
+            templateImg.src = CardTemplateImage.src;
+            templateImg.crossOrigin = "anonymous";
+
+            await new Promise((res, rej) => {
+                templateImg.onload = res;
+                templateImg.onerror = rej;
+            });
+
             ctx.drawImage(templateImg, 0, 0, cvWidth, cvHeight);
-            const leftPadding = 90; const iconColor = "#94a3b8"; const textColor = "#1e293b";
-            ctx.fillStyle = textColor; ctx.font = "bold 52px sans-serif"; ctx.textBaseline = "top";
+
+            // Colors & layout
+            const leftPadding = 90;
+            const iconColor = "#94a3b8";
+            const headingColor = "#1e293b";
+            const textColor = "#334155";
+
+            ctx.textBaseline = "top";
+
+            /* -------------------------
+               NAME & TITLE
+            --------------------------*/
+            ctx.fillStyle = headingColor;
+            ctx.font = "bold 52px sans-serif";
             ctx.fillText(profile.name.toUpperCase(), leftPadding, 180);
-            ctx.fillStyle = "#64748b"; ctx.font = "20px sans-serif"; ctx.fillText("Authorized Partner", leftPadding, 240);
+
+            ctx.fillStyle = "#64748b";
+            ctx.font = "bold 20px sans-serif";
+            ctx.fillText("AUTHORIZED PARTNER", leftPadding, 240);
+
+            /* -------------------------
+               ICON DRAWER
+            --------------------------*/
             const drawIcon = (path: string, x: number, y: number) => {
-                ctx.save(); ctx.translate(x, y); ctx.strokeStyle = iconColor; ctx.lineWidth = 2.5;
-                ctx.lineCap = "round"; ctx.lineJoin = "round"; const p = new Path2D(path); ctx.stroke(p); ctx.restore();
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.strokeStyle = iconColor;
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+                ctx.stroke(new Path2D(path));
+                ctx.restore();
             };
-            const startY = 320; const gap = 75; const textXOffset = 60;
-            drawIcon("M17 2H7C5.89543 2 5 2.89543 5 4V20C5 21.1046 5.89543 22 7 22H17C18.1046 22 19 21.1046 19 20V4C19 2.89543 18.1046 2  17 2ZM12 18H12.01", leftPadding, startY);
-            ctx.fillStyle = textColor; ctx.font = "bold 28px sans-serif"; ctx.fillText(`+91 ${profile.mobile}`, leftPadding + textXOffset, startY - 5);
-            drawIcon("M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4ZM22 7L12 13L2 7", leftPadding, startY + gap);
-            ctx.font = "500 26px sans-serif"; ctx.fillText(profile.email.toLowerCase(), leftPadding + textXOffset, startY + gap - 5);
-            drawIcon("M12 21C12 21 20 13 20 8C20 3.58172 16.4183 0 12 0C7.58172 0 4 3.58172 4 8C4 13 12 21 12 21ZM12 11C10.3431 11 9 9.65685 9 8C9 6.34315 10.3431 5 12 5C13.6569 5 15 6.34315 15 8C15 9.65685 13.6569 11 12 11Z", leftPadding, startY + (gap * 2));
-            ctx.font = "bold 28px sans-serif"; ctx.fillText(profile.city, leftPadding + textXOffset, startY + (gap * 2) - 5);
-            const link = document.createElement("a"); link.download = `${profile.name}_BusinessCard.jpg`;
-            link.href = canvas.toDataURL("image/jpeg", 1.0); link.click();
+
+            const startY = 320;
+            const gap = 70;
+            const textX = leftPadding + 60;
+
+            ctx.fillStyle = textColor;
+            ctx.font = "bold 28px sans-serif";
+
+            /* -------------------------
+               PHONE
+            --------------------------*/
+            drawIcon(
+                "M17 2H7C5.9 2 5 2.9 5 4V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V4C19 2.9 18.1 2 17 2Z",
+                leftPadding,
+                startY
+            );
+            ctx.fillText(`+91 ${profile.mobile}`, textX, startY - 4);
+
+            /* -------------------------
+               EMAIL
+            --------------------------*/
+            drawIcon(
+                "M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4ZM22 7L12 13L2 7",
+                leftPadding,
+                startY + gap
+            );
+            ctx.font = "bold 26px sans-serif";
+            ctx.fillText(profile.email.toLowerCase(), textX, startY + gap - 4);
+
+            /* -------------------------
+               CITY
+            --------------------------*/
+            drawIcon(
+                "M12 21C12 21 20 13 20 8C20 3.6 16.4 0 12 0C7.6 0 4 3.6 4 8C4 13 12 21 12 21Z",
+                leftPadding,
+                startY + gap * 2
+            );
+            ctx.font = "bold 28px sans-serif";
+            ctx.fillText(profile.city, textX, startY + gap * 2 - 4);
+
+            /* -------------------------
+               WEBSITE
+            --------------------------*/
+            drawIcon(
+                "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2Z",
+                leftPadding,
+                startY + gap * 3
+            );
+            ctx.font = "bold 26px sans-serif";
+            ctx.fillText(
+                "www.infinityarthvishva.com",
+                textX,
+                startY + gap * 3 - 4
+            );
+
+            /* -------------------------
+               DOWNLOAD
+            --------------------------*/
+            const link = document.createElement("a");
+            link.download = `${profile.name}_BusinessCard.jpg`;
+            link.href = canvas.toDataURL("image/jpeg", 1);
+            link.click();
+
             toast.success("Card downloaded successfully!");
-        } catch (e) {
-            toast.error("Template failed to load.");
+        } catch (err) {
+            toast.error("Failed to generate card image.");
         } finally {
             setIsDownloadingCard(false);
         }
@@ -624,33 +753,36 @@ export default function ProfileSection() {
                             <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Digital Visiting Card</h4>
                             <div className="aspect-[1.75/1] rounded-2xl shadow-1xl overflow-hidden relative border border-slate-200 bg-slate-900 group">
                                 <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${CardTemplateImage.src})` }} />
-                                <div className="absolute inset-0 p-6 flex flex-col justify-between">
-                                    <div><h4 className="text-xl font-black text-slate-800 uppercase leading-none truncate">{profile.name}</h4><p className="text-[8px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Authorized Partner </p></div>
+                                <div className="absolute inset-0 pl-15 pt-11 p-8 flex flex-col justify-between">
+                                    <div className="">
+                                        <h4 className="text-2xl font-black text-slate-700 uppercase leading-none truncate">{profile.name}</h4>
+                                        <p className="text-[8px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Authorized Partner </p>
+                                    </div>
                                     <div className="space-y-1.5">
                                         <div className="flex items-center gap-2">
                                             <Phone size={10} className="text-slate-400" strokeWidth={2.5} />
-                                            <span className="text-[9px] font-bold text-slate-700">
+                                            <span className="text-[11px] font-bold text-slate-700">
                                                 +91 {profile.mobile}
                                             </span>
                                         </div>
 
                                         <div className="flex items-center gap-2">
                                             <Mail size={10} className="text-slate-400" strokeWidth={2.5} />
-                                            <span className="text-[9px] font-bold text-slate-700 truncate">
+                                            <span className="text-[11px] font-bold text-slate-700 truncate">
                                                 {profile.email}
                                             </span>
                                         </div>
 
                                         <div className="flex items-center gap-2">
                                             <MapPin size={10} className="text-slate-400" strokeWidth={2.5} />
-                                            <span className="text-[9px] font-bold text-slate-700">
+                                            <span className="text-[11px] font-bold text-slate-700">
                                                 {profile.city}
                                             </span>
                                         </div>
 
                                         <div className="flex items-center gap-2">
                                             <Globe size={10} className="text-slate-400" strokeWidth={2.5} />
-                                            <span className="text-[9px] font-bold text-slate-700">
+                                            <span className="text-[11px] font-bold text-slate-700">
                                                 www.infinityarthvishva.com
                                             </span>
                                         </div>
