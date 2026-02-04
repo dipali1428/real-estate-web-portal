@@ -3,19 +3,19 @@ const AboutSection = () => {
         {
           name: "Mr. Rajesh Parkhi",
           title: "Executive Director",
-          description: "Over 25 years of extensive experience in the retail finance sector with an MBA in Marketing. Expertise in structuring retail loan portfolios and fostering sustainable business growth.",
+          description: "25+ years of experience in retail finance, MBA in Marketing, with strong expertise in retail loan structuring and driving sustainable business growth.",
           image: "/leader/Image 8.jpeg"
         },
         {
           name: "Mr. Rahul Kangane",
           title: "Chairman and Managing Director",
-          description: "15 years of expertise in broking and wealth management, with a focus on portfolio strategy. His sharp market insights fuel the company's growth and success.",
+          description: "15 years of experience in broking and wealth management, specializing in portfolio strategy and delivering strong market insights that drive company growth.",
           image: "/leader/rahulsir4.jpeg"
         },
         {
           name: "Mr. Pravin Marathe",
           title: "Chief Financial Officer ",
-          description: "Mr. Pravin Marathe is a Chief Financial Officer at Infinity Arthvishva with over 18 years of experience in financial markets. Known for his client-focused approach and strategic vision, he drives growth through expertise in mutual funds, PMS, and AIFs.",
+          description: "Mr. Pravin Marathe, CFO at Infinity Arthvishva, has 18+ years of experience in financial markets with expertise in mutual funds, PMS, and AIFs.",
           image: "/leader/Img3.jpeg"
         }
     ];
