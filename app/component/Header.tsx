@@ -31,7 +31,7 @@ const Header = () => {
     { label: "Home", href: "/" },
     { label: "About Us", href: "/page/about", component: AboutSection },
     { label: "Events", href: "/page/event", component: AboutSection },
-    // { label: "Services", href: "/#services" },
+    { label: "Careers", href: "/page/careers" },
     { label: "Cibil Check", href: "/page/cibil", component: CibilSection },
   ];
 
@@ -122,7 +122,7 @@ const Header = () => {
               />
               <a
                 href={link.href}
-                className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-bold transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
+                className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
                 {link.label}
               </a>
               <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
@@ -153,7 +153,7 @@ const Header = () => {
                 whileHover={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.35 }}
               />
-              <button className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-bold transition-colors duration-300 group-hover:text-[#2076C7] flex items-center space-x-1 text-sm xl:text-base">
+              <button className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] flex items-center space-x-1 text-sm xl:text-base">
                 <span>Product</span>
                 <ChevronDown
                   size={14}
@@ -398,6 +398,7 @@ const Header = () => {
             </AnimatePresence>
           </motion.div>
 
+
           {/* Other Nav Links */}
           {navLinks.slice(1).map((link, i) => (
             <motion.div
@@ -414,7 +415,7 @@ const Header = () => {
               />
               <a
                 href={link.href}
-                className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-bold transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
+                className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
                 {link.label}
               </a>
               <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
@@ -437,7 +438,7 @@ const Header = () => {
                 whileHover={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.35 }}
               />
-              <button className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-bold transition-colors duration-300 group-hover:text-[#2076C7] flex items-center space-x-1 text-sm xl:text-base">
+              <button className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] flex items-center space-x-1 text-sm xl:text-base">
                 <span>Calculator</span>
                 <ChevronDown
                   size={14}
@@ -483,7 +484,7 @@ const Header = () => {
             />
             <a
               href="/#contact"
-              className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-bold transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
+              className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
               Contact Us
             </a>
             <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />

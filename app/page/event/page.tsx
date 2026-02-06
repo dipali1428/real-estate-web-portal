@@ -386,21 +386,25 @@ const EventSection: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-teal-600">55+</div>
+              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">60+</div>
               <div className="text-gray-600">Total Events</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-teal-600">
+              {/* <div className="text-3xl md:text-4xl font-bold text-teal-600">
                 {new Set(Object.values(eventsByYear).flat().map(event => event.city)).size}+
+              </div> */}
+              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">
+               127+
               </div>
               <div className="text-gray-600">Cities Covered</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-teal-600">{Object.keys(eventsByYear).length}</div>
+              {/* <div className="text-3xl md:text-4xl font-bold text-teal-600">{Object.keys(eventsByYear).length}</div> */}
+              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">2</div>
               <div className="text-gray-600">Years</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-teal-600">10000+</div>
+              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">10000+</div>
               <div className="text-gray-600">Participants</div>
             </div>
           </div>

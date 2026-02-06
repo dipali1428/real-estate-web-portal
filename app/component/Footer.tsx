@@ -159,7 +159,7 @@ const Footer = () => (
 
         {/* LinkedIn */}
         <a
-          href="#"
+          href="https://www.linkedin.com/in/infinity-arthvishva-b4aa583aa/"
           target="_blank"
           rel="noopener noreferrer"
           className="group relative p-3 rounded-full bg-gray-800 hover:bg-linear-to-r hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
