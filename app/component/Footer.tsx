@@ -14,7 +14,7 @@ const Footer = () => (
             <div>
               <div className="flex flex-col items-center md:items-start text-center md:text-left">
                 <h3 className="font-bold text-2xl mb-4 relative inline-block after:content-[''] after:block after:w-18 after:h-1 after:bg-linear-to-r after:from-[#2076C7] after:to-[#1CADA3] after:mt-2 mx-auto md:mx-0">
-                  About 
+                  About
                 </h3>
                 <p className="text-sm md:text-base text-gray-400 leading-relaxed max-w-lg">
                   We are a leading financial advisory firm providing comprehensive
@@ -32,27 +32,23 @@ const Footer = () => (
             </h3>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
-                <a href="#home" className="hover:text-[#1CADA3] transition">
+                <a href="/" className="hover:text-[#1CADA3] transition">
                   Home
                 </a>
               </li>
               <li>
-                <a href="#about" className="hover:text-[#1CADA3] transition">
+                <a href="/page/about" className="hover:text-[#1CADA3] transition">
                   About Us
                 </a>
               </li>
               <li>
-                <a href="#services" className="hover:text-[#1CADA3] transition">
+                <a href="/#services" className="hover:text-[#1CADA3] transition">
                   Services
                 </a>
               </li>
+
               <li>
-                {/* <a href="#partner" className="hover:text-[#1CADA3] transition">
-                Become A Partner
-              </a>*/}
-              </li>
-              <li>
-                <a href="#contact" className="hover:text-[#1CADA3] transition">
+                <a href="/#contact" className="hover:text-[#1CADA3] transition">
                   Contact Us
                 </a>
               </li>
