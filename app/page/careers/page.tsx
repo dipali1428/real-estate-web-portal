@@ -270,11 +270,11 @@ export default function CareersContent() {
           </div>
           
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 font-sans text-center mb-16">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 font-sans text-center mb-16">
             <StatItem value="20+" label="Branches Across India" />
             <StatItem value="127+" label="Cities Covered" />
             <StatItem value="2,700+" label="Active DSA & Partners" />
-            <StatItem value="1" label="ET Business Award 2025" />
+            {/* <StatItem value="1" label="ET Business Award 2025" /> */}
           </div>
 
           {/* Gallery */}
