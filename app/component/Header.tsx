@@ -78,7 +78,7 @@ const Header = () => {
     { label: "PMS / AIF", href: "/products/pms/" },
     { label: "Fixed Deposit", href: "/products/FD" },
     { label: "Bonds", href: "/offers/investment/bonds" },
-    { label: "NCD Bonds", href: "/products/NCD" },
+    { label: "NCD", href: "/products/NCD" },
   ];
 
   const realEstateOptions = [
