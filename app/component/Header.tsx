@@ -71,13 +71,14 @@ const Header = () => {
   ];
 
   const mutualFundOptions = [
-    { label: "Mutual Fund", href: "/offers/investment/mutual-funds" },
+    { label: "Mutual Fund", href: "/products/mutualfunds" },
   ];
 
   const investmentOptions = [
-    { label: "PMS / AIF", href: "/offers/investment/pms-aif" },
-    { label: "Fixed Deposit", href: "/offers/investment/fixed-deposit" },
+    { label: "PMS / AIF", href: "/products/pms/" },
+    { label: "Fixed Deposit", href: "/products/FD" },
     { label: "Bonds", href: "/offers/investment/bonds" },
+    { label: "NCD Bonds", href: "/products/NCD" },
   ];
 
   const realEstateOptions = [
@@ -85,7 +86,7 @@ const Header = () => {
   ];
 
   const unlistedOptions = [
-    { label: "Unlisted", href: "/page/commingSoon" },
+    { label: "Unlisted", href: "/products/unlisted" },
   ];
 
   return (
@@ -93,7 +94,7 @@ const Header = () => {
       <nav className="container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex items-center justify-between">
         {/* Logo Section */}
         <motion.div
-          className="flex items-center space-x-2"
+          className="flex items-center space-x-2"   
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}>
