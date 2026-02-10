@@ -53,14 +53,13 @@ const InvestmentGuide = () => {
         <section className="py-20 bg-gray-50 overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12 animate-fade-in-up">
-                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-clip-text text-transparent drop-shadow-sm" style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Start investing in Minutes</h2>
-                    <div className="w-24 h-1 mx-auto rounded-full mb-4" style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}></div>
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-clip-text text-transparent drop-shadow-sm" style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3, #2076C7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Start investing in Minutes</h2>
                     <p className="text-gray-600">Everything you need to know to start your wealth creation journey.</p>
                 </div>
 
-                <div className="bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[500px] animate-fade-in-up delay-100 border border-gray-100">
+                <div className="bg-white rounded-3xl shadow-lg overflow-hidden flex flex-col lg:flex-row min-h-[500px] animate-fade-in-up delay-100">
                     {/* Sidebar / Tabs */}
-                    <div className="lg:w-1/3 bg-blue-50 p-8 text-gray-900 flex flex-col justify-center border-r border-gray-100">
+                    <div className="lg:w-1/3 bg-blue-50 p-8 text-gray-900 flex flex-col justify-center">
                         <div className="space-y-4">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
@@ -98,7 +97,7 @@ const InvestmentGuide = () => {
                                     <div className="space-y-6">
                                         {content[activeTab].steps.map((step: any, idx: number) => (
                                             <div key={idx} className="flex gap-5 group transition-all duration-300">
-                                                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xl group-hover:bg-primary group-hover:text-white group-hover:scale-110 transition-all duration-300">
+                                                <div className="flex-shrink-0 w-8 h-8 rounded-lg text-white flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-all duration-300 shadow-md" style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}>
                                                     {idx + 1}
                                                 </div>
                                                 <div className="pt-1">
@@ -129,4 +128,3 @@ const InvestmentGuide = () => {
 };
 
 export default InvestmentGuide;
-

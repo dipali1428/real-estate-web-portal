@@ -17,7 +17,7 @@ const BackButton = () => {
         if (pathname.startsWith('/properties/')) {
             // We can't easily scroll to hash on a different page in Next.js without a valid link
             // router.push('/#live') works but it's a navigation
-            router.push('/#live');
+            router.push('#live');
         } else {
             // Checking history length is tricky in Next.js App Router (server components mainly), 
             // but client components have access to window.

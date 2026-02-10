@@ -1,20 +1,14 @@
 'use client';
 
-import { useState, Suspense, useEffect } from 'react';
-// import Navbar from './components/Navbar';
+import { useState, Suspense } from 'react';
 import HomeSection from './components/HomeSection';
 import PropertiesSection from './components/PropertiesSection';
 import AboutSection from './components/AboutSection';
-import ContactSection from './components/ContactSection';
 import PropertyDetailsModal from './components/PropertyDetailsModal';
-// import Footer from './components/Footer';
 import BackButton from './components/BackButton';
 import { X, FileText, Shield } from 'lucide-react';
 
 export default function Home() {
-  // --- State Management ---
-  // Auth state removed as requested
-
   // Property Details Modal State
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
 
@@ -35,14 +29,12 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen relative flex flex-col font-sans text-slate-900 bg-slate-50">
-      {/* Navbar - Auth props removed */}
-      {/* <Navbar /> */}
-
-      <div className="flex-grow">
-        <section id="home">
+    <main className="min-h-screen relative flex flex-col font-sans text-slate-800 bg-slate-50">
+      <div className="grow">
+        <section id="home" className="pt-0 mt-0">
           <HomeSection onPropertySelect={handlePropertySelect} />
         </section>
+
 
         <section id="properties" className="bg-slate-50 scroll-mt-24">
           <Suspense fallback={<div className="py-20 text-center">Loading properties...</div>}>
@@ -56,14 +48,8 @@ export default function Home() {
           <AboutSection onSpeakWithAdvisor={() => setShowInquiryModal(true)} />
         </section>
 
-        {/* Contact Section removed - now a popup */}
       </div>
-
-      {/* Global Footer and Back Button */}
-      <BackButton />
-      {/* <Footer /> */}
-
-      {/* --- Modals --- */}
+      {/* <BackButton /> */}
 
       {/* Property Details Modal */}
       {selectedPropertyId && (
@@ -82,8 +68,7 @@ export default function Home() {
 
             <button
               onClick={() => setShowInquiryModal(false)}
-              className="absolute top-6 right-6 p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors text-slate-500"
-            >
+              className="absolute top-6 right-6 p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors text-slate-500">
               <X size={20} />
             </button>
 

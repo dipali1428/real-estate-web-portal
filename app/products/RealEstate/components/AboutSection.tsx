@@ -13,7 +13,7 @@ const AboutSection = ({ onSpeakWithAdvisor }: AboutSectionProps) => {
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 items-start">
                     <div>
-                        <h2 className="text-4xl md:text-5xl font-extrabold mb-10 text-brand-gradient font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                        <h2 className="text-4xl md:text-5xl font-bold mb-10 text-brand-gradient font-sans  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                             Get In Touch
                         </h2>
 
@@ -40,7 +40,7 @@ const AboutSection = ({ onSpeakWithAdvisor }: AboutSectionProps) => {
                                 </div>
                                 <div>
                                     <h4 className="font-bold font-sans text-gray-700 text-xl mb-2 text-brand-gradient">Direct Contact</h4>
-                                    <p className="text-slate-600 text-lg">Toll-Free: <b className="text-slate-900">1800-532-7600</b></p>
+                                    <p className="text-slate-600 text-lg">Toll-Free: <b className="text-slate-700">1800-532-7600</b></p>
                                 </div>
                             </div>
 
@@ -67,11 +67,11 @@ const AboutSection = ({ onSpeakWithAdvisor }: AboutSectionProps) => {
                             Interested in our financial solutions? Speak with our certified expert advisors today.
                         </p>
                         <button
-                            onClick={onSpeakWithAdvisor}
-                            className="btn-brand w-full flex items-center justify-center gap-4 py-5 px-8 rounded-xl text-xl uppercase tracking-widest"
-                        >
+                            // onClick={onSpeakWithAdvisor}
+                            className="btn-brand w-full flex items-center justify-center gap-4 py-5 px-8 rounded-xl text-xl uppercase tracking-widest">
                             <Phone size={22} /> Speak with Advisor
                         </button>
+                        <p className="text-center mt-6 text-sm text-slate-400">Fill Contact us Form</p>
                         <p className="text-center mt-6 text-sm text-slate-400">Available Mon-Sat: 10AM - 7PM</p>
                     </div>
                 </div>

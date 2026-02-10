@@ -181,53 +181,64 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
     return (
         <div className="animate-fade-in">
             {/* Hero Section - Redesigned with light theme */}
-            <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-100 via-white to-white">
+            <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-blue-100 via-white to-white">
                 {/* Decorative Elements */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full -mr-64 -mt-64" />
                 <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-teal-500/5 blur-[100px] rounded-full -ml-44 -mb-44" />
 
                 <div className="container mx-auto px-4 relative z-20 pt-16 text-center">
                     <div className="max-w-7xl mx-auto">
-                        <span className="block text-blue-600 font-black uppercase tracking-[0.3em] text-xs mb-10 px-4 py-2 bg-blue-50 inline-block rounded-full">
+                        <span className="block text-blue-600 font-black uppercase tracking-[0.3em] text-xs mb-10 px-4 py-2 bg-blue-50 rounded-full">
                             Infinity Arthvishva Premium Realty
                         </span>
                         <h3 className="text-4xl md:text-7xl font-sans font-bold mb-15  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                             Step Into Your Future with Fractional Real Estate Investment </h3>
 
                         {/* Navigation Links in Hero */}
-                        {/* <div className="flex flex-wrap justify-center gap-4 mb-12">
+                        <div className="flex flex-wrap justify-center gap-4 mb-12">
                             {[
-                                { name: 'Current Opportunities', path: '/#live' },
-                                { name: 'Closed Opportunities', path: '/#closed' },
-                                { name: 'Calculator', path: '/#calculator' },
+                                { name: 'Current Opportunities', path: '#properties' },
+                                { name: 'Closed Opportunities', path: '#closed' },
+                                { name: 'Calculator', path: '#calculator' },
                                 { name: 'How to Invest', onClick: handleDownloadGuide, isAction: true }
                             ].map((link) => (
                                 link.isAction ? (
                                     <button
                                         key={link.name}
                                         onClick={link.onClick}
-                                        className="btn-brand flex items-center gap-2 px-8 py-3 rounded-full text-sm"
-                                    >
+                                        className="
+                                                btn-brand
+                                                flex items-center gap-2
+                                                px-8 py-3 rounded-full text-sm font-semibold
+                                             text-white
+                                                shadow-lg
+                                                transition-all duration-300
+                                                active:scale-95
+                                                hover:shadow-xl"
+                                        style={{
+                                            background: 'linear-gradient(to right, #2076C7, #2076C7)'
+                                        }}>
                                         <Download size={18} /> {link.name}
                                     </button>
+
+
                                 ) : (
                                     <Link
                                         key={link.name}
                                         href={link.path!}
-                                        className="px-8 py-3 rounded-full bg-white text-slate-800 font-bold hover:bg-blue-50 hover:text-blue-600 transition-all shadow-md border border-slate-100 text-sm"
-                                    >
+                                        className="px-8 py-3 rounded-full bg-white text-slate-800 font-bold hover:bg-blue-50 hover:text-blue-600 transition-all shadow-md border border-slate-100 text-sm">
                                         {link.name}
                                     </Link>
                                 )
                             ))}
-                        </div> */}
+                        </div>
 
                         <p className="text-lg md:text-xl font-sans text-gray-600 mb-2 max-w-2xl mx-auto leading-relaxed font-medium">
                             Experience the next generation of property acquisition. Immersive AR/VR tours and hand-picked high-yield assets await in India's prime growth corridors.
                         </p>
 
                         {/* Hero Search Bar */}
-                        {/* <div className="bg-white p-2 rounded-2xl max-w-2xl mx-auto flex flex-col md:flex-row gap-2 shadow-[0_20px_50px_rgba(8,_112,_184,_0.1)] transition-transform hover:-translate-y-1 border border-slate-100">
+                        {/* <div className="bg-white p-2 rounded-2xl max-w-2xl mx-auto flex flex-col md:flex-row gap-2 shadow-[0_20px_50px_rgba(8,112,184,0.1)] transition-transform hover:-translate-y-1 border border-slate-100">
                             <div className="flex-1 flex items-center gap-3 px-6 py-3">
                                 <Search size={22} className="text-blue-600" />
                                 <input
@@ -335,7 +346,7 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
                 <div className="text-center mb-12 max-w-3xl mx-auto">
                     <h2 className="text-4xl font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Featured Properties</h2>
                     <p className="text-slate-500 mb-8">Explore our hand-picked selection of premium investment opportunities.</p>
-                    <Link href="/#live" className="inline-flex items-center gap-2 px-6 py-2 bg-slate-100 text-blue-600 rounded-full font-semibold hover:bg-slate-200 transition-colors">
+                    <Link href="#live" className="inline-flex items-center gap-2 px-6 py-2 bg-slate-100 text-blue-600 rounded-full font-semibold hover:bg-slate-200 transition-colors">
                         View all properties <ChevronRight size={20} />
                     </Link>
                 </div>
@@ -361,8 +372,7 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
                                     {property.status !== 'closed' && (
                                         <button
                                             onClick={() => onPropertySelect && onPropertySelect(String(property.id))}
-                                            className="btn-brand px-6 py-2 rounded-lg text-xs"
-                                        >
+                                            className="btn-brand px-6 py-2 rounded-lg text-xs">
                                             Details
                                         </button>
                                     )}

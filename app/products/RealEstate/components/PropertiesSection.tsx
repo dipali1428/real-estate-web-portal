@@ -176,7 +176,7 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
 
 
     return (
-        <div className="animate-fade-in">
+        <div id="properties" className="animate-fade-in">
             <div className="py-12 mb-8 bg-white">
                 <div className="container mx-auto px-4 text-center">
                     <h1 className="text-4xl md:text-5xl font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
@@ -207,8 +207,7 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                             </div>
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-sm border ${showFilters ? 'btn-brand border-transparent' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
-                            >
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-sm border ${showFilters ? 'btn-brand border-transparent' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}>
                                 <Filter size={20} /> Filters
                             </button>
                         </div>
@@ -221,8 +220,7 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                                 <select
                                     value={filters.type}
                                     onChange={(e) => handleFilterChange('type', e.target.value)}
-                                    className="w-full bg-white text-slate-700 p-3 rounded-lg border-2 border-slate-200 font-semibold focus:border-blue-500 outline-none"
-                                >
+                                    className="w-full bg-white text-slate-700 p-3 rounded-lg border-2 border-slate-200 font-semibold focus:border-blue-500 outline-none">
                                     <option value="">All Types</option>
                                     <option value="Villa">Villa</option>
                                     <option value="Apartment">Apartment</option>
@@ -546,7 +544,7 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                         </div>
 
                         {/* Results Card */}
-                        <div className="glass-panel" style={{
+                        <div className="glass-panel rounded-2xl" style={{
                             padding: '2rem',
                             background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)',
                             color: '#1e293b',

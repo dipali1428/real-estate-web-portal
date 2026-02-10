@@ -63,22 +63,22 @@ const SectorComparisonMatrix = () => {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100 font-sans">
+                        <tbody className="font-sans">
                             {[
-                                { sector: "Public Sector Banks", safety: "Highest (Sovereign)", rate: "6.5% - 7.5%", insurance: "DICGC (Up to ₹5L)", roi: "Stable Growth", color: "text-green-600", bg: "bg-green-50", fill: 25 },
+                                { sector: "Public Sector Banks", safety: "Highest (Sovereign)", rate: "6.5% - 7.5%", insurance: "DICGC (Up to ₹5L)", roi: "Stable Growth", color: "text-blue-600", bg: "bg-blue-50", fill: 25 },
                                 { sector: "Private Sector Banks", safety: "Very High (RBI)", rate: "7.0% - 8.2%", insurance: "DICGC (Up to ₹5L)", roi: "Moderate Yield", color: "text-blue-600", bg: "bg-blue-50", fill: 50 },
-                                { sector: "Small Finance Banks", safety: "High (RBI Supervised)", rate: "7.5% - 9.1%", insurance: "DICGC (Up to ₹5L)", roi: "High Yield", color: "text-amber-600", bg: "bg-amber-50", fill: 75 },
-                                { sector: "NBFCs", safety: "Moderate (Credit Rated)", rate: "8.0% - 9.1%", insurance: "Internal (No DICGC)", roi: "Maximum Returns", color: "text-purple-600", bg: "bg-purple-50", fill: 100 }
+                                { sector: "Small Finance Banks", safety: "High (RBI Supervised)", rate: "7.5% - 9.1%", insurance: "DICGC (Up to ₹5L)", roi: "High Yield", color: "text-blue-600", bg: "bg-blue-50", fill: 75 },
+                                { sector: "NBFCs", safety: "Moderate (Credit Rated)", rate: "8.0% - 9.1%", insurance: "Internal (No DICGC)", roi: "Maximum Returns", color: "text-blue-600", bg: "bg-blue-50", fill: 100 }
                             ].map((row, i) => (
                                 <tr key={i} className="hover:bg-gray-50/50 transition-all duration-300 group">
-                                    <td className="py-8 px-8 font-bold text-slate-700 border-l-[6px] border-transparent group-hover:border-primary">
+                                    <td className="py-8 px-8 font-bold text-slate-700 border-none group-hover:bg-primary/5">
                                         <div className="flex flex-col">
                                             <span>{row.sector}</span>
                                             <span className="text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-wider opacity-0 group-hover:opacity-100 transition-opacity">Financial Institution</span>
                                         </div>
                                     </td>
                                     <td className="py-8 px-8 text-center">
-                                        <span className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest ${row.bg} ${row.color} shadow-sm border border-black/5 inline-block`}>
+                                        <span className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest ${row.bg} ${row.color} shadow-sm border-none inline-block`}>
                                             {row.safety}
                                         </span>
                                     </td>
@@ -94,7 +94,7 @@ const SectorComparisonMatrix = () => {
                                     <td className="py-8 px-8 text-center">
                                         <div className="flex flex-col items-center">
                                             <span className="font-bold text-slate-700 mb-3 text-sm tracking-wide group-hover:text-primary transition-colors">{row.roi}</span>
-                                            <div className="w-32 h-2.5 bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200/50 relative">
+                                            <div className="w-32 h-2.5 bg-gray-100 rounded-full overflow-hidden shadow-inner relative">
                                                 <MotionDiv
                                                     initial={{ width: 0 }}
                                                     whileInView={{ width: `${row.fill}%` }}
@@ -114,7 +114,7 @@ const SectorComparisonMatrix = () => {
                                     </td>
                                 </tr>
                             ))}
-                        </tbody>
+                        </tbody>     
                     </table>
                 </div>
 

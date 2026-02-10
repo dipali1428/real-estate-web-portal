@@ -21,6 +21,8 @@ const FDCalculator = () => {
     const [isSeniorCitizen, setIsSeniorCitizen] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
 
+    const formatINR = (n: number) => n.toLocaleString('en-IN');
+
     useEffect(() => {
         setIsMounted(true);
     }, []);
@@ -83,8 +85,7 @@ const FDCalculator = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-white rounded-[40px] shadow-2xl overflow-hidden border border-gray-100 max-w-7xl mx-auto"
-        >
+            className="bg-white rounded-[40px] shadow-2xl overflow-hidden border border-gray-100 max-w-7xl mx-auto">
             <div className="p-6 text-white text-center relative overflow-hidden" style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}>
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[radial-gradient(circle_at_20%_50%,white,transparent)]"></div>
                 <div className="relative z-10">
@@ -105,8 +106,7 @@ const FDCalculator = () => {
                             className={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 ${!isSeniorCitizen
                                 ? 'text-white shadow-lg'
                                 : 'text-gray-500 hover:bg-gray-100'}`}
-                            style={!isSeniorCitizen ? { background: 'linear-gradient(to right, #1CADA3, #2076C7)' } : {}}
-                        >
+                            style={!isSeniorCitizen ? { background: 'linear-gradient(to right, #1CADA3, #2076C7)' } : {}}>
                             Regular FD
                         </button>
                         <button
@@ -114,8 +114,7 @@ const FDCalculator = () => {
                             className={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 ${isSeniorCitizen
                                 ? 'text-white shadow-lg'
                                 : 'text-gray-500 hover:bg-gray-100'}`}
-                            style={isSeniorCitizen ? { background: 'linear-gradient(to right, #1CADA3, #2076C7)' } : {}}
-                        >
+                            style={isSeniorCitizen ? { background: 'linear-gradient(to right, #1CADA3, #2076C7)' } : {}}>
                             Senior Citizen FD
                         </button>
                     </div>
@@ -144,8 +143,8 @@ const FDCalculator = () => {
                                 className={`w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer ${isSeniorCitizen ? 'accent-[#1CADA3]' : 'accent-[#2076C7]'}`}
                             />
                             <div className="flex justify-between text-[11px] text-gray-400 mt-2 font-bold">
-                                <span>₹5,000</span>
-                                <span>₹1,00,00,000</span>
+                                <span> ₹{formatINR(5000)}</span>
+                                <span>₹{formatINR(10000000)}</span>
                             </div>
                         </div>
 
@@ -218,8 +217,7 @@ const FDCalculator = () => {
                                             ? 'text-white shadow-lg border-transparent'
                                             : 'bg-white border-gray-100 text-gray-500 hover:border-primary/30'
                                             }`}
-                                        style={frequency === freq.value ? { background: 'linear-gradient(to right, #1CADA3, #2076C7)' } : {}}
-                                    >
+                                        style={frequency === freq.value ? { background: 'linear-gradient(to right, #1CADA3, #2076C7)' } : {}}>
                                         {freq.label}
                                     </button>
                                 ))}
@@ -229,8 +227,7 @@ const FDCalculator = () => {
                         {/* Reset Button */}
                         <button
                             onClick={resetToDefault}
-                            className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl border-2 border-gray-100 text-gray-500 font-bold hover:bg-gray-50 hover:border-gray-200 transition-all duration-300 group"
-                        >
+                            className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl border-2 border-gray-100 text-gray-500 font-bold hover:bg-gray-50 hover:border-gray-200 transition-all duration-300 group">
                             <RotateCcw size={18} className="group-hover:rotate-[-45deg] transition-transform" />
                             Reset to Default
                         </button>
@@ -281,8 +278,7 @@ const FDCalculator = () => {
                                                 endAngle={-270}
                                                 stroke="none"
                                                 isAnimationActive={true}
-                                                animationDuration={800}
-                                            >
+                                                animationDuration={800}>
                                                 {chartData.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                 ))}
@@ -319,8 +315,10 @@ const FDCalculator = () => {
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center border-b border-gray-200/30 pb-2">
                                     <span className="text-slate-600 text-xs font-semibold">Deposit Amount</span>
-                                    <span className="font-bold text-slate-700 text-sm">₹{amount.toLocaleString()}</span>
+                                    <span className="font-bold text-slate-700 text-sm">₹{formatINR(amount)}</span>
                                 </div>
+                                
+                                {/* ₹{formatINR(amount.toLocaleString())} */}
                                 <div className="flex justify-between items-center border-b border-gray-200/30 pb-2">
                                     <span className="text-slate-600 text-xs font-semibold">Interest Rate</span>
                                     <span className="font-bold text-slate-700 text-sm">{rate}%</span>
@@ -331,7 +329,7 @@ const FDCalculator = () => {
                                 </div>
                                 <div className="pt-1 flex justify-between items-center">
                                     <span className="text-slate-700 font-bold text-sm">Maturity Amount</span>
-                                    <span className="font-bold text-lg text-slate-800">₹{maturityAmount.toLocaleString()}</span>
+                                    <span className="font-bold text-lg text-slate-800">₹{formatINR(maturityAmount)}</span>
                                 </div>
                             </div>
                         </div>

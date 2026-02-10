@@ -60,17 +60,17 @@ const ServicesSection = () => {
       ],
     },
     {
-      id: "investment",
+      id: "products",
       icon: <TrendingUp className="w-12 h-12 text-white" />,
       title: "Investment",
       description: "Strategic investment options to grow your wealth.",
       items: [
-        { name: "Mutual Funds", slug: "mutual-funds" },
+        { name: "Mutual Funds", slug: "mutualfunds" },
         { name: "Unlisted", slug: "unlisted" },
-        { name: "PMS & AIF", slug: "pms-aif" },
+        { name: "PMS & AIF", slug: "pms" },
         { name: "NCD Bonds", slug: "ncd-bonds" },
-        { name: "Fixed Deposits", slug: "fixed-deposits" },
-        { name: "Real Estate", slug: "real-estate-investments" },
+        { name: "Fixed Deposits", slug: "FD" },
+        { name: "Real Estate", slug: "RealEstate" },
         // { name: "Alternative Investment Fund", slug: "alternative-investment-fund" },
         // { name: "Fixed Deposit", slug: "fixed-deposit" },
         { name: "Bonds", slug: "bonds" },
@@ -81,7 +81,7 @@ const ServicesSection = () => {
   ];
 
   const handleServiceItemClick = (serviceCategory: string, itemSlug: string) => {
-    router.push(`/offers/${serviceCategory}/${itemSlug}`);
+    router.push(`${serviceCategory}/${itemSlug}`);
   };
 
   const handleServiceCardClick = (serviceId: string) => {

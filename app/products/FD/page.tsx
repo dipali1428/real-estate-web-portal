@@ -65,7 +65,7 @@ const Home = () => {
               <div className="space-y-6">
                 <motion.p
                   className="text-xl md:text-2xl text-slate-600 max-w-xl leading-relaxed mt-10 mb-10">
-                  Sophisticated investment vehicles for high-alpha wealth creation
+                  Sophisticated fixed-income solutions for secure wealth growth.
                 </motion.p>
 
                 <motion.div
@@ -85,8 +85,7 @@ const Home = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="flex-1 relative"
-            >
+              className="flex-1 relative">
               <motion.div
                 animate={{
                   scale: [1, 1.1, 1],
@@ -98,8 +97,7 @@ const Home = () => {
 
               <motion.div
                 animate={{ y: [0, -15, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              >
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
                 <Image
                   src="/FD/fdimage.png"
                   alt="Financial Wealth Growth"
@@ -111,15 +109,15 @@ const Home = () => {
 
               <MotionDiv
                 animate={{
-                  y: [0, -30, 0],
+                  y: [0, -15, 0], // Made smaller to sync with parent but still have relative motion
                   rotate: [0, 5, 0]
                 }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-10 -right-10 bg-white p-7 rounded-3xl shadow-2xl border border-gray-100 z-20 backdrop-blur-sm bg-white/90"
-              >
-                <div className="text-secondary font-bold text-3xl">9.10%*</div>
-                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Max Interest Rate*</div>
+                className="absolute -top-4 -right-2 md:-top-16 md:-right-16 p-1.5 md:p-7 rounded-lg md:rounded-3xl shadow-xl z-20 backdrop-blur-sm bg-white/90 max-w-20 md:max-w-none text-center">
+                <div className="text-slate-700 font-bold text-base md:text-xl leading-none md:mb-1">9.10%*</div>
+                <div className="text-[6px] md:text-[10px] font-bold text-slate-600 uppercase tracking-tighter md:tracking-widest leading-none">Max Interest Rate*</div>
               </MotionDiv>
+
             </MotionDiv>
           </div>
         </div>
