@@ -149,6 +149,7 @@ export default function RolesManagementPage() {
     const r = role?.toUpperCase();
     if (r === "ADMIN") return "bg-red-50 text-red-600 border-red-100";
     if (r === "RM") return "bg-blue-50 text-blue-600 border-blue-100";
+    if (r == "HR")return "bg-orange-50 text-orange-600 border-orange-100";
     return "bg-green-50 text-green-600 border-green-100";
   };
 
@@ -293,6 +294,7 @@ export default function RolesManagementPage() {
                   <option value="RM">RM</option>
                   <option value="DEPARTMENTHEAD">Department Head</option>
                   <option value="ACCOUNTS">Account</option>
+                 <option value="HR">HR</option>
                 </select>
               </div>
               <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Department</label><input type="text" className={inputClass} value={editingUser.department} onChange={(e) => setEditingUser({ ...editingUser, department: e.target.value })} /></div>
@@ -332,6 +334,7 @@ export default function RolesManagementPage() {
                   <option value="RM">RM</option>
                   <option value="DEPARTMENTHEAD">Department Head</option>
                   <option value="ACCOUNTS">Account</option>
+                  <option value="HR">HR</option>
                 </select>
               </div>
               <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Department</label><input type="text" className={inputClass} value={newUser.department} onChange={(e) => setNewUser({ ...newUser, department: e.target.value })} /></div>

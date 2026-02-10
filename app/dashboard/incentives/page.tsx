@@ -59,10 +59,10 @@ export default function IncentivesPayouts() {
     'insurance': ['Life Insurance', 'Health Insurance', 'Motor Insurance', 'Travel Insurance', 'Fire Insurance', 'Cattle Insurance', 'Marine Insurance', 'Corporate Insurance', 'Loan Protector'],
     'mutual-funds': ['Mutual Fund'],
     'investments': ['Wealth Management', 'PMS / AIF', 'Fixed Deposit', 'Bonds'],
-    'real-estate': ['Residential', 'Commercial', 'Plots/Land']
+    'real-estate': ['Fractional']
   };
 
-  const LOAN_BANKS = ["HDFC Bank", "ICICI Bank", "SBI", "Axis Bank", "Kotak Mahindra Bank", "IDFC First Bank", "IndusInd Bank", "Yes Bank", "RBL Bank", "Federal Bank", "Standard Chartered", "HSBC Bank", "DBS Bank", "Bandhan Bank", "AU Small Finance Bank", "Equitas Small Finance Bank", "Ujjivan Small Finance Bank", "Punjab National Bank", "Bank of Baroda", "Canara Bank", "Union Bank of India", "Bank of India", "Indian Bank", "Central Bank of India", "Bajaj Finserv", "Tata Capital", "L&T Finance", "Aditya Birla Capital", "Fullerton India", "Piramal Finance", "Shriram Finance", "Muthoot Finance", "Manappuram Finance", "Cholamandalam Finance", "Mahindra Finance", "Poonawalla Fincorp", "Godrej Capital", "InCred", "Navi", "Fibe (EarlySalary)", "KreditBee", "MoneyTap", "Cashe", "PaySense", "IIFL Finance", "LIC Housing Finance", "HDFC Ltd", "PNB Housing Finance", "Can Fin Homes", "Aadhar Housing Finance", "Godrej Housing Finance", "Indiabulls Home Loans", "Hero Fincorp", "Dhani Loans", "Home Credit", "Unity Small Finance Bank", "Jana Small Finance Bank", "South Indian Bank"].sort();
+  // const LOAN_BANKS = ["HDFC Bank", "ICICI Bank", "SBI", "Axis Bank", "Kotak Mahindra Bank", "IDFC First Bank", "IndusInd Bank", "Yes Bank", "RBL Bank", "Federal Bank", "Standard Chartered", "HSBC Bank", "DBS Bank", "Bandhan Bank", "AU Small Finance Bank", "Equitas Small Finance Bank", "Ujjivan Small Finance Bank", "Punjab National Bank", "Bank of Baroda", "Canara Bank", "Union Bank of India", "Bank of India", "Indian Bank", "Central Bank of India", "Bajaj Finserv", "Tata Capital", "L&T Finance", "Aditya Birla Capital", "Fullerton India", "Piramal Finance", "Shriram Finance", "Muthoot Finance", "Manappuram Finance", "Cholamandalam Finance", "Mahindra Finance", "Poonawalla Fincorp", "Godrej Capital", "InCred", "Navi", "Fibe (EarlySalary)", "KreditBee", "MoneyTap", "Cashe", "PaySense", "IIFL Finance", "LIC Housing Finance", "HDFC Ltd", "PNB Housing Finance", "Can Fin Homes", "Aadhar Housing Finance", "Godrej Housing Finance", "Indiabulls Home Loans", "Hero Fincorp", "Dhani Loans", "Home Credit", "Unity Small Finance Bank", "Jana Small Finance Bank", "South Indian Bank"].sort();
 
   const INSURANCE_PLAN_MAPPING: Record<string, string[]> = {
     'Axis': ['Smart Wealth Advantage Growth Par Plan', 'Monthly Income Advantage Plan', 'Smart Wealth Income Plan', 'Smart Wealth Advantage Guarantee Plan', 'Smart Wealth Advantage Guarantee Elite Plan', 'Smart Wealth Plan - Lumpsum', 'Smart Wealth Plan - LTI', 'Smart Value Income & Benefit Enhancer Plan', 'Smart Wealth Annuity Guaranteed Pension Plan', 'Guaranteed Lifetime Income Plan', 'Smart Term with Additional Returns ULIP', 'Smart Secure Plan Plus & Smart Term Plan Plus', 'Smart Secure Plan Plus & Smart Term Plan Plus -trop', 'Fastrack', 'Flexi Wealth Advantage', 'Flexi Wealth', 'Forever Young Pension Plan'],
@@ -75,16 +75,16 @@ export default function IncentivesPayouts() {
 
   const commissionStructure = {
     'loans': [{ name: 'Personal Loan', rate: '1.5% - 2.5%' }, { name: 'Home Loan', rate: '0.4% - 0.88%' }, { name: 'Business Loan', rate: '1.0% - 2.0%' }, { name: 'Commercial / Mortgage', rate: '1.04% - 1.44%' }, { name: 'SME Loan', rate: '1.2% - 2.0%' }, { name: 'Education Loan', rate: '0.40% - 0.96%' }, { name: 'Vehicle Loan', rate: '0.75% - 1.5%' }, { name: 'NRP Loan', rate: '0.75% - 1.5%' }, { name: 'Loan Against Securities', rate: '0.5% - 1.2%' }],
-    'insurance': [{ name: 'Life Insurance', rate: '50% - 80%' }, { name: 'Health Insurance', rate: '50% - 80%' }, { name: 'Motor Insurance', rate: '50% - 80%' }, { name: 'Travel Insurance', rate: '50% - 80%' }, { name: 'Fire Insurance', rate: '50% - 80%' }, { name: 'Cattle Insurance', rate: '50% - 80%' }, { name: 'Marine Insurance', rate: '50% - 80%' }, { name: 'Corporate Insurance', rate: '50% - 80%' }, { name: 'Loan Protector', rate: '50% - 80%' }],
+    'insurance': [{ name: 'Life Insurance', rate: '2% - 56%' }, { name: 'Health Insurance', rate: '50% - 80%' }, { name: 'Motor Insurance', rate: '3% - 50%' }, { name: 'Travel Insurance', rate: '50% - 80%' }, { name: 'Fire Insurance', rate: '50% - 80%' }, { name: 'Cattle Insurance', rate: '50% - 80%' }, { name: 'Marine Insurance', rate: '50% - 80%' }, { name: 'Corporate Insurance', rate: '50% - 80%' }, { name: 'Loan Protector', rate: '50% - 80%' }],
     'mutual-funds': [{ name: 'Equity Funds', rate: '0.5% - 0.8%' }, { name: 'Debt Funds', rate: '0.1% - 0.4%' }, { name: 'Hybrid Funds', rate: '0.3% - 0.8%' }],
     'investments': [{ name: 'Wealth Management', rate: '1.0% - 2.5%' }, { name: 'PMS / AIF', rate: '1.5% - 3.0%' }, { name: 'Bonds / FD', rate: '0.2% - 0.6%' }],
-    'real-estate': [{ name: 'Residential', rate: '1.5% - 2.0%' }, { name: 'Commercial', rate: '2.0% - 3.0%' }, { name: 'Plots/Land', rate: '1.0% - 1.5%' }]
+    'real-estate': [{ name: 'Fractional', rate: '13% - 20%' }]
   };
 
-  const currentBankList = useMemo(() => {
-    if (leadCategory === 'loans') return LOAN_BANKS;
-    return ["Axis", "Bajaj", "Digit", "HDFC", "ICICI", "Tata"];
-  }, [leadCategory]);
+  // const currentBankList = useMemo(() => {
+  //   if (leadCategory === 'loans') return LOAN_BANKS;
+  //   return ["Axis", "Bajaj", "Digit", "HDFC", "ICICI", "Tata"];
+  // }, [leadCategory]);
 
   // --- CALCULATION LOGIC ---
   const calculation = useMemo(() => {
@@ -327,13 +327,13 @@ export default function IncentivesPayouts() {
                       {productMapping[leadCategory].map((prod) => <option key={prod} value={prod}>{prod}</option>)}
                     </select>
                   </div>
-                  <div>
+                  {/* <div>
                     <label className="text-xs font-bold text-slate-500 uppercase mb-2 block tracking-wider">Company / Bank</label>
                     <select disabled={!selectedProduct} value={selectedBank} onChange={(e) => { setSelectedBank(e.target.value); setSelectedPlan(''); }} className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px] bg-[right_16px_center] bg-no-repeat text-gray-700 disabled:opacity-50">
                       <option value="">-- Choose Bank --</option>
                       {currentBankList.map((bank) => <option key={bank} value={bank}>{bank}</option>)}
                     </select>
-                  </div>
+                  </div> */}
                 </div>
                 {leadCategory !== 'loans' && selectedBank && (
                   <div className="animate-in slide-in-from-top-2 duration-300">

@@ -14,7 +14,8 @@ import {
     Building2,      // For DSA Management
     UserMinus,      // For Unassigned
     Layers,         // For Total Leads
-    CreditCard,    // For CIBIL
+    CreditCard,  
+    MessageSquare,  // For CIBIL
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -47,6 +48,7 @@ export const sidebarLinks = {
         { label: "Unassigned DSA's", href: "/admin/unassigneddsa", icon: <UserMinus className="h-5 w-5 text-neutral-700" /> },
         { label: "Total Leads", href: "/admin/totalleads", icon: <Layers className="h-5 w-5 text-neutral-700" /> },
         { label: "All Users", href: "/admin/allusers", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Detail Leads", href: "/admin/detailleads", icon: <UserPlus className="h-5 w-5 text-neutral-700" /> },
     ],
 
     GM: [],
@@ -55,8 +57,12 @@ export const sidebarLinks = {
     ACCOUNTS: [
         { label: "Dashboard", href: "/accounts", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "Profile", href: "/accounts/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
-        // { label: "RM's List", href: "//rmlist", icon: <Users className="h-5 w-5 text-neutral-700" /> },
-        // { label: "Leads", href: "//totalleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Receivable", href: "/accounts/reciveable", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "TDS Management", href: "/accounts/tdsmanagement", icon: <CreditCard className="h-5 w-5 text-neutral-700" /> },
+       { label: "Lead Management", href: "/accounts/leadmanagement", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+       { label: "Bill Payment", href: "/accounts/billpayment", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+
+
     ],
 
     DEPARTMENTHEAD: [
@@ -75,4 +81,10 @@ export const sidebarLinks = {
         { label: "Detailed leads", href: "/rm/detailedleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "Consumer Detailed leads", href: "/rm/consumerdetailedleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
     ],
+
+     HR: [ 
+         { label: "Dashboard", href: "/hr", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
+         { label: "Website Enquiry", href: "/hr/websiteenquiry", icon: <Megaphone className="h-5 w-5 text-neutral-700" /> },
+         { label: "Career Management", href: "/hr/careermanagement", icon: < MessageSquare className="h-5 w-5 text-neutral-700" /> },
+        ],
 };

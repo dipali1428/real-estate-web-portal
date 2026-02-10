@@ -230,5 +230,10 @@ export const AdminService = {
     const response = await api.get("/api/admin/get-cibil-request");
     return response.data;
   },
+   // Fetch all detailed leads
+  getAllDetailLeads: async () => {
+    const response = await api.get("/api/admin/get-all-detail-leads");
+    return response.data;
+  },
 };
 

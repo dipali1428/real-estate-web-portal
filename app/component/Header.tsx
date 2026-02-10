@@ -82,7 +82,7 @@ const Header = () => {
   ];
 
   const realEstateOptions = [
-    { label: "Real Estate", href: "/offers/investment/real-estate-investments" },
+    { label: "Real Estate", href: "/products/RealEstate" },
   ];
 
   const unlistedOptions = [

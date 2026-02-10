@@ -90,6 +90,7 @@ export default function ReferralLeadsDashboard() {
   const fetchLeads = async () => {
     try {
       const leadsRes = await RmService.getReferralLeads();
+      console.log('Leads Response:', leadsRes);
       if (leadsRes?.success && Array.isArray(leadsRes.leads)) {
         setLeads(leadsRes.leads);
       } else {
@@ -105,6 +106,7 @@ export default function ReferralLeadsDashboard() {
   const fetchIncomingLeads = async () => {
     try {
       const res = await RmService.getIncomingAssignedLeads();
+      console.log('Incoming Leads Response:', res);
      
       if (res?.success && Array.isArray(res.leads)) {
         setIncomingLeads(res.leads);
