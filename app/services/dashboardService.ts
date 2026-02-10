@@ -115,4 +115,13 @@ export const DashboardService = {
         });
         return response.data;
     },
+
+    updateProfileImage: async (formData: FormData) => {
+        const response = await api.put("/api/dashboard/profile/image", formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    },
 };

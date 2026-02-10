@@ -14,8 +14,8 @@ export const DepartmentHeadService = {
         const response = await api.get('/api/department/getrmlist');
         return response.data;
     },
-    getDepartmentLeads: async () => {
-        const response = await api.get('/api/department/getdeptLeads');
+    getDepartmentReferralLeads: async () => {
+        const response = await api.get('/api/department/getdeptReferralLeads');
         return response.data;
     },
     
@@ -36,4 +36,17 @@ export const DepartmentHeadService = {
         const response = await api.get(`/api/department/getdept-detail-leads?page=${page}&limit=${limit}`);
         return response.data;
     },
+
+    getEligibleRMs: async (leadId: string) => {
+        const response = await api.get(`/api/department/get-eligible-rms/${leadId}`);
+        return response.data;
+    },
+
+    reassignLead: async (leadId: string, rmId: string) => {
+        const response = await api.post(`/api/department/reassign-detail-lead-rm`, {
+            detailLeadId: leadId,
+            newRmId: rmId
+        });
+        return response.data;
+    }
 };

@@ -2,15 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { RmService } from '../../services/rmService';
-import { 
-  Search, 
-  X, 
-  Mail, 
-  MapPin, 
-  IndianRupee, 
-  FileText, 
+import {
+  Search,
+  X,
+  Mail,
+  MapPin,
+  IndianRupee,
+  FileText,
   Info,
-  ExternalLink, 
+  ExternalLink,
   FileUp,
   ChevronLeft,
   ChevronRight,
@@ -24,12 +24,15 @@ import {
   Files,
   CheckCircle2,
   AlertCircle,
-  Check,      
-  XCircle     
+  Check,
+  XCircle
 } from 'lucide-react';
 
 // --- Types ---
 interface Lead {
+  assigned_rm_mobile: string;
+  assigned_rm_name: string;
+  assigned_rm_id: string;
   id: number;
   detail_lead_id: string;
   lead_name: string;
@@ -43,20 +46,26 @@ interface Lead {
   created_at: string;
   dsa_id: number;
   dsa_name: string;
-  dsa_mobile: string;
+  dsa_adv_id: string;
   rm_id: number;
   rm_name: string;
   rm_acceptance_status: string;
   rm_action_deadline: string;
-  referred_rm?: string;
+  referral_rm_name?: string;
   is_self_login: boolean;
   uploaded_documents?: {
     document_key: string;
-    document_label: string;
+    document_label?: string; // Made optional
     file_url: string;
     uploaded_at: string;
   }[];
-  pending_documents?: any[]; 
+  pending_documents?: {
+    id: number;
+    document_key: string;
+    document_label?: string;
+    is_mandatory: boolean;
+    uploaded: boolean;
+  }[];
   form_data?: {
     dob?: string;
     employmentType?: string;
@@ -82,6 +91,8 @@ export default function LeadDashboard() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [docModalLead, setDocModalLead] = useState<Lead | null>(null);
   const [processingId, setProcessingId] = useState<number | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewType, setPreviewType] = useState<'image' | 'pdf' | 'other' | null>(null);
 
   // --- Pagination States ---
   const [currentPage, setCurrentPage] = useState(1);
@@ -93,12 +104,16 @@ export default function LeadDashboard() {
       let response;
       if (leadType === 'my_lead') {
         response = await RmService.getMyDetailLeads();
+        console.log("myleads leads response:", response);
       } else if (leadType === 'incoming') {
         response = await RmService.getIncomingDetailLeads();
+        console.log("imcoming leads response:", response);
       } else if (leadType === 'outgoing') {
         response = await RmService.getOutgoingDetailLeads();
+        console.log("outgoing leads response:", response);
       }
-      
+
+
       if (response && response.success) {
         setLeads(response.leads || []);
       } else {
@@ -114,23 +129,23 @@ export default function LeadDashboard() {
 
   useEffect(() => {
     fetchLeads();
-    setCurrentPage(1); 
+    setCurrentPage(1);
   }, [leadType]);
 
   useEffect(() => {
-    setCurrentPage(1); 
+    setCurrentPage(1);
   }, [searchTerm]);
 
   const handleAction = async (id: number, action: 'accept' | 'reject') => {
     if (action === 'reject' && !confirm("Are you sure you want to reject this lead?")) return;
-    
+
     setProcessingId(id);
     try {
-      const response = action === 'accept' 
-        ? await RmService.acceptDetailLead(id) 
-        : await RmService.rejectDetailLead(id);    
+      const response = action === 'accept'
+        ? await RmService.acceptDetailLead(id)
+        : await RmService.rejectDetailLead(id);
       if (response.success) {
-        fetchLeads(); 
+        fetchLeads();
       } else {
         alert(response.message || `Failed to ${action} lead`);
       }
@@ -142,7 +157,19 @@ export default function LeadDashboard() {
     }
   };
 
-  const filteredLeads = leads.filter(lead => 
+  const handlePreview = (url: string) => {
+    const extension = url.split('.').pop()?.toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'webp'].includes(extension || '')) {
+      setPreviewType('image');
+    } else if (extension === 'pdf') {
+      setPreviewType('pdf');
+    } else {
+      setPreviewType('other');
+    }
+    setPreviewUrl(url);
+  };
+
+  const filteredLeads = leads.filter(lead =>
     lead.lead_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     lead.detail_lead_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     lead.contact_number?.includes(searchTerm)
@@ -158,7 +185,7 @@ export default function LeadDashboard() {
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen font-sans">
       <div className="max-w-[1800px] mx-auto">
-        
+
         {/* HEADER SECTION */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -181,12 +208,12 @@ export default function LeadDashboard() {
             />
             <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
           </div>
-          
+
           <div className="flex items-center gap-3 w-full md:w-auto">
             <div className="flex items-center gap-2 bg-white border px-3 py-2 rounded-lg shadow-sm">
               <span className="text-xs text-gray-500 font-bold whitespace-nowrap">Show:</span>
-              <select 
-                value={itemsPerPage} 
+              <select
+                value={itemsPerPage}
                 onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
                 className="text-xs bg-transparent focus:outline-none text-gray-900 font-bold cursor-pointer"
               >
@@ -225,9 +252,11 @@ export default function LeadDashboard() {
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">DSA Details</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Client Details</th>
-                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Referred RM</th>
+                    {leadType !== 'outgoing' && (
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Referred RM</th>
+                    )}
                     {leadType !== 'my_lead' && (
-                        <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Assigned RM</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Assigned RM</th>
                     )}
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Self Login</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50">Acceptance</th>
@@ -240,67 +269,80 @@ export default function LeadDashboard() {
                   {currentLeads.length > 0 ? (
                     currentLeads.map((lead) => {
                       const isPending = lead.rm_acceptance_status === 'PENDING';
+                      // NEW: Only blur if we are in the 'incoming' tab and status is PENDING
+                      const shouldBlur = leadType === 'incoming' && isPending;
+
                       return (
                         <tr key={lead.id} className="hover:bg-gray-50 transition-colors relative group">
-                          {/* 1. ID - VISIBLE */}
+                          {/* 1. ID */}
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 font-bold bg-white z-20">
                             {lead.id}
-                            {isPending && (
+                            {/* Show Deadline badge only on Incoming Pending leads */}
+                            {shouldBlur && (
                               <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none w-[1200px]">
                                 <span className="text-red-600 font-bold text-[10px] sm:text-xs bg-white/80 px-3 py-1 rounded-full border border-red-200 backdrop-blur-sm shadow-sm whitespace-nowrap">
-                                  Deadline: {new Date(lead.rm_action_deadline).toLocaleDateString('en-GB')} / {new Date(lead.rm_action_deadline).toLocaleTimeString('en-GB', { 
-                                    hour: '2-digit', minute: '2-digit', hour12: true 
+                                  Deadline: {new Date(lead.rm_action_deadline).toLocaleDateString('en-GB')} / {new Date(lead.rm_action_deadline).toLocaleTimeString('en-GB', {
+                                    hour: '2-digit', minute: '2-digit', hour12: true
                                   })}
                                 </span>
                               </div>
                             )}
                           </td>
 
-                          {/* 2. Lead ID - VISIBLE */}
+                          {/* 2. Lead ID */}
                           <td className="px-4 py-4 whitespace-nowrap text-sm font-bold text-gray-700 bg-white z-20">
                             {lead.detail_lead_id}
                           </td>
-                          
-                          {/* 3. Status - BLURRED */}
-                          <td className={`px-4 py-4 whitespace-nowrap transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+
+                          {/* 3. Status */}
+                          <td className={`px-4 py-4 whitespace-nowrap transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${lead.lead_status === 'NEW' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
                               {lead.lead_status}
                             </span>
                           </td>
 
-                          {/* 4. DSA Info - BLURRED */}
-                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-700 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          {/* 4. DSA Info */}
+                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-700 transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
                             <div className="font-bold">{lead.dsa_name}</div>
-                            <div className="text-[10px] text-gray-500">{lead.dsa_mobile || 'N/A'}</div>
+                            <div className="text-[10px] text-gray-500">{lead.dsa_adv_id || 'N/A'}</div>
                           </td>
 
-                          {/* 5. Client Info - BLURRED */}
-                          <td className={`px-4 py-4 whitespace-nowrap text-sm transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          {/* 5. Client Info */}
+                          <td className={`px-4 py-4 whitespace-nowrap text-sm transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
                             <div className="font-bold text-gray-800">{lead.lead_name}</div>
                             <div className="text-[11px] text-gray-600">{lead.email}</div>
-                            <div className="text-[10px] text-gray-500">{lead.contact_number}</div>
+                            <div className="text-[10px] text-gray-500">
+                              {/* Logic for N/A or NA check */}
+                              {lead.contact_number === 'N/A' || lead.contact_number === 'NA'
+                                ? 'Mobile: not available'
+                                : lead.contact_number}
+                            </div>
                           </td>
 
-                          {/* 6. Referred RM - BLURRED */}
-                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
-                            {lead.referred_rm || 'N/A'}
-                          </td>
-
-                          {/* 7. Assigned RM - BLURRED */}
-                          {leadType !== 'my_lead' && (
-                            <td className={`px-4 py-4 whitespace-nowrap text-sm text-purple-600 font-medium transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
-                                {lead.rm_name}
+                          {/* Updated: Referred RM Cell - Hidden if leadType is 'outgoing' */}
+                          {leadType !== 'outgoing' && (
+                            <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                              {lead.referral_rm_name || 'Unassigned'}
                             </td>
                           )}
 
-                          {/* 8. Self Login - BLURRED */}
-                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          {/* 7. Assigned RM */}
+                          {leadType !== 'my_lead' && (
+                            <td className={`px-4 py-4 whitespace-nowrap text-sm text-purple-600 font-medium transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                              <div className="font-bold text-gray-800">{lead.assigned_rm_name}</div>
+                              <div className="text-[10px] text-gray-500">{lead.assigned_rm_mobile}</div>
+                              <div className="text-[11px] text-gray-600">ID: {lead.assigned_rm_id}</div>
+                            </td>
+                          )}
+
+                          {/* 8. Self Login */}
+                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
                             {lead.is_self_login ? <span className="text-green-600 font-bold">Yes</span> : 'No'}
                           </td>
 
-                          {/* 9. Acceptance - VISIBLE */}
+                          {/* 9. Acceptance - MODIFIED: Buttons ONLY for Incoming Pending */}
                           <td className="px-4 py-4 whitespace-nowrap text-sm font-bold z-20 bg-white">
-                            {isPending ? (
+                            {leadType === 'incoming' && isPending ? (
                               <div className="flex items-center gap-2">
                                 {processingId === lead.id ? (
                                   <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
@@ -312,24 +354,28 @@ export default function LeadDashboard() {
                                 )}
                               </div>
                             ) : (
-                              <span className={`${lead.rm_acceptance_status === 'ACCEPTED' ? 'text-green-600' : 'text-red-500'} text-[10px] tracking-wider uppercase`}>{lead.rm_acceptance_status}</span>
+                              <span className={`text-[10px] tracking-wider uppercase ${lead.rm_acceptance_status === 'ACCEPTED' ? 'text-green-600' :
+                                lead.rm_acceptance_status === 'PENDING' ? 'text-orange-500' : 'text-red-500'
+                                }`}>
+                                {lead.rm_acceptance_status}
+                              </span>
                             )}
                           </td>
 
-                          {/* 10. Created At - BLURRED */}
-                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          {/* 10. Created At */}
+                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
                             {new Date(lead.created_at).toLocaleDateString('en-GB')}
                           </td>
 
-                          {/* 11. Documents - BLURRED */}
-                          <td className={`px-4 py-4 whitespace-nowrap transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          {/* 11. Documents */}
+                          <td className={`px-4 py-4 whitespace-nowrap transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
                             <button onClick={() => setDocModalLead(lead)} className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-700 px-3 py-1 rounded-md font-bold hover:bg-gray-200 transition-colors text-xs">
                               <Files size={14} /> Docs
                             </button>
                           </td>
 
-                          {/* 12. Actions - BLURRED */}
-                          <td className={`px-4 py-4 whitespace-nowrap text-right text-sm transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          {/* 12. Actions */}
+                          <td className={`px-4 py-4 whitespace-nowrap text-right text-sm transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
                             <button onClick={() => setSelectedLead(lead)} className="bg-blue-50 text-blue-600 px-3 py-1 rounded-md font-bold transition-colors hover:bg-blue-100">
                               View
                             </button>
@@ -354,20 +400,20 @@ export default function LeadDashboard() {
             </div>
 
             <div className="flex items-center gap-1">
-              <button 
-                onClick={() => paginate(currentPage - 1)} 
+              <button
+                onClick={() => paginate(currentPage - 1)}
                 disabled={currentPage === 1}
                 className="p-1.5 rounded-lg border bg-white text-gray-600 disabled:opacity-50 hover:bg-gray-100 transition-colors"
               >
                 <ChevronLeft size={16} />
               </button>
-              
+
               {[...Array(totalPages)].map((_, i) => {
-                 if (totalPages > 5 && i + 1 !== 1 && i + 1 !== totalPages && Math.abs(currentPage - (i + 1)) > 1) {
-                   if (i + 1 === 2 || i + 1 === totalPages - 1) return <span key={i} className="px-1 text-gray-400">...</span>;
-                   return null;
-                 }
-                 return (
+                if (totalPages > 5 && i + 1 !== 1 && i + 1 !== totalPages && Math.abs(currentPage - (i + 1)) > 1) {
+                  if (i + 1 === 2 || i + 1 === totalPages - 1) return <span key={i} className="px-1 text-gray-400">...</span>;
+                  return null;
+                }
+                return (
                   <button
                     key={i}
                     onClick={() => paginate(i + 1)}
@@ -378,8 +424,8 @@ export default function LeadDashboard() {
                 );
               })}
 
-              <button 
-                onClick={() => paginate(currentPage + 1)} 
+              <button
+                onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === totalPages || totalPages === 0}
                 className="p-1.5 rounded-lg border bg-white text-gray-600 disabled:opacity-50 hover:bg-gray-100 transition-colors"
               >
@@ -417,8 +463,15 @@ export default function LeadDashboard() {
                           {docModalLead.uploaded_documents && docModalLead.uploaded_documents.length > 0 ? (
                             docModalLead.uploaded_documents.map((doc, idx) => (
                               <div key={idx} className="flex items-center justify-between p-3 bg-green-50 border border-green-100 rounded-xl">
-                                <span className="text-sm text-green-700 font-medium">{doc.document_label}</span>
-                                <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-blue-600 flex items-center gap-1 hover:underline">View <ExternalLink size={12} /></a>
+                                <span className="text-sm text-green-700 font-medium">
+                                  {doc.document_label || doc.document_key.replace(/_/g, ' ')}
+                                </span>
+                                <button
+                                  onClick={() => handlePreview(doc.file_url)}
+                                  className="text-[10px] font-bold text-blue-600 flex items-center gap-1 hover:underline cursor-pointer"
+                                >
+                                  View <ExternalLink size={12} />
+                                </button>
                               </div>
                             ))
                           ) : (<div className="p-3 bg-gray-50 border border-dashed rounded-xl text-center text-xs text-gray-400">No documents uploaded yet</div>)}
@@ -429,7 +482,18 @@ export default function LeadDashboard() {
                         <div className="space-y-2">
                           {docModalLead.pending_documents && docModalLead.pending_documents.length > 0 ? (
                             docModalLead.pending_documents.map((doc, idx) => (
-                              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 border border-dashed rounded-xl"><span className="text-sm text-gray-700 font-medium">{typeof doc === 'string' ? doc : (doc.document_label || 'Required Document')}</span><span className="text-[10px] font-bold text-orange-600 uppercase">Pending</span></div>
+                              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 border border-dashed rounded-xl">
+                                <span className="text-sm text-gray-700 font-medium">
+                                  {/* Handles both string arrays and the object structure seen in your console log */}
+                                  {typeof doc === 'string'
+                                    ? doc
+                                    : (doc.document_label || doc.document_key.replace(/_/g, ' '))}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  {doc.is_mandatory && <span className="text-[9px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold">REQUIRED</span>}
+                                  <span className="text-[10px] font-bold text-orange-600 uppercase">Pending</span>
+                                </div>
+                              </div>
                             ))
                           ) : (<div className="p-3 bg-gray-50 border border-dashed rounded-xl text-center text-xs text-gray-400">No pending documents</div>)}
                         </div>
@@ -438,10 +502,72 @@ export default function LeadDashboard() {
                   )}
                 </div>
                 <div className="p-4 border-t bg-gray-50 flex justify-end">
-                  <button onClick={() => setDocModalLead(null)} className="px-6 py-2 bg-white border rounded-lg text-sm hover:bg-gray-100 transition-colors">Close</button>
+                  <button onClick={() => setDocModalLead(null)} className="px-6 py-2 bg-white border text-gray-700 rounded-lg text-sm hover:bg-gray-100 transition-colors">Close</button>
                 </div>
               </>
             )}
+          </div>
+        </div>
+
+        {/* --- DOCUMENT PREVIEW MODAL (IN-APP) --- */}
+        <div className={`fixed inset-0 z-[70] flex items-center justify-center p-2 md:p-10 transition-all duration-300 ${previewUrl ? 'visible opacity-100' : 'invisible opacity-0'}`}>
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setPreviewUrl(null)} />
+
+          <div className="relative bg-white rounded-xl shadow-2xl w-full h-full max-w-5xl flex flex-col overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-4 border-b flex items-center justify-between bg-white">
+              <h3 className="font-bold text-gray-800">Document Preview</h3>
+              <div className="flex items-center gap-2">
+                <a
+                  href={previewUrl || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 hover:bg-gray-100 rounded-full text-blue-600 transition-colors"
+                  title="Open in new tab"
+                >
+                  <ExternalLink size={20} />
+                </a>
+                <button
+                  onClick={() => setPreviewUrl(null)}
+                  className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="flex-1 bg-gray-100 overflow-auto flex items-center justify-center p-4">
+              {previewType === 'image' && (
+                <img
+                  src={previewUrl || ''}
+                  alt="Document"
+                  className="max-w-full max-h-full object-contain shadow-lg"
+                />
+              )}
+
+              {previewType === 'pdf' && (
+                <iframe
+                  src={`${previewUrl}#toolbar=0`}
+                  className="w-full h-full rounded-md shadow-inner"
+                  title="PDF Preview"
+                />
+              )}
+
+              {previewType === 'other' && (
+                <div className="text-center p-10 bg-white rounded-xl shadow-sm">
+                  <FileText size={48} className="mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600 mb-4">Preview not available for this file type.</p>
+                  <a
+                    href={previewUrl || ''}
+                    download
+                    className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-bold"
+                  >
+                    Download to View
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -454,18 +580,28 @@ export default function LeadDashboard() {
                 <div className="p-6 border-b flex items-center justify-between bg-white">
                   <div>
                     <h3 className="text-xl font-bold text-gray-900">Lead Detail View</h3>
-                    <p className="text-xs text-gray-500 font-medium mt-1">{selectedLead.detail_lead_id} • {selectedLead.lead_name}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-[11px] font-black text-gray-500 mr-2">ID:</span>
+                      <span className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-100 rounded text-[10px] font-bold tracking-wider uppercase">
+                        {selectedLead.detail_lead_id}
+                      </span>
+                      <span className="text-gray-300">|</span>
+                      <span className="text-[11px] font-black text-gray-500 mr-2">NAME:</span>
+                      <span className="text-sm font-semibold text-gray-700">
+                        {selectedLead.lead_name}
+                      </span>
+                    </div>
                   </div>
                   <button onClick={() => setSelectedLead(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors"><X size={20} /></button>
                 </div>
-                
+
                 <div className="flex-1 overflow-y-auto p-8">
                   <div className="grid grid-cols-2 gap-y-8 gap-x-12">
                     {[
-                      { label: 'DOB', value: selectedLead.form_data?.dob || 'N/A' },
+                      { label: 'Other Loan', value: selectedLead.form_data?.hasOtherLoan ? 'Yes' : 'No' },
+                      { label: 'Loan ADOB', value: selectedLead.form_data?.dob || 'N/A' },
                       { label: 'Employment Type', value: selectedLead.form_data?.employmentType || 'N/A' },
-                      { label: 'Has Other Loan', value: selectedLead.form_data?.hasOtherLoan ? 'Yes' : 'No' },
-                      { label: 'Loan Amount', value: selectedLead.form_data?.loanAmount ? `₹${parseFloat(selectedLead.form_data.loanAmount).toLocaleString('en-IN')}` : 'N/A' },
+                      { label: 'Has Omount', value: selectedLead.form_data?.loanAmount ? `₹${parseFloat(selectedLead.form_data.loanAmount).toLocaleString('en-IN')}` : 'N/A' },
                       { label: 'Loan Type', value: selectedLead.form_data?.loanType || 'N/A' },
                       { label: 'Location', value: selectedLead.form_data?.location || 'N/A' },
                       { label: 'Other Income', value: selectedLead.form_data?.otherIncome ? 'Yes' : 'No' },

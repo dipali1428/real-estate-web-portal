@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { DashboardService } from "@/app/services/dashboardService";
 import toast from "react-hot-toast";
 import CardTemplateImage from "@/app/assets/Bussiness_Card2.png";
-import { Phone, Mail, MapPin, Globe } from "lucide-react";
+import { Phone, Mail, MapPin, Globe, Landmark, Pencil, CheckCircle2, AlertCircle, Loader2, Camera } from "lucide-react";
 import LogoImage from "@/public/logo.png";
-import { Landmark, Pencil, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 // --- Types & Constants ---
 interface Profile {
@@ -26,8 +25,8 @@ interface Profile {
     branch_name?: string;
     bank_account?: string;
     ifsc?: string;
-    pan_verified: false,
-    profile_photo?: any; // Added to support photo
+    pan_verified: boolean;
+    profile_photo?: any; 
 }
 
 interface KycDetails {
@@ -40,8 +39,8 @@ interface KycDetails {
     gst_number?: string;
     gst_verified: boolean;
     kyc_completed: boolean;
+    profile_image_url?: string;
 }
-
 
 const CATEGORY_MAP: Record<string, string[]> = {
     Investment: ["Mutual Funds", "Wealth Management", "Pension Funds", "Stocks and Securities", "Portfolio Management Services", "Real Estate Investments", "Unlisted Shares"],
@@ -53,36 +52,25 @@ export default function ProfileSection() {
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [uploadingPhoto, setUploadingPhoto] = useState(false); 
     const [profile, setProfile] = useState<Profile | null>(null);
     const [kyc, setKyc] = useState<KycDetails | null>(null);
+    const [imageTimestamp, setImageTimestamp] = useState(Date.now()); 
 
     const originalPassword = useRef<string>("");
     const hasFetched = useRef(false);
 
-    // --- PHOTO UPLOAD STATES & REFS ---
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-    // 🔹 Bank verification states
     const [bankVerified, setBankVerified] = useState<boolean>(false);
     const [verifyingBank, setVerifyingBank] = useState<boolean>(false);
     const [isBankEditing, setIsBankEditing] = useState(false);
     const [bankDraft, setBankDraft] = useState<any>(null);
 
-    // Verification States
-    const [panVerified, setPanVerified] = useState(false);
     const [aadhaarVerified, setAadhaarVerified] = useState(false);
     const [gstVerified, setGstVerified] = useState(false);
 
-    const [panFile, setPanFile] = useState<File | null>(null);
-    const [aadhaarFile, setAadhaarFile] = useState<File | null>(null);
-    const [gstFile, setGstFile] = useState<File | null>(null);
-
-    const [uploadingPan, setUploadingPan] = useState(false);
-    const [uploadingAadhaar, setUploadingAadhaar] = useState(false);
-    const [uploadingGst, setUploadingGst] = useState(false);
-
-    // Loader States for Downloads
     const [isDownloadingCard, setIsDownloadingCard] = useState(false);
     const [isDownloadingDSACard, setIsDownloadingDSACard] = useState(false);
 
@@ -93,16 +81,9 @@ export default function ProfileSection() {
             try {
                 setLoading(true);
                 const res = await DashboardService.getProfile();
-                console.log("Fetched Profile:", res);
-
                 setProfile(res.user);
                 setKyc(res.kycDetails);
-
-                // 🔹 Sync bank verification badge
-                if (res.kycDetails?.bank_verified) {
-                    setBankVerified(true);
-                }
-
+                if (res.kycDetails?.bank_verified) setBankVerified(true);
                 originalPassword.current = res.user.password;
             } finally {
                 setLoading(false);
@@ -115,263 +96,108 @@ export default function ProfileSection() {
         if (!profile?.bank_account || !profile?.ifsc) {
             return toast.error("Please enter Account Number & IFSC");
         }
-
         let toastId: string | undefined;
-
         try {
             setVerifyingBank(true);
             toastId = toast.loading("Verifying bank details...");
-
             const res = await DashboardService.verifyBankDetails({
                 bank_account_number: profile.bank_account,
                 ifsc_code: profile.ifsc,
                 bank_name: profile.bank_name,
             });
-
             if (res.status === "success") {
                 setBankVerified(true);
-
-                // ✅ Trust bank name from API
-                setProfile((prev) =>
-                    prev
-                        ? {
-                            ...prev,
-                            bank_name: res.data.bank_name,
-                        }
-                        : prev
-                );
-
+                setProfile((prev) => prev ? { ...prev, bank_name: res.data.bank_name } : prev);
                 toast.success("Bank verified successfully!", { id: toastId });
             } else {
                 toast.error(res.message || "Bank verification failed", { id: toastId });
             }
         } catch (err: any) {
-            toast.error(
-                err?.response?.data?.message || "Unable to verify bank details",
-                { id: toastId }
-            );
+            toast.error(err?.response?.data?.message || "Unable to verify", { id: toastId });
         } finally {
             setVerifyingBank(false);
         }
     };
 
-
-    // NEW PHOTO HANDLER
-    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file && profile) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPhotoPreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-            // Update profile state so it's included when "Save All Changes" is clicked
-            setProfile({ ...profile, profile_photo: file });
-        }
-    };
+        if (!file) return;
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'pan' | 'aadhaar' | 'gst') => {
-        const file = e.target.files?.[0];
-        if (file) {
-            if (type === 'pan') { setPanFile(file); setPanVerified(false); }
-            else if (type === 'aadhaar') { setAadhaarFile(file); setAadhaarVerified(false); }
-            else if (type === 'gst') { setGstFile(file); setGstVerified(false); }
-        }
-    };
+        const localBlob = URL.createObjectURL(file);
+        setPhotoPreview(localBlob);
 
-    const handleUploadAndVerify = async (type: 'pan' | 'aadhaar' | 'gst') => {
-        const file = type === 'pan' ? panFile : type === 'aadhaar' ? aadhaarFile : gstFile;
-        if (!file) return toast.error(`Please select a ${type.toUpperCase()} file first.`);
-        const setUploading = type === 'pan' ? setUploadingPan : type === 'aadhaar' ? setUploadingAadhaar : setUploadingGst;
-        const setVerified = type === 'pan' ? setPanVerified : type === 'aadhaar' ? setAadhaarVerified : setGstVerified;
+        const formData = new FormData();
+        formData.append("profile_photo", file);
+
+        let toastId: string | undefined;
         try {
-            setUploading(true);
-            const toastId = toast.loading(`Uploading & Verifying ${type.toUpperCase()}...`);
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            setVerified(true);
-            toast.success(`${type.toUpperCase()} Verified Successfully!`, { id: toastId });
-        } catch (error) { toast.error(`Failed to verify.`); } finally { setUploading(false); }
+            setUploadingPhoto(true);
+            toastId = toast.loading("Updating profile picture...");
+            
+            const res = await DashboardService.updateProfileImage(formData);
+            
+                if (res.profile_image_url) {
+                const newTimestamp = Date.now();
+                setImageTimestamp(newTimestamp);
+                const freshUrl = `${res.profile_image_url}?t=${newTimestamp}`;
+
+                setKyc(prev => prev ? { 
+                    ...prev, 
+                    profile_image_url: freshUrl 
+                } : prev);
+
+                setTimeout(() => setPhotoPreview(null), 500);
+                toast.success("Profile picture updated!", { id: toastId });
+            } else {
+                setPhotoPreview(null);
+                toast.error("Failed to update image", { id: toastId });
+            }
+        } catch (err: any) {
+            setPhotoPreview(null);
+            toast.error("Error uploading image", { id: toastId });
+        } finally {
+            setUploadingPhoto(false);
+        }
     };
 
-    const toggleHead = (head: string) => {
-        if (!profile) return;
-        const isAlreadySelected = profile.head === head;
-        const updatedHead = isAlreadySelected ? "" : head;
-        setProfile({ ...profile, head: updatedHead, category: "" });
+    const getProfileImage = () => {
+        if (photoPreview) return photoPreview;
+        return kyc?.profile_image_url || null;
     };
 
-    const toggleCategory = (cat: string) => {
-        if (!profile) return;
-        const selectedCats = profile.category ? profile.category.split(",") : [];
-        const updated = selectedCats.includes(cat) ? selectedCats.filter((c) => c !== cat) : [...selectedCats, cat];
-        setProfile({ ...profile, category: updated.join(",") });
-    };
-
-    // const downloadCardAsPhoto = async () => {
-    //     if (!profile) return;
-    //     setIsDownloadingCard(true);
-    //     const canvas = document.createElement("canvas");
-    //     const ctx = canvas.getContext("2d");
-    //     if (!ctx) return setIsDownloadingCard(false);
-    //     const cvWidth = 1200; const cvHeight = 675;
-    //     canvas.width = cvWidth; canvas.height = cvHeight;
-    //     try {
-    //         const templateImg = new Image();
-    //         templateImg.src = CardTemplateImage.src; templateImg.crossOrigin = "anonymous";
-    //         await new Promise((resolve, reject) => { templateImg.onload = resolve; templateImg.onerror = reject; });
-    //         ctx.drawImage(templateImg, 0, 0, cvWidth, cvHeight);
-    //         const leftPadding = 90; const iconColor = "#94a3b8"; const textColor = "#1e293b";
-    //         ctx.fillStyle = textColor; ctx.font = "bold 52px sans-serif"; ctx.textBaseline = "top";
-    //         ctx.fillText(profile.name.toUpperCase(), leftPadding, 180);
-    //         ctx.fillStyle = "#64748b"; ctx.font = "20px sans-serif"; ctx.fillText("Authorized Partner", leftPadding, 240);
-    //         const drawIcon = (path: string, x: number, y: number) => {
-    //             ctx.save(); ctx.translate(x, y); ctx.strokeStyle = iconColor; ctx.lineWidth = 2.5;
-    //             ctx.lineCap = "round"; ctx.lineJoin = "round"; const p = new Path2D(path); ctx.stroke(p); ctx.restore();
-    //         };
-    //         const startY = 320; const gap = 75; const textXOffset = 60;
-    //         drawIcon("M17 2H7C5.89543 2 5 2.89543 5 4V20C5 21.1046 5.89543 22 7 22H17C18.1046 22 19 21.1046 19 20V4C19 2.89543 18.1046 2  17 2ZM12 18H12.01", leftPadding, startY);
-    //         ctx.fillStyle = textColor; ctx.font = "bold 28px sans-serif"; ctx.fillText(`+91 ${profile.mobile}`, leftPadding + textXOffset, startY - 5);
-    //         drawIcon("M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4ZM22 7L12 13L2 7", leftPadding, startY + gap);
-    //         ctx.font = "500 26px sans-serif"; ctx.fillText(profile.email.toLowerCase(), leftPadding + textXOffset, startY + gap - 5);
-    //         drawIcon("M12 21C12 21 20 13 20 8C20 3.58172 16.4183 0 12 0C7.58172 0 4 3.58172 4 8C4 13 12 21 12 21ZM12 11C10.3431 11 9 9.65685 9 8C9 6.34315 10.3431 5 12 5C13.6569 5 15 6.34315 15 8C15 9.65685 13.6569 11 12 11Z", leftPadding, startY + (gap * 2));
-    //         ctx.font = "bold 28px sans-serif"; ctx.fillText(profile.city, leftPadding + textXOffset, startY + (gap * 2) - 5);
-    //         const link = document.createElement("a"); link.download = `${profile.name}_BusinessCard.jpg`;
-    //         link.href = canvas.toDataURL("image/jpeg", 1.0); link.click();
-    //         toast.success("Card downloaded successfully!");
-    //     } catch (e) {
-    //         toast.error("Template failed to load.");
-    //     } finally {
-    //         setIsDownloadingCard(false);
-    //     }
-    // };
     const downloadCardAsPhoto = async () => {
         if (!profile) return;
-
         setIsDownloadingCard(true);
-
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
         if (!ctx) return setIsDownloadingCard(false);
-
-        const cvWidth = 1200;
-        const cvHeight = 675;
-        canvas.width = cvWidth;
-        canvas.height = cvHeight;
-
+        canvas.width = 1200; canvas.height = 675;
         try {
-            // Load template
             const templateImg = new Image();
-            templateImg.src = CardTemplateImage.src;
-            templateImg.crossOrigin = "anonymous";
-
-            await new Promise((res, rej) => {
-                templateImg.onload = res;
-                templateImg.onerror = rej;
-            });
-
-            ctx.drawImage(templateImg, 0, 0, cvWidth, cvHeight);
-
-            // Colors & layout
-            const leftPadding = 90;
-            const iconColor = "#94a3b8";
-            const headingColor = "#1e293b";
-            const textColor = "#334155";
-
-            ctx.textBaseline = "top";
-
-            /* -------------------------
-               NAME & TITLE
-            --------------------------*/
-            ctx.fillStyle = headingColor;
-            ctx.font = "bold 52px sans-serif";
+            templateImg.src = CardTemplateImage.src; templateImg.crossOrigin = "anonymous";
+            await new Promise((res, rej) => { templateImg.onload = res; templateImg.onerror = rej; });
+            ctx.drawImage(templateImg, 0, 0, 1200, 675);
+            const leftPadding = 90; ctx.textBaseline = "top";
+            ctx.fillStyle = "#1e293b"; ctx.font = "bold 52px sans-serif";
             ctx.fillText(profile.name.toUpperCase(), leftPadding, 180);
-
-            ctx.fillStyle = "#64748b";
-            ctx.font = "bold 20px sans-serif";
+            ctx.fillStyle = "#64748b"; ctx.font = "bold 20px sans-serif";
             ctx.fillText("AUTHORIZED PARTNER", leftPadding, 240);
-
-            /* -------------------------
-               ICON DRAWER
-            --------------------------*/
             const drawIcon = (path: string, x: number, y: number) => {
-                ctx.save();
-                ctx.translate(x, y);
-                ctx.strokeStyle = iconColor;
-                ctx.lineWidth = 2.5;
-                ctx.lineCap = "round";
-                ctx.lineJoin = "round";
-                ctx.stroke(new Path2D(path));
-                ctx.restore();
+                ctx.save(); ctx.translate(x, y); ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 2.5;
+                ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.stroke(new Path2D(path)); ctx.restore();
             };
-
-            const startY = 320;
-            const gap = 70;
-            const textX = leftPadding + 60;
-
-            ctx.fillStyle = textColor;
-            ctx.font = "bold 28px sans-serif";
-
-            /* -------------------------
-               PHONE
-            --------------------------*/
-            drawIcon(
-                "M17 2H7C5.9 2 5 2.9 5 4V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V4C19 2.9 18.1 2 17 2Z",
-                leftPadding,
-                startY
-            );
+            const startY = 320; const gap = 70; const textX = leftPadding + 60;
+            ctx.fillStyle = "#334155"; ctx.font = "bold 28px sans-serif";
+            drawIcon("M17 2H7C5.9 2 5 2.9 5 4V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V4C19 2.9 18.1 2 17 2Z", leftPadding, startY);
             ctx.fillText(`+91 ${profile.mobile}`, textX, startY - 4);
-
-            /* -------------------------
-               EMAIL
-            --------------------------*/
-            drawIcon(
-                "M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4ZM22 7L12 13L2 7",
-                leftPadding,
-                startY + gap
-            );
-            ctx.font = "bold 26px sans-serif";
-            ctx.fillText(profile.email.toLowerCase(), textX, startY + gap - 4);
-
-            /* -------------------------
-               CITY
-            --------------------------*/
-            drawIcon(
-                "M12 21C12 21 20 13 20 8C20 3.6 16.4 0 12 0C7.6 0 4 3.6 4 8C4 13 12 21 12 21Z",
-                leftPadding,
-                startY + gap * 2
-            );
-            ctx.font = "bold 28px sans-serif";
-            ctx.fillText(profile.city, textX, startY + gap * 2 - 4);
-
-            /* -------------------------
-               WEBSITE
-            --------------------------*/
-            drawIcon(
-                "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2Z",
-                leftPadding,
-                startY + gap * 3
-            );
-            ctx.font = "bold 26px sans-serif";
-            ctx.fillText(
-                "www.infinityarthvishva.com",
-                textX,
-                startY + gap * 3 - 4
-            );
-
-            /* -------------------------
-               DOWNLOAD
-            --------------------------*/
-            const link = document.createElement("a");
-            link.download = `${profile.name}_BusinessCard.jpg`;
-            link.href = canvas.toDataURL("image/jpeg", 1);
-            link.click();
-
+            drawIcon("M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4ZM22 7L12 13L2 7", leftPadding, startY + gap);
+            ctx.font = "bold 26px sans-serif"; ctx.fillText(profile.email.toLowerCase(), textX, startY + gap - 4);
+            drawIcon("M12 21C12 21 20 13 20 8C20 3.6 16.4 0 12 0C7.6 0 4 3.6 4 8C4 13 12 21 12 21Z", leftPadding, startY + gap * 2);
+            ctx.font = "bold 28px sans-serif"; ctx.fillText(profile.city, textX, startY + gap * 2 - 4);
+            const link = document.createElement("a"); link.download = `${profile.name}_BusinessCard.jpg`;
+            link.href = canvas.toDataURL("image/jpeg", 1); link.click();
             toast.success("Card downloaded successfully!");
-        } catch (err) {
-            toast.error("Failed to generate card image.");
-        } finally {
-            setIsDownloadingCard(false);
-        }
+        } catch (err) { toast.error("Failed to generate card."); } finally { setIsDownloadingCard(false); }
     };
 
     const downloadDSACardAsPhoto = async () => {
@@ -381,90 +207,92 @@ export default function ProfileSection() {
         const ctx = canvas.getContext("2d");
         if (!ctx) return setIsDownloadingDSACard(false);
 
-        const cvWidth = 1000;
-        const cvHeight = 570;
+        const cvWidth = 600;
+        const cvHeight = 950;
         canvas.width = cvWidth;
         canvas.height = cvHeight;
 
         try {
-            // Background & Quality settings
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
             ctx.fillStyle = "#ffffff";
-            ctx.beginPath();
-            ctx.roundRect(0, 0, cvWidth, cvHeight, 40);
-            ctx.fill();
+            ctx.fillRect(0, 0, cvWidth, cvHeight);
 
-            // Decorative Elements
-            ctx.globalAlpha = 0.08;
+            // Header/Footer Teal Bars
             ctx.fillStyle = "#1CADA3";
-            ctx.beginPath(); ctx.arc(cvWidth, 0, 220, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = "#3b82f6";
-            ctx.beginPath(); ctx.arc(0, cvHeight, 220, 0, Math.PI * 2); ctx.fill();
-            ctx.globalAlpha = 1.0;
+            ctx.fillRect(0, 0, cvWidth, 15);
+            ctx.fillRect(0, cvHeight - 15, cvWidth, 15);
 
-            // Proper Logo Placement (Top Right with padding)
+            // Logo
             const logo = new Image();
             logo.src = LogoImage.src; logo.crossOrigin = "anonymous";
             await new Promise((res) => { logo.onload = res; logo.onerror = res; });
-            if (logo.complete && logo.naturalWidth > 0) {
-                const logoSize = 90;
-                const padding = 50;
-                ctx.drawImage(logo, cvWidth - logoSize - padding, padding, logoSize, logoSize);
+            if (logo.complete) {
+                const logoW = 200; const logoH = 60;
+                ctx.drawImage(logo, (cvWidth - logoW) / 2, 60, logoW, logoH);
             }
 
-            // Header Content
-            ctx.fillStyle = "#1CADA3";
-            ctx.font = "bold 22px sans-serif";
-            ctx.fillText("INFINITY ARTHVISHVA", 60, 80);
+            // Photo Frame (Centered)
+            const photoX = (cvWidth - 220) / 2;
+            const photoY = 180;
+            const activeImg = getProfileImage();
+            if (activeImg) {
+                const userPhoto = new Image();
+                userPhoto.src = activeImg;
+                userPhoto.crossOrigin = "anonymous";
+                await new Promise((res) => { userPhoto.onload = res; userPhoto.onerror = res; });
+                if (userPhoto.complete) {
+                    ctx.drawImage(userPhoto, photoX, photoY, 220, 260);
+                }
+            } else {
+                ctx.strokeStyle = "#slate-200"; ctx.strokeRect(photoX, photoY, 220, 260);
+            }
 
-            ctx.fillStyle = "#1e293b";
-            ctx.font = "900 52px sans-serif";
-            ctx.fillText(profile.name.toUpperCase(), 60, 150);
+            // Name & Titles (Centered)
+            ctx.textAlign = "center";
+            ctx.fillStyle = "#2563eb"; 
+            ctx.font = "bold 38px sans-serif";
+            ctx.fillText(profile.name.toUpperCase(), cvWidth / 2, 520);
 
             ctx.fillStyle = "#64748b";
-            ctx.font = "bold 18px sans-serif";
-            ctx.fillText("CERTIFIED ADVISOR", 60, 190);
+            ctx.font = "bold 24px sans-serif";
+            ctx.fillText("Authorized Partner", cvWidth / 2, 560);
 
-            // Information Grid
-            const gridY = 280;
-            const col1 = 60;
-            const col2 = 520;
-            const rowGap = 90;
+            ctx.fillStyle = "#334155";
+            ctx.font = "bold 24px sans-serif";
+            ctx.fillText(`Partner ID - ${profile.adv_id}`, cvWidth / 2, 600);
 
-            const drawInfo = (label: string, value: string, x: number, y: number) => {
-                ctx.fillStyle = "#94a3b8";
-                ctx.font = "bold 14px sans-serif";
-                ctx.fillText(label.toUpperCase(), x, y);
-                ctx.fillStyle = "#334155";
-                ctx.font = "bold 24px sans-serif";
-                ctx.fillText(value, x, y + 35);
-            };
+            // Centered Details Section
+            const detailsStartY = 680;
+            ctx.font = "bold 20px sans-serif";
+            ctx.fillText(`Contact No: +91 ${profile.mobile}`, cvWidth / 2, detailsStartY);
+            ctx.fillText(`Email ID: ${profile.email}`, cvWidth / 2, detailsStartY + 50);
+            ctx.fillText(`Location: ${profile.city}`, cvWidth / 2, detailsStartY + 100);
 
-            drawInfo("Advisor ID", profile.adv_id, col1, gridY);
-            drawInfo("Contact Number", `+91 ${profile.mobile}`, col2, gridY);
-            drawInfo("Email Address", profile.email, col1, gridY + rowGap);
-            drawInfo("Location", profile.city, col2, gridY + rowGap);
-
-            // Footer Section
-            ctx.fillStyle = "#1CADA3";
-            ctx.beginPath(); ctx.roundRect(60, 510, 80, 10, 5); ctx.fill();
-
-            ctx.textAlign = "right";
-            ctx.fillStyle = "#94a3b8";
-            ctx.font = "italic 15px serif";
-            ctx.fillText("Authorized Partner", cvWidth - 60, 520);
+            ctx.fillStyle = "#2563eb";
+            ctx.font = "bold 22px sans-serif";
+            ctx.fillText("www.infinityarthvishva.com", cvWidth / 2, cvHeight - 60);
 
             const link = document.createElement("a");
-            link.download = `${profile.name}_DSA_IdentityCard.png`;
+            link.download = `${profile.name}_IdentityCard.png`;
             link.href = canvas.toDataURL("image/png", 1.0);
             link.click();
-            toast.success("Identity Card saved!");
+            toast.success("Identity Card Saved!");
         } catch (e) {
-            toast.error("Failed to generate high-quality image.");
+            toast.error("Failed to generate identity card.");
         } finally {
             setIsDownloadingDSACard(false);
         }
+    };
+
+    const toggleHead = (head: string) => {
+        if (!profile) return;
+        setProfile({ ...profile, head: profile.head === head ? "" : head, category: "" });
+    };
+
+    const toggleCategory = (cat: string) => {
+        if (!profile) return;
+        const selectedCats = profile.category ? profile.category.split(",") : [];
+        const updated = selectedCats.includes(cat) ? selectedCats.filter((c) => c !== cat) : [...selectedCats, cat];
+        setProfile({ ...profile, category: updated.join(",") });
     };
 
     if (loading || !profile) return <div className="flex justify-center items-center h-[60vh]"><div className="w-10 h-10 border-4 border-[#1CADA3] border-t-transparent rounded-full animate-spin" /></div>;
@@ -475,78 +303,54 @@ export default function ProfileSection() {
 
     return (
         <main className="max-w-[1440px] mx-auto px-4 md:px-8 py-8 bg-[#F8FAFC] min-h-screen">
-
             {/* --- HEADER --- */}
             <header className="mb-10">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                    {/* Left: Title */}
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">
-                            Profile Settings
-                        </h1>
-                        <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-500">
-                            Manage your basic identity, banking, and professional credentials.
-                        </p>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">Profile Settings</h1>
+                        <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-500">Manage your basic identity, banking, and professional credentials.</p>
                     </div>
-
-                    {/* Right: Status + Action */}
                     <div className="flex items-center gap-2 self-start md:self-auto">
-                        <span
-                            className={`px-2 py-2 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap
-                                ${isProfileCompleted
-                                    ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
-                                    : "bg-amber-50 text-amber-600 border border-amber-200"
-                                }`}>
+                        <span className={`px-2 py-2 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap ${isProfileCompleted ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-amber-50 text-amber-600 border border-amber-200"}`}>
                             {isProfileCompleted ? "Profile Completed" : "Profile Incomplete"}
                         </span>
-
-                        <button
-                            onClick={() => setIsEditing(!isEditing)}
-                            className={`w-[140px] flex items-center justify-center px-2 py-2 rounded-xl text-xs font-bold shadow-lg tracking-widest transition-all
-                                ${isEditing
-                                    ? "bg-rose-500 text-white"
-                                    : "bg-[#1CADA3] text-white"
-                                }`}>
+                        <button onClick={() => setIsEditing(!isEditing)} className={`w-[140px] flex items-center justify-center px-2 py-2 rounded-xl text-xs font-bold shadow-lg tracking-widest transition-all ${isEditing ? "bg-rose-500 text-white" : "bg-[#1CADA3] text-white"}`}>
                             {isEditing ? "Cancel" : "Update Profile"}
                         </button>
                     </div>
-
                 </div>
             </header>
 
-
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
                 {/* --- LEFT COLUMN --- */}
                 <div className="lg:col-span-4 space-y-6">
-                    <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100">
+                    <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 pb-8">
                         <div className="h-28 bg-[#1CADA3] relative mb-14">
                             <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
                                 <div className="relative group">
                                     <div className="w-24 h-24 rounded-2xl bg-slate-100 border-4 border-white overflow-hidden shadow-md flex items-center justify-center">
-                                        {photoPreview || profile.profile_photo ? (
-                                            <img src={photoPreview || profile.profile_photo} alt="Profile" className="w-full h-full object-cover" />
+                                        {uploadingPhoto ? (
+                                            <div className="flex flex-col items-center gap-1">
+                                                <Loader2 className="w-6 h-6 animate-spin text-[#1CADA3]" />
+                                                <span className="text-[8px] font-bold text-slate-400">UPDATING</span>
+                                            </div>
+                                        ) : getProfileImage() ? (
+                                            <img key={imageTimestamp} src={getProfileImage()!} alt="Profile" className="w-full h-full object-cover" />
                                         ) : (
                                             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" className="text-slate-300"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>
                                         )}
                                     </div>
-                                    {isEditing && (
-                                        <>
-                                            {/* Edit Icon Badge */}
-                                            <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#1CADA3] rounded-full border-2 border-white flex items-center justify-center text-white shadow-lg cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
+                                    <div 
+                                        onClick={() => !uploadingPhoto && fileInputRef.current?.click()}
+                                        className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#1CADA3] rounded-full border-2 border-white flex items-center justify-center text-white shadow-lg cursor-pointer hover:scale-110 transition-transform active:scale-95"
+                                    >
+                                        <Camera size={14} strokeWidth={2.5} />
                                             </div>
-                                            {/* Large Hover Overlay */}
-                                            <button onClick={() => fileInputRef.current?.click()} className="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
-                                            </button>
-                                        </>
-                                    )}
                                     <input type="file" ref={fileInputRef} onChange={handlePhotoChange} className="hidden" accept="image/*" />
                                 </div>
                             </div>
                         </div>
-                        <div className="px-6 pb-8 text-center mt-2">
+                        <div className="px-6 text-center mt-2">
                             <h2 className="text-xl font-extrabold text-[#0f172a]">{profile.name}</h2>
                             <p className="text-slate-400 text-[10px] font-bold tracking-widest uppercase">ID: {profile.adv_id}</p>
                             <div className="mt-8 space-y-4 text-left">
@@ -567,450 +371,169 @@ export default function ProfileSection() {
                     </div>
 
                     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm space-y-8">
-
-                        {/* 🔹 HEADER */}
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-emerald-50 text-emerald-500 rounded-2xl">
-                                    <Landmark size={20} strokeWidth={2.5} />
-                                </div>
-
-                                <div>
-                                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">
-                                        Bank Details
-                                    </h3>
-                                    <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-widest mt-0.5">
-                                        Bank Verification
-                                    </p>
-                                </div>
+                                <div className="p-3 bg-emerald-50 text-emerald-500 rounded-2xl"><Landmark size={20} /></div>
+                                <div><h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Bank Details</h3><p className="text-[11px] text-slate-400 font-semibold uppercase tracking-widest mt-0.5">Bank Verification</p></div>
                             </div>
-
                             <div className="flex items-center gap-3">
-                                <span
-                                    className={`flex items-center gap-1.5 text-[9px] font-black uppercase px-3 py-1.5 rounded-full
-                                        ${bankVerified
-                                            ? "text-emerald-600 bg-emerald-50 border border-emerald-100"
-                                            : "text-amber-600 bg-amber-50 border border-amber-100"
-                                        }`}>
-                                    {bankVerified ? (
-                                        <CheckCircle2 size={12} />
-                                    ) : (
-                                        <AlertCircle size={12} />
-                                    )}
-                                    {bankVerified ? "Verified" : "Not Verified"}
+                                <span className={`flex items-center gap-1.5 text-[9px] font-black uppercase px-3 py-1.5 rounded-full ${bankVerified ? "text-emerald-600 bg-emerald-50 border border-emerald-100" : "text-amber-600 bg-amber-50 border border-amber-100"}`}>
+                                    {bankVerified ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />} {bankVerified ? "Verified" : "Not Verified"}
                                 </span>
-
                                 {!isBankEditing && (
-                                    <button
-                                        onClick={() => {
-                                            setBankDraft({
-                                                bank_name: profile.bank_name || kyc?.bank_name || "",
-                                                bank_account: profile.bank_account || kyc?.bank_account_number || "",
-                                                ifsc: profile.ifsc || kyc?.ifsc_code || "",
-                                            });
-                                            setIsBankEditing(true);
-                                        }}
-                                        className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[#1CADA3] hover:underline">
-                                        <Pencil size={12} />
-                                        Edit
-                                    </button>
+                                    <button onClick={() => { setBankDraft({ bank_name: profile.bank_name || kyc?.bank_name || "", bank_account: profile.bank_account || kyc?.bank_account_number || "", ifsc: profile.ifsc || kyc?.ifsc_code || "" }); setIsBankEditing(true); }} className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[#1CADA3] hover:underline"><Pencil size={12} />Edit</button>
                                 )}
                             </div>
                         </div>
-
-                        {/* 🔹 FORM */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                            {/* Bank Name */}
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                    Bank Name
-                                </label>
-                                <input
-                                    disabled={!isBankEditing}
-                                    value={kyc?.bank_name || ""}
-                                    onChange={(e) =>
-                                        setProfile({ ...profile, bank_name: e.target.value.toUpperCase() })
-                                    }
-                                    placeholder="ENTER BANK NAME"
-                                    className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 placeholder:text-slate-400 transition-all
-                                        ${isBankEditing
-                                            ? "bg-white border-2 border-[#1CADA3]"
-                                            : "bg-slate-50 border border-slate-100"
-                                        }`}
-                                />
-                            </div>
-
-                            {/* Account Number */}
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                    Account Number
-                                </label>
-                                <input
-                                    disabled={!isBankEditing}
-                                    value={kyc?.bank_account_number || ""}
-                                    onChange={(e) =>
-                                        setProfile({
-                                            ...profile,
-                                            bank_account: e.target.value.replace(/\D/g, ""),
-                                        })
-                                    }
-                                    placeholder="Enter Number"
-                                    className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 placeholder:text-slate-400 transition-all
-                                        ${isBankEditing
-                                            ? "bg-white border-2 border-[#1CADA3]"
-                                            : "bg-slate-50 border border-slate-100"
-                                        }`}
-                                />
-                            </div>
-
-                            {/* IFSC */}
-                            <div className="space-y-1.5 md:col-span-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                    IFSC Code
-                                </label>
-                                <input
-                                    disabled={!isBankEditing}
-                                    value={kyc?.ifsc_code || ""}
-                                    onChange={(e) =>
-                                        setProfile({ ...profile, ifsc: e.target.value.toUpperCase() })
-                                    }
-                                    placeholder="Enter IFSC Code"
-                                    className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold tracking-widest text-slate-700 placeholder:text-slate-400 transition-all
-                                        ${isBankEditing
-                                            ? "bg-white border-2 border-[#1CADA3]"
-                                            : "bg-slate-50 border border-slate-100"
-                                        }`}
-                                />
-                            </div>
+                            <div className="space-y-1.5"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bank Name</label><input disabled={!isBankEditing} value={kyc?.bank_name || profile.bank_name || ""} onChange={(e) => setProfile({ ...profile, bank_name: e.target.value.toUpperCase() })} placeholder="ENTER BANK NAME" className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 ${isBankEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} /></div>
+                            <div className="space-y-1.5"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Account Number</label><input disabled={!isBankEditing} value={kyc?.bank_account_number || profile.bank_account || ""} onChange={(e) => setProfile({ ...profile, bank_account: e.target.value.replace(/\D/g, "") })} placeholder="Enter Number" className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 ${isBankEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} /></div>
+                            <div className="space-y-1.5 md:col-span-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">IFSC Code</label><input disabled={!isBankEditing} value={kyc?.ifsc_code || profile.ifsc || ""} onChange={(e) => setProfile({ ...profile, ifsc: e.target.value.toUpperCase() })} placeholder="Enter IFSC Code" className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold tracking-widest text-slate-700 ${isBankEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} /></div>
                         </div>
-
-                        {/* 🔹 ACTION BUTTONS */}
                         <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-slate-100">
-
-                            {/* Cancel */}
-                            {isBankEditing && (
-                                <button
-                                    onClick={() => {
-                                        setProfile({
-                                            ...profile,
-                                            bank_name: bankDraft?.bank_name,
-                                            bank_account: bankDraft?.bank_account,
-                                            ifsc: bankDraft?.ifsc,
-                                        });
-                                        setIsBankEditing(false);
-                                    }}
-                                    className="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-black px-6 py-2.5 rounded-xl uppercase">
-                                    Cancel
-                                </button>
-                            )}
-
-                            {/* Save */}
-                            {isBankEditing && (
-                                <button
-                                    onClick={() => {
-                                        setIsBankEditing(false);
-                                        setBankVerified(false);
-                                        toast.success("Bank details saved. Please verify.");
-                                    }}
-                                    className="bg-[#1CADA3] hover:bg-[#179b92] text-white text-[10px] font-black px-6 py-2.5 rounded-xl uppercase shadow-sm">
-                                    Save Details
-                                </button>
-                            )}
-
-                            {/* Verify */}
+                            {isBankEditing && <button onClick={() => { setProfile({ ...profile, bank_name: bankDraft?.bank_name, bank_account: bankDraft?.bank_account, ifsc: bankDraft?.ifsc }); setIsBankEditing(false); }} className="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-black px-6 py-2.5 rounded-xl uppercase">Cancel</button>}
+                            {isBankEditing && <button onClick={() => { setIsBankEditing(false); setBankVerified(false); toast.success("Bank details saved. Please verify."); }} className="bg-[#1CADA3] hover:bg-[#179b92] text-white text-[10px] font-black px-6 py-2.5 rounded-xl uppercase shadow-sm">Save Details</button>}
                             {!isBankEditing && !bankVerified && profile.bank_account && profile.ifsc && (
-                                <button
-                                    disabled={verifyingBank}
-                                    onClick={handleBankVerification}
-                                    className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black px-6 py-2.5 rounded-xl uppercase flex items-center gap-2 shadow-sm disabled:opacity-70">
-                                    {verifyingBank ? (
-                                        <>
-                                            <Loader2 size={12} className="animate-spin" />
-                                            Verifying…
-                                        </>
-                                    ) : (
-                                        <>
-                                            <CheckCircle2 size={12} />
-                                            Verify Bank
-                                        </>
-                                    )}
+                                <button disabled={verifyingBank} onClick={handleBankVerification} className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black px-6 py-2.5 rounded-xl uppercase flex items-center gap-2 shadow-sm disabled:opacity-70">
+                                    {verifyingBank ? <><Loader2 size={12} className="animate-spin" />Verifying…</> : <><CheckCircle2 size={12} />Verify Bank</>}
                                 </button>
                             )}
                         </div>
-
                     </div>
-
-
                 </div>
 
                 {/* --- RIGHT COLUMN --- */}
                 <div className="lg:col-span-8 space-y-8">
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Digital Visiting Card */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                        
+                        {/* LEFT SUB-COLUMN: Visiting Card + KYC */}
+                        <div className="space-y-6">
                         <div className="space-y-3">
                             <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Digital Visiting Card</h4>
                             <div className="aspect-[1.75/1] rounded-2xl shadow-1xl overflow-hidden relative border border-slate-200 bg-slate-900 group">
                                 <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${CardTemplateImage.src})` }} />
                                 <div className="absolute inset-0 pl-15 pt-16 p-8 flex flex-col justify-between">
-                                    <div className="">
-                                        <h4 className="text-2xl font-black text-slate-700 uppercase leading-none truncate">{profile.name}</h4>
-                                        <p className="text-[8px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Authorized Partner </p>
-                                    </div>
+                                        <div><h4 className="text-2xl font-black text-slate-700 uppercase leading-none truncate">{profile.name}</h4><p className="text-[8px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Authorized Partner </p></div>
                                     <div className="space-y-1.5">
-                                        <div className="flex items-center gap-2">
-                                            <Phone size={10} className="text-slate-400" strokeWidth={2.5} />
-                                            <span className="text-[11px] font-bold text-slate-700">
-                                                +91 {profile.mobile}
-                                            </span>
+                                            <div className="flex items-center gap-2"><Phone size={10} className="text-slate-400" strokeWidth={2.5} /><span className="text-[11px] font-bold text-slate-700">+91 {profile.mobile}</span></div>
+                                            <div className="flex items-center gap-2"><Mail size={10} className="text-slate-400" strokeWidth={2.5} /><span className="text-[11px] font-bold text-slate-700 truncate">{profile.email}</span></div>
+                                            <div className="flex items-center gap-2"><MapPin size={10} className="text-slate-400" strokeWidth={2.5} /><span className="text-[11px] font-bold text-slate-700">{profile.city}</span></div>
+                                            <div className="flex items-center gap-2"><Globe size={10} className="text-slate-400" strokeWidth={2.5} /><span className="text-[11px] font-bold text-slate-700">www.infinityarthvishva.com</span></div>
                                         </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <Mail size={10} className="text-slate-400" strokeWidth={2.5} />
-                                            <span className="text-[11px] font-bold text-slate-700 truncate">
-                                                {profile.email}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <MapPin size={10} className="text-slate-400" strokeWidth={2.5} />
-                                            <span className="text-[11px] font-bold text-slate-700">
-                                                {profile.city}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <Globe size={10} className="text-slate-400" strokeWidth={2.5} />
-                                            <span className="text-[11px] font-bold text-slate-700">
-                                                www.infinityarthvishva.com
-                                            </span>
-                                        </div>
+                                        <button disabled={isDownloadingCard} onClick={downloadCardAsPhoto} className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 w-fit bg-slate-700 text-white px-2 py-1 rounded-lg text-[8px] font-bold shadow-lg flex items-center gap-2 hover:bg-black disabled:opacity-70">
+                                            {isDownloadingCard && <Loader2 size={12} className="animate-spin" />} {isDownloadingCard ? "Generating..." : "Download Card"}
+                                        </button>
                                     </div>
+                                </div>
+                                        </div>
 
-                                    <button
-                                        disabled={isDownloadingCard}
-                                        onClick={downloadCardAsPhoto}
-                                        className="
-                                                opacity-100 sm:opacity-0 sm:group-hover:opacity-100
-                                                transition-all duration-300
-                                                w-fit bg-slate-700 text-white
-                                                px-2 py-1 rounded-lg
-                                                text-[8px] font-bold shadow-lg
-                                                flex items-center gap-2
-                                             hover:bg-black disabled:opacity-70">
-                                        {isDownloadingCard && (
-                                            <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                        )}
-                                        {isDownloadingCard ? "Generating..." : "Download Card"}
-                                    </button>
-
+                            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 bg-emerald-50 text-emerald-500 rounded-xl"><CheckCircle2 size={18} strokeWidth={2.5} /></div>
+                                    <h3 className="text-md font-bold text-[#0f172a]">KYC & Verification Hub</h3>
+                                </div>
+                                <div className="space-y-4">
+                                    {[
+                                        { title: 'PAN Card', value: profile.pan, verified: profile.pan_verified },
+                                        { title: 'Aadhar Card', value: `•••• ${profile.aadhaar?.slice(-4) || '1234'}`, verified: aadhaarVerified },
+                                        { title: 'GST Registration', value: profile.gst_number || 'NOT LINKED', verified: gstVerified },
+                                    ].map((item) => (
+                                        <div key={item.title} className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex items-center justify-between">
+                                                <div><p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{item.title}</p><p className="text-[11px] font-bold text-slate-700">{item.value}</p></div>
+                                                <span className={`text-[8px] font-black uppercase px-2 py-1 rounded-lg ${item.verified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>
+                                                    {item.verified ? "Verified" : "Pending"}
+                                            </span>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
 
-                        {/* DSA Identity Card */}
+                        {/* RIGHT SUB-COLUMN: DSA Identity Card */}
                         <div className="space-y-3">
                             <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">DSA Identity Card</h4>
-                            <div className="aspect-[1.75/1] rounded-2xl bg-white border border-blue-100 shadow-1xl p-6 relative overflow-hidden group">
-                                <div className="absolute -right-10 -top-10 w-40 h-40 bg-[#1CADA3] opacity-10 rounded-full blur-3xl"></div>
-                                <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-500 opacity-10 rounded-full blur-3xl"></div>
+                            <div className="max-w-[300px] aspect-[1/1.58] rounded-2xl bg-white border border-slate-200 shadow-xl relative overflow-hidden group flex flex-col">
+                                <div className="h-2 w-full bg-[#1CADA3]"></div>
 
-                                <div className="relative h-full flex flex-col justify-between">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <h4 className="text-xl font-black text-gray-700 uppercase tracking-tight mt-1">{profile.name}</h4>
-                                            <p className="text-[10px] font-bold text-[#1CADA3] tracking-[0.2em] uppercase">Infinity Arthvishva</p>
-                                        </div>
-                                        {/* Minimal Logo in UI */}
-                                        <div className="w-10 h-10 bg-white rounded-xl shadow-sm border border-slate-50 flex items-center justify-center p-1">
+                                <div className="p-6 flex flex-col items-center h-full">
+                                    <div className="h-14 w-38 mb-6">
                                             <img src={LogoImage.src} alt="logo" className="w-full h-full object-contain" />
                                         </div>
+                                    
+                                    <div className="w-25 h-30 border-2 border-slate-200 rounded-lg overflow-hidden mb-4 bg-slate-50 flex items-center justify-center">
+                                        {getProfileImage() ? (
+                                            <img key={imageTimestamp} src={getProfileImage()!} className="w-full h-full object-cover" alt="Profile" />
+                                        ) : (
+                                            <div className="text-slate-300 font-bold text-[8px] uppercase">Photo</div>
+                                        )}
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-slate-100 pt-4">
-                                        <div>
-                                            <p className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">Partner ID</p>
-                                            <p className="text-[8px] font-bold text-gray-500">{profile.adv_id}</p>
+                                    <div className="text-center mb-4">
+                                        <h4 className="text-lg font-black text-blue-600 uppercase leading-tight">{profile.name}</h4>
+                                        <p className="text-[10px] font-bold text-slate-500 uppercase">Authorized Partner</p>
+                                        <p className="text-[10px] font-bold text-slate-700 mt-1">Partner ID - {profile.adv_id}</p>
                                         </div>
-                                        <div>
-                                            <p className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">Contact Number</p>
-                                            <p className="text-[8px] font-bold text-gray-500">+91 {profile.mobile}</p>
+
+                                    <div className="w-full text-center space-y-1 border-t border-slate-100 pt-4 mb-4">
+                                        <p className="text-[12px] font-bold text-slate-700"><span className="text-slate-400">Contact No:</span> +91 {profile.mobile}</p>
+                                        <p className="text-[12px] font-bold text-slate-700 truncate px-2"><span className="text-slate-400">Email ID:</span> {profile.email}</p>
+                                        <p className="text-[12px] font-bold text-slate-700"><span className="text-slate-400">Location:</span> {profile.city}</p>
                                         </div>
-                                        <div>
-                                            <p className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">Email Address</p>
-                                            <p className="text-[8px] font-bold text-gray-500 truncate">{profile.email}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">Location</p>
-                                            <p className="text-[8px] font-bold text-gray-500">{profile.city}</p>
-                                        </div>
+
+                                    <div className="mt-auto pt-2">
+                                        <p className="text-[10px] font-bold text-blue-600">www.infinityarthvishva.com</p>
                                     </div>
 
-                                    <div className="flex justify-between items-end pt-2">
-                                        <button
-                                            disabled={isDownloadingDSACard}
-                                            onClick={downloadDSACardAsPhoto}
-                                            className="opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 bg-[#1CADA3] text-white px-3 py-1.5 rounded-lg text-[9px] font-bold shadow-lg flex items-center gap-2 hover:bg-emerald-600 uppercase tracking-tighter disabled:opacity-70">
-                                            {isDownloadingDSACard && <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                                            {isDownloadingDSACard ? "Generating..." : "Download Card"}
+                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+                                        <button disabled={isDownloadingDSACard} onClick={downloadDSACardAsPhoto} className="bg-[#1CADA3] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-2xl flex items-center gap-2 hover:scale-105 transition-transform">
+                                            {isDownloadingDSACard ? <Loader2 className="animate-spin" size={14} /> : "Download ID Card"}
                                         </button>
-                                        <p className="text-[6px] text-slate-600 uppercase font-medium serif">Authorized Partner</p>
                                     </div>
                                 </div>
+                                <div className="h-2 w-full bg-[#1CADA3] mt-auto"></div>
                             </div>
                         </div>
                     </div>
-
-                    {/* KYC & VERIFICATION HUB */}
-                    <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="p-2.5 bg-emerald-50 text-emerald-500 rounded-xl">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-bold text-[#0f172a]">KYC & Verification (Coming Soon)</h3>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {[
-                                { title: 'PAN Card', value: profile.pan, verified: profile.pan_verified, type: 'pan', file: panFile, uploading: uploadingPan, placeholder: 'Enter 10-digit PAN Number' },
-                                { title: 'Aadhar Card', value: `•••• •••• ${profile.aadhaar?.slice(-4) || '1234'}`, verified: aadhaarVerified, type: 'aadhaar', file: aadhaarFile, uploading: uploadingAadhaar, placeholder: 'Enter 12-digit Aadhaar Number' },
-                                { title: 'GST Registration', value: profile.gst_number || 'NOT LINKED', verified: gstVerified, type: 'gst', file: gstFile, uploading: uploadingGst, placeholder: 'Enter 15-digit GSTIN' },
-                            ].map((item) => (
-                                <div key={item.title} className="p-5 bg-slate-50/50 border border-slate-100 text-gray-600 rounded-2xl flex flex-col gap-4 group hover:border-slate-200 transition-all">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex gap-4 items-center">
-                                            <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-[#1CADA3] transition-colors">
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M7 8h10M7 12h10M7 16h6" /></svg>
-                                            </div>
-                                            <div>
-                                                <h5 className="text-xs font-bold text-[#0f172a]">{item.title}</h5>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.value}</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-lg ${item.verified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>
-                                                {item.verified ? "Verified" : "Pending"}
-
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {isEditing && !item.verified && (
-                                        <div className="pt-3 border-t border-dashed border-slate-200 flex flex-col gap-2">
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    placeholder={item.placeholder}
-                                                    value={item.type === 'pan' ? profile.pan : (item.type === 'gst' ? (profile.gst_number || "") : "")}
-                                                    className="flex-1 px-3 py-2 bg-white border border-slate-100 text-gray-600 rounded-xl text-[11px] font-semibold focus:outline-none focus:border-[#1CADA3] transition-colors"
-                                                    onChange={(e) => {
-                                                        const val = e.target.value;
-                                                        if (item.type === 'pan') {
-                                                            setProfile({ ...profile, pan: val.toUpperCase() });
-                                                        } else if (item.type === 'gst') {
-                                                            setProfile({ ...profile, gst_number: val.toUpperCase() });
-                                                        }
-                                                    }}
-                                                />
-                                                {item.type === 'pan' && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            if (profile.pan.length !== 10) {
-                                                                return toast.error("Please enter a valid 10-digit PAN");
-                                                            }
-                                                            setProfile({ ...profile, pan_verified: true as any });
-                                                            toast.success("PAN verified locally. Click 'Save All Changes' to finish.");
-                                                        }}
-                                                        className="bg-emerald-500 hover:bg-emerald-600 text-white text-[9px] font-black px-2.5 py-1.5 rounded-lg uppercase transition-all shadow-sm h-fit self-center whitespace-nowrap">
-                                                        Verify
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
 
                     {/* PROFESSIONAL EXPERTISE */}
                     <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
                         <div className="flex items-center gap-3 mb-8">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                </svg>
-                            </div>
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg></div>
                             <h3 className="text-xl font-bold text-[#0f172a]">Professional Expertise</h3>
                         </div>
-
                         <div className="space-y-6">
-                            {/* Head Categories */}
                             <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Head Categories</label>
                                 <div className="flex flex-wrap gap-3">
                                     {Object.keys(CATEGORY_MAP).map((head) => (
-                                        <button
-                                            key={head}
-                                            disabled={!isEditing}
-                                            onClick={() => toggleHead(head)}
-                                            className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all border-2 ${profile?.head === head ? "bg-[#1CADA3] border-[#1CADA3] text-white shadow-md shadow-[#1cada330]" : "bg-white border-slate-100 text-slate-500"}`}
-                                        >
-                                            {head}
-                                        </button>
+                                        <button key={head} disabled={!isEditing} onClick={() => toggleHead(head)} className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all border-2 ${profile?.head === head ? "bg-[#1CADA3] border-[#1CADA3] text-white shadow-md shadow-[#1cada330]" : "bg-white border-slate-100 text-slate-500"}`}>{head}</button>
                                     ))}
                                 </div>
                             </div>
-
-                            {/* Unified Sub Categories Section */}
                             <div className="space-y-4">
                                 {selectedHeads.length > 0 ? (
                                     <div className="space-y-6">
                                         {selectedHeads.map((head) => (
-                                            <div
-                                                key={head}
-                                                className="p-5 border border-slate-100 rounded-2xl bg-white shadow-sm animate-in fade-in slide-in-from-top-2"
-                                            >
-                                                <p className="text-[10px] font-black text-[#1CADA3] uppercase mb-4 px-1">
-                                                    {head} Sub Categories
-                                                </p>
+                                            <div key={head} className="p-5 border border-slate-100 rounded-2xl bg-white shadow-sm">
+                                                <p className="text-[10px] font-black text-[#1CADA3] uppercase mb-4 px-1">{head} Sub Categories</p>
                                                 <div className="flex flex-wrap gap-2">
                                                     {(CATEGORY_MAP[head] || []).map((cat) => (
-                                                        <button
-                                                            key={cat}
-                                                            disabled={!isEditing}
-                                                            onClick={() => toggleCategory(cat)}
-                                                            className={`px-4 py-2 rounded-lg text-[11px] font-bold transition-all ${selectedCats.includes(cat)
-                                                                ? "bg-[#1CADA3] text-white shadow-md"
-                                                                : "bg-slate-50 text-slate-500 hover:bg-slate-100 border border-transparent"
-                                                                }`}
-                                                        >
-                                                            {cat}
-                                                        </button>
+                                                        <button key={cat} disabled={!isEditing} onClick={() => toggleCategory(cat)} className={`px-4 py-2 rounded-lg text-[11px] font-bold transition-all ${selectedCats.includes(cat) ? "bg-[#1CADA3] text-white shadow-md" : "bg-slate-50 text-slate-500 hover:bg-slate-100 border border-transparent"}`}>{cat}</button>
                                                     ))}
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="p-8 border-2 border-dashed border-slate-100 rounded-2xl text-center">
-                                        <p className="text-xs text-slate-400 font-medium">
-                                            Please select a Head Category above to see specific sub-categories.
-                                        </p>
-                                    </div>
+                                    <div className="p-8 border-2 border-dashed border-slate-100 rounded-2xl text-center"><p className="text-xs text-slate-400 font-medium">Please select a Head Category above.</p></div>
                                 )}
                             </div>
-
                         </div>
                     </div>
 
                     {isEditing && (
                         <div className="flex justify-end pt-4">
-                            <button disabled={saving} onClick={async () => { try { setSaving(true); const passwordChanged = profile.password !== originalPassword.current; await DashboardService.editProfile(profile); if (passwordChanged) { toast.success("Security credentials updated successfully!"); originalPassword.current = profile.password; } else { toast.success("Profile information updated!"); } setIsEditing(false); } catch (err) { toast.error("Failed to update changes."); } finally { setSaving(false); } }} className="px-12 py-4 bg-[#1CADA3] text-white rounded-2xl shadow-xl shadow-[#1cada340] font-bold transition-all active:scale-95">
+                            <button disabled={saving} onClick={async () => { try { setSaving(true); await DashboardService.editProfile(profile); toast.success("Profile information updated!"); setIsEditing(false); } catch (err) { toast.error("Failed to update changes."); } finally { setSaving(false); } }} className="px-12 py-4 bg-[#1CADA3] text-white rounded-2xl shadow-xl shadow-[#1cada340] font-bold transition-all active:scale-95">
                                 {saving ? "Saving Changes..." : "Save All Changes"}
                             </button>
                         </div>
@@ -1020,4 +543,3 @@ export default function ProfileSection() {
         </main>
     );
 }
-

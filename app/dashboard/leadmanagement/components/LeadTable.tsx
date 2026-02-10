@@ -17,6 +17,7 @@ export interface Lead {
   createdTime: string;
   formData?: any;
   isSelfLogin?: string;
+  status?: string;
 }
 
 interface LeadTableProps {
@@ -77,8 +78,10 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
           // Otherwise just fetch the active tab in the background
           if (activeTab === 'referral') {
             referralRes = await DashboardService.getLeads();
+            console.log("Fetched referral leads:", referralRes)
           } else {
             detailedRes = await DashboardService.getMyLeads();
+            console.log("Fetched detailed leads:", detailedRes)
           }
         }
 
@@ -99,6 +102,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                   notes: "-",
                   formData: item.form_data || null,
                   isSelfLogin: item.is_self_login ? "Yes" : "No",
+                  status: item.lead_status || "N/A",
                   createdDate: isNaN(dateObj.getTime()) ? "N/A" : dateObj.toLocaleDateString(),
                   createdTime: isNaN(dateObj.getTime()) ? "" : dateObj.toLocaleTimeString(),
                 };
@@ -303,6 +307,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Dept</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Sub Category</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Self Login</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
                     <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Actions</th>
                   </>
                 )}
@@ -332,6 +337,11 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.product}</td>
                         <td className="px-4 py-4 text-sm text-gray-700">{lead.subCategory}</td>
                         <td className="px-4 py-4 text-sm text-gray-700 font-medium">{lead.isSelfLogin}</td>
+                        <td className="px-4 py-4 text-sm">
+  <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-100">
+    {lead.status}
+  </span>
+</td>
                         <td className="px-4 py-4 text-center">
                           <div className="flex flex-col gap-1 items-center">
                             <button onClick={() => handleViewDocuments(lead)} className="text-[10px] w-full bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-100 font-bold hover:bg-blue-600 hover:text-white uppercase transition-all">View Docs</button>

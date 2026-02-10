@@ -1,7 +1,7 @@
 "use client";
 import { FC, useState, useMemo, useEffect } from "react";
 import { DepartmentHeadService } from "../../services/departmentHeadService";
-import { X } from "lucide-react"; // Assuming lucide-react is available based on previous context
+import { X, Eye, FileText, Download, Loader2, AlertCircle } from "lucide-react";
 
 // --- Interfaces ---
 export interface RM {
@@ -12,6 +12,7 @@ export interface RM {
 }
 
 export interface Lead {
+  rawData?: any;
   detailLeadId: string;
   assignedRMSubcategory: string;
   assignedRMDepartment: string;
@@ -23,6 +24,7 @@ export interface Lead {
   contactNumber: string;
   email: string;
   product: string;
+  department: string;
   subCategory: string;
   notes: string;
   status: string;
@@ -36,11 +38,12 @@ export interface Lead {
   selfLogin?: boolean;
   acceptanceStatus?: 'yes' | 'no' | 'pending';
   firstRM?: string;
+  firstRMId?: string;
   currentRM?: string;
   previousRM?: string;
+  previousRMId?: string;
   totalMandatoryDocs?: number;
   uploadedMandatoryDocs?: number;
-  // Specific Form Details
   dob?: string;
   employmentType?: string;
   hasOtherLoan?: boolean;
@@ -50,6 +53,8 @@ export interface Lead {
   otherIncome?: string;
   otherIncomeAmount?: string;
   otherLoanAmount?: string;
+  uploadedDocuments?: any[]; // Added for document viewing
+  pendingDocuments?: any[];
 }
 
 // --- Independent Column Components: HEADERS ---
@@ -67,7 +72,6 @@ const DetailedHeader = () => (
     <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Acceptance Status</th>
     <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Assigned RM</th>
     <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Current RM</th>
-    <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Previous RM</th>
     <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Docs</th>
     <th className="px-6 py-4 bg-gray-50 border-b border-gray-200 whitespace-nowrap">Action</th>
   </tr>
@@ -89,7 +93,12 @@ const ReferralHeader = () => (
 
 // --- Independent Column Components: ROWS ---
 
-const DetailedRow = ({ lead, onAssign, onView }: { lead: Lead; onAssign: (l: Lead) => void; onView: (l: Lead) => void }) => (
+const DetailedRow = ({ lead, onAssign, onView, onViewDocs }: {
+  lead: Lead;
+  onAssign: (l: Lead) => void;
+  onView: (l: Lead) => void;
+  onViewDocs: (l: Lead) => void;
+}) => (
   <tr className="hover:bg-gray-50/50 group text-sm">
     <td className="px-6 py-4 text-gray-700 font-medium">{lead.id}</td>
     <td className="px-6 py-4 text-gray-700 whitespace-nowrap">{lead.detailLeadId}</td>
@@ -99,17 +108,24 @@ const DetailedRow = ({ lead, onAssign, onView }: { lead: Lead; onAssign: (l: Lea
     </td>
     <td className="px-6 py-4 whitespace-nowrap">
       <div className="font-medium text-gray-900">{lead.clientName}</div>
-      <div className="text-xs text-blue-600 font-semibold">{lead.contactNumber}</div>
+      <div className="text-xs text-blue-600 font-semibold">
+        {lead.contactNumber === "NA" ? "Mobile: Not Provided" : lead.contactNumber}
+      </div>
     </td>
     <td className="px-6 py-4 whitespace-nowrap">
       <div className="text-gray-900 font-medium">{lead.product}</div>
-      <div className="text-[11px] text-gray-500">{lead.subCategory}</div>
+      <div className="text-[11px] text-gray-500">{lead.department}</div>
     </td>
     <td className="px-6 py-4"><div className="text-xs text-gray-500 max-w-[120px] truncate" title={lead.notes}>{lead.notes}</div></td>
     <td className="px-6 py-4"><span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-[11px] font-bold uppercase">{lead.status}</span></td>
     <td className="px-6 py-4 text-gray-600">{lead.selfLogin ? "Yes" : "No"}</td>
     <td className="px-6 py-4 capitalize text-gray-600">{lead.acceptanceStatus}</td>
-    <td className="px-6 py-4 text-gray-700 font-medium whitespace-nowrap">{lead.firstRM}</td>
+    <td className="px-6 py-4 text-gray-700 font-medium whitespace-nowrap">
+      <div className="flex flex-col">
+        <span className="text-gray-900">{lead.firstRM}</span>
+        <span className="text-[10px] text-gray-400">ID: {lead.firstRMId}</span>
+      </div>
+    </td>
     <td className="px-6 py-4">
       <div className="flex flex-col">
         <div className="flex items-center gap-2">
@@ -119,8 +135,16 @@ const DetailedRow = ({ lead, onAssign, onView }: { lead: Lead; onAssign: (l: Lea
         <span className="text-[10px] text-gray-400">ID: {lead.rmId}</span>
       </div>
     </td>
-    <td className="px-6 py-4 text-gray-700 whitespace-nowrap">{lead.previousRM}</td>
-    <td className="px-6 py-4 text-gray-600 font-medium">{lead.uploadedMandatoryDocs}/{lead.totalMandatoryDocs}</td>
+    {/* FIXED DOCS COLUMN: Made it clickable */}
+    <td className="px-6 py-4">
+      <button
+        onClick={() => onViewDocs(lead)}
+        className="flex items-center gap-1 text-blue-600 font-bold hover:underline bg-blue-50 px-2 py-1 rounded"
+      >
+        {lead.uploadedMandatoryDocs}/{lead.totalMandatoryDocs}
+        <Eye size={14} />
+      </button>
+    </td>
     <td className="px-6 py-4">
       <button 
         onClick={() => onView(lead)}
@@ -138,7 +162,9 @@ const ReferralRow = ({ lead, onAssign }: { lead: Lead; onAssign: (l: Lead) => vo
     <td className="px-6 py-4 text-gray-700 whitespace-nowrap">{lead.refId}</td>
     <td className="px-6 py-4 whitespace-nowrap">
       <div className="font-medium text-gray-900">{lead.clientName}</div>
-      <div className="text-xs text-blue-600 font-semibold">{lead.contactNumber}</div>
+      <div className="text-xs text-blue-600 font-semibold">
+        {lead.contactNumber === "NA" ? "Mobile: Not Provided" : lead.contactNumber}
+      </div>
     </td>
     <td className="px-6 py-4 whitespace-nowrap">
       <div className="text-gray-900 font-medium">{lead.product}</div>
@@ -176,32 +202,46 @@ const LeadTable: FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
   const [serverTotalCount, setServerTotalCount] = useState(0);
   
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
+  const [viewingDocs, setViewingDocs] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewTitle, setPreviewTitle] = useState("");
+  const [docList, setDocList] = useState<{ uploaded: any[], pending: any[] }>({ uploaded: [], pending: [] });
+
+  const [eligibleRms, setEligibleRms] = useState<any[]>([]);
+  const [selectedRmId, setSelectedRmId] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fetchingRms, setFetchingRms] = useState(false);
+
   const mapDetailedLead = (item: any): Lead => {
     const dateObj = item.created_at ? new Date(item.created_at) : new Date();
     return {
+      rawData: item,
       id: item.id.toString(),
       detailLeadId: item.detail_lead_id || "-",
       refId: "-", 
       clientName: item.lead_name || "Unknown",
       clientType: 'Detailed',
-      contactNumber: item.contact_number || "N/A",
+      contactNumber: item.contact_number || "NA",
       email: item.email || "N/A",
       product: item.product_type || "N/A",
+      department: item.department || "N/A",
       subCategory: item.form_data?.loanType || "N/A",
       notes: item.notes || "No notes available",
       status: (item.lead_status || 'new').toLowerCase(),
       selfLogin: item.is_self_login,
       acceptanceStatus: item.rm_acceptance_status?.toLowerCase(),
       firstRM: item.rm_history?.first_rm?.name || "N/A",
+      firstRMId: (item.rm_history?.first_rm?.id || "N/A").toString(),
       currentRM: item.rm_history?.current_rm?.name || "N/A",
       previousRM: item.rm_history?.previous_rm?.name || "N/A",
+      previousRMId: (item.rm_history?.previous_rm?.id || "N/A").toString(),
       rmId: (item.rm_history?.current_rm?.id || "N/A").toString(),
       assignedTo: item.rm_history?.current_rm?.name || "Unassigned",
       assignedRMDepartment: "N/A",
@@ -214,7 +254,6 @@ const LeadTable: FC = () => {
       totalMandatoryDocs: parseInt(item.total_mandatory_docs) || 0,
       uploadedMandatoryDocs: parseInt(item.uploaded_mandatory_docs) || 0,
       documents: [],
-      // MAPPING POPUP DETAILS
       dob: item.form_data?.dob || "N/A",
       employmentType: item.form_data?.employmentType || "N/A",
       hasOtherLoan: item.form_data?.hasOtherLoan || false,
@@ -224,8 +263,21 @@ const LeadTable: FC = () => {
       otherIncome: item.form_data?.otherIncome || "N/A",
       otherIncomeAmount: item.form_data?.otherIncomeAmount || "N/A",
       otherLoanAmount: item.form_data?.otherLoanAmount || "N/A",
+      uploadedDocuments: item.uploaded_documents || [],
+      pendingDocuments: item.pending_documents || [],
     };
   };
+
+  const handleViewDocs = (lead: Lead) => {
+    setSelectedLead(lead);
+    setDocList({
+      uploaded: lead.uploadedDocuments || [],
+      pending: lead.pendingDocuments || []
+    });
+    setViewingDocs(true);
+  };
+
+  const isImage = (url: string) => /\.(jpg|jpeg|png|webp|gif)$/i.test(url);
 
   const mapReferralLead = (item: any): Lead => {
     const dateObj = item.created_at ? new Date(item.created_at) : new Date();
@@ -235,9 +287,10 @@ const LeadTable: FC = () => {
       detailLeadId: "-",
       clientName: item.lead_name || "Unknown",
       clientType: 'Referral',
-      contactNumber: item.contact_number || "N/A",
+      contactNumber: item.contact_number || "NA",
       email: item.email || "N/A",
       product: item.department || "N/A",
+      department: item.department || "N/A",
       subCategory: item.sub_category || "N/A",
       notes: item.notes || "No notes available",
       status: (item.status || 'new').toLowerCase(),
@@ -265,7 +318,7 @@ const LeadTable: FC = () => {
         setServerTotalCount(leadsResponse.pagination?.totalRecords || leadsResponse.count || 0);
         mappedData = (leadsResponse.leads || []).map(mapDetailedLead);
       } else {
-        leadsResponse = await DepartmentHeadService.getDepartmentLeads();
+        leadsResponse = await DepartmentHeadService.getDepartmentReferralLeads();
         mappedData = (leadsResponse.leads || []).map(mapReferralLead);
       }
       const rmsResponse = await DepartmentHeadService.getRelationshipManagers?.() || { rms: [] };
@@ -303,9 +356,38 @@ const LeadTable: FC = () => {
     return filteredLeads.slice(startIndex, startIndex + pageSize);
   }, [filteredLeads, activeTab, currentPage, pageSize]);
 
-  const handleAssignClick = (lead: Lead) => {
+  const handleAssignClick = async (lead: Lead) => {
     setSelectedLead(lead);
+    setSelectedRmId(""); // Reset selection
+    setFetchingRms(true);
     setIsAssignModalOpen(true);
+
+    try {
+      // Fetch only RMs eligible for this specific lead
+      const response = await DepartmentHeadService.getEligibleRMs(lead.id);
+      setEligibleRms(response.rms || []);
+    } catch (error) {
+      console.error("Failed to fetch eligible RMs", error);
+    } finally {
+      setFetchingRms(false);
+    }
+  };
+
+  const handleConfirmReassign = async () => {
+    if (!selectedLead || !selectedRmId) return;
+
+    setIsSubmitting(true);
+    try {
+      await DepartmentHeadService.reassignLead(selectedLead.id, selectedRmId);
+      setIsAssignModalOpen(false);
+      fetchData(); // Refresh the table to show the new RM
+      alert("Lead reassigned successfully!");
+    } catch (error) {
+      console.error("Reassignment failed", error);
+      alert("Failed to reassign lead.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleViewClick = (lead: Lead) => {
@@ -343,7 +425,7 @@ const LeadTable: FC = () => {
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col">
-        <div className="overflow-x-auto scrollbar-x-thin max-h-[450px]">
+        <div className="overflow-x-auto scrollbar-x-thin min-h-auto">
           <table className="min-w-full text-left border-separate border-spacing-0">
             <thead className="sticky top-0 z-10 bg-gray-50 text-[12px] font-bold text-gray-700">
               {activeTab === 'detailed' ? <DetailedHeader /> : <ReferralHeader />}
@@ -352,8 +434,18 @@ const LeadTable: FC = () => {
               {paginatedLeads.length > 0 ? (
                 paginatedLeads.map((lead) => (
                   activeTab === 'detailed' 
-                    ? <DetailedRow key={lead.id} lead={lead} onAssign={handleAssignClick} onView={handleViewClick} />
-                    : <ReferralRow key={lead.id} lead={lead} onAssign={handleAssignClick} />
+                    ? <DetailedRow
+                      key={lead.id}
+                      lead={lead}
+                      onAssign={handleAssignClick}
+                      onView={handleViewClick}
+                      onViewDocs={handleViewDocs} // FIXED: Passing the actual function instead of the error function
+                    />
+                    : <ReferralRow
+                      key={lead.id}
+                      lead={lead}
+                      onAssign={handleAssignClick}
+                    />
                 ))
               ) : (
                 <tr><td colSpan={14} className="px-4 py-20 text-center text-gray-500 font-medium">No leads found</td></tr>
@@ -376,31 +468,300 @@ const LeadTable: FC = () => {
         </div>
       </div>
 
+      {/* 1. DOCUMENT LIST MODAL */}
+      {viewingDocs && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Lead Documents</h3>
+                <p className="text-[10px] text-gray-500 uppercase font-bold tracking-tight">Client: {selectedLead?.clientName}</p>
+              </div>
+              <button onClick={() => setViewingDocs(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="p-6 max-h-[60vh] overflow-y-auto">
+              <div className="space-y-6">
+                {/* Uploaded Section */}
+                <div>
+                  <h4 className="text-xs font-bold text-green-600 uppercase mb-3 flex items-center gap-2">
+                    Uploaded ({docList.uploaded.length})
+                  </h4>
+                  {docList.uploaded.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-2">
+                      {docList.uploaded.map((doc, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 border border-green-100 rounded-lg bg-green-50/50">
+                          <div className="flex items-center gap-3">
+                            <FileText size={18} className="text-green-600" />
+                            <span className="text-sm font-semibold text-gray-700">{doc.document_label}</span>
+                          </div>
+                          <button
+                            onClick={() => { setPreviewUrl(doc.file_url); setPreviewTitle(doc.document_label); }}
+                            className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded font-bold uppercase hover:bg-blue-700 flex items-center gap-1"
+                          >
+                            <Eye size={12} /> View
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (<p className="text-xs text-gray-400 italic">No uploaded documents found.</p>)}
+                </div>
+
+                {/* Pending Section */}
+                {docList.pending.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold text-orange-600 uppercase mb-3">Pending ({docList.pending.length})</h4>
+                    {docList.pending.map((doc, index) => (
+                      <div key={index} className="p-3 border border-gray-200 rounded-lg bg-gray-50 mb-2 flex justify-between items-center">
+                        <span className="text-sm text-gray-600 font-medium">{doc.document_label}</span>
+                        <span className="text-[9px] bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-bold uppercase">Required</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-100 flex justify-end bg-gray-50">
+              <button onClick={() => setViewingDocs(false)} className="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-bold uppercase hover:bg-gray-300 transition-all">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. FILE PREVIEW MODAL */}
+      {previewUrl && (
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+              <h3 className="text-lg font-bold text-gray-800">{previewTitle}</h3>
+              <div className="flex items-center gap-4">
+                <a href={previewUrl} download target="_blank" className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm font-bold">
+                  <Download size={18} /> Download
+                </a>
+                <button onClick={() => setPreviewUrl(null)} className="text-gray-500 hover:text-black transition-colors">
+                  <X size={24} />
+                </button>
+              </div>
+            </div>
+            <div className="flex-grow bg-gray-100 flex items-center justify-center overflow-hidden p-4">
+              {isImage(previewUrl) ? (
+                <img src={previewUrl} alt="Preview" className="max-w-full max-h-full object-contain shadow-lg" />
+              ) : (
+                <iframe src={`${previewUrl}#toolbar=0`} className="w-full h-full border-none rounded-lg shadow-inner" title="PDF Preview" />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* REASSIGN RM MODAL */}
+      {isAssignModalOpen && selectedLead && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+              <h3 className="text-lg font-bold text-gray-800">Reassign Relationship Manager</h3>
+              <button onClick={() => setIsAssignModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="mb-4">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Current Assignment</label>
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100 mt-1">
+                  <p className="text-sm font-semibold text-gray-700">{selectedLead.assignedTo}</p>
+                  <p className="text-[11px] text-gray-500">Current RM ID: {selectedLead.rmId}</p>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tet-gray-700">Select New RM</label>
+                {fetchingRms ? (
+                  <div className="flex items-center gap-2 mt-2 text-blue-600 text-sm">
+                    <Loader2 className="animate-spin" size={16} /> Loading eligible RMs...
+                  </div>
+                ) : (
+                  <select
+                    value={selectedRmId}
+                    onChange={(e) => setSelectedRmId(e.target.value)}
+                    className="w-full mt-1 border border-gray-300 rounded-lg p-2.5 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                  >
+                    <option value="">-- Choose RM --</option>
+                    {eligibleRms.map((rm) => (
+                      <option key={rm.id} value={rm.id}>
+                        {rm.name} (ID: {rm.id})
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {eligibleRms.length === 0 && !fetchingRms && (
+                  <p className="text-xs text-red-500 mt-2 flex items-center gap-1">
+                    <AlertCircle size={12} /> No other eligible RMs found for this department.
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => setIsAssignModalOpen(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-50 transition-all"
+                >
+                  CANCEL
+                </button>
+                <button
+                  disabled={isSubmitting || !selectedRmId}
+                  onClick={handleConfirmReassign}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-100"
+                >
+                  {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : "CONFIRM"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* VIEW DETAILS MODAL */}
       {isViewModalOpen && selectedLead && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in duration-200">
+
+            {/* 1. Header */}
             <div className="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
+              <div>
               <h3 className="font-bold text-gray-800 text-lg">Application Details</h3>
+                <p className="text-xs text-blue-600 font-bold">Detailed Lead ID: {selectedLead.detailLeadId}</p>
+              </div>
               <button onClick={() => setIsViewModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
                 <X size={20} />
               </button>
             </div>
-            <div className="p-6 grid grid-cols-2 gap-y-6 gap-x-4">
+
+            <div className="max-h-[75vh] overflow-y-auto custom-scrollbar">
+
+              {/* 2. DEADLINE BREACH WARNING (Conditional) */}
+              {selectedLead.rawData?.is_deadline_breached && (
+                <div className="bg-red-50 border-b border-red-100 p-4 flex items-center gap-3">
+                  <div className="bg-red-100 p-2 rounded-full">
+                    <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-red-800 font-bold text-sm">RM DEADLINE BREACHED</h4>
+                    <p className="text-red-600 text-xs font-medium">RM haven't accepted this lead before the deadline.</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="p-6">
+                {/* 3. Section: Client & Product Details */}
+                <div className="mb-8">
+                  <h4 className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                    Client & Product <span className="h-[1px] flex-1 bg-blue-100"></span>
+                  </h4>
+                  <div className="grid grid-cols-3 gap-6">
               <DetailItem label="Client Name" value={selectedLead.clientName} />
-              <DetailItem label="Lead ID" value={selectedLead.detailLeadId} />
-              <DetailItem label="DOB" value={selectedLead.dob} />
-              <DetailItem label="Employment" value={selectedLead.employmentType} />
-              <DetailItem label="Loan Type" value={selectedLead.loanType} />
-              <DetailItem label="Loan Amount" value={`₹${Number(selectedLead.loanAmount).toLocaleString()}`} />
-              <DetailItem label="Location" value={selectedLead.location} />
-              <DetailItem label="Other Loan" value={selectedLead.hasOtherLoan ? 'Yes' : 'No'} />
-              {selectedLead.hasOtherLoan && <DetailItem label="Other Loan Amt" value={`₹${Number(selectedLead.otherLoanAmount).toLocaleString()}`} />}
-              <DetailItem label="Other Income" value={selectedLead.otherIncome} />
-              <DetailItem label="Other Inc Amt" value={`₹${Number(selectedLead.otherIncomeAmount).toLocaleString()}`} />
+                    <DetailItem label="Contact Number" value={selectedLead.contactNumber} />
+                    <DetailItem label="Client Email" value={selectedLead.email} />
+                    <DetailItem label="Department" value={selectedLead.department} />
+                    <DetailItem label="Product Type" value={selectedLead.product} />
+                    <DetailItem label="Lead Status" value={<span className="text-blue-700 font-bold uppercase">{selectedLead.rawData?.lead_status}</span>} />
+                  </div>
+                </div>
+                {/* 6. Section: Dynamic Form Data */}
+                <div className="mb-8">
+                  <h4 className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                    Application Detailed Data <span className="h-[1px] flex-1 bg-blue-100"></span>
+                  </h4>
+                  <div className="grid grid-cols-2 gap-x-10 gap-y-3 bg-gray-50 p-5 rounded-xl border border-gray-100">
+                    {selectedLead.rawData?.form_data && Object.entries(selectedLead.rawData.form_data).map(([key, value]) => (
+                      <div key={key} className="flex justify-between items-center border-b border-gray-200/60 pb-2">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{key.replace(/_/g, ' ')}</span>
+                        <span className="text-sm font-semibold text-gray-700">{String(value)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. Section: DSA Details */}
+                <div className="mb-8">
+                  <h4 className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                    DSA Partner <span className="h-[1px] flex-1 bg-blue-100"></span>
+                  </h4>
+                  <div className="grid grid-cols-3 gap-6">
+                    <DetailItem label="DSA Name" value={selectedLead.rawData?.dsa_name} />
+                    <DetailItem label="DSA Advisor ID" value={selectedLead.rawData?.dsa_adv_id} />
+                    <DetailItem label="DSA Mobile" value={selectedLead.rawData?.dsa_mobile} />
+                  </div>
+                </div>
+
+                {/* 5. Section: Assignment History */}
+                <div className="mb-8">
+                  <h4 className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                    Assignment Info <span className="h-[1px] flex-1 bg-blue-100"></span>
+                  </h4>
+                  <div className="grid grid-cols-3 gap-6">
+                    <DetailItem label="Current RM" value={
+                      <span className="bg-green-100 text-green-800 px-0.5 py-0.5 rounded border border-green-200 font-medium">
+                        {selectedLead.rawData?.rm_history?.current_rm?.name}
+                      </span>
+                    }
+                    />
+                    <DetailItem label="Acceptance Status" value={selectedLead.rawData?.rm_acceptance_status} />
+                    <DetailItem label="Assigned At" value={new Date(selectedLead.rawData?.rm_history?.assigned_at).toLocaleString()} />
+                    <DetailItem
+                      label="Deadline Date"
+                      value={
+                        <span className="text-red-600 bg-red-50 px-0.5 py-0.5 rounded border border-red-100 font-bold">
+                          {new Date(selectedLead.rawData?.rm_action_deadline).toLocaleString()}
+                        </span>
+                      }
+                    />
+                    <DetailItem label="Assigned RM" value={
+                      <span className="bg-yellow-100 text-yellow-800 px-0.5 py-0.5 rounded border border-yellow-200 font-medium">
+                        {selectedLead.rawData?.rm_history?.first_rm?.name}
+                      </span>
+                    } />
+                    <DetailItem label="Previous RM" value={
+                      <span className="bg-orange-100 text-orange-800 px-0.5 py-0.5 rounded border border-orange-200 font-medium">
+                        {selectedLead.rawData?.rm_history?.previous_rm?.name || "None"}
+                      </span>
+                    } />
+                  </div>
+                </div>
+
+
+
+                {/* 7. Section: System Metadata (Created At & Self Login restored here) */}
+                <div className="pt-4 border-t border-gray-100 grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase">Created On:</span>
+                    <span className="text-xs text-gray-600 font-medium">
+                      {new Date(selectedLead.rawData?.created_at).toLocaleString('en-GB', {
+                        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase">Self Login:</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${selectedLead.rawData?.is_self_login ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                      {selectedLead.rawData?.is_self_login ? "YES" : "NO"}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            {/* Footer */}
             <div className="bg-gray-50 px-6 py-4 border-t flex justify-end">
-              <button onClick={() => setIsViewModalOpen(false)} className="px-5 py-2 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 transition-colors">
+              <button onClick={() => setIsViewModalOpen(false)} className="px-5 py-2 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-200">
                 Close
               </button>
             </div>
@@ -413,8 +774,8 @@ const LeadTable: FC = () => {
 
 const DetailItem = ({ label, value }: { label: string, value: any }) => (
   <div>
-    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{label}</p>
-    <p className="text-sm font-semibold text-gray-700 mt-0.5">{value || "N/A"}</p>
+    <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">{label}</p>
+    <p className="text-sm font-semibold text-gray-900 mt-0.5">{value || "N/A"}</p>
   </div>
 );
 

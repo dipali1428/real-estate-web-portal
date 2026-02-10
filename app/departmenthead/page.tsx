@@ -38,7 +38,7 @@ export default function Dashboard() {
       const rmData = await DepartmentHeadService.getRelationshipManagers();
       setRmCount(rmData?.total || rmData?.rms?.length || 0);
 
-      const leadsResponse = await DepartmentHeadService.getDepartmentLeads();
+      const leadsResponse = await DepartmentHeadService.getDepartmentReferralLeads();
       const leads = leadsResponse?.leads || (Array.isArray(leadsResponse) ? leadsResponse : []);
 
       // Calculate total business amount
