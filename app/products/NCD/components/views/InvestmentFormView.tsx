@@ -182,7 +182,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             value={formData.fullName}
                                             onChange={handleInputChange}
                                             placeholder="Enter your name"
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium text-slate-800 placeholder:text-slate-500"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -194,7 +194,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             value={formData.phone}
                                             onChange={handleInputChange}
                                             placeholder="+91"
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium text-slate-800 placeholder:text-slate-500"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -206,7 +206,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             value={formData.email}
                                             onChange={handleInputChange}
                                             placeholder="you@example.com"
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium text-slate-800 placeholder:text-slate-500"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -215,7 +215,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             name="occupation"
                                             value={formData.occupation}
                                             onChange={handleInputChange}
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold text-slate-800"
                                         >
                                             <option value="Salaried">Salaried</option>
                                             <option value="Self-Employed">Self-Employed</option>
@@ -231,7 +231,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             name="annualIncome"
                                             value={formData.annualIncome}
                                             onChange={handleInputChange}
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold text-slate-800"
                                         >
                                             <option value="<5L">Up to 5 Lakhs</option>
                                             <option value="5-10L">5 - 10 Lakhs</option>
@@ -245,7 +245,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             name="maritalStatus"
                                             value={formData.maritalStatus}
                                             onChange={handleInputChange}
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold text-slate-800"
                                         >
                                             <option value="Single">Single</option>
                                             <option value="Married">Married</option>
@@ -286,7 +286,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             onChange={handleInputChange}
                                             maxLength={10}
                                             placeholder="ABCDE1234F"
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold tracking-widest"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold tracking-widest text-slate-800 placeholder:text-slate-400"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -331,7 +331,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             value={formData.accountNumber}
                                             onChange={handleInputChange}
                                             placeholder="Enter full account number"
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium text-slate-800 placeholder:text-slate-500"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -343,7 +343,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             value={formData.ifsc}
                                             onChange={handleInputChange}
                                             placeholder="SBIN0001234"
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold text-slate-800 placeholder:text-slate-500"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -355,7 +355,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             value={formData.bankName}
                                             onChange={handleInputChange}
                                             placeholder="e.g., State Bank of India"
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium text-slate-800 placeholder:text-slate-500"
                                         />
                                     </div>
                                 </div>
@@ -384,7 +384,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             name="dpType"
                                             value={formData.dpType}
                                             onChange={handleInputChange}
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-bold text-slate-800"
                                         >
                                             <option value="NSDL">NSDL</option>
                                             <option value="CDSL">CDSL</option>
@@ -399,7 +399,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             value={formData.clientId}
                                             onChange={handleInputChange}
                                             placeholder="16 Digit ID"
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-mono"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-mono text-slate-800 placeholder:text-slate-500"
                                         />
                                     </div>
                                     <div className="col-span-full h-px bg-gray-100 my-4" />
@@ -412,7 +412,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             value={formData.nomineeName}
                                             onChange={handleInputChange}
                                             placeholder="Full name"
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium text-slate-800 placeholder:text-slate-500"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -424,7 +424,7 @@ export default function InvestmentFormView({ id, onBack, onSuccess }: Investment
                                             value={formData.nomineeRelation}
                                             onChange={handleInputChange}
                                             placeholder="e.g., Spouse, Parent"
-                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium"
+                                            className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:border-[#2076C7] focus:bg-white transition-all font-medium text-slate-800 placeholder:text-slate-500"
                                         />
                                     </div>
                                 </div>

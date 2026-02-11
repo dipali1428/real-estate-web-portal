@@ -18,24 +18,24 @@ const Comparison = () => {
         <section className="py-12 bg-white" id="comparison">
             <div className="container-custom">
                 <div className="text-center max-w-3xl mx-auto mb-8">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                    <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
                         NCDs vs Fixed Deposits
                     </h2>
-                    <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
+                    <div className="w-20 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
 
-                    <p className="text-lg text-gray-600 font-medium">
+                    <p className="text-sm md:text-lg text-gray-600 font-medium">
                         See why modern investors are shifting to NCDs for better inflation-beating returns.
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-10">
                     {/* Fixed Deposits Card */}
-                    <div className="bg-gray-50 rounded-[2.5rem] p-8 border border-gray-100 flex flex-col relative overflow-hidden opacity-80 hover:opacity-100 transition-opacity duration-300">
-                        <div className="absolute top-0 right-0 px-6 py-2 bg-gray-200 text-gray-600 font-bold rounded-bl-2xl text-xs uppercase tracking-wider">
+                    <div className="bg-gray-50 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border border-gray-100 flex flex-col relative overflow-hidden opacity-80 hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute top-0 right-0 px-4 py-1.5 md:px-6 md:py-2 bg-gray-200 text-gray-600 font-bold rounded-bl-2xl text-[10px] uppercase tracking-wider">
                             Traditional
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-800 mb-8 flex items-center gap-3">
-                            <Banknote className="w-8 h-8 text-gray-400" />
+                        <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 md:mb-8 flex items-center gap-3">
+                            <Banknote className="w-6 h-6 md:w-8 md:h-8 text-gray-400" />
                             Bank Fixed Deposit
                         </h3>
 
@@ -76,15 +76,15 @@ const Comparison = () => {
                     </div>
 
                     {/* NCDs Card - Highlighted */}
-                    <div className="bg-white rounded-[2.5rem] p-8 border-2 border-[#2076C7] flex flex-col relative overflow-hidden shadow-[0_20px_50px_rgba(32,118,199,0.15)] transform md:scale-105 z-10">
-                        <div className="absolute top-0 right-0 px-6 py-2 bg-[#1CADA3] text-white font-bold rounded-bl-2xl text-xs uppercase tracking-wider shadow-lg">
+                    <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border-2 border-[#2076C7] flex flex-col relative overflow-hidden shadow-[0_20px_50px_rgba(32,118,199,0.15)] transform md:scale-105 z-10">
+                        <div className="absolute top-0 right-0 px-4 py-1.5 md:px-6 md:py-2 bg-[#1CADA3] text-white font-bold rounded-bl-2xl text-[10px] uppercase tracking-wider shadow-lg">
                             Smart Choice
                         </div>
                         {/* Subtle premium gradient overlay */}
                         <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-[#F8FBFE] via-white to-[#F0F7FF] -z-10" />
 
-                        <h3 className="text-2xl font-bold text-[#2076C7] mb-8 flex items-center gap-3 relative z-10">
-                            <TrendingUp className="w-8 h-8 text-[#1CADA3]" />
+                        <h3 className="text-xl md:text-2xl font-bold text-[#2076C7] mb-6 md:mb-8 flex items-center gap-3 relative z-10">
+                            <TrendingUp className="w-6 h-6 md:w-8 md:h-8 text-[#1CADA3]" />
                             Secured NCDs
                         </h3>
 
@@ -135,25 +135,25 @@ const Comparison = () => {
 
                 {/* Expandable Detailed Comparison Table */}
                 {isExpanded && (
-                    <div className="max-w-4xl mx-auto mt-8 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden animate-fade-in-up">
-                        <div className="bg-gray-50 px-8 py-4 border-b border-gray-100">
-                            <h3 className="text-lg font-bold text-gray-800">Detailed Comparison</h3>
+                    <div className="max-w-4xl mx-auto mt-8 bg-white rounded-2xl md:rounded-3xl shadow-xl border border-gray-100 overflow-hidden animate-fade-in-up">
+                        <div className="bg-gray-50 px-6 md:px-8 py-4 border-b border-gray-100">
+                            <h3 className="text-base md:text-lg font-bold text-gray-800">Detailed Comparison</h3>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead>
                                     <tr className="bg-white border-b border-gray-100">
-                                        <th className="px-8 py-4 font-extrabold text-gray-500 uppercase text-xs tracking-wider w-1/3">Feature</th>
-                                        <th className="px-8 py-4 font-extrabold text-gray-500 uppercase text-xs tracking-wider w-1/3">Fixed Deposit</th>
-                                        <th className="px-8 py-4 font-extrabold text-[#2076C7] uppercase text-xs tracking-wider w-1/3">Secured NCD</th>
+                                        <th className="px-4 md:px-8 py-4 font-extrabold text-gray-500 uppercase text-[10px] md:text-xs tracking-wider w-1/3">Feature</th>
+                                        <th className="px-4 md:px-8 py-4 font-extrabold text-gray-500 uppercase text-[10px] md:text-xs tracking-wider w-1/3">Fixed Deposit</th>
+                                        <th className="px-4 md:px-8 py-4 font-extrabold text-[#2076C7] uppercase text-[10px] md:text-xs tracking-wider w-1/3">Secured NCD</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {detailedComparison.map((item, idx) => (
                                         <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                                            <td className="px-8 py-4 font-bold text-gray-700">{item.feature}</td>
-                                            <td className="px-8 py-4 text-gray-600 font-medium">{item.fd}</td>
-                                            <td className="px-8 py-4 text-[#2076C7] font-bold bg-blue-50/30">{item.ncd}</td>
+                                            <td className="px-4 md:px-8 py-4 font-bold text-gray-700 text-xs md:text-sm">{item.feature}</td>
+                                            <td className="px-4 md:px-8 py-4 text-gray-600 font-medium text-xs md:text-sm">{item.fd}</td>
+                                            <td className="px-4 md:px-8 py-4 text-[#2076C7] font-bold bg-blue-50/30 text-xs md:text-sm">{item.ncd}</td>
                                         </tr>
                                     ))}
                                 </tbody>

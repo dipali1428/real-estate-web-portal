@@ -46,15 +46,15 @@ const Risks = () => {
     ];
 
     return (
-        <section className="py-24 bg-white" id="risks">
+        <section className="py-16 bg-white" id="risks">
             <div className="container-custom">
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16 px-4">
+                    <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
                         Risk Assessment & Mitigation
                     </h2>
-                    <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
+                    <div className="w-20 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
 
-                    <p className="text-gray-600 text-lg font-medium">
+                    <p className="text-gray-600 text-sm md:text-lg font-medium">
                         Every investment carries some risk. Our goal is to help you identify, understand, and mitigate them effectively.
                     </p>
                 </div>
@@ -66,7 +66,7 @@ const Risks = () => {
                             <button
                                 key={idx}
                                 onClick={() => setActiveRisk(idx)}
-                                className={`w-full p-6 bg-white rounded-2xl border-2 text-left transition-all duration-300 flex items-center justify-between group ${activeRisk === idx ? risk.color + ' shadow-lg translate-x-4' : 'border-transparent hover:border-gray-100 shadow-sm'}`}>
+                                className={`w-full p-5 md:p-6 bg-white rounded-2xl border-2 text-left transition-all duration-300 flex items-center justify-between group ${activeRisk === idx ? risk.color + ' shadow-lg translate-x-0 md:translate-x-4' : 'border-transparent hover:border-gray-100 shadow-sm'}`}>
                                 <div className="flex items-center space-x-4">
                                     <div className={`p-3 rounded-xl ${activeRisk === idx ? risk.bg : 'bg-gray-100'}`}>
                                         {risk.icon}
@@ -87,16 +87,16 @@ const Risks = () => {
 
                     {/* Risk Detail */}
                     <div className="lg:col-span-7">
-                        <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden min-h-[450px] flex flex-col border border-gray-100">
-                            <div className="h-3 w-full bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] opacity-20"></div>
-                            <div className="p-10 flex-grow">
-                                <div className="flex items-center space-x-6 mb-10">
-                                    <div className={`w-20 h-20 rounded-2xl flex items-center justify-center ${risks[activeRisk].bg}`}>
+                        <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden min-h-[auto] lg:min-h-[450px] flex flex-col border border-gray-100">
+                            <div className="h-2 md:h-3 w-full bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] opacity-20"></div>
+                            <div className="p-6 md:p-10 flex-grow">
+                                <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 mb-8 md:mb-10 text-center sm:text-left">
+                                    <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center shrink-0 ${risks[activeRisk].bg}`}>
                                         {risks[activeRisk].icon}
                                     </div>
                                     <div>
-                                        <h4 className="text-3xl font-extrabold text-[#2076C7]">{risks[activeRisk].title}</h4>
-                                        <p className="text-sm font-bold text-[#1CADA3] uppercase tracking-wider mt-1">Impact Analysis</p>
+                                        <h4 className="text-2xl md:text-3xl font-extrabold text-[#2076C7]">{risks[activeRisk].title}</h4>
+                                        <p className="text-xs md:text-sm font-bold text-[#1CADA3] uppercase tracking-wider mt-1">Impact Analysis</p>
                                     </div>
                                 </div>
 
@@ -106,12 +106,12 @@ const Risks = () => {
                                         <p className="text-gray-600 text-lg leading-relaxed font-medium">{risks[activeRisk].description}</p>
                                     </div>
 
-                                    <div className={`p-8 rounded-3xl border-2 border-dashed ${risks[activeRisk].color} bg-white relative mt-12`}>
-                                        <div className={`absolute -top-4 left-8 px-5 py-2 rounded-full text-xs font-black text-white bg-gradient-to-r from-[#2076C7] to-[#1CADA3] shadow-lg flex items-center space-x-2`}>
-                                            <CheckCircle2 className="w-4 h-4" />
+                                    <div className={`p-6 md:p-8 rounded-3xl border-2 border-dashed ${risks[activeRisk].color} bg-white relative mt-10 md:mt-12`}>
+                                        <div className={`absolute -top-4 left-1/2 -translate-x-1/2 sm:left-8 sm:translate-x-0 px-5 py-2 rounded-full text-[10px] md:text-xs font-black text-white bg-gradient-to-r from-[#2076C7] to-[#1CADA3] shadow-lg flex items-center space-x-2 whitespace-nowrap`}>
+                                            <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4" />
                                             <span>MITIGATION STRATEGY</span>
                                         </div>
-                                        <p className="text-[#0B1C2E] mt-4 leading-relaxed font-bold text-lg">
+                                        <p className="text-[#0B1C2E] mt-6 sm:mt-4 leading-relaxed font-bold text-base md:text-lg">
                                             {risks[activeRisk].mitigation}
                                         </p>
                                         <ul className="mt-8 space-y-4">

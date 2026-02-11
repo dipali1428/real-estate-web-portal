@@ -77,7 +77,7 @@ const FAQ = () => {
                                     : 'border-transparent shadow-[0_10px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.05)] hover:border-[#EDF9F8]'
                                     }`}>
                                 <button
-                                    className="w-full px-10 py-8 text-left flex justify-between items-center bg-white"
+                                    className="w-full px-5 md:px-10 py-6 md:py-8 text-left flex justify-between items-center bg-white"
                                     onClick={() => setOpenIndex(openIndex === idx ? -1 : idx)}>
                                     <div className="flex flex-col items-start gap-4">
                                         <span className={`text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-[0.2em] transition-all duration-300 ${openIndex === idx ? 'bg-[#2076C7] text-white' : 'bg-[#EDF9F8] text-[#1CADA3]'
@@ -99,7 +99,7 @@ const FAQ = () => {
 
                                 <div className={`overflow-hidden transition-all duration-500 ease-in-out ${openIndex === idx ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
                                     }`}>
-                                    <div className="px-10 pb-10 pt-2">
+                                    <div className="px-5 md:px-10 pb-6 md:pb-10 pt-2">
                                         <div className="border-t border-gray-100 pt-8">
                                             <p className="text-lg text-gray-600 leading-relaxed font-medium">
                                                 {faq.answer}

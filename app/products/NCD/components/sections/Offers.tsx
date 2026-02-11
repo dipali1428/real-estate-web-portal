@@ -16,10 +16,10 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'Open': return 'bg-[#1CADA3] text-[#1CADA3] bg-opacity-10';
-            case 'Upcoming': return 'bg-[#2076C7] text-[#2076C7] bg-opacity-10';
-            case 'Closed': return 'bg-gray-500 text-gray-500 bg-opacity-10';
-            default: return 'bg-gray-500 text-gray-500 bg-opacity-10';
+            case 'Open': return 'bg-[#1CADA3] text-white';
+            case 'Upcoming': return 'bg-[#2076C7] text-white';
+            case 'Closed': return 'bg-gray-400 text-white';
+            default: return 'bg-gray-400 text-white';
         }
     };
 
@@ -28,7 +28,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
 
     return (
         <section className="py-14 bg-slate-50 " id="offers">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="container-custom">
 
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-10 pt-6">
@@ -42,14 +42,14 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                 </div>
 
                 {/* Filters */}
-                <div className="flex justify-center mb-10">
-                    <div className="inline-flex bg-white p-1 rounded-full border border-slate-200">
+                <div className="flex justify-center mb-10 px-2">
+                    <div className="flex flex-wrap justify-center gap-2 bg-white p-2 rounded-2xl border border-slate-200">
                         {['All', 'Open', 'Upcoming', 'Closed'].map(status => (
                             <button
                                 key={status}
                                 onClick={() => setFilter(status)}
-                                className={`px-6 py-2 rounded-full text-sm font-medium transition ${filter === status
-                                    ? 'bg-[#2076C7] text-white shadow-sm'
+                                className={`px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${filter === status
+                                    ? 'bg-[#2076C7] text-white shadow-md'
                                     : 'text-slate-500 hover:text-slate-800'
                                     }`}>
                                 {status}
@@ -65,7 +65,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                         {filteredOffers.map((offer, idx) => (
                             <div
                                 key={idx}
-                                className="bg-white rounded-2xl p-6
+                                className="bg-white rounded-2xl p-5 md:p-6
                                            border border-slate-200
                                            shadow-[0_8px_24px_rgba(0,0,0,0.04)]
                                            hover:shadow-[0_14px_32px_rgba(0,0,0,0.06)]
@@ -96,43 +96,43 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                             </span>
                                         </div>
 
-                                        <h3 className="text-lg md:text-xl font-semibold text-slate-900">
+                                        <h3 className="text-lg md:text-xl font-bold text-[#0B1C2E]">
                                             {offer.title}
                                         </h3>
-                                        <p className="text-sm text-slate-500 font-medium mb-5">
+                                        <p className="text-sm text-slate-500 font-semibold mb-5">
                                             {offer.issuer}
                                         </p>
 
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                                             <div>
-                                                <div className="text-xs uppercase text-slate-400 font-medium mb-1">
-                                                    Interest
+                                                <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
+                                                    Returns
                                                 </div>
-                                                <div className="text-xl font-semibold text-[#1CADA3]">
+                                                <div className="text-xl font-black text-[#1CADA3]">
                                                     {offer.interest}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div className="text-xs uppercase text-slate-400 font-medium mb-1">
+                                                <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
                                                     Tenure
                                                 </div>
-                                                <div className="text-base font-medium text-slate-700">
+                                                <div className="text-base font-bold text-slate-700">
                                                     {offer.tenure}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div className="text-xs uppercase text-slate-400 font-medium mb-1">
+                                                <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
                                                     Min Inv.
                                                 </div>
-                                                <div className="text-base font-medium text-slate-700">
+                                                <div className="text-base font-bold text-slate-700">
                                                     {offer.minInvest}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div className="text-xs uppercase text-slate-400 font-medium mb-1">
+                                                <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
                                                     Payout
                                                 </div>
-                                                <div className="text-base font-medium text-slate-700">
+                                                <div className="text-base font-bold text-slate-700">
                                                     {offer.payout}
                                                 </div>
                                             </div>
@@ -180,7 +180,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
 
                             {/* Active Issues */}
                             <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-[0_6px_18px_rgba(0,0,0,0.05)] relative">
-                                <div className="absolute top-0 right-0 bg-slate-800 text-white text-[10px] px-2 py-1 rounded-bl-lg">
+                                <div className="absolute top-0 right-0 bg-[#1CADA3] text-white text-[10px] px-2 py-1 rounded-bl-lg">
                                     Live
                                 </div>
                                 <h4 className="font-semibold text-slate-800 mb-4 flex items-center">
@@ -224,11 +224,11 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                             <Calculator isWidget={true} />
 
                             {/* Trust */}
-                            <div className="bg-slate-800 p-5 rounded-xl text-white text-center">
+                            <div className="bg-[#1CADA3] p-5 rounded-xl text-white text-center shadow-lg shadow-[#1CADA3]/20">
                                 <h5 className="text-xs font-semibold uppercase tracking-wide mb-1">
                                     Trusted by 50K+ Investors
                                 </h5>
-                                <p className="text-[11px] text-white/70">
+                                <p className="text-[11px] text-white/90">
                                     SEBI regulated & CRISIL rated products only
                                 </p>
                             </div>
@@ -237,7 +237,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                     </div>
                 </div>
             </div>
-        </section>
+        </section >
     );
 };
 

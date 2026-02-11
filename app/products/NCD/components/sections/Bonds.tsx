@@ -55,40 +55,40 @@ const Bonds = () => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                     {bondTypes.map((bond, idx) => (
-                        <div key={idx} className={`rounded-[2.5rem] p-10 border ${bond.borderColor} bg-white shadow-sm hover:shadow-xl transition-all duration-300 group relative overflow-hidden`}>
+                        <div key={idx} className={`rounded-[2rem] p-6 md:p-8 border ${bond.borderColor} bg-white shadow-sm hover:shadow-xl transition-all duration-300 group relative overflow-hidden`}>
                             {/* Subtle Brand Gradient Background */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#2076C7]/5 to-transparent rounded-bl-full pointer-events-none" />
 
                             <div className="relative z-10">
-                                <div className="flex items-start justify-between mb-8">
+                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
                                     <div>
-                                        <div className="text-xs font-black text-[#1CADA3] uppercase tracking-wider mb-2 bg-[#1CADA3]/10 px-3 py-1 rounded-full inline-block">{bond.subtitle}</div>
-                                        <h3 className="text-3xl font-extrabold text-[#2076C7] mb-3">{bond.title}</h3>
+                                        <div className="text-[10px] font-black text-[#1CADA3] uppercase tracking-wider mb-2 bg-[#1CADA3]/10 px-3 py-1 rounded-full inline-block">{bond.subtitle}</div>
+                                        <h3 className="text-xl md:text-2xl font-bold text-[#0B1C2E] mb-2">{bond.title}</h3>
                                     </div>
-                                    <div className="w-14 h-14 bg-[#F8FBFE] rounded-2xl border border-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                        <Landmark className="w-7 h-7 text-[#2076C7]" />
+                                    <div className="w-10 h-10 md:w-12 md:h-12 bg-[#F8FBFE] rounded-xl border border-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                                        <Landmark className="w-5 h-5 md:w-6 md:h-6 text-[#2076C7]" />
                                     </div>
                                 </div>
 
-                                <p className="text-gray-600 leading-relaxed mb-8 text-lg font-medium">
+                                <p className="text-gray-600 leading-relaxed mb-6 text-sm md:text-base font-medium">
                                     {bond.description}
                                 </p>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
                                     {bond.features.map((feature, fIdx) => (
-                                        <div key={fIdx} className="bg-[#F8FBFE] p-4 rounded-2xl flex flex-col items-center text-center gap-3 border border-blue-50/50">
+                                        <div key={fIdx} className="bg-[#F8FBFE] p-3 rounded-xl flex flex-col items-center text-center gap-2 border border-blue-50/50">
                                             {feature.icon}
-                                            <span className="text-xs font-bold text-[#2076C7]">{feature.text}</span>
+                                            <span className="text-[10px] md:text-xs font-bold text-[#2076C7]">{feature.text}</span>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="bg-gray-50 rounded-2xl p-6 mb-8 border border-gray-100">
-                                    <ul className="space-y-3">
+                                <div className="bg-gray-50 rounded-xl p-5 mb-6 border border-gray-100">
+                                    <ul className="space-y-2.5">
                                         {bond.details.map((detail, dIdx) => (
-                                            <li key={dIdx} className="flex items-start text-sm text-gray-700 font-bold">
+                                            <li key={dIdx} className="flex items-start text-xs text-gray-700 font-bold">
                                                 <span className="mr-3 text-[#2076C7] mt-[2px]">₹</span>
                                                 {detail}
                                             </li>

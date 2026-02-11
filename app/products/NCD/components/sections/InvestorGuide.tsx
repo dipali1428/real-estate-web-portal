@@ -33,7 +33,7 @@ const InvestorGuide = () => {
     ];
 
     return (
-        <section className="py-16 bg-[#F8FBFE]" id="investor-guide">
+        <section className="py-10 bg-[#F8FBFE]" id="investor-guide">
             <div className="container-custom">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">

@@ -90,7 +90,7 @@ const Calculator = ({ isWidget = false }) => {
                                     <button
                                         key={freq}
                                         onClick={() => setFrequency(freq)}
-                                        className={`py-3 rounded-xl text-xs font-black border-2 transition-all ${frequency === freq
+                                        className={`py-3 rounded-xl text-[10px] sm:text-xs font-black border-2 transition-all ${frequency === freq
                                             ? 'bg-[#1CADA3] text-white border-[#1CADA3] shadow-lg shadow-[#1CADA3]/20'
                                             : 'bg-white text-gray-400 border-gray-100 hover:border-[#1CADA3]'
                                             }`}
@@ -213,8 +213,8 @@ const Calculator = ({ isWidget = false }) => {
     return (
         <section className={sectionClass} id="calculator">
             <div className={wrapperClass}>
-                <div className="text-center max-w-2xl mx-auto mb-8">
-                    <h2 className="text-3xl font-extrabold text-[#2076C7] mb-3">
+                <div className="text-center max-w-2xl mx-auto mb-8 px-4">
+                    <h2 className="text-2xl md:text-3xl font-extrabold text-[#2076C7] mb-3">
                         NCD Returns <span className="heading-gradient">Calculator</span>
                     </h2>
                     <div className="w-24 h-1 mx-auto bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>

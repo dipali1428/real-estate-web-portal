@@ -1,4 +1,5 @@
 ﻿import { Receipt, Calculator as CalcIcon, Percent, FileText, ArrowRight } from 'lucide-react';
+import TaxGuideContent from './TaxGuideContent';
 
 const TaxBenefits = () => {
     const taxData = [
@@ -7,16 +8,20 @@ const TaxBenefits = () => {
         { type: 'Long Term Capital Gains (LTCG)', rate: '10% (Without Indexation)', tenure: '> 12 Months', detail: 'Applicable if NCD sold on stock exchange after 1 year of holding' },
     ];
 
+    const handleDownload = () => {
+        window.print();
+    };
+
     return (
         <section className="py-24 bg-white" id="tax">
             <div className="container-custom">
                 {/* Centered Heading Section */}
-                <div className="text-center max-w-3xl mx-auto mb-20">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                <div className="text-center max-w-3xl mx-auto mb-12 md:mb-20 px-4">
+                    <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
                         Tax Benefits & Efficiency
                     </h2>
-                    <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
-                    <p className="text-gray-600 text-lg font-medium leading-relaxed">
+                    <div className="w-20 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
+                    <p className="text-gray-600 text-base md:text-lg font-medium leading-relaxed">
                         Understanding the tax treatment of NCDs is crucial for maximizing your post-tax returns. NCDs offer attractive capital gains taxation compared to traditional FDs.
                     </p>
                 </div>
@@ -25,12 +30,12 @@ const TaxBenefits = () => {
                     {/* Left Section */}
                     <div className="lg:w-2/5 flex flex-col justify-between h-full">
                         <div className="space-y-6">
-                            <div className="group p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 h-full">
+                            <div className="group p-6 md:p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 h-full">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <div className="bg-[#1CADA3] text-white p-3 rounded-2xl shadow-lg shadow-[#1CADA3]/20 flex items-center justify-center">
-                                        <Percent className="w-6 h-6" />
+                                    <div className="bg-[#1CADA3] text-white p-2.5 md:p-3 rounded-xl md:rounded-2xl shadow-lg shadow-[#1CADA3]/20 flex items-center justify-center">
+                                        <Percent className="w-5 h-5 md:w-6 md:h-6" />
                                     </div>
-                                    <h4 className="font-extrabold text-[#2076C7] text-xl flex items-center">
+                                    <h4 className="font-extrabold text-[#2076C7] text-lg md:text-xl flex items-center">
                                         Tax Efficient Alternative
                                     </h4>
                                 </div>
@@ -39,12 +44,12 @@ const TaxBenefits = () => {
                                 </p>
                             </div>
 
-                            <div className="group p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 h-full">
+                            <div className="group p-6 md:p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 h-full">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <div className="bg-[#2076C7] text-white p-3 rounded-2xl shadow-lg shadow-[#2076C7]/20 flex items-center justify-center">
-                                        <FileText className="w-6 h-6" />
+                                    <div className="bg-[#2076C7] text-white p-2.5 md:p-3 rounded-xl md:rounded-2xl shadow-lg shadow-[#2076C7]/20 flex items-center justify-center">
+                                        <FileText className="w-5 h-5 md:w-6 md:h-6" />
                                     </div>
-                                    <h4 className="font-extrabold text-[#2076C7] text-xl flex items-center">
+                                    <h4 className="font-extrabold text-[#2076C7] text-lg md:text-xl flex items-center">
                                         TDS Management
                                     </h4>
                                 </div>
@@ -55,7 +60,10 @@ const TaxBenefits = () => {
                         </div>
 
                         <div className="mt-10 flex justify-center lg:justify-start">
-                            <button className="flex items-center space-x-3 pl-5 text-[#2076C7] font-extrabold group hover:text-[#1CADA3] transition-colors">
+                            <button
+                                onClick={handleDownload}
+                                className="flex items-center space-x-3 pl-5 text-[#2076C7] font-extrabold group hover:text-[#1CADA3] transition-colors"
+                            >
                                 <span className="border-b-2 border-transparent group-hover:border-[#1CADA3]">
                                     Download Comprehensive Tax Guide
                                 </span>
@@ -66,11 +74,11 @@ const TaxBenefits = () => {
 
                     {/* Right Section */}
                     <div className="lg:w-3/5 w-full flex h-full">
-                        <div className="bg-gradient-to-br from-[#F8FBFE] via-white to-[#F0F7FF] rounded-[3rem] p-10 shadow-xl border border-blue-50 relative overflow-hidden w-full flex flex-col justify-between">
+                        <div className="bg-gradient-to-br from-[#F8FBFE] via-white to-[#F0F7FF] rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-10 shadow-xl border border-blue-50 relative overflow-hidden w-full flex flex-col justify-between">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-[#1CADA3]/5 rounded-full blur-[80px] pointer-events-none" />
 
-                            <h3 className="text-2xl text-slate-500 font-extrabold mb-8 flex items-center">
-                                <Receipt className="w-6 h-6 mr-3 text-[#2076C7]" />
+                            <h3 className="text-xl md:text-2xl text-slate-500 font-extrabold mb-6 md:mb-8 flex items-center">
+                                <Receipt className="w-5 h-5 md:w-6 md:h-6 mr-3 text-[#2076C7]" />
                                 Tax Treatment Table
                             </h3>
 
@@ -110,6 +118,11 @@ const TaxBenefits = () => {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Printable Tax Guide Content - Visible only during printing */}
+            <div className="hidden print:block print:static print:w-full print:h-auto">
+                <TaxGuideContent />
             </div>
         </section>
     );

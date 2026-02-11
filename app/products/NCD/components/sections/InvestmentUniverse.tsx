@@ -1,34 +1,14 @@
 ﻿'use client';
 
 import { useState } from 'react';
-import { Coins, Building2, Landmark, ShieldCheck, ArrowUpRight, TrendingUp, Info } from 'lucide-react';
+import { Landmark, ShieldCheck, ArrowUpRight, TrendingUp, Info } from 'lucide-react';
 
 const InvestmentUniverse = () => {
-    const [activeTab, setActiveTab] = useState<keyof typeof products>('NCDs');
-
-    const productCategories = [
-        { id: 'NCDs', name: 'NCDs', icon: <Landmark className="w-5 h-5" /> },
-        { id: 'SGBs', name: 'Sovereign Gold Bonds', icon: <Coins className="w-5 h-5" /> },
-        { id: '54EC', name: '54EC Bonds', icon: <Building2 className="w-5 h-5" /> },
+    const products = [
+        { issuer: 'Muthoot Finance', rating: 'AA+/AAA', returns: '9.25% - 11%', tenure: '24-60 Months', safety: 'High', type: 'Offers' },
+        { issuer: 'Edelweiss Financial', rating: 'AA/AA+', returns: '10.50%', tenure: '36 Months', safety: 'Moderate', type: 'Offers' },
+        { issuer: 'Ugro Capital', rating: 'A/A+', returns: '10.50%', tenure: '18-27 Months', safety: 'High Yield', type: 'Offers' },
     ];
-
-    const products = {
-        NCDs: [
-            { issuer: 'Muthoot Finance', rating: 'AA+/AAA', returns: '9.25% - 11%', tenure: '24-60 Months', safety: 'High', type: 'Offers' },
-            { issuer: 'Edelweiss Financial', rating: 'AA/AA+', returns: '10.50%', tenure: '36 Months', safety: 'Moderate', type: 'Offers' },
-            { issuer: 'Ugro Capital', rating: 'A/A+', returns: '10.50%', tenure: '18-27 Months', safety: 'High Yield', type: 'Offers' },
-        ],
-        SGBs: [
-            { issuer: 'Govt. of India', rating: 'Sovereign', returns: '2.5% + Gold Appreciation', tenure: '8 Years', safety: 'Highest', type: 'Bonds' },
-            { issuer: 'RBI Issued', rating: 'Sovereign', returns: 'Tax Free Maturity', tenure: '5 Year Lock-in', safety: 'Highest', type: 'Bonds' },
-            { issuer: 'Secondary Market', rating: 'Sovereign', returns: 'Market Linked', tenure: 'Tradable', safety: 'Highest', type: 'Bonds' },
-        ],
-        '54EC': [
-            { issuer: 'REC Limited', rating: 'AAA Rated', returns: 'Tax Exemption', tenure: '5 Years', safety: 'Highest', type: 'Bonds' },
-            { issuer: 'PFC Limited', rating: 'AAA Rated', returns: '5.25% Interest', tenure: '5 Years', safety: 'Highest', type: 'Bonds' },
-            { issuer: 'IRFC Limited', rating: 'AAA Rated', returns: '100% Capital Safe', tenure: '5 Years', safety: 'Highest', type: 'Bonds' },
-        ]
-    };
 
     const handleLearnMore = (type: string) => {
         const sectionId = type === 'Offers' ? 'offers' : 'bonds';
@@ -38,36 +18,20 @@ const InvestmentUniverse = () => {
     return (
         <section className="py-12" id="investment-universe">
             <div className="container-custom">
-                <div className="text-center max-w-3xl mx-auto mb-12">
+                <div className="text-center max-w-3xl mx-auto mb-12 px-4">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
                         Explore Our Investment Universe
                     </h2>
                     <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
                     <p className="text-lg text-gray-600 font-medium">
-                        A curated selection of the most trusted, high-yield financial instruments available in the Indian market today.
+                        A curated selection of the most trusted, high-yield Non-Convertible Debentures (NCDs) available in the Indian market today.
                     </p>
                 </div>
 
-                {/* Tabbed Navigation */}
-                <div className="flex flex-wrap justify-center gap-4 mb-12">
-                    {productCategories.map((cat) => (
-                        <button
-                            key={cat.id}
-                            onClick={() => setActiveTab(cat.id as keyof typeof products)}
-                            className={`flex items-center space-x-3 px-8 py-4 rounded-2xl font-bold transition-all duration-300 ${activeTab === cat.id
-                                ? 'bg-[#2076C7] text-white shadow-xl shadow-[#2076C7]/20 scale-105'
-                                : 'bg-white text-gray-500 hover:bg-[#EDF9F8] hover:text-[#1CADA3] shadow-sm'
-                                }`}>
-                            {cat.icon}
-                            <span>{cat.name}</span>
-                        </button>
-                    ))}
-                </div>
-
                 {/* Product Area */}
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-6xl mx-auto px-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {products[activeTab].map((product, idx) => (
+                        {products.map((product, idx) => (
                             <div
                                 key={idx}
                                 className="relative bg-white
@@ -104,21 +68,23 @@ const InvestmentUniverse = () => {
                                 </div>
 
                                 {/* Details */}
-                                <div className="space-y-5 mb-8">
-                                    <div className="flex justify-between items-end border-b border-gray-100 pb-3">
-                                        <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">
-                                            Returns
+                                <div className="space-y-4 mb-8">
+                                    <div className="border-b border-gray-100 pb-3">
+                                        <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-1">
+                                            Returns & Benefits
                                         </span>
-                                        <span className="text-xl font-black text-[#2076C7]">
-                                            {product.returns}
-                                        </span>
+                                        <div className="flex flex-col gap-1 overflow-hidden">
+                                            <span className="text-sm sm:text-lg md:text-xl font-black text-[#2076C7] leading-tight break-words">
+                                                {product.returns}
+                                            </span>
+                                        </div>
                                     </div>
 
                                     <div className="flex justify-between items-center text-sm">
-                                        <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">
+                                        <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider">
                                             Tenure
                                         </span>
-                                        <span className="font-bold text-[#0B1C2E]">
+                                        <span className="font-bold text-[#0B1C2E] text-xs sm:text-sm">
                                             {product.tenure}
                                         </span>
                                     </div>

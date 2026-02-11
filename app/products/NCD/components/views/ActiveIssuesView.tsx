@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { ncdData } from '../../data/ncdData';
-import { Search } from 'lucide-react';
+import { Search, ArrowLeft } from 'lucide-react';
 
 interface ActiveIssuesViewProps {
     onInvest: (id: string) => void;
     onApply: (id: string) => void;
+    onBack: () => void;
 }
 
-export default function ActiveIssuesView({ onInvest, onApply }: ActiveIssuesViewProps) {
+export default function ActiveIssuesView({ onInvest, onApply, onBack }: ActiveIssuesViewProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('All');
 
@@ -26,20 +27,27 @@ export default function ActiveIssuesView({ onInvest, onApply }: ActiveIssuesView
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'Open': return 'bg-[#1CADA3] text-[#1CADA3] bg-opacity-10';
-            case 'Upcoming': return 'bg-[#2076C7] text-[#2076C7] bg-opacity-10';
-            case 'Closed': return 'bg-gray-500 text-gray-500 bg-opacity-10';
-            default: return 'bg-gray-500 text-gray-500 bg-opacity-10';
+            case 'Open': return 'bg-[#1CADA3] text-white';
+            case 'Upcoming': return 'bg-[#2076C7] text-white';
+            case 'Closed': return 'bg-gray-400 text-white';
+            default: return 'bg-gray-400 text-white';
         }
     };
 
     return (
         <div className="py-12">
             <div className="container-custom">
+                {/* Back Button */}
+                <button
+                    onClick={onBack}
+                    className="flex items-center gap-2 text-[#2076C7] font-bold mb-8 hover:gap-3 transition-all group">
+                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                    Back to NCD Overview
+                </button>
                 {/* Page Header */}
                 <div className="mb-12 text-center max-w-3xl mx-auto">
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-[#0B1C2E] mb-6">
-                        All Active <span className="heading-gradient">NCD Issues</span>
+                    <h1 className="text-3xl md:text-4xl font-bold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                        All Active NCD Issues
                     </h1>
                     <p className="text-lg text-gray-600">
                         Explore our comprehensive list of high-yield Non-Convertible Debentures.
@@ -48,7 +56,7 @@ export default function ActiveIssuesView({ onInvest, onApply }: ActiveIssuesView
                 </div>
 
                 {/* Controls */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-12 flex flex-col md:flex-row gap-6 justify-between items-center">
+                <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100 mb-12 flex flex-col lg:flex-row gap-6 justify-between items-center mx-4 sm:mx-0">
                     {/* Search */}
                     <div className="relative w-full md:w-96">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -62,12 +70,12 @@ export default function ActiveIssuesView({ onInvest, onApply }: ActiveIssuesView
                     </div>
 
                     {/* Filter Pills */}
-                    <div className="flex gap-2 bg-gray-50 p-1.5 rounded-xl">
+                    <div className="flex flex-wrap justify-center gap-2 bg-gray-50 p-2 rounded-xl w-full sm:w-auto">
                         {['All', 'Open', 'Upcoming', 'Closed'].map(status => (
                             <button
                                 key={status}
                                 onClick={() => setFilterStatus(status)}
-                                className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${filterStatus === status
+                                className={`px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all flex-1 sm:flex-none ${filterStatus === status
                                     ? 'bg-[#1CADA3] text-white shadow-md'
                                     : 'text-gray-500 hover:text-[#0B1C2E]'
                                     }`}
@@ -87,23 +95,23 @@ export default function ActiveIssuesView({ onInvest, onApply }: ActiveIssuesView
                                     <div className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider ${getStatusColor(ncd.status)}`}>
                                         {ncd.status}
                                     </div>
-                                    <div className="bg-gray-50 px-2 py-1 rounded-md text-xs font-bold text-gray-500 flex items-center">
-                                        <span className="text-[#1CADA3] mr-1">₹˜…</span> {ncd.rating}
+                                    <div className="bg-gray-50 px-2 py-1 rounded-md text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center">
+                                        <span className="text-[#1CADA3] mr-1">★</span> {ncd.rating}
                                     </div>
                                 </div>
 
                                 <div className="mb-6 flex-grow">
                                     <h3 className="text-xl font-bold text-[#0B1C2E] mb-2 line-clamp-2">{ncd.title}</h3>
-                                    <p className="text-[#2076C7] font-bold text-sm mb-4">{ncd.issuer}</p>
+                                    <p className="text-slate-500 font-bold text-sm mb-4 tracking-tight">{ncd.issuer}</p>
 
                                     <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-xl p-4">
                                         <div>
-                                            <p className="text-[10px] text-gray-400 font-bold uppercase mb-1">Yield</p>
+                                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider mb-1">Returns</p>
                                             <p className="text-lg font-black text-[#1CADA3]">{ncd.interest}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[10px] text-gray-400 font-bold uppercase mb-1">Min Inv.</p>
-                                            <p className="text-base font-bold text-[#0B1C2E]">{ncd.minInvest}</p>
+                                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider mb-1">Min Inv.</p>
+                                            <p className="text-base font-extrabold text-[#0B1C2E]">{ncd.minInvest}</p>
                                         </div>
                                     </div>
                                 </div>

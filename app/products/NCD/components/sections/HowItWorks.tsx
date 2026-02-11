@@ -31,13 +31,13 @@ const HowItWorks = () => {
         <section className="py-24 bg-[#F8FBFE] relative overflow-hidden">
             <div className="container-custom relative z-10">
                 {/* Section Heading */}
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                <div className="text-center max-w-3xl mx-auto mb-16 px-4">
+                    <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
                         Invest in 3 Simple Steps
                     </h2>
-                    <div className="w-24 h-1 mx-auto bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
+                    <div className="w-20 h-1 mx-auto bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
 
-                    <p className="text-lg text-gray-600 font-medium leading-relaxed">
+                    <p className="text-sm md:text-lg text-gray-600 font-medium leading-relaxed">
                         Start your wealth generation journey today. Our seamless platform ensures a hassle-free experience.
                     </p>
                 </div>
@@ -52,7 +52,7 @@ const HowItWorks = () => {
                     {steps.map((step) => (
                         <div
                             key={step.id}
-                            className="group relative bg-white p-10 rounded-3xl
+                            className="group relative bg-white p-6 md:p-10 rounded-3xl
                                        border border-gray-100
                                        shadow-[0_10px_30px_rgba(0,0,0,0.06)]
                                        hover:shadow-[0_20px_55px_rgba(32,118,199,0.15)]
@@ -72,11 +72,11 @@ const HowItWorks = () => {
 
                             {/* Icon */}
                             <div
-                                className={`w-20 h-20 mx-auto rounded-3xl
+                                className={`w-16 h-16 md:w-20 md:h-20 mx-auto rounded-2xl md:rounded-3xl
                                             ${step.color}/10
-                                            flex items-center justify-center mb-8
+                                            flex items-center justify-center mb-6 md:mb-8
                                             group-hover:scale-105 transition-transform`}>
-                                <div className={`p-4 rounded-2xl ${step.color} shadow-md`}>
+                                <div className={`p-3 md:p-4 rounded-xl md:rounded-2xl ${step.color} shadow-md`}>
                                     {step.icon}
                                 </div>
                             </div>
