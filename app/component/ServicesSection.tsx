@@ -68,7 +68,7 @@ const ServicesSection = () => {
         { name: "Mutual Funds", slug: "mutualfunds" },
         { name: "Unlisted", slug: "unlisted" },
         { name: "PMS & AIF", slug: "pms" },
-        { name: "NCD Bonds", slug: "ncd-bonds" },
+        { name: "NCD Bonds", slug: "NCD" },
         { name: "Fixed Deposits", slug: "FD" },
         { name: "Real Estate", slug: "RealEstate" },
         // { name: "Alternative Investment Fund", slug: "alternative-investment-fund" },
