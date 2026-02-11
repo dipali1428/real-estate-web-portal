@@ -91,17 +91,16 @@ const ServicesSection = () => {
   return (
     <section
       id="services"
-      className="relative py-16 bg-linear-to-br from-gray-50 to-white text-white overflow-hidden"
-    >
+      className="relative py-16 bg-linear-to-br from-gray-50 to-white text-white overflow-hidden">
       {/* Background Pattern */}
-      <div 
+      <div
         className="absolute inset-0 opacity-[0.02]"
         style={{
           backgroundImage: "linear-gradient(to right, #f0f0f0 1px, transparent 1px), linear-gradient(to bottom, #f0f0f0 1px, transparent 1px)",
           backgroundSize: "50px 50px"
         }}
       />
-      
+
       {/* Gradient Orbs */}
       {/* <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" /> */}
       {/* <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-r from-[#1CADA3]/20 to-[#2076C7]/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" /> */}
@@ -128,8 +127,7 @@ const ServicesSection = () => {
             <div
               key={service.id}
               className="group relative bg-white rounded-2xl shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-1 flex flex-col items-center text-center p-6 hover:shadow-xl hover:shadow-[#2076C7]/10 cursor-pointer border border-gray-100"
-              onClick={() => handleServiceCardClick(service.id)}
-            >
+              onClick={() => handleServiceCardClick(service.id)}>
               {/* Icon Section */}
               <div className="relative mb-6">
                 <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-5 rounded-full flex justify-center items-center shadow-md">
@@ -144,11 +142,11 @@ const ServicesSection = () => {
                 <h3 className="text-xl md:text-2xl font-bold mb-3 text-gray-800 group-hover:text-[#2076C7] transition-colors duration-300 text-center">
                   {service.title}
                 </h3>
-                
+
                 <p className="text-gray-600 text-sm md:text-base mb-6 leading-relaxed text-center max-w-xs">
                   {service.description}
                 </p>
-                
+
                 {/* Service Items List */}
                 <div className="w-full">
                   <h4 className="text-base font-semibold text-gray-700 mb-3 text-center">
@@ -156,7 +154,7 @@ const ServicesSection = () => {
                   </h4>
                   <ul className="w-full">
                     {service.items.map((item, idx) => (
-                      <li 
+                      <li
                         key={idx}
                         onMouseEnter={() => setHoveredItem(`${service.id}-${item.slug}`)}
                         onMouseLeave={() => setHoveredItem(null)}
