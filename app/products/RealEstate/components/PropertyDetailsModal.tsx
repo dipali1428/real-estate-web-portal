@@ -64,8 +64,12 @@ const PropertyInfographic = ({ property }: { property: any }) => {
                             <h2 className="text-xl font-black text-blue-900 leading-none">{property.title?.split('-')[0].trim()}</h2>
                             <p className="text-[10px] font-bold tracking-widest text-slate-600 mt-1 uppercase">{property.location}</p>
                         </div>
-                        <div className="ml-8">
+                        {/* <div className="ml-8">
+                             
                             <div className="text-2xl font-black italic"><span className="text-blue-600">Quikr</span><span className="text-orange-500">PropX</span></div>
+                        </div> */}
+                        <div className="ml-8">
+                            <img src="/logo.png" alt="Infinity Arthvishva" className="h-12 w-auto" />
                         </div>
                     </div>
 

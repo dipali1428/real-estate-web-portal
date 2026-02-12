@@ -47,8 +47,15 @@ export default function Home() {
         <section id="about" className="bg-white scroll-mt-24">
           <AboutSection onSpeakWithAdvisor={() => setShowInquiryModal(true)} />
         </section>
-
+ {/* Disclaimer Section */}
+        <section className="bg-slate-100 border-t border-slate-200">
+          <div className="max-w-[1600px] mx-auto px-6 py-8">
+            <p className="text-xs text-slate-700 leading-relaxed">
+              <strong className="text-slate-800">Disclaimer:</strong>The information provided on this website is for general informational purposes only. Details related to the developer, associated entities, and their past experience are indicative in nature and subject to change without prior notice. References to completed, ongoing, or upcoming projects do not constitute any assurance of future performance. Any information regarding connectivity, infrastructure, surroundings, or development potential is based on current understanding and publicly available sources and may vary over time. Such statements should not be construed as guarantees of future growth or returns. This content does not constitute a legal offer, financial advice, or commitment of any kind. Prospective buyers are advised to independently verify all information with relevant authorities before making any decision. </p>
+              </div>
+</section>
       </div>
+      
       {/* <BackButton /> */}
 
       {/* Property Details Modal */}

@@ -367,6 +367,9 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
                                         <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider block mb-1">Price</span>
                                         <span className="text-lg font-bold text-teal-600">
                                             ₹{property.price.toLocaleString('en-IN')}
+                                              {property.price && (
+                                                    <span className="text-black font-bold text-sm leading-none shrink-0 cursor-help pt-1" title="Star Marked — Potential for future value appreciation">*</span>
+                                                )}
                                         </span>
                                     </div>
                                     {property.status !== 'closed' && (

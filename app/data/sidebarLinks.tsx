@@ -82,6 +82,7 @@ export const sidebarLinks = {
 
     HR: [
         { label: "Dashboard", href: "/hr", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
+        { label: "Profile", href: "/hr/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "Website Enquiry", href: "/hr/websiteenquiry", icon: <Megaphone className="h-5 w-5 text-neutral-700" /> },
         { label: "Career Management", href: "/hr/careermanagement", icon: < MessageSquare className="h-5 w-5 text-neutral-700" /> },
     ],

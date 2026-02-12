@@ -163,6 +163,8 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
         else if (role === "DEPARTMENTHEAD") router.push("/departmenthead");
         else if (role === "RM") router.push("/rm");
         else if (role === "ACCOUNTS") router.push("/accounts");
+        else if (role === "CUSTOMER") router.push("/customer");
+        else if (role === "HR") router.push("/hr");
         else router.push("/dashboard");
     };
 

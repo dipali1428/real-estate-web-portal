@@ -302,7 +302,11 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                                             <p className="text-[10px] text-slate-400">Total Value</p>
                                             <span className="text-lg font-extrabold text-slate-800">
                                                 ₹{property.price.toLocaleString('en-IN')}
+                                                 {property.price && (
+                                                    <span className="text-black font-bold text-sm leading-none shrink-0 cursor-help pt-1" title="Star Marked — Potential for future value appreciation">*</span>
+                                                )}
                                             </span>
+                                           
                                         </div>
                                         <button
                                             onClick={() => onPropertySelect && onPropertySelect(String(property.id))}
