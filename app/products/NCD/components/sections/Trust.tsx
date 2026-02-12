@@ -37,16 +37,12 @@ const Trust = () => {
     ];
 
     return (
-        <section className="py-12 md:py-16 bg-white border-b border-gray-100">
+        <section className="py-12 md:py-16 mx-20 bg-white border-b border-gray-100">
             <div className="container-custom">
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-10 md:mb-14">
                     <h2 className="text-2xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                        Why Choose{' '}
-                        <span className="bg-clip-text text-transparent bg-linear-to-r from-[#2076C7] to-[#1CADA3]">
-                            Infinity Arthvishva
-                        </span>
-                        ?
+                        Why Choose Infinity Arthvishva?
                     </h2>
                     <div className="w-20 h-1 mx-auto bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
 

@@ -22,7 +22,7 @@ const Header = () => {
   const [isInvestmentOpen, setIsInvestmentOpen] = useState(false);
   const [isRealEstateOpen, setIsRealEstateOpen] = useState(false);
   const [isUnlistedOpen, setIsUnlistedOpen] = useState(false);
-  const { openLogin, openPartner } = useModal();
+  const { openLogin, openPartner, openSignup } = useModal();
 
   // const router = useRouter();
   // const token = useClientCookie("authToken");
@@ -500,6 +500,14 @@ const Header = () => {
               className="font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-3 xl:px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
               Login
             </motion.button>
+            {/* NEW SIGNUP BUTTON */}
+            <motion.button
+              onClick={openSignup}
+              whileHover={{ scale: 1.07, y: -2 }}
+              transition={{ type: "tween", duration: 0.1 }}
+              className="font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-4 xl:px-5 py-2 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer text-sm xl:text-base whitespace-nowrap">
+              Signup
+            </motion.button>
 
             <motion.button
               onClick={openPartner}
@@ -794,6 +802,11 @@ const Header = () => {
                   }}
                   className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition w-[80%] max-w-xs mx-auto" >
                   Login
+                </button>
+                <button
+                  onClick={() => { openSignup(); setIsOpen(false); }}
+                  className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-4 py-2 rounded-lg shadow-md w-[80%] max-w-xs mx-auto" >
+                  Signup
                 </button>
                 <button
                   onClick={() => {

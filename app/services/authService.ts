@@ -17,6 +17,17 @@ interface RegisterPayload {
     registerToken: string; // 🔐 REQUIRED AFTER OTP VERIFY
 }
 
+interface SignupPayload {
+    role: string;
+    name: string;
+    email: string;
+    mobile: string;
+    state: string;
+    city: string;
+    password: string;
+    confirm_password: string;
+}
+
 interface CibilPayload {
     fullName: string;
     email: string;
@@ -35,6 +46,11 @@ export const AuthService = {
     // 🔹 REGISTER (FINAL STEP)
     register: async (formData: RegisterPayload) => {
         const response = await api.post("/api/auth/register", formData);
+        return response.data;
+    },
+
+    signup: async (formData: SignupPayload) => {
+        const response = await api.post("/api/auth/customer-register", formData);
         return response.data;
     },
 

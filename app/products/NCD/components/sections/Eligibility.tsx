@@ -18,49 +18,50 @@ const Eligibility = () => {
     ];
 
     return (
-        <section className="py-24 bg-gray-50" id="eligibility">
-            <div className="container-custom">
+        // Added px-4 to ensure side margins on mobile
+        <section className="py-16 md:py-24 bg-gray-50 px-4 sm:px-6 lg:px-8" id="eligibility">
+            <div className="container-custom mx-auto">
                 {/* Section 1: Who Can Invest */}
-                <div className="mb-20">
-                    <div className="text-center max-w-3xl mx-auto mb-12">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                <div className="mb-16 md:mb-20">
+                    <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
+                        <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
                             Who Can Invest
                         </h2>
-                        <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
+                        <div className="w-20 md:w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
 
-                        <p className="text-gray-600 leading-relaxed text-lg font-medium">
+                        <p className="text-gray-600 leading-relaxed text-base md:text-lg font-medium">
                             NCDs are open to a wide range of investors. Whether you are an individual looking for monthly income or a company seeking better yield for surplus funds, there's an NCD for you.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                         {groups.map((group, idx) => (
-                            <div key={idx} className="bg-white p-8 rounded-3xl border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center group">
-                                <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${idx % 2 === 0 ? 'bg-[#2076C7]/10 text-[#2076C7]' : 'bg-[#1CADA3]/10 text-[#1CADA3]'}`}>
+                            <div key={idx} className="bg-white p-6 md:p-8 rounded-3xl border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center group">
+                                <div className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mb-5 md:mb-6 group-hover:scale-110 transition-transform ${idx % 2 === 0 ? 'bg-[#2076C7]/10 text-[#2076C7]' : 'bg-[#1CADA3]/10 text-[#1CADA3]'}`}>
                                     {group.icon}
                                 </div>
-                                <h4 className="font-extrabold text-[#0B1C2E] mb-2 text-xl">{group.name}</h4>
+                                <h4 className="font-extrabold text-[#0B1C2E] mb-2 text-lg md:text-xl">{group.name}</h4>
                                 <p className="text-sm text-gray-500 font-medium leading-relaxed">{group.desc}</p>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="mb-24">
-                    <div className="bg-gradient-to-br from-[#F8FBFE] via-white to-[#F0F7FF] p-6 sm:p-10 md:p-12 lg:p-16 rounded-3xl md:rounded-[3rem] shadow-xl border border-blue-50 relative overflow-hidden">
+                <div className="mb-16 md:mb-24">
+                    <div className="bg-gradient-to-br from-[#F8FBFE] via-white to-[#F0F7FF] p-6 sm:p-10 md:p-12 lg:p-16 rounded-[2rem] md:rounded-[3rem] shadow-xl border border-blue-50 relative overflow-hidden">
                         {/* Abstract Background Design */}
-                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1CADA3]/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#2076C7]/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-[#1CADA3]/5 rounded-full blur-[80px] md:blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-[250px] md:w-[400px] h-[250px] md:h-[400px] bg-[#2076C7]/5 rounded-full blur-[70px] md:blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-                        <div className="text-center mb-10 relative z-10">
-                            <span className="text-[#2076C7] font-black text-[10px] uppercase tracking-[0.3em] mb-4 block">Quick Preparation</span>
-                            <h3 className="text-2xl md:text-4xl font-bold flex flex-col sm:flex-row items-center justify-center gap-4">
-                                <span className="bg-[#2076C7] p-2.5 rounded-xl shadow-lg shadow-[#2076C7]/20">
-                                    <FileText className="w-6 h-6 text-white" />
+                        <div className="text-center mb-8 md:mb-10 relative z-10">
+                            <span className="text-[#2076C7] font-black text-[10px] uppercase tracking-[0.3em] mb-3 md:mb-4 block">Quick Preparation</span>
+                            <h3 className="text-xl md:text-4xl font-bold flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4">
+                                <span className="bg-[#2076C7] p-2 md:p-2.5 rounded-xl shadow-lg shadow-[#2076C7]/20">
+                                    <FileText className="w-5 h-5 md:w-6 md:h-6 text-white" />
                                 </span>
                                 <span className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">Documents Required</span>
                             </h3>
-                            <p className="text-gray-500 font-medium mt-4 max-w-xl mx-auto italic text-sm">
+                            <p className="text-gray-500 font-medium mt-3 md:mt-4 max-w-xl mx-auto italic text-xs md:text-sm">
                                 Keep these documents ready in digital format for a smooth, paperless verification process.
                             </p>
                         </div>
@@ -72,13 +73,13 @@ const Eligibility = () => {
                                 { label: "Bank Account", detail: "Cancelled Cheque", desc: "With your name pre-printed", icon: <CreditCard className="w-5 h-5" /> },
                                 { label: "Demat Account", detail: "CMR / Statement", desc: "To credit your NCD units", icon: <Briefcase className="w-5 h-5" /> },
                             ].map((doc, idx) => (
-                                <div key={idx} className="bg-white border border-blue-50 p-6 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${idx % 2 === 0 ? 'bg-[#2076C7]' : 'bg-[#1CADA3]'} text-white shadow-lg ${idx % 2 === 0 ? 'shadow-[#2076C7]/20' : 'shadow-[#1CADA3]/20'}`}>
+                                <div key={idx} className="bg-white border border-blue-50 p-5 md:p-6 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${idx % 2 === 0 ? 'bg-[#2076C7]' : 'bg-[#1CADA3]'} text-white shadow-lg ${idx % 2 === 0 ? 'shadow-[#2076C7]/20' : 'shadow-[#1CADA3]/20'}`}>
                                         {doc.icon}
                                     </div>
-                                    <h5 className="text-[10px] font-black text-[#2076C7] uppercase tracking-widest mb-1">{doc.label}</h5>
-                                    <h4 className="text-base font-extrabold text-[#0B1C2E] mb-2">{doc.detail}</h4>
-                                    <p className="text-[11px] text-gray-400 font-medium">{doc.desc}</p>
+                                    <h5 className="text-[9px] md:text-[10px] font-black text-[#2076C7] uppercase tracking-widest mb-1">{doc.label}</h5>
+                                    <h4 className="text-sm md:text-base font-extrabold text-[#0B1C2E] mb-1 md:mb-2">{doc.detail}</h4>
+                                    <p className="text-[10px] md:text-[11px] text-gray-400 font-medium">{doc.desc}</p>
                                 </div>
                             ))}
                         </div>
@@ -86,38 +87,37 @@ const Eligibility = () => {
                 </div>
 
                 {/* Bottom: Process Visualization */}
-                <div className="text-center mb-16">
-                    <span className="text-[#2076C7] font-black text-xs uppercase tracking-[0.4em] mb-4 block">Simple Flow</span>
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                <div className="text-center mb-12 md:mb-16">
+                    <span className="text-[#2076C7] font-black text-[10px] md:text-xs uppercase tracking-[0.4em] mb-3 md:mb-4 block">Simple Flow</span>
+                    <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
                         4-Step Application Process
                     </h2>
-                    <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
-
-                    <p className="text-gray-600 font-medium max-w-xl mx-auto">Getting started with NCDs is simple, fast, and 100% digital with our hand-held support.</p>
+                    <div className="w-20 md:w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
+                    <p className="text-gray-600 font-medium max-w-xl mx-auto text-sm md:text-base">Getting started with NCDs is simple, fast, and 100% digital with our hand-held support.</p>
                 </div>
 
-                <div className="relative max-w-6xl mx-auto">
-                    {/* Connector Line (Desktop) */}
+                <div className="relative max-w-6xl mx-auto mb-10">
+                    {/* Connector Line (Desktop Only) */}
                     <div className="hidden lg:block absolute top-[60px] left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-[#2076C7]/20 via-[#1CADA3]/20 to-[#2076C7]/20 z-0"></div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 relative z-10">
                         {steps.map((step, idx) => (
                             <div key={idx} className="flex flex-col items-center group">
                                 {/* Number Ring */}
                                 <div className="relative mb-6 lg:mb-10">
-                                    <div className={`w-16 h-16 md:w-20 md:h-20 lg:w-28 lg:h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 shadow-2xl ring-[6px] md:ring-[10px] md:ring-[12px] ring-white z-10 ${idx % 2 === 0 ? 'bg-[#2076C7]' : 'bg-[#1CADA3]'}`}>
-                                        <div className="text-white transform group-hover:rotate-12 transition-transform duration-500">
+                                    <div className={`w-20 h-20 lg:w-28 lg:h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 shadow-2xl ring-8 lg:ring-[12px] ring-white z-10 ${idx % 2 === 0 ? 'bg-[#2076C7]' : 'bg-[#1CADA3]'}`}>
+                                        <div className="text-white transform group-hover:rotate-12 transition-transform duration-500 scale-90 lg:scale-100">
                                             {step.icon}
                                         </div>
                                     </div>
-                                    <div className="absolute -top-1 -right-1 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-100 font-black text-[#0B1C2E] text-[10px]">
+                                    <div className="absolute -top-1 -right-1 w-7 h-7 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-100 font-black text-[#0B1C2E] text-[10px]">
                                         0{idx + 1}
                                     </div>
                                 </div>
 
-                                <div className="text-center">
-                                    <h4 className="font-extrabold text-[#0B1C2E] mb-3 text-xl group-hover:text-[#2076C7] transition-colors">{step.title}</h4>
-                                    <p className="text-sm text-gray-500 font-medium leading-relaxed px-4">{step.desc}</p>
+                                <div className="text-center max-w-[250px] md:max-w-none">
+                                    <h4 className="font-extrabold text-[#0B1C2E] mb-3 text-lg md:text-xl group-hover:text-[#2076C7] transition-colors">{step.title}</h4>
+                                    <p className="text-sm text-gray-500 font-medium leading-relaxed px-2 md:px-4">{step.desc}</p>
                                 </div>
                             </div>
                         ))}
@@ -129,6 +129,3 @@ const Eligibility = () => {
 };
 
 export default Eligibility;
-
-
-

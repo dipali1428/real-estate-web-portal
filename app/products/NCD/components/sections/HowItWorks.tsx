@@ -29,7 +29,7 @@ const HowItWorks = () => {
 
     return (
         <section className="py-24 bg-[#F8FBFE] relative overflow-hidden">
-            <div className="container-custom relative z-10">
+            <div className="container-custom relative md:mx-30  z-10">
                 {/* Section Heading */}
                 <div className="text-center max-w-3xl mx-auto mb-16 px-4">
                     <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">

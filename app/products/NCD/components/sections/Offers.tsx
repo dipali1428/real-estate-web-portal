@@ -27,8 +27,9 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
         filter === 'All' ? ncdData : ncdData.filter(o => o.status === filter);
 
     return (
-        <section className="py-14 bg-slate-50 " id="offers">
-            <div className="container-custom">
+        // Added horizontal padding (px-4) for mobile side margins
+        <section className="py-14 bg-slate-50 px-4 sm:px-6 lg:px-8" id="offers">
+            <div className="max-w-7xl mx-auto">
 
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-10 pt-6">
@@ -41,14 +42,14 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                     </p>
                 </div>
 
-                {/* Filters */}
-                <div className="flex justify-center mb-10 px-2">
-                    <div className="flex flex-wrap justify-center gap-2 bg-white p-2 rounded-2xl border border-slate-200">
+                {/* Filters - Responsive width */}
+                <div className="flex justify-center mb-10">
+                    <div className="flex flex-wrap justify-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 w-full sm:w-auto">
                         {['All', 'Open', 'Upcoming', 'Closed'].map(status => (
                             <button
                                 key={status}
                                 onClick={() => setFilter(status)}
-                                className={`px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${filter === status
+                                className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${filter === status
                                     ? 'bg-[#2076C7] text-white shadow-md'
                                     : 'text-slate-500 hover:text-slate-800'
                                     }`}>
@@ -71,9 +72,10 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                            hover:shadow-[0_14px_32px_rgba(0,0,0,0.06)]
                                            transition-shadow duration-300
                                            relative overflow-hidden">
+                                
                                 {/* Status Strip */}
                                 <div
-                                    className={`absolute top-0 left-0 w-0.5 h-full ${getStatusColor(offer.status)
+                                    className={`absolute top-0 left-0 w-1 md:w-0.5 h-full ${getStatusColor(offer.status)
                                         .replace('text-', 'bg-')
                                         .replace('bg-opacity-10', '')
                                         }`}
@@ -83,7 +85,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
 
                                     {/* Left Content */}
                                     <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-2">
+                                        <div className="flex items-center gap-3 mb-3">
                                             <span
                                                 className={`text-[10px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide ${getStatusColor(
                                                     offer.status
@@ -96,19 +98,20 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                             </span>
                                         </div>
 
-                                        <h3 className="text-lg md:text-xl font-bold text-[#0B1C2E]">
+                                        <h3 className="text-lg md:text-xl font-bold text-[#0B1C2E] leading-tight">
                                             {offer.title}
                                         </h3>
-                                        <p className="text-sm text-slate-500 font-semibold mb-5">
+                                        <p className="text-sm text-slate-500 font-semibold mb-6">
                                             {offer.issuer}
                                         </p>
 
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+                                        {/* Data Grid: 2 columns on mobile, 4 on desktop */}
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
                                             <div>
                                                 <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
                                                     Returns
                                                 </div>
-                                                <div className="text-xl font-black text-[#1CADA3]">
+                                                <div className="text-lg md:text-xl font-black text-[#1CADA3]">
                                                     {offer.interest}
                                                 </div>
                                             </div>
@@ -116,7 +119,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                                 <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
                                                     Tenure
                                                 </div>
-                                                <div className="text-base font-bold text-slate-700">
+                                                <div className="text-sm md:text-base font-bold text-slate-700">
                                                     {offer.tenure}
                                                 </div>
                                             </div>
@@ -124,7 +127,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                                 <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
                                                     Min Inv.
                                                 </div>
-                                                <div className="text-base font-bold text-slate-700">
+                                                <div className="text-sm md:text-base font-bold text-slate-700">
                                                     {offer.minInvest}
                                                 </div>
                                             </div>
@@ -132,20 +135,20 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                                 <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
                                                     Payout
                                                 </div>
-                                                <div className="text-base font-bold text-slate-700">
+                                                <div className="text-sm md:text-base font-bold text-slate-700">
                                                     {offer.payout}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Actions */}
-                                    <div className="flex flex-col gap-3 w-full md:w-auto">
+                                    {/* Actions: Stacked full-width on mobile */}
+                                    <div className="flex flex-col gap-3 w-full md:w-auto mt-2 md:mt-0">
                                         {offer.status === 'Open' ? (
                                             <button
                                                 onClick={() => onApply(offer.id)}
-                                                className="w-full md:w-44 py-3 bg-[#1CADA3]
-                                                           text-white font-medium rounded-lg
+                                                className="w-full md:w-44 py-3.5 md:py-3 bg-[#1CADA3]
+                                                           text-white font-bold rounded-xl
                                                            hover:bg-[#17968c] transition
                                                            flex items-center justify-center">
                                                 Apply Now
@@ -153,8 +156,8 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                             </button>
                                         ) : (
                                             <button
-                                                className="w-full md:w-44 py-3 bg-slate-100
-                                                           text-slate-400 font-medium rounded-lg
+                                                className="w-full md:w-44 py-3.5 md:py-3 bg-slate-100
+                                                           text-slate-400 font-bold rounded-xl
                                                            cursor-not-allowed">
                                                 {offer.status === 'Closed' ? 'Closed' : 'Notify Me'}
                                             </button>
@@ -162,8 +165,8 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
 
                                         <button
                                             onClick={() => onInvest(offer.id)}
-                                            className="w-full md:w-44 py-3 bg-white
-                                                       text-[#1CADA3] font-medium rounded-lg
+                                            className="w-full md:w-44 py-3.5 md:py-3 bg-white
+                                                       text-[#1CADA3] font-bold rounded-xl
                                                        border border-[#1CADA3]/30
                                                        hover:bg-slate-50 transition">
                                             Invest Now
@@ -174,7 +177,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                         ))}
                     </div>
 
-                    {/* Sidebar */}
+                    {/* Sidebar: Hidden on mobile, visible on LG */}
                     <div className="hidden lg:block lg:col-span-3">
                         <div className="sticky top-28 space-y-6">
 
@@ -198,8 +201,8 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                                 onClick={() => onInvest(offer.id)}
                                                 className="flex justify-between items-center py-2 px-2 rounded-md hover:bg-slate-50 cursor-pointer"
                                             >
-                                                <div>
-                                                    <div className="text-xs font-medium text-slate-800 line-clamp-1">
+                                                <div className="max-w-[70%]">
+                                                    <div className="text-xs font-medium text-slate-800 truncate">
                                                         {offer.issuer}
                                                     </div>
                                                     <div className="text-[10px] text-slate-400">
@@ -223,7 +226,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                             {/* Calculator */}
                             <Calculator isWidget={true} />
 
-                            {/* Trust */}
+                            {/* Trust Badge */}
                             <div className="bg-[#1CADA3] p-5 rounded-xl text-white text-center shadow-lg shadow-[#1CADA3]/20">
                                 <h5 className="text-xs font-semibold uppercase tracking-wide mb-1">
                                     Trusted by 50K+ Investors

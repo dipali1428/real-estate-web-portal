@@ -86,9 +86,10 @@ const Portfolio = () => {
         <section className="py-12 bg-white" id="portfolio">
             <div className="container-custom max-w-6xl mx-auto">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-                        Investment <span className="text-[#1CADA3]">Portfolios</span>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                       Investment Portfolios
                     </h2>
+                    
                     <p className="text-slate-500 max-w-2xl mx-auto font-medium">
                         Tailored NCD investment strategies based on your risk appetite and financial goals.
                     </p>

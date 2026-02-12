@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, lazy, Suspense } from "react";
+import { useModal } from "../../context/ModalContext";
 import Link from "next/link";
 import {
     PieChart, TrendingUp, Shield, Search, CheckCircle,
@@ -71,6 +72,7 @@ const HeroGraphic = () => (
 );
 
 export default function MutualFundsLandingPage() {
+    const { openSignup } = useModal();
     const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
     const [currentNfoIndex, setCurrentNfoIndex] = useState(0);
 
@@ -228,22 +230,26 @@ export default function MutualFundsLandingPage() {
                                 className="text-lg md:text-xl text-slate-700 max-w-2xl leading-relaxed font-normal">
                                 Start your journey towards financial freedom with our curated selection of top-performing funds and expert guidance.
                             </motion.p>
-                            <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.5, duration: 0.7 }}
-                                className="flex flex-wrap gap-4 pt-4">
-                                <Link href="/products/mutualfunds/auth/register">
-                                    <button className="px-8 py-3.5 text-base font-semibold text-white bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full shadow-md hover:shadow-lg transition-all duration-300">
-                                        Start Investing
-                                    </button>
-                                </Link>
-                                <Link href="#categories">
-                                    <button className="px-8 py-3.5 text-base font-semibold text-slate-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-300">
-                                        Explore Funds
-                                    </button>
-                                </Link>
-                            </motion.div>
+                            {/* Change this section in your Hero */}
+<motion.div
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.5, duration: 0.7 }}
+    className="flex flex-wrap gap-4 pt-4">
+    
+    {/* REPLACED LINK WITH BUTTON ONCLICK */}
+    <button 
+        onClick={openSignup}
+        className="px-8 py-3.5 text-base font-semibold text-white bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer">
+        Start Investing
+    </button>
+
+    <Link href="#categories">
+        <button className="px-8 py-3.5 text-base font-semibold text-slate-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-300">
+            Explore Funds
+        </button>
+    </Link>
+</motion.div>
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
@@ -255,7 +261,6 @@ export default function MutualFundsLandingPage() {
                                 </div>
                             </motion.div>
                         </div>
-                        {/* RIGHT HERO: HDFC NFO CARD */}
                         {/* RIGHT HERO: DYNAMIC NFO CAROUSEL */}
                         <div className="w-full lg:w-1/2 flex items-center justify-center relative h-[400px]">
                             <AnimatePresence mode="wait">
@@ -474,9 +479,11 @@ export default function MutualFundsLandingPage() {
                         <h2 className="text-3xl md:text-5xl font-medium text-white mb-6 tracking-tight">Ready to Grow Your Wealth?</h2>
                         <p className="text-blue-50 text-lg md:text-xl mb-10 max-w-2xl mx-auto opacity-90 font-light">Join thousands of investors who trust us with their financial future. Start your SIP today.</p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Link href="/products/mutualfunds/auth/register">
-                                <button className="px-8 py-4 text-[#2076C7] bg-white rounded-xl shadow-lg font-medium hover:bg-gray-50 transition-all">Open Free Account</button>
-                            </Link>
+                        <button 
+                onClick={openSignup}
+                className="px-8 py-4 text-[#2076C7] bg-white rounded-xl shadow-lg font-medium hover:bg-gray-50 transition-all cursor-pointer">
+                Open Free Account
+            </button>
                             <button className="px-8 py-4 border border-white/30 bg-white/10 backdrop-blur-sm rounded-xl font-medium hover:bg-white/20 transition-all">Talk to an Expert</button>
                         </div>
                     </div>

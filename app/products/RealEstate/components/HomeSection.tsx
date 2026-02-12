@@ -188,9 +188,11 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
 
                 <div className="container mx-auto px-4 relative z-20 pt-16 text-center">
                     <div className="max-w-7xl mx-auto">
-                        <span className="block text-blue-600 font-black uppercase tracking-[0.3em] text-xs mb-10 px-4 py-2 bg-blue-50 rounded-full">
+                        <div className='align-middle text-center mx-auto mb-10'>
+                        <span className=" text-blue-600 font-black uppercase tracking-[0.3em] text-xs mb-10 px-6 py-2 bg-blue-50 rounded-full">
                             Infinity Arthvishva Premium Realty
                         </span>
+                        </div>
                         <h3 className="text-4xl md:text-7xl font-sans font-bold mb-15  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                             Step Into Your Future with Fractional Real Estate Investment </h3>
 

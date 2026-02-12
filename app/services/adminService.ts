@@ -225,6 +225,17 @@ export const AdminService = {
     return res.data;
   },
 
+  uploadDetailLeadsCSV: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file); 
+    const res = await api.post("/api/admin/upload-detail-leads-csv", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  },
+
   // Get CIBIL Requests
   getCIBILRequests: async () => {
     const response = await api.get("/api/admin/get-cibil-request");

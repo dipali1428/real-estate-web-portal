@@ -39,6 +39,7 @@ export default function BecomePartnerForm() {
   // --- Form State ---
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
+    role: "DSA",
     name: "",
     email: "",
     mobile: "",
