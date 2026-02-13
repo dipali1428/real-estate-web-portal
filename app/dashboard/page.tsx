@@ -59,12 +59,6 @@ export default function Dashboard() {
 
                 // Fetch Profile
                 const data = await DashboardService.getProfile();
-                
-                // ✅ FETCH CLIENT DETAILS AND SET COUNT
-                // const clientsData = await DashboardService.getAllClientDetails();
-                // // Assuming clientsData is an array or has a property containing the list
-                // const count = Array.isArray(clientsData) ? clientsData.length : (clientsData?.data?.length || 0);
-                // setClientCount(count);
 
                 const userData = data.user;
                 const formattedUser = {
