@@ -21,7 +21,7 @@ export const fetchTopPerformingFunds = async () => {
 
 export const searchMutualFunds = async (query: string) => {
     try {
-        const response = await api.get(`/api/mf/search?query=${query}`);
+        const response = await api.get(`/api/public/search?query=${query}`);
         // Backend returns array of { scheme_code, scheme_name }
         return response.data.map((f: any) => ({
             name: f.scheme_name,
@@ -35,7 +35,7 @@ export const searchMutualFunds = async (query: string) => {
 
 export const fetchFundDetails = async (schemeCode: string | number) => {
     try {
-        const response = await api.get("/api/mf/" + schemeCode);
+        const response = await api.get("/api/public/" + schemeCode);
         return response.data;
     } catch (error) {
         console.error("Failed to fetch fund details", error);
@@ -46,7 +46,7 @@ export const fetchMarketMovers = async (timeframe: string = '1w') => {
     try {
         // This is a placeholder as the backend doesn't have a dedicated movers endpoint yet.
         // We simulate gainers and losers.
-        const response = await api.get(`/api/mf/search?query=Bluechip`);
+        const response = await api.get(`/api/public/search?query=Bluechip`);
         const funds = response.data.slice(0, 10);
 
         return {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { investmentService } from '../products/mutualfunds/services/investmentService';
-import { fetchTopPerformingFunds } from '../products/mutualfunds/services/mfApi';
+// import { fetchTopPerformingFunds } from '../products/mutualfunds/services/mfApi';
 import api from '../services/api';
 
 export const useDashboardData = () => {
@@ -33,7 +33,7 @@ export const useMarketIndices = () => {
     useEffect(() => {
         const fetchIndices = async () => {
             try {
-                const response = await api.get('/api/market/indices');
+                const response = await api.get('/api/public/indices');
                 setData(response.data || []);
             } catch (error) {
                 console.error("Failed to fetch market indices", error);

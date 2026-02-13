@@ -7,11 +7,11 @@ import { Line } from 'react-chartjs-2'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const SUGGESTED_FUNDS = [
-    { name: "SBI Bluechip Fund", code: 119598 },
-    { name: "HDFC Top 100 Fund", code: 118989 },
-    { name: "ICICI Prudential Bluechip", code: 119551 },
+    { name: " SBI Large Cap FUND-DIRECT PLAN -GROWTH", code: 119598 },
+    { name: "HDFC Mid Cap Fund - Growth Option", code: 118989 },
+    { name: "Aditya Birla Sun Life Banking & PSU Debt Fund", code: 119551 },
     { name: "Mirae Asset Large Cap", code: 118834 },
-    { name: "Axis Bluechip Fund", code: 120465 }
+    { name: " Axis Large Cap Fund - Direct Plan - Growth", code: 120465 }
 ]
 
 // Parse MFAPI date format: DD-MM-YYYY
@@ -161,8 +161,8 @@ export default function MutualFundComparison() {
                             onClick={() => addFund(fund.code)}
                             disabled={selectedFunds.some(f => f.id === fund.code) || loadingFund !== null}
                             className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${selectedFunds.some(f => f.id === fund.code)
-                                    ? 'bg-blue-50 border-blue-200 text-blue-600'
-                                    : 'bg-white border-gray-200 text-slate-600 hover:border-[#1CADA3] hover:text-[#1CADA3]'
+                                ? 'bg-blue-50 border-blue-200 text-blue-600'
+                                : 'bg-white border-gray-200 text-slate-600 hover:border-[#1CADA3] hover:text-[#1CADA3]'
                                 } ${loadingFund === fund.code ? 'opacity-50 cursor-wait' : ''}`}
                         >
                             {loadingFund === fund.code ? (

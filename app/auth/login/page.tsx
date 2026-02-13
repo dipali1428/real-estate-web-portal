@@ -80,7 +80,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
 
     const handleSuccessLogin = (data: any) => {
         if (data?.token) {
-            document.cookie = `authToken=${data.token}; path=/; max-age=86400; SameSite=Lax`;
+            document.cookie = `authToken=${data.token}; path=/; SameSite=Lax`;
             redirectByRole(data.user.role);
             onClose();
         }
@@ -158,14 +158,20 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
         }
     };
 
-    const redirectByRole = (role: string) => {
-        if (role === "ADMIN") router.push("/admin");
-        else if (role === "DEPARTMENTHEAD") router.push("/departmenthead");
-        else if (role === "RM") router.push("/rm");
-        else if (role === "ACCOUNTS") router.push("/accounts");
-        else if (role === "CUSTOMER") router.push("/customer");
-        else if (role === "HR") router.push("/hr");
-        else router.push("/dashboard");
+    type UserRole = "ADMIN" | "DEPARTMENTHEAD" | "RM" | "ACCOUNTS" | "CUSTOMER" | "HR" | "USER";
+
+    const redirectByRole = (role: UserRole) => {
+        const routes: Record<UserRole, string> = {
+            ADMIN: "/admin",
+            DEPARTMENTHEAD: "/departmenthead",
+            RM: "/rm",
+            ACCOUNTS: "/accounts",
+            CUSTOMER: "/customer",
+            HR: "/hr",
+            USER: "/dashboard" // Specific default
+        };
+    
+        router.push(routes[role] ?? "/dashboard");
     };
 
     // OPT Timer

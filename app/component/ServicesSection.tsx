@@ -14,6 +14,7 @@ interface ServiceCategory {
   icon: React.ReactNode;
   title: string;
   description: string;
+  basePath: string;
   items: ServiceItem[];
 }
 
@@ -24,6 +25,7 @@ const ServicesSection = () => {
   const services: ServiceCategory[] = [
     {
       id: "finance",
+      basePath: "offers/finance",
       icon: <Shield className="w-12 h-12 text-white" />,
       title: "Finance",
       description: "Comprehensive loan solutions for all your financial needs.",
@@ -42,6 +44,7 @@ const ServicesSection = () => {
     },
     {
       id: "protection",
+      basePath: "offers/protection",
       icon: <PieChart className="w-12 h-12 text-white" />,
       title: "Protection",
       description: "Insurance solutions to safeguard your future and assets.",
@@ -60,7 +63,8 @@ const ServicesSection = () => {
       ],
     },
     {
-      id: "products",
+      id: "investment",
+      basePath: "products",
       icon: <TrendingUp className="w-12 h-12 text-white" />,
       title: "Investment",
       description: "Strategic investment options to grow your wealth.",
@@ -73,16 +77,17 @@ const ServicesSection = () => {
         { name: "Real Estate", slug: "RealEstate" },
         // { name: "Alternative Investment Fund", slug: "alternative-investment-fund" },
         // { name: "Fixed Deposit", slug: "fixed-deposit" },
-        { name: "Bonds", slug: "bonds" },
+        { name: "Bonds", slug: "../offers/investment/bonds" },
         // { name: "Tax Consultancy", slug: "tax-consultancy" },
         // { name: "Unlisted Shares", slug: "unlisted-shares" },
       ],
     },
   ];
 
-  const handleServiceItemClick = (serviceCategory: string, itemSlug: string) => {
-    router.push(`${serviceCategory}/${itemSlug}`);
+  const handleServiceItemClick = (basePath: string, itemSlug: string) => {
+    router.push(`/${basePath}/${itemSlug}`);
   };
+  
 
   const handleServiceCardClick = (serviceId: string) => {
     router.push(`/offers/${serviceId}`);
@@ -126,8 +131,7 @@ const ServicesSection = () => {
           {services.map((service, index) => (
             <div
               key={service.id}
-              className="group relative bg-white rounded-2xl shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-1 flex flex-col items-center text-center p-6 hover:shadow-xl hover:shadow-[#2076C7]/10 cursor-pointer border border-gray-100"
-              onClick={() => handleServiceCardClick(service.id)}>
+              className="group relative bg-white rounded-2xl shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-1 flex flex-col items-center text-center p-6 hover:shadow-xl hover:shadow-[#2076C7]/10 cursor-pointer border border-gray-100">
               {/* Icon Section */}
               <div className="relative mb-6">
                 <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-5 rounded-full flex justify-center items-center shadow-md">
@@ -160,7 +164,7 @@ const ServicesSection = () => {
                         onMouseLeave={() => setHoveredItem(null)}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleServiceItemClick(service.id, item.slug);
+                          handleServiceItemClick(service.basePath, item.slug);
                         }}
                         className="flex items-center justify-center p-2 rounded-lg hover:bg-linear-to-r hover:from-[#2076C7]/5 hover:to-[#1CADA3]/5 transition-all duration-200 cursor-pointer group/item"
                       >

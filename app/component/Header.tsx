@@ -39,12 +39,12 @@ const Header = () => {
     { label: "EMI Calculator", href: "/page/emi", component: EMICalculator },
     { label: "SIP Calculator", href: "/page/sip" },
     { label: "SIP Vs EMI", href: "/page/sipVsEmi" },
-    { label: "Home Loan Calculator", href: "/page/homeloan"},
-    { label: "Personal Loan Calculator", href: "/page/personalloan"},
-    { label: "Business Loan Calculator", href: "/page/businessloan"},
-    { label: "FD Calculator", href: "/page/fd"},
-    { label: "CI Calculator" , href:"/page/CompoundInterest"},
-    
+    { label: "Home Loan Calculator", href: "/page/homeloan" },
+    { label: "Personal Loan Calculator", href: "/page/personalloan" },
+    { label: "Business Loan Calculator", href: "/page/businessloan" },
+    { label: "FD Calculator", href: "/page/fd" },
+    { label: "CI Calculator", href: "/page/CompoundInterest" },
+
   ];
 
   const loansOptions = [
@@ -91,7 +91,8 @@ const Header = () => {
 
   return (
     <header className="bg-linear-to-br from-[#E8F6FA] via-[#F0FAFB] to-[#E9F8F6] backdrop-blur-md shadow-sm sticky top-0 z-50 transition-all duration-300 border-b border-[#1CADA3]/20">
-      <nav className="container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex items-center justify-between">
+      <nav className="max-w-[1600px] container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex items-center justify-between">
+      {/* <nav className="max-w-[1600px] mx-auto px-4 xl:px-6 2xl:px-8 py-3 flex items-center justify-between"> */}
         {/* Logo Section */}
         <motion.div
           className="flex items-center space-x-2"   
@@ -485,19 +486,19 @@ const Header = () => {
             />
             <a
               href="/#contact"
-              className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
+              className="relative z-10 px-1.5 2xl:px-2 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
               Contact Us
             </a>
             <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
           </motion.div>
 
           {/* Buttons */}
-          <div className="flex items-center space-x-2 xl:space-x-3 pl-1 xl:pl-2">
+          <div className="flex items-center space-x-2 xl:space-x-3 pl-1 xl:pl-2 ">
             <motion.button
               onClick={openLogin}
               whileHover={{ scale: 1.07, y: -2 }}
               transition={{ type: "tween", ease: "easeOut", duration: 0.08 }}
-              className="font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-3 xl:px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
+              className="font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-2 px-2 xl:px-3 2xl:px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
               Login
             </motion.button>
             {/* NEW SIGNUP BUTTON */}
@@ -505,16 +506,19 @@ const Header = () => {
               onClick={openSignup}
               whileHover={{ scale: 1.07, y: -2 }}
               transition={{ type: "tween", duration: 0.1 }}
-              className="font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white px-4 xl:px-5 py-2 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer text-sm xl:text-base whitespace-nowrap">
+              className="font-sans bg-white text-[#1CADA3] border-2 border-[#1CADA3] py-2 px-2 xl:px-3 2xl:px-4 rounded-lg font-semibold shadow-sm hover:bg-[#E8F6FA] transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
               Signup
             </motion.button>
 
             <motion.button
               onClick={openPartner}
-              whileHover={{ scale: 1.07, y: -2 }}
-              transition={{ type: "tween", ease: "easeOut", duration: 0.04 }}
-              className="font-sans bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-3 xl:px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-[#E8F6FA] transition-all duration-300 cursor-pointer text-sm xl:text-base whitespace-nowrap">
-              Become A Partner
+              whileHover={{ scale: 1.05, y: -1 }}
+              transition={{ type: "tween", ease: "easeOut", duration: 0.1 }}
+              className="font-sans bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-2 xl:px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-[#E8F6FA] transition-all duration-300 cursor-pointer text-[13px] xl:text-sm 2xl:text-base whitespace-nowrap"
+            >
+              {/* Show "Partner" on small desktop, full text on large desktop */}
+              <span className="xl:hidden">Partner</span>
+              <span className="hidden xl:inline">Become A Partner</span>
             </motion.button>
 
           </div>
