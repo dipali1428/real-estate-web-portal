@@ -124,4 +124,24 @@ export const DashboardService = {
         });
         return response.data;
     },
+
+
+    // 🔹 Generate Aadhaar OTP
+    generateAadhaarOtp: async (aadhaar_number: string) => {
+        const response = await api.post("/api/dashboard/aadhaar/generate-otp", { aadhaar_number });
+        return response.data;
+    },
+
+    // 🔹 Verify Aadhaar OTP (Updated to include aadhaar_number)
+    verifyAadhaarOtp: async (payload: { reference_id: string; otp: string; aadhaar_number: string }) => {
+        const response = await api.post("/api/dashboard/aadhaar/verify-otp", payload);
+        return response.data;
+    },
+
+    verifyPan: async (payload: { pan: string; name_as_per_pan: string; date_of_birth: string }) => {
+        const response = await api.post("/api/dashboard/verify-pan", payload);
+        return response.data;
+    },
+
+    
 };

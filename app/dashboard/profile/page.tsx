@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { DashboardService } from "@/app/services/dashboardService";
-import toast from "react-hot-toast";
 import CardTemplateImage from "@/app/assets/Bussiness_Card2.png";
-import { Phone, Mail, MapPin, Globe, Landmark, Pencil, CheckCircle2, AlertCircle, Loader2, Camera } from "lucide-react";
+import { Phone, Mail, MapPin, Globe, Landmark, Pencil, CheckCircle2, AlertCircle, Loader2, Camera, Eye, EyeOff, X } from "lucide-react";
 import LogoImage from "@/public/logo.png";
 
 // --- Types & Constants ---
+interface PopupMessage {
+    id: string;
+    message: string;
+    type: "success" | "error" | "loading";
+}
+
 interface Profile {
     adv_id: string;
     name: string;
@@ -26,7 +31,9 @@ interface Profile {
     bank_account?: string;
     ifsc?: string;
     pan_verified: boolean;
-    profile_photo?: any; 
+    profile_photo?: any;
+    name_as_per_pan?: string;
+    date_of_birth?: string;
 }
 
 interface KycDetails {
@@ -49,13 +56,47 @@ const CATEGORY_MAP: Record<string, string[]> = {
 };
 
 export default function ProfileSection() {
+    // --- Custom Popup State ---
+    const [popups, setPopups] = useState<PopupMessage[]>([]);
+
+    const removePopup = useCallback((id: string) => {
+        setPopups(prev => prev.filter(p => p.id !== id));
+    }, []);
+
+    const triggerPopup = useCallback((message: string, type: "success" | "error" | "loading" = "success", manualId?: string) => {
+        const id = manualId || Math.random().toString(36).substring(2, 9);
+
+        setPopups(prev => {
+            const exists = prev.find(p => p.id === id);
+            if (exists) {
+                return prev.map(p => p.id === id ? { ...p, message, type } : p);
+            }
+            return [...prev, { id, message, type }];
+        });
+
+        if (type !== "loading") {
+            setTimeout(() => removePopup(id), 4000);
+        }
+        return id;
+    }, [removePopup]);
+
+    // --- Original Logic States ---
+    const [verifyingPan, setVerifyingPan] = useState(false);
+    const [verifyingAadhaar, setVerifyingAadhaar] = useState(false);
+    const [aadhaarOtpSent, setAadhaarOtpSent] = useState(false);
+    const [aadhaarReferenceId, setAadhaarReferenceId] = useState("");
+    const [aadhaarOtpInput, setAadhaarOtpInput] = useState("");
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [isKycEditing, setIsKycEditing] = useState(false);
+    const [kycDraft, setKycDraft] = useState<any>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [uploadingPhoto, setUploadingPhoto] = useState(false); 
+    const [uploadingPhoto, setUploadingPhoto] = useState(false);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [kyc, setKyc] = useState<KycDetails | null>(null);
-    const [imageTimestamp, setImageTimestamp] = useState(Date.now()); 
+    const [imageTimestamp, setImageTimestamp] = useState(Date.now());
 
     const originalPassword = useRef<string>("");
     const hasFetched = useRef(false);
@@ -74,32 +115,46 @@ export default function ProfileSection() {
     const [isDownloadingCard, setIsDownloadingCard] = useState(false);
     const [isDownloadingDSACard, setIsDownloadingDSACard] = useState(false);
 
+    const refreshProfileData = async () => {
+        try {
+            const res = await DashboardService.getProfile();
+            setProfile({
+                ...res.user,
+                aadhaar: res.kycDetails?.aadhaar_number || res.user.aadhaar || "",
+                gst_number: res.kycDetails?.gst_number || res.user.gst_number || ""
+            });
+            setKyc(res.kycDetails);
+
+            if (res.kycDetails?.bank_verified) setBankVerified(true);
+            if (res.kycDetails?.aadhaar_verified) setAadhaarVerified(true);
+            if (res.kycDetails?.gst_verified) setGstVerified(true);
+
+            originalPassword.current = res.user.password;
+        } catch (error) {
+            console.error("Failed to refresh profile:", error);
+        }
+    };
+
     useEffect(() => {
         if (hasFetched.current) return;
         hasFetched.current = true;
-        const fetchProfile = async () => {
-            try {
-                setLoading(true);
-                const res = await DashboardService.getProfile();
-                setProfile(res.user);
-                setKyc(res.kycDetails);
-                if (res.kycDetails?.bank_verified) setBankVerified(true);
-                originalPassword.current = res.user.password;
-            } finally {
-                setLoading(false);
-            }
+
+        const initFetch = async () => {
+            setLoading(true);
+            await refreshProfileData();
+            setLoading(false);
         };
-        fetchProfile();
+        initFetch();
     }, []);
 
     const handleBankVerification = async () => {
         if (!profile?.bank_account || !profile?.ifsc) {
-            return toast.error("Please enter Account Number & IFSC");
+            return triggerPopup("Please enter Account Number & IFSC", "error");
         }
-        let toastId: string | undefined;
+        let popupId: string;
         try {
             setVerifyingBank(true);
-            toastId = toast.loading("Verifying bank details...");
+            popupId = triggerPopup("Verifying bank details...", "loading");
             const res = await DashboardService.verifyBankDetails({
                 bank_account_number: profile.bank_account,
                 ifsc_code: profile.ifsc,
@@ -108,14 +163,115 @@ export default function ProfileSection() {
             if (res.status === "success") {
                 setBankVerified(true);
                 setProfile((prev) => prev ? { ...prev, bank_name: res.data.bank_name } : prev);
-                toast.success("Bank verified successfully!", { id: toastId });
+                triggerPopup("Bank verified successfully!", "success", popupId);
+                await refreshProfileData();
             } else {
-                toast.error(res.message || "Bank verification failed", { id: toastId });
+                triggerPopup(res.message || "Bank verification failed", "error", popupId);
             }
         } catch (err: any) {
-            toast.error(err?.response?.data?.message || "Unable to verify", { id: toastId });
+            triggerPopup(err?.response?.data?.message || "Unable to verify", "error");
         } finally {
             setVerifyingBank(false);
+        }
+    };
+
+    const handleRequestAadhaarOtp = async () => {
+        if (!profile?.aadhaar || profile.aadhaar.length !== 12) {
+            return triggerPopup("Please enter a valid 12-digit Aadhaar number", "error");
+        }
+
+        let popupId: string;
+        try {
+            setVerifyingAadhaar(true);
+            popupId = triggerPopup("Sending OTP to your Aadhaar-linked mobile...", "loading");
+
+            const res = await DashboardService.generateAadhaarOtp(profile.aadhaar);
+
+            if (res.status === "success" || res.reference_id) {
+                const refId = res.reference_id || res.data?.reference_id;
+                setAadhaarReferenceId(refId);
+                setAadhaarOtpSent(true);
+                triggerPopup("OTP sent successfully!", "success", popupId);
+            } else {
+                triggerPopup(res.message || "Failed to send OTP", "error", popupId);
+            }
+        } catch (err: any) {
+            triggerPopup(err?.response?.data?.message || "Error sending OTP", "error");
+        } finally {
+            setVerifyingAadhaar(false);
+        }
+    };
+
+    const handlePanVerification = async () => {
+        if (!profile?.pan || !profile?.name_as_per_pan || !profile?.date_of_birth) {
+            return triggerPopup("Please enter PAN, Name as per PAN, and Date of Birth", "error");
+        }
+
+        const [year, month, day] = profile.date_of_birth.split("-");
+        const formattedDateForApi = `${day}/${month}/${year}`;
+
+        let popupId: string;
+        try {
+            setVerifyingPan(true);
+            popupId = triggerPopup("Verifying PAN...", "loading");
+
+            const res = await DashboardService.verifyPan({
+                pan: profile.pan,
+                name_as_per_pan: profile.name_as_per_pan,
+                date_of_birth: formattedDateForApi,
+            });
+
+            if (res.status === "success" || res.code === 200) {
+                setProfile(prev => prev ? { ...prev, pan_verified: true } : prev);
+                triggerPopup("PAN verified successfully!", "success", popupId);
+                await refreshProfileData();
+            } else {
+                triggerPopup(res.message || "PAN verification failed", "error", popupId);
+            }
+        } catch (err: any) {
+            triggerPopup(err?.response?.data?.message || "Verification failed", "error");
+        } finally {
+            setVerifyingPan(false);
+        }
+    };
+
+    const handleVerifyAadhaarOtp = async () => {
+        if (!aadhaarOtpInput || aadhaarOtpInput.length < 6) {
+            return triggerPopup("Please enter a valid OTP", "error");
+        }
+
+        if (!profile?.aadhaar) {
+            return triggerPopup("Aadhaar number is missing", "error");
+        }
+
+        let popupId: string;
+        try {
+            setVerifyingAadhaar(true);
+            popupId = triggerPopup("Verifying OTP...", "loading");
+
+            const res = await DashboardService.verifyAadhaarOtp({
+                reference_id: aadhaarReferenceId,
+                otp: aadhaarOtpInput,
+                aadhaar_number: profile.aadhaar
+            });
+
+            if (res.code === 200 && res.data?.status === "VALID") {
+                setAadhaarVerified(true);
+                setAadhaarOtpSent(false);
+
+                if (res.data.name && profile) {
+                    setProfile({ ...profile, name: res.data.name });
+                }
+                triggerPopup("Aadhaar verified successfully!", "success", popupId);
+                await refreshProfileData();
+            } else {
+                const errorMsg = res.data?.message || res.message || "Invalid OTP or Verification Failed";
+                triggerPopup(errorMsg, "error", popupId);
+            }
+        } catch (err: any) {
+            triggerPopup(err?.response?.data?.message || "Verification failed", "error");
+        } finally {
+            setVerifyingAadhaar(false);
         }
     };
 
@@ -129,32 +285,32 @@ export default function ProfileSection() {
         const formData = new FormData();
         formData.append("profile_photo", file);
 
-        let toastId: string | undefined;
+        let popupId: string;
         try {
             setUploadingPhoto(true);
-            toastId = toast.loading("Updating profile picture...");
-            
+            popupId = triggerPopup("Updating profile picture...", "loading");
+
             const res = await DashboardService.updateProfileImage(formData);
-            
-                if (res.profile_image_url) {
+
+            if (res.profile_image_url) {
                 const newTimestamp = Date.now();
                 setImageTimestamp(newTimestamp);
                 const freshUrl = `${res.profile_image_url}?t=${newTimestamp}`;
 
-                setKyc(prev => prev ? { 
-                    ...prev, 
-                    profile_image_url: freshUrl 
+                setKyc(prev => prev ? {
+                    ...prev,
+                    profile_image_url: freshUrl
                 } : prev);
 
                 setTimeout(() => setPhotoPreview(null), 500);
-                toast.success("Profile picture updated!", { id: toastId });
+                triggerPopup("Profile picture updated!", "success", popupId);
             } else {
                 setPhotoPreview(null);
-                toast.error("Failed to update image", { id: toastId });
+                triggerPopup("Failed to update image", "error", popupId);
             }
         } catch (err: any) {
             setPhotoPreview(null);
-            toast.error("Error uploading image", { id: toastId });
+            triggerPopup("Error uploading image", "error");
         } finally {
             setUploadingPhoto(false);
         }
@@ -196,8 +352,8 @@ export default function ProfileSection() {
             ctx.font = "bold 28px sans-serif"; ctx.fillText(profile.city, textX, startY + gap * 2 - 4);
             const link = document.createElement("a"); link.download = `${profile.name}_BusinessCard.jpg`;
             link.href = canvas.toDataURL("image/jpeg", 1); link.click();
-            toast.success("Card downloaded successfully!");
-        } catch (err) { toast.error("Failed to generate card."); } finally { setIsDownloadingCard(false); }
+            triggerPopup("Card downloaded successfully!", "success");
+        } catch (err) { triggerPopup("Failed to generate card.", "error"); } finally { setIsDownloadingCard(false); }
     };
 
     const downloadDSACardAsPhoto = async () => {
@@ -215,13 +371,10 @@ export default function ProfileSection() {
         try {
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, cvWidth, cvHeight);
-
-            // Header/Footer Teal Bars
             ctx.fillStyle = "#1CADA3";
             ctx.fillRect(0, 0, cvWidth, 15);
             ctx.fillRect(0, cvHeight - 15, cvWidth, 15);
 
-            // Logo
             const logo = new Image();
             logo.src = LogoImage.src; logo.crossOrigin = "anonymous";
             await new Promise((res) => { logo.onload = res; logo.onerror = res; });
@@ -230,7 +383,6 @@ export default function ProfileSection() {
                 ctx.drawImage(logo, (cvWidth - logoW) / 2, 60, logoW, logoH);
             }
 
-            // Photo Frame (Centered)
             const photoX = (cvWidth - 220) / 2;
             const photoY = 180;
             const activeImg = getProfileImage();
@@ -246,9 +398,8 @@ export default function ProfileSection() {
                 ctx.strokeStyle = "#slate-200"; ctx.strokeRect(photoX, photoY, 220, 260);
             }
 
-            // Name & Titles (Centered)
             ctx.textAlign = "center";
-            ctx.fillStyle = "#2563eb"; 
+            ctx.fillStyle = "#2563eb";
             ctx.font = "bold 38px sans-serif";
             ctx.fillText(profile.name.toUpperCase(), cvWidth / 2, 520);
 
@@ -260,7 +411,6 @@ export default function ProfileSection() {
             ctx.font = "bold 24px sans-serif";
             ctx.fillText(`Partner ID - ${profile.adv_id}`, cvWidth / 2, 600);
 
-            // Centered Details Section
             const detailsStartY = 680;
             ctx.font = "bold 20px sans-serif";
             ctx.fillText(`Contact No: +91 ${profile.mobile}`, cvWidth / 2, detailsStartY);
@@ -275,9 +425,9 @@ export default function ProfileSection() {
             link.download = `${profile.name}_IdentityCard.png`;
             link.href = canvas.toDataURL("image/png", 1.0);
             link.click();
-            toast.success("Identity Card Saved!");
+            triggerPopup("Identity Card Saved!", "success");
         } catch (e) {
-            toast.error("Failed to generate identity card.");
+            triggerPopup("Failed to generate identity card.", "error");
         } finally {
             setIsDownloadingDSACard(false);
         }
@@ -285,7 +435,9 @@ export default function ProfileSection() {
 
     const toggleHead = (head: string) => {
         if (!profile) return;
-        setProfile({ ...profile, head: profile.head === head ? "" : head, category: "" });
+        const currentHeads = profile.head ? profile.head.split(",").map(h => h.trim()).filter(Boolean) : [];
+        let updatedHeads = currentHeads.includes(head) ? currentHeads.filter(h => h !== head) : [...currentHeads, head];
+        setProfile({ ...profile, head: updatedHeads.join(",") });
     };
 
     const toggleCategory = (cat: string) => {
@@ -299,10 +451,36 @@ export default function ProfileSection() {
 
     const selectedHeads = profile.head ? profile.head.split(",") : [];
     const selectedCats = profile.category ? profile.category.split(",") : [];
-    const isProfileCompleted = !!kyc && kyc.bank_verified === true && kyc.aadhaar_verified === true;
+    const isProfileCompleted = kyc?.kyc_completed === true;
 
     return (
-        <main className="max-w-[1440px] mx-auto px-4 md:px-8 py-8 bg-[#F8FAFC] min-h-screen">
+        <main className="max-w-[1440px] mx-auto px-4 md:px-8 py-8 bg-[#F8FAFC] min-h-screen relative">
+
+            {/* --- CUSTOM NOTIFICATION POPUPS --- */}
+            <div className="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none">
+                {popups.map((p) => (
+                    <div
+                        key={p.id}
+                        className={`pointer-events-auto min-w-[280px] px-6 py-4 rounded-2xl shadow-2xl border transition-all duration-300
+            ${p.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' :
+                                p.type === 'error' ? 'bg-rose-50 border-rose-100 text-rose-800' :
+                                    'bg-white border-slate-200 text-slate-800'}`}
+                    >
+                        <div className="flex items-center justify-between gap-4">
+                            <span className="text-sm font-bold tracking-wide">
+                                {p.type === 'loading' ? `Please wait: ${p.message}` : p.message}
+                            </span>
+                            <button
+                                onClick={() => removePopup(p.id)}
+                                className="text-xs font-black uppercase opacity-50 hover:opacity-100 transition-opacity"
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
             {/* --- HEADER --- */}
             <header className="mb-10">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -340,12 +518,12 @@ export default function ProfileSection() {
                                             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" className="text-slate-300"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>
                                         )}
                                     </div>
-                                    <div 
+                                    <div
                                         onClick={() => !uploadingPhoto && fileInputRef.current?.click()}
                                         className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#1CADA3] rounded-full border-2 border-white flex items-center justify-center text-white shadow-lg cursor-pointer hover:scale-110 transition-transform active:scale-95"
                                     >
                                         <Camera size={14} strokeWidth={2.5} />
-                                            </div>
+                                    </div>
                                     <input type="file" ref={fileInputRef} onChange={handlePhotoChange} className="hidden" accept="image/*" />
                                 </div>
                             </div>
@@ -362,9 +540,31 @@ export default function ProfileSection() {
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email-ID</label>
                                     <input disabled={!isEditing} value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} className={`w-full px-4 py-2.5 rounded-xl font-bold text-slate-700 text-sm outline-none ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} />
                                 </div>
+
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Location</label>
                                     <input readOnly value={`${profile.state}, ${profile.city}`} className="w-full px-4 py-2.5 rounded-xl font-bold text-slate-700 text-sm bg-slate-50 outline-none" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Account Password</label>
+                                    <div className="relative">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            disabled={!isEditing}
+                                            value={profile.password || ""}
+                                            onChange={(e) => setProfile({ ...profile, password: e.target.value })}
+                                            placeholder="Update Password"
+                                            className={`w-full px-4 py-2.5 rounded-xl font-bold text-slate-700 text-sm outline-none pr-10 ${isEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"
+                                                }`}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#1CADA3]"
+                                        >
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -392,7 +592,7 @@ export default function ProfileSection() {
                         </div>
                         <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-slate-100">
                             {isBankEditing && <button onClick={() => { setProfile({ ...profile, bank_name: bankDraft?.bank_name, bank_account: bankDraft?.bank_account, ifsc: bankDraft?.ifsc }); setIsBankEditing(false); }} className="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-black px-6 py-2.5 rounded-xl uppercase">Cancel</button>}
-                            {isBankEditing && <button onClick={() => { setIsBankEditing(false); setBankVerified(false); toast.success("Bank details saved. Please verify."); }} className="bg-[#1CADA3] hover:bg-[#179b92] text-white text-[10px] font-black px-6 py-2.5 rounded-xl uppercase shadow-sm">Save Details</button>}
+                            {isBankEditing && <button onClick={() => { setIsBankEditing(false); setBankVerified(false); triggerPopup("Bank details saved. Please verify.", "success"); }} className="bg-[#1CADA3] hover:bg-[#179b92] text-white text-[10px] font-black px-6 py-2.5 rounded-xl uppercase shadow-sm">Save Details</button>}
                             {!isBankEditing && !bankVerified && profile.bank_account && profile.ifsc && (
                                 <button disabled={verifyingBank} onClick={handleBankVerification} className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black px-6 py-2.5 rounded-xl uppercase flex items-center gap-2 shadow-sm disabled:opacity-70">
                                     {verifyingBank ? <><Loader2 size={12} className="animate-spin" />Verifying…</> : <><CheckCircle2 size={12} />Verify Bank</>}
@@ -405,16 +605,16 @@ export default function ProfileSection() {
                 {/* --- RIGHT COLUMN --- */}
                 <div className="lg:col-span-8 space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                        
+
                         {/* LEFT SUB-COLUMN: Visiting Card + KYC */}
                         <div className="space-y-6">
-                        <div className="space-y-3">
-                            <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Digital Visiting Card</h4>
-                            <div className="aspect-[1.75/1] rounded-2xl shadow-1xl overflow-hidden relative border border-slate-200 bg-slate-900 group">
-                                <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${CardTemplateImage.src})` }} />
-                                <div className="absolute inset-0 pl-15 pt-16 p-8 flex flex-col justify-between">
+                            <div className="space-y-3">
+                                <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Digital Visiting Card</h4>
+                                <div className="aspect-[1.75/1] rounded-2xl shadow-1xl overflow-hidden relative border border-slate-200 bg-slate-900 group">
+                                    <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${CardTemplateImage.src})` }} />
+                                    <div className="absolute inset-0 pl-15 pt-16 p-8 flex flex-col justify-between">
                                         <div><h4 className="text-2xl font-black text-slate-700 uppercase leading-none truncate">{profile.name}</h4><p className="text-[8px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Authorized Partner </p></div>
-                                    <div className="space-y-1.5">
+                                        <div className="space-y-1.5">
                                             <div className="flex items-center gap-2"><Phone size={10} className="text-slate-400" strokeWidth={2.5} /><span className="text-[11px] font-bold text-slate-700">+91 {profile.mobile}</span></div>
                                             <div className="flex items-center gap-2"><Mail size={10} className="text-slate-400" strokeWidth={2.5} /><span className="text-[11px] font-bold text-slate-700 truncate">{profile.email}</span></div>
                                             <div className="flex items-center gap-2"><MapPin size={10} className="text-slate-400" strokeWidth={2.5} /><span className="text-[11px] font-bold text-slate-700">{profile.city}</span></div>
@@ -425,31 +625,207 @@ export default function ProfileSection() {
                                         </button>
                                     </div>
                                 </div>
-                                        </div>
+                            </div>
 
                             <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-2 bg-emerald-50 text-emerald-500 rounded-xl"><CheckCircle2 size={18} strokeWidth={2.5} /></div>
-                                    <h3 className="text-md font-bold text-[#0f172a]">KYC & Verification Hub</h3>
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-emerald-50 text-emerald-500 rounded-xl">
+                                            <CheckCircle2 size={18} strokeWidth={2.5} />
+                                        </div>
+                                        <h3 className="text-md font-bold text-[#0f172a]">KYC & Verification Hub</h3>
+                                    </div>
+
+                                    {!isKycEditing ? (
+                                        <button
+                                            onClick={() => {
+                                                setKycDraft({
+                                                    pan: profile.pan,
+                                                    aadhaar: profile.aadhaar,
+                                                    gst: profile.gst_number
+                                                });
+                                                setIsKycEditing(true);
+                                            }}
+                                            className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[#1CADA3] hover:underline"
+                                        >
+                                            <Pencil size={12} />Edit KYC
+                                        </button>
+                                    ) : (
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => setIsKycEditing(false)}
+                                                className="text-[10px] font-black uppercase text-rose-500"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setIsKycEditing(false);
+                                                    triggerPopup("KYC details updated locally. Save all changes to submit.", "success");
+                                                }}
+                                                className="text-[10px] font-black uppercase text-emerald-600"
+                                            >
+                                                Save
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
+
                                 <div className="space-y-4">
-                                    {[
-                                        { title: 'PAN Card', value: profile.pan, verified: profile.pan_verified },
-                                        { title: 'Aadhar Card', value: `•••• ${profile.aadhaar?.slice(-4) || '1234'}`, verified: aadhaarVerified },
-                                        { title: 'GST Registration', value: profile.gst_number || 'NOT LINKED', verified: gstVerified },
-                                    ].map((item) => (
-                                        <div key={item.title} className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex items-center justify-between">
-                                                <div><p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{item.title}</p><p className="text-[11px] font-bold text-slate-700">{item.value}</p></div>
-                                                <span className={`text-[8px] font-black uppercase px-2 py-1 rounded-lg ${item.verified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>
-                                                    {item.verified ? "Verified" : "Pending"}
+                                    <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">PAN Card</p>
+                                            <span className={`text-[8px] font-black uppercase px-2 py-1 rounded-lg ${profile.pan_verified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>
+                                                {profile.pan_verified ? "Verified" : "Pending"}
                                             </span>
                                         </div>
-                                    ))}
+
+                                        {isKycEditing ? (
+                                            <div className="space-y-3">
+                                                <input
+                                                    className="w-full text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2 outline-[#1CADA3]"
+                                                    value={profile.pan}
+                                                    placeholder="Enter PAN (e.g. ABCDE1234F)"
+                                                    maxLength={10}
+                                                    onChange={(e) => setProfile({ ...profile, pan: e.target.value.toUpperCase() })}
+                                                    disabled={profile.pan_verified}
+                                                />
+
+                                                {!profile.pan_verified && (
+                                                    <>
+                                                        <input
+                                                            className="w-full text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2 outline-[#1CADA3]"
+                                                            value={profile.name_as_per_pan || ""}
+                                                            placeholder="Full Name as per PAN Card"
+                                                            onChange={(e) => setProfile({ ...profile, name_as_per_pan: e.target.value.toUpperCase() })}
+                                                        />
+
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                type="date"
+                                                                className="flex-1 text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2 outline-[#1CADA3]"
+                                                                value={profile.date_of_birth || ""}
+                                                                onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
+                                                            />
+                                                            <button
+                                                                onClick={handlePanVerification}
+                                                                disabled={verifyingPan || !profile.pan}
+                                                                className="bg-[#1CADA3] hover:bg-[#158f87] text-white text-[10px] font-bold px-4 py-2 rounded-xl transition-colors disabled:opacity-50"
+                                                            >
+                                                                {verifyingPan ? "..." : "Verify"}
+                                                            </button>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <p className="text-[11px] font-bold text-slate-700">{profile.pan}</p>
+                                        )}
+                                    </div>
+
+                                    <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Aadhar Card</p>
+                                            <span className={`text-[8px] font-black uppercase px-2 py-1 rounded-lg ${aadhaarVerified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>
+                                                {aadhaarVerified ? "Verified" : "Pending"}
+                                            </span>
+                                        </div>
+
+                                        {isKycEditing ? (
+                                            <div className="flex items-center gap-2">
+                                                <div className="relative flex-1">
+                                                    <input
+                                                        className="w-full text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2 outline-[#1CADA3] transition-all focus:border-[#1CADA3]"
+                                                        value={profile.aadhaar || ""}
+                                                        placeholder="Enter 12 digit Aadhaar"
+                                                        maxLength={12}
+                                                        onChange={(e) => {
+                                                            const newVal = e.target.value.replace(/\D/g, "");
+                                                            setProfile({ ...profile, aadhaar: newVal });
+                                                            if (newVal !== kyc?.aadhaar_number) {
+                                                                setAadhaarVerified(false);
+                                                            }
+                                                        }}
+                                                        disabled={aadhaarOtpSent}
+                                                    />
+                                                </div>
+
+                                                {!aadhaarOtpSent && (
+                                                    <button
+                                                        onClick={handleRequestAadhaarOtp}
+                                                        disabled={verifyingAadhaar || profile.aadhaar?.length !== 12}
+                                                        className="whitespace-nowrap bg-[#1CADA3] hover:bg-[#158f87] text-white text-[10px] font-bold px-4 py-2 rounded-xl transition-colors disabled:opacity-50 disabled:bg-slate-300 shadow-sm"
+                                                    >
+                                                        {verifyingAadhaar ? "Sending..." : (aadhaarVerified ? "Re-verify" : "Get OTP")}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <p className="text-[11px] font-bold text-slate-700">
+                                                {profile.aadhaar ? `•••• •••• ${profile.aadhaar.slice(-4)}` : "NOT PROVIDED"}
+                                            </p>
+                                        )}
+
+                                        {aadhaarOtpSent && (
+                                            <div className="mt-3 pt-3 border-t border-slate-200 flex items-center gap-2 text-gray-700 animate-in fade-in slide-in-from-top-1">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Enter 6-digit OTP"
+                                                    maxLength={6}
+                                                    value={aadhaarOtpInput}
+                                                    onChange={(e) => setAadhaarOtpInput(e.target.value.replace(/\D/g, ""))}
+                                                    className="flex-1 text-[11px] font-bold px-3 py-2 rounded-lg border border-[#1CADA3] outline-none bg-emerald-50/30"
+                                                />
+                                                <button
+                                                    onClick={handleVerifyAadhaarOtp}
+                                                    disabled={verifyingAadhaar || aadhaarOtpInput.length < 6}
+                                                    className="bg-emerald-600 text-white text-[10px] px-4 py-2 rounded-lg font-bold disabled:opacity-50 shadow-sm"
+                                                >
+                                                    {verifyingAadhaar ? "..." : "Verify"}
+                                                </button>
+                                                <button
+                                                    onClick={() => setAadhaarOtpSent(false)}
+                                                    className="text-rose-500 text-[9px] font-bold hover:underline px-2"
+                                                >
+                                                    Edit No.
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex items-center justify-between">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                                                    GST Registration
+                                                </p>
+                                                <span className="text-[7px] leading-none bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full font-bold uppercase">
+                                                    Optional
+                                                </span>
+                                            </div>
+
+                                            {isKycEditing ? (
+                                                <input
+                                                    className="text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded px-2 py-1 w-full outline-[#1CADA3]"
+                                                    value={profile.gst_number || ""}
+                                                    placeholder="Enter GST Number"
+                                                    onChange={(e) => setProfile({ ...profile, gst_number: e.target.value.toUpperCase() })}
+                                                />
+                                            ) : (
+                                                <p className="text-[11px] font-bold text-slate-700">
+                                                    {profile.gst_number || 'NOT LINKED'}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <span className={`ml-4 text-[8px] font-black uppercase px-2 py-1 rounded-lg ${gstVerified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>
+                                            {gstVerified ? "Verified" : "Pending"}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* RIGHT SUB-COLUMN: DSA Identity Card */}
                         <div className="space-y-3">
                             <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">DSA Identity Card</h4>
                             <div className="max-w-[300px] aspect-[1/1.58] rounded-2xl bg-white border border-slate-200 shadow-xl relative overflow-hidden group flex flex-col">
@@ -457,9 +833,9 @@ export default function ProfileSection() {
 
                                 <div className="p-6 flex flex-col items-center h-full">
                                     <div className="h-14 w-38 mb-6">
-                                            <img src={LogoImage.src} alt="logo" className="w-full h-full object-contain" />
-                                        </div>
-                                    
+                                        <img src={LogoImage.src} alt="logo" className="w-full h-full object-contain" />
+                                    </div>
+
                                     <div className="w-25 h-30 border-2 border-slate-200 rounded-lg overflow-hidden mb-4 bg-slate-50 flex items-center justify-center">
                                         {getProfileImage() ? (
                                             <img key={imageTimestamp} src={getProfileImage()!} className="w-full h-full object-cover" alt="Profile" />
@@ -472,13 +848,13 @@ export default function ProfileSection() {
                                         <h4 className="text-lg font-black text-blue-600 uppercase leading-tight">{profile.name}</h4>
                                         <p className="text-[10px] font-bold text-slate-500 uppercase">Authorized Partner</p>
                                         <p className="text-[10px] font-bold text-slate-700 mt-1">Partner ID - {profile.adv_id}</p>
-                                        </div>
+                                    </div>
 
                                     <div className="w-full text-center space-y-1 border-t border-slate-100 pt-4 mb-4">
                                         <p className="text-[12px] font-bold text-slate-700"><span className="text-slate-400">Contact No:</span> +91 {profile.mobile}</p>
                                         <p className="text-[12px] font-bold text-slate-700 truncate px-2"><span className="text-slate-400">Email ID:</span> {profile.email}</p>
                                         <p className="text-[12px] font-bold text-slate-700"><span className="text-slate-400">Location:</span> {profile.city}</p>
-                                        </div>
+                                    </div>
 
                                     <div className="mt-auto pt-2">
                                         <p className="text-[10px] font-bold text-blue-600">www.infinityarthvishva.com</p>
@@ -495,7 +871,6 @@ export default function ProfileSection() {
                         </div>
                     </div>
 
-                    {/* PROFESSIONAL EXPERTISE */}
                     <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
                         <div className="flex items-center gap-3 mb-8">
                             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg></div>
@@ -505,9 +880,22 @@ export default function ProfileSection() {
                             <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Head Categories</label>
                                 <div className="flex flex-wrap gap-3">
-                                    {Object.keys(CATEGORY_MAP).map((head) => (
-                                        <button key={head} disabled={!isEditing} onClick={() => toggleHead(head)} className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all border-2 ${profile?.head === head ? "bg-[#1CADA3] border-[#1CADA3] text-white shadow-md shadow-[#1cada330]" : "bg-white border-slate-100 text-slate-500"}`}>{head}</button>
-                                    ))}
+                                    {Object.keys(CATEGORY_MAP).map((head) => {
+                                        const isActive = selectedHeads.includes(head);
+                                        return (
+                                            <button
+                                                key={head}
+                                                disabled={!isEditing}
+                                                onClick={() => toggleHead(head)}
+                                                className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all border-2 ${isActive
+                                                    ? "bg-[#1CADA3] border-[#1CADA3] text-white shadow-md shadow-[#1cada330]"
+                                                    : "bg-white border-slate-100 text-slate-500"
+                                                    }`}
+                                            >
+                                                {head}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
                             <div className="space-y-4">
@@ -533,7 +921,7 @@ export default function ProfileSection() {
 
                     {isEditing && (
                         <div className="flex justify-end pt-4">
-                            <button disabled={saving} onClick={async () => { try { setSaving(true); await DashboardService.editProfile(profile); toast.success("Profile information updated!"); setIsEditing(false); } catch (err) { toast.error("Failed to update changes."); } finally { setSaving(false); } }} className="px-12 py-4 bg-[#1CADA3] text-white rounded-2xl shadow-xl shadow-[#1cada340] font-bold transition-all active:scale-95">
+                            <button disabled={saving} onClick={async () => { try { setSaving(true); await DashboardService.editProfile(profile); triggerPopup("Profile information updated!", "success"); setIsEditing(false); } catch (err) { triggerPopup("Failed to update changes.", "error"); } finally { setSaving(false); } }} className="px-12 py-4 bg-[#1CADA3] text-white rounded-2xl shadow-xl shadow-[#1cada340] font-bold transition-all active:scale-95">
                                 {saving ? "Saving Changes..." : "Save All Changes"}
                             </button>
                         </div>
