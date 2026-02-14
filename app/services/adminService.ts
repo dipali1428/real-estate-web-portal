@@ -246,5 +246,10 @@ export const AdminService = {
     const response = await api.get("/api/admin/get-all-detail-leads");
     return response.data;
   },
+
+  getAllReferralLeads: async () => {
+    const response = await api.get("/api/admin/get-all-referral-leads");
+    return response.data;
+  },
 };
 
