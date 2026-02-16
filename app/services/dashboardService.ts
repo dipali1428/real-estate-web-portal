@@ -61,7 +61,7 @@ export const DashboardService = {
 
     // 🔹 NEW: Get Leads
     getLeads: async () => {
-        const response = await api.get("/api/dashboard/get-leads");
+        const response = await api.get("/api/dashboard/get-referral-leads");
         return response.data;
     },
 

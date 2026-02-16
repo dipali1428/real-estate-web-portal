@@ -2,6 +2,16 @@
 import { FC, useState, useMemo, useEffect, ChangeEvent } from "react";
 import { DashboardService } from "@/app/services/dashboardService";
 
+const statusStyles: Record<string, string> = {
+  completed: "bg-green-50 text-green-700 border-green-100",
+  submitted: "bg-blue-50 text-blue-700 border-blue-100",
+  in_progress: "bg-yellow-50 text-yellow-700 border-yellow-100",
+  rejected: "bg-red-50 text-red-700 border-red-100",
+  follow_up: "bg-purple-50 text-purple-700 border-purple-100",
+  pending: "bg-gray-50 text-gray-700 border-gray-100",
+};
+
+
 // ... (Lead interface remains exactly the same)
 export interface Lead {
   id: string;
@@ -18,6 +28,7 @@ export interface Lead {
   formData?: any;
   isSelfLogin?: string;
   status?: string;
+  referral_lead_status?: string;
 }
 
 interface LeadTableProps {
@@ -78,10 +89,10 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
           // Otherwise just fetch the active tab in the background
           if (activeTab === 'referral') {
             referralRes = await DashboardService.getLeads();
-            console.log("Fetched referral leads:", referralRes)
+         
           } else {
             detailedRes = await DashboardService.getMyLeads();
-            console.log("Fetched detailed leads:", detailedRes)
+
           }
         }
 
@@ -118,6 +129,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                 product: item.department || item.product_type || "General",
                 subCategory: item.sub_category || "-",
                 notes: item.notes || "-",
+                 referral_lead_status: item.referral_lead_status || "PENDING",
                 createdDate: isNaN(dateObj.getTime()) ? "N/A" : dateObj.toLocaleDateString(),
                 createdTime: isNaN(dateObj.getTime()) ? "" : dateObj.toLocaleTimeString(),
               };
@@ -236,50 +248,49 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
     <div className="w-full mt-8">
       {/* Tabs Section */}
       <div className="mb-6 border-b border-gray-200">
-          <div className="flex flex-col lg:flex-row justify-between items-end lg:items-center gap-4">
-            <div className="flex space-x-8">
-              {['referral', 'detailed'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab as any)}
-                  className={`pb-2 text-sm font-medium transition-colors border-b-2 capitalize ${
-                    activeTab === tab 
-                      ? 'border-blue-600 text-blue-600' 
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        <div className="flex flex-col lg:flex-row justify-between items-end lg:items-center gap-4">
+          <div className="flex space-x-8">
+            {['referral', 'detailed'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab as any)}
+                className={`pb-2 text-sm font-medium transition-colors border-b-2 capitalize ${activeTab === tab
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
-                >
-                  {tab} Leads ({counts[tab as 'referral' | 'detailed']})
-                </button>
-              ))}
+              >
+                {tab} Leads ({counts[tab as 'referral' | 'detailed']})
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-3 py-1.5">
+              <span className="text-[10px] font-bold text-gray-500 uppercase">Show</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="text-xs text-gray-700 focus:outline-none bg-transparent font-semibold"
+              >
+                <option value={5}>5</option><option value={10}>10</option><option value={25}>25</option>
+              </select>
             </div>
 
-            <div className="flex items-center gap-3 mb-2">
-              <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-3 py-1.5">
-                <span className="text-[10px] font-bold text-gray-500 uppercase">Show</span>
-                <select 
-                  value={itemsPerPage} 
-                  onChange={(e) => setItemsPerPage(Number(e.target.value))} 
-                  className="text-xs text-gray-700 focus:outline-none bg-transparent font-semibold"
-                >
-                  <option value={5}>5</option><option value={10}>10</option><option value={25}>25</option>
-                </select>
-              </div>
-
-              <div className="relative">
-                <input 
-                  type="text" 
-                  placeholder="Search leads..." 
-                  value={searchTerm} 
-                  onChange={(e) => setSearchTerm(e.target.value)} 
-                  className="pl-9 pr-4 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64 text-xs text-gray-700" 
-                />
-                <svg className="absolute left-3 top-2 h-3.5 w-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search leads..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 pr-4 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64 text-xs text-gray-700"
+              />
+              <svg className="absolute left-3 top-2 h-3.5 w-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </div>
           </div>
         </div>
+      </div>
 
       <div className="overflow-x-auto scrollbar-x-thin bg-white shadow-md rounded-lg border border-gray-200">
         {loading && data.length === 0 ? (
@@ -297,6 +308,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Dept</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Product</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Notes</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Lead Status</th>
                   </>
                 ) : (
                   <>
@@ -311,6 +323,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                     <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Actions</th>
                   </>
                 )}
+
                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Created</th>
               </tr>
             </thead>
@@ -327,6 +340,17 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.product}</td>
                         <td className="px-4 py-4 text-sm text-gray-700">{lead.subCategory}</td>
                         <td className="px-4 py-4 text-sm text-gray-700 max-w-xs truncate">{lead.notes}</td>
+                       <td className="px-4 py-4 text-sm">
+                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${
+                            statusStyles[lead.referral_lead_status?.toLowerCase() || "pending"] ||
+                            "bg-gray-50 text-gray-700 border-gray-100"
+                          }`}
+                        >
+                          {lead.referral_lead_status}
+                        </span>
+                        </td>
+                    
+                       
                       </>
                     ) : (
                       <>
@@ -338,10 +362,10 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                         <td className="px-4 py-4 text-sm text-gray-700">{lead.subCategory}</td>
                         <td className="px-4 py-4 text-sm text-gray-700 font-medium">{lead.isSelfLogin}</td>
                         <td className="px-4 py-4 text-sm">
-  <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-100">
-    {lead.status}
-  </span>
-</td>
+                          <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-100">
+                            {lead.status}
+                          </span>
+                        </td>
                         <td className="px-4 py-4 text-center">
                           <div className="flex flex-col gap-1 items-center">
                             <button onClick={() => handleViewDocuments(lead)} className="text-[10px] w-full bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-100 font-bold hover:bg-blue-600 hover:text-white uppercase transition-all">View Docs</button>

@@ -66,4 +66,10 @@ export const RmService = {
     const response = await api.post(`/api/rm/detail-leads/${leadId}/reject`);
     return response.data;
   },
+  updateReferralStatus: async (leadId: number, newStatus: string) => {
+    const response = await api.put(`/api/rm/${leadId}/referral-status`,{
+      referral_lead_status: newStatus  // ✅ MATCH BACKEND
+    },);
+    return response.data;
+  },
 };

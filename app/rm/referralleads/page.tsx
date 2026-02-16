@@ -4,6 +4,16 @@ import { RmService } from '@/app/services/rmService';
 import * as XLSX from 'xlsx';
 import { FileUp, ClipboardList, ChevronLeft, ChevronRight } from "lucide-react";
 
+const statusStyles: Record<string, string> = {
+  completed: "bg-green-50 text-green-700 border-green-100",
+  submitted: "bg-blue-50 text-blue-700 border-blue-100",
+  in_progress: "bg-yellow-50 text-yellow-700 border-yellow-100",
+  rejected: "bg-red-50 text-red-700 border-red-100",
+  follow_up: "bg-purple-50 text-purple-700 border-purple-100",
+  pending: "bg-gray-50 text-gray-700 border-gray-100",
+};
+const ALLOWED_STATUSES = ["SUBMITTED", "IN_PROGRESS", "FOLLOW_UP", "COMPLETED", "REJECTED"];
+
 interface ReferralLead {
   id: number;
   lead_name: string;
@@ -130,7 +140,23 @@ export default function ReferralLeadsDashboard() {
       setLoading(prev => ({ ...prev, outgoingLeads: false }));
     }
   };
-
+ const handleStatusChange = async (leadId: number, newStatus: string) => {
+    try {
+      
+      const res = await RmService.updateReferralStatus(leadId, newStatus);
+      if (res.success) {
+        const updater = (prevLeads: ReferralLead[]) =>
+          prevLeads.map((lead) =>
+            lead.id === leadId ? { ...lead, referral_lead_status: newStatus } : lead
+          );
+        setLeads(updater);
+        setIncomingLeads(updater);
+        setOutgoingLeads(updater);
+      }
+    } catch (err) {
+      console.error('Failed to update status:', err);
+    }
+  };
   const normalize = (str: string) =>
     str?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
 
@@ -313,7 +339,7 @@ export default function ReferralLeadsDashboard() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {['ID','Ref_iD','DSA', 'Client Details', 'Department', 'Sub Category', 'Notes', 'Status', 'Created At'].map(h => (
+                {['ID','Ref_iD','DSA', 'Client Details', 'Department', 'Sub Category', 'Notes', 'Assignment Status','Lead Status', 'Created At'].map(h => (
                   <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -329,6 +355,17 @@ export default function ReferralLeadsDashboard() {
                   <td className="px-6 py-4 text-sm text-gray-800">{lead.sub_category}</td>
                   <td className="px-6 py-4 text-sm text-gray-800 max-w-xs truncate">{lead.notes || '--'} </td>
                   <td className="px-6 py-4 text-sm"><span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{lead.status}</span></td>
+                  <td className="px-4 py-4 text-sm">
+                        <select
+                          value={lead.referral_lead_status?.toUpperCase() || ""}
+                          onChange={(e) => handleStatusChange(lead.id, e.target.value)}
+                          className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border cursor-pointer focus:outline-none ${
+                            statusStyles[lead.referral_lead_status?.toLowerCase() || "pending"] ||"bg-gray-50 text-gray-700 border-gray-100" }`}
+                        >
+                          <option value="" disabled>Select</option>
+                          {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-700">{formatDate(lead.created_at)}<div className="text-xs text-gray-600">{formatTime(lead.created_at)}</div></td>
                 </tr>
               ))}
@@ -372,7 +409,7 @@ export default function ReferralLeadsDashboard() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {[ 'ID','Referral ID','Lead From', 'DSA', 'Client Details', 'Department', 'Sub Category', 'Notes', 'Status', 'Created At'].map(h => (
+                {[ 'ID','Referral ID','Lead From', 'DSA', 'Client Details', 'Department', 'Sub Category', 'Notes', 'Assignment Status','Lead Status', 'Created At'].map(h => (
                   <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -389,6 +426,17 @@ export default function ReferralLeadsDashboard() {
                   <td className="px-6 py-4 text-sm text-gray-800">{lead.sub_category}</td>
                   <td className="px-6 py-4 text-sm text-gray-800 max-w-xs truncate">{lead.notes || '-'}</td>
                   <td className="px-6 py-4 text-sm"><span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${lead.status === 'converted' ? 'bg-green-100 text-green-800' : lead.status === 'new' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>{lead.status}</span></td>
+                   <td className="px-4 py-4 text-sm">
+                        <select
+                          value={lead.referral_lead_status?.toUpperCase() || ""}
+                          onChange={(e) => handleStatusChange(lead.id, e.target.value)}
+                          className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border cursor-pointer focus:outline-none ${
+                            statusStyles[lead.referral_lead_status?.toLowerCase() || "pending"] ||"bg-gray-50 text-gray-700 border-gray-100" }`}
+                        >
+                          <option value="" disabled>Select</option>
+                          {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-700">{formatDate(lead.created_at)}<div className="text-xs text-gray-600">{formatTime(lead.created_at)}</div></td>
                 </tr>
               ))}
@@ -435,7 +483,7 @@ export default function ReferralLeadsDashboard() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {['ID','Ref_ID','DSA Details', 'Client Details', 'Department', 'Sub-Category','Notes','Status', 'Assigned RM', 'Created At'].map(h => (
+                {['ID','Ref_ID','DSA Details', 'Client Details', 'Department', 'Sub-Category','Notes','Assignment Status','Assigned RM','Lead Status', 'Created At'].map(h => (
                   <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -452,6 +500,17 @@ export default function ReferralLeadsDashboard() {
                   <td className="px-6 py-4 text-sm text-gray-600">{lead.notes}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{lead.status}</td>
                   <td className="px-6 py-4 text-sm font-semibold text-blue-600"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.assigned_rm_name || 'Unassigned'}</span><span className="text-blue-500 font-medium">{lead.assigned_rm_sub_category}</span></div></td>
+                   <td className="px-4 py-4 text-sm">
+                        <select
+                          value={lead.referral_lead_status?.toUpperCase() || ""}
+                          onChange={(e) => handleStatusChange(lead.id, e.target.value)}
+                          className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border cursor-pointer focus:outline-none ${
+                            statusStyles[lead.referral_lead_status?.toLowerCase() || "pending"] ||"bg-gray-50 text-gray-700 border-gray-100" }`}
+                        >
+                          <option value="" disabled>Select</option>
+                          {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-500">{formatDate(lead.created_at)}</td>
                 </tr>
               ))}

@@ -571,9 +571,15 @@ export default function ProfileSection() {
                     </div>
 
                     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm space-y-8">
+                        <div className="mb-8">
+                                        <span className="px-3 py-1.5 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-lg border border-blue-100">
+                                            Step - 2
+                                        </span>
+                                    </div>
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-emerald-50 text-emerald-500 rounded-2xl"><Landmark size={20} /></div>
+                             
                                 <div><h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Bank Details</h3><p className="text-[11px] text-slate-400 font-semibold uppercase tracking-widest mt-0.5">Bank Verification</p></div>
                             </div>
                             <div className="flex items-center gap-3">
@@ -628,11 +634,18 @@ export default function ProfileSection() {
                             </div>
 
                             <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                                 <div className="mb-8">
+                                        <span className="px-3 py-1.5 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-lg border border-blue-100">
+                                            Step - 1
+                                        </span>
+                                    </div>
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                                     <div className="flex items-center gap-3">
+                                      {/* <p className="text-xl font-light text-slate-800 tracking-tight">Step 1</p> */}
                                         <div className="p-2 bg-emerald-50 text-emerald-500 rounded-xl">
                                             <CheckCircle2 size={18} strokeWidth={2.5} />
                                         </div>
+                                        
                                         <h3 className="text-md font-bold text-[#0f172a]">KYC & Verification Hub</h3>
                                     </div>
 
@@ -715,6 +728,10 @@ export default function ProfileSection() {
                                                                 {verifyingPan ? "..." : "Verify"}
                                                             </button>
                                                         </div>
+                                         {/* Disclaimer added below */}
+                                                    <p className="text-[9px]  text-red-400 leading-tight">
+                                                        * Note: Upon successful verification, your profile name will be automatically updated to match the name on your PAN card.
+                                                    </p>
                                                     </>
                                                 )}
                                             </div>
