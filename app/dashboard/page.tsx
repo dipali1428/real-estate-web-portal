@@ -114,7 +114,7 @@ export default function Dashboard() {
                         {loading ? "Loading..." : `Welcome back, ${user?.name || "Partner"}.`}
                     </h2>
                     <p className="text-sm sm:text-base mb-4">
-                        Here&apos;s a snapshot of your business performance. 
+                        Here&apos;s a snapshot of your business performance.
                     </p>
                 </motion.div>
 
