@@ -198,8 +198,8 @@ const ContactSection = () => {
                     value={form.message}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
-                  ></textarea>
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900 resize-none overflow-y-auto h-32"
+                  />
 
                   <button
                     type="submit"

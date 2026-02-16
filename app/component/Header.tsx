@@ -6,8 +6,9 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import AboutSection from "../page/about/page";
 import CibilSection from "../page/cibil/page";
 import EMICalculator from "../page/emi/page";
-
+import Image from "next/image";
 import { useModal } from "../context/ModalContext";
+import Link from "next/link";
 // import { useRouter } from "next/navigation";
 // import { useClientCookie } from "../hooks/useClientCookie";
 
@@ -92,18 +93,28 @@ const Header = () => {
   return (
     <header className="bg-linear-to-br from-[#E8F6FA] via-[#F0FAFB] to-[#E9F8F6] backdrop-blur-md shadow-sm sticky top-0 z-50 transition-all duration-300 border-b border-[#1CADA3]/20">
       <nav className="max-w-[1600px] container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex items-center justify-between">
-      {/* <nav className="max-w-[1600px] mx-auto px-4 xl:px-6 2xl:px-8 py-3 flex items-center justify-between"> */}
+        {/* <nav className="max-w-[1600px] mx-auto px-4 xl:px-6 2xl:px-8 py-3 flex items-center justify-between"> */}
         {/* Logo Section */}
         <motion.div
-          className="flex items-center space-x-2"   
+            className="flex items-center space-x-2"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}>
-          <img
+
+          <Link href="/">
+            <Image
+              src="/logo.png"
+              alt="Infinity Arthvishva Logo"
+              className="h-8 sm:h-10 md:h-12 lg:h-14 w-auto object-contain"
+              priority
+            />
+          </Link>
+          {/* <Image
             src="/logo.png"
             alt="Infinity Arthviksha Logo"
+            href="/"
             className="h-8 sm:h-10 md:h-12 lg:h-14 w-auto object-contain"
-          />
+          /> */}
         </motion.div>
 
         {/* Desktop Menu */}
