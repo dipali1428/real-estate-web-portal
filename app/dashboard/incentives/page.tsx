@@ -77,7 +77,7 @@ export default function IncentivesPayouts() {
     'loans': [{ name: 'Personal Loan', rate: '1.5% - 2.5%' }, { name: 'Home Loan', rate: '0.4% - 0.88%' }, { name: 'Business Loan', rate: '1.0% - 2.0%' }, { name: 'Commercial / Mortgage', rate: '1.04% - 1.44%' }, { name: 'SME Loan', rate: '1.2% - 2.0%' }, { name: 'Education Loan', rate: '0.40% - 0.96%' }, { name: 'Vehicle Loan', rate: '0.75% - 1.5%' }, { name: 'NRP Loan', rate: '0.75% - 1.5%' }, { name: 'Loan Against Securities', rate: '0.5% - 1.2%' }],
     'insurance': [{ name: 'Life Insurance', rate: '2% - 56%' }, { name: 'Health Insurance', rate: '50% - 80%' }, { name: 'Motor Insurance', rate: '3% - 50%' }, { name: 'Travel Insurance', rate: '50% - 80%' }, { name: 'Fire Insurance', rate: '50% - 80%' }, { name: 'Cattle Insurance', rate: '50% - 80%' }, { name: 'Marine Insurance', rate: '50% - 80%' }, { name: 'Corporate Insurance', rate: '50% - 80%' }, { name: 'Loan Protector', rate: '50% - 80%' }],
     'mutual-funds': [{ name: 'Equity Funds', rate: '0.5% - 0.8%' }, { name: 'Debt Funds', rate: '0.1% - 0.4%' }, { name: 'Hybrid Funds', rate: '0.3% - 0.8%' }],
-    'investments': [{ name: 'Wealth Management', rate: '1.0% - 2.5%' }, { name: 'PMS / AIF', rate: '1.5% - 3.0%' }, { name: 'Bonds / FD', rate: '0.2% - 0.6%' }],
+    'investments': [{ name: 'NCD Bonds', rate: '0.40% - 1.40%' }, { name: 'FD', rate: '0.10% - 1.52%' }, { name: 'Bonds', rate: '0.12% - 0.30%' }],
     'real-estate': [{ name: 'Fractional', rate: '13% - 20%' }]
   };
 

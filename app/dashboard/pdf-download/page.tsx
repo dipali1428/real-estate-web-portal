@@ -36,200 +36,200 @@ export default function Downloads() {
     // Insurance - Motor Insurance
     {
       id: '1',
-      name: 'Motor_Insurance_JAN_2026_DSA_GRID.pdf',
+      name: 'MAHARASHTRA_DSA_GRID_FEBRUARY_2026.pdf',
       type: 'pdf',
       size: '2.4 MB',
-      uploadDate: '2026-1-14',
+      uploadDate: '2026-2-10',
       category: 'payout',
-      month: 'january-2026',
+      month: 'february-2026',
       year: '2026',
       subCategory: 'motor-insurance',
-      filePath: '/pdfs/motorinsurancepdf/JAN_2026_DSA_GRID.pdf'
+      filePath: '/pdfs/motorinsurancepdf/MAHARASHTRA_DSA_GRID_FEBRUARY_2026.pdf'
     },
-     {
-      id: '2',
-      name: 'Motor_Insurance_MAHARASHTRA_DSA_JANUARY_2026.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-1-14',
-      category: 'payout',
-      month: 'january-2026',
-      year: '2026',
-      subCategory: 'motor-insurance',
-      filePath: '/pdfs/motorinsurancepdf/MAHARASHTRA_DSA_JANUARY_2026.pdf'
-    },
+    //  {
+    //   id: '2',
+    //   name: 'Motor_Insurance_MAHARASHTRA_DSA_JANUARY_2026.pdf',
+    //   type: 'pdf',
+    //   size: '2.4 MB',
+    //   uploadDate: '2026-1-14',
+    //   category: 'payout',
+    //   month: 'january-2026',
+    //   year: '2026',
+    //   subCategory: 'motor-insurance',
+    //   filePath: '/pdfs/motorinsurancepdf/MAHARASHTRA_DSA_JANUARY_2026.pdf'
+    // },
 
     // Insurance - Life Insurance
   {
       id: '3',
-      name: 'AXIS_LIFE_GRID.pdf',
+      name: 'AXIS_MAX_FEB_26.pdf',
       type: 'pdf',
       size: '2.4 MB',
-      uploadDate: '2026-1-14',
+      uploadDate: '2026-2-10',
       category: 'payout',
-      month: 'january-2026',
+      month: 'february-2026',
       year: '2026',
       subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/AXIS_LIFE_GRID.pdf'
+      filePath: '/pdfs/lifeinsurancepdf/AXIS_MAX_FEB_26.pdf'
     },
     {
       id: '4',
-      name: 'AXIS_MAX_GRID_50%.pdf',
+      name: 'HDFC_LIFE_FEB_26.pdf',
       type: 'pdf',
       size: '2.4 MB',
-      uploadDate: '2026-1-14',
+      uploadDate: '2026-2-10',
       category: 'payout',
-      month: 'january-2026',
+      month: 'february-2026',
       year: '2026',
       subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/AXIS_MAX_GRID_50%.pdf'
+      filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE_FEB_26.pdf'
     },
     {
       id: '5',
-      name: 'BAJAJ_LIFE_GRID_50 %.pdf',
+      name: 'ICICI_PRUDENTIAL_LIFE_FEB_26.pd',
       type: 'pdf',
       size: '2.4 MB',
-      uploadDate: '2026-1-14',
+      uploadDate: '2026-2-10',
       category: 'payout',
-      month: 'january-2026',
+      month: 'february-2026',
       year: '2026',
       subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/BAJAJ_LIFE_GRID_50 %.pdf'
+      filePath: '/pdfs/lifeinsurancepdf/ICICI_PRUDENTIAL_LIFE_FEB_26.pdf'
     },
     {
       id: '6',
-      name: 'DIGIT_GRID.pdf',
+      name: 'DIGIT_LIFE_FEB_26.pdf',
       type: 'pdf',
       size: '2.4 MB',
-      uploadDate: '2026-1-14',
+      uploadDate: '2026-2-10',
       category: 'payout',
-      month: 'january-2026',
+      month:'february-2026',
       year: '2026',
       subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/DIGIT_GRID.pdf'
+      filePath: '/pdfs/lifeinsurancepdf/DIGIT_LIFE_FEB_26.pdf'
     },
     {
       id: '7',
-      name: 'DIGIT_GRID_50 %.pdf',
+      name: 'BAJAJ_ALLIANZ_LIFE_FEB_26.pdf',
       type: 'pdf',
       size: '2.4 MB',
-      uploadDate: '2026-1-14',
+      uploadDate: '2026-2-10',
       category: 'payout',
-      month: 'january-2026',
+      month: 'february-2026',
       year: '2026',
       subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/DIGIT_GRID_50 %.pdf'
+      filePath: '/pdfs/lifeinsurancepdf/BAJAJ_ALLIANZ_LIFE_FEB_26.pdf'
     },
     {
       id: '8',
-      name: 'HDFC_LIFE.pdf',
+      name: 'TATA_LIFE_FEB_26.pd',
       type: 'pdf',
       size: '2.4 MB',
-      uploadDate: '2026-1-14',
+      uploadDate: '2026-2-10',
       category: 'payout',
-      month: 'january-2026',
+      month: 'february-2026',
       year: '2026',
       subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE.pdf'
+      filePath: '/pdfs/lifeinsurancepdf/TATA_LIFE_FEB_26.pdf'
     },
-    {
-      id: '9',
-      name: 'HDFC_LIFE_GRID_50 %.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-1-14',
-      category: 'payout',
-      month: 'january-2026',
-      year: '2026',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE_GRID_50 %.pdf'
-    },
-    {
-      id: '10',
-      name: 'ICICI_LIFE.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-1-14',
-      category: 'payout',
-      month: 'january-2026',
-      year: '2026',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/ICICI_LIFE.pdf'
-    },
-    {
-      id: '11',
-      name: 'ICICI_LIFE_GRID_50%.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-1-14',
-      category: 'payout',
-      month: 'january-2026',
-      year: '2026',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/ICICI_LIFE_GRID_50%.pdf'
-    },
-    {
-      id: '12',
-      name: 'TATA_AIA_GRID.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-1-14',
-      category: 'payout',
-      month: 'january-2026',
-      year: '2026',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_GRID.pdf'
-    },
-    {
-      id: '13',
-      name: 'TATA_AIA_GRID_50 %.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-1-14',
-      category: 'payout',
-      month: 'january-2026',
-      year: '2026',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_GRID_50 %.pdf'
-    },
+    // {
+    //   id: '9',
+    //   name: 'HDFC_LIFE_GRID_50 %.pdf',
+    //   type: 'pdf',
+    //   size: '2.4 MB',
+    //   uploadDate: '2026-1-14',
+    //   category: 'payout',
+    //   month: 'january-2026',
+    //   year: '2026',
+    //   subCategory: 'life-insurance',
+    //   filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE_GRID_50 %.pdf'
+    // },
+    // {
+    //   id: '10',
+    //   name: 'ICICI_LIFE.pdf',
+    //   type: 'pdf',
+    //   size: '2.4 MB',
+    //   uploadDate: '2026-1-14',
+    //   category: 'payout',
+    //   month: 'january-2026',
+    //   year: '2026',
+    //   subCategory: 'life-insurance',
+    //   filePath: '/pdfs/lifeinsurancepdf/ICICI_LIFE.pdf'
+    // },
+    // {
+    //   id: '11',
+    //   name: 'ICICI_LIFE_GRID_50%.pdf',
+    //   type: 'pdf',
+    //   size: '2.4 MB',
+    //   uploadDate: '2026-1-14',
+    //   category: 'payout',
+    //   month: 'january-2026',
+    //   year: '2026',
+    //   subCategory: 'life-insurance',
+    //   filePath: '/pdfs/lifeinsurancepdf/ICICI_LIFE_GRID_50%.pdf'
+    // },
+    // {
+    //   id: '12',
+    //   name: 'TATA_AIA_GRID.pdf',
+    //   type: 'pdf',
+    //   size: '2.4 MB',
+    //   uploadDate: '2026-1-14',
+    //   category: 'payout',
+    //   month: 'january-2026',
+    //   year: '2026',
+    //   subCategory: 'life-insurance',
+    //   filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_GRID.pdf'
+    // },
+    // {
+    //   id: '13',
+    //   name: 'TATA_AIA_GRID_50 %.pdf',
+    //   type: 'pdf',
+    //   size: '2.4 MB',
+    //   uploadDate: '2026-1-14',
+    //   category: 'payout',
+    //   month: 'january-2026',
+    //   year: '2026',
+    //   subCategory: 'life-insurance',
+    //   filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_GRID_50 %.pdf'
+    // },
     // Insurance - Health Insurance
-     {
-      id: '14',
-      name: 'HEALTH_GRID_JANUARY_(50%).pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-1-14',
-      category: 'payout',
-      month: 'january-2026',
-      year: '2026',
-      subCategory: 'health-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/HEALTH_GRID_JANUARY_(50%).pdf'
-    },
-    {
-      id: '15',
-      name: 'HEALTH_GRID_MONTH_OF_JANUARY_80%.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-1-14',
-      category: 'payout',
-      month: 'january-2026',
-      year: '2026',
-      subCategory: 'health-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/HEALTH_GRID_MONTH_OF_JANUARY_80%.pdf'
-    },
-    // Loan - Home Loan
-    {
-      id: '16',
-      name: 'IA_Jan_Payout_Structure.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-1-14',
-      category: 'payout',
-      month: 'january-2026',
-      year: '2026',
-      subCategory: 'home-loan',
-      filePath: '/pdfs/homeloan/IA_Jan_Payout_Structure.pdf'
-    },
+    //  {
+    //   id: '14',
+    //   name: 'HEALTH_GRID_JANUARY_(50%).pdf',
+    //   type: 'pdf',
+    //   size: '2.4 MB',
+    //   uploadDate: '2026-1-14',
+    //   category: 'payout',
+    //   month: 'january-2026',
+    //   year: '2026',
+    //   subCategory: 'health-insurance',
+    //   filePath: '/pdfs/lifeinsurancepdf/HEALTH_GRID_JANUARY_(50%).pdf'
+    // },
+    // {
+    //   id: '15',
+    //   name: 'HEALTH_GRID_MONTH_OF_JANUARY_80%.pdf',
+    //   type: 'pdf',
+    //   size: '2.4 MB',
+    //   uploadDate: '2026-1-14',
+    //   category: 'payout',
+    //   month: 'january-2026',
+    //   year: '2026',
+    //   subCategory: 'health-insurance',
+    //   filePath: '/pdfs/lifeinsurancepdf/HEALTH_GRID_MONTH_OF_JANUARY_80%.pdf'
+    // },
+    // // Loan - Home Loan
+    // {
+    //   id: '16',
+    //   name: 'IA_Jan_Payout_Structure.pdf',
+    //   type: 'pdf',
+    //   size: '2.4 MB',
+    //   uploadDate: '2026-1-14',
+    //   category: 'payout',
+    //   month: 'january-2026',
+    //   year: '2026',
+    //   subCategory: 'home-loan',
+    //   filePath: '/pdfs/homeloan/IA_Jan_Payout_Structure.pdf'
+    // },
     // Loan - Business Loan
     
 
@@ -663,23 +663,6 @@ export default function Downloads() {
           {/* Payout Structure Section */}
           {activeSection === 'payout' && (
             <div className="space-y-6">
-              {/* Month Selector */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                  <label className="text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">Select Month:</label>
-                  <select
-                    value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="px-3 sm:px-4 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
-                  >
-                    {months.map(month => (
-                      <option key={month.value} value={month.value}>
-                        {month.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
 
               {/* Category Navigation Bar */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-1">
