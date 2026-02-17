@@ -75,7 +75,7 @@ export default function IncentivesPayouts() {
 
   const commissionStructure = {
     'loans': [{ name: 'Personal Loan', rate: '1.5% - 2.5%' }, { name: 'Home Loan', rate: '0.4% - 0.88%' }, { name: 'Business Loan', rate: '1.0% - 2.0%' }, { name: 'Commercial / Mortgage', rate: '1.04% - 1.44%' }, { name: 'SME Loan', rate: '1.2% - 2.0%' }, { name: 'Education Loan', rate: '0.40% - 0.96%' }, { name: 'Vehicle Loan', rate: '0.75% - 1.5%' }, { name: 'NRP Loan', rate: '0.75% - 1.5%' }, { name: 'Loan Against Securities', rate: '0.5% - 1.2%' }],
-    'insurance': [{ name: 'Life Insurance', rate: '2% - 56%' }, { name: 'Health Insurance', rate: '50% - 80%' }, { name: 'Motor Insurance', rate: '3% - 50%' }, { name: 'Travel Insurance', rate: '50% - 80%' }, { name: 'Fire Insurance', rate: '50% - 80%' }, { name: 'Cattle Insurance', rate: '50% - 80%' }, { name: 'Marine Insurance', rate: '50% - 80%' }, { name: 'Corporate Insurance', rate: '50% - 80%' }, { name: 'Loan Protector', rate: '50% - 80%' }],
+    'insurance': [{ name: 'Life Insurance', rate: '2% - 56%' }, { name: 'Health Insurance', rate: '15% - 35%' }, { name: 'Motor Insurance', rate: '3% - 50%' }, { name: 'Travel Insurance', rate: '22% - 40%' }, { name: 'Fire Insurance', rate: '6% - 28%' }, { name: 'Cattle Insurance', rate: '12%' }, { name: 'Marine Insurance', rate: '8% - 22%' }, { name: 'Corporate Insurance', rate: '5%' }, { name: 'Loan Protector', rate: '23% - 35%' }],
     'mutual-funds': [{ name: 'Equity Funds', rate: '0.5% - 0.8%' }, { name: 'Debt Funds', rate: '0.1% - 0.4%' }, { name: 'Hybrid Funds', rate: '0.3% - 0.8%' }],
     'investments': [{ name: 'NCD Bonds', rate: '0.40% - 1.40%' }, { name: 'FD', rate: '0.10% - 1.52%' }, { name: 'Bonds', rate: '0.12% - 0.30%' }],
     'real-estate': [{ name: 'Fractional', rate: '13% - 20%' }]
@@ -86,42 +86,43 @@ export default function IncentivesPayouts() {
   //   return ["Axis", "Bajaj", "Digit", "HDFC", "ICICI", "Tata"];
   // }, [leadCategory]);
 
-  // --- CALCULATION LOGIC ---
+ // --- CALCULATION LOGIC ---
   const calculation = useMemo(() => {
     const receivableAmount = parseFloat(amount) || 0;
     
-    // Calculate based on category
-    let grossAmount = 0;
-    let percentLabel = "0%";
+    // 1. Get the list of products for the active category
+    const categoryProducts = commissionStructure[leadCategory];
     
-    if (leadCategory === 'loans') {
-      grossAmount = receivableAmount * 0.008; // 0.80% of receivable (changed from 0.5%)
-      percentLabel = "0.80%";
-    } else if (leadCategory === 'insurance') {
-      grossAmount = receivableAmount * 0.50; // 50% of premium
-      percentLabel = "50%";
-    } else if (leadCategory === 'mutual-funds') {
-      grossAmount = receivableAmount * 0.008; // 0.80% of receivable (changed from 0.6%)
-      percentLabel = "0.80%";
-    } else if (leadCategory === 'investments') {
-      grossAmount = receivableAmount * 0.02; // 2.0% of receivable (increased from 1.5%)
-      percentLabel = "2.0%";
-    } else if (leadCategory === 'real-estate') {
-      grossAmount = receivableAmount * 0.02; // 2.0% of receivable (increased from 1.75%)
-      percentLabel = "2.0%";
-    }
+    // 2. Find the rate string for the selected product (e.g., "2% - 56%")
+    const productInfo = categoryProducts.find(p => p.name === selectedProduct);
+    const rateString = productInfo ? productInfo.rate : "0%";
+
+    // 3. Extract all numbers from the string using Regex
+    // This handles "2% - 56%", "0.5%", or "0.40% - 0.96%"
+    const matches = rateString.match(/\d+(\.\d+)?/g);
+    const rates = matches ? matches.map(Number) : [0];
+
+    // 4. Calculate the Average Rate
+    // For Life Insurance: (2 + 56) / 2 = 29
+    const sum = rates.reduce((a, b) => a + b, 0);
+    const avgRatePercent = sum / rates.length;
     
-    const tdsAmount = grossAmount * 0.02; // 2% TDS
+    // 5. Calculate Gross (based on average rate)
+    const grossAmount = receivableAmount * (avgRatePercent / 100);
+    
+    // 6. Calculate 2% TDS on the Gross amount
+    const tdsAmount = grossAmount * 0.02;
+    
+    // 7. Calculate Net Payout
     const netPayout = grossAmount - tdsAmount;
 
     return {
-      gross: grossAmount.toLocaleString(),
-      tds: tdsAmount.toLocaleString(),
-      net: netPayout.toLocaleString(),
-      percent: percentLabel
+      gross: grossAmount.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+      tds: tdsAmount.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+      net: netPayout.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+      percent: avgRatePercent.toFixed(2) + "%"
     };
-  }, [amount, leadCategory]);
-
+  }, [amount, leadCategory, selectedProduct]);
   const isCalculationReady = useMemo(() => {
     if (!amount || !selectedProduct || !selectedBank) return false;
     if (leadCategory !== 'loans' && !selectedPlan) return false;
@@ -374,7 +375,7 @@ export default function IncentivesPayouts() {
                         {calculation.net}
                       </div>
                       <div className="mt-4 inline-flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-lg text-xs font-bold backdrop-blur-sm">
-                        <TrendingUp className="w-4 h-4" />@ {calculation.percent} commission
+                        <TrendingUp className="w-4 h-4" />@ {calculation.percent} avg commission
                       </div>
                     </div>
                   </div>
