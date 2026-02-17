@@ -80,6 +80,7 @@ const Header = () => {
     { label: "Fixed Deposit", href: "/products/FD" },
     { label: "Bonds", href: "/offers/investment/bonds" },
     { label: "NCD", href: "/products/NCD" },
+    { label: "NPS", href: "/products/nps" },
   ];
 
   const realEstateOptions = [
@@ -105,6 +106,8 @@ const Header = () => {
             <Image
               src="/logo.png"
               alt="Infinity Arthvishva Logo"
+              width={200}
+              height={200}
               className="h-8 sm:h-10 md:h-12 lg:h-14 w-auto object-contain"
               priority
             />

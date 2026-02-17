@@ -87,13 +87,49 @@ export const sidebarLinks = {
         { label: "Website Enquiry", href: "/hr/websiteenquiry", icon: <Megaphone className="h-5 w-5 text-neutral-700" /> },
         { label: "Career Management", href: "/hr/careermanagement", icon: < MessageSquare className="h-5 w-5 text-neutral-700" /> },
     ],
-    
+
     CUSTOMER: [
         { label: "Dashboard", href: "/customer", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "Profile", href: "/customer/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
-        { label: "Unlisted Shares", href: "/customer/unlisted", icon: <Users className="h-5 w-5 text-neutral-700" /> },
-        { label: "Mutual Funds", href: "/customer/mutualfunds", icon: <Users className="h-5 w-5 text-neutral-700" /> },
-        // { label: "Detailed leads", href: "/customer/", icon: <Users className="h-5 w-5 text-neutral-700" /> },
-        // { label: "Consumer Detailed leads", href: "/customer/consumerdetailedleads", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+
+        {
+            label: "Products",
+            icon: <Proportions className="h-5 w-5 text-neutral-700" />,
+            children: [
+                {
+                    label: "Unlisted Panel",
+                    icon: <Users className="h-4 w-4 text-neutral-700" />,
+                    children: [
+                        {
+                            label: "Unlisted Dashboard",
+                            href: "/customer/unlisted/",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Startup Shares",
+                            href: "/customer/unlisted/buy-shares",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                    ],
+                },
+                {
+                    label: "Mutual Funds Panel",
+                    icon: <Users className="h-4 w-4 text-neutral-700" />,
+                    children: [
+                        {
+                            label: "Equity Funds",
+                            href: "/customer/mutualfunds/equity",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Debt Funds",
+                            href: "/customer/mutualfunds/debt",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                    ],
+                },
+            ],
+        },
     ],
+
 };

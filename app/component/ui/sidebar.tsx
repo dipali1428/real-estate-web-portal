@@ -12,6 +12,7 @@ interface Links {
     href: string;
     icon: React.ReactNode;
     onClick?: () => void;
+    children?: Links[]; 
 }
 
 interface SidebarContextProps {
@@ -87,7 +88,7 @@ export const DesktopSidebar = ({
     return (
         <motion.div
             className={cn(
-                "hidden md:flex flex-col bg-gray-100 px-4 py-4 h-full shrink-0",
+                "hidden md:flex flex-col bg-gray-100 px-4 py-4 h-screen shrink-0 overflow-y-auto",
                 className
             )}
             animate={{
