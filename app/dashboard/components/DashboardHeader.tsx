@@ -5,6 +5,7 @@ import { MobileSidebar, SidebarProvider } from "../../component/ui/sidebar";
 import { useRouter } from "next/navigation";
 import { getSidebarLinks } from "@/app/utils/getSidebarLinks";
 import type { Role } from "../../utils/getSidebarLinks";
+import { SidebarItem } from "../../component/Sidebar";
 
 export default function DashboardHeader({ role }: { role: Role }) {
     const links = getSidebarLinks(role);

@@ -8,7 +8,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { getSidebarLinks } from "../utils/getSidebarLinks";
 import type { Role } from "../utils/getSidebarLinks";
 
-interface SidebarItem {
+export interface SidebarItem {
   label: string;
   href?: string;
   icon?: React.ReactNode;

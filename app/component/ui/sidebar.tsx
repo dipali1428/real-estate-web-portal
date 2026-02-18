@@ -6,10 +6,12 @@ import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import router from "next/router";
 import { LogOut } from "lucide-react";
+// import { SidebarItem } from "../Sidebar";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface Links {
     label: string;
-    href: string;
+    href?: string;
     icon: React.ReactNode;
     onClick?: () => void;
     children?: Links[]; 
@@ -112,14 +114,13 @@ export const MobileSidebar = ({
     links,
     onNavigate
 }: {
-    links: { label: string; href: string; icon: React.ReactNode }[];
+    links: Links[];
     onNavigate: (href: string) => void;
 }) => {
     const { open, setOpen } = useSidebar();
 
     return (
         <div className="md:hidden">
-            {/* Menu Icon */}
             <div className="p-2">
                 <IconMenu2
                     className="h-7 w-7 text-neutral-700"
@@ -127,54 +128,42 @@ export const MobileSidebar = ({
                 />
             </div>
 
-            {/* Slide Menu */}
             <AnimatePresence>
                 {open && (
                     <motion.div
                         initial={{ x: "-100%", opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: "-100%", opacity: 0 }}
-                        transition={{ duration: 0.35 }}
-                        className="fixed inset-0 bg-white z-50 p-6 flex flex-col">
-                        {/* Close Button */}
+                        transition={{ duration: 0.3 }}
+                        className="fixed inset-0 bg-white z-50 p-6 flex flex-col overflow-y-auto"
+                    >
                         <IconX
                             className="absolute right-6 top-6 h-7 w-7 text-gray-700"
                             onClick={() => setOpen(false)}
                         />
 
-                        {/* LOGO */}
-                        <img
-                            src="/logo.png"
-                            className="h-14 mb-6 mt-12 mx-auto"
-                        />
+                        <img src="/logo.png" className="h-14 mb-6 mt-12 mx-auto" alt="Logo" />
 
-                        {/* LINKS LIST */}
-                        <div className="flex flex-col gap-3 mt-4">
+                        <div className="flex flex-col gap-2 mt-4">
                             {links.map((link, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => {
-                                        onNavigate(link.href);
-                                        setOpen(false);
-                                    }}
-                                    className="flex items-center gap-3 py-2 px-3 rounded-md text-left 
-                                               text-gray-800 hover:bg-blue-100 transition-all">
-                                    {link.icon}
-                                    <span className="text-[15px]">{link.label}</span>
-                                </button>
+                                <MobileNavItem 
+                                    key={index} 
+                                    link={link} 
+                                    onNavigate={onNavigate} 
+                                    setOpen={setOpen} 
+                                />
                             ))}
                         </div>
-                        
-                        <div className="p-0.5 pt-2">
-                            <SidebarLink
-                                link={{
-                                    label: "Logout",
-                                    href: "/",
-                                    icon: <LogOut className="h-5 w-5 text-neutral-700" />,
-                                    onClick: handleLogout
-                                }}
-                                className="text-gray-700"
-                            />
+
+                        {/* Logout Section */}
+                        <div className="mt-auto pt-6 border-t">
+                             <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-3 py-2 px-3 text-gray-700 hover:bg-red-50 w-full rounded-md"
+                            >
+                                <LogOut className="h-5 w-5" />
+                                <span>Logout</span>
+                            </button>
                         </div>
                     </motion.div>
                 )}
@@ -183,6 +172,76 @@ export const MobileSidebar = ({
     );
 };
 
+// New Sub-component to handle nesting
+const MobileNavItem = ({ 
+    link, 
+    onNavigate, 
+    setOpen,
+    depth = 0 
+}: { 
+    link: Links; 
+    onNavigate: (href: string) => void; 
+    setOpen: (open: boolean) => void;
+    depth?: number;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const hasChildren = link.children && link.children.length > 0;
+
+    const handleClick = () => {
+        if (hasChildren) {
+            setIsOpen(!isOpen);
+        } else if (link.href) {
+            onNavigate(link.href);
+            setOpen(false);
+        } else if (link.onClick) {
+            link.onClick();
+            setOpen(false);
+        }
+    };
+
+    return (
+        <div className="flex flex-col">
+            <button
+                onClick={handleClick}
+                className={cn(
+                    "flex items-center justify-between py-2 px-3 rounded-md text-left transition-all",
+                    "text-gray-800 hover:bg-gray-100",
+                    depth > 0 && "ml-4 text-sm text-gray-600" // Indent children
+                )}
+            >
+                <div className="flex items-center gap-3">
+                    {link.icon}
+                    <span>{link.label}</span>
+                </div>
+                {hasChildren && (
+                    isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />
+                )}
+            </button>
+
+            {/* Render Children Recursively */}
+            <AnimatePresence>
+                {hasChildren && isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden flex flex-col"
+                    >
+                        {link.children?.map((child, idx) => (
+                            <MobileNavItem 
+                                key={idx} 
+                                link={child} 
+                                onNavigate={onNavigate} 
+                                setOpen={setOpen}
+                                depth={depth + 1}
+                            />
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
 
 export const SidebarLink = ({
     link,
