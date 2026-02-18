@@ -68,8 +68,17 @@ export const RmService = {
   },
   updateReferralStatus: async (leadId: number, newStatus: string) => {
     const response = await api.put(`/api/rm/${leadId}/referral-status`,{
-      referral_lead_status: newStatus  // ✅ MATCH BACKEND
+      referral_lead_status: newStatus  
     },);
     return response.data;
   },
+ updateDetailLeadStatus: async (leadId: number, newStatus: string) => {
+    // Ensure the ID is passed correctly in the URL and body matches backend expectations
+    const response = await api.put(`/api/rm/${leadId}/detail-lead-status`, {
+      lead_status: newStatus
+    });
+    return response.data;
+  },
+
+
 };

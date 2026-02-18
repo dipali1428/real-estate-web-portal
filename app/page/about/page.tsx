@@ -260,7 +260,19 @@ const AboutSection = () => {
                                     <p className="font-medium text-gray-700">1st Floor, Plot No. 103</p>
                                     <p>Adity Sai Landmark Near Bhoi Clinic</p>
                                     <p>Ram Mandir Chowk</p>
-                                    <p>Sangli,Maharashtra - 416416 </p>
+                                    <p>Sangli, Maharashtra - 416416 </p>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Moshi Branch */}
+                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                            <div className="bg-white rounded-xl p-5 h-full">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Moshi Branch</h3>
+                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
+                                    <p className="font-medium text-gray-700">1st Floor, Office No 104 </p>
+                                    <p>Destination Ostiya</p>
+                                    <p>F Building , Alandi Moshi Road</p>
+                                    <p>Pune, Maharashtra - 412105 </p>
                                 </div>
                             </div>
                         </div>
