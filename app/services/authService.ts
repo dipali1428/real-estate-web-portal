@@ -6,6 +6,7 @@ interface LoginPayload {
 }
 
 interface RegisterPayload {
+    entity_type: string;
     name: string;
     email: string;
     mobile: string;

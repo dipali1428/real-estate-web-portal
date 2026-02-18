@@ -3,17 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { AuthService } from "@/app/services/authService";
 import { useModal } from "../../context/ModalContext";
-import { Eye, EyeOff, CheckCircle, ArrowRight, ArrowLeft, Smartphone, ShieldCheck, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, CheckCircle, ArrowRight, ArrowLeft, Smartphone, ShieldCheck, AlertCircle, User, Building2 } from "lucide-react";
 import { STATES_CITIES } from "@/app/data/statesCities";
 
 const states = Object.keys(STATES_CITIES);
 
-// --- Regex rules ---
 const NAME_REGEX = /^[A-Za-z ]{2,60}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MOBILE_REGEX = /^[6-9]\d{9}$/;
 
-// Simple math CAPTCHA
 function useMathCaptcha() {
   const [a, setA] = useState(0);
   const [b, setB] = useState(0);
@@ -36,9 +34,9 @@ function useMathCaptcha() {
 export default function BecomePartnerForm() {
   const { openLogin, closeAll } = useModal();
 
-  // --- Form State ---
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
+    entity_type: "Individual", // New State Field
     role: "DSA",
     name: "",
     email: "",
@@ -55,8 +53,6 @@ export default function BecomePartnerForm() {
     return form.state ? STATES_CITIES[form.state] || [] : [];
   }, [form.state]);
 
-
-  // --- OTP & Auth State ---
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
@@ -64,7 +60,6 @@ export default function BecomePartnerForm() {
   const [otpSubmitting, setOtpSubmitting] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
 
-  // --- UI State ---
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<{ level: string }>({ level: "" });
@@ -76,7 +71,6 @@ export default function BecomePartnerForm() {
 
   const { a, b, answer, setAnswer, refresh, isValid } = useMathCaptcha();
 
-  // --- Helpers ---
   const checkPasswordStrength = (password: string) => {
     let strength = 0;
     if (password.length >= 8) strength++;
@@ -100,7 +94,6 @@ export default function BecomePartnerForm() {
     }
   }, [success, closeAll, openLogin]);
 
-  // OPT Timer
   useEffect(() => {
     if (otpTimer === 0) return;
     const interval = setInterval(() => {
@@ -122,7 +115,6 @@ export default function BecomePartnerForm() {
       newValue = newValue.replace(/\D/g, "");
       if (newValue.length > 10) return;
 
-      // Reset OTP if mobile changes
       if (newValue !== form.mobile) {
         setOtp("");
         setOtpSent(false);
@@ -132,12 +124,11 @@ export default function BecomePartnerForm() {
       }
     }
 
-    // ✅ IMPORTANT: State → City dependency
     if (key === "state") {
       setForm((prev) => ({
         ...prev,
         state: newValue,
-        city: "", // reset city
+        city: "",
       }));
       setErrors((prev) => ({ ...prev, state: "", city: "" }));
       return;
@@ -147,13 +138,10 @@ export default function BecomePartnerForm() {
     setServerError(null);
   };
 
-  // --- Validations ---
-
-  // Validate Step 1 (Basic Info)
   const validateStep1 = () => {
     const e: Record<string, string> = {};
 
-    if (!NAME_REGEX.test(form.name)) e.name = "Enter a valid name (2-60 chars).";
+    if (!NAME_REGEX.test(form.name)) e.name = form.entity_type === "Individual" ? "Enter a valid name (2-60 chars)." : "Enter a valid company name.";
     if (!EMAIL_REGEX.test(form.email)) e.email = "Enter a valid email address.";
     if (!MOBILE_REGEX.test(form.mobile)) e.mobile = "Enter a valid 10-digit mobile number.";
 
@@ -167,7 +155,6 @@ export default function BecomePartnerForm() {
     return Object.keys(e).length === 0;
   };
 
-  // Validate Step 2 (Submission)
   const validateStep2 = () => {
     const e: Record<string, string> = {};
     if (!form.agree) e.agree = "You must accept the Terms & Privacy Policy.";
@@ -189,8 +176,6 @@ export default function BecomePartnerForm() {
     setServerError(null);
     setStep(1);
   };
-
-  // --- API Actions ---
 
   const onSendOtp = async () => {
     setServerError(null);
@@ -252,6 +237,7 @@ export default function BecomePartnerForm() {
 
     try {
       const data = await AuthService.register({
+        entity_type: form.entity_type, // Passing the new field
         name: form.name,
         email: form.email,
         mobile: form.mobile,
@@ -274,7 +260,6 @@ export default function BecomePartnerForm() {
           : null
       );
 
-      // Clear sensitive states
       setOtp("");
       setOtpSent(false);
       setOtpVerified(false);
@@ -290,7 +275,6 @@ export default function BecomePartnerForm() {
     }
   };
 
-  // --- Styles ---
   const inputClass =
     "w-full rounded-lg border border-gray-300 focus:border-[#1CADA3] focus:ring-2 focus:ring-[#1CADA3]/30 px-3 py-2.5 text-sm bg-white text-gray-800 placeholder:text-gray-400 outline-none transition disabled:bg-gray-50 disabled:text-gray-500";
   const labelClass = "text-sm font-medium text-gray-700 block mb-1";
@@ -308,7 +292,6 @@ export default function BecomePartnerForm() {
              w-full mx-auto overflow-hidden transition-all duration-300 relative">
         {!success ? (
           <>
-            {/* Step Indicator */}
             <div className="flex items-center justify-center mb-4 sm:mb-6 scale-90 sm:scale-100">
               <div className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-colors ${step === 1 ? "bg-[#1CADA3] text-white" : "bg-green-100 text-green-700"}`}>1</div>
               <div className={`w-16 h-1 mx-2 rounded-full transition-colors ${step === 2 ? "bg-[#1CADA3]" : "bg-gray-200"}`}></div>
@@ -317,7 +300,6 @@ export default function BecomePartnerForm() {
 
             <form onSubmit={onSubmit} className="space-y-3 sm:space-y-4">
 
-              {/* --- STEP 1: Basic Details --- */}
               {step === 1 && (
                 <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -325,16 +307,49 @@ export default function BecomePartnerForm() {
                     Basic Details
                   </h3>
 
+                  {/* --- NEW: Entity Type Selector --- */}
+                  <div className="mb-6">
+                    <label className={labelClass}>Register As</label>
+                    <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl border border-gray-200">
+                      <button
+                        type="button"
+                        onClick={() => setField("entity_type", "Individual")}
+                        className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                          form.entity_type === "Individual" 
+                          ? "bg-white text-[#1CADA3] shadow-sm" 
+                          : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <User size={16} />
+                        Individual
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setField("entity_type", "Non-Individual")}
+                        className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                          form.entity_type === "Non-Individual" 
+                          ? "bg-white text-[#1CADA3] shadow-sm" 
+                          : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <Building2 size={16} />
+                        Non-Individual
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                    {/* Name */}
+                    {/* Dynamic Label for Name */}
                     <div>
-                      <label className={labelClass}>Full Name</label>
+                      <label className={labelClass}>
+                        {form.entity_type === "Individual" ? "Full Name" : "Company / Firm Name"}
+                      </label>
                       <input
                         type="text"
                         value={form.name}
                         onChange={(e) => setField("name", e.target.value)}
                         className={inputClass}
-                        placeholder="e.g. John Doe"
+                        placeholder={form.entity_type === "Individual" ? "e.g. John Doe" : "e.g. Acme Solutions Pvt Ltd"}
                       />
                       {errors.name && <p className={errorClass}>{errors.name}</p>}
                     </div>
@@ -352,7 +367,7 @@ export default function BecomePartnerForm() {
                       {errors.email && <p className={errorClass}>{errors.email}</p>}
                     </div>
 
-                    {/* Mobile (Editable here) */}
+                    {/* Mobile */}
                     <div>
                       <label className={labelClass}>Mobile Number</label>
                       <input
@@ -379,6 +394,7 @@ export default function BecomePartnerForm() {
                       />
                     </div>
 
+                    {/* State */}
                     <div>
                       <label className={labelClass}>State</label>
                       <select
@@ -392,31 +408,10 @@ export default function BecomePartnerForm() {
                           </option>
                         ))}
                       </select>
-
                       {errors.state && <p className={errorClass}>{errors.state}</p>}
                     </div>
 
-
-                    {/* <div>
-                      <label className={labelClass}>State</label>
-                      <input
-                        list="state-list"
-                        value={form.state}
-                        onChange={(e) => setField("state", e.target.value.trim())}
-                        className={inputClass}
-                        placeholder="Type to search state"
-                      />
-
-                      <datalist id="state-list">
-                        {states.map((state) => (
-                          <option key={state} value={state} />
-                        ))}
-                      </datalist>
-
-                      {errors.state && <p className={errorClass}>{errors.state}</p>}
-                    </div> */}
-
-
+                    {/* City */}
                     <div>
                       <label className={labelClass}>City</label>
                       <select
@@ -435,25 +430,6 @@ export default function BecomePartnerForm() {
                       </select>
                       {errors.city && <p className={errorClass}>{errors.city}</p>}
                     </div>
-
-                    {/* <div>
-                      <label className={labelClass}>City</label>
-                      <input
-                        list="city-list"
-                        value={form.city}
-                        onChange={(e) => setField("city", e.target.value.trim())}
-                        disabled={!form.state}
-                        className={inputClass}
-                        placeholder={form.state ? "Type to search city" : "Select state first"}
-                      />
-                      <datalist id="city-list">
-                        {cities.map((city) => (
-                          <option key={city} value={city} />
-                        ))}
-                      </datalist>
-
-                      {errors.city && <p className={errorClass}>{errors.city}</p>}
-                    </div> */}
 
                     {/* Password */}
                     <div>
@@ -477,7 +453,6 @@ export default function BecomePartnerForm() {
                         </button>
                       </div>
 
-                      {/* Password Strength Indicator */}
                       {form.password && (
                         <div className="mt-2 flex items-center gap-2 text-xs">
                           <div
@@ -534,7 +509,7 @@ export default function BecomePartnerForm() {
                 </div>
               )}
 
-              {/* --- STEP 2: Verification & Submit --- */}
+              {/* Step 2 remained mostly unchanged, but will now send entity_type on submit */}
               {step === 2 && (
                 <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -543,7 +518,6 @@ export default function BecomePartnerForm() {
                   </h3>
 
                   <div className="bg-slate-50 p-4 rounded-xl border border-gray-200 space-y-4">
-                    {/* Mobile Summary */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-700">
                         <Smartphone size={18} className="text-[#1CADA3]" />
@@ -552,7 +526,6 @@ export default function BecomePartnerForm() {
                       {otpVerified && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-md font-medium flex items-center gap-1"><CheckCircle size={12} /> Verified</span>}
                     </div>
 
-                    {/* Send OTP Button (If not sent yet) */}
                     {!otpSent && (
                       <div className="flex flex-col sm:flex-row gap-2">
                         <button
@@ -565,7 +538,6 @@ export default function BecomePartnerForm() {
                       </div>
                     )}
 
-                    {/* Verify OTP Input (If sent) */}
                     {otpSent && !otpVerified && (
                       <div className="space-y-2">
                         <div className="flex gap-2">
@@ -598,20 +570,10 @@ export default function BecomePartnerForm() {
                             {otpTimer > 0 ? `Resend in ${otpTimer}s` : "Resend OTP"}
                           </button>                        </div>
                         {errors.otp && <p className={errorClass}>{errors.otp}</p>}
-
-                        {/* Global Server Error Message */}
-                        {serverError && (
-                          <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-100 flex items-center gap-2 text-red-700 text-sm animate-shake">
-                            <AlertCircle className="w-4 h-4" />
-                            <p className="font-medium">{serverError}</p>
-                          </div>
-                        )}
-
                       </div>
                     )}
                   </div>
 
-                  {/* Math Captcha */}
                   <div className="mt-4">
                     <label className={labelClass}>Human Verification</label>
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -637,7 +599,6 @@ export default function BecomePartnerForm() {
                     {errors.captcha && <p className={errorClass}>{errors.captcha}</p>}
                   </div>
 
-                  {/* Agreement */}
                   <div className="mt-4 bg-[#E8F6FA]/50 p-3 rounded-lg border border-[#1CADA3]/10">
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input
@@ -656,7 +617,6 @@ export default function BecomePartnerForm() {
                     {errors.agree && <p className={errorClass}>{errors.agree}</p>}
                   </div>
 
-                  {/* Global Server Error Message */}
                   {serverError && (
                     <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-100 flex items-center gap-2 text-red-700 text-sm animate-shake">
                       <AlertCircle className="w-4 h-4" />
@@ -665,10 +625,9 @@ export default function BecomePartnerForm() {
                   )}
 
                   <p className="text-xs text-gray-400 mt-2 italic">
-                    *Please ensure your Name, Email, and Mobile Number are entered correctly during registration.
+                    *Please ensure your details match your official documents.
                   </p>
 
-                  {/* Step 2 Buttons */}
                   <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-3">
                     <button
                       type="button"
@@ -684,7 +643,6 @@ export default function BecomePartnerForm() {
                       {submitting ? "Registering..." : "Complete Registration"} <ShieldCheck size={16} />
                     </button>
                   </div>
-
                 </div>
               )}
             </form>
