@@ -23,14 +23,6 @@ const AdminTicketStats = ({ stats }: { stats: any }) => {
       bgColor: 'bg-red-50'
     },
     {
-      label: 'Resolved',
-      value: stats.resolved,
-      icon: CheckCircle,
-      color: 'bg-green-500',
-      textColor: 'text-green-600',
-      bgColor: 'bg-green-50'
-    },
-    {
       label: 'Closed',
       value: stats.closed,
       icon: XCircle,

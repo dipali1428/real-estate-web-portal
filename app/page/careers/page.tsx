@@ -5,20 +5,17 @@ import {
   Target, 
   TrendingUp, 
   Handshake, 
-  IndianRupee, 
   GraduationCap, 
-  ShieldCheck, 
   MapPin, 
-  Trophy, 
   Users, 
   AlertTriangle, 
   Briefcase, 
   Clock, 
-  ChevronRight,
-  UserMinus,
   Quote, UserRoundCheck,SquareStack,VectorSquare,
-  X, Send, Upload, Link2
+  X, Send, Link2
 } from 'lucide-react';
+// Import the PublicService
+import { PublicService } from '@/app/services/publicService'; 
 
 // --- Types & Data ---
 type JobCategory = 'all' | 'advisory' | 'operations' | 'sales' | 'pune';
@@ -85,6 +82,19 @@ export default function CareersContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // Input States
+  const [formData, setFormData] = useState({
+    full_name: '',
+    email: '',
+    phone: '',
+    current_city: '',
+    total_experience: '',
+    notice_period: '',
+    current_ctc: '',
+    expected_ctc: '',
+    linkedin_url: ''
+  });
+
   useEffect(() => {
     if (activeFilter === 'all') {
       setFilteredJobs(JOBS);
@@ -94,20 +104,51 @@ export default function CareersContent() {
   }, [activeFilter]);
 
   // Handlers
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   const openApplyModal = (job: Job) => {
     setSelectedJob(job);
     setIsModalOpen(true);
     setIsSuccess(false);
+    // Reset form when opening
+    setFormData({
+        full_name: '',
+        email: '',
+        phone: '',
+        current_city: '',
+        total_experience: '',
+        notice_period: '',
+        current_ctc: '',
+        expected_ctc: '',
+        linkedin_url: ''
+    });
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+
+    const payload = {
+        ...formData,
+        applying_for: selectedJob?.title
+    };
+
+    try {
+      await PublicService.submitCareerApplication(payload);
       setIsSuccess(true);
-      setTimeout(() => setIsModalOpen(false), 2500);
-    }, 1500);
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setIsSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Submission failed", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -262,7 +303,7 @@ export default function CareersContent() {
         </div>
       </section>
 
-      {/* APPLICATION MODAL WITH MORE FIELDS */}
+      {/* APPLICATION MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl relative flex flex-col animate-in fade-in zoom-in duration-200">
@@ -289,22 +330,22 @@ export default function CareersContent() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Full Name *</label>
-                      <input required type="text" className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="Enter your full name" />
+                      <input required type="text" name="full_name" value={formData.full_name} onChange={handleInputChange} className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="Enter your full name" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Email Address *</label>
-                      <input required type="email" className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="email@example.com" />
+                      <input required type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="email@example.com" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Phone Number *</label>
-                      <input required type="tel" className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="+91 00000 00000" />
+                      <input required type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="+91 00000 00000" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Current City *</label>
-                      <input required type="text" className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="e.g. Pune, MH" />
+                      <input required type="text" name="current_city" value={formData.current_city} onChange={handleInputChange} className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="e.g. Pune, MH" />
                     </div>
                   </div>
 
@@ -312,7 +353,7 @@ export default function CareersContent() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Total Experience *</label>
-                      <select required className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none bg-white">
+                      <select required name="total_experience" value={formData.total_experience} onChange={handleInputChange} className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none bg-white">
                         <option value="">Select Experience</option>
                         <option value="fresher">Fresher</option>
                         <option value="1-2">1-2 Years</option>
@@ -322,7 +363,7 @@ export default function CareersContent() {
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Notice Period *</label>
-                      <select required className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none bg-white">
+                      <select required name="notice_period" value={formData.notice_period} onChange={handleInputChange} className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none bg-white">
                         <option value="">Select Notice Period</option>
                         <option value="immediate">Immediate</option>
                         <option value="15">15 Days</option>
@@ -336,11 +377,11 @@ export default function CareersContent() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Current CTC (LPA) *</label>
-                      <input required type="text" className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="e.g. 4.5" />
+                      <input required type="text" name="current_ctc" value={formData.current_ctc} onChange={handleInputChange} className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="e.g. 4.5" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Expected CTC (LPA) *</label>
-                      <input required type="text" className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="e.g. 6.0" />
+                      <input required type="text" name="expected_ctc" value={formData.expected_ctc} onChange={handleInputChange} className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="e.g. 6.0" />
                     </div>
                   </div>
 
@@ -349,28 +390,10 @@ export default function CareersContent() {
                     <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">LinkedIn Profile URL</label>
                     <div className="relative">
                       <Link2 className="absolute left-3 top-2.5 text-gray-400" size={16} />
-                      <input type="url" className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="https://linkedin.com/in/username" />
+                      <input type="url" name="linkedin_url" value={formData.linkedin_url} onChange={handleInputChange} className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none" placeholder="https://linkedin.com/in/username" />
                     </div>
                   </div>
 
-                  {/* File Upload */}
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Resume Upload *</label>
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-[#2076C7] transition-all">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                        <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                        <p className="text-xs text-gray-500 font-medium">Click to upload or drag and drop</p>
-                        <p className="text-[10px] text-gray-400 mt-1">PDF or Word (Max 5MB)</p>
-                      </div>
-                      <input type="file" className="hidden" required accept=".pdf,.doc,.docx" />
-                    </label>
-                  </div>
-
-                  {/* Message */}
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Why should we hire you? (Optional)</label>
-                    <textarea rows={3} className="w-full px-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] outline-none resize-none" placeholder="Briefly describe your fit for the role..."></textarea>
-                  </div>
 
                   {/* Submit Button */}
                   <div className="sticky bottom-0 bg-white pt-4 pb-2 border-t border-gray-50">
@@ -439,8 +462,7 @@ export default function CareersContent() {
   );
 }
 
-// --- Sub-Components (Unchanged) ---
-
+// --- Sub-Components ---
 function ValueCard({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
   return (
     <div className="bg-white p-10 rounded-lg text-center shadow-sm border-t-4 border-[#2076C7] hover:border-[#1CADA3] transition-all hover:-translate-y-2">

@@ -143,5 +143,9 @@ export const DashboardService = {
         return response.data;
     },
 
-    
+    // 🔹 Verify GST Number
+    verifyGst: async (gst_number: string) => {
+        const response = await api.post("/api/dashboard/verify-gst", { gst_number });
+        return response.data;
+    },
 };
