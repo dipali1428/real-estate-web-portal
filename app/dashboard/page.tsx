@@ -113,10 +113,11 @@ export default function Dashboard() {
                     <h2 className="text-xl sm:text-2xl font-bold mb-2 pr-20">
                         {loading ? "Loading..." : `Welcome back, ${user?.name || "Partner"}.`}
                     </h2>
-                    
+
                     <p className="text-sm sm:text-base mb-4">
                         Here&apos;s a snapshot of your business performance.
                     </p>
+                    
                 </motion.div>
 
                 <div className="flex justify-between items-center">
