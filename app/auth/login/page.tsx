@@ -158,7 +158,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
         }
     };
 
-    type UserRole = "ADMIN" | "DEPARTMENTHEAD" | "RM" | "ACCOUNTS" | "CUSTOMER" | "HR" | "USER";
+    type UserRole = "ADMIN" | "DEPARTMENTHEAD" | "RM" | "ACCOUNTS" | "CUSTOMER" | "UNLISTEDADMIN" | "HR" | "USER";
 
     const redirectByRole = (role: UserRole) => {
         const routes: Record<UserRole, string> = {
@@ -167,6 +167,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
             RM: "/rm",
             ACCOUNTS: "/accounts",
             CUSTOMER: "/customer",
+            UNLISTEDADMIN: "/UnlistedAdmin",
             HR: "/hr",
             USER: "/dashboard" // Specific default
         };

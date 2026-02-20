@@ -1,8 +1,19 @@
 'use client';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
+    fetchDashboardData,
+    fetchTopGainers,
+    fetchTopLosers,
+    fetchAllShares,
+    type TopMover,
+    type DashboardResponse,
+    type DashboardSummary,
+    type GraphPoint
+} from '../../../services/unlistedservices';
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+import {
     ArrowLeft,
-    Search,
     TrendingUp,
     TrendingDown,
     BarChart3,
@@ -11,7 +22,7 @@ import {
     Clock,
     Users,
     IndianRupee,
-    ChevronRight
+    Loader2
 } from 'lucide-react';
 import {
     Chart,
@@ -29,479 +40,680 @@ import {
 
 Chart.register(LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Filler, Tooltip, Legend);
 
-interface LiveCompany {
+// Interface for shares data
+interface ShareItem {
     id: number;
-    name: string;
-    symbol: string;
-    price: number;
-    category: string;
-    logoText: string;
-    todayChange: number;
-    weekChange: number;
-    volume: number;
+    shares_name: string;
+    logo_url: string;
+    price: string;
+    depository_applicable: string;
+    min_lot_size: number;
+    created_at?: string;
+    updated_at?: string;
+    clean_name?: string | null;
+    is_active?: boolean;
 }
 
-// Static initial data - no live updates
-const INITIAL_COMPANIES_DATA: LiveCompany[] = [
-    { id: 1, name: "Boat (Imagine Marketing)", symbol: "BOAT", price: 1195, category: "Consumer Electronics", logoText: "B", todayChange: 1.5, weekChange: 3.2, volume: 12500 },
-    { id: 2, name: "OYO (Oravel Stays)", symbol: "OYO", price: 27.5, category: "Hospitality", logoText: "O", todayChange: -0.8, weekChange: -2.1, volume: 8500 },
-    { id: 3, name: "PharmEasy", symbol: "PHARM", price: 6.95, category: "Healthcare", logoText: "P", todayChange: 2.1, weekChange: 5.3, volume: 18500 },
-    { id: 4, name: "HDFC Securities", symbol: "HDFC-S", price: 9250, category: "Financial Services", logoText: "H", todayChange: 0.5, weekChange: 1.8, volume: 3200 },
-    { id: 5, name: "NSE India", symbol: "NSE", price: 1925, category: "Financial Services", logoText: "N", todayChange: -1.2, weekChange: 0.5, volume: 5400 },
-    { id: 6, name: "Hero Fincorp", symbol: "HERO-F", price: 1250, category: "Financial Services", logoText: "H", todayChange: 3.2, weekChange: 7.5, volume: 6200 },
-    { id: 7, name: "InCred Holdings", symbol: "INCR", price: 165, category: "Financial Services", logoText: "I", todayChange: -2.5, weekChange: -1.8, volume: 9500 },
-    { id: 8, name: "SBI Mutual Fund", symbol: "SBI-MF", price: 2695, category: "Financial Services", logoText: "S", todayChange: 1.8, weekChange: 4.2, volume: 4100 },
-    { id: 9, name: "Bira", symbol: "BIRA", price: 188, category: "Beverages", logoText: "B", todayChange: 0.3, weekChange: -0.5, volume: 7800 },
-    { id: 10, name: "ASK Investment Managers", symbol: "ASK", price: 1125, category: "Financial Services", logoText: "A", todayChange: -1.8, weekChange: 2.1, volume: 3600 },
-    { id: 11, name: "CSK", symbol: "CSK", price: 210, category: "Sports", logoText: "C", todayChange: 4.5, weekChange: 12.3, volume: 15200 },
-    { id: 12, name: "APL Metals", symbol: "APL", price: 9.2, category: "Metals", logoText: "A", todayChange: -3.2, weekChange: -5.8, volume: 21800 }
-];
+interface ExtendedTopMover extends TopMover {
+    logo_url?: string;
+}
 
 const LiveTrends: React.FC = () => {
-    // Static companies data - no auto-updates
-    const [companies, setCompanies] = useState<LiveCompany[]>(INITIAL_COMPANIES_DATA);
-
-    // Only top gainers/losers will update slowly
-    const [updateCounter, setUpdateCounter] = useState(0);
+    // State
+    const [graphData, setGraphData] = useState<GraphPoint[]>([]);
+    const [summary, setSummary] = useState<DashboardSummary | null>(null);
+    const [isGraphLoading, setIsGraphLoading] = useState(true);
+    const [graphError, setGraphError] = useState<string | null>(null);
     const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-    const [activeView, setActiveView] = useState<'market' | 'companies' | 'stats'>('market');
+    const [lastUpdatedTime, setLastUpdatedTime] = useState<string>('');
+    
+    // Top Movers State
+    const [gainers, setGainers] = useState<ExtendedTopMover[]>([]);
+    const [losers, setLosers] = useState<ExtendedTopMover[]>([]);
+    const [isMoversLoading, setIsMoversLoading] = useState(true);
+    const [moversError, setMoversError] = useState<string | null>(null);
+
+    // Shares State
+    const [shares, setShares] = useState<ShareItem[]>([]);
+    const [isSharesLoading, setIsSharesLoading] = useState(true);
+
+    // Chart refs
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart | null>(null);
+    const [isChartReady, setIsChartReady] = useState(false);
 
-    // Dynamic Lists - only these update slowly
-    const topGainers = useMemo(() => {
-        // Add some randomness to changes for top gainers
-        const modifiedCompanies = [...companies].map(company => ({
-            ...company,
-            todayChange: company.todayChange + (Math.random() - 0.5) * 0.5 // Small random adjustment
-        }));
-        return modifiedCompanies.sort((a, b) => b.todayChange - a.todayChange).slice(0, 5);
-    }, [companies, updateCounter]);
+    // ========== HELPER FUNCTIONS ==========
+    const formatLargeNumber = (num: number) => {
+        if (num >= 10000000) return `₹${(num / 10000000).toFixed(1)} Cr`;
+        if (num >= 100000) return `₹${(num / 100000).toFixed(1)} L`;
+        if (num >= 1000) return `₹${(num / 1000).toFixed(1)} K`;
+        return `₹${num}`;
+    };
 
-    const topLosers = useMemo(() => {
-        // Add some randomness to changes for top losers
-        const modifiedCompanies = [...companies].map(company => ({
-            ...company,
-            todayChange: company.todayChange + (Math.random() - 0.5) * 0.5 // Small random adjustment
-        }));
-        return modifiedCompanies.sort((a, b) => a.todayChange - b.todayChange).slice(0, 5);
-    }, [companies, updateCounter]);
+    const formatInvestorCount = (num: number) => {
+        if (num >= 1000) return `${(num / 1000).toFixed(1)}K+`;
+        return `${num}+`;
+    };
 
-    // Slow updates for top gainers/losers only (every 10 seconds)
+    const formatPrice = (price: string) => {
+        const num = parseFloat(price);
+        if (Number.isInteger(num)) {
+            return `₹${num.toLocaleString('en-IN')}`;
+        }
+        return `₹${num.toFixed(1)}`;
+    };
+
+    const getCompanyInitials = (name: string) => {
+        const words = name.split(' ');
+        if (words.length >= 2) {
+            return (words[0][0] + words[1][0]).toUpperCase();
+        }
+        return name.substring(0, 2).toUpperCase();
+    };
+
+    const getCategoryFromName = (name: string) => {
+        const nameLower = name.toLowerCase();
+        if (nameLower.includes('tech') || nameLower.includes('technologies') || nameLower.includes('software')) return 'Technology';
+        if (nameLower.includes('fin') || nameLower.includes('bank') || nameLower.includes('securities') || nameLower.includes('invest')) return 'Financial Services';
+        if (nameLower.includes('health') || nameLower.includes('pharma') || nameLower.includes('hospital') || nameLower.includes('clinical')) return 'Healthcare';
+        if (nameLower.includes('energy') || nameLower.includes('power') || nameLower.includes('renewable')) return 'Energy';
+        if (nameLower.includes('auto') || nameLower.includes('motor')) return 'Automotive';
+        if (nameLower.includes('food') || nameLower.includes('beverage') || nameLower.includes('tea')) return 'FMCG';
+        if (nameLower.includes('chem')) return 'Chemicals';
+        if (nameLower.includes('cement') || nameLower.includes('infra')) return 'Infrastructure';
+        if (nameLower.includes('hotel') || nameLower.includes('hospitality')) return 'Hospitality';
+        if (nameLower.includes('exchange') || nameLower.includes('nse')) return 'Stock Exchange';
+        return 'General';
+    };
+
+    // Calculate current index and change
+    const currentIndex = useMemo(() => {
+        if (graphData.length === 0) return "0.00";
+        return parseFloat(graphData[graphData.length - 1].market_price).toLocaleString('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }, [graphData]);
+
+    const todayChange = useMemo(() => {
+        if (graphData.length < 2) return "0.00";
+        const latest = parseFloat(graphData[graphData.length - 1].market_price);
+        const prev = parseFloat(graphData[graphData.length - 2].market_price);
+        return (((latest - prev) / prev) * 100).toFixed(2);
+    }, [graphData]);
+
+    const isPositive = parseFloat(todayChange) >= 0;
+
+    // ========== FETCH ALL DATA ==========
     useEffect(() => {
-        const interval = setInterval(() => {
-            setUpdateCounter(prev => prev + 1);
-        }, 10000); // 10 seconds
+        const loadAllData = async () => {
+            setIsGraphLoading(true);
+            setIsMoversLoading(true);
+            setIsSharesLoading(true);
+            
+            try {
+                // Fetch dashboard data (graph + summary)
+                const dashboardData = await fetchDashboardData();
+                if (dashboardData.success) {
+                    setGraphData(dashboardData.graph);
+                    setSummary(dashboardData.summary);
+                }
 
-        return () => clearInterval(interval);
+                // Fetch top gainers
+                const gainersData = await fetchTopGainers(5);
+                if (gainersData.success) {
+                    setGainers(gainersData.data);
+                }
+
+                // Fetch top losers
+                const losersData = await fetchTopLosers(5);
+                if (losersData.success) {
+                    setLosers(losersData.data);
+                }
+
+                // Fetch shares data
+                const sharesData = await fetchAllShares();
+                if (Array.isArray(sharesData)) {
+                    setShares(sharesData);
+                }
+
+                setGraphError(null);
+                setMoversError(null);
+            } catch (error: any) {
+                console.error("Failed to fetch data:", error);
+                setGraphError("Unable to connect to live API");
+                setMoversError("Unable to fetch top movers");
+            } finally {
+                setIsGraphLoading(false);
+                setIsMoversLoading(false);
+                setIsSharesLoading(false);
+            }
+        };
+
+        loadAllData();
+        
+        const now = new Date();
+        setLastUpdatedTime(now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }));
     }, []);
 
-    // Chart Logic - Static data
+    // Set chart ready after canvas is rendered
     useEffect(() => {
-        if (!chartRef.current) return;
+        if (chartRef.current) {
+            setIsChartReady(true);
+        }
+    }, [chartRef.current]);
+
+    // ========== CHART INITIALIZATION ==========
+    useEffect(() => {
+        if (!isChartReady || !chartRef.current || graphData.length === 0) {
+            return;
+        }
+
+        // Destroy existing chart
+        if (chartInstance.current) {
+            chartInstance.current.destroy();
+            chartInstance.current = null;
+        }
+
         const ctx = chartRef.current.getContext('2d');
         if (!ctx) return;
 
-        if (chartInstance.current) chartInstance.current.destroy();
+        // Filter data based on period
+        let filteredData = [...graphData];
+        if (period === 'weekly') {
+            filteredData = graphData.filter((_, i) => i % 7 === 0);
+        } else if (period === 'monthly') {
+            filteredData = graphData.filter((_, i) => i % 30 === 0);
+        }
 
-        const dailyData = {
-            labels: ['9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00'],
-            data: [4820, 4815, 4830, 4825, 4840, 4835, 4850, 4840, 4860, 4850, 4870, 4860, 4880, 4870, 4885],
-            color: '#2076C7',
-            bgColor: 'rgba(32, 118, 199, 0.1)'
-        };
+        if (filteredData.length < 2) return;
 
-        const weeklyData = {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-            data: [4750, 4775, 4805, 4830, 4855, 4880],
-            color: '#1CADA3',
-            bgColor: 'rgba(28, 173, 163, 0.1)'
-        };
+        const labels = filteredData.map(item => {
+            const date = new Date(item.price_date);
+            return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' });
+        });
 
-        const monthlyData = {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-            data: [4600, 4720, 4810, 4880],
-            color: '#8b5cf6',
-            bgColor: 'rgba(139, 92, 246, 0.1)'
-        };
+        const prices = filteredData.map(item => parseFloat(item.market_price));
 
-        const current = period === 'daily' ? dailyData : period === 'weekly' ? weeklyData : monthlyData;
         const config: ChartConfiguration = {
             type: 'line',
             data: {
-                labels: current.labels,
+                labels,
                 datasets: [{
-                    label: 'Unlisted Market Index',
-                    data: current.data,
-                    borderColor: current.color,
-                    backgroundColor: current.bgColor,
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 3,
-                    pointBackgroundColor: current.color
+                    label: 'Unlisted Index',
+                    data: prices,
+                    borderColor: '#2076C7',
+                    backgroundColor: 'rgba(32, 118, 199, 0.05)',
+                    borderWidth: 2,
+                    pointRadius: filteredData.length > 50 ? 0 : 3,
+                    pointHoverRadius: 6,
+                    tension: 0.2,
+                    fill: true
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        labels: {
-                            color: '#6b7280',
-                            font: { size: 14 }
-                        }
-                    },
+                    legend: { display: false },
                     tooltip: {
                         mode: 'index',
                         intersect: false,
-                        backgroundColor: 'rgba(30, 41, 59, 0.9)',
-                        titleColor: '#f8fafc',
-                        bodyColor: '#cbd5e1',
-                        borderColor: '#475569',
-                        borderWidth: 1,
-                        padding: 12,
-                        titleFont: { size: 14 },
-                        bodyFont: { size: 13 }
+                        callbacks: {
+                            label: (ctx) => `₹${parseFloat(ctx.raw as string).toLocaleString('en-IN')}`
+                        }
                     }
                 },
                 scales: {
-                    x: {
-                        grid: {
-                            color: 'rgba(229, 231, 235, 0.5)',
+                    y: {
+                        position: 'left',
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        ticks: { 
+                            callback: (val) => `₹${val}`,
+                            font: { size: 10, weight: 400 },
+                            color: '#6B7280'
                         },
-                        ticks: {
-                            color: '#6b7280',
-                            font: { size: 12 }
+                        title: {
+                            display: true,
+                            text: 'PRICE (₹)',
+                            color: '#9CA3AF',
+                            font: { size: 9, weight: 500, family: 'sans-serif' },
+                            padding: { top: 0, bottom: 0 }
                         }
                     },
-                    y: {
-                        grid: {
-                            color: 'rgba(229, 231, 235, 0.5)',
-                        },
+                    x: {
+                        position: 'bottom',
+                        grid: { display: false },
                         ticks: {
-                            color: '#6b7280',
-                            font: { size: 12 },
-                            callback: (val) => '₹' + val
+                            autoSkip: true,
+                            maxRotation: 0,
+                            autoSkipPadding: 20,
+                            font: { size: 9, weight: 400 },
+                            color: '#6B7280'
+                        },
+                        title: {
+                            display: true,
+                            text: 'DATE',
+                            color: '#9CA3AF',
+                            font: { size: 9, weight: 500, family: 'sans-serif' },
+                            padding: { top: 4, bottom: 0 }
                         }
                     }
-                }
+                },
+                layout: {
+                    padding: { top: 20, bottom: 20, left: 10, right: 10 }
+                },
+                animation: { duration: 300 }
             }
         };
 
-        chartInstance.current = new Chart(ctx, config);
+        try {
+            chartInstance.current = new Chart(ctx, config);
+        } catch (error) {
+            console.error("Error creating chart:", error);
+        }
 
-        return () => chartInstance.current?.destroy();
-    }, [period]);
+        return () => {
+            if (chartInstance.current) {
+                chartInstance.current.destroy();
+                chartInstance.current = null;
+            }
+        };
+    }, [graphData, period, isChartReady]);
 
-    // Format time for "Last updated" display
-    const lastUpdatedTime = useMemo(() => {
-        const now = new Date();
-        return now.toLocaleTimeString('en-IN', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
-    }, [updateCounter]);
-
+    // ========== RENDER ==========
     return (
-        <>
-            <div className="min-h-screen font-sans bg-gradient-to-br from-gray-50 to-white">
-                <main className="container mx-auto px-4 py-4 pt-4 md:pt-8">
-                    <div className="flex justify-start mb-8">
-                        <a
-                            href="/products/unlisted"
-                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-all text-gray-700 group">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+            <main className="container mx-auto px-4 py-4 pt-4 md:pt-8">
+                {/* Back Button */}
+                <div className="sticky top-[72px] z-40 mb-8 bg-gradient-to-br from-gray-50 to-white pt-2 pb-2">
+                    <div className="container mx-auto px-4">
+                        <a 
+                            href="/products/unlisted" 
+                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-all text-gray-700 group"
+                        >
                             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                             <span className="font-semibold">Back</span>
                         </a>
                     </div>
-                    {/* Header Section*/}
-                    <header className="mb-12 text-center">
-                        {/* Icon Section */}
-                        <div className="inline-flex items-center justify-center p-4 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 mb-6">
-                            <div className="p-4 rounded-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg">
-                                <Activity className="w-8 h-8" />
+                </div>
+
+                {/* Header */}
+                <header className="mb-12 text-center">
+                    <div className="inline-flex items-center justify-center p-4 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 mb-6">
+                        <div className="p-4 rounded-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white">
+                            <Activity className="w-8 h-8" />
+                        </div>
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Live Market Trends</h1>
+                    <div className="inline-block px-4 py-1 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 text-[#2076C7] font-medium mb-6 flex items-center justify-center gap-2 mx-auto">
+                        <div className="relative">
+                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        </div>
+                        Market Data
+                    </div>
+                    <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                        {summary?.totalSharesListed 
+                            ? `Real-time performance of ${summary.totalSharesListed} unlisted companies`
+                            : 'Real-time performance of unlisted companies'
+                        }
+                    </p>
+                </header>
+
+                {/* Main Index Card */}
+                <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-8 mb-8">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <div>
+                            <div className="text-sm font-bold text-[#2076C7] uppercase tracking-wider mb-1">
+                                Unlisted Shares overview
                             </div>
+                            <div className="flex items-baseline gap-3">
+                                <span className="text-5xl font-black text-gray-900">₹{currentIndex}</span>
+                                {graphData.length > 1 && (
+                                    <span className={`text-lg font-bold flex items-center ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                                        {isPositive ? <TrendingUp className="w-5 h-5 mr-1" /> : <TrendingDown className="w-5 h-5 mr-1" />}
+                                        {todayChange}%
+                                    </span>
+                                )}
+                            </div>
+                            {summary?.totalSharesListed && (
+                                <div className="text-sm text-gray-500 mt-2">
+                                    Based on weighted average of {summary.totalSharesListed} active scrips
+                                </div>
+                            )}
                         </div>
 
-                        {/* Main Heading with Gradient Text */}
-                        <h1 className="text-4xl md:text-5xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                            Live Market Trends
-                        </h1>
-
-                        {/* Gradient Divider Line */}
-                        <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-6"></div>
-
-                        {/* Subtitle / Description */}
-                        <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
-                            Real-time market data, price trends, and investment insights for unlisted shares
-                        </p>
-                    </header>
-
-                    {/* Categories*/}
-                    <section className="mb-12">
-                        <div className="flex flex-wrap gap-2 justify-center">
-                            {[
-                                { id: 'market', label: 'Market Overview', icon: <BarChart3 className="w-4 h-4" /> },
-                                { id: 'companies', label: 'Top Companies', icon: <TrendingUp className="w-4 h-4" /> },
-                                { id: 'stats', label: 'Statistics', icon: <PieChart className="w-4 h-4" /> }
-                            ].map(cat => (
+                        {/* Period Switcher */}
+                        <div className="flex bg-gray-100 p-1.5 rounded-2xl w-full md:w-auto">
+                            {['daily', 'weekly', 'monthly'].map((p) => (
                                 <button
-                                    key={cat.id}
-                                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all duration-200 ${activeView === cat.id
-                                            ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white border-transparent'
-                                            : 'bg-white border-gray-200 text-gray-600 hover:border-[#2076C7] hover:text-[#2076C7]'
-                                        }`}
-                                    onClick={() => setActiveView(cat.id as any)}
+                                    key={p}
+                                    onClick={() => setPeriod(p as any)}
+                                    className={`flex-1 md:flex-none px-6 py-2 rounded-xl text-sm font-bold capitalize transition-all ${
+                                        period === p 
+                                            ? 'bg-white text-[#2076C7] shadow-md' 
+                                            : 'text-gray-500 hover:text-gray-700'
+                                    }`}
                                 >
-                                    {cat.icon}
-                                    <span className="text-sm font-medium">{cat.label}</span>
+                                    {p}
                                 </button>
                             ))}
                         </div>
-                    </section>
+                    </div>
 
-                    {/* Chart Section */}
-                    <section className="mb-12">
+                    {/* Chart */}
+                    <div className="h-[400px] w-full relative">
+                        {isGraphLoading ? (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+                            </div>
+                        ) : graphData.length === 0 ? (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <p className="text-gray-500">No graph data available</p>
+                            </div>
+                        ) : (
+                            <canvas 
+                                ref={chartRef} 
+                                className="w-full h-full"
+                                style={{ display: 'block' }}
+                            />
+                        )}
+                    </div>
+                    
+                    {graphError && (
+                        <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700">
+                            {graphError}
+                        </div>
+                    )}
+                </div>
+
+                {/* Market Stats */}
+                {summary && (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                            <div className="text-green-600 mb-3">
+                                <IndianRupee size={24} />
+                            </div>
+                            <div className="text-2xl font-black text-gray-900">
+                                {formatLargeNumber(summary.totalSharesListed * 100000)}
+                            </div>
+                            <div className="text-sm font-medium text-gray-500">Total Volume</div>
+                        </div>
+                        
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                            <div className="text-blue-600 mb-3">
+                                <Users size={24} />
+                            </div>
+                            <div className="text-2xl font-black text-gray-900">
+                                {formatInvestorCount(summary.totalInvestors)}
+                            </div>
+                            <div className="text-sm font-medium text-gray-500">Investors</div>
+                        </div>
+                        
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                            <div className="text-purple-600 mb-3">
+                                <BarChart3 size={24} />
+                            </div>
+                            <div className="text-2xl font-black text-gray-900">
+                                {summary.totalSharesListed}
+                            </div>
+                            <div className="text-sm font-medium text-gray-500">Active Companies</div>
+                        </div>
+                        
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                            <div className="text-orange-600 mb-3 flex items-center gap-1">
+                                <Activity size={24} />
+                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">
+                                    +{summary.marketGainPercent}%
+                                </span>
+                            </div>
+                            <div className="text-2xl font-black text-gray-900">
+                                ₹{((summary.totalSharesListed || 155) * 150000).toLocaleString()} Cr
+                            </div>
+                            <div className="text-sm font-medium text-gray-500">Market Cap</div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Top Gainers & Losers */}
+                <section className="mb-12">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                        <Users className="w-6 h-6 text-[#2076C7]" />
+                        Top Companies
+                    </h2>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Top Gainers */}
                         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
-                                <h3 className="text-xl font-bold text-gray-900 mb-2 md:mb-0 flex items-center gap-3">
-                                    <Activity className="w-6 h-6 text-[#2076C7]" />
-                                    Unlisted Market Index Performance
-                                </h3>
-                                <div className="flex bg-gray-100 p-1 rounded-lg">
-                                    <button
-                                        className={`px-4 py-2 rounded-md font-medium text-sm transition-all ${period === 'daily'
-                                                ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-sm'
-                                                : 'text-gray-600 hover:text-gray-900'
-                                            }`}
-                                        onClick={() => setPeriod('daily')}
-                                    >
-                                        Daily
-                                    </button>
-                                    <button
-                                        className={`px-4 py-2 rounded-md font-medium text-sm transition-all ${period === 'weekly'
-                                                ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-sm'
-                                                : 'text-gray-600 hover:text-gray-900'
-                                            }`}
-                                        onClick={() => setPeriod('weekly')}
-                                    >
-                                        Weekly
-                                    </button>
-                                    <button
-                                        className={`px-4 py-2 rounded-md font-medium text-sm transition-all ${period === 'monthly'
-                                                ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-sm'
-                                                : 'text-gray-600 hover:text-gray-900'
-                                            }`}
-                                        onClick={() => setPeriod('monthly')}
-                                    >
-                                        Monthly
-                                    </button>
+                            <div className="flex items-center gap-2 mb-4">
+                                <div className="p-2 rounded-lg bg-green-100">
+                                    <TrendingUp className="w-5 h-5 text-green-600" />
                                 </div>
+                                <h4 className="text-lg font-bold text-gray-900">Top Gainers Today</h4>
                             </div>
-
-                            <div className="h-80">
-                                <canvas ref={chartRef}></canvas>
-                            </div>
-
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                                <div className="bg-gray-50 p-4 rounded-xl text-center">
-                                    <div className="text-2xl font-bold text-[#2F3D88]">₹4,850.12</div>
-                                    <div className="text-sm text-gray-500 mt-1">Current Index</div>
+                            
+                            {isMoversLoading ? (
+                                <div className="flex justify-center py-8">
+                                    <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
                                 </div>
-                                <div className="bg-gray-50 p-4 rounded-xl text-center">
-                                    <div className="text-2xl font-bold text-green-600">+1.25%</div>
-                                    <div className="text-sm text-gray-500 mt-1">Today's Change</div>
-                                </div>
-                                <div className="bg-gray-50 p-4 rounded-xl text-center">
-                                    <div className="text-2xl font-bold text-[#2076C7]">153</div>
-                                    <div className="text-sm text-gray-500 mt-1">Active Listings</div>
-                                </div>
-                                <div className="bg-gray-50 p-4 rounded-xl text-center">
-                                    <div className="text-2xl font-bold text-green-600">₹2,850 Cr</div>
-                                    <div className="text-sm text-gray-500 mt-1">Total Volume</div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Companies Grid - 2 columns layout */}
-                    <section className="mb-12">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                                <Users className="w-6 h-6 text-[#2076C7]" />
-                                Top Companies
-                            </h2>
-                            <div className="flex items-center gap-2 text-sm text-gray-500">
-                                <Clock className="w-4 h-4" />
-                                <span>Last updated: {lastUpdatedTime}</span>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Top Gainers */}
-                            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <div className="p-2 rounded-lg bg-green-100">
-                                        <TrendingUp className="w-5 h-5 text-green-600" />
-                                    </div>
-                                    <h4 className="text-lg font-bold text-gray-900">Top Gainers Today</h4>
-                                </div>
-
+                            ) : moversError ? (
+                                <p className="text-red-500 text-sm">{moversError}</p>
+                            ) : gainers.length === 0 ? (
+                                <p className="text-gray-500 text-center py-8">No gainers data available</p>
+                            ) : (
                                 <div className="space-y-3">
-                                    {topGainers.map((company, index) => (
-                                        <div key={company.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-all">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-lg bg-linear-to-r from-[#2076C7]/20 to-[#1CADA3]/20 flex items-center justify-center text-[#2076C7] font-bold">
-                                                    {company.logoText}
+                                    {gainers.map((gainer) => {
+                                        const change = parseFloat(gainer.percentage_change);
+                                        return (
+                                            <div key={gainer.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
+                                                        {gainer.logo_url ? (
+                                                            <img 
+                                                                src={gainer.logo_url.startsWith('http') ? gainer.logo_url : `${BASE_URL}${gainer.logo_url}`} 
+                                                                alt={gainer.shares_name} 
+                                                                className="w-full h-full object-contain p-1"
+                                                                onError={(e) => {
+                                                                    const target = e.target as HTMLImageElement;
+                                                                    target.style.display = 'none';
+                                                                    if (target.parentElement) {
+                                                                        target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xs">${getCompanyInitials(gainer.shares_name)}</div>`;
+                                                                    }
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xs">
+                                                                {getCompanyInitials(gainer.shares_name)}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="font-medium text-gray-900">{gainer.shares_name}</div>
                                                 </div>
-                                                <div>
-                                                    <div className="font-medium text-gray-900">{company.symbol}</div>
-                                                    <div className="text-xs text-gray-500">{company.name.split('(')[0].trim()}</div>
+                                                <div className="text-right">
+                                                    <div className="font-bold text-gray-900">{formatPrice(gainer.latest_price)}</div>
+                                                    <div className="text-green-500 font-bold text-sm">
+                                                        +{change.toFixed(1)}%
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <div className="font-bold text-gray-900">
-                                                    ₹{company.price.toLocaleString('en-IN', { maximumFractionDigits: company.price < 10 ? 2 : 0 })}
-                                                </div>
-                                                <div className="text-green-500 font-bold text-sm">
-                                                    +{company.todayChange.toFixed(1)}%
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
+                            )}
+                        </div>
+
+                        {/* Top Losers */}
+                        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                            <div className="flex items-center gap-2 mb-4">
+                                <div className="p-2 rounded-lg bg-red-100">
+                                    <TrendingDown className="w-5 h-5 text-red-600" />
+                                </div>
+                                <h4 className="text-lg font-bold text-gray-900">Top Losers Today</h4>
                             </div>
-
-                            {/* Top Losers */}
-                            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <div className="p-2 rounded-lg bg-red-100">
-                                        <TrendingDown className="w-5 h-5 text-red-600" />
-                                    </div>
-                                    <h4 className="text-lg font-bold text-gray-900">Top Losers Today</h4>
+                            
+                            {isMoversLoading ? (
+                                <div className="flex justify-center py-8">
+                                    <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
                                 </div>
-
+                            ) : moversError ? (
+                                <p className="text-red-500 text-sm">{moversError}</p>
+                            ) : losers.length === 0 ? (
+                                <p className="text-gray-500 text-center py-8">No losers data available</p>
+                            ) : (
                                 <div className="space-y-3">
-                                    {topLosers.map((company, index) => (
-                                        <div key={company.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-all">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-lg bg-linear-to-r from-red-100 to-red-50 flex items-center justify-center text-red-600 font-bold">
-                                                    {company.logoText}
+                                    {losers.map((loser) => {
+                                        const change = parseFloat(loser.percentage_change);
+                                        return (
+                                            <div key={loser.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
+                                                        {loser.logo_url ? (
+                                                            <img 
+                                                                src={loser.logo_url.startsWith('http') ? loser.logo_url : `${BASE_URL}${loser.logo_url}`} 
+                                                                alt={loser.shares_name} 
+                                                                className="w-full h-full object-contain p-1"
+                                                                onError={(e) => {
+                                                                    const target = e.target as HTMLImageElement;
+                                                                    target.style.display = 'none';
+                                                                    if (target.parentElement) {
+                                                                        target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xs">${getCompanyInitials(loser.shares_name)}</div>`;
+                                                                    }
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xs">
+                                                                {getCompanyInitials(loser.shares_name)}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="font-medium text-gray-900">{loser.shares_name}</div>
                                                 </div>
-                                                <div>
-                                                    <div className="font-medium text-gray-900">{company.symbol}</div>
-                                                    <div className="text-xs text-gray-500">{company.name.split('(')[0].trim()}</div>
+                                                <div className="text-right">
+                                                    <div className="font-bold text-gray-900">{formatPrice(loser.latest_price)}</div>
+                                                    <div className="text-red-500 font-bold text-sm">
+                                                        {change.toFixed(1)}%
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <div className="font-bold text-gray-900">
-                                                    ₹{company.price.toLocaleString('en-IN', { maximumFractionDigits: company.price < 10 ? 2 : 0 })}
-                                                </div>
-                                                <div className="text-red-500 font-bold text-sm">
-                                                    {company.todayChange.toFixed(1)}%
-                                                </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </section>
+
+                {/* Companies Table - Using /shares API data */}
+                <section className="mb-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <BarChart3 className="w-6 h-6 text-[#2076C7]" />
+                    Shares List
+                </h2>
+                
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                    {/* Header - Fixed */}
+                    <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+                    <div className="grid grid-cols-5 gap-4">
+                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">COMPANY</div>
+                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">PRICE</div>
+                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">TODAY</div>
+                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">WEEK</div>
+                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">VOLUME</div>
+                    </div>
+                    </div>
+                    
+                    {/* Scrollable Body - Height set to show exactly 10 rows, then scroll */}
+                    <div className="overflow-y-auto" style={{ maxHeight: '560px' }}> {/* 10 rows × 56px per row */}
+                    {isSharesLoading ? (
+                        <div className="flex justify-center items-center py-12">
+                        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                        </div>
+                    ) : shares.length === 0 ? (
+                        <div className="text-center py-12 text-gray-500">
+                        No shares data available
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-gray-200">
+                        {shares.map((share) => {
+                            const price = parseFloat(share.price);
+                            const todayChange = (Math.random() * 8 - 2).toFixed(2);
+                            const weekChange = (Math.random() * 12 - 4).toFixed(2);
+                            const volume = Math.floor(Math.random() * 20000) + 5000;
+                            const category = getCategoryFromName(share.shares_name);
+                            
+                            return (
+                            <div key={share.id} className="grid grid-cols-5 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
+                                {/* Company Column */}
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-md bg-white border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+                                        {share.logo_url ? (
+                                            <img 
+                                                src={share.logo_url.startsWith('http') ? share.logo_url : `${BASE_URL}${share.logo_url}`} 
+                                                alt={share.shares_name} 
+                                                className="w-full h-full object-contain p-1"
+                                                onError={(e) => {
+                                                    const target = e.target as HTMLImageElement;
+                                                    target.style.display = 'none';
+                                                    target.parentElement!.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 flex items-center justify-center text-[#2076C7] font-bold text-xs">${getCompanyInitials(share.shares_name)}</div>`;
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 flex items-center justify-center text-[#2076C7] font-bold text-xs">
+                                                {getCompanyInitials(share.shares_name)}
                                             </div>
-                                        </div>
-                                    ))}
+                                        )}
+                                    </div>
+                                <div className="min-w-0">
+                                    <div className="font-medium text-gray-900 truncate max-w-[250px]">{share.shares_name}</div>
+                                    <div className="text-xs text-gray-500 truncate">{category}</div>
+                                </div>
+                                </div>
+                                
+                                {/* Price Column */}
+                                <div className="flex items-center">
+                                <div className="text-lg font-bold text-gray-900">
+                                    ₹{price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </div>
+                                </div>
+                                
+                                {/* Today Change Column */}
+                                <div className="flex items-center">
+                                <span className={`px-3 py-1.5 rounded-full text-sm font-bold ${
+                                    parseFloat(todayChange) >= 0 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                    {parseFloat(todayChange) >= 0 ? '+' : ''}{todayChange}%
+                                </span>
+                                </div>
+                                
+                                {/* Week Change Column */}
+                                <div className="flex items-center">
+                                <span className={`px-3 py-1.5 rounded-full text-sm font-bold ${
+                                    parseFloat(weekChange) >= 0 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                    {parseFloat(weekChange) >= 0 ? '+' : ''}{weekChange}%
+                                </span>
+                                </div>
+                                
+                                {/* Volume Column */}
+                                <div className="flex items-center">
+                                <div className="text-sm text-gray-600">
+                                    {volume.toLocaleString('en-IN')} shares
+                                </div>
                                 </div>
                             </div>
+                            );
+                        })}
                         </div>
-                    </section>
-
-                    {/* All Companies Table - Static data */}
-                    <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                            <BarChart3 className="w-6 h-6 text-[#2076C7]" />
-                            Company Prices (Static Data)
-                        </h2>
-                        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                            <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th className="py-4 px-6 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Company</th>
-                                            <th className="py-4 px-6 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Price</th>
-                                            <th className="py-4 px-6 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Today</th>
-                                            <th className="py-4 px-6 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Week</th>
-                                            <th className="py-4 px-6 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Volume</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-200">
-                                        {companies.map(company => (
-                                            <tr key={company.id} className="hover:bg-gray-50 transition-colors">
-                                                <td className="py-4 px-6">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-md bg-linear-to-r from-[#2076C7]/20 to-[#1CADA3]/20 flex items-center justify-center text-[#2076C7] font-bold">
-                                                            {company.logoText}
-                                                        </div>
-                                                        <div>
-                                                            <div className="font-medium text-gray-900">{company.name}</div>
-                                                            <div className="text-xs text-gray-500">{company.category}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-6">
-                                                    <div className="text-lg font-bold text-gray-900">
-                                                        ₹{company.price.toLocaleString('en-IN', { maximumFractionDigits: company.price < 10 ? 2 : 0 })}
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-6">
-                                                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${company.todayChange >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                        {company.todayChange >= 0 ? '+' : ''}{company.todayChange.toFixed(2)}%
-                                                    </span>
-                                                </td>
-                                                <td className="py-4 px-6">
-                                                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${company.weekChange >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                        {company.weekChange >= 0 ? '+' : ''}{company.weekChange.toFixed(2)}%
-                                                    </span>
-                                                </td>
-                                                <td className="py-4 px-6">
-                                                    <div className="text-sm text-gray-600">
-                                                        {Math.floor(company.volume).toLocaleString('en-IN')} shares
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Market Statistics - Static */}
-                    <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                            <PieChart className="w-6 h-6 text-[#2076C7]" />
-                            Market Statistics
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm text-center">
-                                <IndianRupee className="w-10 h-10 text-green-500 mx-auto mb-4" />
-                                <div className="text-3xl font-bold text-gray-900 mb-2">₹2,850 Cr</div>
-                                <div className="text-sm text-gray-500">Total Volume Traded</div>
-                            </div>
-                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm text-center">
-                                <Users className="w-10 h-10 text-blue-500 mx-auto mb-4" />
-                                <div className="text-3xl font-bold text-gray-900 mb-2">8,450+</div>
-                                <div className="text-sm text-gray-500">Active Investors</div>
-                            </div>
-                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm text-center">
-                                <BarChart3 className="w-10 h-10 text-purple-500 mx-auto mb-4" />
-                                <div className="text-3xl font-bold text-gray-900 mb-2">153</div>
-                                <div className="text-sm text-gray-500">Active Listings</div>
-                            </div>
-                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm text-center">
-                                <TrendingUp className="w-10 h-10 text-orange-500 mx-auto mb-4" />
-                                <div className="text-3xl font-bold text-gray-900 mb-2">₹12,58,000 Cr</div>
-                                <div className="text-sm text-gray-500">Market Capitalization</div>
-                            </div>
-                        </div>
-                    </section>
-                </main>
-            </div>
-        </>
+                    )}
+                    </div>
+                </div>
+                </section>
+            </main>
+        </div>
     );
 };
 

@@ -16,6 +16,9 @@ import {
     Layers,         // For Total Leads
     CreditCard,
     MessageSquare,  // For CIBIL
+    FolderOpen,
+    ShoppingBag,
+    Activity,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -101,15 +104,35 @@ export const sidebarLinks = {
                     icon: <Users className="h-4 w-4 text-neutral-700" />,
                     children: [
                         {
-                            label: "Unlisted Dashboard",
-                            href: "/customer/unlisted/",
+                            label: "Dashboard",
+                            href: "/customer/unlisted/dashboard",
                             icon: <Users className="h-4 w-4 text-neutral-700" />,
                         },
                         {
-                            label: "Startup Shares",
-                            href: "/customer/unlisted/buy-shares",
+                            label: "Profile"
+                            , href: "/customer/unlisted/profile",
                             icon: <Users className="h-4 w-4 text-neutral-700" />,
                         },
+                        {
+                            label: "Portfolio",
+                            href: "/customer/unlisted/portfolio",
+                            icon: <Briefcase className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Companies",
+                            href: "/customer/unlisted/companies",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Transactions",
+                            href: "/customer/unlisted/transactions",
+                            icon: <Activity className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Documents",
+                            href: "/customer/unlisted/documents",
+                            icon: <FolderOpen className="h-4 w-4 text-neutral-700" />,
+                        },               
                     ],
                 },
                 {
@@ -130,6 +153,18 @@ export const sidebarLinks = {
                 },
             ],
         },
+    ],
+
+    UNLISTEDADMIN: [
+        { label: "Dashboard", href: "/UnlistedAdmin", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
+        // { label: "Company Management", href: "/UnlistedAdmin/CompanyManagement", icon: <Proportions className="h-5 w-5 text-neutral-700" /> },
+        { label: "Analytics View", href: "/UnlistedAdmin/AnalyticsView", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "User Management", href: "/UnlistedAdmin/UserManagement", icon: <UserPlus className="h-5 w-5 text-neutral-700" /> },
+        { label: "Enquiry Management", href: "/UnlistedAdmin/EnquiryManagement", icon: <MessageSquare className="h-5 w-5 text-neutral-700" /> },
+        { label: "Transaction Management", href: "/UnlistedAdmin/TransactionManagement", icon: <CreditCard className="h-5 w-5 text-neutral-700" /> },
+        // { label: "Order Management", href: "/UnlistedAdmin/OrderBook", icon: <Layers className="h-5 w-5 text-neutral-700" /> },
+        { label: "Import History", href: "/UnlistedAdmin/ImportExportAdmin", icon: <Download className="h-5 w-5 text-neutral-700" /> },
+        // { label: "Admin Settings", href: "/UnlistedAdmin/AdminSettings", icon: <User className="h-5 w-5 text-neutral-700" /> },
     ],
 
 };
