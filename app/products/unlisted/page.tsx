@@ -67,6 +67,36 @@ const Home = () => {
     const [activeFaq, setActiveFaq] = useState<number | null>(null);
     const [activeBenefit, setActiveBenefit] = useState<number | null>(null);
     const [formData, setFormData] = useState({ fullName: '', email: '', phone: '', quantity: '', message: '' });
+    
+    // Typing animation states
+    const [displayedText, setDisplayedText] = useState('');
+    const fullHeading = "India's Premier Platform for Unlisted Shares & Pre-IPO Investments";
+    const [isTypingComplete, setIsTypingComplete] = useState(false);
+
+    // Typing animation effect
+    useEffect(() => {
+        const hasVisited = localStorage.getItem("homeHeroVisited");
+
+        if (hasVisited) {
+            setDisplayedText(fullHeading);
+            setIsTypingComplete(true);
+            return;
+        }
+
+        let index = 0;
+        const typingInterval = setInterval(() => {
+            if (index <= fullHeading.length) {
+                setDisplayedText(fullHeading.slice(0, index));
+                index++;
+            } else {
+                setIsTypingComplete(true);
+                localStorage.setItem("homeHeroVisited", "true");
+                clearInterval(typingInterval);
+            }
+        }, 60);
+
+        return () => clearInterval(typingInterval);
+    }, []);
 
     useEffect(() => {
         const loadCompanies = async () => {
@@ -200,11 +230,32 @@ const Home = () => {
 
     return (
         <div className="min-h-screen text-gray-900 bg-gradient-to-br from-[#b5d9f3] via-white to-[#ecf5ec]">
-            {/* Hero */}
+            {/* Hero Section with Typing Animation */}
             <section className="pt-24 pb-20 px-6 text-center">
-                <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
-                    India's Premier Platform for Unlisted Shares & Pre-IPO Investments
+                <h1 className="text-5xl md:text-7xl font-bold mb-6 min-h-[120px] md:min-h-[160px] flex items-center justify-center leading-tight">
+                    <span className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                        {displayedText}
+                    </span>
+                    <span 
+                        className="inline-block w-1 h-12 md:h-16 ml-1"
+                        style={{
+                            background: 'linear-gradient(to bottom, #2076C7, #1CADA3)',
+                            animation: isTypingComplete ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'blink 1s infinite'
+                        }}
+                    ></span>
                 </h1>
+                
+                <style jsx>{`
+                    @keyframes blink {
+                        0%, 49% { opacity: 1; }
+                        50%, 100% { opacity: 0; }
+                    }
+                    @keyframes pulse {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.3; }
+                    }
+                `}</style>
+                
                 <div className="w-24 h-1.5 mx-auto bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-8" />
                 <p className="text-xl max-w-4xl mx-auto mb-12 text-gray-700">
                     Access exclusive investment opportunities in unlisted companies with expert research and trading tools.

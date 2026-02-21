@@ -338,25 +338,25 @@ const LiveTrends: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Header */}
+                {/* Icon Section */}
                 <header className="mb-12 text-center">
                     <div className="inline-flex items-center justify-center p-4 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 mb-6">
-                        <div className="p-4 rounded-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white">
+                        <div className="p-4 rounded-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg">
                             <Activity className="w-8 h-8" />
                         </div>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Live Market Trends</h1>
-                    <div className="inline-block px-4 py-1 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 text-[#2076C7] font-medium mb-6 flex items-center justify-center gap-2 mx-auto">
-                        <div className="relative">
-                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                        </div>
-                        Market Data
-                    </div>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                        {summary?.totalSharesListed 
-                            ? `Real-time performance of ${summary.totalSharesListed} unlisted companies`
-                            : 'Real-time performance of unlisted companies'
-                        }
+                
+                    {/* Main Heading with Gradient Text */}
+                    <h1 className="text-4xl md:text-5xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                        Live Market Trends
+                    </h1>
+                    
+                    {/* Gradient Divider Line */}
+                    <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-6"></div>
+                    
+                    {/* Subtitle / Description */}
+                    <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
+                        Real-time performance of 155 unlisted companies
                     </p>
                 </header>
 

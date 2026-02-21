@@ -585,7 +585,7 @@ const formatShortDate = (dateString: string) => {
       </div>
 
       <main className="container mx-auto px-4 py-4 pt-4 md:pt-8 min-h-screen">
-        {/* BACK BUTTON - Updated to match SellShares */}
+        {/* BACK BUTTON */}
         <div className="sticky top-[72px] z-40 mb-8 bg-gradient-to-br from-gray-50 to-white pt-2 pb-2">
           <div className="container mx-auto px-4">
             <a 
