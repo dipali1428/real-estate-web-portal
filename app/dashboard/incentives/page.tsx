@@ -75,7 +75,7 @@ export default function IncentivesPayouts() {
 
   const commissionStructure = {
     'loans': [{ name: 'Personal Loan', rate: '1.5% - 2.5%' }, { name: 'Home Loan', rate: '0.4% - 0.88%' }, { name: 'Business Loan', rate: '1.0% - 2.0%' }, { name: 'Commercial / Mortgage', rate: '1.04% - 1.44%' }, { name: 'SME Loan', rate: '1.2% - 2.0%' }, { name: 'Education Loan', rate: '0.40% - 0.96%' }, { name: 'Vehicle Loan', rate: '0.75% - 1.5%' }, { name: 'NRP Loan', rate: '0.75% - 1.5%' }, { name: 'Loan Against Securities', rate: '0.5% - 1.2%' }],
-    'insurance': [{ name: 'Life Insurance', rate: '2% - 56%' }, { name: 'Health Insurance', rate: '15% - 35%' }, { name: 'Motor Insurance', rate: '3% - 50%' }, { name: 'Travel Insurance', rate: '22% - 40%' }, { name: 'Fire Insurance', rate: '6% - 28%' }, { name: 'Cattle Insurance', rate: '12%' }, { name: 'Marine Insurance', rate: '8% - 22%' }, { name: 'Corporate Insurance', rate: '5%' }, { name: 'Loan Protector', rate: '23% - 35%' }],
+    'insurance': [{ name: 'Life Insurance', rate: '2% - 56%' }, { name: 'Health Insurance', rate: '3% - 32%' }, { name: 'Motor Insurance', rate: '1.5% - 50%' }, { name: 'Travel Insurance', rate: '22% - 40%' }, { name: 'Fire Insurance', rate: '6% - 28%' }, { name: 'Cattle Insurance', rate: '12%' }, { name: 'Marine Insurance', rate: '8% - 22%' }, { name: 'Corporate Insurance', rate: '5%' }, { name: 'Loan Protector', rate: '23% - 35%' }],
     'mutual-funds': [{ name: 'Equity Funds', rate: '0.5% - 0.8%' }, { name: 'Debt Funds', rate: '0.1% - 0.4%' }, { name: 'Hybrid Funds', rate: '0.3% - 0.8%' }],
     'investments': [{ name: 'NCD Bonds', rate: '0.40% - 1.40%' }, { name: 'FD', rate: '0.10% - 1.52%' }, { name: 'Bonds', rate: '0.12% - 0.30%' }],
     'real-estate': [{ name: 'Fractional', rate: '13% - 20%' }]
@@ -347,7 +347,7 @@ export default function IncentivesPayouts() {
                 )}
                 <div>
                   <label className="text-xs font-bold text-slate-500 uppercase mb-2 block tracking-wider">
-                    {leadCategory === 'insurance' ? 'Annual Premium (₹)' : 'Receivable Amount (₹)'}
+                    {leadCategory === 'insurance' ? 'Net Premium (₹)' : 'Receivable Amount (₹)'}
                   </label>
                   <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-all">
