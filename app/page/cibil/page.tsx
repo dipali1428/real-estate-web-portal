@@ -375,7 +375,7 @@ const CreditScorePage: React.FC = () => {
                                         <label
                                             htmlFor="consent"
                                             className="text-sm text-gray-700 leading-snug">
-                                            I authorize Infinity Arthviksha to fetch my CIBIL score and report. I
+                                            I authorize Infinity Arthvishva to fetch my CIBIL score and report. I
                                             agree to the{" "}
                                             <a
                                                 className="text-[#1CADA3] hover:underline font-medium">
