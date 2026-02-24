@@ -207,7 +207,7 @@ const ImportExportAdmin: React.FC = () => {
                     className="w-full py-3.5 bg-gray-900 text-white font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-[#2076C7] transition-all flex items-center justify-center gap-2"
                   >
                     {isExporting === 'shares' ? <Loader2 className="animate-spin w-3 h-3" /> : <Download className="w-3.5 h-3.5" />}
-                    {isExporting === 'shares' ? 'Preparing...' : 'Download CSV'}
+                    {isExporting === 'shares' ? 'Preparing...' : 'Download'}
                   </button>
                 </div>
 
@@ -224,7 +224,7 @@ const ImportExportAdmin: React.FC = () => {
                     className="w-full py-3.5 bg-gray-900 text-white font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-[#1CADA3] transition-all flex items-center justify-center gap-2"
                   >
                     {isExporting === 'transactions' ? <Loader2 className="animate-spin w-3 h-3" /> : <Download className="w-3.5 h-3.5" />}
-                    {isExporting === 'transactions' ? 'Preparing...' : 'Download CSV'}
+                    {isExporting === 'transactions' ? 'Preparing...' : 'Download'}
                   </button>
                 </div>
 

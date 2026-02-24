@@ -167,8 +167,8 @@ else if (/^\d+$/.test(processedIdentifier) && processedIdentifier.length !== 10)
             ACCOUNTS: "/accounts",
             CUSTOMER: "/customer",
             HR: "/hr",
-            USER: "/dashboard", // Specific default
-            UNLISTEDADMIN: "Unlisted Admin",
+            USER: "/dashboard",
+            UNLISTEDADMIN: "/UnlistedAdmin",
         };
         router.push(routes[role] ?? "/dashboard");
     };
