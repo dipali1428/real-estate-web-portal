@@ -63,7 +63,7 @@ const Header = () => {
     { label: "Life Insurance", href: "/offers/insurance/life-insurance" },
     { label: "Health Insurance", href: "/offers/insurance/health-insurance" },
     { label: "Motor Insurance", href: "/offers/insurance/motor-insurance" },
-    { label: "Travel Insurance", href: "/offers/insurance/travel-insurance" },
+    { label: "Travel Insurance", href: "/products/travel-insurance" },
     { label: "Fire Insurance", href: "/offers/insurance/fire-insurance" },
     { label: "Cattle Insurance", href: "/offers/insurance/cattle-insurance" },
     { label: "Marine Insurance", href: "/offers/insurance/marine-insurance" },
@@ -76,7 +76,8 @@ const Header = () => {
   ];
 
   const investmentOptions = [
-    { label: "PMS / AIF", href: "/products/pms/" },
+    { label: "PMS", href: "/products/pms/" },
+    { label: "AIF", href: "/products/aif/" },
     { label: "Fixed Deposit", href: "/products/FD" },
     { label: "Bonds", href: "/products/bonds" },
     { label: "NCD", href: "/products/NCD" },
@@ -304,7 +305,7 @@ const Header = () => {
                     onMouseEnter={() => setIsInvestmentOpen(true)}
                     onMouseLeave={() => setIsInvestmentOpen(false)}>
                     <div className="flex items-center justify-between px-3 xl:px-4 py-2 text-gray-700 hover:bg-[#E8F6FA] hover:text-[#2076C7] transition-colors duration-200 cursor-pointer">
-                      <span className="text-sm xl:text-base">Investment</span>
+                      <span className="text-sm xl:text-base">Investments</span>
                       <ChevronDown
                         size={12}
                         className={`transition-transform duration-300 ${isInvestmentOpen ? "rotate-180" : ""}`}
