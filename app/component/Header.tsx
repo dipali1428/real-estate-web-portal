@@ -76,7 +76,8 @@ const Header = () => {
   ];
 
   const investmentOptions = [
-    { label: "PMS / AIF", href: "/products/pms/" },
+    { label: "PMS", href: "/products/pms/" },
+    { label: "AIF", href: "/products/aif/" },
     { label: "Fixed Deposit", href: "/products/FD" },
     { label: "Bonds", href: "/products/bonds" },
     { label: "NCD", href: "/products/NCD" },
