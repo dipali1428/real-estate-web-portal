@@ -63,7 +63,7 @@ const Header = () => {
     { label: "Life Insurance", href: "/offers/insurance/life-insurance" },
     { label: "Health Insurance", href: "/offers/insurance/health-insurance" },
     { label: "Motor Insurance", href: "/offers/insurance/motor-insurance" },
-    { label: "Travel Insurance", href: "/offers/insurance/travel-insurance" },
+    { label: "Travel Insurance", href: "/products/travel-insurance" },
     { label: "Fire Insurance", href: "/offers/insurance/fire-insurance" },
     { label: "Cattle Insurance", href: "/offers/insurance/cattle-insurance" },
     { label: "Marine Insurance", href: "/offers/insurance/marine-insurance" },
