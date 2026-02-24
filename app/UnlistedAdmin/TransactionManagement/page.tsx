@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { AdminService, UnlistedTransaction } from '../../services/unlistedadminservices';
+import api from '../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeftRight, 
@@ -21,7 +22,10 @@ import {
   Calendar,
   Hash,
   ShieldCheck,
-  History
+  History,
+  Download,
+  Loader2,
+  FileText
 } from "lucide-react";
 
 type TabType = 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED';
@@ -57,32 +61,30 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClo
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      // FIX: Convert price and total_amount to strings as required by API
-      const payload = {
-        user_id: Number(formData.user_id),
-        asset_id: Number(formData.asset_id),
-        transaction_type: formData.transaction_type,
-        quantity: Number(formData.quantity),
-        price: formData.price,
-        total_amount: formData.total_amount
-      };
-      
-      await AdminService.addTransaction(payload);
-      onSuccess();
-      onClose();
-    } catch (error: any) {
-      console.error('Failed to add transaction:', error);
-      // Show actual error message from server if available
-      const msg = error.response?.data?.message || error.response?.data?.error || 'Failed to add transaction';
-      alert(`Error: ${msg}`);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setSubmitting(true);
+  try {
+    const payload = {
+      user_id: Number(formData.user_id),
+      asset: String(formData.asset_id), // Convert to string
+      transaction_type: formData.transaction_type,
+      quantity: Number(formData.quantity),
+      price: formData.price,
+      total_amount: formData.total_amount
+    };
+    
+    await AdminService.addTransaction(payload);
+    onSuccess();
+    onClose();
+  } catch (error: any) {
+    console.error('Failed to add transaction:', error);
+    const msg = error.response?.data?.message || error.response?.data?.error || 'Failed to add transaction';
+    alert(`Error: ${msg}`);
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   if (!isOpen) return null;
 
@@ -181,7 +183,7 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClo
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-3.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white font-black rounded-xl shadow-lg shadow-blue-100 transition-all uppercase text-xs tracking-widest disabled:opacity-50 mt-4"
+              className="w-full py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black rounded-xl shadow-lg shadow-blue-100 transition-all uppercase text-xs tracking-widest disabled:opacity-50 mt-4"
             >
               {submitting ? 'Processing...' : 'Record Transaction'}
             </button>
@@ -197,6 +199,7 @@ const TransactionManagement: React.FC = () => {
   const [transactions, setTransactions] = useState<UnlistedTransaction[]>([]);
   const [pendingTransactions, setPendingTransactions] = useState<UnlistedTransaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   
@@ -227,6 +230,36 @@ const TransactionManagement: React.FC = () => {
       setPendingTransactions([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExportTransactions = async () => {
+    setExporting(true);
+    try {
+      const endpoint = "/api/unlisted/admin/analytics/transactions/export";
+      
+      const response = await api.get(endpoint, {
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      
+      const fileName = `transactions_export_${new Date().toISOString().split('T')[0]}.csv`;
+      link.setAttribute('download', fileName);
+      
+      document.body.appendChild(link);
+      link.click();
+      
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+    } catch (err: any) {
+      console.error("Export failed", err);
+      alert("Failed to export transactions: " + (err.response?.data?.message || "Check your permissions."));
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -276,7 +309,7 @@ const TransactionManagement: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row justify-between items-center gap-4"
+        className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row justify-between items-center gap-4"
       >
         <div>
           <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
@@ -291,9 +324,24 @@ const TransactionManagement: React.FC = () => {
             >
               <Plus className="w-4 h-4" /> New Trade
             </button>
+            
+            <button 
+              onClick={handleExportTransactions}
+              disabled={exporting}
+              className="flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold text-sm shadow-lg transition-all border border-white/20 disabled:opacity-50"
+            >
+              {exporting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
+              {exporting ? 'Exporting...' : 'Export'}
+            </button>
+            
             <button 
               onClick={refreshAll} 
               className="p-2.5 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
+              disabled={loading}
             >
               <RotateCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -397,6 +445,14 @@ const TransactionManagement: React.FC = () => {
                     </td>
                   </tr>
               ))}
+              {!loading && displayTransactions.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                    <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm font-medium">No transactions found</p>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -410,8 +466,14 @@ const TransactionManagement: React.FC = () => {
               <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 ${confirmModal.type === 'APPROVE' ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>{confirmModal.type === 'APPROVE' ? <CheckCircle size={40} /> : <AlertCircle className="w-10 h-10" />}</div>
               <h3 className="text-2xl font-black text-gray-900 mb-2">{confirmModal.type === 'APPROVE' ? 'Confirm Trade' : 'Halt Trade'}</h3>
               <p className="text-gray-500 text-sm mb-8 leading-relaxed">Are you sure you want to <strong>{confirmModal.type?.toLowerCase()}</strong> transaction #{confirmModal.txnId}?</p>
-              <div className="space-y-3"><button onClick={handleStatusAction} className={`w-full py-4 text-white font-black rounded-2xl uppercase text-xs tracking-widest ${confirmModal.type === 'APPROVE' ? 'bg-emerald-600 shadow-emerald-100' : 'bg-rose-600 shadow-rose-100'} shadow-lg`}>Confirm</button>
-              <button onClick={() => setConfirmModal({ show: false, type: null, txnId: null })} className="w-full py-4 bg-gray-100 text-gray-400 font-bold rounded-2xl uppercase text-xs tracking-widest">Cancel</button></div>
+              <div className="space-y-3">
+                <button onClick={handleStatusAction} className={`w-full py-4 text-white font-black rounded-2xl uppercase text-xs tracking-widest ${confirmModal.type === 'APPROVE' ? 'bg-emerald-600 shadow-emerald-100' : 'bg-rose-600 shadow-rose-100'} shadow-lg`}>
+                  Confirm
+                </button>
+                <button onClick={() => setConfirmModal({ show: false, type: null, txnId: null })} className="w-full py-4 bg-gray-100 text-gray-400 font-bold rounded-2xl uppercase text-xs tracking-widest">
+                  Cancel
+                </button>
+              </div>
             </motion.div>
           </div>
         )}

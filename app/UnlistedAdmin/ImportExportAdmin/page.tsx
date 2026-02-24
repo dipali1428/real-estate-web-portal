@@ -227,13 +227,6 @@ const ImportExportAdmin: React.FC = () => {
                     {isExporting === 'transactions' ? 'Preparing...' : 'Download'}
                   </button>
                 </div>
-
-                <div className="md:col-span-2 p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center gap-3">
-                  <Info className="w-4 h-4 text-blue-500" />
-                  <p className="text-[11px] font-bold text-blue-700 uppercase tracking-widest">
-                    Your Authentication Token is verified automatically for secure downloads.
-                  </p>
-                </div>
               </motion.div>
             )}
           </AnimatePresence>
