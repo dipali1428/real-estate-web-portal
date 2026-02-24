@@ -19,6 +19,10 @@ import {
     FolderOpen,
     ShoppingBag,
     Activity,
+    Target,
+    Shield,
+    Calculator,
+    TrendingUp,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -153,6 +157,13 @@ export const sidebarLinks = {
                 },
             ],
         },
+        { label: "Portfolio", href: "/customer/portfolio", icon: <User className="h-5 w-5 text-neutral-700" /> },
+        { label: "Calculator", href: "/customer/calculator", icon: <Calculator className="h-5 w-5 text-neutral-700" /> },
+        { label: "Goal Planner", href: "/customer/goalplanner", icon: <Target className="h-5 w-5 text-neutral-700" /> },
+        { label: "Reports", href: "/customer/reports", icon: <Activity className="h-5 w-5 text-neutral-700" /> },
+        { label: "Wishlist", href: "/customer/wishlist", icon: <ShoppingBag className="h-5 w-5 text-neutral-700" /> },
+        { label: "Help & Support", href: "/customer/support", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },
+        { label: "Relationship Manager", href: "/customer/relationshipmanager", icon: <User className="h-5 w-5 text-neutral-700" /> },
     ],
 
     UNLISTEDADMIN: [
@@ -162,6 +173,8 @@ export const sidebarLinks = {
         { label: "User Management", href: "/UnlistedAdmin/UserManagement", icon: <UserPlus className="h-5 w-5 text-neutral-700" /> },
         { label: "Enquiry Management", href: "/UnlistedAdmin/EnquiryManagement", icon: <MessageSquare className="h-5 w-5 text-neutral-700" /> },
         { label: "Transaction Management", href: "/UnlistedAdmin/TransactionManagement", icon: <CreditCard className="h-5 w-5 text-neutral-700" /> },
+        { label: "Shares Management", href: "/UnlistedAdmin/SharesManagement", icon: <TrendingUp className="h-5 w-5 text-neutral-700" /> },
+        { label: "Demat Management", href: "/UnlistedAdmin/DematManagement", icon: <Shield className="h-5 w-5 text-neutral-700" /> },
         // { label: "Order Management", href: "/UnlistedAdmin/OrderBook", icon: <Layers className="h-5 w-5 text-neutral-700" /> },
         { label: "Import History", href: "/UnlistedAdmin/ImportExportAdmin", icon: <Download className="h-5 w-5 text-neutral-700" /> },
         // { label: "Admin Settings", href: "/UnlistedAdmin/AdminSettings", icon: <User className="h-5 w-5 text-neutral-700" /> },
