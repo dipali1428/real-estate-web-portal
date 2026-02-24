@@ -55,6 +55,16 @@ const CATEGORY_MAP: Record<string, string[]> = {
     Finance: ["Home Finance", "Personal Finance", "SME Finance", "EMI Solution", "Loan Against Securities", "Corporate Finance", "Mortgage Finance", "Debt Capital Market & Loan Syndication", "Asset Reconstruction", "Tax Consultancy", "Education Loan", "Business Loan"],
 };
 
+const maskAccount = (num: string) => {
+    if (!num) return "";
+    return "•".repeat(Math.max(0, num.length - 4)) + num.slice(-4);
+};
+
+const maskIFSC = (ifsc: string) => {
+    if (!ifsc) return "";
+    return ifsc.slice(0, 4) + "••••" + ifsc.slice(-3);
+};
+
 export default function ProfileSection() {
     // --- Custom Popup State ---
     const [popups, setPopups] = useState<PopupMessage[]>([]);
@@ -115,6 +125,8 @@ export default function ProfileSection() {
     const [isDownloadingCard, setIsDownloadingCard] = useState(false);
     const [isDownloadingDSACard, setIsDownloadingDSACard] = useState(false);
 
+    const [verifyingGst, setVerifyingGst] = useState(false);
+
     const refreshProfileData = async () => {
         try {
             const res = await DashboardService.getProfile();
@@ -125,9 +137,9 @@ export default function ProfileSection() {
             });
             setKyc(res.kycDetails);
 
-            if (res.kycDetails?.bank_verified) setBankVerified(true);
-            if (res.kycDetails?.aadhaar_verified) setAadhaarVerified(true);
-            if (res.kycDetails?.gst_verified) setGstVerified(true);
+            setBankVerified(!!res.kycDetails?.bank_verified);
+            setAadhaarVerified(!!res.kycDetails?.aadhaar_verified);
+            setGstVerified(!!res.kycDetails?.gst_verified);
 
             originalPassword.current = res.user.password;
         } catch (error) {
@@ -162,9 +174,8 @@ export default function ProfileSection() {
             });
             if (res.status === "success") {
                 setBankVerified(true);
-                setProfile((prev) => prev ? { ...prev, bank_name: res.data.bank_name } : prev);
-                triggerPopup("Bank verified successfully!", "success", popupId);
                 await refreshProfileData();
+                triggerPopup("Bank verified successfully!", "success", popupId);
             } else {
                 triggerPopup(res.message || "Bank verification failed", "error", popupId);
             }
@@ -222,9 +233,17 @@ export default function ProfileSection() {
             });
 
             if (res.status === "success" || res.code === 200) {
-                setProfile(prev => prev ? { ...prev, pan_verified: true } : prev);
-                triggerPopup("PAN verified successfully!", "success", popupId);
+                const verifiedData = res.data;
+                // Immediate local state update for PAN
+                setProfile(prev => prev ? { 
+                    ...prev, 
+                    pan_verified: true,
+                    name: verifiedData.name || prev.name,
+                    pan: verifiedData.pan || prev.pan
+                } : prev);
+                
                 await refreshProfileData();
+                triggerPopup("PAN verified successfully!", "success", popupId);
             } else {
                 triggerPopup(res.message || "PAN verification failed", "error", popupId);
             }
@@ -255,15 +274,25 @@ export default function ProfileSection() {
                 aadhaar_number: profile.aadhaar
             });
 
-            if (res.code === 200 && res.data?.status === "VALID") {
+            if (res.status === "success" || (res.code === 200 && res.data?.status === "VALID")) {
+                const verifiedData = res.data;
+
+                // 1. Update Local UI States Immediately
                 setAadhaarVerified(true);
                 setAadhaarOtpSent(false);
-
-                if (res.data.name && profile) {
-                    setProfile({ ...profile, name: res.data.name });
+                setAadhaarOtpInput("");
+                
+                if (profile) {
+                    setProfile({
+                        ...profile,
+                        name: verifiedData.name || profile.name,
+                        aadhaar: verifiedData.aadhaar_number || profile.aadhaar
+                    });
                 }
-                triggerPopup("Aadhaar verified successfully!", "success", popupId);
+
+                // 2. Fetch fresh profile data to sync everything else
                 await refreshProfileData();
+                triggerPopup("Aadhaar verified successfully!", "success", popupId);
             } else {
                 const errorMsg = res.data?.message || res.message || "Invalid OTP or Verification Failed";
                 triggerPopup(errorMsg, "error", popupId);
@@ -272,6 +301,55 @@ export default function ProfileSection() {
             triggerPopup(err?.response?.data?.message || "Verification failed", "error");
         } finally {
             setVerifyingAadhaar(false);
+        }
+    };
+
+    const handleGstVerification = async () => {
+        if (!profile?.gst_number || profile.gst_number.length !== 15) {
+            return triggerPopup("Please enter a valid 15-digit GST number", "error");
+        }
+    
+        let popupId: string;
+        try {
+            setVerifyingGst(true);
+            popupId = triggerPopup("Verifying GST details...", "loading");
+    
+            const res = await DashboardService.verifyGst(profile.gst_number);
+    
+            // UPDATED CONDITION: Match your specific server response
+            if (res.message === "GST verified successfully" || res.data?.gst_verified === true) {
+                
+                // 1. Update individual boolean state immediately
+                setGstVerified(true);
+                
+                // 2. Update KYC state locally so the "Profile Completed" logic updates instantly
+                setKyc(prev => {
+                    if (!prev) return prev;
+                    return { 
+                        ...prev, 
+                        gst_verified: true,
+                        gst_number: profile.gst_number,
+                        // If everything else is already verified, mark KYC as complete locally
+                        kyc_completed: (prev.bank_verified && prev.aadhaar_verified) ? true : prev.kyc_completed
+                    };
+                });
+    
+                // 3. Update the profile state to keep data in sync
+                setProfile(prev => prev ? { ...prev, gst_number: profile.gst_number } : prev);
+    
+                // 4. Trigger the background refresh to sync with the database
+                await refreshProfileData();
+                
+                triggerPopup("GST verified successfully!", "success", popupId);
+            } else {
+                // This handles cases where the API returns a 200 but the verification failed
+                triggerPopup(res.message || "GST verification failed", "error", popupId);
+            }
+        } catch (err: any) {
+            console.error("GST verification error:", err);
+            triggerPopup(err?.response?.data?.message || "Verification failed", "error");
+        } finally {
+            setVerifyingGst(false);
         }
     };
 
@@ -593,8 +671,14 @@ export default function ProfileSection() {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div className="space-y-1.5"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bank Name</label><input disabled={!isBankEditing} value={kyc?.bank_name || profile.bank_name || ""} onChange={(e) => setProfile({ ...profile, bank_name: e.target.value.toUpperCase() })} placeholder="ENTER BANK NAME" className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 ${isBankEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} /></div>
-                            <div className="space-y-1.5"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Account Number</label><input disabled={!isBankEditing} value={kyc?.bank_account_number || profile.bank_account || ""} onChange={(e) => setProfile({ ...profile, bank_account: e.target.value.replace(/\D/g, "") })} placeholder="Enter Number" className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 ${isBankEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} /></div>
-                            <div className="space-y-1.5 md:col-span-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">IFSC Code</label><input disabled={!isBankEditing} value={kyc?.ifsc_code || profile.ifsc || ""} onChange={(e) => setProfile({ ...profile, ifsc: e.target.value.toUpperCase() })} placeholder="Enter IFSC Code" className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold tracking-widest text-slate-700 ${isBankEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} /></div>
+                            <div className="space-y-1.5"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Account Number</label><input disabled={!isBankEditing} value={isBankEditing 
+    ? (profile.bank_account || kyc?.bank_account_number || "") 
+    : maskAccount(profile.bank_account || kyc?.bank_account_number || "")
+} onChange={(e) => setProfile({ ...profile, bank_account: e.target.value.replace(/\D/g, "") })} placeholder="Enter Number" className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 ${isBankEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} /></div>
+                            <div className="space-y-1.5 md:col-span-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">IFSC Code</label><input disabled={!isBankEditing} value={isBankEditing 
+    ? (profile.ifsc || kyc?.ifsc_code || "") 
+    : maskIFSC(profile.ifsc || kyc?.ifsc_code || "")
+} onChange={(e) => setProfile({ ...profile, ifsc: e.target.value.toUpperCase() })} placeholder="Enter IFSC Code" className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold tracking-widest text-slate-700 ${isBankEditing ? "bg-white border-2 border-[#1CADA3]" : "bg-slate-50"}`} /></div>
                         </div>
                         <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-slate-100">
                             {isBankEditing && <button onClick={() => { setProfile({ ...profile, bank_name: bankDraft?.bank_name, bank_account: bankDraft?.bank_account, ifsc: bankDraft?.ifsc }); setIsBankEditing(false); }} className="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-black px-6 py-2.5 rounded-xl uppercase">Cancel</button>}
@@ -728,7 +812,6 @@ export default function ProfileSection() {
                                                                 {verifyingPan ? "..." : "Verify"}
                                                             </button>
                                                         </div>
-                                         {/* Disclaimer added below */}
                                                     <p className="text-[9px]  text-red-400 leading-tight">
                                                         * Note: Upon successful verification, your profile name will be automatically updated to match the name on your PAN card.
                                                     </p>
@@ -779,7 +862,7 @@ export default function ProfileSection() {
                                             </div>
                                         ) : (
                                             <p className="text-[11px] font-bold text-slate-700">
-                                                {profile.aadhaar ? `•••• •••• ${profile.aadhaar.slice(-4)}` : "NOT PROVIDED"}
+                                                {profile.aadhaar ? profile.aadhaar : "NOT PROVIDED"}
                                             </p>
                                         )}
 
@@ -811,34 +894,47 @@ export default function ProfileSection() {
                                     </div>
 
                                     <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex items-center justify-between">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
-                                                    GST Registration
-                                                </p>
-                                                <span className="text-[7px] leading-none bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full font-bold uppercase">
-                                                    Optional
-                                                </span>
-                                            </div>
+    <div className="flex-1">
+        <div className="flex items-center gap-2 mb-1">
+            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                GST Registration
+            </p>
+            <span className="text-[7px] leading-none bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full font-bold uppercase">
+                Optional
+            </span>
+        </div>
 
-                                            {isKycEditing ? (
-                                                <input
-                                                    className="text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded px-2 py-1 w-full outline-[#1CADA3]"
-                                                    value={profile.gst_number || ""}
-                                                    placeholder="Enter GST Number"
-                                                    onChange={(e) => setProfile({ ...profile, gst_number: e.target.value.toUpperCase() })}
-                                                />
-                                            ) : (
-                                                <p className="text-[11px] font-bold text-slate-700">
-                                                    {profile.gst_number || 'NOT LINKED'}
-                                                </p>
-                                            )}
-                                        </div>
+        {isKycEditing ? (
+            <div className="flex items-center gap-2">
+                <input
+                    className="text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2 w-full outline-[#1CADA3]"
+                    value={profile.gst_number || ""}
+                    placeholder="Enter GST Number"
+                    maxLength={15}
+                    onChange={(e) => setProfile({ ...profile, gst_number: e.target.value.toUpperCase() })}
+                    disabled={gstVerified}
+                />
+                {!gstVerified && profile.gst_number && (
+                    <button
+                        onClick={handleGstVerification}
+                        disabled={verifyingGst || profile.gst_number.length < 15}
+                        className="bg-[#1CADA3] hover:bg-[#158f87] text-white text-[10px] font-bold px-4 py-2 rounded-xl transition-colors disabled:opacity-50"
+                    >
+                        {verifyingGst ? "..." : "Verify"}
+                    </button>
+                )}
+            </div>
+        ) : (
+            <p className="text-[11px] font-bold text-slate-700">
+                {profile.gst_number || 'NOT LINKED'}
+            </p>
+        )}
+    </div>
 
-                                        <span className={`ml-4 text-[8px] font-black uppercase px-2 py-1 rounded-lg ${gstVerified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>
-                                            {gstVerified ? "Verified" : "Pending"}
-                                        </span>
-                                    </div>
+    <span className={`ml-4 text-[8px] font-black uppercase px-2 py-1 rounded-lg ${gstVerified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>
+        {gstVerified ? "Verified" : "Pending"}
+    </span>
+</div>
                                 </div>
                             </div>
                         </div>

@@ -62,7 +62,7 @@ export default function Downloads() {
     // Insurance - Life Insurance
   {
       id: '3',
-      name: 'AXIS_MAX_FEB_26.pdf',
+      name: 'Axis_max_LI_Feb_2026.pdf',
       type: 'pdf',
       size: '2.4 MB',
       uploadDate: '2026-2-10',
@@ -70,7 +70,7 @@ export default function Downloads() {
       month: 'february-2026',
       year: '2026',
       subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/AXIS_MAX_FEB_26.pdf'
+      filePath: '/pdfs/lifeinsurancepdf/Axis_max_LI_Feb_2026.pdf'
     },
     {
       id: '4',

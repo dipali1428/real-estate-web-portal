@@ -5,6 +5,7 @@ interface LoanParameters {
   loanAmount: number;
   interestRate: number;
   sipReturn: number;
+  shorterTenure: number; // Added field
 }
 
 interface CalculationResults {
@@ -14,6 +15,7 @@ interface CalculationResults {
   sipValue: number;
   totalInterest20: number;
   totalInterest30: number;
+  
 }
 
 interface YearlyBreakdown {
@@ -36,6 +38,7 @@ const LoanTenureCalculator: React.FC = () => {
     loanAmount: 5000000,
     interestRate: 8.5,
     sipReturn: 12,
+    shorterTenure: 20, // Initialized to 20
   });
 
   const [results, setResults] = useState<CalculationResults>({
@@ -86,7 +89,6 @@ const LoanTenureCalculator: React.FC = () => {
 
   // Format currency
   const formatCurrency = useCallback((amount: number): string => {
-    // Check if amount is NaN, null, or undefined
     if (isNaN(amount) || amount === null || amount === undefined) {
       return '₹0';
     }
@@ -115,7 +117,6 @@ const LoanTenureCalculator: React.FC = () => {
 
   // Handle input changes
   const handleInputChange = (field: keyof LoanParameters, value: string) => {
-    // If the value is empty, set it to 0 to allow clearing
     if (value === '') {
       setParameters(prev => ({
         ...prev,
@@ -124,12 +125,9 @@ const LoanTenureCalculator: React.FC = () => {
       return;
     }
 
-    // Remove any non-numeric characters except decimal point
     const cleanValue = value.replace(/[^\d.]/g, '');
-
-    // Ensure only one decimal point
     const parts = cleanValue.split('.');
-    if (parts.length > 2) return; // Invalid input
+    if (parts.length > 2) return;
 
     const numValue = parseFloat(cleanValue);
     if (!isNaN(numValue)) {
@@ -142,30 +140,35 @@ const LoanTenureCalculator: React.FC = () => {
 
   // Calculate impact
   const calculateImpact = useCallback(() => {
-    const { loanAmount, interestRate, sipReturn } = parameters;
+    const { loanAmount, interestRate, sipReturn, shorterTenure } = parameters;
 
-    // Validate inputs - check for 0 or invalid values
-    if (!loanAmount || loanAmount < 100000 || loanAmount === 0) {
+    // Validate inputs
+    if (!loanAmount || loanAmount < 100000) {
       showNotification('Please enter a valid loan amount (min ₹1,00,000)', 'error');
       return;
     }
 
-    if (!interestRate || interestRate < 1 || interestRate === 0) {
+    if (!interestRate || interestRate < 1) {
       showNotification('Please enter a valid interest rate (min 1%)', 'error');
       return;
     }
 
-    if (!sipReturn || sipReturn < 1 || sipReturn === 0) {
+    if (!sipReturn || sipReturn < 1) {
       showNotification('Please enter a valid SIP return rate (min 1%)', 'error');
       return;
     }
 
-    // Calculate EMIs
-    const emi20 = calculateEMI(loanAmount, interestRate, 20);
+    if (!shorterTenure || shorterTenure < 1 || shorterTenure >= 30) {
+      showNotification('Base tenure must be between 1 and 29 years', 'error');
+      return;
+    }
+
+    // Calculate EMIs - Now uses parameters.shorterTenure instead of hardcoded 20
+    const emi20 = calculateEMI(loanAmount, interestRate, shorterTenure);
     const emi30 = calculateEMI(loanAmount, interestRate, 30);
     const emiDifference = emi20 - emi30;
     const sipValue = calculateSIPValue(emiDifference, sipReturn, 30);
-    const totalInterest20 = calculateTotalInterest(emi20, loanAmount, 20);
+    const totalInterest20 = calculateTotalInterest(emi20, loanAmount, shorterTenure);
     const totalInterest30 = calculateTotalInterest(emi30, loanAmount, 30);
 
     setResults({
@@ -208,11 +211,9 @@ const LoanTenureCalculator: React.FC = () => {
         continue;
       }
 
-      // Calculate yearly loan payments
       for (let month = 1; month <= 12; month++) {
         const interestPayment = remainingBalance * monthlyRate;
         const principalPayment = emi30Value - interestPayment;
-
         remainingBalance -= principalPayment;
 
         if (remainingBalance <= 0 && loanPayoffYear === 30) {
@@ -222,12 +223,10 @@ const LoanTenureCalculator: React.FC = () => {
         }
       }
 
-      // Calculate SIP growth for the year
       for (let month = 1; month <= 12; month++) {
         sipCurrentValue = (sipCurrentValue + emiDifference) * (1 + sipMonthlyRate);
       }
 
-      // Check SIP vs loan balance
       if (sipCurrentValue >= remainingBalance && sipExceedsYear === null && remainingBalance > 0) {
         sipExceedsYear = year;
       }
@@ -246,7 +245,7 @@ const LoanTenureCalculator: React.FC = () => {
         className = 'bg-green-200 font-bold';
       } else if (remainingBalance <= 0) {
         className = 'bg-green-50 font-bold';
-      } else if (sipCurrentValue >= remainingBalance && sipExceedsYear === year) {
+      } else if (sipCurrentValue >= remainingBalance && sipExceedsYear === year && remainingBalance > 0) {
         className = 'bg-yellow-100 font-bold';
       }
 
@@ -263,27 +262,24 @@ const LoanTenureCalculator: React.FC = () => {
     }
 
     setYearlyBreakdown(breakdown);
-    showNotification('Calculation completed successfully!', 'success');
   }, [parameters, calculateEMI, calculateSIPValue, calculateTotalInterest, showNotification]);
 
-  // Reset form
   const resetForm = () => {
     setParameters({
       loanAmount: 5000000,
       interestRate: 8.5,
       sipReturn: 12,
+      shorterTenure: 20,
     });
     showNotification('Form reset successfully!', 'success');
   };
 
-  // Calculate on parameter changes
   useEffect(() => {
     calculateImpact();
   }, [calculateImpact]);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg rounded-b-xl mb-8">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -299,8 +295,7 @@ const LoanTenureCalculator: React.FC = () => {
       </header>
 
       <div className="container mx-auto px-4 pb-4">
-        {/* Input Card */}
-        <div className="bg-white rounded-xl  border border-gray-200 shadow-md p-4 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-md p-4 mb-6">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
             <h2 className="text-xl font-medium text-gray-800 flex items-center">
               <i className="fas fa-calculator"></i>
@@ -308,7 +303,7 @@ const LoanTenureCalculator: React.FC = () => {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div>
               <label htmlFor="loan-amount" className="block text-sm font-semibold text-gray-700 mb-2">
                 Loan Amount (₹)
@@ -318,8 +313,7 @@ const LoanTenureCalculator: React.FC = () => {
                 id="loan-amount"
                 value={parameters.loanAmount === 0 ? '' : parameters.loanAmount}
                 onChange={(e) => handleInputChange('loanAmount', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-[#a0ffbd] 
-             focus:border-green-500 focus:outline-none transition-colors text-gray-800"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-[#a0ffbd] focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                 min="100000"
                 step="100000"
               />
@@ -334,8 +328,7 @@ const LoanTenureCalculator: React.FC = () => {
                 id="interest-rate"
                 value={parameters.interestRate === 0 ? '' : parameters.interestRate}
                 onChange={(e) => handleInputChange('interestRate', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-[#a0ffbd] 
-             focus:border-green-500 focus:outline-none transition-colors text-gray-800"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-[#a0ffbd] focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                 min="1"
                 max="30"
                 step="0.1"
@@ -351,11 +344,27 @@ const LoanTenureCalculator: React.FC = () => {
                 id="sip-return"
                 value={parameters.sipReturn === 0 ? '' : parameters.sipReturn}
                 onChange={(e) => handleInputChange('sipReturn', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-[#a0ffbd] 
-             focus:border-green-500 focus:outline-none transition-colors text-gray-800"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-[#a0ffbd] focus:border-green-500 focus:outline-none transition-colors text-gray-800"
                 min="1"
                 max="30"
                 step="0.1"
+              />
+            </div>
+
+            {/* New Year Selection Field */}
+            <div>
+              <label htmlFor="shorter-tenure" className="block text-sm font-semibold text-gray-700 mb-2">
+                Base Tenure (Years)
+              </label>
+              <input
+                type="number"
+                id="shorter-tenure"
+                value={parameters.shorterTenure === 0 ? '' : parameters.shorterTenure}
+                onChange={(e) => handleInputChange('shorterTenure', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-[#a0ffbd] focus:border-green-500 focus:outline-none transition-colors text-gray-800"
+                min="1"
+                max="29"
+                step="1"
               />
             </div>
           </div>
@@ -376,11 +385,10 @@ const LoanTenureCalculator: React.FC = () => {
           </div>
         </div>
 
-        {/* Results */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 font-sans">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6 font-sans">
           <div className="bg-white border border-gray-200 text-gray-800 rounded-xl p-6 text-center shadow-sm hover:shadow-md transition">
             <div className="text-2xl font-medium mb-1">{formatCurrency(results.emi20)}</div>
-            <div className="text-gray-500 text-sm">EMI (20 Years)</div>
+            <div className="text-gray-500 text-sm">EMI ({parameters.shorterTenure} Years)</div>
           </div>
 
           <div className="bg-white border border-gray-200 text-gray-800 rounded-xl p-6 text-center shadow-sm hover:shadow-md transition">
@@ -394,18 +402,9 @@ const LoanTenureCalculator: React.FC = () => {
             <div className="text-2xl font-medium mb-1">{formatCurrency(results.emiDifference)}</div>
             <div className="text-gray-500 text-sm">Monthly SIP Difference</div>
           </div>
-
-          <div className="bg-white border border-gray-200 text-gray-800 rounded-xl p-6 text-center shadow-sm hover:shadow-md transition">
-            <i className="fas fa-piggy-bank text-2xl text-gray-600 mb-2"></i>
-            <div className="text-2xl font-medium mb-1">{formatCurrency(results.sipValue)}</div>
-            <div className="text-gray-500 text-sm">SIP Value After 30 Years</div>
-          </div>
         </div>
 
-
-        {/* Yearly Breakdown Table */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-md overflow-hidden mb-6 flex flex-col max-h-[600px]">
-          {/* Table Header - Fixed */}
+       <div className="bg-white rounded-xl border border-gray-200 shadow-md overflow-hidden mb-6">
           <div className="shrink-0 p-4 pb-4 border-b border-gray-200">
             <h2 className="text-xl font-medium text-gray-800 flex items-center">
               <i className="fas fa-table"></i>
@@ -413,7 +412,6 @@ const LoanTenureCalculator: React.FC = () => {
             </h2>
           </div>
 
-          {/* Scrollable Table Content */}
           <div className="flex-1 overflow-y-auto">
             <div className="relative">
               <table className="w-full border-collapse">
@@ -444,7 +442,6 @@ const LoanTenureCalculator: React.FC = () => {
           </div>
         </div>
 
-        {/* Insights */}
         <div className="bg-white rounded-xl border shadow-md p-4">
           <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <i className="fas fa-lightbulb text-yellow-500"></i>
@@ -452,7 +449,7 @@ const LoanTenureCalculator: React.FC = () => {
           </h2>
 
           <div className="text-gray-700 leading-relaxed">
-            <p className="mb-3">By extending your loan tenure from 20 to 30 years:</p>
+            <p className="mb-3">By extending your loan tenure from {parameters.shorterTenure} to 30 years:</p>
             <ul className="list-disc pl-5 mb-4 space-y-2">
               <li>
                 Your monthly EMI decreases by{' '}
@@ -468,58 +465,20 @@ const LoanTenureCalculator: React.FC = () => {
               <li>The SIP value is <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
                 {((results.sipValue / (parameters.loanAmount + results.totalInterest30)) * 100).toFixed(1)}%
               </span> of your total loan cost</li>
-              <li>You effectively convert EMI savings into significant wealth creation</li>
-              {(() => {
-                const sipExceedsYear = yearlyBreakdown.find(item =>
-                  item.sipValue >= item.loanBalance && item.loanBalance > 0
-                )?.year;
-
-                const loanClosedBySipYear = yearlyBreakdown.find(item =>
-                  item.status.includes('Loan Closed (SIP)')
-                )?.year;
-
-                const loanPayoffYear = yearlyBreakdown.find(item =>
-                  item.status.includes('Loan Closed (Regular)') && !item.status.includes('SIP')
-                )?.year || 30;
-
-                const yearsSaved = 30 - loanPayoffYear;
-
-                return (
-                  <>
-                    {sipExceedsYear && (
-                      <li>
-                        In <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">Year {sipExceedsYear}</span>, your SIP value exceeds your remaining loan balance
-                      </li>
-                    )}
-                    {loanClosedBySipYear && (
-                      <li>
-                        You can close your loan in <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">Year {loanClosedBySipYear}</span> by using your SIP funds, saving even more on interest
-                      </li>
-                    )}
-                    <li>You effectively pay off your loan early while building significant wealth</li>
-                  </>
-                );
-              })()}
             </ul>
             <p className="text-sm text-gray-600">
               <strong>Note:</strong> This analysis assumes consistent SIP returns and doesn't account for inflation or tax implications.
             </p>
           </div>
         </div>
-
       </div>
 
-      {/* Notification */}
       {notification.show && (
-        <div className={`fixed top-5 right-5 bg-white rounded-lg shadow-lg z-50 max-w-sm border-l-4 ${notification.type === 'success' ? 'border-[#1CADA3]' : 'border-red-500'
-          }`}>
+        <div className={`fixed top-5 right-5 bg-white rounded-lg shadow-lg z-50 max-w-sm border-l-4 ${notification.type === 'success' ? 'border-[#1CADA3]' : 'border-red-500'}`}>
           <div className="p-4 flex items-center gap-3">
-            <i className={`fas ${notification.type === 'success' ? 'fa-check-circle text-green-500' : 'fa-exclamation-circle text-red-500'
-              } text-xl`}></i>
+            <i className={`fas ${notification.type === 'success' ? 'fa-check-circle text-green-500' : 'fa-exclamation-circle text-red-500'} text-xl`}></i>
             <span className="flex-1 text-gray-600">{notification.message}</span>
-            <button
-              onClick={() => setNotification(prev => ({ ...prev, show: false }))}
-              className="text-gray-400 hover:text-gray-600 transition-colors">
+            <button onClick={() => setNotification(prev => ({ ...prev, show: false }))} className="text-gray-400 hover:text-gray-600 transition-colors">
               <i className="fas fa-times"></i>
             </button>
           </div>

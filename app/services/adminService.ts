@@ -75,31 +75,47 @@ interface EnquiryPayload {
   subject?: string;
 }
 
-interface Ticket {
-  id: number;
-  ticket_id: string;
-  user_id: number;
-  name: string;
-  email: string;
-  mobile: string;
-  category: string;
-  subject: string;
-  description: string;
-  status: 'Open' | 'Resolved' | 'Closed';
-  created_at: string;
-  updated_at: string;
-  assigned_to?: string | null;
-  comments?: Comment[];
-  admin_solution?: string;
-  admin_id?: number;
-  solved_at?: string;
-}
+// interface Ticket {
+//   id: number;
+//   ticket_id: string;
+//   user_id: number;
+//   name: string;
+//   email: string;
+//   mobile: string;
+//   category: string;
+//   subject: string;
+//   description: string;
+//   status: 'Open' | 'Resolved' | 'Closed';
+//   created_at: string;
+//   updated_at: string;
+//   assigned_to?: string | null;
+//   comments?: Comment[];
+//   admin_solution?: string;
+//   admin_id?: number;
+//   solved_at?: string;
+// }
 
 interface Comment {
   id: string;
   text: string;
   author: string;
   role: 'admin' | 'dsa';
+  created_at: string;
+}
+
+export interface CareerApplication {
+  id: number;
+  full_name: string;
+  email: string;
+  phone: string;
+  current_city: string;
+  total_experience: string;
+  notice_period: string;
+  current_ctc: string;
+  expected_ctc: string;
+  linkedin_url: string;
+  applying_for: string;
+  status: string;
   created_at: string;
 }
 
@@ -249,6 +265,11 @@ export const AdminService = {
 
   getAllReferralLeads: async () => {
     const response = await api.get("/api/admin/get-all-referral-leads");
+    return response.data;
+  },
+
+  getCareerApplications: async (): Promise<{ success: boolean; career_applications: CareerApplication[]; count: number }> => {
+    const response = await api.get("/api/admin/career-applications");
     return response.data;
   },
 };

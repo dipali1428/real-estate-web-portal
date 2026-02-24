@@ -57,6 +57,7 @@ export const sidebarLinks = {
         { label: "All Users", href: "/admin/allusers", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "Detail Leads", href: "/admin/detailleads", icon: <UserPlus className="h-5 w-5 text-neutral-700" /> },
         { label: "Referral Leads", href: "/admin/referralleads", icon: <UserPlus className="h-5 w-5 text-neutral-700" /> },
+        { label: "Career Management", href: "/admin/careermanagement", icon: < MessageSquare className="h-5 w-5 text-neutral-700" /> },
     ],
 
     GM: [],

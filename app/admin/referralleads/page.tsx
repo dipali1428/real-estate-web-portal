@@ -26,7 +26,7 @@ interface ReferralLead {
     department: string;
     sub_category: string;
     notes: string;
-    status: string;
+    referral_lead_status: string;
     created_at: string;
     ref_id: string;
     department_head_id: number;
@@ -138,7 +138,8 @@ export default function ReferralLeadDashboard() {
                                         </td>
                                         <td className="px-4 py-3">
                                             <span className="px-2 py-0.5 rounded-full text-[10px] font-black border bg-orange-50 text-orange-600 border-orange-200">
-                                                {lead.status}
+                                                {lead.referral_lead_status
+}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 text-xs text-gray-700">
@@ -212,7 +213,7 @@ export default function ReferralLeadDashboard() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <DataRow label="Lead Department" value={selectedLead.department} icon={<Briefcase size={12} />} />
                                         <DataRow label="Sub Category" value={selectedLead.sub_category} />
-                                        <DataRow label="Current Status" value={selectedLead.status} icon={<UserCog size={12} />} />
+                                        <DataRow label="Current Status" value={selectedLead.referral_lead_status} icon={<UserCog size={12} />} />
                                     </div>
                                     <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
                                         <p className="text-[10px] font-black text-gray-700 uppercase mb-1">Lead Notes</p>
