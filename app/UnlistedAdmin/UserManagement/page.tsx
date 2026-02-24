@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AdminService, UnlistedUser } from "../../services/unlistedadminservices";
+import { AdminService, UnlistedUser, AddUserPayload, UpdateUserPayload } from "../../services/unlistedadminservices";
 import { 
-  Users, Search, RotateCw, UserCheck, ShieldCheck,
+  Users, Search, RotateCw, 
   ChevronLeft, ChevronRight, Phone, Hash, Pencil, Trash2, Plus, X
 } from "lucide-react";
 
@@ -14,6 +14,7 @@ const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,7 +24,7 @@ const UserManagement: React.FC = () => {
   const fetchUsers = async (page: number) => {
     setLoading(true);
     try {
-      const response = await AdminService.getUnlistedUsers(page);
+      const response = await AdminService.getUsers(page);
       if (response.success && Array.isArray(response.data)) {
         setUsers(response.data);
         setTotalPages(response.totalPages || 1); 
@@ -41,54 +42,67 @@ const UserManagement: React.FC = () => {
 
   // --- API ACTIONS ---
 
-const handleDelete = async (id: number) => {
-  if (!window.confirm("Are you sure?")) return;
-  try {
-    // This now sends /api/.../delete/2724 instead of /api/.../delete/:id
-    await AdminService.deleteUser(id); 
-    fetchUsers(currentPage);
-  } catch (error) {
-    console.error("Delete error:", error);
-    alert("Delete failed. Check console for details.");
-  }
-};
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-
-  try {
-    if (modalType === 'add') {
-      // Create a clean object for the API
-      const payload = {
-        name: selectedUser?.name,
-        email: selectedUser?.email,
-        mobile: selectedUser?.mobile,
-        role: selectedUser?.role,
-        adv_id: selectedUser?.adv_id
-      };
-      
-      await AdminService.addUser(payload);
-      alert("User added successfully!");
-    } else {
-      // For Edit: we need the ID
-      if (selectedUser?.id) {
-        await AdminService.updateUsers(selectedUser.id, selectedUser);
-        alert("User updated successfully!");
-      }
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Are you sure?")) return;
+    try {
+      await AdminService.deleteUser(id); 
+      fetchUsers(currentPage);
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Delete failed. Check console for details.");
     }
-    
-    setIsModalOpen(false);
-    fetchUsers(currentPage);
-  } catch (error: any) {
-    console.error("Submit error:", error);
-    // IMPROVED ERROR ALERT:
-    const serverMessage = error.response?.data?.message || error.response?.data?.error || "Check all fields";
-    alert(`Failed: ${serverMessage}`);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitLoading(true);
+
+    try {
+      if (modalType === 'add') {
+        // For ADD: All required fields must be present
+        if (!selectedUser?.name || !selectedUser?.email || !selectedUser?.mobile) {
+          alert("Name, Email and Mobile are required fields");
+          setSubmitLoading(false);
+          return;
+        }
+
+        const payload: AddUserPayload = {
+          name: selectedUser.name,
+          email: selectedUser.email,
+          mobile: selectedUser.mobile,
+          role: selectedUser.role || 'CUSTOMER',
+          adv_id: selectedUser.adv_id || ''
+        };
+        
+        await AdminService.addUser(payload);
+        alert("User added successfully!");
+      } else {
+        // For EDIT: ID is required, all fields optional
+        if (selectedUser?.id) {
+          const payload: UpdateUserPayload = {};
+          
+          // Only add fields that have values
+          if (selectedUser.name) payload.name = selectedUser.name;
+          if (selectedUser.email) payload.email = selectedUser.email;
+          if (selectedUser.mobile) payload.mobile = selectedUser.mobile;
+          if (selectedUser.role) payload.role = selectedUser.role;
+          if (selectedUser.adv_id !== undefined) payload.adv_id = selectedUser.adv_id;
+
+          await AdminService.updateUser(selectedUser.id, payload);
+          alert("User updated successfully!");
+        }
+      }
+      
+      setIsModalOpen(false);
+      fetchUsers(currentPage);
+    } catch (error: any) {
+      console.error("Submit error:", error);
+      const serverMessage = error.response?.data?.message || error.response?.data?.error || "Check all fields";
+      alert(`Failed: ${serverMessage}`);
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
 
   const openModal = (type: 'add' | 'edit', user?: UnlistedUser) => {
     setModalType(type);
@@ -215,6 +229,29 @@ const handleSubmit = async (e: React.FormEvent) => {
             </tbody>
           </table>
         </div>
+
+        {/* --- PAGINATION --- */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-2 text-gray-400 hover:text-[#2076C7] disabled:opacity-30"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <span className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="p-2 text-gray-400 hover:text-[#2076C7] disabled:opacity-30"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* --- MODAL OVERLAY --- */}
@@ -286,9 +323,17 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                 <button 
                   type="submit"
-                  className="w-full py-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-100 mt-4"
+                  disabled={submitLoading}
+                  className="w-full py-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-100 mt-4 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {modalType === 'add' ? 'Create Account' : 'Save Changes'}
+                  {submitLoading ? (
+                    <>
+                      <RotateCw className="w-4 h-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    modalType === 'add' ? 'Create Account' : 'Save Changes'
+                  )}
                 </button>
               </form>
             </motion.div>

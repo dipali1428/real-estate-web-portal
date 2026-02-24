@@ -3,13 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminService } from '../../services/unlistedadminservices';
-import { motion } from 'framer-motion';
+// Import your 'api' instance to handle headers automatically
+import api from '../../services/api'; 
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Upload, 
   FileSpreadsheet, 
   RotateCw, 
-  CheckCircle, 
-  AlertCircle,
   X,
   Info,
   Zap,
@@ -18,26 +18,23 @@ import {
   ChevronLeft,
   Activity,
   Shield,
-  History,
-  Clock
+  Download,
+  FileText,
+  AlertCircle
 } from "lucide-react";
 
 const ImportExportAdmin: React.FC = () => {
   const router = useRouter();
-  
-  // Import States
+  const [activeTab, setActiveTab] = useState<'import' | 'export'>('import');
+
+  // States
   const [file, setFile] = useState<File | null>(null);
   const [importType, setImportType] = useState('shares_history');
   const [isImporting, setIsImporting] = useState(false);
-  const [progress, setProgress] = useState({ 
-    percent: 0, 
-    status: 'Waiting...', 
-    processed: 0, 
-    skipped: 0 
-  });
+  const [isExporting, setIsExporting] = useState<string | null>(null);
+  const [progress, setProgress] = useState({ percent: 0, status: 'Waiting...' });
   const [logs, setLogs] = useState<string[]>([]);
   
-  // Data States
   const [isClient, setIsClient] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -45,64 +42,66 @@ const ImportExportAdmin: React.FC = () => {
     setIsClient(true);
   }, []);
 
-  // --- FILE HANDLING ---
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-        setFile(selectedFile);
-        setLogs([`[${new Date().toLocaleTimeString()}] File "${selectedFile.name}" selected. Ready for processing.`]);
+  // --- FIXED EXPORT LOGIC (NO MORE ACCESS DENIED) ---
+  const handleExport = async (type: 'shares' | 'transactions') => {
+    setIsExporting(type);
+    try {
+      const endpoint = type === 'shares' 
+        ? "/api/unlisted/admin/analytics/shares/export" 
+        : "/api/unlisted/admin/analytics/transactions/export";
+      
+      // We use the api instance because it automatically includes the Authorization Header
+      const response = await api.get(endpoint, {
+        responseType: 'blob', // This tells the browser we are downloading a file
+      });
+
+      // 1. Create a URL for the downloaded data
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      
+      // 2. Create a temporary anchor element
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // 3. Set the filename
+      const fileName = `${type}_export_${new Date().toISOString().split('T')[0]}.csv`;
+      link.setAttribute('download', fileName);
+      
+      // 4. Trigger the download
+      document.body.appendChild(link);
+      link.click();
+      
+      // 5. Clean up
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+    } catch (err: any) {
+      console.error("Export failed", err);
+      alert("Failed to export: " + (err.response?.data?.message || "Check your permissions."));
+    } finally {
+      setIsExporting(null);
     }
   };
 
-  // --- EXECUTE IMPORT ---
+  // --- IMPORT LOGIC ---
   const startImport = async () => {
     if (!file) return;
-    
     setIsImporting(true);
-    setProgress({ percent: 30, status: 'Uploading...', processed: 0, skipped: 0 });
-    setLogs([`[${new Date().toLocaleTimeString()}] Initializing connection to import API...`]);
-
+    setProgress({ percent: 30, status: 'Processing...' });
     try {
       let response;
-      
       if (importType === 'shares_history') {
-        setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] Processing Excel workbook...`]);
-        response = await AdminService.uploadSharesWithHistory(file);
-      } else if (importType === 'shares_pdf') {
-        response = await AdminService.uploadSharesPdfAndUpdate(file);
+        response = await (AdminService as any).uploadSharesWithHistory(file);
       } else {
-          setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] Standard import selected.`]);
-          return;
+        response = await (AdminService as any).uploadSharesPdfAndUpdate(file);
       }
-      
-      setProgress({
-        percent: 100,
-        status: 'Completed',
-        processed: response.rowsProcessed || 0,
-        skipped: response.rowsSkipped || 0
-      });
-
-      setLogs(prev => [
-        ...prev, 
-        `[${new Date().toLocaleTimeString()}] ✓ ${response.message}`,
-        `[${new Date().toLocaleTimeString()}] Rows Processed: ${response.rowsProcessed}`,
-        `[${new Date().toLocaleTimeString()}] Rows Skipped: ${response.rowsSkipped}`
-      ]);
-
+      setProgress({ percent: 100, status: 'Completed' });
+      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ✓ Import Successful`]);
     } catch (err: any) {
-      console.error('Import error:', err);
-      const errMsg = err.response?.data?.message || err.message || "Unknown error";
-      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ✗ Error: ${errMsg}`]);
-      setProgress(prev => ({ ...prev, percent: 0, status: 'Failed' }));
+      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ✗ Error: ${err.message}`]);
+      setProgress({ percent: 0, status: 'Failed' });
     } finally {
       setIsImporting(false);
     }
-  };
-
-  const clearFile = () => {
-    setFile(null);
-    setLogs([]);
-    setProgress({ percent: 0, status: 'Waiting...', processed: 0, skipped: 0 });
   };
 
   if (!isClient) return null;
@@ -110,217 +109,134 @@ const ImportExportAdmin: React.FC = () => {
   return (
     <div className="flex-1 space-y-6 animate-fade-in pb-10">
       
-      {/* --- HEADER --- */}
+      {/* HEADER */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row justify-between items-center gap-4"
+        className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white shadow-md flex justify-between items-center"
       >
         <div className="flex items-center gap-3">
-          <button 
-            onClick={() => router.back()}
-            className="p-2 hover:bg-white/10 rounded-xl transition-colors"
-          >
+          <button onClick={() => router.back()} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-              <Database className="w-6 h-6" /> Data Import
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <Database className="w-6 h-6" /> Data Portal
             </h2>
-            <p className="text-sm opacity-90">Bulk upload shares with price history</p>
+            <p className="text-sm opacity-90">Secure Import & Export</p>
           </div>
         </div>
         <div className="flex gap-2">
           <span className="px-3 py-1.5 bg-emerald-500/20 text-emerald-100 text-[10px] font-black uppercase tracking-widest rounded-lg border border-emerald-200/30 flex items-center gap-1">
             <Activity className="w-3 h-3" /> System Live
           </span>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="p-2.5 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
-          >
-            <RotateCw className="w-5 h-5" />
-          </button>
         </div>
       </motion.div>
 
-      {/* --- QUICK STATS --- */}
-      {/* Main Container Card */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-          <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <Upload className="w-5 h-5 text-[#2076C7]" />
-            Import Shares with History
-          </h3>
+        {/* TABS */}
+        <div className="flex border-b border-gray-100">
+          <button
+            onClick={() => setActiveTab('import')}
+            className={`flex-1 py-4 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'import' ? 'text-[#2076C7] border-b-2 border-[#2076C7] bg-blue-50/30' : 'text-gray-400'
+            }`}
+          >
+            <Upload className="w-4 h-4" /> Import Data
+          </button>
+          <button
+            onClick={() => setActiveTab('export')}
+            className={`flex-1 py-4 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'export' ? 'text-[#1CADA3] border-b-2 border-[#1CADA3] bg-teal-50/30' : 'text-gray-400'
+            }`}
+          >
+            <Download className="w-4 h-4" /> Export Excel
+          </button>
         </div>
 
         <div className="p-6 sm:p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-8 space-y-6">
-              {/* Drag & Drop Area */}
-              {!file ? (
-                <div 
-                  onDragOver={(e) => { 
-                    e.preventDefault(); 
-                    e.currentTarget.classList.add('border-[#1CADA3]', 'bg-teal-50/30'); 
-                  }}
-                  onDragLeave={(e) => { 
-                    e.currentTarget.classList.remove('border-[#1CADA3]', 'bg-teal-50/30'); 
-                  }}
-                  onDrop={(e) => { 
-                    e.preventDefault(); 
-                    e.currentTarget.classList.remove('border-[#1CADA3]', 'bg-teal-50/30');
-                    if (e.dataTransfer.files[0]) {
-                      const droppedFile = e.dataTransfer.files[0];
-                      setFile(droppedFile);
-                      setLogs([`[${new Date().toLocaleTimeString()}] File "${droppedFile.name}" selected. Ready for processing.`]);
-                    }
-                  }}
-                  onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-gray-200 rounded-2xl p-10 sm:p-12 text-center cursor-pointer hover:border-[#1CADA3] hover:bg-teal-50/30 transition-all group"
-                >
-                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform text-gray-400 group-hover:text-[#1CADA3]">
-                    <FileSpreadsheet className="w-8 h-8" />
+          <AnimatePresence mode="wait">
+            {activeTab === 'import' ? (
+              <motion.div key="import" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div className="lg:col-span-8 space-y-6">
+                  {!file ? (
+                    <div 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="border-2 border-dashed border-gray-200 rounded-2xl p-10 text-center cursor-pointer hover:border-[#1CADA3] transition-all"
+                    >
+                      <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-400">
+                        <FileSpreadsheet className="w-8 h-8" />
+                      </div>
+                      <h4 className="text-lg font-bold text-gray-700">Upload CSV/Excel</h4>
+                      <input type="file" ref={fileInputRef} onChange={(e) => setFile(e.target.files?.[0] || null)} accept=".csv, .xlsx" hidden />
+                    </div>
+                  ) : (
+                    <div className="p-5 bg-emerald-50 border border-emerald-200 rounded-2xl flex justify-between items-center">
+                      <div className="flex items-center gap-4 text-emerald-900 font-bold text-sm"><FileSpreadsheet /> {file.name}</div>
+                      <button onClick={() => setFile(null)}><X className="w-4 h-4" /></button>
+                    </div>
+                  )}
+
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={startImport} 
+                      disabled={!file || isImporting}
+                      className="px-8 py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black uppercase text-xs tracking-widest rounded-xl disabled:opacity-50 flex items-center gap-3"
+                    >
+                      {isImporting ? <Loader2 className="animate-spin w-4 h-4" /> : <Zap className="w-4 h-4" />}
+                      Execute
+                    </button>
                   </div>
-                  <h4 className="text-lg font-bold text-gray-700">Upload Excel/CSV for Bulk Update</h4>
-                  <p className="text-sm text-gray-400 mt-1">Select the file containing share prices and history</p>
-                  <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest mt-4">Supports .csv, .xlsx, .xls</p>
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    onChange={handleFileSelect} 
-                    accept=".csv, .xlsx, .xls" 
-                    hidden 
-                  />
                 </div>
-              ) : (
-                <div className="p-5 bg-emerald-50/50 border border-emerald-200 rounded-2xl flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-emerald-500 shadow-sm">
-                      <FileSpreadsheet className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="font-bold text-emerald-900 text-sm">{file.name}</div>
-                      <div className="text-xs text-emerald-600 font-medium">Size: {(file.size / 1024).toFixed(1)} KB</div>
-                    </div>
+              </motion.div>
+            ) : (
+              /* EXPORT VIEW */
+              <motion.div key="export" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* Export Shares */}
+                <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:border-[#2076C7]/30 transition-all group">
+                  <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-[#2076C7] mb-6 group-hover:scale-110 transition-transform">
+                    <FileText className="w-6 h-6" />
                   </div>
+                  <h4 className="text-lg font-bold text-gray-800 mb-2">Shares Master</h4>
+                  <p className="text-sm text-gray-500 mb-6">Download the list of all shares for Excel auditing.</p>
                   <button 
-                    onClick={clearFile}
-                    className="p-2 text-emerald-900 hover:bg-emerald-100 rounded-full transition-colors"
+                    disabled={isExporting !== null}
+                    onClick={() => handleExport('shares')}
+                    className="w-full py-3.5 bg-gray-900 text-white font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-[#2076C7] transition-all flex items-center justify-center gap-2"
                   >
-                    <X className="w-4 h-4" />
+                    {isExporting === 'shares' ? <Loader2 className="animate-spin w-3 h-3" /> : <Download className="w-3.5 h-3.5" />}
+                    {isExporting === 'shares' ? 'Preparing...' : 'Download CSV'}
                   </button>
                 </div>
-              )}
 
-              {/* Import Config */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Import Engine</label>
-                  <select 
-                    value={importType} 
-                    onChange={(e) => setImportType(e.target.value)} 
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] bg-white text-sm font-bold text-gray-700"
+                {/* Export Transactions */}
+                <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:border-[#1CADA3]/30 transition-all group">
+                  <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-[#1CADA3] mb-6 group-hover:scale-110 transition-transform">
+                    <Activity className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-lg font-bold text-gray-800 mb-2">Transactions</h4>
+                  <p className="text-sm text-gray-500 mb-6">Full audit log of user Buy/Sell activities.</p>
+                  <button 
+                    disabled={isExporting !== null}
+                    onClick={() => handleExport('transactions')}
+                    className="w-full py-3.5 bg-gray-900 text-white font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-[#1CADA3] transition-all flex items-center justify-center gap-2"
                   >
-                    <option value="shares_history">Shares With History (Excel)</option>
-                    <option value="shares_pdf">Shares PDF Extractor</option>
-                  </select>
+                    {isExporting === 'transactions' ? <Loader2 className="animate-spin w-3 h-3" /> : <Download className="w-3.5 h-3.5" />}
+                    {isExporting === 'transactions' ? 'Preparing...' : 'Download CSV'}
+                  </button>
                 </div>
-                <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex items-start gap-3">
-                  <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                  <p className="text-[11px] font-medium text-blue-700 leading-tight">
-                    The engine will automatically match companies by name and update historical price charts.
+
+                <div className="md:col-span-2 p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center gap-3">
+                  <Info className="w-4 h-4 text-blue-500" />
+                  <p className="text-[11px] font-bold text-blue-700 uppercase tracking-widest">
+                    Your Authentication Token is verified automatically for secure downloads.
                   </p>
                 </div>
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <button 
-                  onClick={startImport}
-                  disabled={!file || isImporting}
-                  className="px-8 py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black uppercase text-xs tracking-widest rounded-xl hover:shadow-lg disabled:opacity-50 transition-all flex items-center gap-3"
-                >
-                  {isImporting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Zap className="w-4 h-4" />
-                  )}
-                  {isImporting ? 'Processing Excel...' : 'Execute Import'}
-                </button>
-                <button 
-                  onClick={clearFile} 
-                  disabled={!file}
-                  className="px-6 py-3.5 border border-gray-200 text-gray-400 font-bold rounded-xl hover:bg-gray-50 transition-all uppercase text-[10px] tracking-widest disabled:opacity-50"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-
-            {/* Sidebar: Progress & Results */}
-            <div className="lg:col-span-4 space-y-6">
-              {(isImporting || progress.percent > 0) && (
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                  <h5 className="font-bold text-gray-800 mb-4 uppercase text-xs tracking-widest flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-[#1CADA3]" />
-                    Process Monitor
-                  </h5>
-                  
-                  <div className="h-2 bg-gray-100 rounded-full mb-3 overflow-hidden">
-                    <motion.div 
-                      initial={{ width: 0 }}
-                      animate={{ width: `${progress.percent}%` }}
-                      className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full" 
-                    />
-                  </div>
-                  
-                  <div className="flex justify-between text-[10px] font-black uppercase mb-4">
-                    <span className="text-[#2076C7]">{progress.percent}%</span>
-                    <span className={progress.status === 'Failed' ? 'text-rose-500' : 'text-emerald-500'}>
-                      {progress.status}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 text-center">
-                      <div className="text-xl font-black text-gray-800">{progress.processed}</div>
-                      <div className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Processed</div>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 text-center">
-                      <div className="text-xl font-black text-gray-800">{progress.skipped}</div>
-                      <div className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Skipped</div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-900 rounded-xl p-4 font-mono text-[10px] text-emerald-400 h-40 overflow-y-auto">
-                    {logs.map((log, i) => (
-                      <div key={i} className="mb-1.5 leading-relaxed border-l border-emerald-500/20 pl-2">{log}</div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                <h5 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-xs uppercase tracking-widest">
-                  <Shield className="w-4 h-4 text-[#1CADA3]" /> Data Integrity
-                </h5>
-                <ul className="space-y-3 text-[11px] text-gray-500 font-medium">
-                  <li className="flex gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#1CADA3] flex-shrink-0" />
-                    <span>Ensure Company names match exactly.</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#1CADA3] flex-shrink-0" />
-                    <span>Price columns must be numeric.</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#1CADA3] flex-shrink-0" />
-                    <span>System automatically archives old prices.</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>

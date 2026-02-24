@@ -34,7 +34,7 @@ const DashboardOverview = () => {
     setLoading(true);
     setError(null);
     try {
-      const statsData = await AdminService.getUnlistedDashboardStats();
+      const statsData = await AdminService.getDashboardStats();
       setStats(statsData);
     } catch (err: any) {
       console.error('Dashboard fetch error:', err);

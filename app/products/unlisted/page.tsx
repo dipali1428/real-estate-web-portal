@@ -68,6 +68,9 @@ const Home = () => {
     const [activeBenefit, setActiveBenefit] = useState<number | null>(null);
     const [formData, setFormData] = useState({ fullName: '', email: '', phone: '', quantity: '', message: '' });
     
+    // NEW: Scroll to top state
+    const [showScrollTop, setShowScrollTop] = useState(false);
+
     // Typing animation states
     const [displayedText, setDisplayedText] = useState('');
     const fullHeading = "India's Premier Platform for Unlisted Shares & Pre-IPO Investments";
@@ -97,6 +100,29 @@ const Home = () => {
 
         return () => clearInterval(typingInterval);
     }, []);
+
+    //Scroll to Top button
+    useEffect(() => {
+        const handleScroll = () => {
+            const faqSection = document.getElementById('faq');
+            if (faqSection) {
+                const faqPosition = faqSection.offsetTop;
+                // Show button when user scrolls near the FAQ section
+                if (window.scrollY > faqPosition - 400) {
+                    setShowScrollTop(true);
+                } else {
+                    setShowScrollTop(false);
+                }
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     useEffect(() => {
         const loadCompanies = async () => {
@@ -163,7 +189,6 @@ const Home = () => {
         }
     };
 
-    // Enhanced FAQ data with more detailed answers
     const faqs = [
         { 
             q: 'What exactly are unlisted shares?', 
@@ -230,6 +255,18 @@ const Home = () => {
 
     return (
         <div className="min-h-screen text-gray-900 bg-gradient-to-br from-[#b5d9f3] via-white to-[#ecf5ec]">
+            
+            {/* Scroll to Top Arrow */}
+            {showScrollTop && (
+                <button 
+                    onClick={scrollToTop}
+                    className="fixed bottom-6 right-6 z-[100] p-2 bg-[#2076C7] text-white rounded-full shadow-lg hover:bg-[#1a5fa1] transition-all duration-300 flex items-center justify-center animate-in fade-in zoom-in"
+                    aria-label="Scroll to top"
+                >
+                    <ArrowUp size={20} strokeWidth={3} />
+                </button>
+            )}
+
             {/* Hero Section with Typing Animation */}
             <section className="pt-24 pb-20 px-6 text-center">
                 <h1 className="text-5xl md:text-7xl font-bold mb-6 min-h-[120px] md:min-h-[160px] flex items-center justify-center leading-tight">

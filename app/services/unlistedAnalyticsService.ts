@@ -196,6 +196,23 @@ export const UnlistedAnalyticsService = {
     }
     window.open(`${process.env.NEXT_PUBLIC_API_URL}/api/unlisted/admin/analytics/transactions/export?token=${token}`, '_blank');
   },
+    uploadSharesWithHistory: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post("/api/unlisted/admin/analytics/shares/import-with-history", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  },
+
+  uploadSharesPdfAndUpdate: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post("/api/unlisted/admin/analytics/shares/pdf-import", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  },
 
   /* ===========================
      FILTER / SEARCH

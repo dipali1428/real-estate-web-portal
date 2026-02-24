@@ -827,7 +827,7 @@ export default function KYCVerificationPage() {
                       value={dematDetails.dp_id}
                       onChange={(e) => setDematDetails({...dematDetails, dp_id: e.target.value})}
                       className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:border-[#1CADA3]"
-                      placeholder="IN300123"
+                      placeholder="Enter DP ID"
                     />
                   </div>
                   <div>
@@ -839,7 +839,7 @@ export default function KYCVerificationPage() {
                       value={dematDetails.client_id}
                       onChange={(e) => setDematDetails({...dematDetails, client_id: e.target.value})}
                       className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:border-[#1CADA3]"
-                      placeholder="12345678"
+                      placeholder="Enter Client ID"
                     />
                   </div>
                   <div>
@@ -864,7 +864,7 @@ export default function KYCVerificationPage() {
                       value={dematDetails.demat_name}
                       onChange={(e) => setDematDetails({...dematDetails, demat_name: e.target.value.toUpperCase()})}
                       className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:border-[#1CADA3]"
-                      placeholder="RAHUL SHARMA"
+                      placeholder="Enter Name as per Demat Account"
                     />
                   </div>
                 </div>

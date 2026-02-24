@@ -431,31 +431,35 @@ const EnquiryManagement: React.FC = () => {
     setFilteredEnquiries(filtered);
   }, [enquiries, searchTerm, typeFilter, statusFilter, sortBy, dateRange]);
 
-  const fetchEnquiries = async () => {
-    setLoading(true);
-    try {
-      const response = await AdminService.getAllEnquiries();
-      // Handle the response structure based on your API
-      const enquiriesData = (response as any)?.data || [];
-      // Map to LocalEnquiry type
-      const mappedData: LocalEnquiry[] = enquiriesData.map((e: any) => ({
-        id: e.id,
-        company_id: e.company_id,
-        enquiry_type: e.enquiry_type || 'buy',
-        full_name: e.full_name || '',
-        email: e.email || '',
-        phone: e.phone || '',
-        quantity: e.quantity || 0,
-        created_at: e.created_at || new Date().toISOString(),
-        status: e.status || 'PENDING'
-      }));
-      setEnquiries(mappedData);
-    } catch (error) {
-      console.error('Error fetching enquiries:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchEnquiries = async () => {
+  setLoading(true);
+  try {
+    // ✅ FIXED: Use getEnquiries() instead of getAllEnquiries()
+    const response = await AdminService.getEnquiries();
+    
+    // Handle the response structure based on your API
+    const enquiriesData = Array.isArray(response) ? response : (response as any)?.data || [];
+    
+    // Map to LocalEnquiry type
+    const mappedData: LocalEnquiry[] = enquiriesData.map((e: any) => ({
+      id: e.id,
+      company_id: e.company_id,
+      enquiry_type: e.enquiry_type || 'buy',
+      full_name: e.full_name || '',
+      email: e.email || '',
+      phone: e.phone || '',
+      quantity: e.quantity || 0,
+      created_at: e.created_at || new Date().toISOString(),
+      status: e.status || 'PENDING'
+    }));
+    
+    setEnquiries(mappedData);
+  } catch (error) {
+    console.error('Error fetching enquiries:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleResolveEnquiry = async (id: number) => {
     try {
