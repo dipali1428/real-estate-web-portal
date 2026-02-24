@@ -305,7 +305,7 @@ const Header = () => {
                     onMouseEnter={() => setIsInvestmentOpen(true)}
                     onMouseLeave={() => setIsInvestmentOpen(false)}>
                     <div className="flex items-center justify-between px-3 xl:px-4 py-2 text-gray-700 hover:bg-[#E8F6FA] hover:text-[#2076C7] transition-colors duration-200 cursor-pointer">
-                      <span className="text-sm xl:text-base">Investment</span>
+                      <span className="text-sm xl:text-base">Investments</span>
                       <ChevronDown
                         size={12}
                         className={`transition-transform duration-300 ${isInvestmentOpen ? "rotate-180" : ""}`}
