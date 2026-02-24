@@ -157,12 +157,18 @@ else if (/^\d+$/.test(processedIdentifier) && processedIdentifier.length !== 10)
         }
     };
 
-    type UserRole = "ADMIN" | "DEPARTMENTHEAD" | "RM" | "ACCOUNTS" | "CUSTOMER" | "HR" | "USER";
+    type UserRole = "ADMIN" | "DEPARTMENTHEAD" | "RM" | "ACCOUNTS" | "CUSTOMER" | "UNLISTEDADMIN" | "HR" | "USER";
 
     const redirectByRole = (role: UserRole) => {
         const routes: Record<UserRole, string> = {
-            ADMIN: "/admin", DEPARTMENTHEAD: "/departmenthead", RM: "/rm",
-            ACCOUNTS: "/accounts", CUSTOMER: "/customer", HR: "/hr", USER: "/dashboard"
+            ADMIN: "/admin",
+            DEPARTMENTHEAD: "/departmenthead",
+            RM: "/rm",
+            ACCOUNTS: "/accounts",
+            CUSTOMER: "/customer",
+            HR: "/hr",
+            USER: "/dashboard",
+            UNLISTEDADMIN: "/UnlistedAdmin",
         };
         router.push(routes[role] ?? "/dashboard");
     };

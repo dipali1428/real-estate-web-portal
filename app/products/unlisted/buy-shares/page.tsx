@@ -1,44 +1,229 @@
 'use client';
-import React, { useState, useMemo, useEffect } from 'react';
-import { ALL_COMPANIES } from '../constants';
-import { Company } from '../index';
-import {
-  ArrowLeft, Search, Filter, List, CheckCircle, Package,
-  Database, TrendingUp, X, Mail, Phone, User,
-  MessageSquare, ShoppingCart, DollarSign, ChevronLeft, ChevronRight
+import { useRef } from 'react';
+import Chart, { ChartConfiguration } from 'chart.js/auto';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+// Import services
+import { fetchAllShares, fetchIdGraphData, createEnquiry, GraphPoint, EnquiryPayload } from '../../../services/unlistedservices';
+import { 
+  ArrowLeft, Search, Filter, CheckCircle, Package, Info,  
+  Database, TrendingUp, X, User, FileText, ChevronDown, ChevronUp,
+  ShoppingCart, IndianRupee, ChevronLeft, ChevronRight, LineChart, Loader2,
+  Building, Calendar, MapPin, Award, BarChart3, TrendingDown, Activity,
+  HandCoins, FileSignature, Calculator, ChartLine, Paperclip, Mail, Phone, HelpCircle, FileCheck, Clock, Send, MessageSquare, History
 } from 'lucide-react';
 
+// Define Company interface based on your API response
+interface Company {
+  id: number;
+  shares_name: string;
+  logo_url: string;
+  price: string;
+  depository_applicable: string;
+  min_lot_size: number;
+  created_at?: string;
+  updated_at?: string;
+  clean_name?: string | null;
+}
+
+// Extended Company interface for UI
+interface ExtendedCompany {
+  id: number;
+  name: string;
+  shares_name: string;
+  logo: string;
+  logo_url: string;
+  price: number;
+  lotSize: number;
+  min_lot_size: number;
+  depository: string;
+  depository_applicable: string;
+  category: string;
+  clean_name?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  // Additional UI fields
+  isin: string;
+  founded_year: string;
+  headquarters: string;
+  face_value: string;
+  description: string;
+  pe_ratio: string;
+  pb_ratio: string;
+  roe: string;
+  market_cap: string;
+  volume: string;
+}
+
+// PROCESS STEPS DATA - Matching SellShares
+const PROCESS_STEPS = [
+  { icon: FileSignature, num: 1, title: 'Select Company', desc: 'Browse and select from our verified unlisted companies with live pricing.' },
+  { icon: Calculator, num: 2, title: 'Calculate Investment', desc: 'Determine your investment amount based on current market price and lot size.' },
+  { icon: HandCoins, num: 3, title: 'Submit Enquiry', desc: 'Our team verifies your details and matches you with verified sellers.' },
+  { icon: Clock, num: 4, title: 'Complete Transaction', desc: 'Get shares transferred to your Demat account within 7-10 business days.' }
+];
+
+// FAQ DATA - Matching SellShares
+const FAQ_ITEMS = [
+  { q: 'How long does the buying process take?', a: 'Typically, the buying process takes 7-10 business days from enquiry to shares credited to your Demat account. This includes verification, matching with sellers, and transaction settlement.' },
+  { q: 'What documents are required to buy unlisted shares?', a: "You'll need your PAN card, Demat account details, and KYC documents. Our team will guide you through the specific documentation requirements." },
+  { q: 'Can I buy shares in odd lots?', a: "Yes, you can buy any number of shares. The minimum quantity is the company's lot size, but you can purchase in multiples of the lot size." }
+];
+
 const BuyShares: React.FC = () => {
-  // STATE MANAGEMENT
+  // --- DATA STATES ---
+  const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstance = useRef<any>(null);
+  const [companies, setCompanies] = useState<ExtendedCompany[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // --- GRAPH DATA STATES ---
+  const [graphData, setGraphData] = useState<GraphPoint[]>([]);
+  const [isGraphLoading, setIsGraphLoading] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [graphTimeRange, setGraphTimeRange] = useState('1M');
+
+  // --- FILTER & SEARCH STATES ---
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12;
 
-  // MODAL STATES
-  const [detailCompany, setDetailCompany] = useState<Company | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'news'>('overview');
-  const [enquiryCompany, setEnquiryCompany] = useState<Company | null>(null);
+  // --- MODAL STATES ---
+  const [detailCompany, setDetailCompany] = useState<ExtendedCompany | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'company'>('overview');
+  const [enquiryCompany, setEnquiryCompany] = useState<ExtendedCompany | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [enquiryError, setEnquiryError] = useState<string | null>(null);
+  
+  // --- NOTIFICATION STATE ---
+  const [notifications, setNotifications] = useState<{ id: number; message: string }[]>([]);
+  
+  // --- FAQ STATE ---
+  const [activeFaqs, setActiveFaqs] = useState<number[]>([]);
+  
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    quantity: '5000',
+    quantity: '',
     message: ''
   });
 
+  // NOTIFICATION HANDLER - Matching SellShares
+  const showNotification = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const id = Date.now();
+    setNotifications(prev => [...prev, { id, message }]);
+    setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== id)), 4000);
+  }, []);
+
+  // FETCH SHARES DATA
+  useEffect(() => {
+    const loadShares = async () => {
+      try {
+        setIsLoading(true);
+        const result = await fetchAllShares();
+        
+        // Handle API response - your backend returns array directly
+        const rawData = Array.isArray(result) ? result : [];
+        
+        // Map API data to ExtendedCompany format
+        const mappedData: ExtendedCompany[] = rawData.map((item: any) => {
+          // Extract category from company name or set default
+          let category = 'Unlisted Shares';
+          const name = item.shares_name || '';
+          
+          if (name.toLowerCase().includes('tech') || name.toLowerCase().includes('software')) category = 'Technology';
+          else if (name.toLowerCase().includes('fin') || name.toLowerCase().includes('bank') || name.toLowerCase().includes('microfinance')) category = 'Fintech';
+          else if (name.toLowerCase().includes('health') || name.toLowerCase().includes('pharma') || name.toLowerCase().includes('clinical')) category = 'Healthcare';
+          else if (name.toLowerCase().includes('auto') || name.toLowerCase().includes('motor')) category = 'Automotive';
+          else if (name.toLowerCase().includes('energy') || name.toLowerCase().includes('power') || name.toLowerCase().includes('renewable')) category = 'Energy';
+          else if (name.toLowerCase().includes('chem')) category = 'Chemicals';
+          else if (name.toLowerCase().includes('food') || name.toLowerCase().includes('tea') || name.toLowerCase().includes('beverage')) category = 'FMCG';
+          else if (name.toLowerCase().includes('cement')) category = 'Construction';
+          else if (name.toLowerCase().includes('hospital')) category = 'Healthcare';
+          else if (name.toLowerCase().includes('exchange')) category = 'Financial Services';
+          
+          const id = Number(item.id) || 0;
+          const price = parseFloat(item.price) || 0;
+          const lotSize = Number(item.min_lot_size) || 100;
+          
+          return {
+            id: id,
+            name: item.shares_name || 'Unknown Company',
+            shares_name: item.shares_name || 'Unknown Company',
+            logo: item.logo_url || '',
+            logo_url: item.logo_url || '',
+            price: price,
+            lotSize: lotSize,
+            min_lot_size: lotSize,
+            depository: item.depository_applicable?.replace(/&AMP;/gi, '&') || 'NSDL & CDSL',
+            depository_applicable: item.depository_applicable || '',
+            category: category,
+            clean_name: item.clean_name,
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            // Add mock data for additional UI fields
+            isin: `INE${id}${Math.floor(10000000 + Math.random() * 90000000)}`,
+            founded_year: `${2010 + (id % 13)}`,
+            headquarters: 'Mumbai, India',
+            face_value: id % 3 === 0 ? '1' : id % 3 === 1 ? '2' : '10',
+            description: `${item.shares_name || 'The company'} is a leading player in the ${category} sector with strong growth potential and a proven track record of innovation. The company has shown consistent performance and is poised for significant expansion in the coming years.`,
+            pe_ratio: price > 1000 ? (Math.random() * 20 + 25).toFixed(2) : (Math.random() * 15 + 12).toFixed(2),
+            pb_ratio: (Math.random() * 4 + 1.5).toFixed(2),
+            roe: (Math.random() * 15 + 8).toFixed(2),
+            market_cap: `₹${(price * lotSize * 10000 / 10000000).toFixed(1)} Cr`,
+            volume: `${(Math.random() * 100 + 20).toFixed(1)}K`,
+          };
+        });
+        
+        setCompanies(mappedData);
+        setError(null);
+      } catch (err: any) {
+        console.error("Fetch error:", err);
+        setError(err.response?.data?.message || "Failed to load market data. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadShares();
+  }, []);
+
+// FETCH GRAPH DATA WHEN DETAIL MODAL OPENS
+useEffect(() => {
+  const loadGraphData = async () => {
+    if (!detailCompany) return;
+
+    setIsGraphLoading(true);
+    try {
+      // Calling your specific API: /api/unlisted/:id/graph
+      const data = await fetchIdGraphData(detailCompany.id);
+      
+      if (Array.isArray(data)) {
+        // Mapping your specific JSON structure: "price" -> "market_price"
+        const formattedData = data.map((pt: any) => ({
+          price_date: pt.price_date,
+          market_price: pt.price // Your JSON uses "price"
+        }));
+        
+        // Show all entries or slice to last 60 for clarity
+        setGraphData(formattedData); 
+      }
+    } catch (error) {
+      console.error("Failed to fetch graph data:", error);
+      setGraphData([]); // Reset on error
+    } finally {
+      setIsGraphLoading(false);
+    }
+  };
+
+  loadGraphData();
+}, [detailCompany]);
+
   // PREVENT SCROLL ON MODAL OPEN
   useEffect(() => {
-    if (detailCompany || enquiryCompany || showSuccess) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    document.body.style.overflow = (detailCompany || enquiryCompany || showSuccess) ? 'hidden' : 'unset';
     return () => { document.body.style.overflow = 'unset'; };
   }, [detailCompany, enquiryCompany, showSuccess]);
 
@@ -48,14 +233,115 @@ const BuyShares: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // ✅ CHART INITIALIZATION - Minimal like LiveTrends
+useEffect(() => {
+  if (!chartRef.current || !detailCompany) return;
+  if (graphData.length === 0) return;
+
+  // Destroy existing chart
+  if (chartInstance.current) {
+    chartInstance.current.destroy();
+  }
+
+  const ctx = chartRef.current.getContext('2d');
+  if (!ctx) return;
+
+  // Filter data based on selected time range
+  let filteredData = [...graphData];
+  const now = new Date();
+  let cutoffDate = new Date();
+  
+  if (graphTimeRange === '1W') {
+    cutoffDate.setDate(now.getDate() - 7);
+    filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+  } else if (graphTimeRange === '1M') {
+    cutoffDate.setMonth(now.getMonth() - 1);
+    filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+  } else if (graphTimeRange === '3M') {
+    cutoffDate.setMonth(now.getMonth() - 3);
+    filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+  } else if (graphTimeRange === '1Y') {
+    cutoffDate.setFullYear(now.getFullYear() - 1);
+    filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+  }
+
+  // Sort data by date (oldest to newest for proper line chart)
+  filteredData.sort((a, b) => new Date(a.price_date).getTime() - new Date(b.price_date).getTime());
+
+  const labels = filteredData.map(item => {
+    const date = new Date(item.price_date);
+    return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+  });
+
+  const prices = filteredData.map(item => parseFloat(item.market_price));
+
+  const config: ChartConfiguration = {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Price History',
+        data: prices,
+        borderColor: '#2076C7',
+        backgroundColor: 'rgba(32, 118, 199, 0.05)',
+        borderWidth: 2,
+        pointRadius: filteredData.length > 50 ? 0 : 3,
+        pointHoverRadius: 6,
+        tension: 0.2,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          callbacks: {
+            label: (ctx) => `₹${parseFloat(ctx.raw as string).toLocaleString('en-IN')}`
+          }
+        }
+      },
+      scales: {
+        y: {
+          grid: { color: 'rgba(0, 0, 0, 0.05)' },
+          ticks: { 
+            callback: (val) => `₹${val}`,
+            font: { size: 11 }
+          }
+        },
+        x: {
+          grid: { display: false },
+          ticks: {
+            autoSkip: true,
+            maxRotation: 0,
+            autoSkipPadding: 20,
+            font: { size: 10 }
+          }
+        }
+      }
+    }
+  };
+
+  chartInstance.current = new Chart(ctx, config);
+
+  return () => {
+    if (chartInstance.current) {
+      chartInstance.current.destroy();
+    }
+  };
+}, [graphData, graphTimeRange, detailCompany]);
+
   // FILTERING LOGIC
   const filteredCompanies = useMemo(() => {
-    let result = [...ALL_COMPANIES];
+    let result = [...companies];
 
     if (debouncedSearch) {
       const term = debouncedSearch.toLowerCase();
-      result = result.filter(c =>
-        c.name.toLowerCase().includes(term) ||
+      result = result.filter(c => 
+        c.name.toLowerCase().includes(term) || 
         c.category.toLowerCase().includes(term)
       );
     }
@@ -66,344 +352,1018 @@ const BuyShares: React.FC = () => {
 
     switch (sortBy) {
       case 'name-asc': result.sort((a, b) => a.name.localeCompare(b.name)); break;
+      case 'name-desc': result.sort((a, b) => b.name.localeCompare(a.name)); break;
       case 'price-high': result.sort((a, b) => b.price - a.price); break;
       case 'price-low': result.sort((a, b) => a.price - b.price); break;
     }
 
     return result;
-  }, [debouncedSearch, selectedCategory, sortBy]);
+  }, [companies, debouncedSearch, selectedCategory, sortBy]);
 
-  // PAGINATION CALCULATIONS
-  const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
-  const paginatedItems = filteredCompanies.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const getPageRange = () => {
-    const range = [];
-    const maxVisible = 3;
-    let start = Math.max(1, currentPage - 1);
-    let end = Math.min(totalPages, start + maxVisible - 1);
-    if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
-    for (let i = start; i <= end; i++) range.push(i);
-    return range;
+  // Handle Apply Filters
+  const handleApplyFilters = () => {
+    setDebouncedSearch(searchTerm);
   };
 
-  // HANDLERS
-  const handleOpenEnquiry = (company: Company) => {
+  // DYNAMIC CATEGORIES
+  const categories = useMemo(() => 
+    Array.from(new Set(companies.map(c => c.category))).sort()
+  , [companies]);
+
+  // ENQUIRY HANDLERS
+  const handleOpenEnquiry = (company: ExtendedCompany) => {
     setEnquiryCompany(company);
-    setFormData(prev => ({ ...prev, quantity: '5000' }));
+    setEnquiryError(null);
+    setFormData({
+      fullName: '',
+      email: '',
+      phone: '',
+      quantity: company.lotSize.toString(),
+      message: `I'm interested in buying shares of ${company.name}`
+    });
+
   };
 
-  const categories = Array.from(new Set(ALL_COMPANIES.map(c => c.category))).sort();
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (enquiryError) setEnquiryError(null);
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!enquiryCompany) return;
+    
+    if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim()) {
+      setEnquiryError('Please fill in all required fields');
+      return;
+    }
+
+    const quantity = parseInt(formData.quantity);
+    if (isNaN(quantity) || quantity < enquiryCompany.lotSize) {
+      setEnquiryError(`Quantity must be at least ${enquiryCompany.lotSize} shares`);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setEnquiryError(null);
+    
+    try {
+      const payload: EnquiryPayload = {
+        company_id: enquiryCompany.id,
+        enquiry_type: 'buy',
+        full_name: formData.fullName.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        quantity: quantity,
+        message: formData.message.trim() || `Interested in buying shares of ${enquiryCompany.name}`
+      };
+
+      const response = await createEnquiry(payload);
+      console.log("Enquiry submitted successfully:", response);
+      
+      setShowSuccess(true);
+      setEnquiryCompany(null);
+      setFormData({
+        fullName: '',
+        email: '',
+        phone: '',
+        quantity: '',
+        message: ''
+      });
+      
+      showNotification('Purchase enquiry submitted successfully!', 'success');
+      
+    } catch (error: any) {
+      console.error("Enquiry submission error:", error);
+      setEnquiryError(error.response?.data?.message || "Failed to submit enquiry. Please try again.");
+      showNotification('Failed to submit enquiry', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // FAQ TOGGLE - Matching SellShares
+  const toggleFaq = (idx: number) => {
+    setActiveFaqs(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
+  };
+
+  const calculateMinInvestment = (price: number, lotSize: number): string => {
+    const investment = price * lotSize;
+    return `₹${investment.toLocaleString('en-IN')}`;
+  };
+
+  const formatLargeNumber = (num: number): string => {
+    if (num >= 10000000) return `${(num / 10000000).toFixed(2)} Cr`;
+    if (num >= 100000) return `${(num / 100000).toFixed(2)} L`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
+  };
+
+  // GRAPH HANDLERS
+const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+  const filteredData = getFilteredGraphData();
+  if (!filteredData.length) return;
+  
+  const svg = e.currentTarget;
+  const rect = svg.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const svgWidth = rect.width;
+  const index = Math.floor((x / svgWidth) * filteredData.length);
+  const clampedIndex = Math.min(Math.max(index, 0), filteredData.length - 1);
+  setHoveredIndex(clampedIndex);
+};
+
+  const handleMouseLeave = () => {
+    setHoveredIndex(null);
+  };
+
+  // Add this function near your other helper functions
+const getFilteredGraphData = () => {
+  if (!graphData.length) return [];
+  
+  const now = new Date();
+  let cutoffDate = new Date();
+  
+  switch (graphTimeRange) {
+    case '1W':
+      cutoffDate.setDate(now.getDate() - 7);
+      break;
+    case '1M':
+      cutoffDate.setMonth(now.getMonth() - 1);
+      break;
+    case '3M':
+      cutoffDate.setMonth(now.getMonth() - 3);
+      break;
+    case '1Y':
+      cutoffDate.setFullYear(now.getFullYear() - 1);
+      break;
+    case 'All':
+    default:
+      return graphData; // Return all data
+  }
+  
+  return graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+};
+
+const getGraphPoints = () => {
+  const filteredData = getFilteredGraphData();
+  if (!filteredData.length) return '';
+  
+  const width = 100;
+  const height = 40;
+  const values = filteredData.map(d => parseFloat(d.market_price));
+  const minVal = Math.min(...values);
+  const maxVal = Math.max(...values);
+  const range = (maxVal - minVal) || 1;
+  
+  return filteredData.map((point, i) => {
+    const x = (i / (filteredData.length - 1)) * width;
+    const y = height - (((parseFloat(point.market_price) - minVal) / range) * height * 0.8) - 4;
+    return `${x},${y}`;
+  }).join(' ');
+};
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+  };
+// Add this helper function for shorter date format (DD MMM)
+const formatShortDate = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-IN', { 
+    day: '2-digit', 
+    month: 'short' 
+  }).replace(',', '');
+};
+
+  // LOADING STATE UI - Simplified to match SellShares
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#2076C7] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-500 font-medium">Loading available companies...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ERROR STATE UI - Simplified to match SellShares
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white p-4">
+        <div className="text-center max-w-md">
+          <div className="bg-red-50 text-red-500 p-8 rounded-2xl border border-red-100 mb-6">
+            <X className="w-12 h-12 mx-auto mb-4" />
+            <h3 className="text-lg font-bold mb-2">Failed to Load</h3>
+            <p className="text-sm opacity-90 mb-2">{error}</p>
+            <p className="text-xs text-gray-500">Please check your connection and try again</p>
+          </div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-8 py-3 bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition-colors"
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen font-sans bg-gradient-to-br from-gray-50 to-white text-gray-900">
-      <main className="container mx-auto px-4 py-8">
+    <div className="min-h-screen font-sans bg-gradient-to-br from-gray-50 to-white">
+      {/* NOTIFICATIONS - Matching SellShares */}
+      <div className="fixed top-20 right-5 z-[5000] flex flex-col gap-3">
+        {notifications.map(n => (
+          <div key={n.id} className="px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 bg-blue-100 text-blue-800 border border-blue-200 animate-in slide-in-from-right-5">
+            <CheckCircle className="w-4 h-4 text-blue-600" />
+            <span className="text-sm font-medium">{n.message}</span>
+          </div>
+        ))}
+      </div>
 
-        {/* TOP BACK BUTTON */}
-        <div className="flex justify-start mb-8">
-          <a
-            href="/products/unlisted"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-all text-gray-700 group">
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-semibold">Back</span>
-          </a>
+      <main className="container mx-auto px-4 py-4 pt-4 md:pt-8 min-h-screen">
+        {/* BACK BUTTON */}
+        <div className="sticky top-[72px] z-40 mb-8 bg-gradient-to-br from-gray-50 to-white pt-2 pb-2">
+          <div className="container mx-auto px-4">
+            <a 
+              href="/products/unlisted" 
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-all text-gray-700 group"
+            >
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              <span className="font-semibold">Back</span>
+            </a>
+          </div>
         </div>
 
-        {/* PAGE HEADER */}
+        {/* HEADER - Updated to match SellShares */}
         <header className="mb-12 text-center">
-          {/* Icon Section */}
           <div className="inline-flex items-center justify-center p-4 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 mb-6">
             <div className="p-4 rounded-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg">
               <ShoppingCart className="w-8 h-8" />
             </div>
           </div>
-
-          {/* Main Heading with Gradient Text */}
           <h1 className="text-4xl md:text-5xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
             Buy Unlisted Shares
           </h1>
-
-          {/* Gradient Divider Line */}
           <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-6"></div>
-
-          {/* Subtitle / Description */}
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
-            Browse and purchase unlisted shares from 150+ companies with transparent pricing and secure transactions
+            Browse and purchase unlisted shares from <span className="font-bold text-[#2076C7] bg-blue-50 px-3 py-1 rounded-full">{companies.length}</span> companies with live pricing and institutional-grade research.
           </p>
         </header>
 
-        {/* SEARCH & FILTERS */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
-          <div className="relative mb-6">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search companies..."
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/20"
-              value={searchTerm}
-              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-            />
+        {/* SEARCH & FILTERS - With Search Tab at Top */}
+        <section className="mb-8">
+          {/* Search Bar - Prominently at the top */}
+          <div className="mb-6">
+            <div className="relative max-w-2xl mx-auto">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search companies by name or category..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
+                className="block w-full pl-12 pr-4 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 outline-none transition-all shadow-sm hover:shadow-md text-gray-900 placeholder-gray-500"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 text-center mt-2">
+              Search by company name or category. Press Enter or click Apply Filters.
+            </p>
           </div>
 
-          <div className="flex flex-wrap gap-4">
-            <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-              <select
-                className="w-full p-3 bg-white border border-gray-300 rounded-lg outline-none focus:border-[#2076C7]"
-                value={selectedCategory}
+          {/* Filter Row - Below Search */}
+          <div className="flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex flex-wrap gap-3 flex-1">
+              {/* Category Filter */}
+              <select 
+                className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-gray-900 min-w-[180px]" 
+                value={selectedCategory} 
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
-                <option value="">All Categories</option>
-                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                <option value="" className="text-gray-900">All Categories</option>
+                {categories.map(cat => <option key={cat} value={cat} className="text-gray-900">{cat}</option>)}
               </select>
-            </div>
-
-            <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
-              <select
-                className="w-full p-3 bg-white border border-gray-300 rounded-lg outline-none focus:border-[#2076C7]"
-                value={sortBy}
+              
+              {/* Sort By Filter */}
+              <select 
+                className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-gray-900 min-w-[180px]" 
+                value={sortBy} 
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <option value="name-asc">Name: A to Z</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="price-low">Price: Low to High</option>
+                <option value="name-asc" className="text-gray-900">Name: A to Z</option>
+                <option value="name-desc" className="text-gray-900">Name: Z to A</option>
+                <option value="price-high" className="text-gray-900">Price: High to Low</option>
+                <option value="price-low" className="text-gray-900">Price: Low to High</option>
               </select>
-            </div>
 
-            <div className="flex items-end">
-              <button
-                onClick={() => setCurrentPage(1)}
-                className="px-8 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold hover:opacity-90 transition-all flex items-center gap-2"
-              >
-                <Filter className="w-5 h-5" /> Apply Filters
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* COMPANIES GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {paginatedItems.map(company => (
-            <div
-              key={company.id}
-              className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
-            >
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-16 h-16 rounded-xl bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center">
-                  {company.logo ? (
-                    <img src={company.logo} className="w-12 h-12 object-contain" alt={company.name} />
-                  ) : (
-                    <span className="text-2xl font-bold text-[#2076C7]">{company.name.charAt(0)}</span>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-bold text-gray-900 truncate mb-1">{company.name}</h3>
-                  <div className="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-full">
-                    {company.category}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <div className="text-2xl font-bold text-green-600 mb-2">₹{company.price.toLocaleString('en-IN')}</div>
-                <span className="px-3 py-1 bg-green-100 text-green-600 text-xs font-bold rounded-full">
-                  +1.25% Today
+              {/* Results Count Badge */}
+              <div className="flex items-center px-4 py-2 bg-blue-50 rounded-lg">
+                <span className="text-sm text-[#2076C7] font-semibold">
+                  {filteredCompanies.length} companies
                 </span>
               </div>
-
-              {/* REQUESTED CARD STATS */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div>
-                  <div className="text-xs text-gray-500 font-medium mb-1 flex items-center gap-1">
-                    <Package className="w-3 h-3" /> Lot Size
-                  </div>
-                  <div className="text-sm font-bold text-gray-900">5,000 shares</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 font-medium mb-1 flex items-center gap-1">
-                    <DollarSign className="w-3 h-3" /> Min. Invest
-                  </div>
-                  <div className="text-sm font-bold text-gray-900">₹2,60,000</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 font-medium mb-1 flex items-center gap-1">
-                    <Database className="w-3 h-3" /> Depository
-                  </div>
-                  <div className="text-sm font-bold text-gray-900">NSDL & CDSL</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 font-medium mb-1 flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3" /> Available
-                  </div>
-                  <div className="text-sm font-bold text-gray-900">120,000</div>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleOpenEnquiry(company)}
-                  className="flex-1 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
-                >
-                  <ShoppingCart className="w-5 h-5" /> Enquire Now
-                </button>
-                <button
-                  onClick={() => setDetailCompany(company)}
-                  className="px-4 py-3 border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-all"
-                >
-                  <List size={20} />
-                </button>
-              </div>
             </div>
-          ))}
+
+            {/* Apply Filters Button */}
+            <button 
+              onClick={handleApplyFilters} 
+              className="px-6 py-2.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold hover:opacity-90 transition-all flex items-center gap-2 shadow-md whitespace-nowrap"
+            >
+              <Filter className="w-4 h-4" /> Apply Filters
+            </button>
+          </div>
+        </section>
+
+        {/* RESULTS INFO - Without pagination */}
+        <div className="flex justify-between items-center mb-4">
+          <p className="text-sm text-gray-600 bg-white/60 px-4 py-2 rounded-full">
+            Showing <span className="font-bold text-[#2076C7]">{filteredCompanies.length}</span> companies
+          </p>
         </div>
 
-        {/* PAGINATION - LIGHT THEME 1, 2, 3 + NEXT */}
-        {totalPages > 1 && (
-          <div className="flex flex-col items-center justify-center space-y-4 pt-8 mb-12">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-all"
-              >
-                <ChevronLeft size={20} />
-              </button>
-
-              {getPageRange().map(page => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-10 h-10 rounded-lg font-bold text-sm transition-all border ${currentPage === page
-                    ? 'bg-[#2476c4] text-white shadow-md'
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
-                    }`}
+        {/* COMPANIES GRID - 4 columns with internal scrolling */}
+        <div className="relative">
+          {/* Scrollable Container */}
+          <div className="overflow-y-auto max-h-[800px] pr-2 custom-scrollbar">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+              {filteredCompanies.map(company => (
+                <div
+                  key={company.id}
+                  className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-6 flex flex-col items-center text-center h-full"
                 >
-                  {page}
-                </button>
-              ))}
+                  {/* Company Logo - Centered */}
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center mb-4 border-2 border-white shadow-sm">
+                    {company.logo ? (
+                      <img 
+                        src={company.logo} 
+                        className="w-10 h-10 object-contain" 
+                        alt={company.name}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          const parent = (e.target as HTMLImageElement).parentElement;
+                          if (parent) {
+                            const span = document.createElement('span');
+                            span.className = 'text-xl font-bold text-[#2076C7]';
+                            span.textContent = company.name.charAt(0);
+                            parent.appendChild(span);
+                          }
+                        }}
+                      />
+                    ) : (
+                      <span className="text-xl font-bold text-[#2076C7]">{company.name.charAt(0)}</span>
+                    )}
+                  </div>
 
-              <button
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="px-4 h-10 flex items-center justify-center gap-2 rounded-lg bg-white border border-gray-300 text-black font-bold text-sm hover:bg-gray-50 disabled:opacity-50 transition-all"
+                  {/* Company Name & Category - Centered */}
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">{company.name}</h3>
+                  <div className="text-sm text-gray-500 mb-4">{company.category}</div>
+
+                  {/* Price Section - Centered */}
+                  <div className="mb-4">
+                    <div className="text-3xl font-bold text-[#10b981] mb-1">
+                      ₹{company.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                    <div className="flex items-center justify-center gap-1">
+                      <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">
+                        +1.25% Today
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Stats Grid - 2x2 Centered */}
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
+                      <div className="text-sm font-bold text-gray-900">
+                        {company.lotSize.toLocaleString()} shares
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500 mb-0.5">Depository</div>
+                      <div className="text-sm font-bold text-gray-900">
+                        {company.depository?.split(' ')[0] || 'NSDL'}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500 mb-0.5">Min. Invest</div>
+                      <div className="text-sm font-bold text-gray-900">
+                        {calculateMinInvestment(company.price, company.lotSize)}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500 mb-0.5">Available</div>
+                      <div className="text-sm font-bold text-gray-900">
+                        {company.volume || '120K'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons - Side by Side */}
+                  <div className="flex gap-3 w-full mt-auto">
+                    <button
+                      onClick={() => handleOpenEnquiry(company)}
+                      className="flex-1 py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                    >
+                      Enquire Now
+                    </button>
+                    <button
+                      onClick={() => setDetailCompany(company)}
+                      className="flex-1 py-3.5 border-2 border-[#2076C7] text-[#2076C7] text-sm font-bold rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+                    >
+                      Details
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Scroll indicator */}
+          {filteredCompanies.length > 12 && (
+            <div className="sticky bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none flex justify-center items-end pb-2">
+              <span className="text-xs text-gray-400 bg-white/80 px-3 py-1 rounded-full shadow-sm">
+                Scroll for more ▼
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* EMPTY STATE */}
+        {filteredCompanies.length === 0 && (
+          <div className="text-center py-20">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-16 max-w-lg mx-auto shadow-xl border border-gray-100">
+              <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Search className="w-12 h-12 text-gray-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">No Companies Found</h3>
+              <p className="text-gray-600 mb-8 text-lg">Try adjusting your search or filters</p>
+              <button 
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedCategory('');
+                  setDebouncedSearch('');
+                }}
+                className="px-8 py-3.5 bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-xl font-bold hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
               >
-                Next <ChevronRight size={18} />
+                Clear Filters
               </button>
             </div>
           </div>
         )}
+
+        {/* FAQ SECTION - New section matching SellShares */}
+        <section className="mb-12 mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+            <HelpCircle className="w-6 h-6 text-[#2076C7]" /> 
+            Frequently Asked Questions
+          </h2>
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-4">
+            {FAQ_ITEMS.map((item, idx) => (
+              <div key={idx} className="border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 transition-all">
+                <div 
+                  className="p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-all" 
+                  onClick={() => toggleFaq(idx)}
+                >
+                  <h3 className="font-bold text-gray-900">{item.q}</h3>
+                  {activeFaqs.includes(idx) ? (
+                    <ChevronUp className="w-5 h-5 text-gray-500" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                  )}
+                </div>
+                {activeFaqs.includes(idx) && (
+                  <div className="p-4 bg-white text-gray-600">{item.a}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
 
-      {/* ENQUIRY MODAL */}
+      {/* ENQUIRY MODAL - Updated to match SellShares styling */}
       {enquiryCompany && (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl my-8">
-            <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-5 text-white rounded-t-2xl flex justify-between items-center">
+        <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-6 text-white flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-bold">Enquire for Shares</h2>
-                <p className="text-xs opacity-90 mt-1">{enquiryCompany.name}</p>
+                <h3 className="text-xl font-black uppercase tracking-tight">Buy Enquiry</h3>
               </div>
-              <button onClick={() => setEnquiryCompany(null)} className="w-8 h-8 flex items-center justify-center hover:bg-white/20 rounded-full">
-                <X size={20} />
+              <button 
+                onClick={() => setEnquiryCompany(null)} 
+                className="hover:bg-white/20 p-2 rounded-full transition-all"
+              >
+                <X className="w-6 h-6" />
               </button>
             </div>
-            <form
-              className="p-6 space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                setIsSubmitting(true);
-                setTimeout(() => { setIsSubmitting(false); setEnquiryCompany(null); setShowSuccess(true); }, 1500);
-              }}
-            >
+            
+            <form className="p-6 space-y-4" onSubmit={handleFormSubmit}>
+              {enquiryError && (
+                <div className="bg-red-50 text-red-600 text-xs p-3 rounded-lg border border-red-200 flex items-start gap-2">
+                  <X className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                  <span>{enquiryError}</span>
+                </div>
+              )}
+              
+              {/* Name Field - Full width */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Full Name *</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
-                  <input required type="text" className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-black outline-none" placeholder="John Doe" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input 
+                    required 
+                    type="text" 
+                    value={formData.fullName}
+                    onChange={(e) => handleInputChange('fullName', e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 text-sm text-gray-900 placeholder:text-gray-400 transition-all" 
+                    placeholder="Enter your full name" 
+                  />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              
+              {/* Email & Phone - Side by side */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Email *</label>
-                  <input required type="email" className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-black outline-none" placeholder="john@email.com" />
+                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input 
+                      required 
+                      type="email" 
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 text-sm text-gray-900 placeholder:text-gray-400 transition-all" 
+                      placeholder="your@email.com" 
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Phone *</label>
-                  <input required type="tel" className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-black outline-none" placeholder="+91..." />
+                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                    Phone <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input 
+                      required 
+                      type="tel" 
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 text-sm text-gray-900 placeholder:text-gray-400 transition-all" 
+                      placeholder="+91 98765 43210" 
+                    />
+                  </div>
                 </div>
               </div>
+              
+              {/* Quantity with Quick Select */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Quantity *</label>
-                <input type="number" defaultValue={5000} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-black outline-none" />
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-gray-700">
+                    Quantity <span className="text-red-500">*</span>
+                  </label>
+                  <span className="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                    Min: {enquiryCompany.lotSize} shares
+                  </span>
+                </div>
+                
+                <div className="relative">
+                  <Calculator className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input 
+                    type="number" 
+                    value={formData.quantity}
+                    onChange={(e) => handleInputChange('quantity', e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 text-sm text-gray-900 transition-all" 
+                    min={enquiryCompany.lotSize}
+                    step={enquiryCompany.lotSize}
+                    placeholder="Enter quantity"
+                  />
+                </div>
+                
+                {/* Investment summary card */}
+                <div className="mt-3 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-lg p-3 border border-blue-100/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Total Investment</p>
+                      <p className="text-base font-bold text-gray-900">
+                        {calculateMinInvestment(
+                          enquiryCompany.price, 
+                          parseInt(formData.quantity) || enquiryCompany.lotSize
+                        )}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Price per share</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        ₹{enquiryCompany.price.toLocaleString('en-IN')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <button disabled={isSubmitting} className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90">
-                {isSubmitting ? 'Submitting...' : 'Confirm Interest'}
-              </button>
+              
+              {/* Message - Compact */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                  Additional Message <span className="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <div className="relative">
+                  <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <textarea 
+                    value={formData.message}
+                    onChange={(e) => handleInputChange('message', e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 text-sm text-gray-900 placeholder:text-gray-400 transition-all resize-none" 
+                    placeholder="Any specific requirements or questions..."
+                    rows={2}
+                  />
+                </div>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 pt-2">
+                <button 
+                  type="button"
+                  onClick={() => setEnquiryCompany(null)}
+                  className="flex-1 py-2.5 px-4 bg-white border border-gray-200 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-50 hover:border-gray-300 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 py-2.5 px-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-medium text-sm hover:opacity-90 disabled:opacity-70 transition-all flex items-center justify-center gap-2 shadow-sm"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Submit Enquiry
+                    </>
+                  )}
+                </button>
+              </div>
+              
+              {/* Trust message */}
+              <p className="text-[10px] text-gray-400 text-center pt-1">
+                ✓ Your information is secure and will not be shared
+              </p>
             </form>
           </div>
         </div>
       )}
 
-      {/* SUCCESS MODAL */}
+      {/* SUCCESS MODAL - Updated to match SellShares styling */}
       {showSuccess && (
-        <div className="fixed inset-0 z-[4000] bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-10 text-center shadow-2xl">
-            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Request Submitted</h2>
-            <p className="text-gray-600 mb-8 text-sm">Our relationship manager will contact you with the latest quotes and procedure.</p>
-            <button onClick={() => setShowSuccess(false)} className="w-full py-3 bg-black text-white rounded-lg font-bold">Back to Marketplace</button>
+        <div className="fixed inset-0 z-[7000] bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white p-10 rounded-3xl max-w-sm w-full text-center shadow-2xl">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-green-600" />
+            </div>
+            <h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">Enquiry Sent!</h3>
+            <p className="text-gray-500 text-sm mb-8 leading-relaxed">
+              Our relationship manager will contact you within 24 hours with the latest quotes and procedure.
+            </p>
+            <button 
+              onClick={() => setShowSuccess(false)} 
+              className="w-full py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-black hover:opacity-90 transition-all"
+            >
+              Back to Marketplace
+            </button>
           </div>
         </div>
       )}
 
       {/* DETAIL MODAL */}
       {detailCompany && (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
-          <div className="bg-white rounded-2xl w-full max-w-4xl shadow-2xl my-8">
-            <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-6 text-white rounded-t-2xl flex justify-between items-center">
-              <h2 className="text-2xl font-bold truncate">{detailCompany.name}</h2>
-              <button onClick={() => setDetailCompany(null)} className="w-8 h-8 flex items-center justify-center hover:bg-white/20 rounded-full"><X size={24} /></button>
-            </div>
-            <div className="p-8">
-              <div className="flex items-start gap-8 mb-8">
-                <div className="w-20 h-20 rounded-xl bg-gray-50 flex items-center justify-center">
-                  {detailCompany.logo ? <img src={detailCompany.logo} className="w-12 h-12 object-contain" /> : <span className="text-3xl font-bold text-[#2076C7]">{detailCompany.name.charAt(0)}</span>}
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 animate-fadeIn overflow-hidden flex flex-col border border-gray-100">
+            
+            {/* HEADER: Simplified Clean Design */}
+            <div className="bg-white border-b border-gray-100 p-6 flex items-start justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center flex-shrink-0">
+                  {detailCompany.logo ? (
+                    <img src={detailCompany.logo} className="w-10 h-10 object-contain" alt={detailCompany.name} />
+                  ) : (
+                    <span className="text-2xl font-bold text-[#2076C7]">{detailCompany.name.charAt(0)}</span>
+                  )}
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-gray-500 mb-1">{detailCompany.category}</div>
-                  <div className="text-4xl font-bold text-green-600 mb-3">₹{detailCompany.price.toLocaleString()}</div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full">
+                      {detailCompany.category}
+                    </span>
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{detailCompany.name}</h2>
+                  <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5" /> {detailCompany.headquarters} • Est. {detailCompany.founded_year}
+                  </p>
                 </div>
               </div>
-              <div className="flex gap-6 border-b mb-8">
-                {['overview', 'financials', 'news'].map(tab => (
-                  <button key={tab} onClick={() => setActiveTab(tab as any)} className={`pb-4 text-sm font-bold uppercase tracking-wider transition-all ${activeTab === tab ? 'border-b-2 border-black text-black' : 'text-gray-400'}`}>{tab}</button>
+              
+              <div className="flex items-start gap-4">
+                <div className="text-right">
+                  <p className="text-xs text-gray-500 font-medium">Current Price</p>
+                  <div className="text-2xl md:text-3xl font-bold text-[#10b981]">
+                    ₹{detailCompany.price.toLocaleString('en-IN')}
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setDetailCompany(null)} 
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+            </div>
+
+            {/* BODY: Clean Grid Layout */}
+            <div className="p-6 md:p-8 bg-gray-50/30 overflow-y-auto max-h-[calc(90vh-120px)]">
+              
+              {/* Metric Cards Row - Clean & Simple */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                {[
+                  { label: 'Minimum Lot', value: `${detailCompany.lotSize.toLocaleString()} Shares`, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
+                  { label: 'Min Investment', value: calculateMinInvestment(detailCompany.price, detailCompany.lotSize), icon: IndianRupee, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                  { label: 'Face Value', value: `₹${detailCompany.face_value}`, icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50' },
+                  { label: 'Market Cap', value: detailCompany.market_cap, icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50' }
+                ].map((item, i) => (
+                  <div key={i} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                    <div className={`w-10 h-10 ${item.bg} ${item.color} rounded-lg flex items-center justify-center mb-3`}>
+                      <item.icon size={20} />
+                    </div>
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{item.label}</p>
+                    <p className="text-lg font-bold text-gray-900">{item.value}</p>
+                  </div>
                 ))}
               </div>
-              {activeTab === 'overview' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <div className="flex justify-between border-b pb-2"><span>Min. Lot Size</span><span className="font-bold">5,000 shares</span></div>
-                    <div className="flex justify-between border-b pb-2"><span>Depository</span><span className="font-bold">NSDL & CDSL</span></div>
-                    <div className="flex justify-between border-b pb-2"><span>Min. Invest</span><span className="font-bold text-[#2076C7]">₹2,60,000</span></div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* LEFT: Graph & Description */}
+                <div className="lg:col-span-2 space-y-6">
+                  
+                  {/* Chart Section - Minimal like LiveTrends */}
+                  <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                    {/* Header with Index Value and Change */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-medium text-gray-500">Price History</span>
+                          <span className="text-[10px] font-medium text-gray-400">•</span>
+                          <span className="text-[10px] font-medium text-gray-400">
+                            {graphTimeRange === '1W' ? 'Weekly' : 
+                             graphTimeRange === '1M' ? 'Monthly' : 
+                             graphTimeRange === '3M' ? 'Quarterly' : 
+                             graphTimeRange === '1Y' ? 'Yearly' : 'All Time'}
+                          </span>
+                        </div>
+                        <div className="flex items-baseline gap-3">
+                          <h3 className="text-2xl font-bold text-gray-900">
+                            ₹{detailCompany.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </h3>
+                          <span className="text-sm font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                            +{(Math.random() * 5).toFixed(2)}%
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1">Current Price</p>
+                      </div>
+                      
+                      {/* Time Range Filters */}
+                      <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80">
+                        {['1W', '1M', '3M', '1Y', 'All'].map(r => (
+                          <button 
+                            key={r} 
+                            onClick={() => setGraphTimeRange(r)} 
+                            className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-all ${
+                              graphTimeRange === r 
+                                ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200' 
+                                : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                            }`}
+                          >
+                            {r}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Graph Container */}
+                    <div className="h-64 w-full relative mb-8">
+                      {isGraphLoading ? (
+                        <div className="h-full flex items-center justify-center">
+                          <Loader2 className="animate-spin text-[#2076C7]" size={32} />
+                        </div>
+                      ) : graphData.length > 0 ? (
+                        <canvas ref={chartRef}></canvas>
+                      ) : (
+                        <div className="h-full flex items-center justify-center">
+                          <p className="text-sm text-gray-400">No price data available</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Market Stats Cards */}
+                    <div className="grid grid-cols-3 gap-4 mt-2">
+                      <div className="bg-gray-50/50 rounded-lg p-3">
+                        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">
+                          52W High
+                        </p>
+                        <p className="text-lg font-bold text-gray-900">
+                          ₹{graphData.length > 0 
+                            ? Math.max(...graphData.map(d => parseFloat(d.market_price))).toLocaleString('en-IN', { minimumFractionDigits: 2 })
+                            : detailCompany.price.toLocaleString('en-IN')}
+                        </p>
+                        <p className="text-[10px] text-gray-500 font-medium mt-0.5">
+                          {graphData.length > 0 
+                            ? new Date(graphData.find(d => parseFloat(d.market_price) === Math.max(...graphData.map(p => parseFloat(p.market_price))))?.price_date || '').toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
+                            : 'N/A'}
+                        </p>
+                      </div>
+                      
+                      <div className="bg-gray-50/50 rounded-lg p-3">
+                        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">
+                          52W Low
+                        </p>
+                        <p className="text-lg font-bold text-gray-900">
+                          ₹{graphData.length > 0 
+                            ? Math.min(...graphData.map(d => parseFloat(d.market_price))).toLocaleString('en-IN', { minimumFractionDigits: 2 })
+                            : detailCompany.price.toLocaleString('en-IN')}
+                        </p>
+                        <p className="text-[10px] text-gray-500 font-medium mt-0.5">
+                          {graphData.length > 0 
+                            ? new Date(graphData.find(d => parseFloat(d.market_price) === Math.min(...graphData.map(p => parseFloat(p.market_price))))?.price_date || '').toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
+                            : 'N/A'}
+                        </p>
+                      </div>
+                      
+                      <div className="bg-gray-50/50 rounded-lg p-3">
+                        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">
+                          Avg Volume
+                        </p>
+                        <p className="text-lg font-bold text-gray-900">
+                          {detailCompany.volume || '45.2K'}
+                        </p>
+                        <p className="text-[10px] text-gray-500 font-medium mt-0.5">
+                          Daily average
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-4 bg-gray-50 rounded-xl text-sm text-gray-600 leading-relaxed">
-                    High-growth opportunity in the unlisted sector. Full research data and institutional quotes available upon enquiry.
+
+                  {/* Description Card - Clean Typography */}
+                  <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                    <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <Info className="text-[#1CADA3]" size={20} />
+                      About the Company
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed text-sm">
+                      {detailCompany.description || `${detailCompany.name} is a leading player in the ${detailCompany.category} sector with strong growth potential and a proven track record of innovation. The company has shown consistent performance and is poised for significant expansion in the coming years.`}
+                    </p>
+                    
+                    {/* Key Highlights */}
+                    <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">ISIN</p>
+                        <p className="text-sm font-semibold text-gray-900">{detailCompany.isin}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Depository</p>
+                        <p className="text-sm font-semibold text-gray-900">{detailCompany.depository}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Face Value</p>
+                        <p className="text-sm font-semibold text-gray-900">₹{detailCompany.face_value}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Lot Size</p>
+                        <p className="text-sm font-semibold text-gray-900">{detailCompany.lotSize.toLocaleString()} shares</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              )}
-              {activeTab !== 'overview' && <div className="py-20 text-center text-gray-400 italic font-medium">Detailed {activeTab} data protected. Enquire to receive info pack.</div>}
-            </div>
-            <div className="p-6 border-t flex justify-end gap-3">
-              <button onClick={() => setDetailCompany(null)} className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-bold">Close</button>
-              <button onClick={() => handleOpenEnquiry(detailCompany)} className="px-8 py-2.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold">Enquire Now</button>
+                
+                {/* RIGHT: Sidebar - Clean Cards */}
+                <div className="space-y-6">
+                  
+                  {/* Key Statistics Card */}
+                  <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                    <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <Activity size={16} className="text-[#2076C7]" />
+                      Key Statistics
+                    </h4>
+                    
+                    <div className="space-y-4">
+                      {[
+                        { label: 'P/E Ratio', value: detailCompany.pe_ratio },
+                        { label: 'P/B Ratio', value: detailCompany.pb_ratio },
+                        { label: 'ROE', value: `${detailCompany.roe}%` },
+                        { label: '24h Volume', value: detailCompany.volume }
+                      ].map((stat, i) => (
+                        <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+                          <span className="text-xs text-gray-500">{stat.label}</span>
+                          <span className="text-sm font-bold text-gray-900">{stat.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Card */}
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                    <h4 className="text-sm font-bold text-gray-900 mb-3">Ready to Invest?</h4>
+                    <p className="text-xs text-gray-500 mb-6">
+                      Minimum investment: {calculateMinInvestment(detailCompany.price, detailCompany.lotSize)}
+                    </p>
+                    
+                    <p className="text-[10px] text-gray-400 text-center mt-4">
+                      Our team will contact you within 24 hours
+                    </p>
+                  </div>
+
+                  {/* Valuation Progress Bars - Simplified */}
+                  <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                    <h4 className="text-sm font-bold text-gray-900 mb-4">Valuation Metrics</h4>
+                    <div className="space-y-5">
+                      {[
+                        { label: 'Industry Position', value: '85%', percent: 85 },
+                        { label: 'Growth Potential', value: '72%', percent: 72 },
+                        { label: 'Market Demand', value: '68%', percent: 68 }
+                      ].map((metric, i) => (
+                        <div key={i}>
+                          <div className="flex justify-between items-center mb-1.5">
+                            <span className="text-xs text-gray-600">{metric.label}</span>
+                            <span className="text-xs font-bold text-gray-900">{metric.value}</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full" 
+                              style={{ width: metric.percent }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Animation Styles */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
+        }
+        
+        /* Custom scrollbar styling */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #2076C7;
+          border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #1a5e9e;
+        }
+      `}</style>
     </div>
   );
 };

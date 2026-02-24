@@ -9,7 +9,7 @@ import {
 } from 'chart.js';
 import {
   Building, TrendingUp, ChartBar, Download, ShoppingCart,
-  DollarSign, Info, AlertTriangle, File,
+  IndianRupee, Info, AlertTriangle, File,
   ArrowUp, FileText, ArrowLeft
 } from 'lucide-react';
 
@@ -176,13 +176,20 @@ const CompanyDetails: React.FC = () => {
 
   return (
     <div className="min-h-screen font-sans bg-gradient-to-br from-gray-50 to-white pb-20 text-gray-900">
+      
       <main className="container mx-auto px-4 py-8">
-
-        {/* Navigation - Uses next/link */}
-        <Link href="/products/unlisted" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-all text-gray-700 group mb-8">
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="font-semibold">Back</span>
-        </Link>
+        {/* BACK BUTTON - Updated to match SellShares */}
+        <div className="sticky top-[72px] z-40 mb-8 bg-gradient-to-br from-gray-50 to-white pt-2 pb-2">
+          <div className="container mx-auto px-4">
+            <a 
+              href="/products/unlisted" 
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-all text-gray-700 group"
+            >
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              <span className="font-semibold">Back</span>
+            </a>
+          </div>
+        </div>
 
         {/* Hero Header */}
         <header className="mb-12 text-center">
@@ -291,7 +298,7 @@ const CompanyDetails: React.FC = () => {
         {/* Global Actions */}
         <div className="mt-12 flex flex-wrap gap-4 justify-center">
           <ActionButton onClick={() => handleAction('buy')} icon={<ShoppingCart size={20} />} label="Buy Now" color="from-[#2076C7] to-[#1CADA3]" />
-          <ActionButton onClick={() => handleAction('sell')} icon={<DollarSign size={20} />} label="Sell Now" color="from-green-600 to-green-500" />
+          <ActionButton onClick={() => handleAction('sell')} icon={<IndianRupee size={20} />} label="Sell Now" color="from-green-600 to-green-500" />
           <ActionButton onClick={() => handleAction('report')} icon={<Download size={20} />} label="Download Report" color="from-[#2076C7] to-[#1CADA3]" />
         </div>
       </main>
