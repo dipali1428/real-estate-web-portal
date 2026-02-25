@@ -60,6 +60,13 @@ export interface GraphPoint {
   market_price: string;
 }
 
+// Create a new interface for the graph response
+export interface GraphResponse {
+  success: boolean;
+  summary: DashboardSummary; // If summary is included
+  graph: GraphPoint[];
+}
+
 // ✅ NEW: Company Interface for the companies API
 export interface Company {
   id: number;
@@ -150,23 +157,10 @@ export const fetchTopLosers = async (limit: number = 5): Promise<TopMoversRespon
   }
 };
 
-// Fetch Dashboard Data (Graph + Summary)
-export const fetchDashboardData = async (): Promise<DashboardResponse> => {
-  try {
-    const response = await api.get("/api/unlisted/public/graph");
-    return response.data;
-  } catch (error: any) {
-    console.error("DEBUG - Dashboard URL called:", error.config?.url);
-    console.error("DEBUG - Dashboard Error:", error.response?.data);
-    throw error;
-  }
-};
-
-
 // Create Enquiry
 export const createEnquiry = async (payload: EnquiryPayload): Promise<EnquiryResponse> => {
   try {
-    const response = await api.post("/api/unlisted/enquiries", payload); 
+    const response = await api.post("/api/unlisted/public/enquiries", payload); 
     return response.data;
   } catch (error: any) {
     console.error("DEBUG - Enquiry URL called:", error.config?.url);
@@ -187,6 +181,17 @@ export const fetchAllCorporateActions = async (): Promise<CorporateActionsRespon
   } catch (error: any) {
     console.error("DEBUG - Corporate Actions URL called:", error.config?.url);
     console.error("DEBUG - Corporate Actions Error:", error.response?.data);
+    throw error;
+  }
+};
+
+export const fetchDashboardData = async (): Promise<GraphResponse> => {
+  try {
+    const response = await api.get("/api/unlisted/public/graph");
+    return response.data;
+  } catch (error: any) {
+    console.error("DEBUG - Dashboard URL called:", error.config?.url);
+    console.error("DEBUG - Dashboard Error:", error.response?.data);
     throw error;
   }
 };

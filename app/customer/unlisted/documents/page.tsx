@@ -507,103 +507,7 @@ export default function KYCVerificationPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column - Bank Verification */}
-        <div className="lg:col-span-5 space-y-6">          
-          {/* Bank Verification Card - Step 1 */}
-          <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-md border border-blue-100">
-                Step - 1
-              </span>
-              <span className={`flex items-center gap-1 text-[8px] font-black uppercase px-2 py-1 rounded-full ${
-                bankStatus === 'VERIFIED' 
-                  ? "text-emerald-600 bg-emerald-50 border border-emerald-100" 
-                  : "text-amber-600 bg-amber-50 border border-amber-100"
-              }`}>
-                {bankStatus === 'VERIFIED' ? <CheckCircle2 size={10} /> : <AlertCircle size={10} />} 
-                {bankStatus === 'VERIFIED' ? "Verified" : "Not Verified"}
-              </span>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-50 text-emerald-500 rounded-lg">
-                <Landmark size={18} />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Bank Details</h3>
-                <p className="text-[10px] text-slate-500">Verify your bank account</p>
-              </div>
-            </div>
 
-            <div className="space-y-3">
-              <div>
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Bank Name</label>
-                <input 
-                  value={bankDetails.bank_name} 
-                  onChange={(e) => setBankDetails({...bankDetails, bank_name: e.target.value})} 
-                  placeholder="Enter Bank Name" 
-                  className="w-full px-3 py-2 rounded-lg text-xs font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none" 
-                />
-              </div>
-              <div>
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Account Number</label>
-                <input 
-                  value={bankDetails.bank_account_number} 
-                  onChange={(e) => setBankDetails({...bankDetails, bank_account_number: e.target.value.replace(/\D/g, '')})} 
-                  placeholder="Enter Account Number" 
-                  className="w-full px-3 py-2 rounded-lg text-xs font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none" 
-                />
-              </div>
-              <div>
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">IFSC Code</label>
-                <div className="relative">
-                  <input 
-                    value={bankDetails.ifsc_code} 
-                    onChange={(e) => setBankDetails({...bankDetails, ifsc_code: e.target.value.toUpperCase()})} 
-                    placeholder="Enter IFSC Code" 
-                    className="w-full px-3 py-2 rounded-lg text-xs font-medium tracking-widest text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none" 
-                  />
-                  {fetchingBankDetails && (
-                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 animate-spin" />
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            {/* Info Notice */}
-            <div className="flex items-start gap-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
-              <Info className="text-amber-600 w-3 h-3 flex-shrink-0 mt-0.5" />
-              <p className="text-[10px] font-medium text-amber-700 leading-relaxed">
-                We'll deposit ₹1.00 to verify your account. This amount will be refunded within 24 hours.
-              </p>
-            </div>
-
-            {/* Bank Verified Status */}
-            {bankStatus === 'VERIFIED' && (
-              <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
-                <CheckCircle2 className="text-emerald-500 w-4 h-4 flex-shrink-0" />
-                <span className="text-emerald-700 font-bold text-xs">Bank account verified successfully</span>
-              </div>
-            )}
-
-            {/* Verify Button */}
-            {bankStatus !== 'VERIFIED' && bankDetails.bank_account_number && bankDetails.ifsc_code && (
-              <div className="flex justify-end">
-                <button 
-                  disabled={loadingSection === 'bank'} 
-                  onClick={handleVerifyBank} 
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black px-4 py-2 rounded-lg uppercase flex items-center gap-1 shadow-sm disabled:opacity-70"
-                >
-                  {loadingSection === 'bank' ? (
-                    <><Loader2 size={10} className="animate-spin" />Verifying…</>
-                  ) : (
-                    <><CheckCircle2 size={10} />Verify Bank</>
-                  )}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Right Column - KYC Steps */}
         <div className="lg:col-span-7 space-y-6">
@@ -615,7 +519,7 @@ export default function KYCVerificationPage() {
             <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-md border border-blue-100">
-                  Step - 2
+                  Step - 1
                 </span>
                 <span className={`text-[8px] font-black uppercase px-2 py-1 rounded-md ${
                   panStatus === 'VERIFIED' 
@@ -686,7 +590,7 @@ export default function KYCVerificationPage() {
             <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-md border border-blue-100">
-                  Step - 3
+                  Step - 2
                 </span>
                 <span className={`text-[8px] font-black uppercase px-2 py-1 rounded-md ${
                   aadhaarStatus === 'VERIFIED' 
@@ -780,6 +684,104 @@ export default function KYCVerificationPage() {
               </div>
             </div>
           </div>
+
+                  {/* Left Column - Bank Verification */}
+        <div className="lg:col-span-5 space-y-6">          
+          {/* Bank Verification Card - Step 1 */}
+          <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-md border border-blue-100">
+                Step - 3
+              </span>
+              <span className={`flex items-center gap-1 text-[8px] font-black uppercase px-2 py-1 rounded-full ${
+                bankStatus === 'VERIFIED' 
+                  ? "text-emerald-600 bg-emerald-50 border border-emerald-100" 
+                  : "text-amber-600 bg-amber-50 border border-amber-100"
+              }`}>
+                {bankStatus === 'VERIFIED' ? <CheckCircle2 size={10} /> : <AlertCircle size={10} />} 
+                {bankStatus === 'VERIFIED' ? "Verified" : "Not Verified"}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-emerald-50 text-emerald-500 rounded-lg">
+                <Landmark size={18} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Bank Details</h3>
+                <p className="text-[10px] text-slate-500">Verify your bank account</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Bank Name</label>
+                <input 
+                  value={bankDetails.bank_name} 
+                  onChange={(e) => setBankDetails({...bankDetails, bank_name: e.target.value})} 
+                  placeholder="Enter Bank Name" 
+                  className="w-full px-3 py-2 rounded-lg text-xs font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none" 
+                />
+              </div>
+              <div>
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Account Number</label>
+                <input 
+                  value={bankDetails.bank_account_number} 
+                  onChange={(e) => setBankDetails({...bankDetails, bank_account_number: e.target.value.replace(/\D/g, '')})} 
+                  placeholder="Enter Account Number" 
+                  className="w-full px-3 py-2 rounded-lg text-xs font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none" 
+                />
+              </div>
+              <div>
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">IFSC Code</label>
+                <div className="relative">
+                  <input 
+                    value={bankDetails.ifsc_code} 
+                    onChange={(e) => setBankDetails({...bankDetails, ifsc_code: e.target.value.toUpperCase()})} 
+                    placeholder="Enter IFSC Code" 
+                    className="w-full px-3 py-2 rounded-lg text-xs font-medium tracking-widest text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none" 
+                  />
+                  {fetchingBankDetails && (
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 animate-spin" />
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Info Notice */}
+            <div className="flex items-start gap-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
+              <Info className="text-amber-600 w-3 h-3 flex-shrink-0 mt-0.5" />
+              <p className="text-[10px] font-medium text-amber-700 leading-relaxed">
+                We'll deposit ₹1.00 to verify your account. This amount will be refunded within 24 hours.
+              </p>
+            </div>
+
+            {/* Bank Verified Status */}
+            {bankStatus === 'VERIFIED' && (
+              <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                <CheckCircle2 className="text-emerald-500 w-4 h-4 flex-shrink-0" />
+                <span className="text-emerald-700 font-bold text-xs">Bank account verified successfully</span>
+              </div>
+            )}
+
+            {/* Verify Button */}
+            {bankStatus !== 'VERIFIED' && bankDetails.bank_account_number && bankDetails.ifsc_code && (
+              <div className="flex justify-end">
+                <button 
+                  disabled={loadingSection === 'bank'} 
+                  onClick={handleVerifyBank} 
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black px-4 py-2 rounded-lg uppercase flex items-center gap-1 shadow-sm disabled:opacity-70"
+                >
+                  {loadingSection === 'bank' ? (
+                    <><Loader2 size={10} className="animate-spin" />Verifying…</>
+                  ) : (
+                    <><CheckCircle2 size={10} />Verify Bank</>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
 
           {/* Demat Card - Step 4 */}
           <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm">

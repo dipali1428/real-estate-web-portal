@@ -265,7 +265,7 @@ export const CustomerService = {
     addDematAccount: async (dematDetails: DematDetailsParams): Promise<DematDetailsResponse> => {
         console.log('Adding demat account with:', dematDetails);
         
-        const response = await api.post("/api/dashboard/demat/add", {
+        const response = await api.post("/api/unlisted/user/demat/add", {
             dp_id: dematDetails.dp_id,
             client_id: dematDetails.client_id,
             depository: dematDetails.depository,
@@ -281,7 +281,7 @@ export const CustomerService = {
      * GET → /api/dashboard/demat/details
      */
     getDematDetails: async (): Promise<DematDetailsResponse> => {
-        const response = await api.get("/api/dashboard/demat/details");
+        const response = await api.get("/api/unlisted/user/demat/details");
         return response.data;
     },
 
@@ -290,7 +290,7 @@ export const CustomerService = {
      * PUT → /api/dashboard/demat/update
      */
     updateDematAccount: async (dematDetails: DematDetailsParams): Promise<DematDetailsResponse> => {
-        const response = await api.put("/api/dashboard/demat/update", {
+        const response = await api.put("/api/unlisted/user/demat/update", {
             dp_id: dematDetails.dp_id,
             client_id: dematDetails.client_id,
             depository: dematDetails.depository,
@@ -304,7 +304,7 @@ export const CustomerService = {
      * DELETE → /api/dashboard/demat/delete
      */
     deleteDematAccount: async (): Promise<{ status: string; message: string }> => {
-        const response = await api.delete("/api/dashboard/demat/delete");
+        const response = await api.delete("/api/unlisted/user/demat/delete");
         return response.data;
     },
 
