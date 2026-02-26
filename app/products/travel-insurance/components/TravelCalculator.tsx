@@ -431,7 +431,7 @@ export default function TravelCalculator() {
                     <div className="space-y-6 lg:sticky lg:top-24">
                         <motion.div
                             layout
-                            className="bg-gray-300 p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] shadow-2xl relative overflow-hidden group"
+                            className="bg-white p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] shadow-2xl relative overflow-hidden group"
                         >
                             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform duration-1000">
                                 <IconCalculator size={180} className="text-white" />

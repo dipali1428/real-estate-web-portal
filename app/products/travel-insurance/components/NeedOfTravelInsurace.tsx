@@ -16,7 +16,7 @@ const coverageItems = [
             '24/7 travel assistance',
         ],
         // Image: Doctor Consultation (Medical Emergency)
-        image: '/travel insurance/medical1.jfif',
+        image: '/travel insurance/medical1.jpg',
     },
     {
         title: 'Trip Cancellation / Delay',

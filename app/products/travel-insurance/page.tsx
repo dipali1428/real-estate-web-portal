@@ -23,10 +23,10 @@ export default function TravelInsurancePage() {
             <KeyCoverageHighlights />
             <ProviderComparison />
             <InsuranceTypes />
+            <TravelCalculator />
             <HowItWorks />
             <WhyTravelInsurance />
             <GlobalEligibility />
-            <TravelCalculator />
             <ClaimsProcess />
             <DocumentsSection />
             <FAQSection />
