@@ -1,5 +1,4 @@
-"use client"; // Important for refs and state
-// import { useRef } from "react";
+"use client";
 import AboutSection from "./component/AboutSection";
 import ContactSection from "./component/ContactSection";
 import CTASection from "./component/CTASection";
@@ -9,11 +8,10 @@ import PartnershipSection from "./component/PartnerShipSection";
 import ServicesSection from "./component/ServicesSection";
 import Chatbot from "./component/chatbot/page";
 import ScrollToTop from "./component/ScrollToTop";
-
+ 
 export default function Home() {
   return (
-    <div className="min-h-screen w-full overflow-x-hidden font-sans"> 
-      {/* Sections */}
+    <div className="min-h-screen w-full overflow-x-hidden font-sans">
       <HeroSection />
       <ServicesSection />
       <AboutSection />
@@ -22,7 +20,7 @@ export default function Home() {
       <ContactSection />
       <CTASection />
       <Chatbot />
-      <ScrollToTop/>
+      <ScrollToTop />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { motion, useAnimation, useScroll, useTransform, AnimatePresence } from '
 import { IconChevronRight, IconCalendar, IconMapPin, IconWorld, IconShieldCheck, IconPlaneDeparture, IconAlertCircle } from '@tabler/icons-react';
 import { useState, useEffect, useRef } from 'react';
 import QuoteModal from './QuoteModal';
+import herooImg from '../assets/heroo.jpg';
 
 export default function HeroSection() {
   const containerRef = useRef(null);
@@ -47,7 +48,7 @@ export default function HeroSection() {
             y: [0, 50, 0],
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-[120px]"
+          className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-[#2076C7]/10 rounded-full blur-[120px]"
         />
         <motion.div
           animate={{
@@ -56,9 +57,9 @@ export default function HeroSection() {
             y: [0, 100, 0],
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-[-10%] left-[-5%] w-[700px] h-[700px] bg-teal-50/50 rounded-full blur-[140px]"
+          className="absolute bottom-[-10%] left-[-5%] w-[700px] h-[700px] bg-[#1CADA3]/10 rounded-full blur-[140px]"
         />
-        <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-indigo-50/30 rounded-full blur-[100px]" />
+        <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#2076C7]/5 rounded-full blur-[100px]" />
       </div>
 
       {/* Hero Grid Pattern */}
@@ -83,18 +84,18 @@ export default function HeroSection() {
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:w-[70%] text-center"
+            className="lg:w-[70%] text-center lg:text-left"
           >
             {/* Animated Badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/60 backdrop-blur-md border border-blue-100 shadow-sm text-blue-700 text-xs font-bold tracking-widest mb-8 uppercase"
+              className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/60 backdrop-blur-md border border-[#2076C7]/20 shadow-sm text-[#2076C7] text-[10px] md:text-xs font-bold tracking-widest mb-6 lg:mb-8 uppercase"
             >
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1CADA3] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#2076C7]"></span>
               </span>
               Travel Fearlessly
             </motion.div>
@@ -103,7 +104,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tight mb-8 leading-[1.1] gradient-text py-2"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tight mb-6 lg:mb-8 leading-[1.2] lg:leading-[1.1] py-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm"
             >
               Explore Your
               <br className="hidden md:block" />
@@ -116,7 +117,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
-              className="text-lg md:text-xl text-slate-600 mb-8 max-w-3xl font-medium leading-relaxed mx-auto lg:mx-0 lg:text-left"
+              className="text-base md:text-xl text-slate-500 mb-8 max-w-3xl font-medium leading-relaxed mx-auto lg:mx-0"
             >
               Comprehensive coverage for domestic and international travel. Get affordable plans with global medical coverage, trip protection & instant issuance.
             </motion.p>
@@ -135,9 +136,9 @@ export default function HeroSection() {
               <div className="absolute inset-4 rounded-full border-2 border-dashed border-slate-200/60 -z-0" />
 
               {/* Main Circular Image */}
-              <div className="relative w-[300px] h-[300px] rounded-full overflow-hidden shadow-2xl z-10 border-4 border-white">
+              <div className="relative w-[260px] h-[260px] sm:w-[320px] sm:h-[320px] lg:w-[380px] lg:h-[380px] rounded-full overflow-hidden shadow-2xl z-10 border-4 border-white">
                 <img
-                  src="/travel insurance/heroo.jpg"
+                  src={herooImg.src}
                   alt="Travel Protection Illustration"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 ease-in-out"
                 />
@@ -158,9 +159,9 @@ export default function HeroSection() {
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-4 right-4 bg-white p-2 rounded-lg shadow-lg flex items-center gap-1.5 border border-blue-50 z-20"
+                className="absolute top-4 right-4 bg-white p-2 rounded-lg shadow-lg flex items-center gap-1.5 border border-[#2076C7]/10 z-20"
               >
-                <div className="w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center text-white">
+                <div className="w-6 h-6 bg-[#1CADA3] rounded-full flex items-center justify-center text-white">
                   <IconWorld size={12} />
                 </div>
                 <div className="text-left">
@@ -197,7 +198,7 @@ export default function HeroSection() {
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
                 className="absolute bottom-16 -right-2 z-30"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center shadow-xl border-4 border-white">
+                <div className="w-16 h-16 bg-gradient-to-br from-[#1CADA3] to-[#2076C7] rounded-full flex items-center justify-center shadow-xl border-4 border-white">
                   <IconWorld size={28} className="text-white" strokeWidth={1.8} />
                 </div>
               </motion.div>
@@ -226,15 +227,15 @@ export default function HeroSection() {
           </AnimatePresence>
 
           {/* Animated Glowing Aura */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-teal-500/20 rounded-[2.5rem] blur-2xl opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+          <div className="absolute -inset-1 bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 rounded-[2.5rem] blur-2xl opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
 
-          <div className="relative max-w-4xl mx-auto bg-white/70 backdrop-blur-2xl p-3 md:p-4 rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(32,118,199,0.12)] border border-white/80 overflow-hidden">
+          <div className="relative max-w-5xl mx-auto bg-white/70 backdrop-blur-2xl p-4 md:p-6 lg:p-4 rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(32,118,199,0.12)] border border-white/80 overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
 
               {/* Destination Input */}
               <div className="relative">
-                <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all duration-300 group/input ${showError && !destination ? 'border-red-200 bg-red-50/30' : 'border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5'}`}>
-                  <div className="flex items-center gap-2 text-blue-600">
+                <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all duration-300 group/input ${showError && !destination ? 'border-red-200 bg-red-50/30' : 'border-slate-200 hover:border-[#2076C7]/40 hover:shadow-lg hover:shadow-[#2076C7]/5'}`}>
+                  <div className="flex items-center gap-2 text-[#2076C7]">
                     <IconMapPin size={18} stroke={2} />
                     <span className="text-sm font-medium">Travel Destination</span>
                   </div>
@@ -250,8 +251,8 @@ export default function HeroSection() {
 
               {/* Residence Select */}
               <div className="relative">
-                <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all duration-300 group/input ${showError && !residingIn ? 'border-red-200 bg-red-50/30' : 'border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5'}`}>
-                  <div className="flex items-center gap-2 text-blue-600">
+                <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all duration-300 group/input ${showError && !residingIn ? 'border-red-200 bg-red-50/30' : 'border-slate-200 hover:border-[#2076C7]/40 hover:shadow-lg hover:shadow-[#2076C7]/5'}`}>
+                  <div className="flex items-center gap-2 text-[#2076C7]">
                     <IconWorld size={18} stroke={2} />
                     <span className="text-sm font-medium">Residing In</span>
                   </div>
@@ -271,8 +272,8 @@ export default function HeroSection() {
 
               {/* Date Input */}
               <div className="relative">
-                <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all duration-300 group/input ${showError && !departureDate ? 'border-red-200 bg-red-50/30' : 'border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5'}`}>
-                  <div className="flex items-center gap-2 text-blue-600">
+                <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all duration-300 group/input ${showError && !departureDate ? 'border-red-200 bg-red-50/30' : 'border-slate-200 hover:border-[#2076C7]/40 hover:shadow-lg hover:shadow-[#2076C7]/5'}`}>
+                  <div className="flex items-center gap-2 text-[#2076C7]">
                     <IconCalendar size={18} stroke={2} />
                     <span className="text-sm font-medium">Departure Date</span>
                   </div>
@@ -291,7 +292,7 @@ export default function HeroSection() {
               {/* Animated Button */}
               <button
                 onClick={handleGetFreeQuote}
-                className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-teal-500 text-white font-black text-lg rounded-2xl shadow-[0_10px_30px_-10px_rgba(32,118,199,0.4)] hover:shadow-[0_20px_50px_-12px_rgba(32,118,199,0.5)] transition-all duration-300 group/btn h-full py-3 lg:py-0 hover:scale-[1.02] active:scale-[0.98]"
+                className="relative overflow-hidden bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black text-lg rounded-2xl shadow-[0_10px_30px_-10px_rgba(32,118,199,0.4)] hover:shadow-[0_20px_50px_-12px_rgba(32,118,199,0.5)] transition-all duration-300 group/btn h-full py-3 lg:py-0 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span className="relative z-10 flex gap-3 items-center justify-center">
                   Get Free Quote
@@ -311,10 +312,10 @@ export default function HeroSection() {
                       <img src={`https://i.pravatar.cc/100?u=${i + 10}`} alt="User" />
                     </div>
                   ))}
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-xl">+12k</div>
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[#2076C7] flex items-center justify-center text-[10px] font-bold text-white shadow-xl">+12k</div>
                 </div>
                 <p className="text-sm font-bold text-slate-500">
-                  <span className="text-blue-600 font-black">12,400+</span> travelers insured last 6 months
+                  <span className="text-[#2076C7] font-black">12,400+</span> travelers insured last 6 months
                 </p>
               </div>
             </div>

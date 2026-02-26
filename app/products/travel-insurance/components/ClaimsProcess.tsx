@@ -9,33 +9,33 @@ const steps = [
         icon: IconFileDescription,
         title: 'Report Incident',
         desc: 'Notify us efficiently via app or hotline within 24 hours of the incident.',
-        gradient: 'from-blue-500 to-cyan-400',
-        shadow: 'shadow-blue-500/30',
-        ring: 'ring-blue-200',
+        gradient: 'from-[#2076C7] to-[#1CADA3]',
+        shadow: 'shadow-[#2076C7]/30',
+        ring: 'ring-[#2076C7]/20',
     },
     {
         icon: IconUpload,
         title: 'Upload Documents',
         desc: 'Submit photos, receipts, and reports through our secure digital portal.',
-        gradient: 'from-blue-600 to-blue-400',
-        shadow: 'shadow-blue-500/20',
-        ring: 'ring-blue-100',
+        gradient: 'from-[#2076C7] to-[#2076C7]/60',
+        shadow: 'shadow-[#2076C7]/20',
+        ring: 'ring-[#2076C7]/10',
     },
     {
         icon: IconCheckbox,
         title: 'Claim Review',
         desc: 'Our experts verify your claim within 48 hours for fast processing.',
-        gradient: 'from-teal-500 to-emerald-400',
-        shadow: 'shadow-teal-500/30',
-        ring: 'ring-teal-200',
+        gradient: 'from-[#1CADA3] to-[#1CADA3]/70',
+        shadow: 'shadow-[#1CADA3]/30',
+        ring: 'ring-[#1CADA3]/20',
     },
     {
         icon: IconHeadset,
         title: 'Settlement',
         desc: 'Approved claims are paid out directly to your bank account instantly.',
-        gradient: 'from-blue-700 to-blue-500',
-        shadow: 'shadow-blue-600/20',
-        ring: 'ring-blue-100',
+        gradient: 'from-[#2076C7] to-[#2076C7]/80',
+        shadow: 'shadow-[#2076C7]/20',
+        ring: 'ring-[#2076C7]/10',
     }
 ];
 
@@ -93,35 +93,33 @@ export default function ClaimsProcess() {
     return (
         <section className="py-24 bg-white overflow-hidden">
             <div className="max-w-7xl mx-auto px-6">
-                {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
-                    className="text-center mb-16"
+                    className="text-center mb-10 md:mb-16"
                 >
-                    <span className="text-primary-blue font-bold tracking-widest uppercase text-sm">Hassle-Free Experience</span>
-                    <h2 className="text-3xl md:text-5xl font-extrabold gradient-text mt-3">
-                        Simple 4-Step Claims Process
+                    <span className="text-primary-blue font-bold tracking-widest uppercase text-xs md:text-sm">Hassle-Free Experience</span>
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                      Simple 4-Step Claims Process
                     </h2>
-                    <p className="text-lg text-slate-500 mt-4 max-w-2xl mx-auto">
+                    <p className="text-base md:text-lg text-slate-500 mt-4 max-w-2xl mx-auto px-4 md:px-0">
                         We know that filing a claim can be stressful. That&apos;s why we&apos;ve made our process digital, transparent, and incredibly fast.
                     </p>
                 </motion.div>
 
-                {/* Steps Grid */}
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: '-50px' }}
-                    className="grid md:grid-cols-4 gap-8 relative"
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 relative"
                 >
                     {/* Animated Connecting Line (Desktop) */}
                     <motion.div
                         variants={lineVariants}
-                        className="hidden md:block absolute top-16 left-[12%] right-[12%] h-1 bg-gradient-to-r from-blue-400 via-blue-500 to-teal-400 rounded-full origin-left"
+                        className="hidden md:block absolute top-16 left-[12%] right-[12%] h-1 bg-gradient-to-r from-[#2076C7] via-[#2076C7] to-[#1CADA3] rounded-full origin-left"
                         style={{ zIndex: 0 }}
                     />
 
@@ -165,7 +163,7 @@ export default function ClaimsProcess() {
                             </motion.div>
 
                             {/* Title with hover color */}
-                            <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-teal-500 transition-all duration-300">
+                            <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#2076C7] group-hover:to-[#1CADA3] transition-all duration-300">
                                 {step.title}
                             </h3>
                             <p className="text-slate-500 leading-relaxed text-sm px-4">
@@ -196,7 +194,7 @@ export default function ClaimsProcess() {
                         onClick={openPartner}
                         whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(32,118,199,0.3)' }}
                         whileTap={{ scale: 0.98 }}
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-bold rounded-xl shadow-lg transition-all"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-xl shadow-lg transition-all text-sm md:text-base"
                     >
                         Start a Claim Notification
                     </motion.button>

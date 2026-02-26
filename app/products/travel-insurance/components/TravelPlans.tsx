@@ -16,7 +16,7 @@ const plans = [
         price: '₹399',
         duration: 'per trip',
         popular: false,
-        gradient: 'from-blue-600 to-teal-500',
+        gradient: 'from-[#2076C7] to-[#1CADA3]',
     },
     {
         icon: IconBriefcase,
@@ -27,7 +27,7 @@ const plans = [
         price: '₹2,499',
         duration: 'per year',
         popular: true,
-        gradient: 'from-blue-600 to-teal-500',
+        gradient: 'from-[#2076C7] to-[#1CADA3]',
     },
     {
         icon: IconSchool,
@@ -38,7 +38,7 @@ const plans = [
         price: '₹4,999',
         duration: 'per year',
         popular: false,
-        gradient: 'from-blue-600 to-teal-500',
+        gradient: 'from-[#2076C7] to-[#1CADA3]',
     },
     {
         icon: IconUsers,
@@ -49,7 +49,7 @@ const plans = [
         price: '₹3,799',
         duration: 'per trip',
         popular: false,
-        gradient: 'from-blue-600 to-teal-500',
+        gradient: 'from-[#2076C7] to-[#1CADA3]',
     },
 ];
 
@@ -68,14 +68,16 @@ export default function InsuranceTypes() {
                 >
                     <div className="max-w-3xl">
                         <span className="text-primary-blue font-bold tracking-widest uppercase text-sm">Our Plans</span>
-                        <h2 className="text-4xl md:text-5xl font-extrabold text-[#1CADA3] mt-3">Tailored for Every Traveler</h2>
-                        <p className="text-lg text-slate-500 mt-4">
+                          <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                              Tailored for Every Traveler
+                    </h2>
+                        <p className="text-base md:text-lg text-slate-500 mt-4 px-4 md:px-0">
                             Choose the perfect plan for your journey. Each plan includes 24/7 support and hassle-free claims.
                         </p>
                     </div>
                 </motion.div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {plans.map((plan, idx) => (
                         <motion.div
                             key={idx}
@@ -99,8 +101,8 @@ export default function InsuranceTypes() {
                                     )}
                                 </div>
 
-                                <h3 className="text-2xl font-extrabold text-[#1CADA3]">{plan.title}</h3>
-                                <p className="text-sm text-slate-500 font-medium mt-1">{plan.tagline}</p>
+                                <h3 className="text-xl md:text-2xl font-extrabold text-[#1CADA3]">{plan.title}</h3>
+                                <p className="text-xs md:text-sm text-slate-500 font-medium mt-1">{plan.tagline}</p>
                                 <p className="text-sm text-slate-600 mt-4 leading-relaxed min-h-[60px]">{plan.desc}</p>
 
                                 <div className="mt-6 border-t border-slate-100 pt-6">
@@ -124,8 +126,8 @@ export default function InsuranceTypes() {
                                 <button
                                     onClick={openPartner}
                                     className={`mt-8 w-full block text-center py-3.5 rounded-xl font-bold transition-all ${plan.popular
-                                        ? 'bg-gradient-to-r from-blue-600 to-teal-500 text-white shadow-lg hover:shadow-xl hover:scale-[1.02]'
-                                        : 'bg-slate-100 text-slate-700 hover:bg-gradient-to-r hover:from-blue-600 hover:to-teal-500 hover:text-white'
+                                        ? 'bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg hover:shadow-xl hover:scale-[1.02]'
+                                        : 'bg-slate-100 text-slate-700 hover:bg-linear-to-r hover:from-[#2076C7] hover:to-[#1CADA3] hover:text-white'
                                         }`}
                                 >
                                     Get This Plan

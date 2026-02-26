@@ -13,7 +13,7 @@ const documentGroups = [
             'PAN Card or Aadhaar Card for KYC verification',
             'Recent passport-size photograph (digital or physical)',
         ],
-        color: 'from-blue-600 to-teal-500',
+        color: 'from-[#2076C7] to-[#1CADA3]',
     },
     {
         icon: <Plane size={24} />,
@@ -24,7 +24,7 @@ const documentGroups = [
             'Hotel booking or accommodation proof',
             'Travel itinerary with dates and destinations',
         ],
-        color: 'from-teal-600 to-blue-500',
+        color: 'from-[#1CADA3] to-[#2076C7]',
     },
     {
         icon: <FileText size={24} />,
@@ -34,7 +34,7 @@ const documentGroups = [
             'Proof of tuition fee payment or scholarship letter',
             'NOC from sponsor/parent (if applicable)',
         ],
-        color: 'from-blue-500 to-blue-700',
+        color: 'from-[#2076C7] to-[#2076C7]/80',
     },
     {
         icon: <ShieldCheck size={24} />,
@@ -45,7 +45,7 @@ const documentGroups = [
             'Property Irregularity Report from airline (for baggage)',
             'Proof of trip cancellation (airline/hotel confirmation)',
         ],
-        color: 'from-teal-500 to-teal-700',
+        color: 'from-[#1CADA3] to-[#1CADA3]/80',
     },
 ];
 
@@ -62,7 +62,9 @@ export default function DocumentsSection() {
                     className="text-center mb-16"
                 >
                     <span className="text-primary-blue font-bold tracking-widest uppercase text-sm">Documentation</span>
-                    <h2 className="text-4xl md:text-5xl font-extrabold gradient-text mt-3">Documents You'll Need</h2>
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                     Documents You'll Need
+                    </h2>
                     <p className="text-lg text-slate-500 mt-4">
                         Keep these documents ready for a smooth application and claims process.
                     </p>
@@ -116,7 +118,7 @@ export default function DocumentsSection() {
                                                         transition={{ delay: i * 0.08 }}
                                                         className="flex items-start gap-3 text-slate-600"
                                                     >
-                                                        <div className="w-6 h-6 flex-shrink-0 bg-teal-50 text-secondary-teal rounded-full flex items-center justify-center mt-0.5 text-xs font-bold">
+                                                        <div className="w-6 h-6 flex-shrink-0 bg-[#1CADA3]/10 text-[#1CADA3] rounded-full flex items-center justify-center mt-0.5 text-xs font-bold">
                                                             {i + 1}
                                                         </div>
                                                         <span className="text-sm leading-relaxed">{item}</span>

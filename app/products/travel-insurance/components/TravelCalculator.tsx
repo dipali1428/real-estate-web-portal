@@ -48,7 +48,7 @@ const SUM_INSURED_OPTIONS = [
 const PROVIDERS = [
     {
         name: 'Tata AIG',
-        brandColor: 'bg-[#1d4076]',
+        brandColor: 'bg-[#2076C7]',
         planName: 'International Plus',
         medical: '₹ 40 Lakhs',
         tripCancellation: '₹ 1 Lakhs',
@@ -58,7 +58,7 @@ const PROVIDERS = [
     },
     {
         name: 'Bajaj Allianz',
-        brandColor: 'bg-[#004a99]',
+        brandColor: 'bg-[#1CADA3]',
         planName: 'Travel Elite',
         medical: '₹ 50 Lakhs',
         tripCancellation: '₹ 1.5 Lakhs',
@@ -68,7 +68,7 @@ const PROVIDERS = [
     },
     {
         name: 'HDFC ERGO',
-        brandColor: 'bg-[#1CADA3]',
+        brandColor: 'bg-[#2076C7]',
         planName: 'Travel Assure',
         medical: '₹ 45 Lakhs',
         tripCancellation: '₹ 1.2 Lakhs',
@@ -78,7 +78,7 @@ const PROVIDERS = [
     },
     {
         name: 'ICICI Lombard',
-        brandColor: 'bg-[#005a9c]',
+        brandColor: 'bg-[#1CADA3]',
         planName: 'Trip Secure Plus',
         medical: '₹ 60 Lakhs',
         tripCancellation: '₹ 2 Lakhs',
@@ -88,7 +88,7 @@ const PROVIDERS = [
     },
     {
         name: 'Niva Bupa',
-        brandColor: 'bg-[#1CADA3]',
+        brandColor: 'bg-[#2076C7]',
         planName: 'GoActive Travel',
         medical: '₹ 55 Lakhs',
         tripCancellation: '₹ 1.8 Lakhs',
@@ -98,7 +98,7 @@ const PROVIDERS = [
     },
     {
         name: 'Reliance',
-        brandColor: 'bg-[#00529b]',
+        brandColor: 'bg-[#1CADA3]',
         planName: 'Travel Care',
         medical: '₹ 35 Lakhs',
         tripCancellation: '₹ 0.8 Lakhs',
@@ -177,37 +177,39 @@ export default function TravelCalculator() {
 
     return (
         <section id="calculator" className="pt-24 pb-12 px-6 bg-slate-50 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-100/30 rounded-full blur-[120px] -z-0" />
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-50/40 rounded-full blur-[120px] -z-0" />
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#2076C7]/10 rounded-full blur-[120px] -z-0" />
+            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#1CADA3]/10 rounded-full blur-[120px] -z-0" />
 
             <div className="max-w-6xl mx-auto relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="text-center mb-16"
+                    className="text-center mb-10 md:mb-16"
                 >
-                    <span className="text-secondary-teal font-bold tracking-widest uppercase text-sm">Compare & Save</span>
-                    <h2 className="text-4xl md:text-5xl font-black gradient-text mt-3 text-slate-900 leading-tight">Travel Premium Calculator</h2>
-                    <p className="text-lg text-slate-500 mt-4 max-w-2xl mx-auto">
+                    <span className="text-secondary-teal font-bold tracking-widest uppercase text-xs md:text-sm">Compare & Save</span>
+                     <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                              Travel Premium Calculator
+                    </h2>
+                    <p className="text-base md:text-lg text-slate-500 mt-4 max-w-2xl mx-auto px-4 md:px-0">
                         Get personalized quotes in 3 simple steps, similar to PolicyBazaar’s advanced evaluation.
                     </p>
                 </motion.div>
 
                 {/* Multi-step Navigation Bar */}
-                <div className="max-w-md mx-auto mb-12 flex items-center justify-between relative">
+                <div className="max-w-xs md:max-w-md mx-auto mb-10 md:mb-12 flex items-center justify-between relative px-2">
                     <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -translate-y-1/2 -z-10" />
                     {[1, 2, 3].map((num) => (
-                        <div key={num} className="relative bg-slate-50 p-2">
+                        <div key={num} className="relative bg-slate-50 p-1 md:p-2">
                             <div
-                                className={`w-10 h-10 rounded-full flex items-center justify-center font-black transition-all duration-300 ${step >= num ? 'bg-gradient-to-br from-blue-600 to-teal-500 text-white shadow-lg' : 'bg-white text-slate-300 border-2 border-slate-200'
+                                className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs md:text-base font-black transition-all duration-300 ${step >= num ? 'bg-gradient-to-br from-[#2076C7] to-[#1CADA3] text-white shadow-lg' : 'bg-white text-slate-300 border-2 border-slate-200'
                                     }`}
                             >
                                 {num}
                             </div>
-                            <span className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${step >= num ? 'text-blue-600' : 'text-slate-300'
+                            <span className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 text-[8px] md:text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${step >= num ? 'text-[#2076C7]' : 'text-slate-300'
                                 }`}>
-                                {num === 1 ? 'Trip Info' : num === 2 ? 'Travelers' : 'Special Cover'}
+                                {num === 1 ? 'Trip Info' : num === 2 ? 'Travelers' : 'Cover'}
                             </span>
                         </div>
                     ))}
@@ -219,7 +221,7 @@ export default function TravelCalculator() {
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="bg-white p-8 md:p-11 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(32,118,199,0.08)] border border-slate-100 min-h-[560px] flex flex-col relative overflow-hidden"
+                        className="bg-white p-6 md:p-11 rounded-[2rem] md:rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(32,118,199,0.08)] border border-slate-100 min-h-[480px] md:min-h-[560px] flex flex-col relative overflow-hidden"
                     >
                         <AnimatePresence mode="wait">
                             {step === 1 && (
@@ -232,10 +234,10 @@ export default function TravelCalculator() {
                                 >
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-black text-slate-900 uppercase tracking-widest mb-4">
-                                            <IconWorld className="text-secondary-teal" size={20} />
+                                            <IconWorld className="text-[#1CADA3]" size={20} />
                                             Where are you traveling?
                                         </label>
-                                        <div className="grid grid-cols-2 gap-3">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                             {DESTINATIONS.map((d) => (
                                                 <button
                                                     key={d.id}
@@ -253,17 +255,17 @@ export default function TravelCalculator() {
 
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-black text-slate-900 uppercase tracking-widest mb-4">
-                                            <IconCalendarEvent className="text-blue-600" size={20} />
+                                            <IconCalendarEvent className="text-[#2076C7]" size={20} />
                                             Trip Dates
                                         </label>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="space-y-1">
                                                 <span className="text-[10px] font-bold text-slate-400 uppercase">Departure</span>
                                                 <input
                                                     type="date"
                                                     value={startDate}
                                                     onChange={(e) => setStartDate(e.target.value)}
-                                                    className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-700 outline-none focus:border-blue-300"
+                                                    className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-700 outline-none focus:border-[#2076C7]/30"
                                                 />
                                             </div>
                                             <div className="space-y-1">
@@ -272,7 +274,7 @@ export default function TravelCalculator() {
                                                     type="date"
                                                     value={endDate}
                                                     onChange={(e) => setEndDate(e.target.value)}
-                                                    className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-700 outline-none focus:border-blue-300"
+                                                    className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-700 outline-none focus:border-[#2076C7]/30"
                                                 />
                                             </div>
                                         </div>
@@ -290,13 +292,13 @@ export default function TravelCalculator() {
                                 >
                                     <div className="flex justify-between items-center mb-4">
                                         <label className="flex items-center gap-2 text-sm font-black text-slate-900 uppercase tracking-widest">
-                                            <IconUsers className="text-blue-600" size={20} />
+                                            <IconUsers className="text-[#2076C7]" size={20} />
                                             Who is traveling?
                                         </label>
                                         <button
                                             onClick={addTraveler}
                                             disabled={travelers.length >= 6}
-                                            className="flex items-center gap-1 text-xs font-black text-blue-600 hover:text-blue-700 disabled:opacity-30 uppercase tracking-wider"
+                                            className="flex items-center gap-1 text-xs font-black text-[#2076C7] hover:text-[#2076C7]/80 disabled:opacity-30 uppercase tracking-wider"
                                         >
                                             <IconPlus size={16} stroke={3} />
                                             Add Member
@@ -311,7 +313,7 @@ export default function TravelCalculator() {
                                                 animate={{ opacity: 1, y: 0 }}
                                                 className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 group"
                                             >
-                                                <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-black">
+                                                <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-[#2076C7]/10 flex items-center justify-center text-[#2076C7] text-sm font-black">
                                                     {index + 1}
                                                 </div>
                                                 <div className="flex-grow">
@@ -353,7 +355,7 @@ export default function TravelCalculator() {
                                 >
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-black text-slate-900 uppercase tracking-widest mb-6">
-                                            <IconShieldCheck className="text-blue-600" size={20} />
+                                            <IconShieldCheck className="text-[#2076C7]" size={20} />
                                             Choose Sum Insured
                                         </label>
                                         <div className="grid grid-cols-2 gap-3">
@@ -372,10 +374,10 @@ export default function TravelCalculator() {
                                         </div>
                                     </div>
 
-                                    <div className="p-6 rounded-3xl bg-blue-50 border border-blue-100">
+                                    <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
-                                                <IconStethoscope className="text-blue-600" size={24} />
+                                                <IconStethoscope className="text-[#2076C7]" size={24} />
                                                 <div>
                                                     <p className="text-sm font-black text-slate-900">Pre-existing Diseases?</p>
                                                     <p className="text-[10px] text-slate-500 font-bold uppercase">Diabetes, Hypertension, etc.</p>
@@ -383,7 +385,7 @@ export default function TravelCalculator() {
                                             </div>
                                             <button
                                                 onClick={() => setHasMedicalCondition(!hasMedicalCondition)}
-                                                className={`w-14 h-8 rounded-full relative transition-colors ${hasMedicalCondition ? 'bg-gradient-to-r from-blue-600 to-teal-500' : 'bg-slate-200'
+                                                className={`w-14 h-8 rounded-full relative transition-colors ${hasMedicalCondition ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3]' : 'bg-slate-200'
                                                     }`}
                                             >
                                                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${hasMedicalCondition ? 'left-7' : 'left-1'
@@ -417,7 +419,7 @@ export default function TravelCalculator() {
                                         setTimeout(() => document.getElementById('recommended-plans')?.scrollIntoView({ behavior: 'smooth' }), 100);
                                     }
                                 }}
-                                className={`flex-grow py-4 font-black rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 ${isStepValid() ? 'bg-gradient-to-r from-blue-600 to-teal-500 text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed hover:scale-100'}`}
+                                className={`flex-grow py-4 font-black rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 ${isStepValid() ? 'bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed hover:scale-100'}`}
                             >
                                 {step === 3 ? 'View Detailed Plans' : 'Continue'}
                                 <IconArrowRight size={20} />
@@ -429,46 +431,46 @@ export default function TravelCalculator() {
                     <div className="space-y-6 lg:sticky lg:top-24">
                         <motion.div
                             layout
-                            className="bg-[#7DD3FC] p-6 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(14,165,233,0.25)] relative overflow-hidden group"
+                            className="bg-white p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] shadow-2xl relative overflow-hidden group"
                         >
-                            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:rotate-12 transition-transform duration-1000">
-                                <IconCalculator size={180} className="text-blue-400" />
+                            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform duration-1000">
+                                <IconCalculator size={180} className="text-white" />
                             </div>
 
                             <div className="relative z-10">
                                 <span className="text-[15px] font-black tracking-[0.3em] text-white mb-2 block">Quick Summary</span>
 
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mt-3">
-                                    <div className="flex items-center gap-4 mb-6">
-                                        <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-                                            <IconShieldCheck size={28} className="text-blue-500" />
+                                    <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+                                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                                            <IconShieldCheck size={24} className="md:size-7 text-[#2076C7]" />
                                         </div>
                                         <div>
-                                            <h3 className="text-xl font-black text-slate-900">Estimated Quote</h3>
-                                            <p className="text-xs font-bold text-slate-400">{travelers.length} Member(s) | {duration} Days</p>
+                                            <h3 className="text-lg md:text-xl font-black text-slate-900">Estimated Quote</h3>
+                                            <p className="text-[10px] md:text-xs font-bold text-slate-400">{travelers.length} Member(s) | {duration} Days</p>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-baseline gap-2 mb-6 pb-6 border-b border-slate-100">
-                                        <span className="text-5xl md:text-6xl font-black text-slate-900">₹{totalPremium.toLocaleString()}</span>
-                                        <span className="text-sm font-bold text-slate-400">Incl. GST</span>
+                                    <div className="flex items-baseline gap-2 mb-4 md:mb-6 pb-4 md:pb-6 border-b border-slate-100">
+                                        <span className="text-4xl md:text-6xl font-black text-slate-900">₹{totalPremium.toLocaleString()}</span>
+                                        <span className="text-xs md:text-sm font-bold text-slate-400">Incl. GST</span>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Max Cover</div>
-                                            <div className="text-lg font-black text-slate-800">{sumInsured.label}</div>
+                                    <div className="grid grid-cols-2 gap-2 md:gap-3">
+                                        <div className="bg-slate-50 p-3 md:p-4 rounded-xl border border-slate-100">
+                                            <div className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Max Cover</div>
+                                            <div className="text-sm md:text-lg font-black text-slate-800">{sumInsured.label}</div>
                                         </div>
-                                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Zone</div>
-                                            <div className="text-lg font-black text-slate-800 truncate">{destination.label.split(' ')[0]}</div>
+                                        <div className="bg-slate-50 p-3 md:p-4 rounded-xl border border-slate-100">
+                                            <div className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Zone</div>
+                                            <div className="text-sm md:text-lg font-black text-slate-800 truncate">{destination.label.split(' ')[0]}</div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <button
                                     onClick={openPartner}
-                                    className="w-full mt-6 py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-black rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-lg"
+                                    className="w-full mt-6 py-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white font-black rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-lg"
                                 >
                                     Confirm & Proceed
                                     <IconArrowRight className="text-white" size={24} />
@@ -500,10 +502,10 @@ export default function TravelCalculator() {
                         animate={{ opacity: 1, y: 0 }}
                         className="mt-20 border-t border-slate-200 pt-16"
                     >
-                        <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-6">
+                        <div className="flex flex-col md:flex-row items-center justify-between mb-8 md:mb-10 gap-6">
                             <div className="text-center md:text-left">
-                                <h3 className="text-3xl font-black gradient-text">Recommended Plans for You</h3>
-                                <p className="text-slate-500 font-bold mt-2">Personalized coverage from India's top insurers</p>
+                                <h3 className="text-2xl md:text-3xl font-black gradient-text">Recommended Plans for You</h3>
+                                <p className="text-sm md:text-base text-slate-500 font-bold mt-2">Personalized coverage from India's top insurers</p>
                             </div>
                             <div className="flex gap-4">
                                 <button
@@ -523,9 +525,9 @@ export default function TravelCalculator() {
                             </div>
                         </div>
 
-                        <div className="overflow-hidden">
+                        <div className="overflow-x-auto pb-8 -mx-6 px-6 lg:mx-0 lg:px-0 lg:overflow-visible custom-scrollbar">
                             <motion.div
-                                animate={{ x: `-${carouselIndex * 33.33}%` }}
+                                animate={{ x: `-${carouselIndex * (window.innerWidth < 768 ? 100 : 33.33)}%` }}
                                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                 className="flex"
                                 style={{ gap: '1rem' }}
@@ -534,8 +536,7 @@ export default function TravelCalculator() {
                                     <motion.div
                                         key={idx}
                                         whileHover={{ y: -4 }}
-                                        className="bg-white p-4 rounded-xl border border-slate-100 shadow-[0_8px_24px_-5px_rgba(32,118,199,0.05)] hover:shadow-lg transition-all flex-shrink-0"
-                                        style={{ width: 'calc(33.33% - 0.67rem)' }}
+                                        className="bg-white p-6 rounded-2xl border border-slate-100 shadow-[0_8px_24px_-5px_rgba(32,118,199,0.05)] hover:shadow-lg transition-all flex-shrink-0 w-full md:w-[calc(33.33%-0.67rem)]"
                                     >
                                         <div className="flex items-center gap-3 mb-6">
                                             <div className={`w-11 h-11 flex-shrink-0 ${p.brandColor} rounded-lg flex flex-col items-center justify-center border border-white/20 shadow-inner overflow-hidden relative`}>
@@ -569,7 +570,7 @@ export default function TravelCalculator() {
 
                                         <div className="pt-5 border-t border-slate-100 flex items-center justify-between">
                                             <p className="text-sm font-bold text-slate-500">Plan Premium</p>
-                                            <p className="text-xl font-black text-blue-600">₹{Math.round(totalPremium * p.factor).toLocaleString()}</p>
+                                            <p className="text-xl font-black text-[#2076C7]">₹{Math.round(totalPremium * p.factor).toLocaleString()}</p>
                                         </div>
                                     </motion.div>
                                 ))}
