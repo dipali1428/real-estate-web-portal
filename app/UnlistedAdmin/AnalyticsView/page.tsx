@@ -309,7 +309,7 @@ const AnalyticsView = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <Loader2 className="w-10 h-10 text-[#2076C7] animate-spin" />
-        <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Loading Analytics Intelligence...</p>
+        <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Loading Analytics View...</p>
       </div>
     );
   }
@@ -323,7 +323,7 @@ const AnalyticsView = () => {
           <div>
             <h3 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
               <BarChart3 className="w-6 h-6" />
-              Analytics Intelligence
+              Analytics View
             </h3>
             <p className="text-white/80 text-sm mt-1 flex items-center gap-1">
               <Activity className="w-4 h-4" />

@@ -7,7 +7,7 @@ import {
   Shield, Search, RotateCw, 
   ChevronLeft, ChevronRight, Hash, Eye, X,
   User, Calendar, Fingerprint, CreditCard, Database,
-  AlertCircle, Loader2, Plus
+  AlertCircle, Loader2
 } from "lucide-react";
 
 interface LocalDemat extends DematDetails {
@@ -16,69 +16,34 @@ interface LocalDemat extends DematDetails {
 
 const DematManagement: React.FC = () => {
   const [dematRecords, setDematRecords] = useState<LocalDemat[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [selectedDemat, setSelectedDemat] = useState<LocalDemat | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [userIdInput, setUserIdInput] = useState('');
-  const [fetchingByUserId, setFetchingByUserId] = useState(false);
+  const [dematIdInput, setDematIdInput] = useState('');
+  const [fetchingByDematId, setFetchingByDematId] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  // Fetch initial demat records on component mount
-  useEffect(() => {
-    fetchInitialDemat();
-  }, []);
+  // No initial fetch - let user search by ID
 
-  const fetchInitialDemat = async () => {
-    setLoading(true);
-    try {
-      // Fetch user 2716's demat details
-      const response = await AdminService.getUserDemat(2716);
-      console.log("Initial fetch response:", response); // Debug log
-      
-      if (response.success && response.data) {
-        const recordWithTime = {
-          ...response.data,
-          fetchedAt: new Date().toISOString()
-        };
-        setDematRecords([recordWithTime]);
-        console.log("Records set:", [recordWithTime]); // Debug log
-      }
-    } catch (error) {
-      console.error('Error fetching initial demat:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchDematByUserId = async () => {
-    if (!userIdInput.trim()) {
-      setFetchError('Please enter a User ID');
-      return;
-    }
-
-    const userId = parseInt(userIdInput);
-    if (isNaN(userId)) {
-      setFetchError('Invalid User ID');
-      return;
-    }
-
-    setFetchingByUserId(true);
+  const fetchDematById = async (dematId: number) => {
+    setFetchingByDematId(true);
     setFetchError(null);
     
     try {
-      const response = await AdminService.getUserDemat(userId);
-      console.log("Fetch by ID response:", response); // Debug log
+      console.log(`🔍 Fetching demat with ID: ${dematId}`);
+      const response = await AdminService.getUserDemat(dematId);
+      console.log("✅ Fetch response:", response);
       
-      if (response.success && response.data) {
+      if (response?.success && response?.data) {
         const recordWithTime = {
           ...response.data,
           fetchedAt: new Date().toISOString()
         };
         
-        // Check if record already exists
+        // Check if record already exists by its demat ID
         setDematRecords(prev => {
           const exists = prev.some(d => d.id === response.data.id);
           if (exists) {
@@ -88,50 +53,51 @@ const DematManagement: React.FC = () => {
           }
         });
         
-        setUserIdInput('');
+        setDematIdInput('');
       } else {
-        setFetchError('No Demat details found for this user');
+        setFetchError('No Demat details found for this ID');
       }
     } catch (error: any) {
-      console.error('Error fetching demat by user ID:', error);
+      console.error('❌ Error fetching demat by ID:', error);
       if (error.response?.status === 404) {
-        setFetchError('No Demat details found for this user ID');
+        setFetchError('No Demat record found with this ID');
       } else {
         setFetchError(error.response?.data?.message || 'Failed to fetch demat details');
       }
     } finally {
-      setFetchingByUserId(false);
+      setFetchingByDematId(false);
     }
   };
 
-  const refreshAllRecords = async () => {
-    setLoading(true);
-    try {
-      // Refresh each record
-      const updatedRecords = await Promise.all(
-        dematRecords.map(async (record) => {
-          try {
-            const response = await AdminService.getUserDemat(record.user_id);
-            if (response.success && response.data) {
-              return {
-                ...response.data,
-                fetchedAt: new Date().toISOString()
-              };
-            }
-            return null;
-          } catch (err) {
-            console.error(`Failed to refresh user ${record.user_id}:`, err);
-            return null;
-          }
-        })
-      );
+  const handleSearch = () => {
+    if (!dematIdInput.trim()) {
+      setFetchError('Please enter a Demat ID');
+      return;
+    }
 
-      const validRecords = updatedRecords.filter(r => r !== null) as LocalDemat[];
-      if (validRecords.length > 0) {
-        setDematRecords(validRecords);
+    const dematId = parseInt(dematIdInput);
+    if (isNaN(dematId) || dematId <= 0) {
+      setFetchError('Invalid Demat ID');
+      return;
+    }
+
+    fetchDematById(dematId);
+  };
+
+  const refreshRecord = async (record: LocalDemat) => {
+    try {
+      const response = await AdminService.getUserDemat(record.id);
+      if (response?.success && response?.data) {
+        const updatedRecord = {
+          ...response.data,
+          fetchedAt: new Date().toISOString()
+        };
+        setDematRecords(prev => 
+          prev.map(d => d.id === record.id ? updatedRecord : d)
+        );
       }
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error(`Failed to refresh demat ID ${record.id}:`, error);
     }
   };
 
@@ -142,7 +108,8 @@ const DematManagement: React.FC = () => {
       record.dp_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.client_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.depository?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.user_id?.toString().includes(searchTerm);
+      record.user_id?.toString().includes(searchTerm) ||
+      record.id?.toString().includes(searchTerm);
     
     return matchesSearch;
   });
@@ -181,16 +148,7 @@ const DematManagement: React.FC = () => {
           <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
             <Shield className="w-6 h-6" /> Demat Management
           </h2>
-          <p className="text-sm opacity-90">Manage user Demat account details.</p>
-        </div>
-        <div className="flex gap-2">
-          <button 
-            onClick={refreshAllRecords}
-            className="p-2.5 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
-            title="Refresh All"
-          >
-            <RotateCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-          </button>
+          <p className="text-sm opacity-90">View individual Demat account details by Demat ID.</p>
         </div>
       </motion.div>
 
@@ -198,26 +156,26 @@ const DematManagement: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1">
             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">
-              Search Demat by User ID
+              Search Demat by ID
             </label>
             <div className="flex gap-3">
               <input
                 type="number"
-                placeholder="Enter User ID"
+                placeholder="Enter Demat ID (e.g., 1, 2, 3...)"
                 className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-sm text-gray-900 font-medium transition-all shadow-sm"
-                value={userIdInput}
+                value={dematIdInput}
                 onChange={(e) => {
-                  setUserIdInput(e.target.value);
+                  setDematIdInput(e.target.value);
                   setFetchError(null);
                 }}
-                onKeyDown={(e) => e.key === 'Enter' && fetchDematByUserId()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <button
-                onClick={fetchDematByUserId}
-                disabled={fetchingByUserId}
+                onClick={handleSearch}
+                disabled={fetchingByDematId}
                 className="px-6 py-2.5 bg-[#2076C7] text-white rounded-xl font-bold text-sm hover:bg-[#1b62a5] transition-all disabled:opacity-50 flex items-center gap-2 min-w-[100px] justify-center"
               >
-                {fetchingByUserId ? (
+                {fetchingByDematId ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
                     Searching...
@@ -236,6 +194,9 @@ const DematManagement: React.FC = () => {
                 {fetchError}
               </p>
             )}
+            <p className="text-xs text-gray-400 mt-2">
+              Enter a Demat ID to view its details. Example: ID 1 belongs to User 2716
+            </p>
           </div>
         </div>
       </div>
@@ -251,7 +212,7 @@ const DematManagement: React.FC = () => {
             <Search className="absolute left-4 top-2.5 text-gray-400 w-4 h-4" />
             <input
               type="text"
-              placeholder="Search by name, DP ID, Client ID..."
+              placeholder="Filter results..."
               className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-sm text-gray-900 font-medium transition-all shadow-sm"
               value={searchTerm}
               onChange={(e) => {
@@ -267,7 +228,7 @@ const DematManagement: React.FC = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-gray-50/50 text-gray-400 text-[11px] font-black uppercase tracking-widest border-b border-gray-100">
-                <th className="px-6 py-4">ID</th>
+                <th className="px-6 py-4">Demat ID</th>
                 <th className="px-6 py-4">User ID</th>
                 <th className="px-6 py-4">Demat Holder</th>
                 <th className="px-6 py-4">DP ID</th>
@@ -283,7 +244,7 @@ const DematManagement: React.FC = () => {
                   <td colSpan={8} className="py-20 text-center">
                     <div className="flex items-center justify-center gap-3">
                       <Loader2 className="w-6 h-6 animate-spin text-[#2076C7]" />
-                      <span className="text-gray-500 font-medium">Loading demat records...</span>
+                      <span className="text-gray-500 font-medium">Loading...</span>
                     </div>
                   </td>
                 </tr>
@@ -291,12 +252,12 @@ const DematManagement: React.FC = () => {
                 paginatedDemat.map((record) => (
                   <tr key={record.id} className="hover:bg-gray-50/50 transition-colors group">
                     <td className="px-6 py-4">
-                      <span className="text-sm font-mono text-gray-500">#{record.id}</span>
+                      <div className="flex items-center gap-1.5 font-bold text-gray-700 text-sm">
+                        <Hash className="w-3 h-3 text-gray-300" /> {record.id}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-1.5 font-bold text-gray-700 text-sm">
-                        <Hash className="w-3 h-3 text-gray-300" /> {record.user_id}
-                      </div>
+                      <span className="text-sm font-mono text-gray-600">{record.user_id}</span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -333,13 +294,20 @@ const DematManagement: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex justify-center">
+                      <div className="flex justify-center gap-2">
                         <button 
                           onClick={() => viewDematDetails(record)}
                           className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
                           title="View Details"
                         >
                           <Eye className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => refreshRecord(record)}
+                          className="p-2 text-green-500 hover:bg-green-50 rounded-lg transition-colors"
+                          title="Refresh"
+                        >
+                          <RotateCw className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -349,8 +317,8 @@ const DematManagement: React.FC = () => {
                 <tr>
                   <td colSpan={8} className="py-20 text-center text-gray-400">
                     <Shield className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                    <p className="text-sm font-medium">No demat records found</p>
-                    <p className="text-xs text-gray-400 mt-1">Enter a User ID above to fetch demat details</p>
+                    <p className="text-sm font-medium">No demat records fetched yet</p>
+                    <p className="text-xs text-gray-400 mt-1">Enter a Demat ID above to fetch details</p>
                   </td>
                 </tr>
               )}
@@ -395,7 +363,7 @@ const DematManagement: React.FC = () => {
               <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] px-6 py-4 text-white flex justify-between items-center">
                 <h3 className="font-bold text-lg flex items-center gap-2">
                   <Shield className="w-5 h-5" />
-                  Demat Details
+                  Demat Details #{selectedDemat.id}
                 </h3>
                 <button onClick={() => setViewModalOpen(false)}>
                   <X className="w-5 h-5 text-white/80 hover:text-white" />
@@ -419,12 +387,12 @@ const DematManagement: React.FC = () => {
                 {/* Details Grid */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-gray-50 rounded-xl p-3">
-                    <p className="text-[10px] font-black uppercase text-gray-400 mb-1">User ID</p>
-                    <p className="text-sm font-bold text-gray-900">#{selectedDemat.user_id}</p>
+                    <p className="text-[10px] font-black uppercase text-gray-400 mb-1">Demat ID</p>
+                    <p className="text-sm font-bold text-gray-900">#{selectedDemat.id}</p>
                   </div>
                   <div className="bg-gray-50 rounded-xl p-3">
-                    <p className="text-[10px] font-black uppercase text-gray-400 mb-1">Record ID</p>
-                    <p className="text-sm font-bold text-gray-900">#{selectedDemat.id}</p>
+                    <p className="text-[10px] font-black uppercase text-gray-400 mb-1">User ID</p>
+                    <p className="text-sm font-bold text-gray-900">#{selectedDemat.user_id}</p>
                   </div>
                   <div className="bg-gray-50 rounded-xl p-3">
                     <p className="text-[10px] font-black uppercase text-gray-400 mb-1">DP ID</p>

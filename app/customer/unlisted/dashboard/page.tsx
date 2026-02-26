@@ -65,10 +65,10 @@ import { useRouter } from 'next/navigation';
 
 // ==================== API SERVICE ====================
 
-const API_BASE = 'http://192.168.1.69:5000';
+const API_BASE = 'http://192.168.1.83:5000';
 
 const fetchDashboard = async () => {
-  // Get token from cookie (set by your login page)
+  // Get token from cookie (set by your login page) 
   const token = document.cookie
     .split('; ')
     .find(row => row.startsWith('authToken='))

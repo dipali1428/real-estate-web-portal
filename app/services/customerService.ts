@@ -5,7 +5,8 @@ import api from "./api";
 export interface ProfileData {
     id?: number;
     name: string;
-    email: string;
+    mobile: string;
+    email?: string;
     profile_image?: string;
 }
 
@@ -89,13 +90,25 @@ export interface KycStatusResponse {
     updated_at: string;
 }
 
-// ==================== DEMAT TYPES ====================
+export interface ProfileData {
+    id?: number;
+    name: string;
+    mobile: string;
+    email?: string;
+    profile_image?: string;
+    // Add any other fields your API returns
+}
+
+export interface UpdateProfilePayload {
+  name: string;
+  mobile: string;
+}
+
 export interface DematDetailsParams {
     dp_id: string;
     client_id: string;
     depository: string;
     demat_name: string;
-    // pan_number is NOT included as it's not in req.body
 }
 
 export interface DematDetailsResponse {
@@ -106,13 +119,12 @@ export interface DematDetailsResponse {
         client_id: string;
         depository: string;
         demat_name: string;
-        // pan_number may be returned but not sent
     };
 }
 
 // ==================== CUSTOMER SERVICE ====================
 
-export const CustomerService = {
+const CustomerService = {
     // ==================== DASHBOARD ====================
     getDashboard: async () => {
         const response = await api.get("/api/unlisted/user/dashboard");
@@ -154,16 +166,23 @@ export const CustomerService = {
         return response.data;
     },
 
-    updateProfile: async (profileData: ProfileData) => {
-        const response = await api.put("/api/unlisted/user/updateprofile", profileData);
-        return response.data;
-    },
+    //    * Update current user profile
+    //    * PUT → /api/unlisted/user/updateprofile
+    //    */
+        updateProfile: async (profileData: UpdateProfilePayload) => {
+            const response = await api.put(
+                "/api/unlisted/user/updateprofile", 
+                {
+                    name: profileData.name,
+                    mobile: profileData.mobile
+                }
+            );
+            return response.data;
+        },
 
     /**
      * Update Profile Image
      * PUT → /api/dashboard/profile/image
-     * Sending key: profile_photo, file
-     * Response: { message: "Profile image updated successfully", profile_image_url: url }
      */
     updateProfileImage: async (formData: FormData) => {
         const response = await api.put("/api/dashboard/profile/image", formData, {
@@ -171,7 +190,7 @@ export const CustomerService = {
                 'Content-Type': 'multipart/form-data',
             },
         });
-        return response.data; // Returns { message, profile_image_url }
+        return response.data;
     },
 
     deleteAccount: async () => {
@@ -184,28 +203,7 @@ export const CustomerService = {
         return response.data;
     },
 
-    // ==================== ORDERS ====================
-    getOrders: async () => {
-        const response = await api.get("/api/unlisted/user/orders");
-        return response.data;
-    },
-
-    placeBuyOrder: async (orderData: OrderData) => {
-        const response = await api.post("/api/unlisted/user/orders/buy", orderData);
-        return response.data;
-    },
-
-    placeSellOrder: async (orderData: OrderData) => {
-        const response = await api.post("/api/unlisted/user/orders/sell", orderData);
-        return response.data;
-    },
-
     // ==================== KYC VERIFICATION ====================
-
-    /**
-     * Verify PAN Card and Update Name as per PAN
-     * POST → /api/dashboard/verify-pan
-     */
     verifyPan: async (params: PanVerificationParams): Promise<PanVerificationResponse> => {
         const response = await api.post("/api/dashboard/verify-pan", {
             pan: params.pan,
@@ -215,28 +213,16 @@ export const CustomerService = {
         return response.data;
     },
 
-    /**
-     * Generate Aadhaar OTP
-     * POST → /api/dashboard/aadhaar/generate-otp
-     */
     generateAadhaarOtp: async (aadhaar_number: string) => {
         const response = await api.post("/api/dashboard/aadhaar/generate-otp", { aadhaar_number });
         return response.data;
     },
 
-    /**
-     * Verify Aadhaar OTP
-     * POST → /api/dashboard/aadhaar/verify-otp
-     */
     verifyAadhaarOtp: async (payload: { reference_id: string; otp: string; aadhaar_number: string }) => {
         const response = await api.post("/api/dashboard/aadhaar/verify-otp", payload);
         return response.data;
     },
 
-    /**
-     * Verify Bank Account (Penny Drop)
-     * POST → /api/dashboard/verify-bank
-     */
     verifyBankPennyDrop: async (params: BankVerificationParams): Promise<BankVerificationResponse> => {
         const response = await api.post("/api/dashboard/verify-bank", {
             bank_name: params.bank_name,
@@ -246,65 +232,19 @@ export const CustomerService = {
         return response.data;
     },
 
-    /**
-     * Get KYC Status
-     * GET → /api/dashboard/kyc/status
-     */
     getKycStatus: async (): Promise<KycStatusResponse> => {
         const response = await api.get("/api/dashboard/kyc/status");
         return response.data;
     },
 
     // ==================== DEMAT ACCOUNT ====================
-
-    /**
-     * Add Demat Account
-     * POST → /api/dashboard/demat/add
-     * Body: { dp_id, client_id, depository, demat_name }
-     */
     addDematAccount: async (dematDetails: DematDetailsParams): Promise<DematDetailsResponse> => {
-        console.log('Adding demat account with:', dematDetails);
-        
         const response = await api.post("/api/unlisted/user/demat/add", {
             dp_id: dematDetails.dp_id,
             client_id: dematDetails.client_id,
             depository: dematDetails.depository,
             demat_name: dematDetails.demat_name
-            // pan_number is intentionally omitted as it's not in req.body
         });
-        
-        return response.data;
-    },
-
-    /**
-     * Get Demat Account Details
-     * GET → /api/dashboard/demat/details
-     */
-    getDematDetails: async (): Promise<DematDetailsResponse> => {
-        const response = await api.get("/api/unlisted/user/demat/details");
-        return response.data;
-    },
-
-    /**
-     * Update Demat Account
-     * PUT → /api/dashboard/demat/update
-     */
-    updateDematAccount: async (dematDetails: DematDetailsParams): Promise<DematDetailsResponse> => {
-        const response = await api.put("/api/unlisted/user/demat/update", {
-            dp_id: dematDetails.dp_id,
-            client_id: dematDetails.client_id,
-            depository: dematDetails.depository,
-            demat_name: dematDetails.demat_name
-        });
-        return response.data;
-    },
-
-    /**
-     * Delete Demat Account
-     * DELETE → /api/dashboard/demat/delete
-     */
-    deleteDematAccount: async (): Promise<{ status: string; message: string }> => {
-        const response = await api.delete("/api/unlisted/user/demat/delete");
         return response.data;
     },
 

@@ -144,14 +144,19 @@ export default function KYCVerificationPage() {
             ifsc_code: profileData.ifsc || ''
           });
           
-          // Set PAN verification status from profile
+          // Set verification statuses
           if (profileData.pan_verified) {
             setPanStatus('VERIFIED');
           }
           
-          // Note: Bank and Aadhaar verification status would need to come from
-          // a separate KYC endpoint which you don't have. For now, we'll assume
-          // they are not verified unless we have another way to determine this.
+          // You might want to check if these fields exist to set status
+          if (profileData.aadhaar) {
+            setAadhaarStatus('VERIFIED');
+          }
+          
+          if (profileData.bank_name && profileData.bank_account && profileData.ifsc) {
+            setBankStatus('VERIFIED');
+          }
         }
       } catch (error) {
         console.error('Failed to fetch profile:', error);
@@ -378,37 +383,8 @@ export default function KYCVerificationPage() {
   };
 
   // ========== SAVE ALL CHANGES ==========
-  const handleSaveAllChanges = async () => {
-    if (!profile) return;
-    
-    setSaving(true);
-    try {
-      // Update profile with all the edited details
-      const updatedProfile = {
-        id: profile.id,
-        name: profile.name,
-        email: profile.email,
-        pan: panDetails.pan,
-        name_as_per_pan: panDetails.name_as_per_pan,
-        date_of_birth: panDetails.date_of_birth,
-        aadhaar: aadhaarNumber,
-        bank_name: bankDetails.bank_name,
-        bank_account: bankDetails.bank_account_number,
-        ifsc: bankDetails.ifsc_code
-      };
-      
-      const response = await CustomerService.updateProfile(updatedProfile);
-      
-      if (response) {
-        triggerPopup('All changes saved successfully!', 'success');
-      }
-    } catch (error: any) {
-      console.error('Save error:', error);
-      triggerPopup(error.response?.data?.message || 'Failed to save changes', 'error');
-    } finally {
-      setSaving(false);
-    }
-  };
+  // NOTE: This function is kept but not used. Each section saves independently.
+  // If you need a global save, you'll need a new API endpoint that accepts all KYC data.
 
   // ==================== HELPER FUNCTIONS ====================
 
@@ -506,443 +482,436 @@ export default function KYCVerificationPage() {
         </div>
       </div>
 
-<div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-
-  {/* PAN Verification Card - Step 1 */}
-  <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-          <CreditCard className="w-6 h-6 text-blue-600" />
-        </div>
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
-              Step 1 of 4
-            </span>
-            <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
-              panStatus === 'VERIFIED' 
-                ? "text-emerald-600 bg-emerald-50 border border-emerald-100" 
-                : panStatus === 'FAILED'
-                ? "text-rose-600 bg-rose-50 border border-rose-100"
-                : "text-amber-600 bg-amber-50 border border-amber-100"
-            }`}>
-              {panStatus === 'VERIFIED' ? "Verified" : panStatus === 'FAILED' ? "Failed" : "Pending"}
-            </span>
-          </div>
-          <h3 className="text-lg font-bold text-slate-900">PAN Card Verification</h3>
-          <p className="text-xs text-slate-500">Verify your PAN card for tax compliance</p>
-        </div>
-      </div>
-    </div>
-
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-1">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">PAN Number</label>
-          <input
-            className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100 uppercase"
-            value={panDetails.pan}
-            placeholder="ABCDE1234F"
-            maxLength={10}
-            onChange={(e) => setPanDetails({...panDetails, pan: e.target.value.toUpperCase()})}
-            disabled={panStatus === 'VERIFIED'}
-          />
-        </div>
-
-        {panStatus !== 'VERIFIED' && (
-          <>
-            <div className="md:col-span-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Full Name as per PAN</label>
-              <input
-                className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
-                value={panDetails.name_as_per_pan}
-                placeholder="Enter your full name"
-                onChange={(e) => setPanDetails({...panDetails, name_as_per_pan: e.target.value})}
-              />
-            </div>
-
-            <div className="md:col-span-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Date of Birth</label>
-              <div className="flex gap-2">
-                <input
-                  type="date"
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
-                  value={panDetails.date_of_birth}
-                  onChange={(e) => setPanDetails({...panDetails, date_of_birth: e.target.value})}
-                />
-                <button
-                  onClick={handleVerifyPan}
-                  disabled={loadingSection === 'pan' || !panDetails.pan}
-                  className="px-6 bg-[#1CADA3] hover:bg-[#158f87] text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-50 whitespace-nowrap"
-                >
-                  {loadingSection === 'pan' ? "Verifying..." : "Verify PAN"}
-                </button>
+        {/* PAN Verification Card - Step 1 */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                <CreditCard className="w-6 h-6 text-blue-600" />
               </div>
-            </div>
-          </>
-        )}
-
-        {panStatus === 'VERIFIED' && (
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-4 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-              <CheckCircle2 className="text-emerald-500 w-5 h-5" />
               <div>
-                <p className="text-sm font-bold text-emerald-800">PAN Verified Successfully</p>
-                <p className="text-xs text-emerald-600">PAN: {panDetails.pan}</p>
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
+                    Step 1 of 4
+                  </span>
+                  <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
+                    panStatus === 'VERIFIED' 
+                      ? "text-emerald-600 bg-emerald-50 border border-emerald-100" 
+                      : panStatus === 'FAILED'
+                      ? "text-rose-600 bg-rose-50 border border-rose-100"
+                      : "text-amber-600 bg-amber-50 border border-amber-100"
+                  }`}>
+                    {panStatus === 'VERIFIED' ? "Verified" : panStatus === 'FAILED' ? "Failed" : "Pending"}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900">PAN Card Verification</h3>
+                <p className="text-xs text-slate-500">Verify your PAN card for tax compliance</p>
               </div>
             </div>
           </div>
-        )}
-      </div>
-      
-      {/* Disclaimer */}
-      {panStatus !== 'VERIFIED' && (
-        <p className="text-[10px] text-amber-600 bg-amber-50 p-3 rounded-xl border border-amber-100">
-          * Upon verification, your name will be updated as per PAN card records
-        </p>
-      )}
-    </div>
-  </div>
 
-  {/* Aadhaar Verification Card - Step 2 */}
-  <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-          <Fingerprint className="w-6 h-6 text-purple-600" />
-        </div>
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
-              Step 2 of 4
-            </span>
-            <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
-              aadhaarStatus === 'VERIFIED' 
-                ? "text-emerald-600 bg-emerald-50 border border-emerald-100" 
-                : aadhaarStatus === 'FAILED'
-                ? "text-rose-600 bg-rose-50 border border-rose-100"
-                : "text-amber-600 bg-amber-50 border border-amber-100"
-            }`}>
-              {aadhaarStatus === 'VERIFIED' ? "Verified" : aadhaarStatus === 'FAILED' ? "Failed" : "Pending"}
-            </span>
-          </div>
-          <h3 className="text-lg font-bold text-slate-900">Aadhaar Authentication</h3>
-          <p className="text-xs text-slate-500">Verify your Aadhaar for identity proof</p>
-        </div>
-      </div>
-    </div>
-
-    <div className="space-y-4">
-      {!otpSent && aadhaarStatus !== 'VERIFIED' && (
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Aadhaar Number</label>
-            <input
-              className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
-              value={aadhaarNumber}
-              placeholder="Enter 12 digit Aadhaar number"
-              maxLength={12}
-              onChange={(e) => setAadhaarNumber(e.target.value.replace(/\D/g, ''))}
-            />
-          </div>
-          <div className="flex items-end">
-            <button
-              onClick={handleGenerateAadhaarOtp}
-              disabled={loadingSection === 'aadhaar-otp' || aadhaarNumber.length !== 12}
-              className="px-8 py-2.5 bg-[#1CADA3] hover:bg-[#158f87] text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-50 shadow-sm"
-            >
-              {loadingSection === 'aadhaar-otp' ? "Sending OTP..." : "Send OTP"}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {aadhaarStatus === 'VERIFIED' && (
-        <div className="flex items-center gap-4 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-          <CheckCircle2 className="text-emerald-500 w-5 h-5" />
-          <div>
-            <p className="text-sm font-bold text-emerald-800">Aadhaar Verified Successfully</p>
-            <p className="text-xs text-emerald-600">Aadhaar: •••• •••• {aadhaarNumber?.slice(-4)}</p>
-          </div>
-        </div>
-      )}
-
-      {otpSent && (
-        <div className="space-y-4">
-          <div>
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Enter OTP</label>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="text"
-                placeholder="Enter 6-digit OTP"
-                maxLength={6}
-                value={otp.join('')}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, '');
-                  const newOtp = [...Array(6)].map((_, i) => val[i] || '');
-                  setOtp(newOtp);
-                }}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium border border-[#1CADA3] outline-none bg-emerald-50/30 focus:ring-2 focus:ring-emerald-100"
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={handleVerifyAadhaarOtp}
-                  disabled={loadingSection === 'aadhaar-verify' || otp.join('').length < 6}
-                  className="px-6 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl disabled:opacity-50 shadow-sm hover:bg-emerald-700 transition-colors"
-                >
-                  {loadingSection === 'aadhaar-verify' ? "Verifying..." : "Verify OTP"}
-                </button>
-                <button
-                  onClick={() => {
-                    setOtpSent(false);
-                    setOtp(['', '', '', '', '', '']);
-                    setReferenceId(null);
-                  }}
-                  className="px-4 py-2.5 border border-rose-200 text-rose-600 text-xs font-bold rounded-xl hover:bg-rose-50 transition-colors"
-                >
-                  Edit
-                </button>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">PAN Number</label>
+                <input
+                  className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100 uppercase"
+                  value={panDetails.pan}
+                  placeholder="ABCDE1234F"
+                  maxLength={10}
+                  onChange={(e) => setPanDetails({...panDetails, pan: e.target.value.toUpperCase()})}
+                  disabled={panStatus === 'VERIFIED'}
+                />
               </div>
+
+              {panStatus !== 'VERIFIED' && (
+                <>
+                  <div className="md:col-span-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Full Name as per PAN</label>
+                    <input
+                      className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                      value={panDetails.name_as_per_pan}
+                      placeholder="Enter your full name"
+                      onChange={(e) => setPanDetails({...panDetails, name_as_per_pan: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="md:col-span-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Date of Birth</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="date"
+                        className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                        value={panDetails.date_of_birth}
+                        onChange={(e) => setPanDetails({...panDetails, date_of_birth: e.target.value})}
+                      />
+                      <button
+                        onClick={handleVerifyPan}
+                        disabled={loadingSection === 'pan' || !panDetails.pan}
+                        className="px-6 bg-[#1CADA3] hover:bg-[#158f87] text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-50 whitespace-nowrap"
+                      >
+                        {loadingSection === 'pan' ? "Verifying..." : "Verify PAN"}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {panStatus === 'VERIFIED' && (
+                <div className="md:col-span-2">
+                  <div className="flex items-center gap-4 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                    <CheckCircle2 className="text-emerald-500 w-5 h-5" />
+                    <div>
+                      <p className="text-sm font-bold text-emerald-800">PAN Verified Successfully</p>
+                      <p className="text-xs text-emerald-600">PAN: {panDetails.pan}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Disclaimer */}
+            {panStatus !== 'VERIFIED' && (
+              <p className="text-[10px] text-amber-600 bg-amber-50 p-3 rounded-xl border border-amber-100">
+                * Upon verification, your name will be updated as per PAN card records
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Aadhaar Verification Card - Step 2 */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+                <Fingerprint className="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
+                    Step 2 of 4
+                  </span>
+                  <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
+                    aadhaarStatus === 'VERIFIED' 
+                      ? "text-emerald-600 bg-emerald-50 border border-emerald-100" 
+                      : aadhaarStatus === 'FAILED'
+                      ? "text-rose-600 bg-rose-50 border border-rose-100"
+                      : "text-amber-600 bg-amber-50 border border-amber-100"
+                  }`}>
+                    {aadhaarStatus === 'VERIFIED' ? "Verified" : aadhaarStatus === 'FAILED' ? "Failed" : "Pending"}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900">Aadhaar Authentication</h3>
+                <p className="text-xs text-slate-500">Verify your Aadhaar for identity proof</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {!otpSent && aadhaarStatus !== 'VERIFIED' && (
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Aadhaar Number</label>
+                  <input
+                    className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    value={aadhaarNumber}
+                    placeholder="Enter 12 digit Aadhaar number"
+                    maxLength={12}
+                    onChange={(e) => setAadhaarNumber(e.target.value.replace(/\D/g, ''))}
+                  />
+                </div>
+                <div className="flex items-end">
+                  <button
+                    onClick={handleGenerateAadhaarOtp}
+                    disabled={loadingSection === 'aadhaar-otp' || aadhaarNumber.length !== 12}
+                    className="px-8 py-2.5 bg-[#1CADA3] hover:bg-[#158f87] text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-50 shadow-sm"
+                  >
+                    {loadingSection === 'aadhaar-otp' ? "Sending OTP..." : "Send OTP"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {aadhaarStatus === 'VERIFIED' && (
+              <div className="flex items-center gap-4 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                <CheckCircle2 className="text-emerald-500 w-5 h-5" />
+                <div>
+                  <p className="text-sm font-bold text-emerald-800">Aadhaar Verified Successfully</p>
+                  <p className="text-xs text-emerald-600">Aadhaar: •••• •••• {aadhaarNumber?.slice(-4)}</p>
+                </div>
+              </div>
+            )}
+
+            {otpSent && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Enter OTP</label>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      type="text"
+                      placeholder="Enter 6-digit OTP"
+                      maxLength={6}
+                      value={otp.join('')}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '');
+                        const newOtp = [...Array(6)].map((_, i) => val[i] || '');
+                        setOtp(newOtp);
+                      }}
+                      className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium border border-[#1CADA3] outline-none bg-emerald-50/30 focus:ring-2 focus:ring-emerald-100"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleVerifyAadhaarOtp}
+                        disabled={loadingSection === 'aadhaar-verify' || otp.join('').length < 6}
+                        className="px-6 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl disabled:opacity-50 shadow-sm hover:bg-emerald-700 transition-colors"
+                      >
+                        {loadingSection === 'aadhaar-verify' ? "Verifying..." : "Verify OTP"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setOtpSent(false);
+                          setOtp(['', '', '', '', '', '']);
+                          setReferenceId(null);
+                        }}
+                        className="px-4 py-2.5 border border-rose-200 text-rose-600 text-xs font-bold rounded-xl hover:bg-rose-50 transition-colors"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                {otpExpiry && (
+                  <div className="flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-50 p-3 rounded-xl">
+                    <Clock className="w-4 h-4" />
+                    <span>OTP expires in {Math.max(0, Math.floor((otpExpiry - Date.now()) / 1000))} seconds</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Bank Verification Card - Step 3 */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                <Landmark className="w-6 h-6 text-emerald-600" />
+              </div>
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
+                    Step 3 of 4
+                  </span>
+                  <span className={`flex items-center gap-1 text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
+                    bankStatus === 'VERIFIED' 
+                      ? "text-emerald-600 bg-emerald-50 border border-emerald-100" 
+                      : "text-amber-600 bg-amber-50 border border-amber-100"
+                  }`}>
+                    {bankStatus === 'VERIFIED' ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />} 
+                    {bankStatus === 'VERIFIED' ? "Verified" : "Pending Verification"}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900">Bank Account Verification</h3>
+                <p className="text-xs text-slate-500">Verify your bank account to enable transactions</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Bank Name</label>
+              <input 
+                value={bankDetails.bank_name} 
+                onChange={(e) => setBankDetails({...bankDetails, bank_name: e.target.value})} 
+                placeholder="Enter Bank Name" 
+                className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100" 
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Account Number</label>
+              <input 
+                value={bankDetails.bank_account_number} 
+                onChange={(e) => setBankDetails({...bankDetails, bank_account_number: e.target.value.replace(/\D/g, '')})} 
+                placeholder="Enter Account Number" 
+                className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100" 
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">IFSC Code</label>
+              <div className="relative">
+                <input 
+                  value={bankDetails.ifsc_code} 
+                  onChange={(e) => setBankDetails({...bankDetails, ifsc_code: e.target.value.toUpperCase()})} 
+                  placeholder="Enter IFSC Code" 
+                  className="w-full px-4 py-2.5 rounded-xl text-sm font-medium tracking-widest text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100 pr-10" 
+                />
+                {fetchingBankDetails && (
+                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 animate-spin" />
+                )}
+              </div>
+              
             </div>
           </div>
           
-          {otpExpiry && (
-            <div className="flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-50 p-3 rounded-xl">
-              <Clock className="w-4 h-4" />
-              <span>OTP expires in {Math.max(0, Math.floor((otpExpiry - Date.now()) / 1000))} seconds</span>
+          {/* Info Notice */}
+          <div className="mt-4 flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-100">
+            <Info className="text-amber-600 w-4 h-4 flex-shrink-0 mt-0.5" />
+            <p className="text-xs font-medium text-amber-700">
+              We'll deposit ₹1.00 to verify your account. This amount will be refunded within 24 hours.
+            </p>
+          </div>
+
+          {/* Bank Verified Status */}
+          {bankStatus === 'VERIFIED' && (
+            <div className="mt-4 flex items-center gap-3 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+              <CheckCircle2 className="text-emerald-500 w-5 h-5 flex-shrink-0" />
+              <span className="text-emerald-700 font-bold text-sm">Bank account verified successfully</span>
+            </div>
+          )}
+
+          {/* Verify Button */}
+          {bankStatus !== 'VERIFIED' && bankDetails.bank_account_number && bankDetails.ifsc_code && (
+            <div className="mt-4 flex justify-end">
+              <button 
+                disabled={loadingSection === 'bank'} 
+                onClick={handleVerifyBank} 
+                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black rounded-xl uppercase flex items-center gap-2 shadow-sm disabled:opacity-70 transition-all"
+              >
+                {loadingSection === 'bank' ? (
+                  <><Loader2 size={14} className="animate-spin" />Verifying…</>
+                ) : (
+                  <><CheckCircle2 size={14} />Verify Bank Account</>
+                )}
+              </button>
             </div>
           )}
         </div>
-      )}
-    </div>
-  </div>
 
-  {/* Bank Verification Card - Step 3 */}
-  <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-          <Landmark className="w-6 h-6 text-emerald-600" />
-        </div>
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
-              Step 3 of 4
-            </span>
-            <span className={`flex items-center gap-1 text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
-              bankStatus === 'VERIFIED' 
-                ? "text-emerald-600 bg-emerald-50 border border-emerald-100" 
-                : "text-amber-600 bg-amber-50 border border-amber-100"
-            }`}>
-              {bankStatus === 'VERIFIED' ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />} 
-              {bankStatus === 'VERIFIED' ? "Verified" : "Pending Verification"}
-            </span>
+        {/* Demat Account Card - Step 4 */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
+                <Database className="w-6 h-6 text-indigo-600" />
+              </div>
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
+                    Step 4 of 4
+                  </span>
+                  {dematAdded && (
+                    <span className="flex items-center gap-1 text-[10px] font-black uppercase px-2.5 py-1 rounded-full text-emerald-600 bg-emerald-50 border border-emerald-100">
+                      <CheckCircle2 size={12} />
+                      Added
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-lg font-bold text-slate-900">Demat Account</h3>
+                <p className="text-xs text-slate-500">Link your Demat account for trading</p>
+              </div>
+            </div>
           </div>
-          <h3 className="text-lg font-bold text-slate-900">Bank Account Verification</h3>
-          <p className="text-xs text-slate-500">Verify your bank account to enable transactions</p>
-        </div>
-      </div>
-    </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div>
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Bank Name</label>
-        <input 
-          value={bankDetails.bank_name} 
-          onChange={(e) => setBankDetails({...bankDetails, bank_name: e.target.value})} 
-          placeholder="Enter Bank Name" 
-          className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100" 
-        />
-      </div>
-      <div>
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Account Number</label>
-        <input 
-          value={bankDetails.bank_account_number} 
-          onChange={(e) => setBankDetails({...bankDetails, bank_account_number: e.target.value.replace(/\D/g, '')})} 
-          placeholder="Enter Account Number" 
-          className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100" 
-        />
-      </div>
-      <div>
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">IFSC Code</label>
-        <div className="relative">
-          <input 
-            value={bankDetails.ifsc_code} 
-            onChange={(e) => setBankDetails({...bankDetails, ifsc_code: e.target.value.toUpperCase()})} 
-            placeholder="Enter IFSC Code" 
-            className="w-full px-4 py-2.5 rounded-xl text-sm font-medium tracking-widest text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100 pr-10" 
-          />
-          {fetchingBankDetails && (
-            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 animate-spin" />
-          )}
-        </div>
-      </div>
-    </div>
-    
-    {/* Info Notice */}
-    <div className="mt-4 flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-100">
-      <Info className="text-amber-600 w-4 h-4 flex-shrink-0 mt-0.5" />
-      <p className="text-xs font-medium text-amber-700">
-        We'll deposit ₹1.00 to verify your account. This amount will be refunded within 24 hours.
-      </p>
-    </div>
-
-    {/* Bank Verified Status */}
-    {bankStatus === 'VERIFIED' && (
-      <div className="mt-4 flex items-center gap-3 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-        <CheckCircle2 className="text-emerald-500 w-5 h-5 flex-shrink-0" />
-        <span className="text-emerald-700 font-bold text-sm">Bank account verified successfully</span>
-      </div>
-    )}
-
-    {/* Verify Button */}
-    {bankStatus !== 'VERIFIED' && bankDetails.bank_account_number && bankDetails.ifsc_code && (
-      <div className="mt-4 flex justify-end">
-        <button 
-          disabled={loadingSection === 'bank'} 
-          onClick={handleVerifyBank} 
-          className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black rounded-xl uppercase flex items-center gap-2 shadow-sm disabled:opacity-70 transition-all"
-        >
-          {loadingSection === 'bank' ? (
-            <><Loader2 size={14} className="animate-spin" />Verifying…</>
+          {dematAdded ? (
+            <div className="flex items-center gap-4 p-6 bg-emerald-50 rounded-xl border border-emerald-100">
+              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+              </div>
+              <div>
+                <h4 className="text-base font-bold text-emerald-800">Demat Account Added Successfully!</h4>
+                <p className="text-sm text-emerald-600">Your demat account has been linked to your profile.</p>
+              </div>
+            </div>
           ) : (
-            <><CheckCircle2 size={14} />Verify Bank Account</>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                    DP ID <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={dematDetails.dp_id}
+                    onChange={(e) => setDematDetails({...dematDetails, dp_id: e.target.value})}
+                    className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    placeholder="Enter DP ID"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                    Client ID <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={dematDetails.client_id}
+                    onChange={(e) => setDematDetails({...dematDetails, client_id: e.target.value})}
+                    className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    placeholder="Enter Client ID"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                    Depository <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={dematDetails.depository}
+                    onChange={(e) => setDematDetails({...dematDetails, depository: e.target.value})}
+                    className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  >
+                    <option value="NSDL">NSDL</option>
+                    <option value="CDSL">CDSL</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                    Name on Demat <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={dematDetails.demat_name}
+                    onChange={(e) => setDematDetails({...dematDetails, demat_name: e.target.value.toUpperCase()})}
+                    className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    placeholder="Enter Name as per Demat Account"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <Info className="text-blue-600 w-4 h-4 flex-shrink-0 mt-0.5" />
+                <p className="text-xs font-medium text-blue-700">
+                  Ensure all details match your official Demat account records exactly as they appear on your statement.
+                </p>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  onClick={handleAddDemat}
+                  disabled={savingDemat}
+                  className="px-8 py-3 bg-[#1CADA3] text-white rounded-xl font-bold text-sm hover:bg-[#158f87] transition-all disabled:opacity-50 flex items-center gap-2 shadow-md"
+                >
+                  {savingDemat ? (
+                    <><Loader2 className="animate-spin w-4 h-4" />Saving Demat...</>
+                  ) : (
+                    <><Save className="w-4 h-4" />Save Demat Account</>
+                  )}
+                </button>
+              </div>
+            </div>
           )}
-        </button>
-      </div>
-    )}
-  </div>
-
-  {/* Demat Account Card - Step 4 */}
-  <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
-          <Database className="w-6 h-6 text-indigo-600" />
-        </div>
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
-              Step 4 of 4
-            </span>
-            {dematAdded && (
-              <span className="flex items-center gap-1 text-[10px] font-black uppercase px-2.5 py-1 rounded-full text-emerald-600 bg-emerald-50 border border-emerald-100">
-                <CheckCircle2 size={12} />
-                Added
-              </span>
-            )}
-          </div>
-          <h3 className="text-lg font-bold text-slate-900">Demat Account</h3>
-          <p className="text-xs text-slate-500">Link your Demat account for trading</p>
-        </div>
-      </div>
-    </div>
-
-    {dematAdded ? (
-      <div className="flex items-center gap-4 p-6 bg-emerald-50 rounded-xl border border-emerald-100">
-        <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
-          <CheckCircle2 className="w-6 h-6 text-emerald-600" />
-        </div>
-        <div>
-          <h4 className="text-base font-bold text-emerald-800">Demat Account Added Successfully!</h4>
-          <p className="text-sm text-emerald-600">Your demat account has been linked to your profile.</p>
-        </div>
-      </div>
-    ) : (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
-              DP ID <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={dematDetails.dp_id}
-              onChange={(e) => setDematDetails({...dematDetails, dp_id: e.target.value})}
-              className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
-              placeholder="Enter DP ID"
-            />
-          </div>
-          <div>
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
-              Client ID <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={dematDetails.client_id}
-              onChange={(e) => setDematDetails({...dematDetails, client_id: e.target.value})}
-              className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
-              placeholder="Enter Client ID"
-            />
-          </div>
-          <div>
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
-              Depository <span className="text-rose-500">*</span>
-            </label>
-            <select
-              value={dematDetails.depository}
-              onChange={(e) => setDematDetails({...dematDetails, depository: e.target.value})}
-              className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
-            >
-              <option value="NSDL">NSDL</option>
-              <option value="CDSL">CDSL</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
-              Name on Demat <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={dematDetails.demat_name}
-              onChange={(e) => setDematDetails({...dematDetails, demat_name: e.target.value.toUpperCase()})}
-              className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
-              placeholder="Enter Name as per Demat Account"
-            />
-          </div>
         </div>
 
-        <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
-          <Info className="text-blue-600 w-4 h-4 flex-shrink-0 mt-0.5" />
-          <p className="text-xs font-medium text-blue-700">
-            Ensure all details match your official Demat account records exactly as they appear on your statement.
+        {/* Note: Global Save Button Removed - Each section saves independently */}
+        <div className="flex justify-end pt-4">
+          <p className="text-xs text-slate-400">
+            Each section saves automatically when you click Verify/Add
           </p>
         </div>
 
-        <div className="flex justify-end">
-          <button
-            onClick={handleAddDemat}
-            disabled={savingDemat}
-            className="px-8 py-3 bg-[#1CADA3] text-white rounded-xl font-bold text-sm hover:bg-[#158f87] transition-all disabled:opacity-50 flex items-center gap-2 shadow-md"
-          >
-            {savingDemat ? (
-              <><Loader2 className="animate-spin w-4 h-4" />Saving Demat...</>
-            ) : (
-              <><Save className="w-4 h-4" />Save Demat Account</>
-            )}
-          </button>
-        </div>
       </div>
-    )}
-  </div>
-
-  {/* Global Save Button */}
-  <div className="flex justify-end pt-4">
-    <button
-      onClick={handleSaveAllChanges}
-      disabled={saving}
-      className="px-8 py-3 bg-[#1CADA3] text-white rounded-xl font-bold text-base hover:bg-[#158f87] transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg"
-    >
-      {saving ? (
-        <><Loader2 className="animate-spin w-5 h-5" />Saving All Changes...</>
-      ) : (
-        <><Save className="w-5 h-5" />Save All Changes</>
-      )}
-    </button>
-  </div>
-</div>
     </main>
   );
 }

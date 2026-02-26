@@ -8,36 +8,21 @@ import {
   Shield,
   CheckCircle,
   AlertCircle,
-  Clock,
   Loader2,
   Edit2,
   Save,
-  Info,
   X,
   Copy,
   Check,
-  LogOut,
   XCircle,
-  Home,
   Key,
   Eye,
   EyeOff,
   Trash2,
-  AlertTriangle,
   Bell,
   Lock,
   Camera,
-  Upload,
   ArrowLeft,
-  Building2,
-  BadgeCheck,
-  Database,
-  Fingerprint,
-  Smartphone,
-  Hash,
-  CreditCard,
-  Landmark,
-  ShieldCheck,
   ChevronRight
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -45,16 +30,15 @@ import { motion } from 'framer-motion';
 import customerService from '../../../services/customerService';
 
 // ==================== TYPES ====================
-
 interface ProfileData {
   id?: number;
   name: string;
-  email: string;
+  mobile: string;
+  email?: string;
   profile_image?: string;
 }
 
 // ==================== HELPER FUNCTIONS ====================
-
 const getTokenFromCookie = (): string | null => {
   if (typeof document === 'undefined') return null;
   const cookies = document.cookie.split('; ');
@@ -67,7 +51,6 @@ const removeTokenCookie = () => {
 };
 
 // ==================== MAIN COMPONENT ====================
-
 export default function ProfilePage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -99,11 +82,11 @@ export default function ProfilePage() {
   const [updatingPassword, setUpdatingPassword] = useState(false);
   const [notifications, setNotifications] = useState<{ id: number; message: string; type: 'success' | 'error' | 'info' }[]>([]);
 
-  // Get completed steps count for progress
+  // ========== COMPLETED STEPS ==========
   const getCompletedSteps = () => {
     let count = 0;
-    if (profile?.email) count++;
-    if (profile?.name) count++;
+    if (profile?.mobile && profile.mobile.trim() !== '') count++;
+    if (profile?.name && profile.name.trim() !== '') count++;
     if (profile?.profile_image) count++;
     return count;
   };
@@ -145,26 +128,49 @@ export default function ProfilePage() {
 
         localStorage.setItem('token', token);
         
-        const profileData = await customerService.getProfile();
-        console.log('Profile data from API:', profileData);
+        const response = await customerService.getProfile();
+        console.log('🔍 Full API Response:', response);
         
         if (!isMounted) return;
         
-        if (profileData) {
-          const storedImageUrl = localStorage.getItem('profile_image_url');
+        if (response) {
+          // Handle different response structures
+          let profileData = response;
           
-          if (storedImageUrl && !profileData.profile_image) {
-            profileData.profile_image = storedImageUrl;
+          // If response has a data property, use that
+          if (response.data) {
+            profileData = response.data;
           }
           
-          setProfile(profileData);
-          setOriginalProfile(profileData);
+          // If response has a user property, use that
+          if (response.user) {
+            profileData = response.user;
+          }
+          
+          console.log('🔍 Mapped Profile Data:', profileData);
+          
+          const storedImageUrl = localStorage.getItem('profile_image_url');
+          
+          // Create profile object with proper mapping
+          const mappedProfile: ProfileData = {
+            id: profileData.id || profileData.user_id,
+            name: profileData.name || profileData.full_name || '',
+            mobile: profileData.mobile || profileData.phone || profileData.mobile_number || '',
+            email: profileData.email || '',
+            profile_image: storedImageUrl || profileData.profile_image || profileData.avatar || profileData.profile_pic
+          };
+          
+          console.log('🔍 Final Mapped Profile:', mappedProfile);
+          
+          setProfile(mappedProfile);
+          setOriginalProfile(mappedProfile);
         } else {
           setError('Failed to load profile data');
         }
 
       } catch (err: any) {
         if (!isMounted) return;
+        console.error('🔴 Fetch Error:', err);
         
         if (err.response?.status === 401) {
           removeTokenCookie();
@@ -207,38 +213,85 @@ export default function ProfilePage() {
   }, [passwordData.newPassword]);
 
   // ========== HANDLE PROFILE UPDATE ==========
-  const handleProfileUpdate = async (e: React.FormEvent) => {
+  const handleProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    if (!profile) return;
-    
-    setUpdating(true);
-    setError(null);
-    
+
+    if (!profile) {
+      showNotification('Profile data not found', 'error');
+      return;
+    }
+
+    if (!profile.name?.trim()) {
+      showNotification('Name is required', 'error');
+      return;
+    }
+
+    if (!profile.mobile?.trim()) {
+      showNotification('Mobile number is required', 'error');
+      return;
+    }
+
+    if (!/^\d{10}$/.test(profile.mobile)) {
+      showNotification('Please enter a valid 10-digit mobile number', 'error');
+      return;
+    }
+
     try {
-      const response = await customerService.updateProfile({
-        id: profile.id,
-        name: profile.name,
-        email: profile.email
-      });
+      setUpdating(true);
       
-      if (response) {
-        setOriginalProfile(profile);
+      console.log('📤 Sending update:', {
+        name: profile.name,
+        mobile: profile.mobile
+      });
+
+      const response = await customerService.updateProfile({
+        name: profile.name,
+        mobile: profile.mobile,
+      });
+
+      console.log('📥 Update response:', response);
+
+      if (response?.success || response?.message?.includes('success')) {
         setIsEditing(false);
-        showNotification('Profile updated successfully!', 'success');
+        setOriginalProfile(profile);
+        showNotification(response.message || 'Profile updated successfully!', 'success');
+        
+        // Refresh profile data
+        const refreshedResponse = await customerService.getProfile();
+        if (refreshedResponse) {
+          let refreshedData = refreshedResponse;
+          if (refreshedResponse.data) {
+            refreshedData = refreshedResponse.data;
+          }
+          
+          const refreshedProfile: ProfileData = {
+            id: refreshedData.id || profile.id,
+            name: refreshedData.name || profile.name,
+            mobile: refreshedData.mobile || profile.mobile,
+            email: refreshedData.email || profile.email,
+            profile_image: profile.profile_image
+          };
+          
+          setProfile(refreshedProfile);
+          setOriginalProfile(refreshedProfile);
+        }
+      } else {
+        showNotification('Failed to update profile', 'error');
       }
-    } catch (err: any) {
-      if (err.response?.status === 401) {
+
+    } catch (error: any) {
+      console.error('❌ Update failed:', error);
+      console.error('❌ Error details:', error.response?.data);
+      
+      if (error.response?.status === 401) {
         showNotification('Session expired. Please login again.', 'error');
         removeTokenCookie();
         localStorage.removeItem('token');
         localStorage.removeItem('profile_image_url');
         router.push('/');
-      } else if (err.response?.status === 400) {
-        setError(err.response.data?.message || 'Invalid data provided');
-        showNotification('Validation error', 'error');
+      } else if (error.response?.status === 400) {
+        showNotification(error.response.data?.message || 'Invalid data provided', 'error');
       } else {
-        setError('Failed to update profile');
         showNotification('Failed to update profile', 'error');
       }
     } finally {
@@ -267,33 +320,16 @@ export default function ProfilePage() {
     setUploadingImage(true);
     try {
       const response = await customerService.updateProfileImage(formData);
-      console.log("Upload response:", response);
       
-      let imageUrl = null;
-      
-      if (response.profile_image_url) {
-        imageUrl = response.profile_image_url;
-      } else if (response.data?.profile_image_url) {
-        imageUrl = response.data.profile_image_url;
-      } else if (response.image_url) {
-        imageUrl = response.image_url;
-      } else if (response.url) {
-        imageUrl = response.url;
-      }
+      let imageUrl = response.profile_image_url || response.data?.profile_image_url || response.image_url || response.url;
       
       if (imageUrl) {
         localStorage.setItem('profile_image_url', imageUrl);
         
-        setProfile(prev => prev ? { 
-          ...prev, 
-          profile_image: imageUrl 
-        } : null);
+        setProfile(prev => prev ? { ...prev, profile_image: imageUrl } : null);
         
         if (!isEditing) {
-          setOriginalProfile(prev => prev ? { 
-            ...prev, 
-            profile_image: imageUrl 
-          } : null);
+          setOriginalProfile(prev => prev ? { ...prev, profile_image: imageUrl } : null);
         }
         
         showNotification(response.message || 'Profile picture updated!', 'success');
@@ -307,10 +343,7 @@ export default function ProfilePage() {
       }
     } catch (err: any) {
       console.error("Upload Error:", err.response?.data);
-      showNotification(
-        err.response?.data?.message || 'Failed to upload image', 
-        'error'
-      );
+      showNotification(err.response?.data?.message || 'Failed to upload image', 'error');
     } finally { 
       setUploadingImage(false);
       if (fileInputRef.current) {
@@ -324,25 +357,21 @@ export default function ProfilePage() {
     e.preventDefault();
     
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError('New passwords do not match');
       showNotification('New passwords do not match', 'error');
       return;
     }
     
     if (passwordData.newPassword.length < 8) {
-      setError('Password must be at least 8 characters');
-      showNotification('Password too short', 'error');
+      showNotification('Password must be at least 8 characters', 'error');
       return;
     }
     
     if (passwordStrength < 75) {
-      setError('Please choose a stronger password');
       showNotification('Please choose a stronger password', 'error');
       return;
     }
     
     setUpdatingPassword(true);
-    setError(null);
     
     try {
       const response = await customerService.changePassword({
@@ -361,13 +390,10 @@ export default function ProfilePage() {
       }
     } catch (err: any) {
       if (err.response?.status === 401) {
-        setError('Current password is incorrect');
         showNotification('Incorrect current password', 'error');
       } else if (err.response?.status === 400) {
-        setError(err.response.data?.message || 'Invalid password data');
-        showNotification('Validation error', 'error');
+        showNotification(err.response.data?.message || 'Invalid password data', 'error');
       } else {
-        setError('Failed to update password');
         showNotification('Failed to update password', 'error');
       }
     } finally {
@@ -378,7 +404,6 @@ export default function ProfilePage() {
   // ========== HANDLE ACCOUNT DELETION ==========
   const handleDeleteAccount = async () => {
     setDeleting(true);
-    setError(null);
     
     try {
       const response = await customerService.deleteAccount();
@@ -392,10 +417,8 @@ export default function ProfilePage() {
       }
     } catch (err: any) {
       if (err.response?.status === 401) {
-        setError('Your session has expired. Please login again.');
         showNotification('Session expired', 'error');
       } else {
-        setError('Failed to delete account');
         showNotification('Failed to delete account', 'error');
       }
       setShowDeleteModal(false);
@@ -414,7 +437,6 @@ export default function ProfilePage() {
   const cancelEdit = () => {
     setProfile(originalProfile);
     setIsEditing(false);
-    setError(null);
     showNotification('Edit cancelled', 'info');
   };
 
@@ -577,17 +599,6 @@ export default function ProfilePage() {
                         src={getImageUrl(profile.profile_image)!} 
                         alt="Profile" 
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          console.log('Image failed to load:', profile.profile_image);
-                          e.currentTarget.style.display = 'none';
-                          const parent = e.currentTarget.parentElement;
-                          if (parent) {
-                            const fallback = document.createElement('div');
-                            fallback.className = 'fallback-avatar w-full h-full flex items-center justify-center bg-slate-100 text-[#2076C7]';
-                            fallback.innerHTML = '<svg class="w-10 h-10" ...></svg>';
-                            parent.appendChild(fallback);
-                          }
-                        }}
                       />
                     ) : (
                       <User className="w-12 h-12 text-slate-300" />
@@ -643,6 +654,7 @@ export default function ProfilePage() {
         <div className="lg:col-span-8 space-y-6">
           {/* Personal Information Card */}
           <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+            {/* Header */}
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-emerald-50 text-emerald-500 rounded-2xl">
@@ -653,9 +665,10 @@ export default function ProfilePage() {
                   <p className="text-sm text-slate-500">Update your personal details</p>
                 </div>
               </div>
-              
+
               {!isEditing ? (
                 <button
+                  type="button"
                   onClick={() => setIsEditing(true)}
                   className="px-6 py-3 bg-[#2076C7] text-white rounded-xl hover:opacity-90 flex items-center gap-2 text-xs font-black uppercase tracking-widest shadow-sm"
                 >
@@ -665,87 +678,74 @@ export default function ProfilePage() {
               ) : (
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={cancelEdit}
                     className="px-6 py-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 text-xs font-black uppercase tracking-widest"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={handleProfileUpdate}
+                    type="submit"
+                    form="profile-form"
                     disabled={updating}
                     className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 disabled:opacity-50 flex items-center gap-2 text-xs font-black uppercase tracking-widest shadow-sm"
                   >
                     {updating ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                    {updating ? 'Saving...' : 'Save'}
+                    {updating ? "Saving..." : "Save"}
                   </button>
                 </div>
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Name Field */}
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center justify-between">
-                  <span>Full Name</span>
-                  {!isEditing && (
-                    <button 
-                      onClick={() => copyToClipboard(profile?.name || '', 'Name')}
-                      className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
-                    >
-                      {copiedField === 'Name' ? 
-                        <Check size={14} className="text-emerald-600" /> : 
-                        <Copy size={14} className="text-slate-400" />
-                      }
-                    </button>
-                  )}
-                </label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={profile?.name || ''}
-                    onChange={(e) => handleProfileChange('name', e.target.value)}
-                    className="w-full px-4 py-3 bg-white border-2 border-[#1CADA3] rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#158f87] transition-all"
-                    placeholder="Enter your full name"
-                  />
-                ) : (
-                  <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-bold text-slate-700 border-2 border-transparent">
-                    {profile?.name || 'Not provided'}
-                  </div>
-                )}
-              </div>
+            {/* Form */}
+            <form id="profile-form" onSubmit={handleProfileUpdate}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Name Field */}
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Full Name
+                  </label>
 
-              {/* Email Field */}
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center justify-between">
-                  <span>Email Address</span>
-                  {!isEditing && (
-                    <button 
-                      onClick={() => copyToClipboard(profile?.email || '', 'Email')}
-                      className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
-                    >
-                      {copiedField === 'Email' ? 
-                        <Check size={14} className="text-emerald-600" /> : 
-                        <Copy size={14} className="text-slate-400" />
-                      }
-                    </button>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={profile?.name || ""}
+                      onChange={(e) => handleProfileChange("name", e.target.value)}
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1CADA3] rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#158f87] transition-all"
+                      placeholder="Enter your full name"
+                      required
+                    />
+                  ) : (
+                    <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-bold text-slate-700">
+                      {profile?.name || "Not provided"}
+                    </div>
                   )}
-                </label>
-                {isEditing ? (
-                  <input
-                    type="email"
-                    value={profile?.email || ''}
-                    onChange={(e) => handleProfileChange('email', e.target.value)}
-                    className="w-full px-4 py-3 bg-white border-2 border-[#1CADA3] rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#158f87] transition-all"
-                    placeholder="Enter your email"
-                  />
-                ) : (
-                  <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-bold text-slate-700 border-2 border-transparent flex items-center gap-2">
-                    <Mail size={16} className="text-slate-400" />
-                    {profile?.email || 'Not provided'}
-                  </div>
-                )}
+                </div>
+
+                {/* Mobile Field */}
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Mobile Number
+                  </label>
+
+                  {isEditing ? (
+                    <input
+                      type="tel"
+                      value={profile?.mobile || ""}
+                      onChange={(e) => handleProfileChange("mobile", e.target.value)}
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1CADA3] rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#158f87] transition-all"
+                      placeholder="Enter your mobile number"
+                      required
+                      maxLength={10}
+                    />
+                  ) : (
+                    <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-bold text-slate-700">
+                      {profile?.mobile || "Not provided"}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            </form>
           </div>
 
           {/* Security Card */}
@@ -800,16 +800,12 @@ export default function ProfilePage() {
                 <Key size={24} />
                 <h3 className="text-xl font-bold">Change Password</h3>
               </div>
-              <button 
-                onClick={() => setShowPasswordModal(false)} 
-                className="p-2 hover:bg-white/20 rounded-xl transition-colors"
-              >
+              <button onClick={() => setShowPasswordModal(false)} className="p-2 hover:bg-white/20 rounded-xl transition-colors">
                 <X size={20} />
               </button>
             </div>
             
             <form onSubmit={handlePasswordUpdate} className="p-8 space-y-6">
-              
               {/* Current Password */}
               <div className="space-y-2">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Current Password</label>
@@ -913,18 +909,10 @@ export default function ProfilePage() {
               </div>
               
               <div className="flex gap-4 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowPasswordModal(false)}
-                  className="flex-1 py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-black uppercase tracking-widest transition-colors"
-                >
+                <button type="button" onClick={() => setShowPasswordModal(false)} className="flex-1 py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-black uppercase tracking-widest transition-colors">
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  disabled={updatingPassword}
-                  className="flex-1 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest shadow-sm"
-                >
+                <button type="submit" disabled={updatingPassword} className="flex-1 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest shadow-sm">
                   {updatingPassword ? <Loader2 size={16} className="animate-spin" /> : 'Update'}
                 </button>
               </div>
@@ -942,22 +930,13 @@ export default function ProfilePage() {
                 <Trash2 size={40} className="text-rose-500" />
               </div>
               <h3 className="text-2xl font-bold text-slate-900 mb-2">Delete Account?</h3>
-              <p className="text-sm text-slate-500 mb-8">
-                This action cannot be undone. This will permanently delete your account and remove all associated data.
-              </p>
+              <p className="text-sm text-slate-500 mb-8">This action cannot be undone. This will permanently delete your account and remove all associated data.</p>
               
               <div className="flex gap-4">
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-black uppercase tracking-widest transition-colors"
-                >
+                <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-black uppercase tracking-widest transition-colors">
                   Cancel
                 </button>
-                <button
-                  onClick={handleDeleteAccount}
-                  disabled={deleting}
-                  className="flex-1 py-3 bg-rose-500 text-white rounded-xl hover:bg-rose-600 disabled:opacity-50 text-sm font-black uppercase tracking-widest shadow-sm"
-                >
+                <button onClick={handleDeleteAccount} disabled={deleting} className="flex-1 py-3 bg-rose-500 text-white rounded-xl hover:bg-rose-600 disabled:opacity-50 text-sm font-black uppercase tracking-widest shadow-sm">
                   {deleting ? 'Deleting...' : 'Delete'}
                 </button>
               </div>

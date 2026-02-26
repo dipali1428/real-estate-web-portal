@@ -214,13 +214,6 @@ export default function PortfolioPage() {
           <p className="text-gray-600 mb-8 max-w-md mx-auto">
             Start building your portfolio by purchasing unlisted shares from our curated list of 150+ pre-IPO companies.
           </p>
-          <Link 
-            href="/products/unlisted/buy-shares"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-[#2076C7]/20"
-          >
-            Browse Companies
-            <ArrowUpRight size={18} />
-          </Link>
         </div>
       </div>
     );
