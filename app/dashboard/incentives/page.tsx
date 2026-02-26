@@ -58,7 +58,7 @@ export default function IncentivesPayouts() {
     'loans': ['Home Loan', 'Personal Loan', 'Vehicle Loan', 'SME Loan', 'Mortgage Loan', 'Business Loan', 'Loan Against Securities', 'Education Loan'],
     'insurance': ['Life Insurance', 'Health Insurance', 'Motor Insurance', 'Travel Insurance', 'Fire Insurance', 'Cattle Insurance', 'Marine Insurance', 'Corporate Insurance', 'Loan Protector'],
     'mutual-funds': ['Mutual Fund'],
-    'investments': ['Wealth Management', 'PMS / AIF', 'Fixed Deposit', 'Bonds'],
+    'investments': ['PMS', 'AIF', 'Fixed Deposit', 'Bonds'],
     'real-estate': ['Fractional']
   };
 
