@@ -60,7 +60,7 @@ const AIFHeroVisual = () => {
 
     return (
         <div
-            className="relative w-full h-[450px] lg:h-[450px] flex items-center justify-center overflow-hidden"
+        className="relative w-full h-[450px] lg:h-[450px] flex items-center justify-center overflow-hidden scale-75 md:scale-90 lg:scale-100"
             onMouseMove={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
                 mouseX.set(e.clientX - rect.left - rect.width / 2);
@@ -305,7 +305,7 @@ const AIFProductsContent = () => {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 1, delay: 0.2 }}
-                                className="relative h-[500px] hidden lg:block"
+                                className="relative h-[350px] md:h-[400px] lg:h-[500px] w-full block mt-8 lg:mt-0"
                             >
                                 <AIFHeroVisual />
                             </motion.div>

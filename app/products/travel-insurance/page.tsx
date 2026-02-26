@@ -20,13 +20,13 @@ export default function TravelInsurancePage() {
         <main className="min-h-screen bg-white text-slate-800 font-sans scroll-smooth">
             <Toaster position="bottom-right" />
             <HeroSection />
-            <HowItWorks />
-            <WhyTravelInsurance />
             <KeyCoverageHighlights />
             <ProviderComparison />
             <InsuranceTypes />
-            <TravelCalculator />
+            <HowItWorks />
+            <WhyTravelInsurance />
             <GlobalEligibility />
+            <TravelCalculator />
             <ClaimsProcess />
             <DocumentsSection />
             <FAQSection />

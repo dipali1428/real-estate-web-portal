@@ -61,12 +61,12 @@ const Header = () => {
 
   const insuranceOptions = [
     { label: "Life Insurance", href: "/offers/insurance/life-insurance" },
-    { label: "Health Insurance", href: "/offers/insurance/health-insurance" },
+    { label: "Health Insurance", href: "/products/health-insurance" },
     { label: "Motor Insurance", href: "/offers/insurance/motor-insurance" },
     { label: "Travel Insurance", href: "/products/travel-insurance" },
     { label: "Fire Insurance", href: "/offers/insurance/fire-insurance" },
     { label: "Cattle Insurance", href: "/offers/insurance/cattle-insurance" },
-    { label: "Marine Insurance", href: "/offers/insurance/marine-insurance" },
+    { label: "Marine Insurance", href: "/products/marine-insurance" },
     { label: "Corporate Insurance", href: "/offers/insurance/corporate-insurance" },
     { label: "Loan Protector", href: "/offers/insurance/loan-protector-plan" },
   ];

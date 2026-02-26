@@ -6,6 +6,8 @@ import { toast } from 'react-hot-toast';
 import { IconSend, IconPhone, IconMail, IconMapPin, IconClock, IconShieldCheck } from '@tabler/icons-react';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import travelInsuraceImg from '../assets/travelinsurace.png';
+import insuranceImg from '../assets/insurance.jpg';
 
 import { useModal } from '@/app/context/ModalContext';
 
@@ -31,11 +33,13 @@ export default function ContactSection() {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="text-center max-w-3xl mx-auto mb-16"
+                    className="text-center max-w-3xl mx-auto mb-10 md:mb-16"
                 >
-                    <span className="text-primary-blue font-bold tracking-widest uppercase text-sm">Get In Touch</span>
-                    <h2 className="text-4xl md:text-5xl font-extrabold gradient-text mt-3">Free Expert Consultation</h2>
-                    <p className="text-lg text-slate-500 mt-4">
+                    <span className="text-primary-blue font-bold tracking-widest uppercase text-xs md:text-sm">Get In Touch</span>
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                      Free Expert Consultation
+                    </h2>
+                    <p className="text-base md:text-lg text-slate-500 mt-4 px-4 md:px-0">
                         Interested in our travel insurance solutions? Fill the form below and speak with our certified expert advisors.
                     </p>
                 </motion.div>
@@ -46,7 +50,7 @@ export default function ContactSection() {
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="lg:col-span-3 bg-white rounded-3xl p-8 md:p-10 shadow-xl border border-slate-100"
+                        className="lg:col-span-3 bg-white rounded-3xl p-6 md:p-10 shadow-xl border border-slate-100"
                     >
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <div className="grid md:grid-cols-2 gap-5">
@@ -121,7 +125,7 @@ export default function ContactSection() {
 
                             <button
                                 disabled={loading}
-                                className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white font-bold text-lg py-4 rounded-xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all disabled:opacity-70 flex justify-center items-center gap-3"
+                                className="w-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold text-lg py-4 rounded-xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all disabled:opacity-70 flex justify-center items-center gap-3"
                             >
                                 {loading ? (
                                     <Loader2 className="animate-spin" size={22} />
@@ -136,10 +140,10 @@ export default function ContactSection() {
 
                             <div className="flex gap-4 mt-4">
                                 <div className="flex-1 rounded-xl overflow-hidden h-28 relative">
-                                    <Image src="/travel insurance/travelinsurace.png" alt="Travel Protection" fill className="object-cover" />
+                                    <Image src={travelInsuraceImg} alt="Travel Protection" fill className="object-cover" />
                                 </div>
                                 <div className="flex-1 rounded-xl overflow-hidden h-28 relative">
-                                    <Image src="/travel insurance/insurance.jfif" alt="Baggage Coverage" fill className="object-cover" />
+                                    <Image src={insuranceImg} alt="Baggage Coverage" fill className="object-cover" />
                                 </div>
                             </div>
                         </form>
@@ -157,8 +161,8 @@ export default function ContactSection() {
                             { icon: IconPhone, title: 'Toll-Free', desc: '1800-532-7600' },
                             { icon: IconMail, title: 'Email Support', desc: 'info@infinityarthvishva.com' },
                         ].map((info, i) => (
-                            <div key={i} className="flex gap-5 p-6 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-shadow">
-                                <div className="w-12 h-12 flex-shrink-0 bg-gradient-to-br from-blue-600 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-lg">
+                            <div key={i} className="flex flex-col sm:flex-row gap-5 p-6 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-shadow items-center sm:items-start text-center sm:text-left">
+                                <div className="w-12 h-12 flex-shrink-0 bg-gradient-to-br from-[#2076C7] to-[#1CADA3] rounded-xl flex items-center justify-center text-white shadow-lg">
                                     <info.icon size={22} />
                                 </div>
                                 <div>

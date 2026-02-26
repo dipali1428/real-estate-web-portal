@@ -42,7 +42,7 @@ const PMSHeaderRecommended = () => {
 
 const PMSHeroVisual = () => {
     return (
-        <div className="relative w-full h-full flex items-center justify-center">
+         <div className="relative w-full h-full flex items-center justify-center scale-75 md:scale-90 lg:scale-100">
             {/* Background Glow */}
             <motion.div
                 animate={{
@@ -188,8 +188,7 @@ function PMSProductsContent() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 1, delay: 0.2 }}
-                                className="relative h-[500px] hidden lg:block"
-                            >
+                                className="relative h-[350px] md:h-[400px] lg:h-[500px] w-full block mt-8 lg:mt-0">
                                 <PMSHeroVisual />
                             </motion.div>
                         </div>

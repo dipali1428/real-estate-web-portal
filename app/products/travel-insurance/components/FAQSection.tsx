@@ -47,8 +47,10 @@ export default function FAQSection() {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <span className="text-secondary-teal font-bold tracking-widest uppercase text-sm">Got Questions?</span>
-                    <h2 className="text-4xl md:text-5xl font-extrabold gradient-text mt-3">Common Questions</h2>
+                    <span className="text-[#1CADA3] font-bold tracking-widest uppercase text-sm">Got Questions?</span>
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                    Common Questions
+                    </h2> 
                     <p className="text-lg text-slate-500 mt-4">
                         Everything you need to know about our travel insurance plans.
                     </p>
@@ -63,8 +65,8 @@ export default function FAQSection() {
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.05 }}
                             className={`rounded-2xl border-2 overflow-hidden transition-all duration-300 ${openIdx === idx
-                                ? 'border-secondary-teal bg-teal-50/30 shadow-[0_20px_50px_-12px_rgba(28,173,163,0.3)] scale-[1.02]'
-                                : 'border-teal-100 bg-white hover:border-teal-200 shadow-[0_10px_30px_-10px_rgba(28,173,163,0.12)] hover:shadow-md'
+                                ? 'border-[#1CADA3] bg-[#1CADA3]/5 shadow-[0_20px_50px_-12px_rgba(28,173,163,0.3)] scale-[1.02]'
+                                : 'border-[#1CADA3]/20 bg-white hover:border-[#1CADA3]/40 shadow-[0_10px_30px_-10px_rgba(28,173,163,0.12)] hover:shadow-md'
                                 }`}
                         >
                             <button
@@ -72,14 +74,14 @@ export default function FAQSection() {
                                 className="w-full flex items-center justify-between p-6 text-left"
                             >
                                 <div className="flex items-center gap-4">
-                                    <span className={`text-sm font-extrabold ${openIdx === idx ? 'text-secondary-teal' : 'text-slate-300'}`}>
+                                    <span className={`text-sm font-extrabold ${openIdx === idx ? 'text-[#1CADA3]' : 'text-slate-300'}`}>
                                         {String(idx + 1).padStart(2, '0')}
                                     </span>
-                                    <h3 className={`text-lg font-bold ${openIdx === idx ? 'text-secondary-teal' : 'text-slate-800'}`}>
+                                    <h3 className={`text-lg font-bold ${openIdx === idx ? 'text-[#1CADA3]' : 'text-slate-800'}`}>
                                         {faq.q}
                                     </h3>
                                 </div>
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${openIdx === idx ? 'bg-gradient-to-br from-blue-600 to-teal-500 text-white rotate-180' : 'bg-slate-100 text-slate-400'
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${openIdx === idx ? 'bg-gradient-to-br from-[#2076C7] to-[#1CADA3] text-white rotate-180' : 'bg-slate-100 text-slate-400'
                                     }`}>
                                     <IconChevronDown size={16} />
                                 </div>

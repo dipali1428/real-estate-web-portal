@@ -22,12 +22,12 @@ export default function TrustedPartners() {
                     viewport={{ once: true }}
                     className="mb-10"
                 >
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 text-secondary-teal text-sm font-semibold mb-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1CADA3]/10 text-[#1CADA3] text-sm font-semibold mb-4">
                         <IconShieldCheck size={16} />
                         <span>Trusted by Millions</span>
                     </div>
-                    <h2 className="text-3xl font-bold text-gradient">
-                        Compare Plans from Top Rated Providers
+                     <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                                  Compare Plans from Top Rated Providers
                     </h2>
                     <p className="text-slate-500 mt-3 max-w-2xl mx-auto">
                         We partner with the world's leading travel insurance underwriters to bring you the best coverage at guaranteed lowest prices.
@@ -45,7 +45,7 @@ export default function TrustedPartners() {
                             className="flex items-center justify-center p-4"
                         >
                             {/* Using simple text/placeholder for now to avoid broken images if external links blocked */}
-                            <div className="text-lg font-bold text-slate-400 hover:text-primary-blue transition-colors cursor-pointer">
+                            <div className="text-lg font-bold text-slate-400 hover:text-[#2076C7] transition-colors cursor-pointer">
                                 {partner.name}
                             </div>
                         </motion.div>
@@ -54,15 +54,15 @@ export default function TrustedPartners() {
 
                 <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm text-slate-500">
                     <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-secondary-teal animate-pulse"></span>
+                        <span className="w-2 h-2 rounded-full bg-[#1CADA3] animate-pulse"></span>
                         A+ Rated Insurers
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-secondary-teal animate-pulse"></span>
+                        <span className="w-2 h-2 rounded-full bg-[#1CADA3] animate-pulse"></span>
                         24/7 Assistance
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-secondary-teal animate-pulse"></span>
+                        <span className="w-2 h-2 rounded-full bg-[#1CADA3] animate-pulse"></span>
                         100% Secure Checkout
                     </div>
                 </div>

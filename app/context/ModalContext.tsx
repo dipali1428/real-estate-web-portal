@@ -3,6 +3,7 @@ import { createContext, useContext, useState, ReactNode } from "react";
 import Login from "../auth/login/page"; // Adjust path accordingly
 import PartnershipPage from "../auth/register/page";
 import CustomerRegistrationForm from "../auth/signup/page"; // Import your new Customer file
+import QuoteRequestForm from "../products/corporate-insurance/components/QuoteRequestForm"; // Import Quote Form
 import { X } from "lucide-react";
 
 const ModalContext = createContext({
@@ -15,6 +16,9 @@ const ModalContext = createContext({
     isSignupOpen: false, // Added
     openSignup: () => { }, // Added
     closeSignup: () => { }, // Added
+    isQuoteOpen: false, // Added Quote
+    openQuote: (productName?: string) => { }, // Added Quote
+    closeQuote: () => { }, // Added Quote
     closeAll: () => { },
 });
 
@@ -24,11 +28,14 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isPartnerOpen, setIsPartnerOpen] = useState(false);
     const [isSignupOpen, setIsSignupOpen] = useState(false); // New state
+    const [isQuoteOpen, setIsQuoteOpen] = useState(false); // Quote State
+    const [quoteProduct, setQuoteProduct] = useState<string | undefined>(undefined); // Product for Quote
 
     const closeAll = () => {
         setIsLoginOpen(false);
         setIsPartnerOpen(false);
         setIsSignupOpen(false);
+        setIsQuoteOpen(false);
     };
 
     return (
@@ -45,6 +52,14 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                 isSignupOpen,
                 openSignup: () => { closeAll(); setIsSignupOpen(true); },
                 closeSignup: () => setIsSignupOpen(false),
+
+                isQuoteOpen,
+                openQuote: (productName?: string) => {
+                    closeAll();
+                    setQuoteProduct(productName);
+                    setIsQuoteOpen(true);
+                },
+                closeQuote: () => setIsQuoteOpen(false),
 
                 closeAll,
             }}>
@@ -81,6 +96,15 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                         <CustomerRegistrationForm />
                     </div>
                 </div>
+            )}
+
+            {/* Custom Quote Modal */}
+            {isQuoteOpen && (
+                <QuoteRequestForm
+                    isOpen={isQuoteOpen}
+                    onClose={() => setIsQuoteOpen(false)}
+                    initialProduct={quoteProduct}
+                />
             )}
         </ModalContext.Provider>
     );
