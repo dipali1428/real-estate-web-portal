@@ -158,7 +158,7 @@ const HealthInsuranceApplyForm: React.FC<ApplyFormProps> = ({ isOpen, onClose, p
                                     className="text-center py-10"
                                 >
                                     <div className="w-20 h-20 rounded-xl flex items-center justify-center mx-auto mb-6 shadow-2xl"
-                                        style={{ background: 'linear-gradient(to bottom right, #2076C7, #1CADA3)' }}
+                                        style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}
                                     >
                                         <Send size={32} className="text-white ml-1" />
                                     </div>

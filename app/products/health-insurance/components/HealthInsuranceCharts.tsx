@@ -41,7 +41,6 @@ const HealthInsuranceCharts = () => {
                 backgroundColor: (context: any) => {
                     const ctx = context.chart.ctx;
                     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-                    gradient.addColorStop(0, '#2076C7');
                     gradient.addColorStop(0.5, '#1CADA3');
                     gradient.addColorStop(1, '#2076C7');
                     return gradient;

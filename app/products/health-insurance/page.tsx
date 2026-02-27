@@ -70,7 +70,7 @@ const HealthHeroVisual = () => {
                     >
                         <div className="relative z-10 flex flex-col items-center">
                             <div className="w-24 h-24 rounded-lg flex items-center justify-center mb-4 transition-transform group-hover:scale-110 shadow-lg"
-                                style={{ background: 'linear-gradient(to bottom right, #2076C7, #1CADA3, #2076C7)' }}
+                                style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}
                             >
                                 <HeartPulse className="text-white w-12 h-12" />
                             </div>
@@ -353,7 +353,7 @@ const HealthInsurancePage = () => {
     return (
         <div className="bg-neutral-100 min-h-screen font-sans">
             {/* Hero Content Section */}
-            <section className="relative py-20 lg:py-28 overflow-hidden bg-linear-to-br from-blue-50 via-teal-50 to-emerald-50" style={{ background: 'linear-gradient(to bottom right, #79c2f7ff, #ffffffff, #e5f8e5ff)' }}>
+            <section className="relative py-20 lg:py-28 overflow-hidden bg-linear-to-r from-blue-50 via-teal-50 to-emerald-50" style={{ background: 'linear-gradient(to right, #79c2f7ff, #ffffffff)' }}>
                 {/* Animated background shapes */}
                 <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ backgroundColor: 'rgba(28, 202, 163, 0.3)' }}></div>
@@ -821,7 +821,7 @@ const HealthInsurancePage = () => {
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="p-8 sm:p-16 shadow-3xl rounded-xl relative overflow-hidden bg-gradient-to-br from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-white"
+                        className="p-8 sm:p-16 shadow-3xl rounded-xl relative overflow-hidden bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white"
                     >
                         <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-[80px] -mr-32 -mt-32" />
                         <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 tracking-tighter font-sans">Ready to protect your family?</h2>
