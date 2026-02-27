@@ -271,29 +271,29 @@ const UserManagement: React.FC = () => {
 
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
                 <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">Full Name</label>
+                  <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">Full Name</label>
                   <input 
                     required
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                     value={selectedUser?.name || ''}
                     onChange={e => setSelectedUser({...selectedUser, name: e.target.value})}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">Email Address</label>
+                    <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">Email Address</label>
                     <input 
                       required type="email"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                       value={selectedUser?.email || ''}
                       onChange={e => setSelectedUser({...selectedUser, email: e.target.value})}
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">Mobile</label>
+                    <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">Mobile</label>
                     <input 
                       required
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                       value={selectedUser?.mobile || ''}
                       onChange={e => setSelectedUser({...selectedUser, mobile: e.target.value})}
                     />
@@ -301,17 +301,17 @@ const UserManagement: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">Advisor ID</label>
+                    <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">Advisor ID</label>
                     <input 
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                       value={selectedUser?.adv_id || ''}
                       onChange={e => setSelectedUser({...selectedUser, adv_id: e.target.value})}
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">Role</label>
+                    <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">Role</label>
                     <select 
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm bg-white"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm bg-white"
                       value={selectedUser?.role || 'CUSTOMER'}
                       onChange={e => setSelectedUser({...selectedUser, role: e.target.value})}
                     >

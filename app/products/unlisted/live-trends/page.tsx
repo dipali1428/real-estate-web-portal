@@ -144,87 +144,82 @@ const LiveTrends: React.FC = () => {
     const isPositive = parseFloat(todayChange) >= 0;
 
     // ========== FETCH ALL DATA ==========
-useEffect(() => {
-    const loadAllData = async () => {
-        setIsGraphLoading(true);
-        setIsMoversLoading(true);
-        setIsSharesLoading(true);
-        
-        try {
-            // Fetch graph data - now it returns {success, summary, graph}
-            const graphResponse = await fetchDashboardData();
-            console.log("Graph data received:", graphResponse);
+    useEffect(() => {
+        const loadAllData = async () => {
+            setIsGraphLoading(true);
+            setIsMoversLoading(true);
+            setIsSharesLoading(true);
             
-            // Check if the response has the expected structure
-            if (graphResponse && graphResponse.success && graphResponse.graph) {
-                // Set the graph data from the graph property
-                setGraphData(graphResponse.graph);
+            try {
+                // Fetch graph data - now it returns {success, summary, graph}
+                const graphResponse = await fetchDashboardData();
                 
-                // Set summary from the response
-                if (graphResponse.summary) {
-                    setSummary(graphResponse.summary);
-                }
-                
-                console.log("Graph array length:", graphResponse.graph.length);
-            } else {
-                console.error("Invalid graph response structure:", graphResponse);
-                setGraphError("Invalid graph data format");
-            }
-
-            // Fetch top gainers
-            try {
-                const gainersData = await fetchTopGainers(5);
-                if (gainersData.success) {
-                    setGainers(gainersData.data);
-                }
-            } catch (error) {
-                console.error("Failed to fetch gainers:", error);
-            }
-
-            // Fetch top losers
-            try {
-                const losersData = await fetchTopLosers(5);
-                if (losersData.success) {
-                    setLosers(losersData.data);
-                }
-            } catch (error) {
-                console.error("Failed to fetch losers:", error);
-            }
-
-            // Fetch shares data
-            try {
-                const sharesData = await fetchAllShares();
-                if (Array.isArray(sharesData)) {
-                    setShares(sharesData);
+                // Check if the response has the expected structure
+                if (graphResponse && graphResponse.success && graphResponse.graph) {
+                    // Set the graph data from the graph property
+                    setGraphData(graphResponse.graph);
                     
-                    // Update total companies count from shares data if summary exists
-                    setSummary(prev => prev ? {
-                        ...prev,
-                        totalCompanies: sharesData.length,
-                        totalSharesListed: sharesData.length
-                    } : null);
+                    // Set summary from the response
+                    if (graphResponse.summary) {
+                        setSummary(graphResponse.summary);
+                    }
+                } else {
+                    setGraphError("Invalid graph data format");
                 }
-            } catch (error) {
-                console.error("Failed to fetch shares:", error);
+
+                // Fetch top gainers
+                try {
+                    const gainersData = await fetchTopGainers(5);
+                    if (gainersData.success) {
+                        setGainers(gainersData.data);
+                    }
+                } catch (error) {
+                    // Silently handle error
+                }
+
+                // Fetch top losers
+                try {
+                    const losersData = await fetchTopLosers(5);
+                    if (losersData.success) {
+                        setLosers(losersData.data);
+                    }
+                } catch (error) {
+                    // Silently handle error
+                }
+
+                // Fetch shares data
+                try {
+                    const sharesData = await fetchAllShares();
+                    if (Array.isArray(sharesData)) {
+                        setShares(sharesData);
+                        
+                        // Update total companies count from shares data if summary exists
+                        setSummary(prev => prev ? {
+                            ...prev,
+                            totalCompanies: sharesData.length,
+                            totalSharesListed: sharesData.length
+                        } : null);
+                    }
+                } catch (error) {
+                    // Silently handle error
+                }
+
+                setGraphError(null);
+                setMoversError(null);
+            } catch (error: any) {
+                setGraphError("Unable to connect to live API");
+            } finally {
+                setIsGraphLoading(false);
+                setIsMoversLoading(false);
+                setIsSharesLoading(false);
             }
+        };
 
-            setGraphError(null);
-            setMoversError(null);
-        } catch (error: any) {
-            console.error("Failed to fetch data:", error);
-            setGraphError("Unable to connect to live API");
-        } finally {
-            setIsGraphLoading(false);
-            setIsMoversLoading(false);
-            setIsSharesLoading(false);
-        }
-    };
-
-    loadAllData();
-    
-    const now = new Date();
-    setLastUpdatedTime(now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }));
-}, []);
+        loadAllData();
+        
+        const now = new Date();
+        setLastUpdatedTime(now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }));
+    }, []);
 
     // Set chart ready after canvas is rendered
     useEffect(() => {
@@ -340,7 +335,7 @@ useEffect(() => {
         try {
             chartInstance.current = new Chart(ctx, config);
         } catch (error) {
-            console.error("Error creating chart:", error);
+            // Silently handle chart creation error
         }
 
         return () => {

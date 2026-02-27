@@ -122,6 +122,15 @@ export interface DematDetailsResponse {
     };
 }
 
+interface Company {
+  id: number;
+  shares_name: string;
+  logo_url: string | null;  
+  price: string;
+  min_lot_size: number | null; 
+  depository_applicable: string | null;
+}
+
 // ==================== CUSTOMER SERVICE ====================
 
 const CustomerService = {

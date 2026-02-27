@@ -162,25 +162,25 @@ const handleSubmit = async (e: React.FormEvent) => {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">User ID</label>
+                <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">User ID</label>
                 <input
                   type="number"
                   name="user_id"
                   value={formData.user_id}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-sm font-medium bg-gray-50/50"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-gray-700 text-sm font-medium bg-gray-50/50"
                   placeholder="ID"
                   required
                 />
               </div>
               <div>
-                <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">Asset ID</label>
+                <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">Asset ID</label>
                 <input
                   type="number"
                   name="asset_id"
                   value={formData.asset_id}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-sm font-medium bg-gray-50/50"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-gray-700 text-sm font-medium bg-gray-50/50"
                   placeholder="ID"
                   required
                 />
@@ -188,12 +188,12 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
 
             <div>
-              <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">Trade Direction</label>
+              <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">Trade Direction</label>
               <select
                 name="transaction_type"
                 value={formData.transaction_type}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-sm font-bold bg-white"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-gray-700 text-sm font-bold bg-white"
                 required
               >
                 <option value="BUY">BUY ORDER</option>
@@ -203,26 +203,26 @@ const handleSubmit = async (e: React.FormEvent) => {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">Quantity</label>
+                <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">Quantity</label>
                 <input
                   type="number"
                   name="quantity"
                   value={formData.quantity}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-sm font-bold"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-gray-700 text-sm font-bold"
                   placeholder="Qty"
                   required
                 />
               </div>
               <div>
-                <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">Price (₹)</label>
+                <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">Price (₹)</label>
                 <input
                   type="number"
                   step="0.01"
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-sm font-bold text-[#2076C7]"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1CADA3] outline-none text-gray-700 text-sm font-bold text-[#2076C7]"
                   placeholder="Price"
                   required
                 />

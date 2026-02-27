@@ -67,6 +67,19 @@ export interface GraphResponse {
   graph: GraphPoint[];
 }
 
+// ✅ NEW: Interface for Share-specific Graph Response
+export interface ShareGraphData {
+  price_date: string;
+  market_price: string | number;
+}
+
+export interface ShareGraphResponse {
+  success: boolean;
+  share_id: number;
+  view: string;
+  graph: ShareGraphData[];
+}
+
 // ✅ NEW: Company Interface for the companies API
 export interface Company {
   id: number;
@@ -118,8 +131,8 @@ export const fetchGraphData = async (): Promise<GraphPoint[]> => {
   }
 };
 
-// Fetch Graph Data by Share ID
-export const fetchIdGraphData = async (share_id: number): Promise<GraphPoint[]> => {
+// Fetch Graph Data by Share ID - FIXED: Returns ShareGraphResponse with graph array
+export const fetchIdGraphData = async (share_id: number): Promise<ShareGraphResponse> => {
   try {
     const response = await api.get(`/api/unlisted/public/${share_id}/graph`); 
     return response.data;
