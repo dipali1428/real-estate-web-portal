@@ -82,7 +82,7 @@ const HealthInsuranceCalculator = () => {
                                             key={type}
                                             onClick={() => setCoverageType(type)}
                                             className={`flex-1 h-14 rounded-lg font-bold transition-all border ${coverageType === type
-                                                ? 'bg-[#1CADA3] border-primary text-white shadow-lg shadow-primary/20'
+                                                ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
                                                 : 'bg-white border-gray-200 text-gray-500 hover:border-primary/30 hover:bg-primary/5'
                                                 }`}
                                         >
@@ -160,7 +160,7 @@ const HealthInsuranceCalculator = () => {
                                             </div>
 
                                             <div className="p-6 rounded-lg shadow-lg text-white"
-                                                style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}
+                                                style={{ background: 'linear-gradient(to bottom right, #2076C7, #1CADA3, #2076C7)' }}
                                             >
                                                 <p className="text-white/80 text-sm font-bold uppercase tracking-wider mb-1">Yearly Premium (Save ~7%)</p>
                                                 <div className="flex items-baseline gap-1">
