@@ -92,7 +92,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">lead ID</th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client Name</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact Details</th>
+                            {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact Details</th> */}
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dept / Sub-Cat</th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created At</th>
                         </tr>
@@ -133,10 +133,10 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                                         <span className="ml-3 text-sm font-semibold text-slate-900">{item.lead_name || item.name}</span>
                                     </div>
                                 </td>
-                                <td className="px-4 py-4 whitespace-nowrap">
+                                {/* <td className="px-4 py-4 whitespace-nowrap">
                                     <div className="text-sm text-slate-900">{item.contact_number || item.mobile}</div>
                                     <div className="text-xs text-slate-500">{item.email}</div>
-                                </td>
+                                </td> */}
                                 <td className="px-4 py-4 whitespace-nowrap">
                                     <div className="text-sm text-slate-900">{item.department}</div>
                                     <div className="text-xs text-slate-400">{item.sub_category}</div>
