@@ -24,10 +24,12 @@ export interface Lead {
   notes: string;
   createdDate: string;
   createdTime: string;
+  disbursmentAmount: string;
   formData?: any;
   isSelfLogin?: string;
   status?: string;
   referral_lead_status?: string;
+  disbursement_amount?: string;
 }
 
 interface LeadTableProps {
@@ -81,6 +83,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
             DashboardService.getLeads(),
             DashboardService.getMyLeads()
           ]);
+          
         } else {
           if (activeTab === 'referral') {
             referralRes = await DashboardService.getLeads();
@@ -105,6 +108,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                   subCategory: item.sub_category || "-",
                   notes: "-",
                   formData: item.form_data || null,
+                  disbursement_amount: item.disbursement_amount || "N/A",
                   isSelfLogin: item.is_self_login ? "Yes" : "No",
                   status: item.lead_status || "PENDING",
                   createdDate: isNaN(dateObj.getTime()) ? "N/A" : dateObj.toLocaleDateString(),
@@ -195,6 +199,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
     formData.append("metadata", JSON.stringify(metadata));
     try {
       const response = await DashboardService.uploadLeadDocument(refId, formData);
+    
       if (response.success) {
         alert("Document uploaded successfully!");
         loadDocuments(activeLead.id);
@@ -292,6 +297,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Contact</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Dept</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Product</th>
+                    {activeTab === 'all' && <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Amount</th>}
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Type</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
                     {activeTab === 'all' && <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Actions</th>}
@@ -302,6 +308,8 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Lead Name</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Dept</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Sub Category</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Amount</th>
+                    
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Self Login</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
                     <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Actions</th>
@@ -321,7 +329,9 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.clientName}</td>
                         <td className="px-4 py-4 text-sm text-gray-600">{lead.contactNumber}</td>
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.product}</td>
+                        
                         <td className="px-4 py-4 text-sm text-gray-700">{lead.subCategory}</td>
+                           <td className="px-4 py-4 text-sm text-gray-900">{lead.disbursement_amount}</td>
                         <td className="px-4 py-4 text-sm text-gray-700">
                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${lead.clientType === 'Detailed' ? 'bg-purple-50 text-purple-600 border border-purple-100' : 'bg-orange-50 text-orange-600 border border-orange-100'}`}>
                              {lead.clientType}
@@ -348,6 +358,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.clientName}</td>
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.product}</td>
                         <td className="px-4 py-4 text-sm text-gray-700">{lead.subCategory}</td>
+                        <td className="px-4 py-4 text-sm text-gray-700">{lead.disbursement_amount}</td>
                         <td className="px-4 py-4 text-sm text-gray-700 font-medium">{lead.isSelfLogin}</td>
                         <td className="px-4 py-4 text-sm">
                           <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase bg-green-50 text-[#1CADA3] border border-[#1CADA3]">

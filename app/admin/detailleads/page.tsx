@@ -54,7 +54,20 @@ interface Lead {
     is_mandatory: boolean;
     uploaded: boolean;
   }[];
-  form_data?: any; // Adjusted to handle dynamic form fields
+  form_data?: any;
+  // NEW FIELDS FOR EXPORT
+  disbursement_amount?: any;
+  gross_payout_amount?: any;
+  gst_amount?: any;
+  tds_amount?: any;
+  net_payout_amount?: any;
+  payout_date?: any;
+  payout_id?: any;
+  payment_mode?: any;
+  transaction_reference_no?: string;
+  invoice_number?: any;
+  invoice_date?: any;
+  policy_number?: any;
 }
 
 export default function LeadDashboard() {
@@ -112,8 +125,6 @@ export default function LeadDashboard() {
   };
 
   const downloadCSV = () => {
-    // Use filteredLeads so the user gets all results matching their search, 
-    // regardless of which page they are currently viewing.
     const dataToExport = filteredLeads;
 
     if (dataToExport.length === 0) {
@@ -121,15 +132,33 @@ export default function LeadDashboard() {
       return;
     }
 
-    // 1. Extract all unique keys from all objects 
-    // (This ensures that if lead[5] has a field lead[0] doesn't, it still gets a column)
+    // List of specific fields to ensure are included in the export
+    const extraFields = [
+      'disbursement_amount',
+      'gross_payout_amount',
+      'gst_amount',
+      'tds_amount',
+      'net_payout_amount',
+      'payout_date',
+      'payout_id',
+      'payment_mode',
+      'transaction_reference_no',
+      'invoice_number',
+      'invoice_date',
+      'policy_number'
+    ];
+
     const allKeys = new Set<string>();
+    
+    // Collect existing keys from the data
     dataToExport.forEach(lead => {
       Object.keys(lead).forEach(key => allKeys.add(key));
     });
-    const headers = Array.from(allKeys);
 
-    // 2. Create CSV rows
+    // Explicitly add the requested fields to the header set
+    extraFields.forEach(field => allKeys.add(field));
+
+    const headers = Array.from(allKeys);
     const csvRows = [];
 
     // Add Header row
@@ -144,20 +173,17 @@ export default function LeadDashboard() {
         if (val === null || val === undefined) {
           cellValue = '';
         } else if (typeof val === 'object') {
-          // Flatten nested objects (like form_data or uploaded_documents) into JSON strings
           cellValue = JSON.stringify(val);
         } else {
           cellValue = String(val);
         }
 
-        // Clean the string: escape double quotes and wrap in quotes to handle commas/newlines
         const escaped = cellValue.replace(/"/g, '""');
         return `"${escaped}"`;
       });
       csvRows.push(values.join(','));
     }
 
-    // 3. Create Blob and trigger download
     const csvString = csvRows.join('\n');
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -176,10 +202,9 @@ export default function LeadDashboard() {
     setUploading(true);
     try {
       const response = await AdminService.uploadDetailLeadsCSV(file);
-      // console.log("Upload response:", response);
+      console.log("Upload response:", response);
       if (response.success) {
         alert("CSV uploaded and processed successfully!");
-        // fetchLeads(); // Refresh the list
       } else {
         alert(response.message || "Failed to upload CSV");
       }
@@ -188,7 +213,7 @@ export default function LeadDashboard() {
       alert(error.response?.data?.message || "Error uploading file");
     } finally {
       setUploading(false);
-      event.target.value = ''; // Reset input
+      event.target.value = '';
     }
   };
 
@@ -245,7 +270,7 @@ export default function LeadDashboard() {
                 ))}
               </select>
             </div>
-            {/* NEW IMPORT BUTTON */}
+            
             <div className="flex-1 md:flex-none">
               <input
                 type="file"
@@ -257,22 +282,20 @@ export default function LeadDashboard() {
               />
               <label
                 htmlFor="csvUpload"
-                className={`inline-flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors shadow-sm cursor-pointer ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
-              >
+                className={`inline-flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors shadow-sm cursor-pointer ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
                 {uploading ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
                   <FileUp className="w-4 h-4 mr-2" />
                 )}
-                {uploading ? 'Uploading...' : 'Import CSV'}
+                {uploading ? 'Uploading...' : 'Upload CSV'}
               </label>
             </div>
-            {/* UPDATED DOWNLOAD BUTTON */}
+            
             <button
               onClick={downloadCSV}
-              className="flex-1 md:flex-none inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium transition-colors shadow-sm"
-            >
-              <FileUp className="w-4 h-4 mr-2" /> Export CSV
+              className="flex-1 md:flex-none inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium transition-colors shadow-sm cursor-pointer">
+              <FileUp className="w-4 h-4 mr-2" /> Download CSV
             </button>
           </div>
         </div>
@@ -308,56 +331,46 @@ export default function LeadDashboard() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {currentLeads.length > 0 ? (
                     currentLeads.map((lead) => {
-                      const isPending = false;
                       return (
                         <tr key={lead.id} className="hover:bg-gray-50 transition-colors relative group">
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 font-bold bg-white z-20">
                             {lead.id}
-                            {/* {isPending && (
-                              <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none w-[1200px]">
-                                <span className="text-red-600 font-bold text-[10px] sm:text-xs bg-white/80 px-3 py-1 rounded-full border border-red-200 backdrop-blur-sm shadow-sm whitespace-nowrap">
-                                  Deadline: {new Date(lead.rm_action_deadline).toLocaleDateString('en-GB')} / {new Date(lead.rm_action_deadline).toLocaleTimeString('en-GB', {
-                                    hour: '2-digit', minute: '2-digit', hour12: true
-                                  })}
-                                </span>
-                              </div>
-                            )} */}
                           </td>
 
                           <td className="px-4 py-4 whitespace-nowrap text-sm font-bold text-gray-700 bg-white z-20">
                             {lead.detail_lead_id}
                           </td>
 
-                          <td className={`px-4 py-4 whitespace-nowrap transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          <td className="px-4 py-4 whitespace-nowrap">
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${lead.lead_status === 'NEW' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
                               {lead.lead_status}
                             </span>
                           </td>
 
-                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-700 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
                             <div className="font-bold">{lead.dsa_name}</div>
                             <div className="text-[10px] text-gray-500">ID: {lead.dsa_id || 'N/A'}</div>
                           </td>
 
-                          <td className={`px-4 py-4 whitespace-nowrap text-sm transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm">
                             <div className="font-bold text-gray-800">{lead.lead_name}</div>
                             <div className="text-[11px] text-gray-600">{lead.email}</div>
                             <div className="text-[10px] text-gray-500">{lead.contact_number}</div>
                           </td>
 
-                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                             {lead.referred_rm || 'N/A'}
                           </td>
 
                           {leadType !== 'my_lead' && (
-                            <td className={`px-4 py-4 whitespace-nowrap text-sm text-purple-600 font-medium transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-purple-600 font-medium">
                               <div className="font-bold text-gray-800">{lead.assigned_rm_name}</div>
                               <div className="text-[10px] text-gray-500">{lead.assigned_rm_mobile}</div>
                               <div className="text-[11px] text-gray-600">ID: {lead.assigned_rm_id}</div>
                             </td>
                           )}
 
-                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                             {lead.is_self_login ? <span className="text-green-600 font-bold">Yes</span> : 'No'}
                           </td>
 
@@ -367,17 +380,17 @@ export default function LeadDashboard() {
                             </span>
                           </td>
 
-                          <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                             {new Date(lead.created_at).toLocaleDateString('en-GB')}
                           </td>
 
-                          <td className={`px-4 py-4 whitespace-nowrap transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          <td className="px-4 py-4 whitespace-nowrap">
                             <button onClick={() => setDocModalLead(lead)} className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-700 px-3 py-1 rounded-md font-bold hover:bg-gray-200 transition-colors text-xs">
                               <Files size={14} /> Docs
                             </button>
                           </td>
 
-                          <td className={`px-4 py-4 whitespace-nowrap text-right text-sm transition-all duration-300 ${isPending ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
+                          <td className="px-4 py-4 whitespace-nowrap text-right text-sm">
                             <button onClick={() => setSelectedLead(lead)} className="bg-blue-50 text-blue-600 px-3 py-1 rounded-md font-bold transition-colors hover:bg-blue-100">
                               View
                             </button>
@@ -536,7 +549,6 @@ export default function LeadDashboard() {
         </div>
 
         {/* --- LEAD VIEW FORM --- */}
-        {/* --- LEAD VIEW FORM --- */}
         <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${selectedLead ? 'visible opacity-100' : 'invisible opacity-0'}`}>
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedLead(null)} />
           <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transition-all duration-300 transform ${selectedLead ? 'scale-100' : 'scale-95'}`}>
@@ -554,14 +566,12 @@ export default function LeadDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
                     {selectedLead.form_data && Object.keys(selectedLead.form_data).length > 0 ? (
                       Object.entries(selectedLead.form_data).map(([key, value]) => {
-                        // 1. Format the Label (e.g., "loanAmount" -> "Loan Amount")
                         const formattedLabel = key
-                          .replace(/([A-Z])/g, ' $1') // Add space before capital letters
-                          .replace(/_/g, ' ')        // Replace underscores with spaces
-                          .replace(/^\w/, (c) => c.toUpperCase()) // Capitalize first letter
+                          .replace(/([A-Z])/g, ' $1')
+                          .replace(/_/g, ' ')
+                          .replace(/^\w/, (c) => c.toUpperCase())
                           .trim();
 
-                        // 2. Format the Value
                         let displayValue = "";
                         if (value === null || value === undefined || value === "") {
                           displayValue = "N/A";
@@ -595,9 +605,6 @@ export default function LeadDashboard() {
                 </div>
 
                 <div className="p-6 border-t bg-gray-50 flex gap-3">
-                  <button className="flex-1 bg-[#1CADA3] text-white font-bold py-2.5 rounded-xl text-sm hover:shadow-lg transition-all">
-                    Process Lead
-                  </button>
                   <button onClick={() => setSelectedLead(null)} className="px-6 py-2.5 bg-white border text-gray-600 font-bold rounded-xl text-sm hover:bg-gray-100 transition-all">
                     Close
                   </button>

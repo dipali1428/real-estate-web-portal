@@ -47,6 +47,7 @@ interface Lead {
   dsa_id: number;
   dsa_name: string;
   dsa_adv_id: string;
+  dsa_mobile: string;
   rm_id: number;
   rm_name: string;
   rm_acceptance_status: string;
@@ -374,7 +375,8 @@ console.log("Status update response:", response);
                           {/* 4. DSA Info */}
                           <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-700 transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
                             <div className="font-bold">{lead.dsa_name}</div>
-                            <div className="text-[10px] text-gray-500">{lead.dsa_adv_id || 'N/A'}</div>
+                            <div className="font-bold">{lead.dsa_mobile}</div>
+                            <div className="text-[10px] text-gray-500">{lead.dsa_adv_id}</div>
                           </td>
 
                           {/* 5. Client Info */}
