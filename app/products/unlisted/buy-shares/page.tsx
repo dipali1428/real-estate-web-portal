@@ -180,9 +180,8 @@ const BuyShares: React.FC = () => {
         
         setCompanies(mappedData);
         setError(null);
-      } catch (err: any) {
-        console.error("Fetch error:", err);
-        setError(err.response?.data?.message || "Failed to load market data. Please try again.");
+      } catch {
+        setError("Failed to load market data. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -190,36 +189,41 @@ const BuyShares: React.FC = () => {
     loadShares();
   }, []);
 
-// FETCH GRAPH DATA WHEN DETAIL MODAL OPENS
-useEffect(() => {
-  const loadGraphData = async () => {
-    if (!detailCompany) return;
+  // FETCH GRAPH DATA WHEN DETAIL MODAL OPENS - FIXED
+  useEffect(() => {
+    const loadGraphData = async () => {
+      if (!detailCompany) return;
 
-    setIsGraphLoading(true);
-    try {
-      // Calling your specific API: /api/unlisted/:id/graph
-      const data = await fetchIdGraphData(detailCompany.id);
+      setIsGraphLoading(true);
+      setGraphData([]);
       
-      if (Array.isArray(data)) {
-        // Mapping your specific JSON structure: "price" -> "market_price"
-        const formattedData = data.map((pt: any) => ({
-          price_date: pt.price_date,
-          market_price: pt.price // Your JSON uses "price"
-        }));
+      try {
+        const response = await fetchIdGraphData(detailCompany.id);
         
-        // Show all entries or slice to last 60 for clarity
-        setGraphData(formattedData); 
+        // Check if response exists and has the graph array
+        if (response && response.success && response.graph && Array.isArray(response.graph)) {
+          // Map the graph array - using market_price from API response
+          const formattedData: GraphPoint[] = response.graph
+            .filter(item => item && item.price_date && item.market_price !== null && item.market_price !== undefined)
+            .map((item) => ({
+              price_date: item.price_date,
+              market_price: item.market_price?.toString() || '0'
+            }));
+          
+          if (formattedData.length > 0) {
+            setGraphData(formattedData);
+          }
+        }
+      } catch {
+        // Silently handle error
+        setGraphData([]);
+      } finally {
+        setIsGraphLoading(false);
       }
-    } catch (error) {
-      console.error("Failed to fetch graph data:", error);
-      setGraphData([]); // Reset on error
-    } finally {
-      setIsGraphLoading(false);
-    }
-  };
+    };
 
-  loadGraphData();
-}, [detailCompany]);
+    loadGraphData();
+  }, [detailCompany]);
 
   // PREVENT SCROLL ON MODAL OPEN
   useEffect(() => {
@@ -234,105 +238,108 @@ useEffect(() => {
   }, [searchTerm]);
 
   // ✅ CHART INITIALIZATION - Minimal like LiveTrends
-useEffect(() => {
-  if (!chartRef.current || !detailCompany) return;
-  if (graphData.length === 0) return;
+  useEffect(() => {
+    if (!chartRef.current || !detailCompany) return;
+    if (graphData.length === 0) return;
 
-  // Destroy existing chart
-  if (chartInstance.current) {
-    chartInstance.current.destroy();
-  }
-
-  const ctx = chartRef.current.getContext('2d');
-  if (!ctx) return;
-
-  // Filter data based on selected time range
-  let filteredData = [...graphData];
-  const now = new Date();
-  let cutoffDate = new Date();
-  
-  if (graphTimeRange === '1W') {
-    cutoffDate.setDate(now.getDate() - 7);
-    filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
-  } else if (graphTimeRange === '1M') {
-    cutoffDate.setMonth(now.getMonth() - 1);
-    filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
-  } else if (graphTimeRange === '3M') {
-    cutoffDate.setMonth(now.getMonth() - 3);
-    filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
-  } else if (graphTimeRange === '1Y') {
-    cutoffDate.setFullYear(now.getFullYear() - 1);
-    filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
-  }
-
-  // Sort data by date (oldest to newest for proper line chart)
-  filteredData.sort((a, b) => new Date(a.price_date).getTime() - new Date(b.price_date).getTime());
-
-  const labels = filteredData.map(item => {
-    const date = new Date(item.price_date);
-    return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-  });
-
-  const prices = filteredData.map(item => parseFloat(item.market_price));
-
-  const config: ChartConfiguration = {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Price History',
-        data: prices,
-        borderColor: '#2076C7',
-        backgroundColor: 'rgba(32, 118, 199, 0.05)',
-        borderWidth: 2,
-        pointRadius: filteredData.length > 50 ? 0 : 3,
-        pointHoverRadius: 6,
-        tension: 0.2,
-        fill: true
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          mode: 'index',
-          intersect: false,
-          callbacks: {
-            label: (ctx) => `₹${parseFloat(ctx.raw as string).toLocaleString('en-IN')}`
-          }
-        }
-      },
-      scales: {
-        y: {
-          grid: { color: 'rgba(0, 0, 0, 0.05)' },
-          ticks: { 
-            callback: (val) => `₹${val}`,
-            font: { size: 11 }
-          }
-        },
-        x: {
-          grid: { display: false },
-          ticks: {
-            autoSkip: true,
-            maxRotation: 0,
-            autoSkipPadding: 20,
-            font: { size: 10 }
-          }
-        }
-      }
-    }
-  };
-
-  chartInstance.current = new Chart(ctx, config);
-
-  return () => {
+    // Destroy existing chart
     if (chartInstance.current) {
       chartInstance.current.destroy();
     }
-  };
-}, [graphData, graphTimeRange, detailCompany]);
+
+    const ctx = chartRef.current.getContext('2d');
+    if (!ctx) return;
+
+    // Filter data based on selected time range
+    let filteredData = [...graphData];
+    const now = new Date();
+    
+    if (graphTimeRange === '1W') {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(now.getDate() - 7);
+      filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+    } else if (graphTimeRange === '1M') {
+      const cutoffDate = new Date();
+      cutoffDate.setMonth(now.getMonth() - 1);
+      filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+    } else if (graphTimeRange === '3M') {
+      const cutoffDate = new Date();
+      cutoffDate.setMonth(now.getMonth() - 3);
+      filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+    } else if (graphTimeRange === '1Y') {
+      const cutoffDate = new Date();
+      cutoffDate.setFullYear(now.getFullYear() - 1);
+      filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+    }
+
+    // Sort data by date (oldest to newest for proper line chart)
+    filteredData.sort((a, b) => new Date(a.price_date).getTime() - new Date(b.price_date).getTime());
+
+    const labels = filteredData.map(item => {
+      const date = new Date(item.price_date);
+      return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+    });
+
+    const prices = filteredData.map(item => parseFloat(item.market_price));
+
+    const config: ChartConfiguration = {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Price History',
+          data: prices,
+          borderColor: '#2076C7',
+          backgroundColor: 'rgba(32, 118, 199, 0.05)',
+          borderWidth: 2,
+          pointRadius: filteredData.length > 50 ? 0 : 3,
+          pointHoverRadius: 6,
+          tension: 0.2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: (ctx) => `₹${parseFloat(ctx.raw as string).toLocaleString('en-IN')}`
+            }
+          }
+        },
+        scales: {
+          y: {
+            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+            ticks: { 
+              callback: (val) => `₹${val}`,
+              font: { size: 11 }
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              autoSkip: true,
+              maxRotation: 0,
+              autoSkipPadding: 20,
+              font: { size: 10 }
+            }
+          }
+        }
+      }
+    };
+
+    chartInstance.current = new Chart(ctx, config);
+
+    return () => {
+      if (chartInstance.current) {
+        chartInstance.current.destroy();
+      }
+    };
+  }, [graphData, graphTimeRange, detailCompany]);
 
   // FILTERING LOGIC
   const filteredCompanies = useMemo(() => {
@@ -420,7 +427,6 @@ useEffect(() => {
       };
 
       const response = await createEnquiry(payload);
-      console.log("Enquiry submitted successfully:", response);
       
       setShowSuccess(true);
       setEnquiryCompany(null);
@@ -434,9 +440,8 @@ useEffect(() => {
       
       showNotification('Purchase enquiry submitted successfully!', 'success');
       
-    } catch (error: any) {
-      console.error("Enquiry submission error:", error);
-      setEnquiryError(error.response?.data?.message || "Failed to submit enquiry. Please try again.");
+    } catch {
+      setEnquiryError("Failed to submit enquiry. Please try again.");
       showNotification('Failed to submit enquiry', 'error');
     } finally {
       setIsSubmitting(false);
@@ -461,82 +466,88 @@ useEffect(() => {
   };
 
   // GRAPH HANDLERS
-const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-  const filteredData = getFilteredGraphData();
-  if (!filteredData.length) return;
-  
-  const svg = e.currentTarget;
-  const rect = svg.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const svgWidth = rect.width;
-  const index = Math.floor((x / svgWidth) * filteredData.length);
-  const clampedIndex = Math.min(Math.max(index, 0), filteredData.length - 1);
-  setHoveredIndex(clampedIndex);
-};
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const filteredData = getFilteredGraphData();
+    if (!filteredData.length) return;
+    
+    const svg = e.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const svgWidth = rect.width;
+    const index = Math.floor((x / svgWidth) * filteredData.length);
+    const clampedIndex = Math.min(Math.max(index, 0), filteredData.length - 1);
+    setHoveredIndex(clampedIndex);
+  };
 
   const handleMouseLeave = () => {
     setHoveredIndex(null);
   };
 
   // Add this function near your other helper functions
-const getFilteredGraphData = () => {
-  if (!graphData.length) return [];
-  
-  const now = new Date();
-  let cutoffDate = new Date();
-  
-  switch (graphTimeRange) {
-    case '1W':
-      cutoffDate.setDate(now.getDate() - 7);
-      break;
-    case '1M':
-      cutoffDate.setMonth(now.getMonth() - 1);
-      break;
-    case '3M':
-      cutoffDate.setMonth(now.getMonth() - 3);
-      break;
-    case '1Y':
-      cutoffDate.setFullYear(now.getFullYear() - 1);
-      break;
-    case 'All':
-    default:
-      return graphData; // Return all data
-  }
-  
-  return graphData.filter(item => new Date(item.price_date) >= cutoffDate);
-};
+  const getFilteredGraphData = () => {
+    if (!graphData.length) return [];
+    
+    const now = new Date();
+    
+    switch (graphTimeRange) {
+      case '1W': {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(now.getDate() - 7);
+        return graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+      }
+      case '1M': {
+        const cutoffDate = new Date();
+        cutoffDate.setMonth(now.getMonth() - 1);
+        return graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+      }
+      case '3M': {
+        const cutoffDate = new Date();
+        cutoffDate.setMonth(now.getMonth() - 3);
+        return graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+      }
+      case '1Y': {
+        const cutoffDate = new Date();
+        cutoffDate.setFullYear(now.getFullYear() - 1);
+        return graphData.filter(item => new Date(item.price_date) >= cutoffDate);
+      }
+      case 'All':
+      default:
+        return graphData;
+    }
+  };
 
-const getGraphPoints = () => {
-  const filteredData = getFilteredGraphData();
-  if (!filteredData.length) return '';
-  
-  const width = 100;
-  const height = 40;
-  const values = filteredData.map(d => parseFloat(d.market_price));
-  const minVal = Math.min(...values);
-  const maxVal = Math.max(...values);
-  const range = (maxVal - minVal) || 1;
-  
-  return filteredData.map((point, i) => {
-    const x = (i / (filteredData.length - 1)) * width;
-    const y = height - (((parseFloat(point.market_price) - minVal) / range) * height * 0.8) - 4;
-    return `${x},${y}`;
-  }).join(' ');
-};
+  const getGraphPoints = () => {
+    const filteredData = getFilteredGraphData();
+    if (!filteredData.length) return '';
+    
+    const width = 100;
+    const height = 40;
+    const values = filteredData.map(d => parseFloat(d.market_price));
+    const minVal = Math.min(...values);
+    const maxVal = Math.max(...values);
+    const range = (maxVal - minVal) || 1;
+    
+    return filteredData.map((point, i) => {
+      const x = (i / (filteredData.length - 1)) * width;
+      const y = height - (((parseFloat(point.market_price) - minVal) / range) * height * 0.8) - 4;
+      return `${x},${y}`;
+    }).join(' ');
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
   };
-// Add this helper function for shorter date format (DD MMM)
-const formatShortDate = (dateString: string) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-IN', { 
-    day: '2-digit', 
-    month: 'short' 
-  }).replace(',', '');
-};
+
+  // Add this helper function for shorter date format (DD MMM)
+  const formatShortDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-IN', { 
+      day: '2-digit', 
+      month: 'short' 
+    }).replace(',', '');
+  };
 
   // LOADING STATE UI - Simplified to match SellShares
   if (isLoading) {

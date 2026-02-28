@@ -1,136 +1,28 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import {
   IndianRupee,
   TrendingUp,
-  Clock,
-  CheckCircle,
   AlertCircle,
   Eye,
   EyeOff,
-  Loader2,
   RefreshCw,
   Wallet,
   BarChart3,
-  Activity,
   Building,
-  ShoppingCart,
-  HandCoins,
   ChevronRight,
-  LogOut,
-  ArrowUpRight,
-  ArrowDownRight,
   Sparkles,
   Target,
-  PieChart,
-  Shield,
-  Award,
-  Zap,
-  TrendingDown,
   Users,
-  Briefcase,
-  Calendar,
-  Gift,
-  Star,
-  Bell,
-  Settings,
-  HelpCircle,
-  FileText,
-  Download,
-  Copy,
-  ExternalLink,
-  Home,
-  LayoutDashboard,
   LineChart,
-  Mail,
-  Phone,
-  MapPin,
-  User,
-  CreditCard,
-  Hash,
-  BarChart4,
-  CandlestickChart,
-  Layers,
-  Network,
-  Rocket,
   Flame,
-  Leaf,
-  Gem,
-  Crown,
-  Medal,
-  ThumbsUp
+  Award,
+  Leaf
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
-// ==================== API SERVICE ====================
-
-const API_BASE = 'http://192.168.1.69:5000';
-
-const fetchDashboard = async () => {
-  // Get token from cookie (set by your login page)
-  const token = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('authToken='))
-    ?.split('=')[1];
-
-  if (!token) {
-    throw new Error('NO_TOKEN');
-  }
-
-  const res = await fetch(`${API_BASE}/api/unlisted/user/dashboard`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  });
-  
-  if (res.status === 401) {
-    throw new Error('UNAUTHORIZED');
-  }
-  if (!res.ok) throw new Error('Failed to fetch dashboard');
-  return res.json();
-};
-
-const fetchProfile = async () => {
-  const token = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('authToken='))
-    ?.split('=')[1];
-
-  if (!token) throw new Error('NO_TOKEN');
-
-  const res = await fetch(`${API_BASE}/api/unlisted/user/profile`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  });
-  if (res.status === 401) throw new Error('UNAUTHORIZED');
-  if (!res.ok) throw new Error('Failed to fetch profile');
-  return res.json();
-};
-
-const logout = async () => {
-  const token = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('authToken='))
-    ?.split('=')[1];
-
-  if (token) {
-    await fetch(`${API_BASE}/api/unlisted/user/logout`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-  }
-  
-  // Clear cookie
-  document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-  localStorage.removeItem('token'); // Also clear localStorage if you're using it
-};
+import customerService from '../../../services/customerService';
 
 // ==================== TYPES ====================
 
@@ -139,6 +31,25 @@ interface DashboardData {
   total_transactions: string;
   pending_transactions: string;
 }
+
+interface ProfileData {
+  name?: string;
+  email?: string;
+  mobile?: string;
+}
+
+// ==================== HELPER FUNCTIONS ====================
+
+const getTokenFromCookie = (): string | null => {
+  if (typeof document === 'undefined') return null;
+  const cookies = document.cookie.split('; ');
+  const authCookie = cookies.find(row => row.startsWith('authToken='));
+  return authCookie ? authCookie.split('=')[1] : null;
+};
+
+const removeTokenCookie = (): void => {
+  document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+};
 
 // ==================== MAIN DASHBOARD COMPONENT ====================
 
@@ -155,10 +66,7 @@ const UserDashboard: React.FC = () => {
   // ========== CHECK AUTH AND FETCH DATA ==========
   useEffect(() => {
     // Check if user is logged in by looking for authToken cookie
-    const token = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('authToken='))
-      ?.split('=')[1];
+    const token = getTokenFromCookie();
     
     // If no token, redirect to home page which will open login modal
     if (!token) {
@@ -177,22 +85,27 @@ const UserDashboard: React.FC = () => {
       setError(null);
       
       try {
-        // Fetch dashboard data
-        const dashboardResponse = await fetchDashboard();
+        // Store token in localStorage for the API service
+        localStorage.setItem('token', token);
         
-        if (dashboardResponse.success) {
+        // Fetch dashboard data using customerService
+        const dashboardResponse = await customerService.getDashboard();
+        
+        if (dashboardResponse?.success) {
           setDashboard(dashboardResponse.data);
           setLastUpdated(new Date().toLocaleTimeString('en-IN', {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit'
           }));
+        } else {
+          setError('Failed to load dashboard data');
         }
 
-        // Fetch profile data
+        // Fetch profile data using customerService
         try {
-          const profileResponse = await fetchProfile();
-          if (profileResponse.success) {
+          const profileResponse = await customerService.getProfile();
+          if (profileResponse?.success) {
             const fullName = profileResponse.data?.name || 'Investor';
             setUserName(fullName.split(' ')[0] || 'Investor');
           }
@@ -204,12 +117,13 @@ const UserDashboard: React.FC = () => {
       } catch (err: any) {
         console.error('Dashboard error:', err);
         
-        if (err.message === 'UNAUTHORIZED' || err.message === 'NO_TOKEN') {
-          // Clear invalid token
-          document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        // Check for 401 Unauthorized
+        if (err.response?.status === 401 || err.message?.includes('401')) {
+          removeTokenCookie();
+          localStorage.removeItem('token');
           router.push('/');
         } else {
-          setError(err.message || 'Unable to connect to server');
+          setError(err.response?.data?.message || err.message || 'Unable to connect to server');
         }
       } finally {
         setIsLoading(false);
@@ -226,10 +140,13 @@ const UserDashboard: React.FC = () => {
   // ========== HANDLE LOGOUT ==========
   const handleLogout = async () => {
     try {
-      await logout();
+      await customerService.logout();
     } catch (err) {
       console.error('Logout error:', err);
     }
+    // Clear everything and redirect
+    removeTokenCookie();
+    localStorage.removeItem('token');
     router.push('/');
   };
 
@@ -355,6 +272,30 @@ const UserDashboard: React.FC = () => {
               <span className="font-semibold">+12.4% this month</span>
             </div>
           </div>
+
+          {/* Total Transactions Card */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-4">
+              <BarChart3 className="w-7 h-7 text-white" />
+            </div>
+            <p className="text-sm font-medium text-gray-500 mb-1">Total Transactions</p>
+            <p className="text-3xl font-black text-gray-900 mb-2">
+              {dashboard ? parseInt(dashboard.total_transactions).toLocaleString() : '0'}
+            </p>
+            <p className="text-xs text-gray-500">Lifetime transactions</p>
+          </div>
+
+          {/* Pending Transactions Card */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 mb-4">
+              <RefreshCw className="w-7 h-7 text-white" />
+            </div>
+            <p className="text-sm font-medium text-gray-500 mb-1">Pending Transactions</p>
+            <p className="text-3xl font-black text-gray-900 mb-2">
+              {dashboard ? parseInt(dashboard.pending_transactions).toLocaleString() : '0'}
+            </p>
+            <p className="text-xs text-gray-500">Awaiting confirmation</p>
+          </div>
         </div>
 
         {/* Market Insights & Quick Links */}
@@ -453,6 +394,11 @@ const UserDashboard: React.FC = () => {
               </Link>
             </div>
           </div>
+        </div>
+
+        {/* Last Updated Info */}
+        <div className="text-center text-xs text-gray-400">
+          <span>Last updated: {lastUpdated || 'Just now'}</span>
         </div>
       </main>
       

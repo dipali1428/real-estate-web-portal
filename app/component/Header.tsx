@@ -60,7 +60,7 @@ const Header = () => {
   ];
 
   const insuranceOptions = [
-    { label: "Life Insurance", href: "/offers/insurance/life-insurance" },
+    { label: "Life Insurance", href: "/products/life-insurance" },
     { label: "Health Insurance", href: "/products/health-insurance" },
     { label: "Motor Insurance", href: "/offers/insurance/motor-insurance" },
     { label: "Travel Insurance", href: "/products/travel-insurance" },

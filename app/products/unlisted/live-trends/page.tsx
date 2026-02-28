@@ -6,7 +6,6 @@ import {
     fetchTopLosers,
     fetchAllShares,
     type TopMover,
-    type DashboardResponse,
     type DashboardSummary,
     type GraphPoint
 } from '../../../services/unlistedservices';
@@ -152,37 +151,63 @@ const LiveTrends: React.FC = () => {
             setIsSharesLoading(true);
             
             try {
-                // Fetch dashboard data (graph + summary)
-                const dashboardData = await fetchDashboardData();
-                if (dashboardData.success) {
-                    setGraphData(dashboardData.graph);
-                    setSummary(dashboardData.summary);
+                // Fetch graph data - now it returns {success, summary, graph}
+                const graphResponse = await fetchDashboardData();
+                
+                // Check if the response has the expected structure
+                if (graphResponse && graphResponse.success && graphResponse.graph) {
+                    // Set the graph data from the graph property
+                    setGraphData(graphResponse.graph);
+                    
+                    // Set summary from the response
+                    if (graphResponse.summary) {
+                        setSummary(graphResponse.summary);
+                    }
+                } else {
+                    setGraphError("Invalid graph data format");
                 }
 
                 // Fetch top gainers
-                const gainersData = await fetchTopGainers(5);
-                if (gainersData.success) {
-                    setGainers(gainersData.data);
+                try {
+                    const gainersData = await fetchTopGainers(5);
+                    if (gainersData.success) {
+                        setGainers(gainersData.data);
+                    }
+                } catch (error) {
+                    // Silently handle error
                 }
 
                 // Fetch top losers
-                const losersData = await fetchTopLosers(5);
-                if (losersData.success) {
-                    setLosers(losersData.data);
+                try {
+                    const losersData = await fetchTopLosers(5);
+                    if (losersData.success) {
+                        setLosers(losersData.data);
+                    }
+                } catch (error) {
+                    // Silently handle error
                 }
 
                 // Fetch shares data
-                const sharesData = await fetchAllShares();
-                if (Array.isArray(sharesData)) {
-                    setShares(sharesData);
+                try {
+                    const sharesData = await fetchAllShares();
+                    if (Array.isArray(sharesData)) {
+                        setShares(sharesData);
+                        
+                        // Update total companies count from shares data if summary exists
+                        setSummary(prev => prev ? {
+                            ...prev,
+                            totalCompanies: sharesData.length,
+                            totalSharesListed: sharesData.length
+                        } : null);
+                    }
+                } catch (error) {
+                    // Silently handle error
                 }
 
                 setGraphError(null);
                 setMoversError(null);
             } catch (error: any) {
-                console.error("Failed to fetch data:", error);
                 setGraphError("Unable to connect to live API");
-                setMoversError("Unable to fetch top movers");
             } finally {
                 setIsGraphLoading(false);
                 setIsMoversLoading(false);
@@ -310,7 +335,7 @@ const LiveTrends: React.FC = () => {
         try {
             chartInstance.current = new Chart(ctx, config);
         } catch (error) {
-            console.error("Error creating chart:", error);
+            // Silently handle chart creation error
         }
 
         return () => {

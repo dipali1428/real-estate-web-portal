@@ -60,15 +60,20 @@ const ShareManagement: React.FC = () => {
 
   const openModal = (type: 'add' | 'edit', share?: Share) => {
     setModalType(type);
-    setSelectedShare(share || { 
-      shares_name: '', 
-      price: '', 
-      depository_applicable: 'NSDL & CDSL',
-      min_lot_size: 100,
-      is_active: true,
-      status: 'APPROVED',
-      logo_url: ''
-    });
+    if (type === 'add') {
+      // For add, DON'T include ID - let backend generate it
+      setSelectedShare({ 
+        shares_name: '', 
+        price: '', 
+        depository_applicable: 'NSDL & CDSL',
+        min_lot_size: 100,
+        logo_url: ''
+        // No ID field!
+      });
+    } else {
+      // For edit, use the existing share (which has an ID)
+      setSelectedShare(share || null);
+    }
     setIsModalOpen(true);
   };
 
@@ -77,88 +82,72 @@ const ShareManagement: React.FC = () => {
     setDeleteModalOpen(true);
   };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitLoading(true);
 
     try {
-        if (modalType === 'add') {
-        // For ADD: All fields except optional ones are required
-        const addPayload: {
-            shares_name: string;
-            price: string;
-            depository_applicable: string;
-            min_lot_size: number;
-            logo_url?: string;
-            clean_name?: string;
-            is_active?: boolean;
-            status?: string;
-        } = {
-            shares_name: selectedShare?.shares_name || '',
-            price: selectedShare?.price || '0',
-            depository_applicable: selectedShare?.depository_applicable || 'NSDL & CDSL',
-            min_lot_size: selectedShare?.min_lot_size || 100,
+      if (modalType === 'add') {
+        // For ADD: DO NOT send ID - let backend generate it
+        const addPayload: any = {
+          shares_name: selectedShare?.shares_name || '',
+          price: selectedShare?.price || '0',
+          depository_applicable: selectedShare?.depository_applicable || 'NSDL & CDSL',
+          min_lot_size: selectedShare?.min_lot_size || 100,
         };
 
-        // Add optional fields only if they have values
-        if (selectedShare?.clean_name) {
-            addPayload.clean_name = selectedShare.clean_name;
-        }
-        
+        // Only add logo_url if it exists
         if (selectedShare?.logo_url) {
-            addPayload.logo_url = selectedShare.logo_url;
+          addPayload.logo_url = selectedShare.logo_url;
         }
         
-        if (selectedShare?.is_active !== undefined) {
-            addPayload.is_active = selectedShare.is_active;
-        }
-        
-        if (selectedShare?.status) {
-            addPayload.status = selectedShare.status;
-        }
+        // ❌ DO NOT send these fields for add:
+        // - id (let backend generate)
+        // - clean_name
+        // - is_active
+        // - status
 
-        await AdminService.addShare(addPayload);
+        console.log('📤 Sending add payload:', addPayload);
+        
+        const response = await AdminService.addShare(addPayload);
+        console.log('📥 Response:', response);
+        
         alert("Share added successfully!");
         
-        } else {
-        // For EDIT: All fields are optional
+      } else {
+        // For EDIT: Send update payload with ID in URL, not in body
         if (selectedShare?.id) {
-            const updatePayload: {
-            shares_name?: string;
-            price?: string;
-            depository_applicable?: string;
-            min_lot_size?: number;
-            logo_url?: string;
-            clean_name?: string;
-            is_active?: boolean;
-            status?: string;
-            } = {};
+          const updatePayload: any = {};
 
-            // Only add fields that have values
-            if (selectedShare.shares_name) updatePayload.shares_name = selectedShare.shares_name;
-            if (selectedShare.price) updatePayload.price = selectedShare.price;
-            if (selectedShare.depository_applicable) updatePayload.depository_applicable = selectedShare.depository_applicable;
-            if (selectedShare.min_lot_size) updatePayload.min_lot_size = selectedShare.min_lot_size;
-            if (selectedShare.clean_name) updatePayload.clean_name = selectedShare.clean_name;
-            if (selectedShare.logo_url) updatePayload.logo_url = selectedShare.logo_url;
-            if (selectedShare.is_active !== undefined) updatePayload.is_active = selectedShare.is_active;
-            if (selectedShare.status) updatePayload.status = selectedShare.status;
+          if (selectedShare.shares_name) updatePayload.shares_name = selectedShare.shares_name;
+          if (selectedShare.price) updatePayload.price = selectedShare.price;
+          if (selectedShare.depository_applicable) updatePayload.depository_applicable = selectedShare.depository_applicable;
+          if (selectedShare.min_lot_size) updatePayload.min_lot_size = selectedShare.min_lot_size;
+          if (selectedShare.clean_name) updatePayload.clean_name = selectedShare.clean_name;
+          if (selectedShare.logo_url) updatePayload.logo_url = selectedShare.logo_url;
+          if (selectedShare.is_active !== undefined) updatePayload.is_active = selectedShare.is_active;
+          if (selectedShare.status) updatePayload.status = selectedShare.status;
 
-            await AdminService.updateShare(selectedShare.id, updatePayload);
-            alert("Share updated successfully!");
+          console.log('📤 Sending update payload:', updatePayload);
+          
+          const response = await AdminService.updateShare(selectedShare.id, updatePayload);
+          console.log('📥 Response:', response);
+          
+          alert("Share updated successfully!");
         }
-        }
-        
-        setIsModalOpen(false);
-        fetchShares();
+      }
+      
+      setIsModalOpen(false);
+      fetchShares();
     } catch (error: any) {
-        console.error("Submit error:", error);
-        const serverMessage = error.response?.data?.message || error.response?.data?.error || "Check all fields";
-        alert(`Failed: ${serverMessage}`);
+      console.error("Submit error:", error);
+      console.error("Error response:", error.response?.data);
+      const serverMessage = error.response?.data?.message || error.response?.data?.error || "Check all fields";
+      alert(`Failed: ${serverMessage}`);
     } finally {
-        setSubmitLoading(false);
+      setSubmitLoading(false);
     }
-    };
+  };
 
   const handleDelete = async () => {
     if (!shareToDelete) return;
@@ -385,38 +374,25 @@ const ShareManagement: React.FC = () => {
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
                 {/* Company Name */}
                 <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">
+                  <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
                     Company Name <span className="text-red-500">*</span>
                   </label>
                   <input 
                     required
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                     value={selectedShare?.shares_name || ''}
                     onChange={e => setSelectedShare({...selectedShare, shares_name: e.target.value})}
                     placeholder="e.g., ABC Technologies Limited Unlisted Shares"
                   />
                 </div>
 
-                {/* Clean Name */}
-                <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">
-                    Clean Name (Optional)
-                  </label>
-                  <input 
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm"
-                    value={selectedShare?.clean_name || ''}
-                    onChange={e => setSelectedShare({...selectedShare, clean_name: e.target.value})}
-                    placeholder="Display name without 'Unlisted Shares'"
-                  />
-                </div>
-
                 {/* Logo URL */}
                 <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">
+                  <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
                     Logo URL (Optional)
                   </label>
                   <input 
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                     value={selectedShare?.logo_url || ''}
                     onChange={e => setSelectedShare({...selectedShare, logo_url: e.target.value})}
                     placeholder="https://example.com/logo.jpg"
@@ -426,27 +402,27 @@ const ShareManagement: React.FC = () => {
                 {/* Price and Lot Size */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">
+                    <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
                       Price (₹) <span className="text-red-500">*</span>
                     </label>
                     <input 
                       required
                       type="number"
                       step="0.01"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                       value={selectedShare?.price || ''}
                       onChange={e => setSelectedShare({...selectedShare, price: e.target.value})}
                       placeholder="475.00"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">
+                    <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
                       Minimum Lot Size <span className="text-red-500">*</span>
                     </label>
                     <input 
                       required
                       type="number"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                       value={selectedShare?.min_lot_size || 100}
                       onChange={e => setSelectedShare({...selectedShare, min_lot_size: parseInt(e.target.value)})}
                       placeholder="100"
@@ -456,54 +432,69 @@ const ShareManagement: React.FC = () => {
 
                 {/* Depository */}
                 <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">
+                  <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
                     Depository Applicable <span className="text-red-500">*</span>
                   </label>
                   <select
                     required
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm bg-white"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm bg-white"
                     value={selectedShare?.depository_applicable || 'NSDL & CDSL'}
                     onChange={e => setSelectedShare({...selectedShare, depository_applicable: e.target.value})}
                   >
                     <option value="NSDL & CDSL">NSDL & CDSL</option>
-                    <option value="NSDL &amp; CDSL">NSDL &amp; CDSL</option>
                     <option value="NSDL Only">NSDL Only</option>
                     <option value="CDSL Only">CDSL Only</option>
-                    <option value="Only NSDL">Only NSDL</option>
-                    <option value="Only CDSL">Only CDSL</option>
                   </select>
                 </div>
 
-                {/* Status and Active */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">
-                      Status
-                    </label>
-                    <select
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm bg-white"
-                      value={selectedShare?.status || 'APPROVED'}
-                      onChange={e => setSelectedShare({...selectedShare, status: e.target.value})}
-                    >
-                      <option value="APPROVED">APPROVED</option>
-                      <option value="PENDING">PENDING</option>
-                      <option value="REJECTED">REJECTED</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">
-                      Active Status
-                    </label>
-                    <select
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm bg-white"
-                      value={selectedShare?.is_active ? 'true' : 'false'}
-                      onChange={e => setSelectedShare({...selectedShare, is_active: e.target.value === 'true'})}
-                    >
-                      <option value="true">Active</option>
-                      <option value="false">Inactive</option>
-                    </select>
-                  </div>
-                </div>
+                {/* EDIT-ONLY FIELDS - Only show when editing */}
+                {modalType === 'edit' && (
+                  <>
+                    {/* Clean Name */}
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">
+                        Clean Name (Optional)
+                      </label>
+                      <input 
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
+                        value={selectedShare?.clean_name || ''}
+                        onChange={e => setSelectedShare({...selectedShare, clean_name: e.target.value})}
+                        placeholder="Display name without 'Unlisted Shares'"
+                      />
+                    </div>
+
+                    {/* Status and Active */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
+                          Status
+                        </label>
+                        <select
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm bg-white"
+                          value={selectedShare?.status || 'APPROVED'}
+                          onChange={e => setSelectedShare({...selectedShare, status: e.target.value})}
+                        >
+                          <option value="APPROVED">APPROVED</option>
+                          <option value="PENDING">PENDING</option>
+                          <option value="REJECTED">REJECTED</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
+                          Active Status
+                        </label>
+                        <select
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm bg-white"
+                          value={selectedShare?.is_active ? 'true' : 'false'}
+                          onChange={e => setSelectedShare({...selectedShare, is_active: e.target.value === 'true'})}
+                        >
+                          <option value="true">Active</option>
+                          <option value="false">Inactive</option>
+                        </select>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <button 
                   type="submit"

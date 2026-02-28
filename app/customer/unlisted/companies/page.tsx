@@ -22,10 +22,16 @@ import customerService from '../../../services/customerService';
 interface Company {
   id: number;
   shares_name: string;
-  logo_url: string;
+  logo_url: string | null;
   price: string;
-  min_lot_size: number;
-  depository_applicable: string;
+  min_lot_size: number | null;
+  depository_applicable: string | null;
+}
+
+interface DepositoryBadge {
+  bg: string;
+  text: string;
+  label: string;
 }
 
 // ==================== HELPER FUNCTIONS ====================
@@ -37,24 +43,100 @@ const getTokenFromCookie = (): string | null => {
   return authCookie ? authCookie.split('=')[1] : null;
 };
 
-const removeTokenCookie = () => {
+const removeTokenCookie = (): void => {
   document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
 };
+
+const formatCurrency = (amount: string): string => {
+  const num = parseFloat(amount);
+  return `₹${num.toLocaleString('en-IN', { 
+    minimumFractionDigits: 2, 
+    maximumFractionDigits: 2 
+  })}`;
+};
+
+const formatMinLotSize = (minLotSize: number | null): string => {
+  if (minLotSize === null || minLotSize === undefined) {
+    return 'N/A';
+  }
+  return minLotSize.toLocaleString();
+};
+
+const getCompanyInitials = (name: string): string => {
+  return name
+    .split(' ')
+    .map(word => word[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+};
+
+const getDepositoryBadge = (depository: string | null): DepositoryBadge => {
+  // Handle null, undefined, or empty string
+  if (!depository) {
+    return { bg: 'bg-gray-50', text: 'text-gray-700', label: 'Not Specified' };
+  }
+  
+  // Clean up the depository string (remove &amp; and extra spaces)
+  const cleanDepository = depository.replace(/&amp;/g, '&').trim();
+  
+  if (cleanDepository.includes('NSDL') && cleanDepository.includes('CDSL')) {
+    return { bg: 'bg-purple-50', text: 'text-purple-700', label: 'NSDL & CDSL' };
+  } else if (cleanDepository.includes('NSDL')) {
+    return { bg: 'bg-blue-50', text: 'text-blue-700', label: 'NSDL' };
+  } else if (cleanDepository.includes('CDSL')) {
+    return { bg: 'bg-indigo-50', text: 'text-indigo-700', label: 'CDSL' };
+  } else {
+    return { bg: 'bg-gray-50', text: 'text-gray-700', label: cleanDepository };
+  }
+};
+
+const calculateMinInvestment = (price: string, minLotSize: number | null): number => {
+  const priceNum = parseFloat(price);
+  const lotSize = minLotSize || 0;
+  return priceNum * lotSize;
+};
+
+// ==================== PRICE RANGES ====================
+
+const PRICE_RANGES = [
+  { label: 'All Prices', value: 'ALL' },
+  { label: 'Under ₹100', value: '0-100' },
+  { label: '₹100 - ₹500', value: '100-500' },
+  { label: '₹500 - ₹1000', value: '500-1000' },
+  { label: '₹1000 - ₹5000', value: '1000-5000' },
+  { label: 'Above ₹5000', value: '5000-1000000' },
+] as const;
+
+// ==================== SORT OPTIONS ====================
+
+const SORT_OPTIONS = [
+  { label: 'Name: A to Z', value: 'name-asc' },
+  { label: 'Name: Z to A', value: 'name-desc' },
+  { label: 'Price: Low to High', value: 'price-asc' },
+  { label: 'Price: High to Low', value: 'price-desc' },
+  { label: 'Lot Size: Low to High', value: 'lot-asc' },
+  { label: 'Lot Size: High to Low', value: 'lot-desc' },
+] as const;
+
+type SortOption = typeof SORT_OPTIONS[number]['value'];
+type PriceRangeOption = typeof PRICE_RANGES[number]['value'];
 
 // ==================== MAIN COMPONENT ====================
 
 export default function UserDashboard() {
   const router = useRouter();
+  
+  // State
   const [companies, setCompanies] = useState<Company[]>([]);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [priceRange, setPriceRange] = useState<string>('ALL');
-  const [sortBy, setSortBy] = useState<string>('name-asc');
+  const [priceRange, setPriceRange] = useState<PriceRangeOption>('ALL');
+  const [sortBy, setSortBy] = useState<SortOption>('name-asc');
   const [showFilters, setShowFilters] = useState(false);
-  // ===== NEW STATE =====
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
 
   // ========== FETCH COMPANIES ==========
@@ -73,10 +155,9 @@ export default function UserDashboard() {
 
         localStorage.setItem('token', token);
         
-        // Fetch all companies from your API
         const response = await customerService.getAllCompanies();
         
-        if (response.success) {
+        if (response?.success && Array.isArray(response.data)) {
           setCompanies(response.data);
           setFilteredCompanies(response.data);
           setLastUpdated(new Date().toLocaleTimeString('en-IN', {
@@ -104,7 +185,6 @@ export default function UserDashboard() {
 
     fetchCompanies();
     
-    // Auto refresh every 60 seconds
     const interval = setInterval(fetchCompanies, 60000);
     return () => clearInterval(interval);
   }, [router]);
@@ -114,7 +194,7 @@ export default function UserDashboard() {
     let filtered = [...companies];
     
     // Apply search
-    if (searchTerm) {
+    if (searchTerm.trim()) {
       filtered = filtered.filter(company =>
         company.shares_name.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -127,9 +207,8 @@ export default function UserDashboard() {
         const price = parseFloat(company.price);
         if (max) {
           return price >= min && price <= max;
-        } else {
-          return price >= min;
         }
+        return price >= min;
       });
     }
     
@@ -137,6 +216,8 @@ export default function UserDashboard() {
     filtered.sort((a, b) => {
       const priceA = parseFloat(a.price);
       const priceB = parseFloat(b.price);
+      const lotA = a.min_lot_size || 0;
+      const lotB = b.min_lot_size || 0;
       
       switch (sortBy) {
         case 'name-asc':
@@ -148,9 +229,9 @@ export default function UserDashboard() {
         case 'price-desc':
           return priceB - priceA;
         case 'lot-asc':
-          return a.min_lot_size - b.min_lot_size;
+          return lotA - lotB;
         case 'lot-desc':
-          return b.min_lot_size - a.min_lot_size;
+          return lotB - lotA;
         default:
           return 0;
       }
@@ -159,36 +240,13 @@ export default function UserDashboard() {
     setFilteredCompanies(filtered);
   }, [companies, searchTerm, priceRange, sortBy]);
 
-  // ===== NEW FUNCTION: Handle image errors =====
-  const handleImageError = (companyId: number) => {
+  // ========== HANDLE IMAGE ERRORS ==========
+  const handleImageError = (companyId: number): void => {
     setImageErrors(prev => new Set(prev).add(companyId));
   };
 
-  // ========== CLEAR FILTERS ==========
-  const clearFilters = () => {
-    setSearchTerm('');
-    setPriceRange('ALL');
-    setSortBy('name-asc');
-  };
-
-  // ========== FORMATTERS ==========
-  const formatCurrency = (amount: string) => {
-    const num = parseFloat(amount);
-    return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
-
-  // ========== GET COMPANY INITIALS ==========
-  const getCompanyInitials = (name: string) => {
-    return name.split(' ')
-      .map(word => word[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase();
-  };
-
-  // ===== NEW FUNCTION: Render logo with fallback =====
+  // ========== RENDER COMPANY LOGO ==========
   const renderCompanyLogo = (company: Company) => {
-    // Show image if logo_url exists and no error
     if (company.logo_url && !imageErrors.has(company.id)) {
       return (
         <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0 border border-gray-100">
@@ -203,7 +261,6 @@ export default function UserDashboard() {
       );
     }
     
-    // Fallback to initials
     return (
       <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center text-[#2076C7] font-bold text-sm flex-shrink-0">
         {getCompanyInitials(company.shares_name)}
@@ -211,47 +268,33 @@ export default function UserDashboard() {
     );
   };
 
-  // ========== GET DEPOSITORY BADGE ==========
-  const getDepositoryBadge = (depository: string) => {
-    // Clean up the depository string (remove &amp; and extra spaces)
-    const cleanDepository = depository.replace(/&amp;/g, '&').trim();
-    
-    if (cleanDepository.includes('NSDL') && cleanDepository.includes('CDSL')) {
-      return { bg: 'bg-purple-50', text: 'text-purple-700', label: 'NSDL & CDSL' };
-    } else if (cleanDepository.includes('NSDL')) {
-      return { bg: 'bg-blue-50', text: 'text-blue-700', label: 'NSDL' };
-    } else if (cleanDepository.includes('CDSL')) {
-      return { bg: 'bg-indigo-50', text: 'text-indigo-700', label: 'CDSL' };
-    } else {
-      return { bg: 'bg-gray-50', text: 'text-gray-700', label: cleanDepository };
-    }
+  // ========== CLEAR FILTERS ==========
+  const clearFilters = (): void => {
+    setSearchTerm('');
+    setPriceRange('ALL');
+    setSortBy('name-asc');
   };
 
   // ========== CALCULATE STATS ==========
   const totalCompanies = companies.length;
-  const avgPrice = companies.reduce((sum, c) => sum + parseFloat(c.price), 0) / companies.length;
-  const minPrice = Math.min(...companies.map(c => parseFloat(c.price)));
-  const maxPrice = Math.max(...companies.map(c => parseFloat(c.price)));
+  
+  const avgPrice = companies.length > 0
+    ? companies.reduce((sum, c) => sum + parseFloat(c.price), 0) / companies.length
+    : 0;
+  
+  const minPrice = companies.length > 0
+    ? Math.min(...companies.map(c => parseFloat(c.price)))
+    : 0;
+  
+  const maxPrice = companies.length > 0
+    ? Math.max(...companies.map(c => parseFloat(c.price)))
+    : 0;
 
-  // ========== PRICE RANGES ==========
-  const priceRanges = [
-    { label: 'All Prices', value: 'ALL' },
-    { label: 'Under ₹100', value: '0-100' },
-    { label: '₹100 - ₹500', value: '100-500' },
-    { label: '₹500 - ₹1000', value: '500-1000' },
-    { label: '₹1000 - ₹5000', value: '1000-5000' },
-    { label: 'Above ₹5000', value: '5000-1000000' },
-  ];
-
-  // ========== SORT OPTIONS ==========
-  const sortOptions = [
-    { label: 'Name: A to Z', value: 'name-asc' },
-    { label: 'Name: Z to A', value: 'name-desc' },
-    { label: 'Price: Low to High', value: 'price-asc' },
-    { label: 'Price: High to Low', value: 'price-desc' },
-    { label: 'Lot Size: Low to High', value: 'lot-asc' },
-    { label: 'Lot Size: High to Low', value: 'lot-desc' },
-  ];
+  const activeFilterCount = [
+    searchTerm ? 1 : 0,
+    priceRange !== 'ALL' ? 1 : 0,
+    sortBy !== 'name-asc' ? 1 : 0
+  ].reduce((a, b) => a + b, 0);
 
   // ========== LOADING STATE ==========
   if (loading) {
@@ -264,7 +307,9 @@ export default function UserDashboard() {
               <div className="w-10 h-10 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full animate-pulse"></div>
             </div>
           </div>
-          <p className="text-gray-600 font-medium mt-6 animate-pulse">Loading available companies...</p>
+          <p className="text-gray-600 font-medium mt-6 animate-pulse">
+            Loading available companies...
+          </p>
         </div>
       </div>
     );
@@ -278,7 +323,9 @@ export default function UserDashboard() {
           <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
             <AlertCircle className="w-10 h-10 text-red-500" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">Unable to Load Companies</h3>
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            Unable to Load Companies
+          </h3>
           <p className="text-gray-600 mb-6">{error}</p>
           <button 
             onClick={() => window.location.reload()}
@@ -306,7 +353,9 @@ export default function UserDashboard() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-black text-gray-900">Unlisted Companies</h1>
+                  <h1 className="text-xl font-black text-gray-900">
+                    Unlisted Companies
+                  </h1>
                   <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200">
                     {totalCompanies} Companies
                   </span>
@@ -342,13 +391,9 @@ export default function UserDashboard() {
               >
                 <Filter size={18} />
                 Filters
-                {(searchTerm || priceRange !== 'ALL' || sortBy !== 'name-asc') && (
+                {activeFilterCount > 0 && (
                   <span className="w-5 h-5 bg-white text-[#2076C7] rounded-full text-xs flex items-center justify-center font-bold">
-                    {[
-                      searchTerm ? 1 : 0,
-                      priceRange !== 'ALL' ? 1 : 0,
-                      sortBy !== 'name-asc' ? 1 : 0
-                    ].reduce((a, b) => a + b, 0)}
+                    {activeFilterCount}
                   </span>
                 )}
               </button>
@@ -367,7 +412,9 @@ export default function UserDashboard() {
               <Building2 size={16} className="text-[#2076C7]" />
               Total Companies
             </div>
-            <p className="text-2xl font-bold text-gray-900">{totalCompanies}</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {totalCompanies}
+            </p>
           </div>
           
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
@@ -375,7 +422,9 @@ export default function UserDashboard() {
               <IndianRupee size={16} className="text-emerald-600" />
               Avg. Price
             </div>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(avgPrice.toFixed(2))}</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {formatCurrency(avgPrice.toFixed(2))}
+            </p>
           </div>
           
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
@@ -393,7 +442,9 @@ export default function UserDashboard() {
               <Clock size={16} className="text-purple-600" />
               Last Updated
             </div>
-            <p className="text-lg font-bold text-gray-900">{lastUpdated?.split(' ')[0] || 'Now'}</p>
+            <p className="text-lg font-bold text-gray-900">
+              {lastUpdated?.split(' ')[0] || 'Now'}
+            </p>
           </div>
         </div>
 
@@ -423,11 +474,10 @@ export default function UserDashboard() {
                 <select 
                   className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
                   value={priceRange}
-                  onChange={(e) => setPriceRange(e.target.value)}
-                  style={{ color: 'black' }}
+                  onChange={(e) => setPriceRange(e.target.value as PriceRangeOption)}
                 >
-                  {priceRanges.map(range => (
-                    <option key={range.value} value={range.value} className="text-gray-900 bg-white" style={{ color: 'black', background: 'white' }}>
+                  {PRICE_RANGES.map(range => (
+                    <option key={range.value} value={range.value}>
                       {range.label}
                     </option>
                   ))}
@@ -442,11 +492,10 @@ export default function UserDashboard() {
                 <select 
                   className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  style={{ color: 'black' }}
+                  onChange={(e) => setSortBy(e.target.value as SortOption)}
                 >
-                  {sortOptions.map(option => (
-                    <option key={option.value} value={option.value} className="text-gray-900 bg-white" style={{ color: 'black', background: 'white' }}>
+                  {SORT_OPTIONS.map(option => (
+                    <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
@@ -457,8 +506,12 @@ export default function UserDashboard() {
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 flex items-center justify-between">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Showing</p>
-                  <p className="text-2xl font-bold text-gray-900">{filteredCompanies.length}</p>
-                  <p className="text-xs text-gray-500">of {totalCompanies} companies</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {filteredCompanies.length}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    of {totalCompanies} companies
+                  </p>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
                   <Database className="w-6 h-6 text-[#2076C7]" />
@@ -468,7 +521,7 @@ export default function UserDashboard() {
           </div>
         )}
 
-        {/* Companies List - Single Column */}
+        {/* Companies List */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           {/* Table Header */}
           <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
@@ -485,14 +538,19 @@ export default function UserDashboard() {
           <div className="divide-y divide-gray-200">
             {filteredCompanies.length > 0 ? (
               filteredCompanies.map((company) => {
-                const price = parseFloat(company.price);
-                const minInvestment = price * company.min_lot_size;
+                const minInvestment = calculateMinInvestment(
+                  company.price, 
+                  company.min_lot_size
+                );
                 const depository = getDepositoryBadge(company.depository_applicable);
                 
                 return (
-                  <div key={company.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <div 
+                    key={company.id} 
+                    className="px-6 py-4 hover:bg-gray-50 transition-colors"
+                  >
                     <div className="grid grid-cols-12 gap-4 items-center">
-                      {/* Company Column with Logo or Initials - CHANGED */}
+                      {/* Company Column */}
                       <div className="col-span-5">
                         <div className="flex items-center gap-3">
                           {renderCompanyLogo(company)}
@@ -510,17 +568,26 @@ export default function UserDashboard() {
                       
                       {/* Price */}
                       <div className="col-span-2 text-right">
-                        <span className="font-bold text-[#2076C7]">{formatCurrency(company.price)}</span>
+                        <span className="font-bold text-[#2076C7]">
+                          {formatCurrency(company.price)}
+                        </span>
                       </div>
                       
                       {/* Min Lot */}
                       <div className="col-span-2 text-right">
-                        <span className="font-medium text-gray-900">{company.min_lot_size.toLocaleString()}</span>
+                        <span className="font-medium text-gray-900">
+                          {formatMinLotSize(company.min_lot_size)}
+                        </span>
                       </div>
                       
                       {/* Min Investment */}
                       <div className="col-span-2 text-right">
-                        <span className="font-medium text-gray-900">{formatCurrency(minInvestment.toFixed(2))}</span>
+                        <span className="font-medium text-gray-900">
+                          {minInvestment > 0 
+                            ? formatCurrency(minInvestment.toFixed(2))
+                            : 'N/A'
+                          }
+                        </span>
                       </div>
                       
                       {/* Depository */}
@@ -562,7 +629,7 @@ export default function UserDashboard() {
         </div>
       </main>
 
-      {/* Custom Animation */}
+      {/* Custom Animation Styles */}
       <style jsx>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(-10px); }

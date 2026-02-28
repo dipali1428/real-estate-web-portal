@@ -45,27 +45,6 @@ export interface UnlistedTransaction {
   timestamp: string;       
 }
 
-// export interface UnlistedOrder {
-//   order_id: number;
-//   user_name: string;
-//   company_name: string;
-//   quantity: number;
-//   status: 'PENDING' | 'APPROVED' | 'REJECTED';
-//   created_at: string;
-//   updated_at: string;
-// }
-
-// export interface KYCRequest {
-//   id: number;
-//   userId: number;
-//   userName: string;
-//   status: 'PENDING' | 'APPROVED' | 'REJECTED';
-//   documents?: any;
-//   remarks?: string;
-//   createdAt: string;
-//   updatedAt: string;
-// }
-
 export interface Enquiry {
   id: number;
   name: string;
@@ -110,9 +89,6 @@ export interface AddSharePayload {
   price: string;
   depository_applicable: string;
   min_lot_size: number;
-  clean_name?: string;
-  is_active?: boolean;
-  status?: string;
 }
 
 export interface UpdateSharePayload {
@@ -180,52 +156,54 @@ export const AdminService = {
    */
   getShares: async (): Promise<Share[]> => {
     const response = await api.get("/api/unlisted/admin/shares");
-    return response.data;
+    return response.data; // Returns array of shares directly
   },
 
   /**
    * Add new share
    * POST → /api/unlisted/admin/shares/add
+   * Request Body: { shares_name, logo_url, price, depository_applicable, min_lot_size }
    */
-  addShare: async (payload: AddSharePayload) => {
-    const response = await api.post("/api/unlisted/admin/shares/add", payload);
-    return response.data;
-  },
+addShare: async (payload: AddSharePayload) => {
+  const cleanPayload: any = {
+    shares_name: payload.shares_name,
+    price: payload.price,
+    depository_applicable: payload.depository_applicable,
+    min_lot_size: payload.min_lot_size,
+  };
+
+  if (payload.logo_url) {
+    cleanPayload.logo_url = payload.logo_url;
+  }
+
+  const response = await api.post("/api/unlisted/admin/shares/add", cleanPayload);
+  return response.data;
+},
 
   /**
    * Update share
-   * PUT → /api/unlisted/admin/shares/update/:id
+   * POST → /api/unlisted/admin/shares/update/:id
+   * Note: This is a POST request, not PUT
    */
   updateShare: async (id: number, payload: UpdateSharePayload) => {
     const response = await api.put(`/api/unlisted/admin/shares/update/${id}`, payload);
-    return response.data;
+    return response.data; // Returns { success, message, data }
   },
 
   /**
    * Delete share
-   * DELETE → /api/unlisted/admin/shares/delete/:id
+   * POST → /api/unlisted/admin/shares/delete/:id
+   * Note: This is a POST request, not DELETE
    */
   deleteShare: async (id: number) => {
     const response = await api.delete(`/api/unlisted/admin/shares/delete/${id}`);
-    return response.data;
+    return response.data; // Returns { message }
   },
 
   /**
-   * Upload shares PDF and update
-   * POST → /api/unlisted/admin/shares/upload-pdf
-   */
-  // uploadSharesPdf: async (file: File) => {
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-  //   const response = await api.post("/api/unlisted/admin/shares/upload-pdf", formData, {
-  //     headers: { "Content-Type": "multipart/form-data" },
-  //   });
-  //   return response.data;
-  // },
-
-  /**
-   * Upload shares with history (CSV)
+   * Upload shares with history (Excel)
    * POST → /api/unlisted/admin/shares/uploadSharesWithHistory
+   * Body: form-data with file field
    */
   uploadSharesWithHistory: async (file: File) => {
     const formData = new FormData();
@@ -233,7 +211,7 @@ export const AdminService = {
     const response = await api.post("/api/unlisted/admin/shares/uploadSharesWithHistory", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    return response.data;
+    return response.data; // Returns { message, rowsProcessed, rowsSkipped }
   },
 
   /**
@@ -261,7 +239,6 @@ export const AdminService = {
    * POST → /api/unlisted/admin/users/add
    */
   addUser: async (payload: AddUserPayload) => {
-    // Map mobile to phone if backend expects it
     const finalPayload = {
       name: payload.name,
       email: payload.email,
@@ -352,93 +329,8 @@ export const AdminService = {
     return response.data;
   },
 
-  // ==================== ORDERS ====================
-
-  /**
-   * Get all orders
-   * GET → /api/unlisted/admin/orders
-   */
-  // getOrders: async (): Promise<UnlistedOrder[]> => {
-  //   const response = await api.get("/api/unlisted/admin/orders");
-  //   return response.data;
-  // },
-
-  /**
-   * Get pending orders
-   * GET → /api/unlisted/admin/orders/pending
-   */
-  // getPendingOrders: async (): Promise<UnlistedOrder[]> => {
-  //   const response = await api.get("/api/unlisted/admin/orders/pending");
-  //   return response.data;
-  // },
-
-  /**
-   * Approve order
-   * PUT → /api/unlisted/admin/orders/:orderId/approve
-  //  */
-  // approveOrder: async (orderId: number) => {
-  //   const response = await api.put(`/api/unlisted/admin/orders/${orderId}/approve`);
-  //   return response.data;
-  // },
-
-  // /**
-  //  * Reject order
-  //  * PUT → /api/unlisted/admin/orders/:orderId/reject
-  //  */
-  // rejectOrder: async (orderId: number) => {
-  //   const response = await api.put(`/api/unlisted/admin/orders/${orderId}/reject`);
-  //   return response.data;
-  // },
-
-  // ==================== KYC ====================
-
-  /**
-   * Get all KYC requests
-   * GET → /api/unlisted/admin/kyc
-   */
-  // getKycRequests: async (): Promise<KYCRequest[]> => {
-  //   const response = await api.get("/api/unlisted/admin/kyc");
-  //   return response.data;
-  // },
-
-  /**
-   * Get KYC by user ID
-   * GET → /api/unlisted/admin/kyc/:userId
-   */
-  // getUserKyc: async (userId: number): Promise<KYCRequest> => {
-  //   const response = await api.get(`/api/unlisted/admin/kyc/${userId}`);
-  //   return response.data;
-  // },
-
-  /**
-   * Approve KYC
-   * PUT → /api/unlisted/admin/kyc/:userId/approve
-   */
-  // approveKyc: async (userId: number) => {
-  //   const response = await api.put(`/api/unlisted/admin/kyc/${userId}/approve`);
-  //   return response.data;
-  // },
-
-  /**
-   * Reject KYC
-   * PUT → /api/unlisted/admin/kyc/:userId/reject
-  //  */
-  // rejectKyc: async (userId: number) => {
-  //   const response = await api.put(`/api/unlisted/admin/kyc/${userId}/reject`);
-  //   return response.data;
-  // },
-
   // ==================== ENQUIRIES ====================
-
-  /**
-   * Create enquiry
-   * POST → /api/unlisted/admin/enquiries
-   */
-  createEnquiry: async (payload: CreateEnquiryPayload) => {
-    const response = await api.post("/api/unlisted/admin/enquiries", payload);
-    return response.data;
-  },
-
+  
   /**
    * Get all enquiries
    * GET → /api/unlisted/admin/enquiries
@@ -456,31 +348,20 @@ export const AdminService = {
    */
   logout: async () => {
     const response = await api.post("/api/unlisted/admin/logout");
-    
-    // Clear token on logout
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token');
     }
-    
     return response.data;
   },
 
-  
-/**
- * Get all demat records
- * GET → /api/unlisted/admin/user/demat
- */
-// getAllDemat: async (): Promise<DematListResponse> => {
-//   const response = await api.get("/api/unlisted/admin/user/demat");
-//   return response.data;
-// },
+  // ==================== DEMAT ====================
 
-/**
- * Get user Demat details by user ID
- * GET → /api/unlisted/admin/user/demat/:userId
- */
-getUserDemat: async (userId: number): Promise<{ success: boolean; data: DematDetails }> => {
-  const response = await api.get(`/api/unlisted/admin/user/demat/${userId}`);
-  return response.data;
-},
+  /**
+   * Get user Demat details by user ID
+   * GET → /api/unlisted/admin/user/demat/:userId
+   */
+  getUserDemat: async (userId: number): Promise<{ success: boolean; data: DematDetails }> => {
+    const response = await api.get(`/api/unlisted/admin/user/demat/${userId}`);
+    return response.data;
+  },
 };

@@ -27,7 +27,7 @@ interface HighInvestmentAlert {
   share_id: number;
   company_name: string;
   price: string;
-  quantity: number;
+  min_lot_size: number;
   min_investment: string;
 }
 

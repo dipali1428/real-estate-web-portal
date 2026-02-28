@@ -114,11 +114,6 @@ export const sidebarLinks = {
                             icon: <Users className="h-4 w-4 text-neutral-700" />,
                         },
                         {
-                            label: "Profile"
-                            , href: "/customer/unlisted/profile",
-                            icon: <Users className="h-4 w-4 text-neutral-700" />,
-                        },
-                        {
                             label: "Portfolio",
                             href: "/customer/unlisted/portfolio",
                             icon: <Briefcase className="h-4 w-4 text-neutral-700" />,
