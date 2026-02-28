@@ -84,59 +84,59 @@ export default function OrdersPage() {
   const [notifications, setNotifications] = useState<{ id: number; message: string; type: 'success' | 'error' | 'info' }[]>([]);
 
   // ========== FETCH ORDERS ==========
-  useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      setError(null);
+  // useEffect(() => {
+  //   const fetchOrders = async () => {
+  //     setLoading(true);
+  //     setError(null);
       
-      try {
-        const token = getTokenFromCookie();
+  //     try {
+  //       const token = getTokenFromCookie();
         
-        if (!token) {
-          router.push('/');
-          return;
-        }
+  //       if (!token) {
+  //         router.push('/');
+  //         return;
+  //       }
 
-        localStorage.setItem('token', token);
+  //       localStorage.setItem('token', token);
         
-        // Fetch orders from API
-        const response = await customerService.getOrders();
+  //       // Fetch orders from API
+  //       const response = await customerService.getOrders();
         
-        if (response.success) {
-          setOrders(response.data);
-          setFilteredOrders(response.data);
-          setLastUpdated(new Date().toLocaleTimeString('en-IN', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-          }));
-          showNotification('Orders loaded successfully', 'success');
-        } else {
-          setError('Failed to load orders');
-        }
-      } catch (err: any) {
-        console.error('Orders fetch error:', err);
+  //       if (response.success) {
+  //         setOrders(response.data);
+  //         setFilteredOrders(response.data);
+  //         setLastUpdated(new Date().toLocaleTimeString('en-IN', {
+  //           hour: '2-digit',
+  //           minute: '2-digit',
+  //           second: '2-digit'
+  //         }));
+  //         showNotification('Orders loaded successfully', 'success');
+  //       } else {
+  //         setError('Failed to load orders');
+  //       }
+  //     } catch (err: any) {
+  //       console.error('Orders fetch error:', err);
         
-        if (err.response?.status === 401) {
-          showNotification('Session expired. Please login again.', 'error');
-          removeTokenCookie();
-          localStorage.removeItem('token');
-          router.push('/');
-        } else {
-          setError(err.response?.data?.message || 'Failed to load orders');
-          showNotification('Failed to load orders', 'error');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+  //       if (err.response?.status === 401) {
+  //         showNotification('Session expired. Please login again.', 'error');
+  //         removeTokenCookie();
+  //         localStorage.removeItem('token');
+  //         router.push('/');
+  //       } else {
+  //         setError(err.response?.data?.message || 'Failed to load orders');
+  //         showNotification('Failed to load orders', 'error');
+  //       }
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchOrders();
+  //   fetchOrders();
     
-    // Auto refresh every 60 seconds
-    const interval = setInterval(fetchOrders, 60000);
-    return () => clearInterval(interval);
-  }, [router]);
+  //   // Auto refresh every 60 seconds
+  //   const interval = setInterval(fetchOrders, 60000);
+  //   return () => clearInterval(interval);
+  // }, [router]);
 
   // ========== APPLY FILTERS ==========
   useEffect(() => {
