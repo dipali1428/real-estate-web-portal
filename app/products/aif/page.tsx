@@ -58,14 +58,11 @@ const AIFHeroVisual = () => {
         setMounted(true);
     }, []);
 
+
+
     return (
         <div
-        className="relative w-full h-[450px] lg:h-[450px] flex items-center justify-center overflow-hidden scale-75 md:scale-90 lg:scale-100"
-            onMouseMove={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                mouseX.set(e.clientX - rect.left - rect.width / 2);
-                mouseY.set(e.clientY - rect.top - rect.height / 2);
-            }}
+            className="relative w-full h-[450px] lg:h-[450px] flex items-center justify-center overflow-hidden scale-75 md:scale-90 lg:scale-100"
         >
             <div className="absolute inset-0 opacity-30">
                 <svg width="100%" height="100%" className="absolute inset-0">
@@ -79,20 +76,8 @@ const AIFHeroVisual = () => {
             </div>
 
             {[...Array(4)].map((_, i) => (
-                <motion.div
+                <div
                     key={i}
-                    animate={{
-                        x: [0, (i % 2 ? 50 : -50), 0],
-                        y: [0, (i % 2 ? -40 : 40), 0],
-                        scale: [1, 1.3, 1],
-                        opacity: [0.3, 0.4, 0.3]
-                    }}
-                    transition={{
-                        duration: 15 + i * 3,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: i * 2
-                    }}
                     className="absolute rounded-full blur-[80px]"
                     style={{
                         width: `${200 + i * 60}px`,
@@ -106,72 +91,34 @@ const AIFHeroVisual = () => {
                 />
             ))}
 
-            <motion.div
-                style={{ rotateX, rotateY }}
+            <div
                 className="relative z-20 w-64 h-64"
             >
                 <div className="relative w-full h-full perspective-1000">
-                    <motion.div
-                        animate={{
-                            rotateY: 360,
-                            rotateX: [0, 5, 0, -5, 0]
-                        }}
-                        transition={{
-                            rotateY: { duration: 25, repeat: Infinity, ease: "linear" },
-                            rotateX: { duration: 10, repeat: Infinity, ease: "easeInOut" }
-                        }}
+                    <div
                         className="w-full h-full relative preserve-3d"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-teal-400/10 rounded-[2.5rem] blur-md" />
                         <div className="absolute inset-0 bg-white/40 backdrop-blur-2xl border border-white/60 shadow-xl rounded-[2.5rem] flex items-center justify-center overflow-hidden group">
                             <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-teal-400/10 animate-pulse" />
                             <div className="relative z-10 flex flex-col items-center">
-                                <motion.div
-                                    animate={{
-                                        scale: [1, 1.15, 1],
-                                        rotate: [0, 5, -5, 0]
-                                    }}
-                                    transition={{ duration: 4, repeat: Infinity }}
+                                <div
                                     className="w-20 h-20 bg-gradient-to-br from-white to-blue-50 rounded-2xl flex items-center justify-center shadow-lg border border-blue-100 mb-3"
                                 >
                                     <ShieldCheck className="text-primary w-10 h-10 drop-shadow-sm" />
-                                </motion.div>
+                                </div>
                                 <div className="h-px w-16 bg-gradient-to-r from-transparent via-primary/50 to-transparent my-2" />
                                 <span className="text-teal-600 font-bold text-xs tracking-[0.3em]">
                                     AIF PLATFORM
                                 </span>
                             </div>
-                            <motion.div
-                                animate={{
-                                    top: ['-100%', '200%'],
-                                    opacity: [0, 1, 0]
-                                }}
-                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                className="absolute left-0 w-full h-1"
-                                style={{
-                                    background: 'linear-gradient(to right, transparent, #1CADA3, #2076C7, transparent)',
-                                    boxShadow: '0 0 30px #1CADA3'
-                                }}
-                            />
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
 
                 {aifFloatingTags.map((tag, i) => (
-                    <motion.div
+                    <div
                         key={i}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{
-                            opacity: 1,
-                            scale: 1,
-                            y: [0, -8, 0],
-                            rotate: [0, 2, -2, 0]
-                        }}
-                        transition={{
-                            delay: tag.delay,
-                            y: { duration: 5, repeat: Infinity, ease: "easeInOut" },
-                            rotate: { duration: 7, repeat: Infinity, ease: "easeInOut" }
-                        }}
                         className={`absolute ${tag.pos} z-30`}
                     >
                         <div className="relative group">
@@ -186,12 +133,12 @@ const AIFHeroVisual = () => {
                                 </span>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 ))}
-            </motion.div>
+            </div>
 
-            <div className="absolute w-[400px] h-[400px] border border-primary/10 rounded-full animate-ping opacity-30" />
-            <div className="absolute w-[550px] h-[550px] border border-primary/5 rounded-full animate-pulse opacity-40" />
+            <div className="absolute w-[400px] h-[400px] border border-primary/10 rounded-full opacity-30" />
+            <div className="absolute w-[550px] h-[550px] border border-primary/5 rounded-full opacity-40" />
         </div>
     );
 };
@@ -269,6 +216,9 @@ const AIFProductsContent = () => {
                                         <ArrowLeft size={16} />
                                         Back
                                     </Link>
+                                    <div className="bg-primary/10 text-gray-500 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">
+                                        Advanced Investments
+                                    </div>
                                 </div>
 
                                 <div className="absolute top-0 right-0 z-30">
@@ -405,7 +355,7 @@ const AIFProductsContent = () => {
                                         key={cat}
                                         onClick={() => setSelectedCategory(cat)}
                                         className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${selectedCategory === cat
-                                            ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105'
+                                            ? 'bg-[#2076C7] text-white shadow-lg shadow-primary/30'
                                             : 'bg-white text-gray-600 border border-gray-100 hover:border-primary/30 hover:bg-gray-50'
                                             }`}
                                     >
@@ -416,15 +366,15 @@ const AIFProductsContent = () => {
                         </div>
 
                         <div className="flex flex-col gap-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
-                            <AnimatePresence mode='popLayout'>
+                            <AnimatePresence>
                                 {filteredStrategies.length > 0 ? (
                                     filteredStrategies.map((fund, idx) => (
                                         <motion.div
                                             key={fund.name}
                                             layout
-                                            initial={{ opacity: 0, scale: 0.95 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            exit={{ opacity: 0, scale: 0.95 }}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
                                             transition={{ duration: 0.3 }}
                                             className="w-full"
                                         >
@@ -465,7 +415,7 @@ const AIFProductsContent = () => {
                                                         <div className="hidden sm:block text-right">
                                                             <div className="text-xs font-bold text-primary group-hover:translate-x-[-4px] transition-transform">VIEW DETAILS</div>
                                                         </div>
-                                                        <div className="p-3 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                                                        <div className="p-3 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-[#2076C7] group-hover:text-white transition-all shadow-sm">
                                                             <ArrowRight size={20} />
                                                         </div>
                                                     </div>
@@ -504,7 +454,7 @@ const AIFProductsContent = () => {
                 <section className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
-                            <motion.h2 variants={slideUpFade} className="text-3xl lg:text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
+                            <motion.h2 variants={slideUpFade} className="text-4xl font-bold bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
                                 AIF Funds Comparison
                             </motion.h2>
                             <motion.p variants={slideUpFade} className="text-gray-500 text-lg lg:text-xl font-light">
@@ -614,7 +564,7 @@ const AIFProductsContent = () => {
                     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
                             <motion.h2 variants={slideUpFade} className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">AIF FAQ & Investor Guidance</motion.h2>
-                            <motion.p variants={slideUpFade} className="text-gray-00 text-xl">Common questions about starting your AIF journey.</motion.p>
+                            <motion.p variants={slideUpFade} className="text-xl text-gray-500 max-w-3xl mx-auto font-light">Common questions about starting your AIF journey.</motion.p>
                         </motion.div>
                         <div className="space-y-6">
                             {aifFaqs.map((faq, idx) => (
@@ -646,7 +596,7 @@ const AIFProductsContent = () => {
                 onClose={() => setIsDetailModalOpen(false)}
                 fund={selectedFund}
             />
-        </div>
+        </div >
     );
 };
 

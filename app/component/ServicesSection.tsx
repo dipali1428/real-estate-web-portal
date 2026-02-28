@@ -54,7 +54,7 @@ const ServicesSection = () => {
         { name: "Motor Insurance", slug: "motor-insurance" },
         { name: "Property Insurance", slug: "property-insurance" },
         { name: "Travel Insurance", slug: "../../products/travel-insurance" },
-        { name: "Cattle Insurance", slug: "cattle-insurance" },
+        { name: "Cattle Insurance", slug: "../../products/cattle-insurance" },
         { name: "Marine Insurance", slug: "../../products/marine-insurance" },
         // { name: "Group Medi-Claim Cover", slug: "group-medi-claim-cover" },
         // { name: "Group Personal Accident Cover", slug: "group-personal-accident-cover" },

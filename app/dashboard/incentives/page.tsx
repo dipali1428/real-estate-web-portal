@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { 
   IndianRupee, Search, Filter, Download, Eye, 
   Wallet, Clock, FileText, Info, Calculator, 
@@ -8,12 +8,14 @@ import {
   Inbox, FileDown
 } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
+import { DashboardService } from '@/app/services/dashboardService';
 
 // --- Types ---
 type TabType = 'payout-history' | 'commission-structure' | 'earnings-calculator';
 type CategoryType = 'loans' | 'insurance' | 'mutual-funds' | 'investments' | 'real-estate';
 
 interface PayoutRecord {
+  Id: string;
   payoutId: string;
   date: string;
   clientName: string;
@@ -22,10 +24,20 @@ interface PayoutRecord {
   category: string;
   paymentMode: string;
   refNumber: string;
+  gstAmount?: string;
+  invoiceDate?: string;
+  invoiceNumber?: string;
   netPayout: string;
-  status: 'Processed' | 'Pending';
+  tdsAmount: string;
+  amount: string;
+  grossAmount: string;
+  status: 'Completed' | 'Pending';
   loanNumber?: string;
   policyNumber?: string;
+  payout_date?: string;
+  lead_name?: string;
+  lead_status?: string;
+  tds_amount?: string;
 }
 
 export default function IncentivesPayouts() {
@@ -35,23 +47,83 @@ export default function IncentivesPayouts() {
   const [amount, setAmount] = useState<string>('');
   const [selectedPlan, setSelectedPlan] = useState<string>('');
   const [selectedBank, setSelectedBank] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  // --- Mock Payout Data ---
-  const [payoutData, setPayoutData] = useState<PayoutRecord[]>([
-    // {
-    //   payoutId: 'PAY-88219',
-    //   date: '02 Feb 2026',
-    //   clientName: 'Rahul Sharma',
-    //   leadId: 'LD-4412',
-    //   product: 'Home Loan',
-    //   category: 'loans',
-    //   paymentMode: 'IMPS',
-    //   refNumber: 'TXN99281102',
-    //   netPayout: '19,600',
-    //   status: 'Processed',
-    //   loanNumber: 'HL-77266100',
-    // }
-  ]);
+  // --- State for API Data ---
+  const [payoutData, setPayoutData] = useState<PayoutRecord[]>([]);
+
+  const formatValue = (val: any) => {
+  if (!val) return "";
+  // .replace(/"/g, "") removes all double quotes
+  // .trim() removes extra spaces at start and end
+  return val.toString().replace(/"/g, "").trim();
+};
+
+  // --- Fetch API Data ---
+  useEffect(() => {
+    const loadPayouts = async () => {
+      try {
+        setIsLoading(true);
+        const response = await DashboardService.getCompletedDetailLeads();
+        console.log("Raw API Response for Completed Detail Leads:", response);
+        
+        // 🔹 FIX: Safety check to handle different API response structures
+        // If the API returns { leads: [] } or { data: [] }, we extract the array
+        const rawList = Array.isArray(response) 
+          ? response 
+          : (response?.leads || response?.data || []);
+
+        if (!Array.isArray(rawList)) {
+          throw new Error("Invalid data format received");
+        }
+
+        // Mapping API response to the PayoutRecord interface
+        const mappedData: PayoutRecord[] = rawList.map((item: any) => ({
+          Id: item.id || 'N/A',
+          payoutId: item.payout_id || `PAY-${item._id?.slice(-5).toUpperCase() || Math.random().toString(36).substr(2, 5)}`,
+          date: item.payout_date? new Date(item.payout_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A',
+          clientName: item.lead_name || 'N/A',
+          leadId: item.detail_lead_id || 'N/A',
+          product: item.product_type || item.sub_category || 'N/A',
+          category: item.department?.toLowerCase() || 'N/A',
+          paymentMode: item.payment_mode || 'N/A',
+          refNumber: item.payout_details?.transaction_id || 'N/A',
+          gstAmount: item.gst_amount || '0',
+          invoiceDate: item.invoice_date || 'N/A',
+          invoiceNumber: item.invoice_number || 'N/A',
+          netPayout: item.net_payout_amount?.toLocaleString() || '0',
+          status: item.lead_status || 'Pending',
+          loanNumber: item.policy_number || 'N/A',
+          policyNumber: item.form_data?.policy_number || 'N/A',
+          tdsAmount: item.tds_amount?.toLocaleString() || '0',
+          amount: item.disbursement_amount || '0',
+          grossAmount: item.gross_payout_amount || '0',
+        }));
+
+        console.log("Mapped Payout Data:", mappedData);
+        setPayoutData(mappedData);
+      } catch (error) {
+        console.error("Failed to fetch payouts", error);
+        toast.error("Could not load payout history");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPayouts();
+  }, []);
+
+  // --- Totals Calculation for Dashboard Cards ---
+  const stats = useMemo(() => {
+    const total = payoutData.reduce((acc, curr) => {
+      const val = parseFloat(curr.netPayout.replace(/,/g, '')) || 0;
+      return acc + val;
+    }, 0);
+    return {
+      totalEarnings: total.toLocaleString(),
+      processedCount: payoutData.length
+    };
+  }, [payoutData]);
 
   // --- Mappings ---
   const productMapping: Record<CategoryType, string[]> = {
@@ -61,8 +133,6 @@ export default function IncentivesPayouts() {
     'investments': ['PMS', 'AIF', 'Fixed Deposit', 'Bonds'],
     'real-estate': ['Fractional']
   };
-
-  // const LOAN_BANKS = ["HDFC Bank", "ICICI Bank", "SBI", "Axis Bank", "Kotak Mahindra Bank", "IDFC First Bank", "IndusInd Bank", "Yes Bank", "RBL Bank", "Federal Bank", "Standard Chartered", "HSBC Bank", "DBS Bank", "Bandhan Bank", "AU Small Finance Bank", "Equitas Small Finance Bank", "Ujjivan Small Finance Bank", "Punjab National Bank", "Bank of Baroda", "Canara Bank", "Union Bank of India", "Bank of India", "Indian Bank", "Central Bank of India", "Bajaj Finserv", "Tata Capital", "L&T Finance", "Aditya Birla Capital", "Fullerton India", "Piramal Finance", "Shriram Finance", "Muthoot Finance", "Manappuram Finance", "Cholamandalam Finance", "Mahindra Finance", "Poonawalla Fincorp", "Godrej Capital", "InCred", "Navi", "Fibe (EarlySalary)", "KreditBee", "MoneyTap", "Cashe", "PaySense", "IIFL Finance", "LIC Housing Finance", "HDFC Ltd", "PNB Housing Finance", "Can Fin Homes", "Aadhar Housing Finance", "Godrej Housing Finance", "Indiabulls Home Loans", "Hero Fincorp", "Dhani Loans", "Home Credit", "Unity Small Finance Bank", "Jana Small Finance Bank", "South Indian Bank"].sort();
 
   const INSURANCE_PLAN_MAPPING: Record<string, string[]> = {
     'Axis': ['Smart Wealth Advantage Growth Par Plan', 'Monthly Income Advantage Plan', 'Smart Wealth Income Plan', 'Smart Wealth Advantage Guarantee Plan', 'Smart Wealth Advantage Guarantee Elite Plan', 'Smart Wealth Plan - Lumpsum', 'Smart Wealth Plan - LTI', 'Smart Value Income & Benefit Enhancer Plan', 'Smart Wealth Annuity Guaranteed Pension Plan', 'Guaranteed Lifetime Income Plan', 'Smart Term with Additional Returns ULIP', 'Smart Secure Plan Plus & Smart Term Plan Plus', 'Smart Secure Plan Plus & Smart Term Plan Plus -trop', 'Fastrack', 'Flexi Wealth Advantage', 'Flexi Wealth', 'Forever Young Pension Plan'],
@@ -81,39 +151,17 @@ export default function IncentivesPayouts() {
     'real-estate': [{ name: 'Fractional', rate: '13% - 20%' }]
   };
 
-  // const currentBankList = useMemo(() => {
-  //   if (leadCategory === 'loans') return LOAN_BANKS;
-  //   return ["Axis", "Bajaj", "Digit", "HDFC", "ICICI", "Tata"];
-  // }, [leadCategory]);
-
- // --- CALCULATION LOGIC ---
   const calculation = useMemo(() => {
     const receivableAmount = parseFloat(amount) || 0;
-    
-    // 1. Get the list of products for the active category
     const categoryProducts = commissionStructure[leadCategory];
-    
-    // 2. Find the rate string for the selected product (e.g., "2% - 56%")
     const productInfo = categoryProducts.find(p => p.name === selectedProduct);
     const rateString = productInfo ? productInfo.rate : "0%";
-
-    // 3. Extract all numbers from the string using Regex
-    // This handles "2% - 56%", "0.5%", or "0.40% - 0.96%"
     const matches = rateString.match(/\d+(\.\d+)?/g);
     const rates = matches ? matches.map(Number) : [0];
-
-    // 4. Calculate the Average Rate
-    // For Life Insurance: (2 + 56) / 2 = 29
     const sum = rates.reduce((a, b) => a + b, 0);
     const avgRatePercent = sum / rates.length;
-    
-    // 5. Calculate Gross (based on average rate)
     const grossAmount = receivableAmount * (avgRatePercent / 100);
-    
-    // 6. Calculate 2% TDS on the Gross amount
     const tdsAmount = grossAmount * 0.02;
-    
-    // 7. Calculate Net Payout
     const netPayout = grossAmount - tdsAmount;
 
     return {
@@ -123,11 +171,6 @@ export default function IncentivesPayouts() {
       percent: avgRatePercent.toFixed(2) + "%"
     };
   }, [amount, leadCategory, selectedProduct]);
-  const isCalculationReady = useMemo(() => {
-    if (!amount || !selectedProduct || !selectedBank) return false;
-    if (leadCategory !== 'loans' && !selectedPlan) return false;
-    return true;
-  }, [amount, selectedProduct, selectedBank, selectedPlan, leadCategory]);
 
   const handleDownloadInvoice = (id: string) => {
     toast.success(`Downloading Bill Invoice for ${id}`);
@@ -172,7 +215,7 @@ export default function IncentivesPayouts() {
               <div className="bg-green-50 p-2 rounded-lg"><Wallet className="w-5 h-5 text-green-500" /></div>
               <span className="font-medium text-slate-600 text-sm">Total Earnings</span>
             </div>
-            <div className="text-3xl font-bold text-slate-800">₹ 0</div>
+            <div className="text-3xl font-bold text-slate-800">₹ {stats.totalEarnings}</div>
           </div>
 
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
@@ -186,14 +229,14 @@ export default function IncentivesPayouts() {
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
               <div className="bg-blue-50 p-2 rounded-lg"><FileText className="w-5 h-5 text-blue-500" /></div>
-              <span className="font-medium text-slate-600 text-sm">Processed This Month</span>
+              <span className="font-medium text-slate-600 text-sm">Processed Deals</span>
             </div>
-            <div className="text-3xl font-bold text-slate-800">₹ 0</div>
+            <div className="text-3xl font-bold text-slate-800">{stats.processedCount}</div>
           </div>
         </div>
 
         {activeTab === 'payout-history' && (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mt-8 animate-in fade-in duration-500">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mt-8">
             <div className="p-4 flex flex-col md:flex-row gap-4">
               <div className="flex-grow relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -214,63 +257,98 @@ export default function IncentivesPayouts() {
             </div>
 
             <div className="overflow-x-auto min-h-[300px]">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-slate-50 border-y border-slate-100 uppercase text-[11px] font-bold text-slate-500 tracking-wider">
-                    <th className="px-6 py-4">Payout ID / Date</th>
-                    <th className="px-6 py-4">Client Details</th>
-                    <th className="px-6 py-4">Product</th>
-                    <th className="px-6 py-4">Loan / Policy No</th>
-                    <th className="px-6 py-4 text-center">Payment Mode</th>
-                    <th className="px-6 py-4">Net Payout</th>
-                    <th className="px-6 py-4 text-center">Status</th>
-                    <th className="px-6 py-4 text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-sm">
-                  {payoutData.map((row, i) => (
-                    <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-5">
-                        <div className="font-bold text-slate-700">{row.payoutId}</div>
-                        <div className="text-xs text-slate-400 mt-1">{row.date}</div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <div className="font-bold text-slate-700">{row.clientName}</div>
-                        <div className="inline-block mt-1 px-2 py-0.5 bg-[#e6fcf5] text-[#0d9488] rounded text-[10px] font-bold border border-[#c3fae8]">
-                          {row.leadId}
-                        </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <div className="font-medium text-slate-700">{row.product}</div>
-                        <div className="text-xs text-slate-400 text-capitalize">{row.category}</div>
-                      </td>
-                      <td className="px-6 py-5">
-                         <div className="font-bold text-slate-600 uppercase">
-                           {row.category === 'loans' ? (row.loanNumber || 'N/A') : (row.policyNumber || 'N/A')}
-                         </div>
-                      </td>
-                      <td className="px-6 py-5 text-center">
-                        <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold uppercase">
-                          {row.paymentMode}
-                        </span>
-                      </td>
-                      <td className="px-6 py-5 font-bold text-[#0d9488]">₹{row.netPayout}</td>
-                      <td className="px-6 py-5 text-center">
-                        <span className={`px-4 py-1.5 rounded-full text-[11px] font-bold ${row.status === 'Processed' ? 'bg-[#e6fcf5] text-[#0d9488] border border-[#c3fae8]' : 'bg-[#fff9db] text-[#f08c00] border border-[#fff3bf]'}`}>
-                          {row.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-5 text-center">
-                        <div className="flex justify-center gap-3">
-                          <button title="View Payout" className="text-slate-400 hover:text-slate-600 transition-all"><Eye className="w-5 h-5" /></button>
-                          <button onClick={() => handleDownloadInvoice(row.payoutId)} title="Download Invoice" className="text-[#10b981] hover:text-[#059669] transition-all"><FileDown className="w-5 h-5" /></button>
-                          <button onClick={() => handleDownloadTDS(row.payoutId)} title="Download TDS Certificate" className="text-blue-500 hover:text-blue-700 transition-all"><ShieldCheck className="w-5 h-5" /></button>
-                        </div>
-                      </td>
+              {isLoading ? (
+                <div className="flex items-center justify-center h-64">
+                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1CADA3]"></div>
+                </div>
+              ) : payoutData.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-64 text-slate-400">
+                  <Inbox className="w-12 h-12 mb-2 opacity-20" />
+                  <p>No payout history found</p>
+                </div>
+              ) : (
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-slate-50 border-y border-slate-100 uppercase text-[11px] font-bold text-slate-500 tracking-wider">
+                      <th className="px-6 py-4">ID</th>
+                      <th className="px-6 py-4">Payout ID / Date</th>
+                      <th className="px-6 py-4">Client Details</th>
+                      <th className="px-6 py-4">Product</th>
+                      <th className="px-6 py-4">reference No</th>
+                      <th className="px-6 py-4 text-center">Payment Mode</th>
+                       <th className="px-6 py-4 text-center">Status</th>
+                       <th className="px-6 py-4">Amount</th>
+                       <th className="px-6 py-4">Gross Amount</th>
+                      <th className="px-6 py-4">Net Payout</th>
+                      <th className="px-6 py-4">GST</th>
+                      <th className="px-6 py-4 text-center">TDS</th>
+                      <th className="px-6 py-4">Invoice Number</th>
+                      
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-sm">
+                    {payoutData.map((row, i) => (
+                      <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="px-6 py-5">
+                          <div className="font-medium text-slate-700">{row.Id}</div>
+                          
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="font-bold text-slate-700">{row.payoutId}</div>
+                          <div className="text-xs text-slate-400 mt-1">{row.date}</div>
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="font-bold text-slate-700">{row.clientName}</div>
+                          <div className="text-xs text-slate-400 mt-1">{row.leadId}</div>
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="font-medium text-slate-700">{row.product}</div>
+                          <div className="text-xs text-slate-400 text-capitalize">{row.category}</div>
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="font-medium text-slate-700">
+                            {formatValue(row.loanNumber)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 text-center">
+                          <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold uppercase">
+                            {row.paymentMode}
+                          </span>
+                        </td>
+                       
+                        <td className="px-6 py-5 text-center">
+                          <span className={`px-4 py-1.5 rounded-full text-[11px] font-bold ${row.status === 'Completed' ? 'bg-[#e6fcf5] text-[#0d9488] border border-[#c3fae8]' : 'bg-green-50 text-[#1CADA3] border border-green-200'}`}>
+                            {row.status}
+                          </span>
+                        </td>
+                         <td className="px-6 py-5 font-bold text-gray-600">₹{row.amount}</td>
+                          <td className="px-6 py-5 font-bold text-gray-600">₹{row.grossAmount}</td>
+                         <td className="px-6 py-5 font-bold text-gray-600">₹{row.netPayout}</td>
+                         <td className="px-6 py-5">
+                          <div className="font-medium text-slate-700">₹{row.gstAmount}</div>
+                          
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="font-medium text-slate-700">₹{row.tdsAmount}</div>
+                          
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="font-medium text-slate-700">₹{row.invoiceNumber}</div>
+                          <div className="font-medium text-slate-700">₹{row.invoiceDate}</div>
+                          
+                        </td>
+                        {/* <td className="px-6 py-5 text-center">
+                          <div className="flex justify-center gap-3">
+                            <button title="View Payout" className="text-slate-400 hover:text-slate-600 transition-all"><Eye className="w-5 h-5" /></button>
+                            <button onClick={() => handleDownloadInvoice(row.payoutId)} title="Download Invoice" className="text-[#10b981] hover:text-[#059669] transition-all"><FileDown className="w-5 h-5" /></button>
+                            <button onClick={() => handleDownloadTDS(row.payoutId)} title="Download TDS Certificate" className="text-blue-500 hover:text-blue-700 transition-all"><ShieldCheck className="w-5 h-5" /></button>
+                          </div>
+                        </td> */}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         )}
@@ -293,10 +371,6 @@ export default function IncentivesPayouts() {
                         <span className="font-bold text-slate-800 text-sm">{item.rate}</span>
                       </div>
                     ))}
-                    <div className="mt-4 flex gap-3 p-4 bg-slate-50 border border-slate-100 rounded-xl text-xs text-slate-500 italic">
-                      <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                      Rates may vary based on institution tie-ups.
-                    </div>
                   </div>
                 </div>
               );
@@ -328,23 +402,7 @@ export default function IncentivesPayouts() {
                       {productMapping[leadCategory].map((prod) => <option key={prod} value={prod}>{prod}</option>)}
                     </select>
                   </div>
-                  {/* <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase mb-2 block tracking-wider">Company / Bank</label>
-                    <select disabled={!selectedProduct} value={selectedBank} onChange={(e) => { setSelectedBank(e.target.value); setSelectedPlan(''); }} className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px] bg-[right_16px_center] bg-no-repeat text-gray-700 disabled:opacity-50">
-                      <option value="">-- Choose Bank --</option>
-                      {currentBankList.map((bank) => <option key={bank} value={bank}>{bank}</option>)}
-                    </select>
-                  </div> */}
                 </div>
-                {leadCategory !== 'loans' && selectedBank && (
-                  <div className="animate-in slide-in-from-top-2 duration-300">
-                    <label className="text-xs font-bold text-slate-500 uppercase mb-2 block tracking-wider">Select Specific Plan</label>
-                    <select value={selectedPlan} onChange={(e) => setSelectedPlan(e.target.value)} className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px] bg-[right_16px_center] bg-no-repeat text-gray-700">
-                      <option value="">-- Select Plan --</option>
-                      {leadCategory === 'insurance' ? INSURANCE_PLAN_MAPPING[selectedBank]?.map(p => <option key={p} value={p}>{p}</option>) : <option value="Standard Plan">Standard Plan</option>}
-                    </select>
-                  </div>
-                )}
                 <div>
                   <label className="text-xs font-bold text-slate-500 uppercase mb-2 block tracking-wider">
                     {leadCategory === 'insurance' ? 'Net Premium (₹)' : 'Receivable Amount (₹)'}

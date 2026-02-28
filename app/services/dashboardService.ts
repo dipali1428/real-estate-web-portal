@@ -125,6 +125,11 @@ export const DashboardService = {
         return response.data;
     },
 
+// 🔹 Get Completed Detail Leads (For Payout History)
+getCompletedDetailLeads: async () => {
+    const response = await api.get("/api/dashboard/get-completed-detail-leads");
+    return response.data;
+},
 
     // 🔹 Generate Aadhaar OTP
     generateAadhaarOtp: async (aadhaar_number: string) => {
@@ -148,4 +153,6 @@ export const DashboardService = {
         const response = await api.post("/api/dashboard/verify-gst", { gst_number });
         return response.data;
     },
+
+   
 };

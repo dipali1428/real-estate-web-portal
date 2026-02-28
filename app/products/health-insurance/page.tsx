@@ -1,5 +1,6 @@
 'use client';
 
+import NextImage from 'next/image';
 import React, { useState } from 'react';
 import { motion, Variants, AnimatePresence } from 'framer-motion';
 import {
@@ -38,68 +39,48 @@ import HealthInsuranceComparison from './components/HealthInsuranceComparison';
 
 const HealthHeroVisual = () => {
     return (
-        <div className="relative w-full h-[550px] flex items-center justify-center overflow-hidden">
-            {/* Minimalist Grid Background */}
-            <div className="absolute inset-0 opacity-10">
-                <svg width="100%" height="100%" className="absolute inset-0">
-                    <defs>
-                        <pattern id="health-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-                            <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#2076C7" strokeWidth="1" />
-                        </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#health-grid)" />
-                </svg>
-            </div>
+        <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+            {/* Background Gradient / Glow */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#2076C7]/5 to-[#1CADA3]/10 rounded-full blur-3xl" />
 
-            {/* Main Centerpiece */}
+            {/* Main Image Container */}
             <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8 }}
-                className="relative z-20"
+                className="relative z-20 w-full aspect-square max-w-[500px]"
             >
-                <div className="relative w-80 h-80 flex items-center justify-center">
-                    {/* Minimal Geometric Accents */}
-                    <div className="absolute w-[380px] h-[380px] border-2 border-primary/5 rounded-full" />
-                    <div className="absolute w-[460px] h-[460px] border border-primary/5 rounded-full" />
+                <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-white/20">
+                    <NextImage
+                        src="/images/health_insurance_hero.png"
+                        alt="Health Insurance Coverage"
+                        fill
+                        className="object-cover"
+                        priority
+                    />
+                    {/* Soft Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#2076C7]/20 to-transparent opacity-40" />
+                </div>
 
-                    {/* Solid Glass Container */}
+                {/* Clean Info Tags - Repositioned for new visual */}
+                {[
+                    { icon: ShieldCheck, label: "SECURE", pos: "-top-3 -right-6", color: "#2076C7" },
+                    { icon: Activity, label: "ACTIVE", pos: "bottom-12 -right-8", color: "#1CADA3" },
+                    { icon: Stethoscope, label: "EXPERT", pos: "bottom-4 -left-12", color: "#2076C7" }
+                ].map((tag, i) => (
                     <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className="relative w-64 h-64 bg-white border border-gray-100 shadow-[0_32px_64px_rgba(0,0,0,0.06)] rounded-xl flex items-center justify-center overflow-hidden"
+                        key={i}
+                        initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.6 + i * 0.1 }}
+                        className={`absolute ${tag.pos} z-30 hidden sm:block`}
                     >
-                        <div className="relative z-10 flex flex-col items-center">
-                            <div className="w-24 h-24 rounded-lg flex items-center justify-center mb-4 transition-transform group-hover:scale-110 shadow-lg"
-                                style={{ background: 'linear-gradient(to bottom right, #2076C7, #1CADA3, #2076C7)' }}
-                            >
-                                <HeartPulse className="text-white w-12 h-12" />
-                            </div>
-                            <span className="text-primary font-bold text-[10px] tracking-[0.4em] uppercase">
-                                Health Shield
-                            </span>
+                        <div className="bg-white/95 backdrop-blur-md px-5 py-2.5 rounded-lg border border-gray-100 flex items-center gap-2.5 shadow-xl">
+                            <tag.icon size={16} style={{ color: tag.color }} />
+                            <span className="text-gray-900 text-[11px] font-bold tracking-widest uppercase">{tag.label}</span>
                         </div>
                     </motion.div>
-
-                    {/* Clean Info Tags */}
-                    {[
-                        { icon: ShieldCheck, label: "SECURE", pos: "-top-6 -right-12", color: "#2076C7" },
-                        { icon: Activity, label: "ACTIVE", pos: "bottom-12 -right-16", color: "#1CADA3" },
-                        { icon: Stethoscope, label: "EXPERT", pos: "top-16 -left-16", color: "#2076C7" }
-                    ].map((tag, i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4 + i * 0.1 }}
-                            className={`absolute ${tag.pos} z-30`}
-                        >
-                            <div className="bg-white px-5 py-2.5 rounded-lg border border-gray-100 flex items-center gap-2.5 shadow-xl">
-                                <tag.icon size={16} style={{ color: tag.color }} />
-                                <span className="text-gray-900 text-[11px] font-bold tracking-widest">{tag.label}</span>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                ))}
             </motion.div>
         </div>
     );
@@ -412,7 +393,7 @@ const HealthInsurancePage = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 1, delay: 0.2 }}
-                            className="relative h-[500px] hidden lg:block"
+                            className="relative h-[350px] sm:h-[450px] md:h-[500px] lg:h-[500px] mt-8 lg:mt-0"
                         >
                             <HealthHeroVisual />
                         </motion.div>
@@ -661,14 +642,14 @@ const HealthInsurancePage = () => {
             </section>
 
             {/* Eligibility Section */}
-            <section className="py-24 bg-white relative overflow-hidden border-t border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 relative z-10">
-                    <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
-                        <div>
-                            <h2 className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
+            <section className="py-12 md:py-24 bg-white relative overflow-hidden border-t border-gray-100">
+                <div className="max-w-7xl mx-auto px-3 sm:px-4 relative z-10">
+                    <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
+                        <div className="min-w-0">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4 tracking-tight">
                                 Eligibility Criteria
                             </h2>
-                            <p className="text-xl text-gray-500 font-light mb-12">
+                            <p className="text-base sm:text-xl text-gray-500 font-light mb-8 sm:mb-12">
                                 Simple criteria for complete peace of mind.
                             </p>
                             <div className="space-y-6">
@@ -679,15 +660,15 @@ const HealthInsurancePage = () => {
                                     { k: "Medical Check-up", v: "Required if age > 45 or high sum insured chosen" },
                                     { k: "Residency", v: "Must be an Indian resident (NRIs covered for treatment in India)" }
                                 ].map((item, idx) => (
-                                    <div key={idx} className="flex gap-4 items-start group">
-                                        <div className="p-1 rounded-lg bg-[#2076C7]/20 text-[#2076C7] mt-1">
-                                            <CheckCircle2 size={20} />
+                                    <div key={idx} className="flex gap-3 sm:gap-4 items-start group min-w-0">
+                                        <div className="p-1 rounded-lg bg-[#2076C7]/20 text-[#2076C7] mt-1 shrink-0">
+                                            <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
                                         </div>
-                                        <div>
-                                            <span className="block text-gray-500 text-sm font-bold uppercase tracking-widest group-hover:text-[#2076C7] transition-colors">
+                                        <div className="min-w-0 flex-1">
+                                            <span className="block text-gray-500 text-[10px] sm:text-sm font-bold uppercase tracking-widest group-hover:text-[#2076C7] transition-colors truncate">
                                                 {item.k}
                                             </span>
-                                            <span className="text-base sm:text-lg font-bold text-gray-900">
+                                            <span className="text-sm sm:text-lg font-bold text-gray-900 break-words block leading-snug">
                                                 {item.v}
                                             </span>
                                         </div>
@@ -695,13 +676,13 @@ const HealthInsurancePage = () => {
                                 ))}
                             </div>
 
-                            <div className="mt-12 overflow-hidden rounded-lg border border-gray-200">
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left bg-white min-w-[500px]">
+                            <div className="mt-10 sm:mt-12 overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                                <div className="overflow-x-auto custom-scrollbar-horizontal pb-1">
+                                    <table className="w-full text-left bg-white min-w-[380px]">
                                         <thead className="bg-gray-50">
                                             <tr>
-                                                <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">Criteria</th>
-                                                <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">Requirement</th>
+                                                <th className="px-4 sm:px-6 py-3 sm:py-4 text-[10px] font-bold uppercase tracking-widest text-gray-500">Criteria</th>
+                                                <th className="px-4 sm:px-6 py-3 sm:py-4 text-[10px] font-bold uppercase tracking-widest text-gray-500">Requirement</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100">
@@ -713,8 +694,8 @@ const HealthInsurancePage = () => {
                                                 ["Residency", "Indian resident"]
                                             ].map(([k, v], i) => (
                                                 <tr key={i}>
-                                                    <td className="px-6 py-4 font-bold text-gray-900 text-sm sm:text-base">{k}</td>
-                                                    <td className="px-6 py-4 text-gray-600 font-medium text-sm sm:text-base">{v}</td>
+                                                    <td className="px-4 sm:px-6 py-3 sm:py-4 font-bold text-gray-900 text-xs sm:text-base">{k}</td>
+                                                    <td className="px-4 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium text-xs sm:text-base">{v}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -723,32 +704,32 @@ const HealthInsurancePage = () => {
                             </div>
                         </div>
 
-                        <div>
-                            <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-2xl border border-gray-100">
-                                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-8 uppercase tracking-tighter text-center sm:text-left">Who Should Consider?</h3>
-                                <div className="grid gap-6">
+                        <div className="mt-10 lg:mt-0">
+                            <div className="bg-white p-5 sm:p-10 rounded-2xl shadow-2xl border border-gray-100">
+                                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8 uppercase tracking-tighter text-center sm:text-left">Who Should Consider?</h3>
+                                <div className="grid gap-4 sm:gap-6">
                                     {/* Benefits / Who should consider */}
                                     {[
-                                        { title: "Working Professionals", desc: "Protect savings from sudden medical expenses.", icon: <Zap size={24} className="text-yellow-500" /> },
-                                        { title: "Families", desc: "Covers spouse and children under one plan.", icon: <Users2 size={24} className="text-teal-500" /> },
-                                        { title: "Senior Citizens", desc: "Higher risk of illness with age requires special care.", icon: <HeartPulse size={24} className="text-red-500" /> },
-                                        { title: "Young Adults", desc: "Lower premiums by starting early and completing waiting periods.", icon: <Activity size={24} className="text-blue-500" /> }
+                                        { title: "Working Professionals", desc: "Protect savings from sudden medical expenses.", icon: <Zap size={22} className="text-yellow-500" /> },
+                                        { title: "Families", desc: "Covers spouse and children under one plan.", icon: <Users2 size={22} className="text-teal-500" /> },
+                                        { title: "Senior Citizens", desc: "Higher risk of illness with age requires special care.", icon: <HeartPulse size={22} className="text-red-500" /> },
+                                        { title: "Young Adults", desc: "Lower premiums by starting early and completing waiting periods.", icon: <Activity size={22} className="text-blue-500" /> }
                                     ].map((person, idx) => (
-                                        <div key={idx} className="flex gap-4 p-5 rounded-lg bg-gray-50/50 border border-transparent hover:border-primary/20 transition-all group">
-                                            <div className="w-12 h-12 bg-white rounded-lg shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <div key={idx} className="flex gap-3 sm:gap-4 p-4 sm:p-5 rounded-lg bg-gray-50/50 border border-transparent hover:border-primary/20 transition-all group min-w-0">
+                                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-lg shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
                                                 {person.icon}
                                             </div>
-                                            <div>
-                                                <h4 className="font-bold text-gray-900">{person.title}</h4>
-                                                <p className="text-xs text-gray-500 font-medium">{person.desc}</p>
+                                            <div className="min-w-0 flex-1">
+                                                <h4 className="font-bold text-gray-900 text-sm sm:text-base truncate">{person.title}</h4>
+                                                <p className="text-[10px] sm:text-xs text-gray-500 font-medium line-clamp-2">{person.desc}</p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
-                                <div className="mt-8 pt-8 border-t border-gray-100">
+                                <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-100">
                                     <button
                                         onClick={() => document.getElementById('plans-grid')?.scrollIntoView({ behavior: 'smooth' })}
-                                        className="w-full py-4 sm:py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold tracking-widest text-base sm:text-lg shadow-xl shadow-[#2076C7]/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                                        className="w-full py-3.5 sm:py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold tracking-widest text-sm sm:text-lg shadow-xl shadow-[#2076C7]/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                                     >
                                         VIEW PLANS
                                     </button>
