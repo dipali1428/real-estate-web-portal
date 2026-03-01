@@ -7,7 +7,8 @@ import { successContests } from "../../data/contests";
 import { getEventImages } from "../../data/eventImages";
 import { featuredVideos } from "../../data/youtubeVideos";
 
-// Lazy loading wrapper component
+// ... (Helper components: LazyLoad, LazyImageCarousel, YouTubeVideo, LazyYouTubeVideo remain exactly the same)
+
 interface LazyLoadProps {
   children: React.ReactNode;
   rootMargin?: string;
@@ -58,7 +59,6 @@ const LazyLoad: React.FC<LazyLoadProps> = ({
   );
 };
 
-// Lazy Image Carousel component
 interface LazyImageCarouselProps {
   images: string[];
   alt: string;
@@ -111,7 +111,6 @@ const LazyImageCarousel: React.FC<LazyImageCarouselProps> = ({
   );
 };
 
-// YouTube Video Component
 interface YouTubeVideoProps {
   videoId: string;
   title: string;
@@ -143,7 +142,6 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ videoId, title }) => {
   );
 };
 
-// Lazy YouTube Video Component
 const LazyYouTubeVideo: React.FC<YouTubeVideoProps> = (props) => {
   return (
     <LazyLoad rootMargin="200px">
@@ -152,7 +150,6 @@ const LazyYouTubeVideo: React.FC<YouTubeVideoProps> = (props) => {
   );
 };
 
-// Helper function to extract month and year from date string
 const getMonthAndYearFromDate = (dateString: string): { month: string; year: number } => {
   const months = [
     "January", "February", "March", "April", "May", "June",
@@ -292,97 +289,170 @@ const EventMonthSection: React.FC<{ month: string; events: Event[] }> = ({ month
   );
 };
 
+const SectionHeader: React.FC<{ title: string; isOpen: boolean; onToggle: () => void; description?: string | React.ReactNode }> = ({ title, isOpen, onToggle, description }) => (
+  <div className="text-center mb-8 cursor-pointer group" onClick={onToggle}>
+    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm flex items-center justify-center gap-4">
+      {title}
+      <span className={`text-teal-600 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+        </svg>
+      </span>
+    </h2>
+    {description && (
+      <p className="text-gray-600 max-w-3xl mx-auto text-xl md:text-1xl">
+        {description}
+      </p>
+    )}
+  </div>
+);
+
+function StatItem({ value, label }: { value: string, label: string }) {
+  return (
+    <div>
+      <div className="text-4xl font-bold text-[#2076C7] mb-2">{value}</div>
+      <div className="text-[#666666] font-semibold text-sm uppercase tracking-wide">{label}</div>
+    </div>
+  );
+}
+
+function GalleryImage({ src, alt }: { src: string, alt: string }) {
+  return (
+    <div className="h-64 rounded-lg overflow-hidden group shadow-md">
+      <img src={src} alt={alt} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+    </div>
+  );
+}
+
 const EventSection: React.FC = () => {
   const eventsByMonth = groupEventsByMonth(eventsByYear);
+  
+  const [expanded, setExpanded] = useState({
+    contests: true, // Open by default
+    stories: false, // Closed by default
+    events: false,  // Closed by default
+    life: false     // Closed by default
+  });
+
+  const toggle = (section: keyof typeof expanded) => {
+    setExpanded(prev => ({ ...prev, [section]: !prev[section] }));
+  };
 
   return (
     <section className="bg-gray-50">
       <div className="container mx-auto px-4 py-10">
 
         {/* ===== Success Contest Section ===== */}
-        <div className="mb-20">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-              Success International Contests
-            </h2>
-            <p className="text-gray-600 max-w-3xl mx-auto text-xl md:text-1xl">
-              Celebrating our top achievers and innovators at <span className="font-semibold text-teal-600">Infinity Arthvishva</span>.
-            </p>
-          </div>
-          <div className="flex justify-center">
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 w-full max-w-7xl">
-              {successContests.map((contest, idx) => (
-                <ContestCard key={idx} contest={contest} index={idx} />
-              ))}
+        <div className="mb-16 pb-16 border-b border-gray-200">
+          <SectionHeader 
+            title="Success International Contests"
+            isOpen={expanded.contests}
+            onToggle={() => toggle('contests')}
+            description={<>Celebrating our top achievers and innovators at <span className="font-semibold text-teal-600">Infinity Arthvishva</span>.</>}
+          />
+          {expanded.contests && (
+            <div className="flex justify-center transition-all duration-500">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 w-full max-w-7xl">
+                {successContests.map((contest, idx) => (
+                  <ContestCard key={idx} contest={contest} index={idx} />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* ===== Success Stories Section (Updated for Videos & Images) ===== */}
-        <div className="mb-20">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-              Success Stories
-            </h2>
-            <p className="text-gray-600 max-w-3xl mx-auto text-xl md:text-1xl">
-              Watch inspiring stories of transformation and success from our <span className="font-semibold text-teal-600">Infinity Arthvishva</span> community members.
-            </p>
-          </div>
-
-          <div className={`flex justify-center ${featuredVideos.length === 1 ? 'max-w-2xl mx-auto' :
-              featuredVideos.length === 2 ? 'max-w-4xl mx-auto' : 'w-full'
-            }`}>
-            <div className={`grid gap-8 w-full ${featuredVideos.length === 1 ? 'grid-cols-1' :
-                featuredVideos.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
-                  'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+        {/* ===== Success Stories Section ===== */}
+        <div className="mb-16 pb-16 border-b border-gray-200">
+          <SectionHeader 
+            title="Success Stories"
+            isOpen={expanded.stories}
+            onToggle={() => toggle('stories')}
+            description={<>Watch inspiring stories of transformation and success from our <span className="font-semibold text-teal-600">Infinity Arthvishva</span> community members.</>}
+          />
+          {expanded.stories && (
+            <div className={`flex justify-center transition-all duration-500 ${featuredVideos.length === 1 ? 'max-w-2xl mx-auto' :
+                featuredVideos.length === 2 ? 'max-w-4xl mx-auto' : 'w-full'
               }`}>
-              {featuredVideos.map((item, index) => (
-                <div key={index} className="group flex flex-col h-full">
-                  <div className="mb-4">
-                    {item.videoId ? (
-                      <LazyYouTubeVideo videoId={item.videoId} title={item.title} />
-                    ) : (
-                      <div className="rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105">
-                        <LazyImageCarousel
-                          images={[item.image || ""]}
-                          alt={item.title}
-                          delay={5000}
-                        />
-                      </div>
-                    )}
+              <div className={`grid gap-8 w-full ${featuredVideos.length === 1 ? 'grid-cols-1' :
+                  featuredVideos.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
+                    'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                }`}>
+                {featuredVideos.map((item, index) => (
+                  <div key={index} className="group flex flex-col h-full">
+                    <div className="mb-4">
+                      {item.videoId ? (
+                        <LazyYouTubeVideo videoId={item.videoId} title={item.title} />
+                      ) : (
+                        <div className="rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105">
+                          <LazyImageCarousel
+                            images={[item.image || ""]}
+                            alt={item.title}
+                            delay={5000}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-2 flex-grow">
+                      <h4 className="font-semibold text-gray-700 text-lg mb-2">
+                        {item.title}
+                      </h4>
+                      <p className="text-gray-600 text-sm">{item.description}</p>
+                    </div>
                   </div>
-                  <div className="mt-2 flex-grow">
-                    <h4 className="font-semibold text-gray-700 text-lg mb-2">
-                      {item.title}
-                    </h4>
-                    <p className="text-gray-600 text-sm">{item.description}</p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* ===== Events Section ===== */}
-        <div>
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-              Business Events
-            </h2>
-            <p className="text-gray-600 max-w-3xl mx-auto text-lg md:text-1xl">
-              Join <span className="font-semibold text-teal-600">Infinity Arthvishva</span> across India for networking, workshops, and business growth opportunities.
-            </p>
-          </div>
-          {Object.keys(eventsByMonth).map((month) => (
-            <EventMonthSection key={month} month={month} events={eventsByMonth[month]} />
-          ))}
+        <div className="mb-16 pb-16 border-b border-gray-200">
+          <SectionHeader 
+            title="Business Events"
+            isOpen={expanded.events}
+            onToggle={() => toggle('events')}
+            description={<>Join <span className="font-semibold text-teal-600">Infinity Arthvishva</span> across India for networking, workshops, and business growth opportunities.</>}
+          />
+          {expanded.events && (
+            <div className="transition-all duration-500">
+              {Object.keys(eventsByMonth).map((month) => (
+                <EventMonthSection key={month} month={month} events={eventsByMonth[month]} />
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Statistics Section */}
-        <div className="mt-20 bg-white rounded-3xl shadow-2xl p-8">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-700">Our Event Reach</h3>
-            <p className="text-gray-600 mt-2">Across multiple cities in India</p>
+        {/* ===== Life at Infinity Section ===== */}
+        <div className="mb-16 pb-16 border-b border-gray-200">
+          <SectionHeader 
+            title="Life at Infinity Arthvishva"
+            isOpen={expanded.life}
+            onToggle={() => toggle('life')}
+            description="Join a growing network that's empowering financial futures across India."
+          />
+          {expanded.life && (
+            <div className="transition-all duration-500">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <GalleryImage src="\Team\Image-1.jpeg" alt="Team Collaboration" />
+                <GalleryImage src="\Team\Image-6.jpeg" alt="Celebration Event" />
+                <GalleryImage src="\Team\Image-2.jpeg" alt="Training Session" />
+                <GalleryImage src="\Team\Image-3.jpeg" alt="Office Environment" />
+                <GalleryImage src="\Team\Image-4.jpeg" alt="Celebration Event" />
+                <GalleryImage src="\Team\Image-5.jpeg" alt="Celebration Event" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Statistics Section (NOT Collapsible) */}
+        <div className="mt-16 bg-white rounded-3xl shadow-2xl p-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+              Our Event Reach
+            </h2>
+            <p className="text-gray-600 max-w-3xl mx-auto text-xl md:text-1xl">
+              Across multiple cities in India
+            </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
@@ -390,16 +460,10 @@ const EventSection: React.FC = () => {
               <div className="text-gray-600">Total Events</div>
             </div>
             <div>
-              {/* <div className="text-3xl md:text-4xl font-bold text-teal-600">
-                {new Set(Object.values(eventsByYear).flat().map(event => event.city)).size}+
-              </div> */}
-              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">
-               127+
-              </div>
+              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">127+</div>
               <div className="text-gray-600">Cities Covered</div>
             </div>
             <div>
-              {/* <div className="text-3xl md:text-4xl font-bold text-teal-600">{Object.keys(eventsByYear).length}</div> */}
               <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">2</div>
               <div className="text-gray-600">Years</div>
             </div>
