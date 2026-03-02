@@ -334,72 +334,104 @@ const HealthInsurancePage = () => {
     return (
         <div className="bg-neutral-100 min-h-screen font-sans">
             {/* Hero Content Section */}
-            <section className="relative py-20 lg:py-28 overflow-hidden bg-linear-to-br from-blue-50 via-teal-50 to-emerald-50" style={{ background: 'linear-gradient(to bottom right, #79c2f7ff, #ffffffff, #e5f8e5ff)' }}>
-                {/* Animated background shapes */}
-                <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ backgroundColor: 'rgba(28, 202, 163, 0.3)' }}></div>
-                    <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ backgroundColor: 'rgba(32, 118, 199, 0.3)', animationDelay: '1s' }}></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ backgroundColor: 'rgba(28, 202, 163, 0.2)', animationDelay: '2s' }}></div>
-                </div>
+           {/* Hero Content Section */}
+<section
+  className="relative py-20 lg:py-28 overflow-hidden bg-linear-to-br from-blue-50 via-teal-50 to-emerald-50"
+  style={{ background: "linear-gradient(to bottom right, #79c2f7ff, #ffffffff, #e5f8e5ff)" }}
+>
+  {/* Animated background shapes */}
+  <div className="absolute inset-0 overflow-hidden">
+    <div
+      className="absolute -top-40 -right-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"
+      style={{ backgroundColor: "rgba(28, 202, 163, 0.3)" }}
+    ></div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <div className="text-left">
-                            <div className="mb-6">
-                                <Link
-                                    href="/"
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-lg border border-gray-100 shadow-sm text-gray-700 font-bold text-sm hover:shadow-md transition-all active:scale-95"
-                                >
-                                    <ArrowLeft size={16} />
-                                    Back
-                                </Link>
-                            </div>
-                            <motion.h1
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="text-5xl md:text-7xl font-bold font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent leading-[1.1] mb-6 tracking-tight"
-                            >
-                                Health Protection <br />
-                                for Every <br />
-                                Generation
-                            </motion.h1>
+    <div
+      className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"
+      style={{
+        backgroundColor: "rgba(32, 118, 199, 0.3)",
+        animationDelay: "1s",
+      }}
+    ></div>
 
-                            <motion.p
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 }}
-                                className="text-xl md:text-2xl text-gray-600 max-w-xl leading-relaxed mb-10"
-                            >
-                                Secure your family's future with India's most trusted health insurance plans.
-                            </motion.p>
+    <div
+      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+      style={{
+        backgroundColor: "rgba(28, 202, 163, 0.2)",
+        animationDelay: "2s",
+      }}
+    ></div>
+  </div>
 
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="flex flex-wrap gap-5 pt-4"
-                            >
-                                <button
-                                    onClick={() => document.getElementById('calculator')?.scrollIntoView({ behavior: 'smooth' })}
-                                    className="group relative px-8 py-4 rounded-xl font-bold text-sm md:text-base text-white shadow-lg hover:brightness-110 transform hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden"
-                                    style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}
-                                >
-                                    Consult an Advisor
-                                </button>
-                            </motion.div>
-                        </div>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div className="grid lg:grid-cols-2 gap-12 items-center">
 
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 1, delay: 0.2 }}
-                            className="relative h-[350px] sm:h-[450px] md:h-[500px] lg:h-[500px] mt-8 lg:mt-0"
-                        >
-                            <HealthHeroVisual />
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
+      {/* Left Content */}
+      <div className="text-left">
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-lg border border-gray-100 shadow-sm text-gray-700 font-bold text-sm hover:shadow-md transition-all active:scale-95"
+          >
+            <ArrowLeft size={16} />
+            Back
+          </Link>
+        </div>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-5xl md:text-7xl font-bold font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent leading-[1.1] mb-6 tracking-tight"
+        >
+          Health Protection <br />
+          for Every <br />
+          Generation
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-xl md:text-2xl text-gray-600 max-w-xl leading-relaxed mb-10"
+        >
+          Secure your family's future with India's most trusted health insurance plans.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-wrap gap-5 pt-4"
+        >
+          <button
+            onClick={() =>
+              document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth" })
+            }
+            className="group relative px-8 py-4 rounded-xl font-bold text-sm md:text-base text-white shadow-lg hover:brightness-110 transform hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden"
+            style={{ background: "linear-gradient(to right, #2076C7, #1CADA3)" }}
+          >
+            Consult an Advisor
+          </button>
+        </motion.div>
+      </div>
+
+      {/* Updated Image Section */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 0.2 }}
+        className="relative h-[350px] sm:h-[450px] md:h-[500px] lg:h-[500px] mt-8 lg:mt-0 flex items-center justify-center"
+      >
+        <img
+          src="/loan/health-insurance-hero image.png"
+          alt="Happy family at home"
+          className="w-full h-full object-cover rounded-3xl shadow-2xl"
+        />
+      </motion.div>
+
+    </div>
+  </div>
+</section>
 
 
 
