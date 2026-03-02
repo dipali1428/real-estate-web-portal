@@ -59,6 +59,8 @@ const Header = () => {
     { label: "Loan Against Securities", href: "/offers/loans/loan-against-securities" },
   ];
 
+
+  
   const insuranceOptions = [
     { label: "Life Insurance", href: "/products/life-insurance" },
     { label: "Health Insurance", href: "/products/health-insurance" },
