@@ -199,38 +199,38 @@ export default function ProfileSection() {
     };
 
     const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]; 
+        const file = e.target.files?.[0];
         if (!file) return;
-    
+
         // 1. Set local preview immediately for instant UI feedback
         const localUrl = URL.createObjectURL(file);
         setPhotoPreview(localUrl);
-        
-        const formData = new FormData(); 
+
+        const formData = new FormData();
         formData.append("profile_photo", file);
         let popupId: string;
-    
+
         try {
-            setUploadingPhoto(true); 
+            setUploadingPhoto(true);
             popupId = triggerPopup("Updating photo...", "loading");
-            
+
             const res = await DashboardService.updateProfileImage(formData);
-            
+
             if (res.profile_image_url || res.status === "success") {
                 // 2. Update the timestamp to force browser to ignore old cache
-                setImageTimestamp(Date.now()); 
-                
+                setImageTimestamp(Date.now());
+
                 // 3. Fetch fresh data from server
-                await refreshProfileData(); 
-                
+                await refreshProfileData();
+
                 triggerPopup("Photo updated!", "success", popupId);
             }
-        } catch (err: any) { 
-            triggerPopup("Upload failed", "error"); 
-        } finally { 
-            setUploadingPhoto(false); 
+        } catch (err: any) {
+            triggerPopup("Upload failed", "error");
+        } finally {
+            setUploadingPhoto(false);
             // 4. Clear the blob URL and let getProfileImage switch to the new timestamped URL
-            setPhotoPreview(null); 
+            setPhotoPreview(null);
         }
     };
 
@@ -243,47 +243,47 @@ export default function ProfileSection() {
         if (!ctx) return setIsDownloadingCard(false);
         canvas.width = 1200; canvas.height = 675;
         const locationText = (kyc?.aadhaar_kyc_data?.full_address || profile.city).toUpperCase();
-        
+
         try {
             const templateImg = new Image();
             templateImg.src = CardTemplateImage.src; templateImg.crossOrigin = "anonymous";
             await new Promise((res, rej) => { templateImg.onload = res; templateImg.onerror = rej; });
             ctx.drawImage(templateImg, 0, 0, 1200, 675);
-            
+
             const leftPadding = 90; ctx.textBaseline = "top";
             ctx.fillStyle = "#1e293b"; ctx.font = "bold 52px sans-serif";
             ctx.fillText(profile.name.toUpperCase(), leftPadding, 180);
-            
+
             ctx.fillStyle = "#64748b"; ctx.font = "bold 20px sans-serif";
             ctx.fillText("AUTHORIZED PARTNER", leftPadding, 240);
-            
+
             const drawIcon = (path: string, x: number, y: number) => {
                 ctx.save(); ctx.translate(x, y); ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 2.5;
                 ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.stroke(new Path2D(path)); ctx.restore();
             };
-            
+
             const startY = 320; const gap = 70; const textX = leftPadding + 60;
             ctx.fillStyle = "#334155"; ctx.font = "bold 28px sans-serif";
-            
+
             // Phone
             drawIcon("M17 2H7C5.9 2 5 2.9 5 4V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V4C19 2.9 18.1 2 17 2Z", leftPadding, startY);
             ctx.fillText(`+91 ${profile.mobile}`, textX, startY - 4);
-            
+
             // Email
             drawIcon("M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4ZM22 7L12 13L2 7", leftPadding, startY + gap);
             ctx.font = "bold 26px sans-serif"; ctx.fillText(profile.email.toLowerCase(), textX, startY + gap - 4);
-            
+
             // Location with Text Wrapping
             drawIcon("M12 21C12 21 20 13 20 8C20 3.6 16.4 0 12 0C7.6 0 4 3.6 4 8C4 13 12 21 12 21Z", leftPadding, startY + gap * 2);
             ctx.font = "bold 24px sans-serif";
-            
+
             // Wrapping Logic for Location
             const words = locationText.split(' ');
             let line = '';
-            const maxWidth = 600; 
+            const maxWidth = 600;
             const lineHeight = 32;
             let currentY = startY + gap * 2 - 4;
-            
+
             for (let n = 0; n < words.length; n++) {
                 let testLine = line + words[n] + ' ';
                 let metrics = ctx.measureText(testLine);
@@ -307,18 +307,18 @@ export default function ProfileSection() {
     const downloadDSACardAsPhoto = async () => {
         if (!profile) return;
         setIsDownloadingDSACard(true);
-    
+
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
         if (!ctx) return setIsDownloadingDSACard(false);
-    
+
         const cvWidth = 600;
         const cvHeight = 950;
         canvas.width = cvWidth;
         canvas.height = cvHeight;
-    
+
         const locationText = kyc?.aadhaar_kyc_data?.full_address || profile.city;
-    
+
         try {
             // 1. Draw Background
             ctx.fillStyle = "#ffffff";
@@ -326,12 +326,12 @@ export default function ProfileSection() {
             ctx.fillStyle = "#1CADA3";
             ctx.fillRect(0, 0, cvWidth, 15);
             ctx.fillRect(0, cvHeight - 15, cvWidth, 15);
-    
+
             // 2. Load and Draw Logo
             const logo = new Image();
             logo.src = LogoImage.src;
             // Even local logos should have crossOrigin if served via CDN/Next.js Image Optimization
-            logo.crossOrigin = "anonymous"; 
+            logo.crossOrigin = "anonymous";
             await new Promise((res) => {
                 logo.onload = res;
                 logo.onerror = res;
@@ -341,15 +341,15 @@ export default function ProfileSection() {
                 const logoH = 60;
                 ctx.drawImage(logo, (cvWidth - logoW) / 2, 60, logoW, logoH);
             }
-    
+
             // 3. Load and Draw Profile Photo (The Critical CORS Part)
             const photoX = (cvWidth - 220) / 2;
             const photoY = 180;
             const activeImg = photoPreview || kyc?.profile_image_url || null;
-    
+
             if (activeImg) {
                 const userPhoto = new Image();
-                
+
                 if (activeImg.startsWith('blob:')) {
                     // Local previews (blobs) don't need CORS or timestamps
                     userPhoto.src = activeImg;
@@ -358,11 +358,11 @@ export default function ProfileSection() {
                     // to avoid getting a cached non-CORS version from the browser
                     userPhoto.crossOrigin = "anonymous";
                     const cacheBuster = `cb=${Date.now()}`;
-                    userPhoto.src = activeImg.includes('?') 
-                        ? `${activeImg}&${cacheBuster}` 
+                    userPhoto.src = activeImg.includes('?')
+                        ? `${activeImg}&${cacheBuster}`
                         : `${activeImg}?${cacheBuster}`;
                 }
-    
+
                 await new Promise((res, rej) => {
                     userPhoto.onload = res;
                     userPhoto.onerror = (e) => {
@@ -370,7 +370,7 @@ export default function ProfileSection() {
                         res(null); // Resolve anyway to continue drawing other parts of the card
                     };
                 });
-    
+
                 if (userPhoto.complete) {
                     // Draw photo
                     ctx.drawImage(userPhoto, photoX, photoY, 220, 260);
@@ -380,27 +380,27 @@ export default function ProfileSection() {
                     ctx.strokeRect(photoX, photoY, 220, 260);
                 }
             }
-    
+
             // 4. Draw User Info
             ctx.textAlign = "center";
             ctx.fillStyle = "#2563eb";
             ctx.font = "bold 38px sans-serif";
             ctx.fillText(profile.name.toUpperCase(), cvWidth / 2, 520);
-    
+
             ctx.fillStyle = "#64748b";
             ctx.font = "bold 24px sans-serif";
             ctx.fillText("Authorized Partner", cvWidth / 2, 560);
-    
+
             ctx.fillStyle = "#334155";
             ctx.font = "bold 24px sans-serif";
             ctx.fillText(`Partner ID - ${profile.adv_id}`, cvWidth / 2, 600);
-    
+
             // 5. Draw Contact Details
             const detailsStartY = 680;
             ctx.font = "bold 20px sans-serif";
             ctx.fillText(`Contact No: +91 ${profile.mobile}`, cvWidth / 2, detailsStartY);
             ctx.fillText(`Email ID: ${profile.email}`, cvWidth / 2, detailsStartY + 50);
-    
+
             // 6. Draw Wrapped Location (Prevents text from going off-canvas)
             const fullLocation = `Location: ${locationText}`;
             const words = fullLocation.split(' ');
@@ -408,7 +408,7 @@ export default function ProfileSection() {
             const maxWidth = 500;
             const lineHeight = 28;
             let currentY = detailsStartY + 100;
-    
+
             ctx.font = "bold 20px sans-serif"; // Reset font for location
             for (let n = 0; n < words.length; n++) {
                 let testLine = line + words[n] + ' ';
@@ -422,12 +422,12 @@ export default function ProfileSection() {
                 }
             }
             ctx.fillText(line, cvWidth / 2, currentY);
-    
+
             // 7. Footer Website
             ctx.fillStyle = "#2563eb";
             ctx.font = "bold 22px sans-serif";
             ctx.fillText("www.infinityarthvishva.com", cvWidth / 2, cvHeight - 60);
-    
+
             // 8. Trigger Download
             const link = document.createElement("a");
             link.download = `${profile.name.replace(/\s+/g, '_')}_IdentityCard.png`;
@@ -435,7 +435,7 @@ export default function ProfileSection() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
+
             triggerPopup("Identity Card Saved!", "success");
         } catch (e) {
             console.error("Card generation error:", e);
@@ -485,7 +485,7 @@ export default function ProfileSection() {
 
             <header className="mb-5 text-center">
                 <h1 className="text-3xl font-bold text-slate-700">Profile Settings</h1>
-                
+
                 <div className="flex justify-center items-center mt-10 gap-2 sm:gap-6">
                     {[1, 2, 3].map((step) => (
                         <div key={step} className="flex items-center">
@@ -500,10 +500,10 @@ export default function ProfileSection() {
                     ))}
                 </div>
                 {/* Profile Completion Badge */}
-        <div className={`flex items-center w-fit mx-auto gap-1.5 px-3 mt-7 py-1 rounded-full border text-[10px] font-black uppercase tracking-wider ${kyc?.kyc_completed ? "bg-emerald-50 border-emerald-200 text-emerald-600" : "bg-amber-50 border-amber-200 text-amber-600"}`}>
-            {kyc?.kyc_completed ? <ShieldCheck size={12} /> : <AlertCircle size={12} />}
-            Status: {kyc?.kyc_completed ? "KYC Completed" : "KYC Incomplete"}
-        </div>
+                <div className={`flex items-center w-fit mx-auto gap-1.5 px-3 mt-7 py-1 rounded-full border text-[10px] font-black uppercase tracking-wider ${kyc?.kyc_completed ? "bg-emerald-50 border-emerald-200 text-emerald-600" : "bg-amber-50 border-amber-200 text-amber-600"}`}>
+                    {kyc?.kyc_completed ? <ShieldCheck size={12} /> : <AlertCircle size={12} />}
+                    Status: {kyc?.kyc_completed ? "KYC Completed" : "KYC Incomplete"}
+                </div>
             </header>
 
             <div className="max-w-full mx-auto">
@@ -562,7 +562,7 @@ export default function ProfileSection() {
                                         {isKycEditing && !aadhaarVerified ? (
                                             <div className="flex flex-col gap-2">
                                                 <div className="flex gap-2"><input className="flex-1 text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2" value={profile.aadhaar || ""} onChange={(e) => setProfile({ ...profile, aadhaar: e.target.value })} placeholder="12 digit Aadhaar" maxLength={12} /><button onClick={handleRequestAadhaarOtp} className="bg-[#1CADA3] text-white px-4 py-2 rounded-xl text-[10px] font-bold">Get OTP</button></div>
-                                                {aadhaarOtpSent && <div className="flex gap-2"><input placeholder="OTP" value={aadhaarOtpInput} onChange={(e) => setAadhaarOtpInput(e.target.value)} className="flex-1 text-[11px] font-bold px-3 py-2 rounded-lg border border-[#1CADA3] outline-none" /><button onClick={handleVerifyAadhaarOtp} className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold">Verify</button></div>}
+                                                {aadhaarOtpSent && <div className="flex gap-2"><input placeholder="OTP" value={aadhaarOtpInput} onChange={(e) => setAadhaarOtpInput(e.target.value)} className="flex-1 text-gray-700 text-[11px] font-bold px-3 py-2 rounded-lg border border-[#1CADA3] outline-none" /><button onClick={handleVerifyAadhaarOtp} className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold">Verify</button></div>}
                                             </div>
                                         ) : (
                                             <p className="text-[11px] font-bold text-slate-700">{profile.aadhaar ? maskAadhaar(profile.aadhaar) : "NOT PROVIDED"}</p>
@@ -598,14 +598,14 @@ export default function ProfileSection() {
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-2 p-4 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 text-[10px] font-bold leading-relaxed">
-                                                        <AlertCircle size={14} className="mt-0.5 shrink-0 text-amber-500" />
-                                                        <span>Note: GST verification is mandatory if total payout exceeds ₹20 lakh in a financial year.</span>
-                                                    </div>
+                                    <AlertCircle size={14} className="mt-0.5 shrink-0 text-amber-500" />
+                                    <span>Note: GST verification is mandatory if total payout exceeds ₹20 lakh in a financial year.</span>
+                                </div>
                                 <div className="mt-10 flex justify-end gap-3">
                                     {isKycEditing && <button onClick={() => setIsKycEditing(false)} className="px-6 py-2 border-2 border-slate-100 text-slate-500 rounded-xl font-bold text-xs">Close Edit</button>}
                                     <button onClick={() => setCurrentStep(2)} className="flex items-center gap-2 px-10 py-4 bg-[#1CADA3] text-white rounded-2xl font-bold shadow-xl shadow-[#1cada340]">Next: Bank Payouts <ChevronRight size={18} /></button>
                                 </div>
-                                
+
                             </div>
                         </div>
                     </div>
@@ -698,10 +698,10 @@ export default function ProfileSection() {
                                     <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Profile Summary</h4>
                                     <span className="text-[10px] font-black text-[#1CADA3] bg-[#1cada310] px-2 py-1 rounded-md">ID: {profile.adv_id}</span>
                                 </div>
-                                
+
                                 <div className="grid grid-cols-2 gap-y-4 gap-x-2">
                                     <div><p className="text-[8px] font-black text-slate-400 uppercase">Full Name</p><p className="text-xs font-bold text-slate-700 truncate">{profile.name}</p></div>
-                                    
+
                                     {/* --- UPDATED: PROFILE SUMMARY LOCATION --- */}
                                     <div>
                                         <p className="text-[8px] font-black text-slate-400 uppercase">Location</p>
@@ -732,7 +732,7 @@ export default function ProfileSection() {
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2"><Phone size={12} className="text-slate-400" strokeWidth={2.5} /><span className="text-[13px] font-bold text-slate-700">+91 {profile.mobile}</span></div>
                                             <div className="flex items-center gap-2"><Mail size={12} className="text-slate-400" strokeWidth={2.5} /><span className="text-[13px] font-bold text-slate-700 truncate">{profile.email}</span></div>
-                                            
+
                                             {/* --- UPDATED: DIGITAL VISITING CARD LOCATION --- */}
                                             <div className="flex items-start gap-2 max-w-[220px]">
                                                 <MapPin size={12} className="text-slate-400 mt-0.5 shrink-0" strokeWidth={2.5} />
@@ -740,7 +740,7 @@ export default function ProfileSection() {
                                                     {kyc?.aadhaar_kyc_data?.full_address || profile.city}
                                                 </span>
                                             </div>
-                                            
+
                                             <div className="flex items-center gap-2"><Globe size={12} className="text-slate-400" strokeWidth={2.5} /><span className="text-[13px] font-bold text-slate-700">www.infinityarthvishva.com</span></div>
                                         </div>
                                         <button onClick={downloadCardAsPhoto} className="opacity-0 group-hover:opacity-100 transition-all w-fit bg-slate-800 text-white px-3 py-1.5 rounded-lg text-[9px] font-bold flex items-center gap-2 shadow-lg">{isDownloadingCard ? <Loader2 size={10} className="animate-spin" /> : <Download size={10} />} Download Card</button>
@@ -758,7 +758,7 @@ export default function ProfileSection() {
                                         <div className="text-center mb-4"><h4 className="text-md font-black text-blue-600 uppercase leading-tight">{profile.name}</h4><p className="text-[9px] font-bold text-slate-500 uppercase">Authorized Partner</p><p className="text-[9px] font-bold text-slate-700 mt-1">Partner ID - {profile.adv_id}</p></div>
                                         <div className="w-full text-center space-y-1 border-t border-slate-100 pt-4 mb-4">
                                             <p className="text-[11px] font-bold text-slate-700"><span className="text-slate-400">Contact:</span> +91 {profile.mobile}</p>
-                                            
+
                                             {/* --- UPDATED: DSA IDENTITY CARD LOCATION --- */}
                                             <p className="text-[10px] font-bold text-slate-700 px-2 leading-tight whitespace-normal break-words">
                                                 <span className="text-slate-400">Location:</span> {kyc?.aadhaar_kyc_data?.full_address || profile.city}
