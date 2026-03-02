@@ -16,7 +16,7 @@ const AboutSection = () => {
             name: "Mr. K Krishna",
             title: "Regional Director, Hyderabad ",
             description: "K Krishna brings 18+ years of banking experience, driving strategic growth, operational excellence, and revenue expansion through high-performing teams and strong client-focused strategies.",
-            image: "/leader/K-krishna.jpeg"
+            image: "/leader/K-Krishna.jpeg"
         },
         {
             name: "Mr. Pravin Marathe",
