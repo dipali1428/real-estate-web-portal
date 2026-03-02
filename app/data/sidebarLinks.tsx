@@ -40,7 +40,7 @@ export const sidebarLinks = {
         { label: "Downloads", href: "/dashboard/pdf-download", icon: <Download className="h-5 w-5 text-neutral-700" /> },
         { label: "Relationship Manager", href: "/dashboard/relationshipManager", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "Help & Support", href: "/dashboard/helpSupport", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },
-        { label: "Our Products", href: "/dashboard/products", icon: <Proportions className="h-5 w-5 text-neutral-700" /> },
+        // { label: "Our Products", href: "/dashboard/products", icon: <Proportions className="h-5 w-5 text-neutral-700" /> },
         { label: "Co-Partners", href: "/dashboard/copartners", icon: <UserPlus className="h-5 w-5 text-neutral-700" /> },
     ],
 

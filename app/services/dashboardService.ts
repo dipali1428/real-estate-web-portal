@@ -168,9 +168,14 @@ getCompletedDetailLeads: async () => {
     // },
 
     // 🔹 SEND OTP FOR REGISTER
-    sendEmailOtp: async (data: { newEmail: string;}) => {
-        const response = await api.post("/api/dashboard/send-email-otp", data);
+    sendEmailOtp: async () => {
+        const response = await api.post("/api/dashboard/send-email-otp");
         return response.data;
+    },
+
+    verifyEmailOtp: async (data: {otp: string;}) => {
+            const response = await api.post("/api/dashboard/verify-email-otp", data);
+            return response.data;
     },
 
     verifyPanAadhaarLink: async () => {

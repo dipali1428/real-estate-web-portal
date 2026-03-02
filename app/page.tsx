@@ -11,7 +11,7 @@ import ScrollToTop from "./component/ScrollToTop";
  
 export default function Home() {
   return (
-    <div className="min-h-screen w-full overflow-x-hidden font-sans">
+    <div className="min-h-screen w-full overflow-x-hidden font-sans"> 
       <HeroSection />
       <ServicesSection />
       <AboutSection />
