@@ -30,7 +30,7 @@ export default function FireInsurancePage() {
             {/* Hero Section */}
             <FireHero />
 
-            {/* Premium Calculator - Moved up for alignment */}
+            {/* Premium Calculator */}
             <div id="calculator">
                 <FireCalculator openForm={openForm} />
             </div>
