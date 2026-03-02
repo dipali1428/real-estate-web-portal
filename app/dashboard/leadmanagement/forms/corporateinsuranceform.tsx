@@ -3,8 +3,17 @@ import { useState, useRef } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, ChevronDown, Download, Info, AlertCircle, Loader2 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
 
+// Mapping for API keys
+const DOC_KEYS: Record<string, { key: string; label: string }> = {
+  gstCertificate: { key: "GST_CERTIFICATE", label: "GST Certificate" },
+  gmcExcel: { key: "GMC_EMPLOYEE_DETAILS", label: "GMC Employee Details" },
+  gpaExcel: { key: "GPA_EMPLOYEE_DETAILS", label: "GPA Employee Census" },
+  renewalCopy: { key: "PREVIOUS_POLICY", label: "Previous Policy Copy" },
+  claimedFile: { key: "CLAIM_HISTORY", label: "Claim History / MIS Report" },
+};
+
 /**
- * CSS Fix to hide number input spinners globally for this component
+ * CSS Fix to hide number input spinners
  */
 const hideSpinnersCSS = `
   input::-webkit-outer-spin-button,
@@ -12,7 +21,6 @@ const hideSpinnersCSS = `
   input[type=number] { -moz-appearance: textfield; }
 `;
 
-// Header Constants
 const GMC_HEADERS = ["Sl NO", "E. Code", "Name", "DOB", "Relation", "Age (Yr)", "GENDER", "Sum Insured"];
 const GPA_HEADERS = ["Sr No", "First Name", "Middle Name", "Last Name", "Employee Code", "Date of Birth", "Gender", "Designation", "Gross Salary", "Sum Insured"];
 
@@ -23,14 +31,19 @@ const STYLES = {
       : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"
     }`,
   label: "block text-sm font-semibold mb-1 text-gray-700",
-  btn: "w-full sm:w-64 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2.5 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base font-bold shadow-md disabled:opacity-50 disabled:cursor-not-allowed",
+  btn: "w-full sm:w-64 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2.5 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base font-bold shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2",
   errorText: "text-red-500 text-xs mt-1",
   sectionTitle: "text-md font-bold mb-3 text-[#1CADA3] border-b pb-2 mt-6 uppercase tracking-wider"
 };
 
+type QueuedFile = {
+  file: File;
+  status: "pending" | "uploading" | "success" | "error";
+};
+
 export default function InsurancePolicyForm({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState({
-    insuranceType: "",
+    insuranceProductType: "",
     insuredName: "",
     insuredAddress: "",
     businessNature: "",
@@ -45,9 +58,8 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
     preExistingDisease: false,
     roomRentLimit: "",
     sumInsured: "",
-    claimLastYear: "",
-    // Added Medical Extension fields
-    medicalExtension: "no",
+    anyClaimLastYear: "",
+    medicalExtension: "No",
     medicalLimit: "",
     wcRows: [
       { category: "ENGINEER", count: "4", months: "12", monthlyWage: "40800" },
@@ -57,19 +69,20 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
     ]
   });
 
-  const [files, setFiles] = useState<Record<string, File | null>>({});
+  // Track files and their specific upload status
+  const [files, setFiles] = useState<Record<string, QueuedFile | null>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMsg, setStatusMsg] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleInsuranceTypeChange = (type: string) => {
-    // Resetting specific fields when switching types to prevent data leaks
+  const handleinsuranceProductTypeChange = (type: string) => {
     setForm(prev => ({
       ...prev,
-      insuranceType: type,
+      insuranceProductType: type,
       policyType: "",
       pincode: "",
-      medicalExtension: "no",
+      medicalExtension: "No",
       medicalLimit: ""
     }));
     setFiles({});
@@ -82,51 +95,35 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
   };
 
   const handleFileChange = (field: string, file: File | null) => {
-    setFiles(prev => ({ ...prev, [field]: file }));
+    setFiles(prev => ({ 
+      ...prev, 
+      [field]: file ? { file, status: "pending" } : null 
+    }));
     if (file && errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
   };
 
   const handleWCRowChange = (index: number, field: string, value: string) => {
     const updatedRows = [...form.wcRows];
-    let sanitizedValue = value;
-    if (["count", "months", "monthlyWage"].includes(field)) {
-      if (parseFloat(value) < 0) sanitizedValue = "0";
-    }
-    updatedRows[index] = { ...updatedRows[index], [field]: sanitizedValue };
+    updatedRows[index] = { ...updatedRows[index], [field]: value };
     setForm(prev => ({ ...prev, wcRows: updatedRows }));
   };
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!form.insuranceType) newErrors.insuranceType = "Required";
-
-    if (form.insuranceType) {
+    if (!form.insuranceProductType) newErrors.insuranceProductType = "Required";
+    if (form.insuranceProductType) {
       if (!form.insuredName) newErrors.insuredName = "Name required";
       if (!form.contactName) newErrors.contactName = "Contact name required";
       if (!form.contactMobile || form.contactMobile.length < 10) newErrors.contactMobile = "10 digit number required";
       if (!form.contactEmail || !/\S+@\S+\.\S+/.test(form.contactEmail)) newErrors.contactEmail = "Valid email required";
-      if (!files.gstCertificate) newErrors.gstCertificate = "GST Certificate required";
     }
-
-    if (form.insuranceType === "WC" || form.insuranceType === "GPA") {
+    if (form.insuranceProductType === "WC" || form.insuranceProductType === "GPA") {
       if (!form.pincode || form.pincode.length < 6) newErrors.pincode = "6 digit Pincode required";
     }
-
-    if (form.insuranceType === "WC") {
+    if (form.insuranceProductType === "WC") {
       if (!form.riskLocation) newErrors.riskLocation = "Risk location required";
-      // Added validation for medical limit if extension is required
-      if (form.medicalExtension === "yes" && !form.medicalLimit) newErrors.medicalLimit = "Medical limit required";
+      if (form.medicalExtension === "Yes" && !form.medicalLimit) newErrors.medicalLimit = "Medical limit required";
     }
-
-    if (form.insuranceType === "GMC" || form.insuranceType === "GPA") {
-      if (!form.policyType) newErrors.policyType = "Select policy type";
-      if (form.insuranceType === "GMC" && !form.sumInsured) newErrors.sumInsured = "Sum insured required";
-      if (form.policyType === "renewal" && form.claimLastYear === "yes" && !files.claimedFile) newErrors.claimedFile = "Claim report required";
-      if (form.policyType === "renewal" && !files.renewalCopy) newErrors.renewalCopy = "Previous policy copy required";
-      if (form.insuranceType === "GMC" && !files.gmcExcel) newErrors.gmcExcel = "Excel required";
-      if (form.insuranceType === "GPA" && !files.gpaExcel) newErrors.gpaExcel = "Excel required";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -135,8 +132,51 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
+    setStatusMsg("Creating Application...");
 
     try {
+      // Filter form data based on insuranceProductType
+      const commonData = {
+        insuranceProductType: form.insuranceProductType,
+        insuredName: form.insuredName,
+        insuredAddress: form.insuredAddress,
+        businessNature: form.businessNature,
+        contactName: form.contactName,
+        contactMobile: form.contactMobile,
+        contactEmail: form.contactEmail,
+      };
+
+      let filteredFormData = {};
+
+      if (form.insuranceProductType === "GMC") {
+        filteredFormData = {
+          ...commonData,
+          policyType: form.policyType,
+          coverType: form.coverType,
+          maternityCover: form.maternityCover,
+          preExistingDisease: form.preExistingDisease,
+          roomRentLimit: form.roomRentLimit,
+          sumInsured: form.sumInsured,
+          anyClaimLastYear: form.anyClaimLastYear,
+        };
+      } else if (form.insuranceProductType === "GPA") {
+        filteredFormData = {
+          ...commonData,
+          pincode: form.pincode,
+          policyType: form.policyType,
+          anyClaimLastYear: form.anyClaimLastYear,
+        };
+      } else if (form.insuranceProductType === "WC") {
+        filteredFormData = {
+          ...commonData,
+          pincode: form.pincode,
+          riskLocation: form.riskLocation,
+          medicalExtension: form.medicalExtension,
+          medicalLimit: form.medicalLimit,
+          wcRows: form.wcRows,
+        };
+      }
+
       const payload = {
         department: "Insurance",
         product_type: "Corporate Insurance",
@@ -146,26 +186,45 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
           mobile: form.contactMobile || "",
           email: form.contactEmail || "",
         },
-        meta: {
-          is_self_login: false,
-        },
-        form_data: {
-          insuranceType: form.insuranceType,
-          insuredAddress: form.insuredAddress,
-          businessNature: form.businessNature,
-          pincode: form.pincode,
-          riskLocation: form.riskLocation,
-          contactName: form.contactName,
-          policyType: form.policyType,
-          sumInsured: form.sumInsured
-        }
+        meta: { is_self_login: false },
+        form_data: filteredFormData
       };
 
-      await DashboardService.createLead(payload);
+      const result = await DashboardService.createLead(payload);
+      const leadId = result?.detail_lead_id;
+
+      if (!leadId) throw new Error("Lead ID missing");
+
+      // Document Upload Phase
+      const fileKeys = Object.keys(files).filter(k => files[k] !== null);
+      
+      for (let i = 0; i < fileKeys.length; i++) {
+        const key = fileKeys[i];
+        const queuedFile = files[key]!;
+        const docInfo = DOC_KEYS[key];
+
+        setStatusMsg(`Uploading ${i + 1}/${fileKeys.length}...`);
+        
+        setFiles(prev => ({ ...prev, [key]: { ...queuedFile, status: "uploading" } }));
+
+        const formData = new FormData();
+        formData.append("leadDbId", leadId);
+        formData.append("documents", queuedFile.file);
+        formData.append("metadata", JSON.stringify([{ key: docInfo.key, label: docInfo.label }]));
+
+        try {
+          await DashboardService.uploadLeadDocument(leadId, formData);
+          setFiles(prev => ({ ...prev, [key]: { ...queuedFile, status: "success" } }));
+        } catch (err) {
+          setFiles(prev => ({ ...prev, [key]: { ...queuedFile, status: "error" } }));
+          throw new Error(`Upload failed for ${docInfo.label}`);
+        }
+      }
+
       setShowSuccess(true);
     } catch (err) {
-      console.error("Submission error:", err);
-      alert("Something went wrong. Please try again.");
+      console.error(err);
+      setStatusMsg("Submission failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -184,19 +243,19 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
         <div className="overflow-y-auto p-6 sm:p-8 bg-white">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="w-full">
-              <Field type="select" label="Insurance Product Type" value={form.insuranceType} onChange={handleInsuranceTypeChange} options={["GMC", "GPA", "WC"]} error={errors.insuranceType} required />
+              <Field type="select" label="Insurance Product Type" value={form.insuranceProductType} onChange={handleinsuranceProductTypeChange} options={["GMC", "GPA", "WC"]} error={errors.insuranceProductType} required />
             </div>
 
-            {(form.insuranceType === "GMC" || form.insuranceType === "GPA") && (
+            {(form.insuranceProductType === "GMC" || form.insuranceProductType === "GPA") && (
               <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                <h3 className={STYLES.sectionTitle}>{form.insuranceType === "GPA" ? "Organisation Details" : "Insured Details"}</h3>
+                <h3 className={STYLES.sectionTitle}>{form.insuranceProductType === "GPA" ? "Organisation Details" : "Insured Details"}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Field label={form.insuranceType === "GPA" ? "Name Of Organisation" : "Full Name of Insured"} value={form.insuredName} onChange={(v: any) => handleInputChange("insuredName", v)} error={errors.insuredName} required />
+                  <Field label={form.insuranceProductType === "GPA" ? "Name Of Organisation" : "Full Name of Insured"} value={form.insuredName} onChange={(v: any) => handleInputChange("insuredName", v)} error={errors.insuredName} required />
                   <Field label="Nature of Business" value={form.businessNature} onChange={(v: any) => handleInputChange("businessNature", v)} placeholder="e.g. IT, Manufacturing" />
-                  <div className={form.insuranceType === "GPA" ? "md:col-span-1" : "md:col-span-2"}>
-                    <Field label={form.insuranceType === "GPA" ? "Address Of Organisation" : "Insured Address"} value={form.insuredAddress} onChange={(v: any) => handleInputChange("insuredAddress", v)} />
+                  <div className={form.insuranceProductType === "GPA" ? "md:col-span-1" : "md:col-span-2"}>
+                    <Field label={form.insuranceProductType === "GPA" ? "Address Of Organisation" : "Insured Address"} value={form.insuredAddress} onChange={(v: any) => handleInputChange("insuredAddress", v)} />
                   </div>
-                  {form.insuranceType === "GPA" && (
+                  {form.insuranceProductType === "GPA" && (
                     <Field label="Pin Code" value={form.pincode} onChange={(v: any) => handleInputChange("pincode", v)} error={errors.pincode} onlyNumber maxLength={6} required placeholder="6-digit PIN" />
                   )}
                 </div>
@@ -207,22 +266,21 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
                   <Field label="Mobile Number" value={form.contactMobile} onChange={(v: any) => handleInputChange("contactMobile", v)} error={errors.contactMobile} required onlyNumber maxLength={10} placeholder="10-digit number" />
                   <Field label="Email ID" value={form.contactEmail} onChange={(v: any) => handleInputChange("contactEmail", v)} error={errors.contactEmail} required placeholder="email@company.com" />
                 </div>
-                {/* Policy Configuration and Documents sections follow here (omitted for brevity but kept in your build) */}
+
                 <h3 className={STYLES.sectionTitle}>Policy Configuration</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Field type="select" label="Type of Policy" options={["fresh", "renewal"]} value={form.policyType} onChange={(v: any) => handleInputChange("policyType", v)} error={errors.policyType} required />
-                  {form.policyType === "renewal" ? (
-                    <Field type="select" label="Any claim taken last year?" value={form.claimLastYear} onChange={(v: any) => handleInputChange("claimLastYear", v)} options={["yes", "no"]} />
+                  <Field type="select" label="Type of Policy" options={["fresh", "Renewal"]} value={form.policyType} onChange={(v: any) => handleInputChange("policyType", v)} error={errors.policyType} required />
+                  {form.policyType === "Renewal" ? (
+                    <Field type="select" label="Any claim taken last year?" value={form.anyClaimLastYear} onChange={(v: any) => handleInputChange("anyClaimLastYear", v)} options={["Yes", "No"]} />
                   ) : <div className="hidden md:block" />}
                 </div>
 
-                {form.insuranceType === "GMC" && (
+                {form.insuranceProductType === "GMC" && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <Field label="Sum Insured Amount" value={form.sumInsured} onChange={(v: any) => handleInputChange("sumInsured", v)} onlyNumber placeholder="Amount per person" error={errors.sumInsured} required />
                       <Field label="Room Rent Limit" value={form.roomRentLimit} onChange={(v: any) => handleInputChange("roomRentLimit", v)} placeholder="e.g. 1% of SI" />
                     </div>
-
                     <div className="bg-gray-50 p-5 rounded-xl border border-gray-200">
                       <label className={STYLES.label}>Cover Required</label>
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
@@ -249,17 +307,23 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
 
                 <h3 className={STYLES.sectionTitle}>Required Documents</h3>
                 <div className="space-y-6">
-                  <FileUpload label={form.insuranceType === "GMC" ? "GMC Employee Details" : "GPA Employee Census"} onUpdate={(f: any) => handleFileChange(form.insuranceType === "GMC" ? "gmcExcel" : "gpaExcel", f)} error={errors[form.insuranceType === "GMC" ? "gmcExcel" : "gpaExcel"]} showTemplateGuide requiredHeaders={form.insuranceType === "GMC" ? GMC_HEADERS : GPA_HEADERS} />
+                  <FileUpload 
+                    label={form.insuranceProductType === "GMC" ? "GMC Employee Details" : "GPA Employee Census"} 
+                    queuedFile={files[form.insuranceProductType === "GMC" ? "gmcExcel" : "gpaExcel"]}
+                    onUpdate={(f: any) => handleFileChange(form.insuranceProductType === "GMC" ? "gmcExcel" : "gpaExcel", f)} 
+                    error={errors[form.insuranceProductType === "GMC" ? "gmcExcel" : "gpaExcel"]} 
+                    showTemplateGuide requiredHeaders={form.insuranceProductType === "GMC" ? GMC_HEADERS : GPA_HEADERS} 
+                  />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FileUpload label="GST Certificate of company" onUpdate={(f: any) => handleFileChange("gstCertificate", f)} error={errors.gstCertificate} />
-                    {form.policyType === "renewal" && <FileUpload label="Previous Policy Copy" onUpdate={(f: any) => handleFileChange("renewalCopy", f)} error={errors.renewalCopy} />}
-                    {form.policyType === "renewal" && form.claimLastYear === "yes" && <FileUpload label="Claim History / MIS Report" onUpdate={(f: any) => handleFileChange("claimedFile", f)} error={errors.claimedFile} />}
+                    <FileUpload label="GST Certificate of company" queuedFile={files.gstCertificate} onUpdate={(f: any) => handleFileChange("gstCertificate", f)} error={errors.gstCertificate} />
+                    {form.policyType === "Renewal" && <FileUpload label="Previous Policy Copy" queuedFile={files.renewalCopy} onUpdate={(f: any) => handleFileChange("renewalCopy", f)} error={errors.renewalCopy} />}
+                    {form.policyType === "Renewal" && form.anyClaimLastYear === "Yes" && <FileUpload label="Claim History / MIS Report" queuedFile={files.claimedFile} onUpdate={(f: any) => handleFileChange("claimedFile", f)} error={errors.claimedFile} />}
                   </div>
                 </div>
               </div>
             )}
 
-            {form.insuranceType === "WC" && (
+            {form.insuranceProductType === "WC" && (
               <div className="space-y-6 animate-in fade-in slide-in-from-top-2">
                 <h3 className={STYLES.sectionTitle}>Organisation Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -270,21 +334,17 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
                   </div>
                   <Field label="Pin Code" value={form.pincode} onChange={(v: any) => handleInputChange("pincode", v)} error={errors.pincode} onlyNumber maxLength={6} required placeholder="6-digit PIN" />
                 </div>
-
                 <h3 className={STYLES.sectionTitle}>Risk Location Details</h3>
                 <div className="w-full">
                   <Field label="RISK LOCATION (Address with Pin Code)" value={form.riskLocation} onChange={(v: any) => handleInputChange("riskLocation", v)} error={errors.riskLocation} placeholder="Complete site address where work is performed" required />
                 </div>
-
-                {/* NEW: Medical Extension Section */}
                 <h3 className={STYLES.sectionTitle}>Medical Extension Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Field type="select" label="Medical Extension Required?" value={form.medicalExtension} onChange={(v: any) => handleInputChange("medicalExtension", v)} options={["yes", "no"]} />
-                  {form.medicalExtension === "yes" && (
+                  <Field type="select" label="Medical Extension Required?" value={form.medicalExtension} onChange={(v: any) => handleInputChange("medicalExtension", v)} options={["Yes", "No"]} />
+                  {form.medicalExtension === "Yes" && (
                     <Field label="Medical Extension Limit (Per Person)" value={form.medicalLimit} onChange={(v: any) => handleInputChange("medicalLimit", v)} onlyNumber placeholder="Enter Amount" error={errors.medicalLimit} required />
                   )}
                 </div>
-
                 <h3 className={STYLES.sectionTitle}>Contact Person Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Field label="Contact Person Name" value={form.contactName} onChange={(v: any) => handleInputChange("contactName", v)} error={errors.contactName} required />
@@ -298,7 +358,7 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
                     <table className="w-full text-left border-collapse min-w-[800px]">
                       <thead className="bg-gray-50 text-gray-600 text-[11px] uppercase font-bold border-b">
                         <tr>
-                          <th className="px-4 py-3 w-16">Sr. No.</th>
+                          <th className="px-4 py-3 w-16 text-center">Sr. No.</th>
                           <th className="px-4 py-3">Category of Worker</th>
                           <th className="px-4 py-3 w-28 text-center">No. of Employees</th>
                           <th className="px-4 py-3 w-28 text-center">Period (Months)</th>
@@ -314,13 +374,13 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
                               <td className="px-4 py-2 font-medium text-gray-500 text-center">{index + 1}</td>
                               <td className="px-2 py-2"><input className="w-full p-1.5 border rounded-md" value={row.category} readOnly /></td>
                               <td className="px-2 py-2">
-                                <input type="number" min="0" onWheel={(e) => e.currentTarget.blur()} className="w-full p-1.5 border rounded-md text-center" value={row.count} onChange={(e) => handleWCRowChange(index, "count", e.target.value)} />
+                                <input type="number" className="w-full p-1.5 border rounded-md text-center" value={row.count} onChange={(e) => handleWCRowChange(index, "count", e.target.value)} />
                               </td>
                               <td className="px-2 py-2">
-                                <input type="number" min="0" onWheel={(e) => e.currentTarget.blur()} className="w-full p-1.5 border rounded-md text-center" value={row.months} onChange={(e) => handleWCRowChange(index, "months", e.target.value)} />
+                                <input type="number" className="w-full p-1.5 border rounded-md text-center" value={row.months} onChange={(e) => handleWCRowChange(index, "months", e.target.value)} />
                               </td>
                               <td className="px-2 py-2">
-                                <input type="number" min="0" onWheel={(e) => e.currentTarget.blur()} className="w-full p-1.5 border rounded-md" value={row.monthlyWage} onChange={(e) => handleWCRowChange(index, "monthlyWage", e.target.value)} />
+                                <input type="number" className="w-full p-1.5 border rounded-md" value={row.monthlyWage} onChange={(e) => handleWCRowChange(index, "monthlyWage", e.target.value)} />
                               </td>
                               <td className="px-4 py-2 font-bold text-gray-700">₹ {total.toLocaleString('en-IN')}</td>
                             </tr>
@@ -333,13 +393,20 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
 
                 <h3 className={STYLES.sectionTitle}>Required Documents</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FileUpload label="GST Certificate of company" onUpdate={(f: any) => handleFileChange("gstCertificate", f)} error={errors.gstCertificate} />
+                  <FileUpload label="GST Certificate of company" queuedFile={files.gstCertificate} onUpdate={(f: any) => handleFileChange("gstCertificate", f)} error={errors.gstCertificate} />
                 </div>
               </div>
             )}
 
             <div className="flex justify-center pt-8 pb-4">
-              <button type="submit" disabled={isSubmitting} className={STYLES.btn}>{isSubmitting ? "Submitting..." : "Submit"}</button>
+              <button type="submit" disabled={isSubmitting} className={STYLES.btn}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin" size={20} />
+                    {statusMsg}
+                  </>
+                ) : "Submit Application"}
+              </button>
             </div>
           </form>
         </div>
@@ -349,7 +416,7 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
   );
 }
 
-// ... Field and FileUpload functions remain identical to your previous build ...
+// ... Rest of the helper components (Field, FileUpload, SuccessModal) remain identical to the original file
 function Field({ label, value, onChange, type = "text", options, required, placeholder, onlyNumber, error, maxLength }: any) {
   const handleChange = (e: any) => {
     let val = e.target.value;
@@ -380,9 +447,9 @@ function Field({ label, value, onChange, type = "text", options, required, place
   );
 }
 
-function FileUpload({ label, onUpdate, error, showTemplateGuide, requiredHeaders = [] }: any) {
-  const [file, setFile] = useState<File | null>(null);
+function FileUpload({ label, onUpdate, error, showTemplateGuide, requiredHeaders = [], queuedFile }: any) {
   const ref = useRef<HTMLInputElement>(null);
+  
   return (
     <div className="w-full flex flex-col">
       <div className="flex justify-between items-center mb-1.5">
@@ -396,22 +463,36 @@ function FileUpload({ label, onUpdate, error, showTemplateGuide, requiredHeaders
           }} className="text-[10px] font-bold text-[#2076C7] flex items-center gap-1 hover:underline"><Download size={12} /> Download Format</button>
         )}
       </div>
-      {showTemplateGuide && !file && (
+      
+      {showTemplateGuide && !queuedFile && (
         <div className="mb-2 p-2 bg-blue-50 border border-blue-100 rounded text-[10px] text-blue-800 flex items-center gap-2">
           <Info size={14} className="shrink-0 text-blue-500" />
-          <p>Format: <span className="font-mono font-bold">{requiredHeaders.join(", ")}</span></p>
+          <p>Format: <span className="font-mono font-bold">{requiredHeaders.join(", ")}</span> (Max 200KB)</p>
         </div>
       )}
-      <input type="file" ref={ref} onChange={(e) => { const f = e.target.files?.[0]; if (f) { setFile(f); onUpdate(f); } }} className="hidden" />
-      {!file ? (
+
+      <input type="file" ref={ref} onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpdate(f); e.target.value = ""; }} className="hidden" accept=".pdf,image/*,.xls,.xlsx,.csv" />
+      
+      {!queuedFile ? (
         <div onClick={() => ref.current?.click()} className={`cursor-pointer border border-dashed rounded-lg px-4 py-2.5 flex flex-row items-center justify-center gap-3 transition-all ${error ? "border-red-400 bg-red-50" : "border-gray-300 hover:border-[#1CADA3] hover:bg-teal-50 bg-gray-50/50"}`}>
           <UploadCloud size={18} className={error ? "text-red-500" : "text-[#1CADA3]"} />
           <span className="text-xs font-bold text-gray-600">Click to upload</span>
         </div>
       ) : (
-        <div className="flex items-center justify-between bg-teal-50 border border-[#1CADA3] px-3 py-2 rounded-lg">
-          <span className="truncate text-xs font-bold text-gray-800">{file.name}</span>
-          <button type="button" onClick={() => { setFile(null); onUpdate(null); }} className="text-gray-400 hover:text-red-500"><Trash2 size={16} /></button>
+        <div className={`flex items-center justify-between border px-3 py-2 rounded-lg transition-colors ${
+          queuedFile.status === 'success' ? 'bg-teal-50 border-[#1CADA3]' : 
+          queuedFile.status === 'error' ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'
+        }`}>
+          <div className="flex items-center gap-2 truncate">
+            {queuedFile.status === "uploading" ? <Loader2 size={14} className="animate-spin text-blue-500" /> :
+             queuedFile.status === "success" ? <CheckCircle size={14} className="text-[#1CADA3]" /> :
+             queuedFile.status === "error" ? <AlertCircle size={14} className="text-red-500" /> :
+             <div className="w-3 h-3 rounded-full border border-gray-400" />}
+            <span className="truncate text-xs font-bold text-gray-800">{queuedFile.file.name}</span>
+          </div>
+          {queuedFile.status === "pending" && (
+            <button type="button" onClick={() => onUpdate(null)} className="text-gray-400 hover:text-red-500"><Trash2 size={16} /></button>
+          )}
         </div>
       )}
       {error && <div className="flex items-center gap-1 mt-1 text-red-500"><AlertCircle size={12} /><p className="text-[10px] font-medium">{error}</p></div>}
@@ -425,7 +506,7 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
       <div className="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%] mx-auto">
         <div className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4"><CheckCircle className="w-12 h-12 text-[#1CADA3]" /></div>
         <h3 className="text-2xl font-bold text-gray-800 mb-2">Success!</h3>
-        <p className="text-gray-600 mb-8">Your details have been submitted.</p>
+        <p className="text-gray-600 mb-8">Your policy application and documents have been submitted successfully.</p>
         <button onClick={onClose} className="w-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-3 rounded-xl font-bold">Great, thanks!</button>
       </div>
     </div>

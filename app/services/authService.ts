@@ -112,6 +112,18 @@ export const AuthService = {
         const response = await api.post("/api/public/create-customer-detail-lead", payload);
         return response.data;
     },
+    
+    // 🔹 Forgot Password - Step 1: Verify Identifier & Send OTP
+    forgotPasswordVerify: async (identifier: string) => {
+        const response = await api.post("/api/auth/verify", { identifier });
+        return response.data;
+    },
+
+    // 🔹 Forgot Password - Step 2: Update to New Password
+    updatePassword: async ({ identifier, newPassword }: { identifier: string; newPassword: string }) => {
+        const response = await api.post("/api/auth/update-password", { identifier, newPassword });
+        return response.data;
+    },
 
 
 };

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Smartphone, LockKeyhole, ArrowRight, KeyRound } from "lucide-react";
+import { X, Smartphone, LockKeyhole, ArrowRight, KeyRound, ChevronLeft } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
 import { useRouter } from "next/navigation";
 
@@ -27,16 +27,21 @@ const itemVariants = {
 };
 
 const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-    const [loginMethod, setLoginMethod] = useState<'OTP' | 'PASSWORD'>('OTP');
+    const [loginMethod, setLoginMethod] = useState<'OTP' | 'PASSWORD' | 'FORGOT'>('OTP');
 
     const [otpSent, setOtpSent] = useState(false);
     const [otpTimer, setOtpTimer] = useState(0);
     const [emailOrPhone, setEmailOrPhone] = useState("");
     const [otp, setOtp] = useState("");
     const [password, setPassword] = useState("");
+    
+    // Forgot Password State
+    const [forgotStep, setForgotStep] = useState(1);
+    const [newPassword, setNewPassword] = useState("");
 
     // UI State
     const [error, setError] = useState("");
+    const [isSuccess, setIsSuccess] = useState(false); // NEW STATE FOR GREEN COLOR
     const [loading, setLoading] = useState(false);
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -45,13 +50,16 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     const phoneRegex = /^[0-9]{10}$/;
 
     // Reset state when switching methods
-    const handleMethodSwitch = (method: 'OTP' | 'PASSWORD') => {
+    const handleMethodSwitch = (method: 'OTP' | 'PASSWORD' | 'FORGOT') => {
         setLoginMethod(method);
         setError("");
+        setIsSuccess(false); // Reset color
         setOtpSent(false);
         setOtp("");
         setPassword("");
-        setEmailOrPhone(""); 
+        setNewPassword("");
+        setForgotStep(1);
+        if (method !== 'FORGOT') setEmailOrPhone(""); 
     };
 
     // 1. WEB OTP API
@@ -86,10 +94,25 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+        setIsSuccess(false); // Default to error style
         setLoading(true);
 
         try {
-            // SCENARIO 1: PASSWORD LOGIN (Supports Email, Phone, or ADV ID)
+            if (loginMethod === 'FORGOT') {
+                if (forgotStep === 1) {
+                    await AuthService.forgotPasswordVerify(emailOrPhone);
+                    setForgotStep(2);
+                } else {
+                    if (newPassword.length < 6) throw new Error("Password must be at least 6 characters");
+                    await AuthService.updatePassword({ identifier: emailOrPhone, newPassword });
+                    setLoginMethod('PASSWORD');
+                    setIsSuccess(true); // SET TO GREEN
+                    setError("Password updated! Please login.");
+                }
+                setLoading(false);
+                return;
+            }
+
             if (loginMethod === 'PASSWORD') {
                 if (!emailOrPhone) {
                     setError("Please enter your identifier.");
@@ -97,32 +120,21 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                     return;
                 }
                 
-                // --- AUTO-PREFIX LOGIC ---
-let processedIdentifier = emailOrPhone.trim();
+                let processedIdentifier = emailOrPhone.trim();
+                if (/^ADV[\s_.-]?\d+$/i.test(processedIdentifier)) {
+                    const digits = processedIdentifier.match(/\d+/)?.[0];
+                    processedIdentifier = `ADV_${digits}`;
+                } 
+                else if (/^\d+$/.test(processedIdentifier) && processedIdentifier.length !== 10) {
+                    processedIdentifier = `ADV_${processedIdentifier}`;
+                }
 
-// 1. If it starts with ADV (with space, dash, or nothing) followed by numbers
-// Example: "ADV2618", "adv 2618", "ADV-2618" -> "ADV_2618"
-if (/^ADV[\s_.-]?\d+$/i.test(processedIdentifier)) {
-    const digits = processedIdentifier.match(/\d+/)?.[0];
-    processedIdentifier = `ADV_${digits}`;
-} 
-// 2. If it's pure numbers and NOT a 10-digit mobile, prepend ADV_
-// Example: "2618" -> "ADV_2618"
-else if (/^\d+$/.test(processedIdentifier) && processedIdentifier.length !== 10) {
-    processedIdentifier = `ADV_${processedIdentifier}`;
-}
-
-                const data = await AuthService.login({
-                    identifier: processedIdentifier, 
-                    password: password,
-                });
-
+                const data = await AuthService.login({ identifier: processedIdentifier, password });
                 handleSuccessLogin(data);
                 setLoading(false);
                 return;
             }
 
-            // SCENARIO 2: OTP LOGIN
             if (!phoneRegex.test(emailOrPhone)) {
                 setError("Please enter a valid 10-digit phone number.");
                 setLoading(false);
@@ -143,15 +155,12 @@ else if (/^\d+$/.test(processedIdentifier) && processedIdentifier.length !== 10)
                 return;
             }
 
-            const data = await AuthService.verifyLoginOtp({
-                identifier: emailOrPhone,
-                otp: otp,
-            });
-
+            const data = await AuthService.verifyLoginOtp({ identifier: emailOrPhone, otp });
             handleSuccessLogin(data);
 
         } catch (err: any) {
-            setError(err?.response?.data?.message || "Login failed. Please try again.");
+            setIsSuccess(false); // Ensure it's red on catch
+            setError(err?.response?.data?.message || err.message || "Action failed. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -211,76 +220,77 @@ else if (/^\d+$/.test(processedIdentifier) && processedIdentifier.length !== 10)
             {isOpen && (
                 <motion.div
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-9999 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 sm:p-6">
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 sm:p-6">
                     <motion.div
                         variants={containerVariants} initial={{ scale: 0.9, opacity: 0, y: -20 }} animate="visible" exit="exit"
                         className="relative w-full max-w-[95%] sm:max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3]" />
+                        
+                        {loginMethod === 'FORGOT' && (
+                             <button onClick={() => handleMethodSwitch('PASSWORD')} className="absolute top-4 left-4 p-2 text-gray-400 hover:text-[#2076C7] transition-colors z-10">
+                                <ChevronLeft size={20} />
+                             </button>
+                        )}
+
                         <button onClick={onClose} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors z-10">
                             <X size={20} />
                         </button>
                         <div className="p-6 sm:p-8 pt-10">
                             <motion.div variants={itemVariants} className="text-center mb-6">
                                 <div className="mx-auto w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mb-3 text-[#2076C7]">
-                                    {loginMethod === 'PASSWORD' ? <KeyRound size={28} /> : (otpSent ? <LockKeyhole size={28} /> : <Smartphone size={28} />)}
+                                    {loginMethod === 'FORGOT' ? <LockKeyhole size={28} /> : (loginMethod === 'PASSWORD' ? <KeyRound size={28} /> : <Smartphone size={28} />)}
                                 </div>
                                 <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">
-                                    {otpSent ? "Verify Identity" : "Welcome Back"}
+                                    {loginMethod === 'FORGOT' ? (forgotStep === 1 ? "Reset Password" : "Set New Password") : (otpSent ? "Verify Identity" : "Welcome Back")}
                                 </h2>
                                 <p className="text-gray-500 text-xs sm:text-sm">
-                                    {otpSent ? `Enter the code sent to ${emailOrPhone}` : "Select your preferred login method."}
+                                    {loginMethod === 'FORGOT' ? "Securely update your account access." : (otpSent ? `Enter the code sent to ${emailOrPhone}` : "Select your preferred login method.")}
                                 </p>
                             </motion.div>
 
-                            {!otpSent && (
+                            {loginMethod !== 'FORGOT' && !otpSent && (
                                 <motion.div variants={itemVariants} className="flex p-1 bg-gray-100 rounded-xl mb-6">
                                     <button type="button" onClick={() => handleMethodSwitch('OTP')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${loginMethod === 'OTP' ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
                                         <Smartphone size={16} /> OTP
                                     </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleMethodSwitch('PASSWORD')}
-                                        className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${loginMethod === 'PASSWORD'
-                                            ? "bg-white text-[#2076C7] shadow-sm"
-                                            : "text-gray-500 hover:text-gray-700"
-                                            }`}>
-                                        <KeyRound size={16} /> With Password
+                                    <button type="button" onClick={() => handleMethodSwitch('PASSWORD')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${loginMethod === 'PASSWORD' ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
+                                        <KeyRound size={16} /> Password
                                     </button>
                                 </motion.div>
                             )}
 
                             <form onSubmit={handleSubmit} className="space-y-6">
-                                <motion.div variants={itemVariants} className="relative group">
-                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5 ml-1">
-                                        {loginMethod === 'OTP' ? 'Phone Number' : 'Email, Phone or ADV ID'}
-                                    </label>
-                                    <div className="relative">
+                                {forgotStep === 1 && (
+                                    <motion.div variants={itemVariants} className="relative group">
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5 ml-1">
+                                            {loginMethod === 'OTP' ? 'Phone Number' : 'Email, Phone or ADV ID'}
+                                        </label>
                                         <input
                                             type="text"
                                             value={emailOrPhone}
                                             disabled={otpSent}
-                                            onChange={(e) => {
-                                                if (loginMethod === 'OTP') {
-                                                    setEmailOrPhone(e.target.value.replace(/\D/g, "").slice(0, 10));
-                                                } else {
-                                                    // NO lowercase conversion here
-                                                    setEmailOrPhone(e.target.value);
-                                                }
-                                            }}
+                                            onChange={(e) => loginMethod === 'OTP' ? setEmailOrPhone(e.target.value.replace(/\D/g, "").slice(0, 10)) : setEmailOrPhone(e.target.value)}
                                             placeholder={loginMethod === 'OTP' ? "Enter 10-digit number" : "ADV_123 or Email or Phone"}
-                                            className={`w-full h-11 sm:h-12 px-4 border font-sans text-gray-700 placeholder-gray-400 rounded-xl text-base transition-all duration-200 outline-none
-                                                ${otpSent ? "bg-gray-50 text-gray-500 border-gray-200" : "bg-white border-gray-300 focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/10"}`}
+                                            className="w-full h-11 sm:h-12 px-4 border font-sans text-gray-700 placeholder-gray-400 rounded-xl text-base transition-all duration-200 outline-none bg-white border-gray-300 focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/10"
                                         />
-                                        {otpSent && (
-                                            <button type="button" onClick={() => { setOtpSent(false); setOtp(""); setError(""); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#2076C7] hover:bg-blue-50 px-2 py-1 rounded-md transition-colors cursor-pointer">Edit</button>
-                                        )}
-                                    </div>
-                                </motion.div>
+                                    </motion.div>
+                                )}
 
                                 {loginMethod === 'PASSWORD' && (
                                     <motion.div variants={itemVariants} className="relative group">
-                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5 ml-1">Password</label>
+                                        <div className="flex justify-between items-center mb-1.5 ml-1">
+                                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide">Password</label>
+                                            <button type="button" onClick={() => handleMethodSwitch('FORGOT')} className="text-[#2076C7] text-xs font-semibold hover:underline cursor-pointer">Forgot Password?</button>
+                                        </div>
                                         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password"
+                                            className="w-full h-11 sm:h-12 px-4 border font-sans text-gray-700 placeholder-gray-400 rounded-xl text-base transition-all duration-200 outline-none bg-white border-gray-300 focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/10" />
+                                    </motion.div>
+                                )}
+
+                                {loginMethod === 'FORGOT' && forgotStep === 2 && (
+                                    <motion.div variants={itemVariants} className="relative group">
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5 ml-1">New Password</label>
+                                        <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Minimum 6 characters"
                                             className="w-full h-11 sm:h-12 px-4 border font-sans text-gray-700 placeholder-gray-400 rounded-xl text-base transition-all duration-200 outline-none bg-white border-gray-300 focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/10" />
                                     </motion.div>
                                 )}
@@ -294,26 +304,23 @@ else if (/^\d+$/.test(processedIdentifier) && processedIdentifier.length !== 10)
                                                     className="w-10 h-12 sm:w-12 sm:h-12 border border-gray-300 rounded-lg text-center text-lg sm:text-xl font-semibold bg-white focus:border-[#1CADA3] focus:ring-2 focus:ring-[#1CADA3]/20 transition-all duration-200 shadow-xs text-gray-800" />
                                             ))}
                                         </div>
-                                        <div className="flex justify-center">
-                                            <button type="button" disabled={otpTimer > 0} onClick={async () => { await AuthService.sendLoginOtp({ identifier: emailOrPhone }); setOtpTimer(45); }}
-                                                className={`text-sm font-medium ${otpTimer > 0 ? "text-red-400" : "text-[#2076C7] hover:underline"}`}>
-                                                {otpTimer > 0 ? `Resend code in ${otpTimer}s` : "Didn't receive code? Resend"}
-                                            </button>
-                                        </div>
                                     </motion.div>
                                 )}
 
                                 {error && (
-                                    <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-3 rounded-lg bg-red-50 border border-red-100">
-                                        <p className="text-red-600 text-sm text-center font-medium">{error}</p>
+                                    <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} 
+                                        className={`p-3 rounded-lg border ${isSuccess ? "bg-green-50 border-green-100" : "bg-red-50 border-red-100"}`}>
+                                        <p className={`${isSuccess ? "text-green-600" : "text-red-600"} text-sm text-center font-medium`}>{error}</p>
                                     </motion.div>
                                 )}
 
                                 <motion.button variants={itemVariants} type="submit" disabled={loading}
                                     className={`w-full h-12 rounded-xl text-white font-semibold text-base shadow-lg bg-linear-to-r from-[#2076C7] to-[#1CADA3] hover:brightness-105 transition-all duration-300 flex items-center justify-center gap-2 ${loading ? "opacity-80 cursor-wait" : "cursor-pointer"}`}>
                                     {loading ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : (
-                                        <>{loginMethod === 'PASSWORD' ? "Login" : (otpSent ? "Verify & Login" : "Get OTP")}
-                                        {!loading && !otpSent && loginMethod === 'OTP' && <ArrowRight size={18} />}</>
+                                        <>
+                                            {loginMethod === 'FORGOT' ? (forgotStep === 1 ? "Next" : "Update Password") : (loginMethod === 'PASSWORD' ? "Login" : (otpSent ? "Verify & Login" : "Get OTP"))}
+                                            {!loading && !otpSent && loginMethod !== 'PASSWORD' && <ArrowRight size={18} />}
+                                        </>
                                     )}
                                 </motion.button>
                             </form>

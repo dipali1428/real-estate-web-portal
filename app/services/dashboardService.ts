@@ -154,5 +154,27 @@ getCompletedDetailLeads: async () => {
         return response.data;
     },
 
-   
+    
+    // // 🔹 SEND OTP FOR REGISTER
+    // sendOtp: async (data: { mobile: string;}) => {
+    //     const response = await api.post("/api/dashboard/send-mobile-otp", data);
+    //     return response.data;
+    // },
+
+    // // 🔹 VERIFY OTP FOR REGISTER
+    // verifyOtp: async (data: { mobile: string; otp: string;}) => {
+    //     const response = await api.post("/api/dashboard/send-mobile-otp", data);
+    //     return response.data;
+    // },
+
+    // 🔹 SEND OTP FOR REGISTER
+    sendEmailOtp: async (data: { newEmail: string;}) => {
+        const response = await api.post("/api/dashboard/send-email-otp", data);
+        return response.data;
+    },
+
+    verifyPanAadhaarLink: async () => {
+        const response = await api.post("/api/dashboard/verify-pan-aadhaar-link");
+        return response.data;
+    },
 };
