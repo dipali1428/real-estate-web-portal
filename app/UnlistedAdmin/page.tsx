@@ -13,8 +13,6 @@ import {
   CheckCircle 
 } from 'lucide-react';
 
-
-
 const DashboardOverview = () => {
   const router = useRouter();
   
@@ -93,10 +91,6 @@ const DashboardOverview = () => {
         transition={{ duration: 0.4 }}
         className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white shadow-md"
       >
-        
-        <div className="absolute bottom-4 right-6 text-xs font-mono text-white/90 bg-black/20 px-3 py-1 rounded-md border border-white/10">
-          SYSTEM STATUS: <span className="text-emerald-400 font-bold ml-1">LIVE</span>
-        </div>
         <h2 className="text-xl sm:text-2xl font-bold mb-2">Welcome back, Administrator.</h2>
         <p className="text-sm sm:text-base opacity-90">The unlisted marketplace is performing stable today. Here are the key metrics.</p>
       </motion.div>
@@ -218,7 +212,6 @@ const DashboardOverview = () => {
               )}
             </div>
           </div>
-
           {/* Details/Legend Area */}
           <div className="w-full md:w-1/2 space-y-6">
             <div className="grid grid-cols-1 gap-4">

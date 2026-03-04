@@ -146,20 +146,12 @@ const ImportExportAdmin: React.FC = () => {
         className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white shadow-md flex justify-between items-center"
       >
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
               <Database className="w-6 h-6" /> Data Portal
             </h2>
-            <p className="text-sm opacity-90">Import share data & export shares master</p>
+            <p className="text-sm opacity-90">Import & export shares data</p>
           </div>
-        </div>
-        <div className="flex gap-2">
-          <span className="px-3 py-1.5 bg-emerald-500/20 text-emerald-100 text-[10px] font-black uppercase tracking-widest rounded-lg border border-emerald-200/30 flex items-center gap-1">
-            <Activity className="w-3 h-3" /> System Live
-          </span>
         </div>
       </motion.div>
 
@@ -295,7 +287,7 @@ const ImportExportAdmin: React.FC = () => {
               ) : (
                 <>
                   <Zap className="w-4 h-4" />
-                  Execute Import
+                  Import file
                 </>
               )}
             </button>
@@ -322,7 +314,7 @@ const ImportExportAdmin: React.FC = () => {
                 <Package className="w-10 h-10" />
               </div>
               
-              <h4 className="text-xl font-bold text-gray-800 mb-2">Shares Master Export</h4>
+              <h4 className="text-xl font-bold text-gray-800 mb-2">Shares Export Data</h4>
               <p className="text-sm text-gray-500 mb-8 max-w-md mx-auto">
                 Download complete list of all shares with current prices, lot sizes, and depository information for auditing purposes.
               </p>
@@ -340,7 +332,7 @@ const ImportExportAdmin: React.FC = () => {
                 ) : (
                   <>
                     <Download className="w-4 h-4" />
-                    Download Shares CSV
+                    Download File
                   </>
                 )}
               </button>

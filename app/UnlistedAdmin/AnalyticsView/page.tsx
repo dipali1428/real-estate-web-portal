@@ -335,19 +335,12 @@ const AnalyticsView = () => {
             <select
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
-              className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-xl text-xs font-bold uppercase"
+              className="px-4 py-2 bg-white/10 backdrop-blur-sm text-gray-700 border border-white/20 rounded-xl text-xs font-bold uppercase"
             >
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
             </select>
-            <button 
-              onClick={() => UnlistedAnalyticsService.exportSharesCSV()}
-              className="flex-1 md:flex-none px-4 py-2 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-xl text-xs font-bold uppercase hover:bg-white/20 transition-all flex items-center justify-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              Export
-            </button>
           </div>
         </div>
       </div>
@@ -686,7 +679,7 @@ const AnalyticsView = () => {
                   <p className="text-4xl font-black text-rose-500">
                     {Array.isArray(highInvestmentAlerts) ? highInvestmentAlerts.length : 0}
                   </p>
-                  <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Flagged</span>
+                  <span className="text-xs font-black text-gray-600 uppercase tracking-widest">Flagged</span>
                 </div>
               </div>
             </div>
@@ -700,7 +693,7 @@ const AnalyticsView = () => {
               </h4>
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
-                  <thead className="bg-gray-50/50 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                  <thead className="bg-gray-50/50 text-[10px] font-black uppercase tracking-widest text-gray-900">
                     <tr>
                       <th className="px-4 py-4">Company</th>
                       <th className="px-4 py-4">Price</th>
@@ -712,8 +705,8 @@ const AnalyticsView = () => {
                     {highInvestmentAlerts.map((alert) => (
                       <tr key={alert.share_id} className="hover:bg-gray-50/50">
                         <td className="px-4 py-4 font-bold text-gray-800">{alert.company_name}</td>
-                        <td className="px-4 py-4 text-sm font-medium">{formatCurrency(alert.price)}</td>
-                        <td className="px-4 py-4 text-sm font-medium">{alert.min_lot_size?.toLocaleString() || 'N/A'}</td>
+                        <td className="px-4 py-4 text-gray-700 text-sm font-medium">{formatCurrency(alert.price)}</td>
+                        <td className="px-4 py-4 text-gray-700 text-sm font-medium">{alert.min_lot_size?.toLocaleString() || 'N/A'}</td>
                         <td className="px-4 py-4 font-black text-rose-500">{formatCurrency(alert.min_investment)}</td>
                       </tr>
                     ))}
@@ -733,106 +726,105 @@ const AnalyticsView = () => {
       )}
 
       {/* Filters Tab */}
-// Add filter input UI in the Filters tab
-{activeTab === 'filters' && (
-  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-    
-    {/* Share Filters Section with Actual Inputs */}
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <h4 className="text-sm font-black text-gray-800 uppercase tracking-widest mb-4 flex items-center gap-2">
-        <Database className="w-4 h-4" />
-        Filter Shares
-      </h4>
-      
-      {/* Filter Inputs */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Company Name"
-          value={shareFilterParams.company_name}
-          onChange={(e) => setShareFilterParams({...shareFilterParams, company_name: e.target.value})}
-          className="px-4 py-2 border border-gray-200 rounded-xl text-sm"
-        />
-        <input
-          type="number"
-          placeholder="Min Price"
-          value={shareFilterParams.min_price}
-          onChange={(e) => setShareFilterParams({...shareFilterParams, min_price: e.target.value})}
-          className="px-4 py-2 border border-gray-200 rounded-xl text-sm"
-        />
-        <input
-          type="number"
-          placeholder="Max Price"
-          value={shareFilterParams.max_price}
-          onChange={(e) => setShareFilterParams({...shareFilterParams, max_price: e.target.value})}
-          className="px-4 py-2 border border-gray-200 rounded-xl text-sm"
-        />
-        <button
-          onClick={applyShareFilters}
-          className="px-4 py-2 bg-[#2076C7] text-white rounded-xl text-xs font-black uppercase"
-        >
-          Apply Filters
-        </button>
-      </div>
-      
-      {/* Results Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          {/* table headers and rows */}
-        </table>
-      </div>
-    </div>
+      {activeTab === 'filters' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          
+          {/* Share Filters Section with Actual Inputs */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <h4 className="text-sm font-black text-gray-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Database className="w-4 h-4" />
+              Filter Shares
+            </h4>
+            
+            {/* Filter Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <input
+                type="text"
+                placeholder="Company Name"
+                value={shareFilterParams.company_name}
+                onChange={(e) => setShareFilterParams({...shareFilterParams, company_name: e.target.value})}
+                className="px-4 py-2 border border-gray-200 rounded-xl text-gray-900 text-sm"
+              />
+              <input
+                type="number"
+                placeholder="Min Price"
+                value={shareFilterParams.min_price}
+                onChange={(e) => setShareFilterParams({...shareFilterParams, min_price: e.target.value})}
+                className="px-4 py-2 border border-gray-200 rounded-xl text-gray-900 text-sm"
+              />
+              <input
+                type="number"
+                placeholder="Max Price"
+                value={shareFilterParams.max_price}
+                onChange={(e) => setShareFilterParams({...shareFilterParams, max_price: e.target.value})}
+                className="px-4 py-2 border border-gray-200 rounded-xl text-gray-900 text-sm"
+              />
+              <button
+                onClick={applyShareFilters}
+                className="px-4 py-2 bg-[#2076C7] text-white rounded-xl text-gray-900 text-xs font-black uppercase"
+              >
+                Apply Filters
+              </button>
+            </div>
+            
+            {/* Results Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                {/* table headers and rows */}
+              </table>
+            </div>
+          </div>
 
-    {/* Similar Transaction Filters Section */}
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <h4 className="text-sm font-black text-gray-800 uppercase tracking-widest mb-4 flex items-center gap-2">
-        <FileText className="w-4 h-4" />
-        Filter Transactions
-      </h4>
-      
-      {/* Transaction filter inputs */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Company Name"
-          value={transactionFilterParams.company_name}
-          onChange={(e) => setTransactionFilterParams({...transactionFilterParams, company_name: e.target.value})}
-          className="px-4 py-2 border border-gray-200 rounded-xl text-sm"
-        />
-        <select
-          value={transactionFilterParams.transaction_type}
-          onChange={(e) => setTransactionFilterParams({...transactionFilterParams, transaction_type: e.target.value})}
-          className="px-4 py-2 border border-gray-200 rounded-xl text-sm"
-        >
-          <option value="">All Types</option>
-          <option value="BUY">Buy</option>
-          <option value="SELL">Sell</option>
-        </select>
-        <select
-          value={transactionFilterParams.status}
-          onChange={(e) => setTransactionFilterParams({...transactionFilterParams, status: e.target.value})}
-          className="px-4 py-2 border border-gray-200 rounded-xl text-sm"
-        >
-          <option value="">All Status</option>
-          <option value="approved">Approved</option>
-          <option value="pending">Pending</option>
-          <option value="rejected">Rejected</option>
-        </select>
-        <button
-          onClick={applyTransactionFilters}
-          className="px-4 py-2 bg-[#2076C7] text-white rounded-xl text-xs font-black uppercase"
-        >
-          Apply Filters
-        </button>
-      </div>
-      
-      {/* Results Table */}
-      <div className="overflow-x-auto">
-        {/* transaction table */}
-      </div>
-    </div>
-  </motion.div>
-)}
+          {/* Similar Transaction Filters Section */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <h4 className="text-sm font-black text-gray-800 uppercase tracking-widest mb-4 flex items-center gap-2 text-gray-900">
+              <FileText className="w-4 h-4" />
+              Filter Transactions
+            </h4>
+            
+            {/* Transaction filter inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <input
+                type="text"
+                placeholder="Company Name"
+                value={transactionFilterParams.company_name}
+                onChange={(e) => setTransactionFilterParams({...transactionFilterParams, company_name: e.target.value})}
+                className="px-4 py-2 border border-gray-200 rounded-xl text-gray-900 text-sm"
+              />
+              <select
+                value={transactionFilterParams.transaction_type}
+                onChange={(e) => setTransactionFilterParams({...transactionFilterParams, transaction_type: e.target.value})}
+                className="px-4 py-2 border border-gray-200 rounded-xl text-gray-900 text-sm"
+              >
+                <option value="">All Types</option>
+                <option value="BUY">Buy</option>
+                <option value="SELL">Sell</option>
+              </select>
+              <select
+                value={transactionFilterParams.status}
+                onChange={(e) => setTransactionFilterParams({...transactionFilterParams, status: e.target.value})}
+                className="px-4 py-2 border border-gray-200 rounded-xl text-gray-900 text-sm"
+              >
+                <option value="">All Status</option>
+                <option value="approved">Approved</option>
+                <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <button
+                onClick={applyTransactionFilters}
+                className="px-4 py-2 bg-[#2076C7] text-white rounded-xl text-gray-900 text-xs font-black uppercase"
+              >
+                Apply Filters
+              </button>
+            </div>
+            
+            {/* Results Table */}
+            <div className="overflow-x-auto">
+              {/* transaction table */}
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };
