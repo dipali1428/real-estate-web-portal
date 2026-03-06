@@ -49,7 +49,7 @@ const ServicesSection = () => {
       title: "Protection",
       description: "Insurance solutions to safeguard your future and assets.",
       items: [
-        { name: "Life Insurance", slug: "life-insurance" },
+        { name: "Life Insurance", slug: "../../products/life-insurance" },
         { name: "Health Insurance", slug: "../../products/health-insurance" },
         { name: "Motor Insurance", slug: "motor-insurance" },
         { name: "Property Insurance", slug: "property-insurance" },

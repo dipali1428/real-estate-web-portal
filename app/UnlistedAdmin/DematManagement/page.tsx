@@ -28,46 +28,43 @@ const DematManagement: React.FC = () => {
 
   // No initial fetch - let user search by ID
 
-  const fetchDematById = async (dematId: number) => {
-    setFetchingByDematId(true);
-    setFetchError(null);
-    
-    try {
-      console.log(`🔍 Fetching demat with ID: ${dematId}`);
-      const response = await AdminService.getUserDemat(dematId);
-      console.log("✅ Fetch response:", response);
-      
-      if (response?.success && response?.data) {
-        const recordWithTime = {
-          ...response.data,
-          fetchedAt: new Date().toISOString()
-        };
-        
-        // Check if record already exists by its demat ID
-        setDematRecords(prev => {
-          const exists = prev.some(d => d.id === response.data.id);
-          if (exists) {
-            return prev.map(d => d.id === response.data.id ? recordWithTime : d);
-          } else {
-            return [recordWithTime, ...prev];
-          }
-        });
-        
-        setDematIdInput('');
-      } else {
-        setFetchError('No Demat details found for this ID');
-      }
-    } catch (error: any) {
-      console.error('❌ Error fetching demat by ID:', error);
-      if (error.response?.status === 404) {
-        setFetchError('No Demat record found with this ID');
-      } else {
-        setFetchError(error.response?.data?.message || 'Failed to fetch demat details');
-      }
-    } finally {
-      setFetchingByDematId(false);
+ const fetchDematById = async (dematId: number) => {
+  setFetchingByDematId(true);
+  setFetchError(null);
+
+  try {
+    const response = await AdminService.getUserDemat(dematId);
+
+    if (response?.success && response?.data) {
+      const recordWithTime = {
+        ...response.data,
+        fetchedAt: new Date().toISOString()
+      };
+
+      setDematRecords(prev => {
+        const exists = prev.some(d => d.id === response.data.id);
+        if (exists) {
+          return prev.map(d => d.id === response.data.id ? recordWithTime : d);
+        } else {
+          return [recordWithTime, ...prev];
+        }
+      });
+
+      setDematIdInput('');
+    } else {
+      setFetchError('No Demat details found for this ID');
     }
-  };
+  } catch (error: any) {
+    console.error('❌ Error fetching demat by ID:', error);
+    if (error.response?.status === 404) {
+      setFetchError('No Demat record found with this ID');
+    } else {
+      setFetchError(error.response?.data?.message || 'Failed to fetch demat details');
+    }
+  } finally {
+    setFetchingByDematId(false);
+  }
+};
 
   const handleSearch = () => {
     if (!dematIdInput.trim()) {
