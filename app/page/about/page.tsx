@@ -1,23 +1,72 @@
 const AboutSection = () => {
     const leaders = [
         {
-          name: "Mr. Rajesh Parkhi",
-          title: "Executive Director",
-          description: "25+ years of experience in retail finance, MBA in Marketing, with strong expertise in retail loan structuring and driving sustainable business growth.",
-          image: "/leader/Image 8.jpeg"
+            name: "Mr. Rajesh Parkhi",
+            title: "Executive Director",
+            description: "25+ years of experience in retail finance, MBA in Marketing, with strong expertise in retail loan structuring and driving sustainable business growth.",
+            image: "/leader/Image 8.jpeg"
         },
         {
-          name: "Mr. Rahul Kangane",
-          title: "Chairman and Managing Director",
-          description: "15 years of experience in broking and wealth management, specializing in portfolio strategy and delivering strong market insights that drive company growth.",
-          image: "/leader/rahulsir4.jpeg"
+            name: "Mr. Rahul Kangane",
+            title: "Chairman and Managing Director",
+            description: "15 years of experience in broking and wealth management, specializing in portfolio strategy and delivering strong market insights that drive company growth.",
+            image: "/leader/rahulsir4.jpeg"
         },
         {
-          name: "Mr. Pravin Marathe",
-          title: "Chief Financial Officer ",
-          description: "Mr. Pravin Marathe, CFO at Infinity Arthvishva, has 18+ years of experience in financial markets with expertise in mutual funds, PMS, and AIFs.",
-          image: "/leader/Img3.jpeg"
-        }
+            name: "Mr. K Krishna",
+            title: "Regional Director, Hyderabad ",
+            description: "K Krishna brings 18+ years of banking experience, driving strategic growth, operational excellence, and revenue expansion through high-performing teams and strong client-focused strategies.",
+            image: "/leader/K-Krishna.jpeg"
+        },
+        {
+            name: "Mr. Pravin Marathe",
+            title: "Chief Financial Officer ",
+            description: "Mr. Pravin Marathe, CFO at Infinity Arthvishva, has 18+ years of experience in financial markets with expertise in mutual funds, PMS, and AIFs.",
+            image: "/leader/Img3.jpeg"
+        },
+        {
+            name: "Mr. Sandip Powar",
+            title: "Vice President",
+            description: "Mr. Sandip Powar, Vice President, brings 11+ years of expertise in Home Loans and Insurance, leading Pan-India expansion, branch development, and strategic growth with a strong customer-focused approach.",
+            image: "/leader/Sandip-Powar.jpeg"
+        },
+        {
+            name: "Mr. Satyen Mehta",
+            title: "General Manager",
+            description: "Mr. Satyen Mehta brings 25+ years of banking experience in Home Loans, LAP, Insurance, and Real Estate, leading overall strategy, revenue growth, operational excellence, and sustainable business expansion.",
+            image: "/leader/Satyen-Mehta (2).jpeg"
+        },
+        {
+            name: "Mr. Sharad Kulkarni",
+            title: "Regional Business Head (Sangli Branch)",
+            description: "Mr. Satyen Mehta brings 25+ years of banking experience in Home Loans, LAP, Insurance, and Real Estate, leading overall strategy, revenue growth, operational excellence, and sustainable business expansion.",
+            image: "/leader/Sharad-Kulkarni.jpeg"
+        },
+        {
+            name: "Mr. Anant Chachad",
+            title: "Regional Business Head – Kolhapur",
+            description: "Mr. Sharad Kulkarni, Regional Business Head – Sangli, brings over 9 years of lending and 5 years of insurance experience, driving regional growth, high-performing teams, and strong client-focused business expansion.",
+            image: "/leader/Anant-Chachad.jpeg"
+        },
+        {
+            name: "Mr. Kailas Patil",
+            title: "Assistant Vice President (AVP) – Nashik",
+            description: "Mr. Kailas Eknath Patil is a finance professional with 15+ years of experience in Home Loans, LAP, and Business Loans, driving regional growth through strong sales leadership, channel partnerships, and operational excellence.",
+            image: "/leader/Kailas-Patil.jpeg"
+        },
+        {
+            name: "Mr. Neeraj Mohata",
+            title: "Regional Business Head – Nagpur",
+            description: "Mr. Neeraj Mohata brings 11+ years of experience in lending and financial services, driving regional sales growth, channel expansion, and profitable business performance with strong leadership and market expertise.",
+            image: "/leader/Neeraj-Mohata.jpeg"
+        },
+        {
+            name: "Mr. Pravin Rautray",
+            title: "Business Head (Moshi PCMC Branch )",
+            description: "Mr. Pravin Rautray drives growth across Loans and Insurance with a strong track record in building high-performing teams, expanding market reach, and delivering strategic, customer-focused revenue growth.",
+            image: "/leader/Pravin-Rautray.jpeg"
+        },
+
     ];
 
     return (
@@ -35,7 +84,7 @@ const AboutSection = () => {
                             At <span className="font-semibold text-[#1CADA3]">Infinity Arthvishva</span>,
                             we believe that your financial success is our true achievement. We are a one-stop financial advisory firm offering end-to-end solutions in loans, investments, insurance, and wealth management. With a strong foundation of trust, expertise, and innovation, we strive to simplify finance and empower individuals and businesses to achieve their goals with confidence.
                         </p>
-                        <p className="text-gray-700 max-w-3xl mx-auto text-lg leading-relaxed">
+                        <p className="text-gray-700 max-w-3xl mx-auto text-lg leading-relaxed mt-4">
                             At Infinity Arthvishva, we don’t just manage finances — we build lasting relationships and craft infinite possibilities for your financial future.
                         </p>
 
@@ -51,12 +100,12 @@ const AboutSection = () => {
                                 </p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                                {leaders.map((leader, index) => (
+                            {/* Row 1: 3 Leaders */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
+                                {leaders.slice(0, 3).map((leader, index) => (
                                     <div
                                         key={index}
                                         className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
-                                        
                                         <div className="w-full aspect-square overflow-hidden">
                                             <img
                                                 src={leader.image}
@@ -64,17 +113,62 @@ const AboutSection = () => {
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             />
                                         </div>
-
                                         <div className="p-6 text-center">
-                                            <h3 className="text-xl font-bold text-gray-800 mb-1">
-                                                {leader.name}
-                                            </h3>
-                                            <p className="text-[#2076C7] font-semibold mb-3">
-                                                {leader.title}
-                                            </p>
-                                            <p className="text-gray-800 text-sm leading-relaxed">
-                                                {leader.description}
-                                            </p>
+                                            <h3 className="text-xl font-bold text-gray-800 mb-1">{leader.name}</h3>
+                                            <p className="text-[#2076C7] font-semibold mb-3">{leader.title}</p>
+                                            <p className="text-gray-800 text-sm leading-relaxed">{leader.description}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Row 2: 3 Leaders */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+                                {leaders.slice(3, 6).map((leader, index) => (
+                                    <div
+                                        key={index + 3}
+                                        className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                                        <div className="w-full aspect-square overflow-hidden">
+                                            <img
+                                                src={leader.image}
+                                                alt={leader.name}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            />
+                                        </div>
+                                        <div className="p-6 text-center">
+                                            <h3 className="text-xl font-bold text-gray-800 mb-1">{leader.name}</h3>
+                                            <p className="text-[#2076C7] font-semibold mb-3">{leader.title}</p>
+                                            <p className="text-gray-800 text-sm leading-relaxed">{leader.description}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Headline for 3rd row */}
+                            <div className="text-center mb-10">
+                                <h3 className="text-2xl md:text-3xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                                    Branch Heads
+                                </h3>
+                                <div className="w-16 h-0.5 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mt-2"></div>
+                            </div>
+
+                            {/* Row 3: Remaining 5 Leaders */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-[95rem] mx-auto">
+                                {leaders.slice(6).map((leader, index) => (
+                                    <div
+                                        key={index + 6}
+                                        className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                                        <div className="w-full aspect-[4/5] overflow-hidden">
+                                            <img
+                                                src={leader.image}
+                                                alt={leader.name}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            />
+                                        </div>
+                                        <div className="p-6 text-center">
+                                            <h3 className="text-lg font-bold text-gray-800 mb-1">{leader.name}</h3>
+                                            <p className="text-[#2076C7] text-sm font-semibold mb-3">{leader.title}</p>
+                                            <p className="text-gray-800 text-xs leading-relaxed">{leader.description}</p>
                                         </div>
                                     </div>
                                 ))}

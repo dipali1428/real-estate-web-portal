@@ -6,9 +6,7 @@ import {
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
 
-// --- Constants & Styles ---
-// Changed to exactly 200 KB
-const MAX_FILE_SIZE_BYTES = 200 * 1024; 
+// --- Constants & Styles --- 
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -25,7 +23,7 @@ const DOC_REGISTRY: Record<string, { key: string; label: string; multiple: boole
   "2 Years Form 16": { key: "FORM16", label: "2 Years Form 16", multiple: true },
   "6 Months Banking Statement": { key: "BANK_STATEMENT", label: "6 Months Banking Statement", multiple: true },
   "Address Proof": { key: "ADDRESS_PROOF", label: "Address Proof", multiple: false },
-  "Photograph": { key: "photo", label: "Photograph", multiple: false },
+  "Photograph": { key: "PHOTOGRAPH", label: "Photograph", multiple: false },
   "Property Cost Sheet / Index II": { key: "COST_SHEET", label: "Property Cost Sheet / Index II", multiple: true },
   "Own Contribution Proof": { key: "CONTRIBUTION_PROOF", label: "Own Contribution Proof", multiple: true },
   "Udyam Registration": { key: "UDYAM", label: "Udyam Registration", multiple: false },
@@ -108,17 +106,10 @@ function FileSelectionCard({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const validFiles = files.filter(f => {
-        // Enforcing the 200KB Limit
-        if (f.size > MAX_FILE_SIZE_BYTES) {
-            alert(`File "${f.name}" exceeds the 200KB limit.`);
-            return false;
-        }
-        return true;
-    });
+    const validFiles = allowMultiple ? files : [files[0]];
 
     if (validFiles.length > 0) {
-        onAdd(allowMultiple ? validFiles : [validFiles[0]]);
+        onAdd(validFiles);
     }
     if (inputRef.current) inputRef.current.value = "";
   };
@@ -140,20 +131,20 @@ function FileSelectionCard({
               {selectedFiles.length > 0 ? "Add More" : "Choose File"}
             </span>
           </div>
-          <p className="text-[10px] text-gray-400 mt-1">Max size: 200KB</p>
         </button>
 
         {selectedFiles.map((f, idx) => (
           <div key={idx} className={`flex items-center justify-between border px-2 py-1.5 rounded-md text-xs ${f.status === 'error' ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'}`}>
             <div className="flex items-center truncate gap-2 max-w-[80%]">
-              {f.status === "uploading" ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-500" /> : 
-               f.status === "success" ? <CheckCircle className="w-3.5 h-3.5 text-[#1CADA3]" /> : 
-               f.status === "error" ? <AlertCircle className="w-3.5 h-3.5 text-red-500" /> : 
-               <div className="w-3.5 h-3.5 rounded-full border border-gray-300" />}
+              {/* Added shrink-0 to all status indicators below */}
+              {f.status === "uploading" ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-500 shrink-0" /> : 
+               f.status === "success" ? <CheckCircle className="w-3.5 h-3.5 text-[#1CADA3] shrink-0" /> : 
+               f.status === "error" ? <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" /> : 
+               <div className="w-3.5 h-3.5 rounded-full border border-gray-300 shrink-0" />}
               <span className="truncate text-gray-700">{f.file.name}</span>
             </div>
             {f.status === "pending" && (
-                <button onClick={() => onRemove(f.file.name)} className="text-gray-400 hover:text-red-500"><Trash2 size={14}/></button>
+                <button onClick={() => onRemove(f.file.name)} className="text-gray-400 hover:text-red-500 shrink-0"><Trash2 size={14}/></button>
             )}
           </div>
         ))}
@@ -205,7 +196,12 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
   }, [form, isSelfLoginActive]);
 
   const handleInputChange = (field: string, value: string) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+    // Automatically convert email inputs to lowercase
+    const processedValue = (field === "email" || field === "rmEmail") 
+      ? value.toLowerCase() 
+      : value;
+  
+    setForm(prev => ({ ...prev, [field]: processedValue }));
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
   };
 
@@ -259,7 +255,13 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
         }
       };
 
+      // console.log(">>> API CALL: DashboardService.createLead", payload);
+
       const result = await DashboardService.createLead(payload);
+      
+      // --- LOGGING CREATE LEAD API RESPONSE ---
+      console.log("<<< API RESPONSE: DashboardService.createLead", result);
+      
       const id = result?.detail_lead_id;
 
       if (!id) throw new Error("Lead ID missing");
@@ -415,19 +417,25 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
              <button onClick={() => setStep(1)} className={STYLES.secondaryBtn}><ArrowLeft size={18} /> Back</button>
            )}
            <div className="flex-1" />
-           <button 
-                onClick={step === 1 ? handleCreateLead : handleFinalSubmission} 
-                disabled={isSubmitting} 
-                className={STYLES.btn}
-            >
-                {isSubmitting ? (
-                    <><Loader2 className="animate-spin" size={20} /> {statusMsg}</>
-                ) : step === 1 ? (
-                    <>Submit & Upload Documents <ArrowRight size={18} /></>
-                ) : (
-                    "Complete Submission"
-                )}
-           </button>
+          <button
+            onClick={step === 1 ? handleCreateLead : handleFinalSubmission}
+            disabled={isSubmitting}
+            className={`${STYLES.btn} px-6 py-3 w-auto min-w-max`}
+          >
+            {isSubmitting ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="animate-spin" size={20} />
+                {statusMsg}
+              </div>
+            ) : step === 1 ? (
+              <div className="flex items-center gap-2">
+                Create Lead & Upload Documents
+                <ArrowRight size={18} />
+              </div>
+            ) : (
+              "Complete Submission"
+            )}
+          </button>
         </div>
 
         {showSuccess && <SuccessModal onClose={onClose} />}

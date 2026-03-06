@@ -64,6 +64,11 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
     detailed: [] 
   });
 
+  const formatValue = (val: any) => {
+    if (!val) return "";
+    return val.toString().replace(/"/g, "").trim();
+  };
+
   useEffect(() => {
     setSearchTerm("");
     setCurrentPage(1);
@@ -331,7 +336,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.product}</td>
                         
                         <td className="px-4 py-4 text-sm text-gray-700">{lead.subCategory}</td>
-                           <td className="px-4 py-4 text-sm text-gray-900">{lead.disbursement_amount}</td>
+                           <td className="px-4 py-4 text-sm text-gray-900">{formatValue(lead.disbursement_amount).replace(/\.0+$/, "")}</td>
                         <td className="px-4 py-4 text-sm text-gray-700">
                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${lead.clientType === 'Detailed' ? 'bg-purple-50 text-purple-600 border border-purple-100' : 'bg-orange-50 text-orange-600 border border-orange-100'}`}>
                              {lead.clientType}
@@ -358,7 +363,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.clientName}</td>
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.product}</td>
                         <td className="px-4 py-4 text-sm text-gray-700">{lead.subCategory}</td>
-                        <td className="px-4 py-4 text-sm text-gray-700">{lead.disbursement_amount}</td>
+                        <td className="px-4 py-4 text-sm text-gray-700">{formatValue(lead.disbursement_amount).replace(/\.0+$/, "")}</td>
                         <td className="px-4 py-4 text-sm text-gray-700 font-medium">{lead.isSelfLogin}</td>
                         <td className="px-4 py-4 text-sm">
                           <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase bg-green-50 text-[#1CADA3] border border-[#1CADA3]">
@@ -416,7 +421,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                           {key.replace(/_/g, ' ')}
                         </p>
                         <p className="text-sm font-semibold text-gray-700">
-                          {key.toLowerCase().includes('amount') ? `₹ ${value}` : String(value)}
+                          {key.toLowerCase().includes('amount') ? `₹ ${formatValue(value).replace(/\.0+$/, "")}` : String(value)}
                         </p>
                       </div>
                     );

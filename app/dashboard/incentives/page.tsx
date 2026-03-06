@@ -7,7 +7,7 @@ import {
   Building2, ShieldCheck, PieChart, Briefcase, Landmark,
   Inbox, FileDown
 } from 'lucide-react';
-import { Toaster, toast } from 'react-hot-toast';
+// import { Toaster, toast } from 'react-hot-toast';
 import { DashboardService } from '@/app/services/dashboardService';
 
 // --- Types ---
@@ -65,7 +65,7 @@ export default function IncentivesPayouts() {
       try {
         setIsLoading(true);
         const response = await DashboardService.getCompletedDetailLeads();
-        console.log("Raw API Response for Completed Detail Leads:", response);
+      
         
         // 🔹 FIX: Safety check to handle different API response structures
         // If the API returns { leads: [] } or { data: [] }, we extract the array
@@ -100,11 +100,11 @@ export default function IncentivesPayouts() {
           grossAmount: item.gross_payout_amount || '0',
         }));
 
-        console.log("Mapped Payout Data:", mappedData);
+        // console.log("Mapped Payout Data:", mappedData);
         setPayoutData(mappedData);
       } catch (error) {
         console.error("Failed to fetch payouts", error);
-        toast.error("Could not load payout history");
+        // toast.error("Could not load payout history");
       } finally {
         setIsLoading(false);
       }
@@ -172,17 +172,17 @@ export default function IncentivesPayouts() {
     };
   }, [amount, leadCategory, selectedProduct]);
 
-  const handleDownloadInvoice = (id: string) => {
-    toast.success(`Downloading Bill Invoice for ${id}`);
-  };
+  // const handleDownloadInvoice = (id: string) => {
+  //   toast.success(`Downloading Bill Invoice for ${id}`);
+  // };
 
-  const handleDownloadTDS = (id: string) => {
-    toast.success(`Downloading TDS Certificate for ${id}`);
-  };
+  // const handleDownloadTDS = (id: string) => {
+  //   toast.success(`Downloading TDS Certificate for ${id}`);
+  // };
 
   return (
     <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 font-sans">
-      <Toaster position="top-right" />
+      {/* <Toaster position="top-right" /> */}
 
       <div className="max-w-7xl mx-auto space-y-6">
         
@@ -279,9 +279,9 @@ export default function IncentivesPayouts() {
                        <th className="px-6 py-4 text-center">Status</th>
                        <th className="px-6 py-4">Amount</th>
                        <th className="px-6 py-4">Gross Amount</th>
-                      <th className="px-6 py-4">Net Payout</th>
-                      <th className="px-6 py-4">GST</th>
                       <th className="px-6 py-4 text-center">TDS</th>
+                      <th className="px-6 py-4">GST</th>
+                      <th className="px-6 py-4">Net Payout</th>
                       <th className="px-6 py-4">Invoice Number</th>
                       
                     </tr>
@@ -321,17 +321,18 @@ export default function IncentivesPayouts() {
                             {row.status}
                           </span>
                         </td>
-                         <td className="px-6 py-5 font-bold text-gray-600">₹{row.amount}</td>
-                          <td className="px-6 py-5 font-bold text-gray-600">₹{row.grossAmount}</td>
-                         <td className="px-6 py-5 font-bold text-gray-600">₹{row.netPayout}</td>
+                         <td className="px-6 py-5 font-bold text-gray-600">₹{formatValue(row.amount).replace(/\.0+$/, "")}</td>
+                          <td className="px-6 py-5 font-bold text-gray-600">₹{formatValue(row.grossAmount).replace(/\.0+$/, "")}</td>
+                        <td className="px-6 py-5">
+                          <div className="font-medium text-slate-700">₹{formatValue(row.tdsAmount).replace(/\.0+$/, "")}</div>
+                          
+                        </td>
                          <td className="px-6 py-5">
                           <div className="font-medium text-slate-700">₹{row.gstAmount}</div>
                           
                         </td>
-                        <td className="px-6 py-5">
-                          <div className="font-medium text-slate-700">₹{row.tdsAmount}</div>
-                          
-                        </td>
+                        
+                          <td className="px-6 py-5 font-bold text-gray-600">₹{formatValue(row.netPayout).replace(/\.0+$/, "")}</td>
                         <td className="px-6 py-5">
                           <div className="font-medium text-slate-700">₹{row.invoiceNumber}</div>
                           <div className="font-medium text-slate-700">₹{row.invoiceDate}</div>

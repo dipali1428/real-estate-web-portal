@@ -49,26 +49,28 @@ const Header = () => {
   ];
 
   const loansOptions = [
-    { label: "Home Loan", href: "/offers/loans/home-loan" },
-    { label: "Personal Loan", href: "/offers/loans/personal-loan" },
-    { label: "Business Loan", href: "/offers/loans/business-loan" },
-    { label: "Mortgage Loan", href: "/offers/loans/mortgage-loan" },
-    { label: "SME Loan", href: "/offers/loans/sme-loan" },
-    { label: "Education Loan", href: "/offers/loans/education-loan" },
-    { label: "Vehicle Loan", href: "/offers/loans/vehicle-loan" },
-    { label: "Loan Against Securities", href: "/offers/loans/loan-against-securities" },
+    { label: "Home Loan", href: "/products/home-loan" },
+    { label: "Personal Loan", href: "/products/personal-loan" },
+    { label: "Business Loan", href: "/products/business-loan" },
+    { label: "Mortgage Loan", href: "/products/mortgage-loan" },
+    { label: "SME Loan", href: "/products/sme" },
+    { label: "Education Loan", href: "/productseducation-loan" },
+    { label: "Vehicle Loan", href: "/products/vehicle-loan" },
+    { label: "Loan Against Securities", href: "/products/loan-against-securities" },
   ];
 
+
+  
   const insuranceOptions = [
     { label: "Life Insurance", href: "/products/life-insurance" },
     { label: "Health Insurance", href: "/products/health-insurance" },
-    { label: "Motor Insurance", href: "/offers/insurance/motor-insurance" },
+    { label: "Motor Insurance", href: "/products/motor-insurance" },
     { label: "Travel Insurance", href: "/products/travel-insurance" },
-    { label: "Fire Insurance", href: "/offers/insurance/fire-insurance" },
+    { label: "Fire Insurance", href: "/products/fire-insurance" },
     { label: "Cattle Insurance", href: "/products/cattle-insurance" },
     { label: "Marine Insurance", href: "/products/marine-insurance" },
-    { label: "Corporate Insurance", href: "/offers/insurance/corporate-insurance" },
-    { label: "Loan Protector", href: "/offers/insurance/loan-protector-plan" },
+    { label: "Corporate Insurance", href: "/products/corporate-insurance" },
+    { label: "Loan Protector", href: "/products/loan-protector" },
   ];
 
   const mutualFundOptions = [

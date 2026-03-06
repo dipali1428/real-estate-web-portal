@@ -155,7 +155,7 @@ export const AdminService = {
    * GET → /api/unlisted/admin/shares
    */
   getShares: async (): Promise<Share[]> => {
-    const response = await api.get("/api/unlisted/admin/shares");
+    const response = await api.get("/api/unlisted/public/shares");
     return response.data; // Returns array of shares directly
   },
 

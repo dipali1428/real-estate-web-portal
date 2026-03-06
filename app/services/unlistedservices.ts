@@ -120,16 +120,16 @@ export const fetchAllShares = async () => {
 };
 
 // Fetch Graph Data
-export const fetchGraphData = async (): Promise<GraphPoint[]> => {
-  try {
-    const response = await api.get("/api/unlisted/public/graph");
-    return response.data;
-  } catch (error: any) {
-    console.error("DEBUG - Graph URL called:", error.config?.url);
-    console.error("DEBUG - Graph Error:", error.response?.data);
-    throw error;
-  }
-};
+// export const fetchGraphData = async (): Promise<GraphPoint[]> => {
+//   try {
+//     const response = await api.get("/api/unlisted/public/graph");
+//     return response.data;
+//   } catch (error: any) {
+//     console.error("DEBUG - Graph URL called:", error.config?.url);
+//     console.error("DEBUG - Graph Error:", error.response?.data);
+//     throw error;
+//   }
+// };
 
 // Fetch Graph Data by Share ID - FIXED: Returns ShareGraphResponse with graph array
 export const fetchIdGraphData = async (share_id: number): Promise<ShareGraphResponse> => {
