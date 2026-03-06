@@ -56,6 +56,7 @@ const ServicesSection = () => {
         { name: "Travel Insurance", slug: "../../products/travel-insurance" },
         { name: "Cattle Insurance", slug: "../../products/cattle-insurance" },
         { name: "Marine Insurance", slug: "../../products/marine-insurance" },
+        { name: "Pet Insurance", slug: "../../products/pet-insurance" },
         // { name: "Group Medi-Claim Cover", slug: "group-medi-claim-cover" },
         // { name: "Group Personal Accident Cover", slug: "group-personal-accident-cover" },
         // { name: "Worker Compensation Insurance", slug: "worker-compensation-insurance" },
