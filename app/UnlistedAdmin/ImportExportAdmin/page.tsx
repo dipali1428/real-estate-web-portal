@@ -97,68 +97,67 @@ const ImportExportAdmin: React.FC = () => {
   };
 
   // --- IMPORT LOGIC WITH MODE SELECTION ---
-  const startImport = async () => {
-    if (!file) {
-      setToast({ message: 'Please select a file first', type: 'error' });
-      setTimeout(() => setToast(null), 3000);
-      return;
+const startImport = async () => {
+  if (!file) {
+    setToast({ message: 'Please select a file first', type: 'error' });
+    setTimeout(() => setToast(null), 3000);
+    return;
+  }
+  
+  setIsImporting(true);
+  setProgress({ percent: 30, status: 'Processing...' });
+  setToast({ message: `Importing file in ${importMode} mode...`, type: 'info' });
+  setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] Starting ${importMode} import of ${file.name}...`]);
+  setImportResult(null);
+  
+  try {
+    let response;
+    
+    if (importMode === 'history') {
+      // Updated API call
+      response = await (AdminService as any).uploadSharesWithHistory(file, "history");
+    } else {
+      // Updated API call
+      response = await (AdminService as any).uploadSharesWithHistory(file, "daily");
     }
     
-    setIsImporting(true);
-    setProgress({ percent: 30, status: 'Processing...' });
-    setToast({ message: `Importing file in ${importMode} mode...`, type: 'info' });
-    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] Starting ${importMode} import of ${file.name}...`]);
+    setProgress({ percent: 100, status: 'Completed' });
+    
+    // Store import result for display
+    setImportResult({
+      success: response.success,
+      message: response.message,
+      mode: response.mode,
+      applySoftDelete: response.applySoftDelete,
+      rowsProcessed: response.rowsProcessed,
+      rowsSkipped: response.rowsSkipped
+    });
+    
+    // Success message
+    const successMsg = `✓ File imported successfully in ${response.mode} mode (${response.rowsProcessed.toLocaleString()} rows processed)`;
+    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${successMsg}`]);
+    setToast({ message: successMsg, type: 'success' });
+    
+    // Clear file after successful import
+    setTimeout(() => {
+      setFile(null);
+      setProgress({ percent: 0, status: 'Waiting...' });
+      setToast(null);
+    }, 3000);
+    
+  } catch (err: any) {
+    const errorMsg = `✗ Import failed: ${err.response?.data?.message || err.message}`;
+    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${errorMsg}`]);
+    setProgress({ percent: 0, status: 'Failed' });
+    setToast({ message: errorMsg, type: 'error' });
     setImportResult(null);
     
-    try {
-      let response;
-      
-      if (importMode === 'history') {
-        // Call history mode API (no query parameter)
-        response = await (AdminService as any).uploadSharesWithHistoryMode(file);
-      } else {
-        // Call daily mode API (with mode=daily)
-        response = await (AdminService as any).uploadSharesWithDailyMode(file);
-      }
-      
-      setProgress({ percent: 100, status: 'Completed' });
-      
-      // Store import result for display
-      setImportResult({
-        success: response.success,
-        message: response.message,
-        mode: response.mode,
-        applySoftDelete: response.applySoftDelete,
-        rowsProcessed: response.rowsProcessed,
-        rowsSkipped: response.rowsSkipped
-      });
-      
-      // Success message
-      const successMsg = `✓ File imported successfully in ${response.mode} mode (${response.rowsProcessed.toLocaleString()} rows processed)`;
-      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${successMsg}`]);
-      setToast({ message: successMsg, type: 'success' });
-      
-      // Clear file after successful import
-      setTimeout(() => {
-        setFile(null);
-        setProgress({ percent: 0, status: 'Waiting...' });
-        setToast(null);
-      }, 3000);
-      
-    } catch (err: any) {
-      const errorMsg = `✗ Import failed: ${err.response?.data?.message || err.message}`;
-      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${errorMsg}`]);
-      setProgress({ percent: 0, status: 'Failed' });
-      setToast({ message: errorMsg, type: 'error' });
-      setImportResult(null);
-      
-      // Auto-hide error toast after 5 seconds
-      setTimeout(() => setToast(null), 5000);
-    } finally {
-      setIsImporting(false);
-    }
-  };
-
+    // Auto-hide error toast after 5 seconds
+    setTimeout(() => setToast(null), 5000);
+  } finally {
+    setIsImporting(false);
+  }
+};
   const clearLogs = () => {
     setLogs([]);
     setImportResult(null);
