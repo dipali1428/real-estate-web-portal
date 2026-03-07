@@ -219,7 +219,7 @@ addShare: async (payload: AddSharePayload) => {
    * GET → /api/unlisted/admin/shares/:shareId/graph
    */
   getSharePriceGraph: async (shareId: number): Promise<SharePriceGraphData> => {
-    const response = await api.get(`/api/unlisted/admin/shares/${shareId}/graph`);
+    const response = await api.get(`/api/unlisted/public/${shareId}/graph`);
     return response.data;
   },
 
