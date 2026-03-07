@@ -30,7 +30,7 @@ export default function BenefitsSection() {
         <>
             {/* ── Key Benefits ──────────────────────────────────────────── */}
             <section className="py-6 bg-white relative overflow-hidden">
-                <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12">
+                <div className="relative z-10 max-w-[1440px] mx-auto px-6">
                     <div className="relative flex items-center justify-center mb-12">
                         {/* Centered Header */}
                         <motion.div
@@ -40,13 +40,15 @@ export default function BenefitsSection() {
                             className="text-center"
                         >
                             <span className="text-[#2076C7] font-black tracking-widest uppercase text-xs mb-4 block">Why Choose Us</span>
-                            <h2 className="text-3xl md:text-4xl font-extrabold mb-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                            <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
                                 Benefits of Our Education Loan
                             </h2>
                             <div className="w-24 h-1 bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] mx-auto rounded-full mb-4" />
-                            <p className="text-gray-600 max-w-xl mx-auto font-medium text-lg leading-relaxed">
+                            <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
                                 We go beyond just financing — every product is designed to give you maximum flexibility.
                             </p>
+
+
                         </motion.div>
 
                     </div>
@@ -97,7 +99,7 @@ export default function BenefitsSection() {
                                         transition={{ duration: 0.4, delay: i * 0.05 }}
                                         className="min-w-[280px] md:min-w-[320px] bg-white rounded-[2rem] p-8 border border-slate-100 hover:border-blue-200 hover:shadow-[0_20px_50px_-12px_rgba(32,118,199,0.1)] transition-all duration-300 group flex flex-col items-center text-center snap-start"
                                     >
-                                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-[#2076C7]/10 text-[#2076C7] group-hover:scale-110 transition-transform shadow-sm">
+                                        <div className="w-12 h-12 bg-[#2076C7]/5 rounded-xl flex items-center justify-center text-[#2076C7] mb-6 group-hover:scale-110 group-hover:bg-[#2076C7] group-hover:text-white transition-all duration-500">
                                             <Icon size={28} strokeWidth={1.8} />
                                         </div>
                                         <h3 className="text-xl font-extrabold text-[#2076C7] mb-3 tracking-tight leading-snug">{b.title}</h3>

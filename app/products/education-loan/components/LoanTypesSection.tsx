@@ -76,7 +76,7 @@ export default function LoanTypesSection() {
 
     return (
         <section className="py-2 bg-white relative overflow-hidden">
-            <div className="max-w-6xl mx-auto px-6 md:px-12">
+            <div className="max-w-[1440px] mx-auto px-6 leading-relaxed">
 
                 {/* Header */}
                 <motion.div
@@ -89,10 +89,10 @@ export default function LoanTypesSection() {
                         <IconAward size={14} />
                         Loan Products
                     </span>
-                    <h2 className="text-3xl md:text-4xl font-extrabold mb-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
                         Choose Your Education Loan
                     </h2>
-                    <p className="text-gray-600 max-w-2xl mx-auto font-medium text-xl md:text-1xl leading-relaxed">
+                    <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
                         From domestic degrees to international programs — we have tailored loan products to match every aspiration and budget.
                     </p>
                 </motion.div>
@@ -125,22 +125,22 @@ export default function LoanTypesSection() {
 
                                 <div className="space-y-2 mb-6">
                                     <div className="flex justify-between items-center py-2 border-b border-black/5">
-                                        <span className="text-xs font-bold text-slate-400 uppercase">Max Amount</span>
-                                        <span className="text-sm font-extrabold text-[#2076C7]">{loan.amount}</span>
+                                        <span className="text-sm font-bold text-slate-400 uppercase">Max Amount</span>
+                                        <span className="text-base font-extrabold text-[#2076C7]">{loan.amount}</span>
                                     </div>
                                     <div className="flex justify-between items-center py-2 border-b border-black/5">
-                                        <span className="text-xs font-bold text-slate-400 uppercase">Interest Rate</span>
-                                        <span className="text-sm font-extrabold text-slate-700">{loan.rate}</span>
+                                        <span className="text-sm font-bold text-slate-400 uppercase">Interest Rate</span>
+                                        <span className="text-base font-extrabold text-slate-700">{loan.rate}</span>
                                     </div>
                                     <div className="flex justify-between items-center py-2">
-                                        <span className="text-xs font-bold text-slate-400 uppercase">Tenure</span>
-                                        <span className="text-sm font-extrabold text-slate-700">{loan.tenure}</span>
+                                        <span className="text-sm font-bold text-slate-400 uppercase">Tenure</span>
+                                        <span className="text-base font-extrabold text-slate-700">{loan.tenure}</span>
                                     </div>
                                 </div>
 
                                 <ul className="space-y-2 mb-8">
                                     {loan.features.map((f) => (
-                                        <li key={f} className="flex items-start gap-2 text-xs font-bold text-slate-600">
+                                        <li key={f} className="flex items-start gap-2 text-sm font-bold text-slate-600">
                                             <IconCheck size={14} className="text-teal-500 shrink-0 mt-0.5" strokeWidth={3} />
                                             {f}
                                         </li>
@@ -150,7 +150,7 @@ export default function LoanTypesSection() {
                                 {/* Apply Now Button */}
                                 <button
                                     onClick={openLogin}
-                                    className="absolute bottom-6 right-6 inline-flex items-center gap-2 px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group"
+                                    className="absolute bottom-6 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-10 py-3.5 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group whitespace-nowrap"
                                     style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
                                 >
                                     <span className="relative z-6 flex items-center justify-center gap-1">
@@ -172,7 +172,7 @@ export default function LoanTypesSection() {
                     className="mt-14"
                 >
                     <div className="text-center mb-6">
-                        <h3 className="text-xl sm:text-2xl md:text-3xl font-black bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent inline-block">
+                        <h3 className="text-3xl md:text-4xl py-8 font-extrabold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent inline-block drop-shadow-sm tracking-tight leading-tight">
                             Domestic vs. Abroad — Quick Comparison
                         </h3>
                         <div className="w-24 h-1 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] mx-auto mt-4 rounded-full opacity-30" />
@@ -183,16 +183,16 @@ export default function LoanTypesSection() {
                             <table className="w-full text-sm border-collapse">
                                 <thead>
                                     <tr className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3]">
-                                        <th className="text-left px-8 py-4 text-base font-black text-white border-b border-white/10">Key Features</th>
-                                        <th className="text-center px-8 py-4 border-b border-white/10">
+                                        <th className="text-left px-4 sm:px-8 py-5 text-lg md:text-xl font-black text-white border-b border-white/10">Key Features</th>
+                                        <th className="text-center px-4 sm:px-8 py-5 border-b border-white/10">
                                             <div className="inline-flex flex-col items-center">
-                                                <span className="text-base font-black text-white">Domestic Loan</span>
+                                                <span className="text-lg md:text-xl font-black text-white">Domestic Loan</span>
                                                 <div className="text-[10px] font-bold text-white/90 mt-0.5">(study in india)</div>
                                             </div>
                                         </th>
-                                        <th className="text-center px-8 py-4 border-b border-white/10">
+                                        <th className="text-center px-4 sm:px-8 py-5 border-b border-white/10">
                                             <div className="inline-flex flex-col items-center">
-                                                <span className="text-base font-black text-white">Abroad Loan</span>
+                                                <span className="text-lg md:text-xl font-black text-white">Abroad Loan</span>
                                                 <div className="text-[10px] font-bold text-white/90 mt-0.5">(study overseas)</div>
                                             </div>
                                         </th>
@@ -206,30 +206,30 @@ export default function LoanTypesSection() {
                                                 key={row.feature}
                                                 className={`group transition-all duration-300 ${i === comparison.length - 1 ? '' : 'border-b border-slate-50'} hover:bg-blue-50/30`}
                                             >
-                                                <td className="px-8 py-3.5">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-9 h-9 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-md">
+                                                <td className="px-3 sm:px-8 py-4">
+                                                    <div className="flex items-center gap-3 md:gap-4">
+                                                        <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-md">
                                                             <FeatureIcon size={18} strokeWidth={2.5} />
                                                         </div>
-                                                        <span className="font-extrabold text-slate-700 tracking-tight">{row.feature}</span>
+                                                        <span className="font-extrabold text-slate-700 tracking-tight text-sm md:text-lg">{row.feature}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-8 py-3.5 text-center">
+                                                <td className="px-4 sm:px-8 py-3.5 text-center">
                                                     {typeof row.domestic === 'boolean' ? (
                                                         <div className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center ${row.domestic ? 'bg-teal-50 text-teal-600' : 'bg-red-50 text-red-500'}`}>
                                                             {row.domestic ? <IconCheck size={16} strokeWidth={3} /> : <IconX size={16} strokeWidth={3} />}
                                                         </div>
                                                     ) : (
-                                                        <span className="text-sm font-bold text-slate-500">{row.domestic}</span>
+                                                        <span className="text-base md:text-lg font-bold text-slate-500">{row.domestic}</span>
                                                     )}
                                                 </td>
-                                                <td className="px-8 py-3.5 text-center">
+                                                <td className="px-4 sm:px-8 py-3.5 text-center">
                                                     {typeof row.abroad === 'boolean' ? (
                                                         <div className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center ${row.abroad ? 'bg-teal-50 text-teal-600' : 'bg-red-50 text-red-500'}`}>
                                                             {row.abroad ? <IconCheck size={16} strokeWidth={3} /> : <IconX size={16} strokeWidth={3} />}
                                                         </div>
                                                     ) : (
-                                                        <span className="text-sm font-black text-[#2076C7]">{row.abroad}</span>
+                                                        <span className="text-base md:text-lg font-black text-[#2076C7]">{row.abroad}</span>
                                                     )}
                                                 </td>
                                             </tr>
@@ -239,20 +239,6 @@ export default function LoanTypesSection() {
                             </table>
                         </div>
 
-                        {/* Summary Footer */}
-                        <div className="bg-slate-50/50 p-4 border-t border-slate-100">
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-teal-500" />
-                                    <span>Instant Disbursal Available</span>
-                                </div>
-                                <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-slate-200" />
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-[#2076C7]" />
-                                    <span>Customized Repayment Plans</span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </motion.div>
             </div>

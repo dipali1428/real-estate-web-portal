@@ -47,13 +47,13 @@ export default function FAQSection() {
 
     return (
         <div className="bg-white font-sans">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-[1440px] mx-auto px-6 py-8">
                 <div className="text-center mb-8">
-                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
                         Frequently Asked Questions
                     </h2>
                     <div className="w-24 h-1 mx-auto rounded-full mb-4" style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}></div>
-                    <p className="text-gray-600 max-w-2xl mx-auto text-sm leading-relaxed">
+                    <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
                         Everything you need to know about education loans — answered by our experts.
                     </p>
                 </div>
