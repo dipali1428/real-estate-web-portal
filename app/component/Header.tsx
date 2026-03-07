@@ -54,7 +54,7 @@ const Header = () => {
     { label: "Business Loan", href: "/products/business-loan" },
     { label: "Mortgage Loan", href: "/products/mortgage-loan" },
     { label: "SME Loan", href: "/products/sme" },
-    { label: "Education Loan", href: "/productseducation-loan" },
+    { label: "Education Loan", href: "/products/education-loan" },
     { label: "Vehicle Loan", href: "/products/vehicle-loan" },
     { label: "Loan Against Securities", href: "/products/loan-against-securities" },
   ];
@@ -74,7 +74,7 @@ const Header = () => {
   ];
 
   const mutualFundOptions = [
-    { label: "Mutual Fund", href: "/products/mutualfunds" },
+    { label: "Mutual Fund", href: "/products/mutual-funds" },
   ];
 
   const investmentOptions = [

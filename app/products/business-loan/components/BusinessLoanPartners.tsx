@@ -48,14 +48,14 @@ const totalPages = Math.ceil(partners.length / itemsPerPage);
 
 // Predefined palette applied by grid index to simulate colored icons
 const iconColors = [
-    'bg-blue-50 text-blue-500',      // 0
-    'bg-emerald-50 text-emerald-500',// 1
-    'bg-red-50 text-red-500',        // 2
-    'bg-orange-50 text-orange-500',  // 3
-    'bg-indigo-50 text-indigo-500',  // 4
-    'bg-slate-100 text-slate-500',   // 5
-    'bg-cyan-50 text-cyan-500',      // 6
-    'bg-fuchsia-50 text-fuchsia-500' // 7
+    'bg-teal-50 text-teal-500',// 1
+    'bg-teal-50 text-teal-500',        // 2
+    'bg-teal-50 text-teal-500',  // 3
+    'bg-teal-50 text-teal-500',  // 4
+    'bg-teal-50 text-teal-500',   // 5
+    'bg-teal-50 text-teal-500',      // 6
+    'bg-teal-50 text-teal-500',      // 0
+    'bg-teal-50 text-teal-500' // 7
 ];
 
 const BusinessLoanPartners = () => {
@@ -70,30 +70,30 @@ const BusinessLoanPartners = () => {
         : partners.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
 
     return (
-        <section className="py-0 bg-gray-50/50 relative overflow-hidden">
-            <div className="container mx-auto px-4 max-w-7xl relative">
+        <section className="py-8 md:py-12 bg-gray-50/80 relative overflow-hidden font-sans">
+            <div className="container mx-auto px-4 max-w-7xl relative font-sans">
 
                 {/* Section Header - Centered Style */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="text-center max-w-3xl mx-auto mb-16"
+                    className="text-center max-w-3xl mx-auto mb-12"
                 >
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-bold text-xs mb-6 uppercase tracking-widest">
                         <Building2 size={14} />
                         Our Network
                     </div>
-                    <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-linear-to-r from-[#2076C7] to-[#1CADA3]">
-                        Our Lending Partners
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                        Our Banking Partners and HFC's
                     </h2>
-                    <p className="text-lg text-gray-600 font-medium leading-relaxed">
+                    <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
                         Widest network for the most competitive rates. We've collaborated with India's premier financial institutions to provider you with the most competitive interest rates.
                     </p>
                 </motion.div>
 
                 {/* Main Card Container */}
-                <div className="bg-white rounded-[40px] p-6 py-10 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-300 relative">
+                <div className="bg-blue-50/40 rounded-[40px] p-6 py-10 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-300 relative font-sans">
 
                     {/* View All Button Toggle */}
                     <div className="flex justify-end mb-8">
@@ -146,12 +146,12 @@ const BusinessLoanPartners = () => {
                                     return (
                                         <div
                                             key={partner.name}
-                                            className="group flex flex-row items-center gap-4 bg-white p-4 lg:p-5 rounded-[24px] border border-gray-300 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgb(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300"
+                                            className="group flex flex-row items-center gap-4 bg-white p-4 lg:p-5 rounded-[24px] border border-gray-300 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_20px_rgb(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300 font-sans"
                                         >
                                             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110 ${colorClass}`}>
                                                 <Landmark className="w-6 h-6" strokeWidth={2} />
                                             </div>
-                                            <h3 className="text-xs font-bold text-gray-600 uppercase tracking-widest leading-snug pr-2 group-hover:text-gray-900 transition-colors">
+                                            <h3 className="text-xs font-bold uppercase tracking-widest leading-snug pr-2 text-gray-700 transition-all font-sans">
                                                 {partner.name}
                                             </h3>
                                         </div>
