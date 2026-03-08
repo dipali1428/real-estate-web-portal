@@ -12,8 +12,6 @@ import {
   Zap,
   Loader2,
   Database,
-  ChevronLeft,
-  Activity,
   Download,
   CheckCircle,
   AlertCircle,
@@ -28,19 +26,17 @@ const ImportExportAdmin: React.FC = () => {
 
   // States
   const [file, setFile] = useState<File | null>(null);
-  const [importMode, setImportMode] = useState<'history' | 'daily'>('history');
+  const [importType, setImportType] = useState<'history' | 'daily'>('history');
   const [isImporting, setIsImporting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState({ percent: 0, status: 'Waiting...' });
   const [logs, setLogs] = useState<string[]>([]);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [importResult, setImportResult] = useState<{
-    success?: boolean;
-    message?: string;
-    mode?: string;
-    applySoftDelete?: boolean;
     rowsProcessed?: number;
     rowsSkipped?: number;
+    mode?: string;
+    applySoftDelete?: boolean;
   } | null>(null);
   
   const [isClient, setIsClient] = useState(false);
@@ -97,75 +93,69 @@ const ImportExportAdmin: React.FC = () => {
   };
 
   // --- IMPORT LOGIC WITH MODE SELECTION ---
-const startImport = async () => {
-  if (!file) {
-    setToast({ message: 'Please select a file first', type: 'error' });
-    setTimeout(() => setToast(null), 3000);
-    return;
-  }
-  
-  setIsImporting(true);
-  setProgress({ percent: 30, status: 'Processing...' });
-  setToast({ message: `Importing file in ${importMode} mode...`, type: 'info' });
-  setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] Starting ${importMode} import of ${file.name}...`]);
-  setImportResult(null);
-  
-  try {
-    let response;
-    
-    if (importMode === 'history') {
-      // Updated API call
-      response = await (AdminService as any).uploadSharesWithHistory(file, "history");
-    } else {
-      // Updated API call
-      response = await (AdminService as any).uploadSharesWithHistory(file, "daily");
+  const startImport = async () => {
+    if (!file) {
+      setToast({ message: 'Please select a file first', type: 'error' });
+      setTimeout(() => setToast(null), 3000);
+      return;
     }
     
-    setProgress({ percent: 100, status: 'Completed' });
-    
-    // Store import result for display
-    setImportResult({
-      success: response.success,
-      message: response.message,
-      mode: response.mode,
-      applySoftDelete: response.applySoftDelete,
-      rowsProcessed: response.rowsProcessed,
-      rowsSkipped: response.rowsSkipped
-    });
-    
-    // Success message
-    const successMsg = `✓ File imported successfully in ${response.mode} mode (${response.rowsProcessed.toLocaleString()} rows processed)`;
-    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${successMsg}`]);
-    setToast({ message: successMsg, type: 'success' });
-    
-    // Clear file after successful import
-    setTimeout(() => {
-      setFile(null);
-      setProgress({ percent: 0, status: 'Waiting...' });
-      setToast(null);
-    }, 3000);
-    
-  } catch (err: any) {
-    const errorMsg = `✗ Import failed: ${err.response?.data?.message || err.message}`;
-    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${errorMsg}`]);
-    setProgress({ percent: 0, status: 'Failed' });
-    setToast({ message: errorMsg, type: 'error' });
+    setIsImporting(true);
+    setProgress({ percent: 30, status: 'Processing...' });
+    setToast({ message: `Importing file with ${importType} mode...`, type: 'info' });
+    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] Starting ${importType} import of ${file.name}...`]);
     setImportResult(null);
     
-    // Auto-hide error toast after 5 seconds
-    setTimeout(() => setToast(null), 5000);
-  } finally {
-    setIsImporting(false);
-  }
-};
+    try {
+      let response;
+      
+      if (importType === 'history') {
+        // Call history mode API
+        response = await AdminService.uploadSharesWithHistoryMode(file);
+      } else {
+        // Call daily mode API
+        response = await AdminService.uploadSharesWithDailyMode(file);
+      }
+      
+      setProgress({ percent: 100, status: 'Completed' });
+      
+      // Store import result for display
+      setImportResult({
+        rowsProcessed: response.rowsProcessed,
+        rowsSkipped: response.rowsSkipped,
+        mode: response.mode,
+        applySoftDelete: response.applySoftDelete
+      });
+      
+      // Success message
+      const successMsg = `✓ File imported successfully in ${importType} mode (${response.rowsProcessed} rows processed)`;
+      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${successMsg}`]);
+      setToast({ message: successMsg, type: 'success' });
+      
+      // Clear file after successful import (delayed)
+      setTimeout(() => {
+        setFile(null);
+        setProgress({ percent: 0, status: 'Waiting...' });
+        setToast(null);
+      }, 3000);
+      
+    } catch (err: any) {
+      const errorMsg = `✗ Import failed: ${err.response?.data?.message || err.message}`;
+      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${errorMsg}`]);
+      setProgress({ percent: 0, status: 'Failed' });
+      setToast({ message: errorMsg, type: 'error' });
+      setImportResult(null);
+      
+      // Auto-hide error toast after 5 seconds
+      setTimeout(() => setToast(null), 5000);
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   const clearLogs = () => {
     setLogs([]);
     setImportResult(null);
-  };
-
-  const formatNumber = (num: number | undefined) => {
-    if (num === undefined) return '0';
-    return num.toLocaleString();
   };
 
   if (!isClient) return null;
@@ -240,14 +230,14 @@ const startImport = async () => {
           </div>
 
           <div className="p-6 space-y-6">
-            {/* Import Mode Tabs */}
+            {/* Import Type Tabs */}
             <div>
               <label className="text-[10px] font-black uppercase text-gray-400 mb-2 block">Import Mode</label>
               <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
                 <button
-                  onClick={() => setImportMode('history')}
+                  onClick={() => setImportType('history')}
                   className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                    importMode === 'history'
+                    importType === 'history'
                       ? 'bg-white text-[#2076C7] shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
@@ -256,9 +246,9 @@ const startImport = async () => {
                   History Mode
                 </button>
                 <button
-                  onClick={() => setImportMode('daily')}
+                  onClick={() => setImportType('daily')}
                   className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                    importMode === 'daily'
+                    importType === 'daily'
                       ? 'bg-white text-[#2076C7] shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
@@ -270,9 +260,9 @@ const startImport = async () => {
               
               {/* Mode description */}
               <p className="mt-2 text-xs text-gray-500">
-                {importMode === 'history' 
-                  ? '📊 History mode: Updates share master and complete price history (29,850 rows)'
-                  : '📈 Daily mode: Updates only daily prices (156 rows)'}
+                {importType === 'history' 
+                  ? '📊 History mode: Updates share master and price history with soft delete'
+                  : '📈 Daily mode: Updates only daily prices without soft delete'}
               </p>
             </div>
 
@@ -316,48 +306,6 @@ const startImport = async () => {
               </div>
             )}
 
-            {/* Import Result Summary */}
-            {importResult && importResult.success && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-blue-50 border border-blue-200 rounded-xl"
-              >
-                <h4 className="font-bold text-blue-700 mb-2 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" />
-                  Import Summary
-                </h4>
-                <div className="space-y-2 text-sm">
-                  <p className="text-gray-600 flex justify-between">
-                    <span className="font-medium">Status:</span>
-                    <span className="text-green-600">Successful</span>
-                  </p>
-                  <p className="text-gray-600 flex justify-between">
-                    <span className="font-medium">Mode:</span>
-                    <span className="capitalize">{importResult.mode || importMode}</span>
-                  </p>
-                  <p className="text-gray-600 flex justify-between">
-                    <span className="font-medium">Rows Processed:</span>
-                    <span className="font-bold text-blue-600">{formatNumber(importResult.rowsProcessed)}</span>
-                  </p>
-                  <p className="text-gray-600 flex justify-between">
-                    <span className="font-medium">Rows Skipped:</span>
-                    <span className={importResult.rowsSkipped ? 'text-orange-600' : 'text-green-600'}>
-                      {formatNumber(importResult.rowsSkipped)}
-                    </span>
-                  </p>
-                  {importResult.applySoftDelete !== undefined && (
-                    <p className="text-gray-600 flex justify-between">
-                      <span className="font-medium">Soft Delete Applied:</span>
-                      <span className={importResult.applySoftDelete ? 'text-orange-600' : 'text-gray-600'}>
-                        {importResult.applySoftDelete ? 'Yes' : 'No'}
-                      </span>
-                    </p>
-                  )}
-                </div>
-              </motion.div>
-            )}
-
             {/* Progress Bar */}
             {progress.percent > 0 && (
               <div className="space-y-2">
@@ -389,30 +337,10 @@ const startImport = async () => {
               ) : (
                 <>
                   <Zap className="w-4 h-4" />
-                  Import file ({importMode === 'history' ? 'History' : 'Daily'} mode)
+                  Import file ({importType === 'history' ? 'History' : 'Daily'} mode)
                 </>
               )}
             </button>
-
-            {/* Logs Section */}
-            {logs.length > 0 && (
-              <div className="mt-4 border-t pt-4">
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Activity Log</h4>
-                  <button 
-                    onClick={clearLogs}
-                    className="text-xs text-gray-400 hover:text-gray-600"
-                  >
-                    Clear
-                  </button>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-3 max-h-32 overflow-y-auto text-xs font-mono">
-                  {logs.map((log, idx) => (
-                    <div key={idx} className="text-gray-600 py-0.5">{log}</div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </motion.div>
 
