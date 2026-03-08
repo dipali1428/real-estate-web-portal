@@ -12,13 +12,13 @@ import {
   Zap,
   Loader2,
   Database,
-  ChevronLeft,
-  Activity,
   Download,
   CheckCircle,
   AlertCircle,
   RefreshCw,
-  Package
+  Package,
+  History,
+  Clock
 } from "lucide-react";
 
 const ImportExportAdmin: React.FC = () => {
@@ -26,12 +26,18 @@ const ImportExportAdmin: React.FC = () => {
 
   // States
   const [file, setFile] = useState<File | null>(null);
-  const [importType, setImportType] = useState('shares_history');
+  const [importType, setImportType] = useState<'history' | 'daily'>('history');
   const [isImporting, setIsImporting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState({ percent: 0, status: 'Waiting...' });
   const [logs, setLogs] = useState<string[]>([]);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [importResult, setImportResult] = useState<{
+    rowsProcessed?: number;
+    rowsSkipped?: number;
+    mode?: string;
+    applySoftDelete?: boolean;
+  } | null>(null);
   
   const [isClient, setIsClient] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -86,7 +92,7 @@ const ImportExportAdmin: React.FC = () => {
     }
   };
 
-  // --- IMPORT LOGIC ---
+  // --- IMPORT LOGIC WITH MODE SELECTION ---
   const startImport = async () => {
     if (!file) {
       setToast({ message: 'Please select a file first', type: 'error' });
@@ -96,32 +102,49 @@ const ImportExportAdmin: React.FC = () => {
     
     setIsImporting(true);
     setProgress({ percent: 30, status: 'Processing...' });
-    setToast({ message: 'Importing file...', type: 'info' });
-    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] Starting import of ${file.name}...`]);
+    setToast({ message: `Importing file with ${importType} mode...`, type: 'info' });
+    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] Starting ${importType} import of ${file.name}...`]);
+    setImportResult(null);
     
     try {
-      // Always use shares_history since that's the only option
-      const response = await (AdminService as any).uploadSharesWithHistory(file);
+      let response;
+      
+      if (importType === 'history') {
+        // Call history mode API
+        response = await AdminService.uploadSharesWithHistoryMode(file);
+      } else {
+        // Call daily mode API
+        response = await AdminService.uploadSharesWithDailyMode(file);
+      }
       
       setProgress({ percent: 100, status: 'Completed' });
       
+      // Store import result for display
+      setImportResult({
+        rowsProcessed: response.rowsProcessed,
+        rowsSkipped: response.rowsSkipped,
+        mode: response.mode,
+        applySoftDelete: response.applySoftDelete
+      });
+      
       // Success message
-      const successMsg = '✓ File imported successfully';
+      const successMsg = `✓ File imported successfully in ${importType} mode (${response.rowsProcessed} rows processed)`;
       setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${successMsg}`]);
       setToast({ message: successMsg, type: 'success' });
       
-      // Clear file after successful import
+      // Clear file after successful import (delayed)
       setTimeout(() => {
         setFile(null);
         setProgress({ percent: 0, status: 'Waiting...' });
-        setToast(null); // Clear toast after file is cleared
-      }, 2000);
+        setToast(null);
+      }, 3000);
       
     } catch (err: any) {
-      const errorMsg = `✗ Import failed: ${err.message}`;
+      const errorMsg = `✗ Import failed: ${err.response?.data?.message || err.message}`;
       setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${errorMsg}`]);
       setProgress({ percent: 0, status: 'Failed' });
       setToast({ message: errorMsg, type: 'error' });
+      setImportResult(null);
       
       // Auto-hide error toast after 5 seconds
       setTimeout(() => setToast(null), 5000);
@@ -132,6 +155,7 @@ const ImportExportAdmin: React.FC = () => {
 
   const clearLogs = () => {
     setLogs([]);
+    setImportResult(null);
   };
 
   if (!isClient) return null;
@@ -146,20 +170,12 @@ const ImportExportAdmin: React.FC = () => {
         className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white shadow-md flex justify-between items-center"
       >
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
               <Database className="w-6 h-6" /> Data Portal
             </h2>
-            <p className="text-sm opacity-90">Import share data & export shares master</p>
+            <p className="text-sm opacity-90">Import & export shares data</p>
           </div>
-        </div>
-        <div className="flex gap-2">
-          <span className="px-3 py-1.5 bg-emerald-500/20 text-emerald-100 text-[10px] font-black uppercase tracking-widest rounded-lg border border-emerald-200/30 flex items-center gap-1">
-            <Activity className="w-3 h-3" /> System Live
-          </span>
         </div>
       </motion.div>
 
@@ -214,15 +230,41 @@ const ImportExportAdmin: React.FC = () => {
           </div>
 
           <div className="p-6 space-y-6">
-              {/* Import Type */}
-              <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-2 block">Import Type</label>
-                  <div className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-700 font-medium">
-                      Shares with History (CSV)
-                  </div>
-                  {/* Hidden input to maintain the value */}
-                  <input type="hidden" name="importType" value="shares_history" />
+            {/* Import Type Tabs */}
+            <div>
+              <label className="text-[10px] font-black uppercase text-gray-400 mb-2 block">Import Mode</label>
+              <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
+                <button
+                  onClick={() => setImportType('history')}
+                  className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                    importType === 'history'
+                      ? 'bg-white text-[#2076C7] shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <History className="w-4 h-4" />
+                  History Mode
+                </button>
+                <button
+                  onClick={() => setImportType('daily')}
+                  className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                    importType === 'daily'
+                      ? 'bg-white text-[#2076C7] shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Clock className="w-4 h-4" />
+                  Daily Mode
+                </button>
               </div>
+              
+              {/* Mode description */}
+              <p className="mt-2 text-xs text-gray-500">
+                {importType === 'history' 
+                  ? '📊 History mode: Updates share master and price history with soft delete'
+                  : '📈 Daily mode: Updates only daily prices without soft delete'}
+              </p>
+            </div>
 
             {/* File Upload Area */}
             {!file ? (
@@ -239,7 +281,7 @@ const ImportExportAdmin: React.FC = () => {
                   type="file" 
                   ref={fileInputRef} 
                   onChange={(e) => setFile(e.target.files?.[0] || null)} 
-                  accept=".csv, .xlsx, .pdf" 
+                  accept=".csv, .xlsx, .xls" 
                   hidden 
                 />
               </div>
@@ -295,7 +337,7 @@ const ImportExportAdmin: React.FC = () => {
               ) : (
                 <>
                   <Zap className="w-4 h-4" />
-                  Execute Import
+                  Import file ({importType === 'history' ? 'History' : 'Daily'} mode)
                 </>
               )}
             </button>
@@ -322,7 +364,7 @@ const ImportExportAdmin: React.FC = () => {
                 <Package className="w-10 h-10" />
               </div>
               
-              <h4 className="text-xl font-bold text-gray-800 mb-2">Shares Master Export</h4>
+              <h4 className="text-xl font-bold text-gray-800 mb-2">Shares Export Data</h4>
               <p className="text-sm text-gray-500 mb-8 max-w-md mx-auto">
                 Download complete list of all shares with current prices, lot sizes, and depository information for auditing purposes.
               </p>
@@ -340,7 +382,7 @@ const ImportExportAdmin: React.FC = () => {
                 ) : (
                   <>
                     <Download className="w-4 h-4" />
-                    Download Shares CSV
+                    Download File
                   </>
                 )}
               </button>

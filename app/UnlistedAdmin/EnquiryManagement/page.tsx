@@ -711,10 +711,6 @@ const fetchEnquiries = async () => {
               Buy: {getTypeCount('buy')} | Sell: {getTypeCount('sell')}
             </span>
           </div>
-          <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            Export
-          </button>
         </div>
 
         {/* Enquiries Table - Actions always visible */}

@@ -159,13 +159,13 @@ const CustomerService = {
 
     // ==================== COMPANIES ====================
     getAllCompanies: async () => {
-        const response = await api.get("/api/unlisted/user/shares");
+        const response = await api.get("/api/unlisted/public/shares");
         return response.data;
     },
 
     // ==================== USER SHARES ====================
     getUserShares: async () => {
-        const response = await api.get("/api/unlisted/user/shares");
+        const response = await api.get("/api/unlisted/public/shares");
         return response.data;
     },
 
