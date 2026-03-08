@@ -18,7 +18,7 @@ const AboutSection = () => {
             name: "Mr. K Krishna",
             title: "Regional Director, Hyderabad ",
             description: "K Krishna brings 18+ years of banking experience, driving strategic growth, operational excellence, and revenue expansion through high-performing teams and strong client-focused strategies.",
-            image: "/leader/K-krishna.jpeg"
+            image: "/leader/K-Krishna.jpeg"
         },
         {
             name: "Dr. Sanjay Shaha",
@@ -70,7 +70,7 @@ const AboutSection = () => {
         },
         {
             name: "Mr. Pravin Rautray",
-            title: "Business Head (Moshi PCMC Branch )",
+            title: "Business Head (Moshi Branch )",
             description: "Mr. Pravin Rautray drives growth across Loans and Insurance with a strong track record in building high-performing teams, expanding market reach, and delivering strategic, customer-focused revenue growth.",
             image: "/leader/Pravin-Rautray.jpeg"
         },
