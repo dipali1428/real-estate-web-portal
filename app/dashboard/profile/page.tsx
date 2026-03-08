@@ -544,35 +544,35 @@ export default function ProfileSection() {
                             <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
                                 <div className="flex items-center justify-between mb-8">
                                     <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2"><ShieldCheck className="text-[#1CADA3]" size={20} /> KYC Verification</h3>
-                                    {!isKycEditing && <button onClick={() => setIsKycEditing(true)} className="text-[10px] font-black uppercase text-[#1CADA3] flex items-center gap-1"><Pencil size={12} /> Edit KYC</button>}
+                                    {!isKycEditing && <button onClick={() => setIsKycEditing(true)} className="text-[12px] font-black uppercase text-[#1CADA3] flex items-center gap-1"><Pencil size={14} /> Edit KYC</button>}
                                 </div>
                                 <div className="space-y-6">
                                     <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl space-y-3">
-                                        <div className="flex items-center justify-between"><p className="text-[8px] font-black text-slate-400 uppercase">PAN Card</p><span className={`text-[8px] font-black uppercase px-2 py-1 rounded-lg ${profile.pan_verified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>{profile.pan_verified ? "Verified" : "Pending"}</span></div>
+                                        <div className="flex items-center justify-between"><p className="text-[10px] font-black text-slate-400 uppercase">PAN Card</p><span className={`text-[8px] font-black uppercase px-2 py-1 rounded-lg ${profile.pan_verified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>{profile.pan_verified ? "Verified" : "Pending"}</span></div>
                                         {isKycEditing && !profile.pan_verified ? (
                                             <div className="space-y-3">
                                                 <input className="w-full text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2" placeholder="PAN Number" value={profile.pan} onChange={(e) => setProfile({ ...profile, pan: e.target.value.toUpperCase() })} />
                                                 <input className="w-full text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2" placeholder="Name as per PAN" value={profile.name_as_per_pan || ""} onChange={(e) => setProfile({ ...profile, name_as_per_pan: e.target.value.toUpperCase() })} />
                                                 <div className="flex gap-2"><input type="date" className="flex-1 text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2" value={profile.date_of_birth || ""} onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })} /><button onClick={handlePanVerification} className="bg-[#1CADA3] text-white px-4 py-2 rounded-xl text-[10px] font-bold">Verify</button></div>
                                             </div>
-                                        ) : <p className="text-[11px] font-bold text-slate-700">{profile.pan_verified ? maskPAN(profile.pan) : profile.pan || "NOT PROVIDED"}</p>}
+                                        ) : <p className="text-[13px] font-bold text-slate-700">{profile.pan_verified ? maskPAN(profile.pan) : profile.pan || "NOT PROVIDED"}</p>}
                                     </div>
                                     <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
-                                        <div className="flex items-center justify-between mb-2"><p className="text-[8px] font-black text-slate-400 uppercase">Aadhar Card</p><span className={`text-[8px] font-black uppercase px-2 py-1 rounded-lg ${aadhaarVerified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>{aadhaarVerified ? "Verified" : "Pending"}</span></div>
+                                        <div className="flex items-center justify-between mb-2"><p className="text-[10px] font-black text-slate-400 uppercase">Aadhar Card</p><span className={`text-[8px] font-black uppercase px-2 py-1 rounded-lg ${aadhaarVerified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>{aadhaarVerified ? "Verified" : "Pending"}</span></div>
                                         {isKycEditing && !aadhaarVerified ? (
                                             <div className="flex flex-col gap-2">
                                                 <div className="flex gap-2"><input className="flex-1 text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2" value={profile.aadhaar || ""} onChange={(e) => setProfile({ ...profile, aadhaar: e.target.value })} placeholder="12 digit Aadhaar" maxLength={12} /><button onClick={handleRequestAadhaarOtp} className="bg-[#1CADA3] text-white px-4 py-2 rounded-xl text-[10px] font-bold">Get OTP</button></div>
                                                 {aadhaarOtpSent && <div className="flex gap-2"><input placeholder="OTP" value={aadhaarOtpInput} onChange={(e) => setAadhaarOtpInput(e.target.value)} className="flex-1 text-gray-700 text-[11px] font-bold px-3 py-2 rounded-lg border border-[#1CADA3] outline-none" /><button onClick={handleVerifyAadhaarOtp} className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold">Verify</button></div>}
                                             </div>
                                         ) : (
-                                            <p className="text-[11px] font-bold text-slate-700">{profile.aadhaar ? maskAadhaar(profile.aadhaar) : "NOT PROVIDED"}</p>
+                                            <p className="text-[13px] font-bold text-slate-700">{profile.aadhaar ? maskAadhaar(profile.aadhaar) : "NOT PROVIDED"}</p>
                                         )}
                                     </div>
 
                                     {profile.pan_verified && aadhaarVerified && (
                                         <div className="mt-4">
                                             {panAadhaarLinked === true ? (
-                                                <div className="flex items-center gap-2 p-3.5 bg-emerald-50 border border-emerald-100 rounded-2xl text-emerald-700 text-[10px] font-bold">
+                                                <div className="flex items-center gap-2 p-3.5 bg-emerald-50 border border-emerald-100 rounded-2xl text-emerald-700 text-[12px] font-bold">
                                                     <CheckCircle2 size={14} className="text-emerald-500" /> PAN Aadhaar is linked
                                                 </div>
                                             ) : (
@@ -591,13 +591,13 @@ export default function ProfileSection() {
 
                                     <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex items-center justify-between">
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-1"><p className="text-[8px] font-black text-slate-400 uppercase">GST Registration</p><span className="text-[7px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full font-bold">Optional</span></div>
-                                            {isKycEditing ? <div className="flex gap-2"><input className="text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2 w-full" value={profile.gst_number || ""} onChange={(e) => setProfile({ ...profile, gst_number: e.target.value.toUpperCase() })} placeholder="GST Number" /><button onClick={handleGstVerification} className="bg-[#1CADA3] text-white px-4 py-2 rounded-xl text-[10px] font-bold">Verify</button></div> : <p className="text-[11px] font-bold text-slate-700">{profile.gst_number ? maskGST(profile.gst_number) : 'NOT LINKED'}</p>}
+                                            <div className="flex items-center gap-2 mb-1"><p className="text-[10px] font-black text-slate-400 uppercase">GST Registration</p><span className="text-[7px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full font-bold">Optional</span></div>
+                                            {isKycEditing ? <div className="flex gap-2"><input className="text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2 w-full" value={profile.gst_number || ""} onChange={(e) => setProfile({ ...profile, gst_number: e.target.value.toUpperCase() })} placeholder="GST Number" /><button onClick={handleGstVerification} className="bg-[#1CADA3] text-white px-4 py-2 rounded-xl text-[10px] font-bold">Verify</button></div> : <p className="text-[13px] font-bold text-slate-700">{profile.gst_number ? maskGST(profile.gst_number) : 'NOT LINKED'}</p>}
                                         </div>
                                         <span className={`ml-4 text-[8px] font-black uppercase px-2 py-1 rounded-lg ${gstVerified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>{gstVerified ? "Verified" : "Pending"}</span>
                                     </div>
                                 </div>
-                                <div className="flex items-start gap-2 p-4 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 text-[10px] font-bold leading-relaxed">
+                                <div className="flex items-start gap-2 p-4 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 text-[12px] font-bold leading-relaxed">
                                     <AlertCircle size={14} className="mt-0.5 shrink-0 text-amber-500" />
                                     <span>Note: GST verification is mandatory if total payout exceeds ₹20 lakh in a financial year.</span>
                                 </div>
@@ -712,7 +712,7 @@ export default function ProfileSection() {
 
                                     <div><p className="text-[8px] font-black text-slate-400 uppercase">Phone Number</p><p className="text-xs font-bold text-slate-700">+91 {profile.mobile}</p></div>
                                     <div><p className="text-[8px] font-black text-slate-400 uppercase">Registered Email</p><p className="text-xs font-bold text-slate-700 truncate">{profile.email}</p></div>
-                                    <div className="col-span-2"><p className="text-[8px] font-black text-slate-400 uppercase">Bank Account</p><p className="text-xs font-bold text-slate-700 truncate">{profile.bank_name} - {maskAccount(profile.bank_account || "")}</p></div>
+                                    {/* <div className="col-span-2"><p className="text-[8px] font-black text-slate-400 uppercase">Bank Account</p><p className="text-xs font-bold text-slate-700 truncate">{profile.bank_name} - {maskAccount(profile.bank_account || "")}</p></div> */}
                                 </div>
                                 <div className="pt-4 border-t border-slate-50">
                                     <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-2">Update Password</label>
