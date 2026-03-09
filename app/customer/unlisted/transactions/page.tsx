@@ -731,18 +731,6 @@ export default function TransactionsPage() {
         </div>
       </div>
 
-      {/* Footer Note */}
-      <div className="mt-6 text-xs text-gray-400 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <RefreshCw size={14} className="animate-spin-slow" />
-          <span>Auto-updates every 60 seconds</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Clock size={14} />
-          <span>Last updated: {lastUpdated || 'Just now'}</span>
-        </div>
-      </div>
-
       {/* Custom Animation */}
       <style jsx>{`
         @keyframes fadeIn {

@@ -159,15 +159,15 @@ const UserDashboard: React.FC = () => {
   // ========== LOADING STATE ==========
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center p-4">
+        <div className="text-center w-full max-w-sm mx-auto">
           <div className="relative">
-            <div className="w-20 h-20 border-4 border-[#2076C7]/20 border-t-[#2076C7] rounded-full animate-spin mx-auto"></div>
+            <div className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-[#2076C7]/20 border-t-[#2076C7] rounded-full animate-spin mx-auto"></div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-10 h-10 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full animate-pulse"></div>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full animate-pulse"></div>
             </div>
           </div>
-          <p className="text-gray-600 font-medium mt-6 animate-pulse">Loading your dashboard...</p>
+          <p className="text-gray-600 font-medium mt-4 sm:mt-6 animate-pulse text-sm sm:text-base">Loading your dashboard...</p>
           <p className="text-xs text-gray-400 mt-2">Fetching your investment data</p>
         </div>
       </div>
@@ -178,23 +178,23 @@ const UserDashboard: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 text-center border border-red-100">
-          <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <AlertCircle className="w-10 h-10 text-red-500" />
+        <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 sm:p-8 text-center border border-red-100">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+            <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-red-500" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">Unable to Load Dashboard</h3>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">Unable to Load Dashboard</h3>
+          <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">{error}</p>
           <div className="space-y-3">
             <button 
               onClick={() => window.location.reload()}
-              className="w-full py-3 px-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-semibold rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-semibold rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
             >
               <RefreshCw size={18} />
               Retry Connection
             </button>
             <button 
               onClick={handleLogout}
-              className="w-full py-3 px-4 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all"
+              className="w-full py-3 px-4 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all text-sm sm:text-base"
             >
               Back to Login
             </button>
@@ -208,90 +208,90 @@ const UserDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         
         {/* Welcome Section */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-sm font-medium text-[#2076C7] bg-blue-50 px-3 py-1 rounded-full">
+              <span className="text-xs sm:text-sm font-medium text-[#2076C7] bg-blue-50 px-2 sm:px-3 py-1 rounded-full">
                 {greeting}!
               </span>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-              Welcome back, {userName}!
-              <span className="text-base font-normal text-gray-500 ml-2 hidden sm:inline">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <span>Welcome back, {userName}!</span>
+              <span className="text-xs sm:text-sm font-normal text-gray-500 sm:ml-2 hidden xs:inline">
                 Ready to grow your wealth?
               </span>
             </h2>
-            <p className="text-gray-600 mt-2 flex items-center gap-2">
-              <Sparkles size={16} className="text-[#2076C7]" />
-              Here's your complete investment overview and portfolio performance
+            <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 flex items-center gap-1 sm:gap-2">
+              <Sparkles size={14} className="text-[#2076C7] flex-shrink-0" />
+              <span className="truncate">Here's your complete investment overview</span>
             </p>
           </div>
           
-          {/* Quick Stats Pills */}
-          <div className="flex items-center gap-2 mt-4 md:mt-0">
-            <div className="bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm flex items-center gap-2">
-              <Target size={14} className="text-[#2076C7]" />
-              <span className="text-xs font-medium text-gray-700">Target: ₹10L</span>
+          {/* Quick Stats Pills - Hidden on very small screens */}
+          <div className="hidden xs:flex items-center gap-2 mt-3 sm:mt-0 overflow-x-auto pb-2 sm:pb-0">
+            <div className="bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-gray-200 shadow-sm flex items-center gap-1 sm:gap-2 flex-shrink-0">
+              <Target size={12} className="text-[#2076C7]" />
+              <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Target: ₹10L</span>
             </div>
-            <div className="bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm flex items-center gap-2">
-              <Award size={14} className="text-amber-500" />
-              <span className="text-xs font-medium text-gray-700">Silver Tier</span>
+            <div className="bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-gray-200 shadow-sm flex items-center gap-1 sm:gap-2 flex-shrink-0">
+              <Award size={12} className="text-amber-500" />
+              <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Silver Tier</span>
             </div>
           </div>
         </div>
 
-        {/* Stats Grid - From your API */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Stats Grid - Stack on mobile */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           
           {/* Total Invested Card */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-bl-full -mr-5 -mt-5 opacity-50 group-hover:opacity-70 transition-opacity"></div>
-            <div className="flex justify-between items-start mb-4">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <IndianRupee className="w-7 h-7 text-white" />
+          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-16 sm:w-20 h-16 sm:h-20 bg-blue-50 rounded-bl-full -mr-5 -mt-5 opacity-50 group-hover:opacity-70 transition-opacity"></div>
+            <div className="flex justify-between items-start mb-3 sm:mb-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <IndianRupee className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
               </div>
               <button 
                 onClick={() => setBalanceVisible(!balanceVisible)}
                 className="text-gray-400 hover:text-gray-600 transition-colors bg-white/80 backdrop-blur-sm p-1.5 rounded-lg"
               >
-                {balanceVisible ? <Eye size={18} /> : <EyeOff size={18} />}
+                {balanceVisible ? <Eye size={16} className="sm:w-[18px] sm:h-[18px]" /> : <EyeOff size={16} className="sm:w-[18px] sm:h-[18px]" />}
               </button>
             </div>
-            <p className="text-sm font-medium text-gray-500 mb-1 flex items-center gap-1">
-              <Wallet size={14} className="text-gray-400" />
+            <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1 flex items-center gap-1">
+              <Wallet size={12} className="sm:w-[14px] sm:h-[14px] text-gray-400" />
               Total Invested
             </p>
-            <p className="text-3xl font-black text-gray-900 mb-2">
+            <p className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 mb-2 break-words">
               {balanceVisible && dashboard ? formatCurrency(dashboard.total_invested) : '••••••'}
             </p>
-            <div className="flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full w-fit">
-              <TrendingUp size={14} />
-              <span className="font-semibold">+12.4% this month</span>
+            <div className="flex items-center gap-1 sm:gap-2 text-xs text-emerald-600 bg-emerald-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full w-fit">
+              <TrendingUp size={12} className="sm:w-[14px] sm:h-[14px]" />
+              <span className="font-semibold whitespace-nowrap">+12.4% this month</span>
             </div>
           </div>
 
           {/* Total Transactions Card */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-4">
-              <BarChart3 className="w-7 h-7 text-white" />
+          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-3 sm:mb-4">
+              <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
             </div>
-            <p className="text-sm font-medium text-gray-500 mb-1">Total Transactions</p>
-            <p className="text-3xl font-black text-gray-900 mb-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Total Transactions</p>
+            <p className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 mb-2 break-words">
               {dashboard ? parseInt(dashboard.total_transactions).toLocaleString() : '0'}
             </p>
             <p className="text-xs text-gray-500">Lifetime transactions</p>
           </div>
 
           {/* Pending Transactions Card */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 mb-4">
-              <RefreshCw className="w-7 h-7 text-white" />
+          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 sm:col-span-2 lg:col-span-1">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 mb-3 sm:mb-4">
+              <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
             </div>
-            <p className="text-sm font-medium text-gray-500 mb-1">Pending Transactions</p>
-            <p className="text-3xl font-black text-gray-900 mb-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Pending Transactions</p>
+            <p className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 mb-2 break-words">
               {dashboard ? parseInt(dashboard.pending_transactions).toLocaleString() : '0'}
             </p>
             <p className="text-xs text-gray-500">Awaiting confirmation</p>
@@ -299,46 +299,46 @@ const UserDashboard: React.FC = () => {
         </div>
 
         {/* Market Insights & Quick Links */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           
           {/* Market Overview */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <LineChart size={20} className="text-[#2076C7]" />
+          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 lg:col-span-2">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-1 sm:gap-2">
+                <LineChart size={16} className="sm:w-[20px] sm:h-[20px] text-[#2076C7]" />
                 Market Overview
               </h3>
-              <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full flex items-center gap-1">
-                <TrendingUp size={12} />
+              <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full flex items-center gap-1 whitespace-nowrap">
+                <TrendingUp size={10} className="sm:w-[12px] sm:h-[12px]" />
                 +5.39% YTD
               </span>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <p className="text-xs text-gray-500 mb-1">Unlisted Index</p>
-                <p className="text-xl font-bold text-gray-900">₹2,010.17</p>
+                <p className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">₹2,010.17</p>
                 <p className="text-xs text-emerald-600 font-medium mt-1">+5.2% this month</p>
               </div>
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4">
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <p className="text-xs text-gray-500 mb-1">Total Volume</p>
-                <p className="text-xl font-bold text-gray-900">₹2.8K Cr</p>
+                <p className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">₹2.8K Cr</p>
                 <p className="text-xs text-gray-500 font-medium mt-1">24h volume</p>
               </div>
             </div>
             
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                    <Flame size={16} className="text-amber-600" />
+            <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">
+              <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 xs:gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <Flame size={12} className="sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-amber-600" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-medium text-gray-500">Trending</p>
-                    <p className="text-sm font-bold text-gray-900">Zepto, OYO, PharmEasy</p>
+                    <p className="text-xs sm:text-sm font-bold text-gray-900 truncate">Zepto, OYO, PharmEasy</p>
                   </div>
                 </div>
-                <Link href="/customer/unlisted/companies" className="text-xs text-[#2076C7] font-semibold hover:underline">
+                <Link href="/customer/unlisted/companies" className="text-xs text-[#2076C7] font-semibold hover:underline whitespace-nowrap ml-auto xs:ml-0">
                   View all
                 </Link>
               </div>
@@ -346,58 +346,48 @@ const UserDashboard: React.FC = () => {
           </div>
           
           {/* Quick Stats */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <BarChart3 size={20} className="text-[#2076C7]" />
+          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-1 sm:gap-2">
+              <BarChart3 size={16} className="sm:w-[20px] sm:h-[20px] text-[#2076C7]" />
               Quick Stats
             </h3>
             
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <Building size={16} className="text-blue-600" />
+            <div className="space-y-2 sm:space-y-3">
+              <div className="flex items-center justify-between p-2 sm:p-3 hover:bg-gray-50 rounded-lg sm:rounded-xl transition-colors">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <Building size={12} className="sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-blue-600" />
                   </div>
-                  <span className="text-sm text-gray-700">Active Investments</span>
+                  <span className="text-xs sm:text-sm text-gray-700 truncate">Active Investments</span>
                 </div>
-                <span className="font-bold text-gray-900">3</span>
+                <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">3</span>
               </div>
               
-              <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                    <Leaf size={16} className="text-emerald-600" />
+              <div className="flex items-center justify-between p-2 sm:p-3 hover:bg-gray-50 rounded-lg sm:rounded-xl transition-colors">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                    <Leaf size={12} className="sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-emerald-600" />
                   </div>
-                  <span className="text-sm text-gray-700">Diversification</span>
+                  <span className="text-xs sm:text-sm text-gray-700 truncate">Diversification</span>
                 </div>
-                <span className="font-bold text-gray-900">4 sectors</span>
+                <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">4 sectors</span>
               </div>
               
-              <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                    <Users size={16} className="text-purple-600" />
+              <div className="flex items-center justify-between p-2 sm:p-3 hover:bg-gray-50 rounded-lg sm:rounded-xl transition-colors">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+                    <Users size={12} className="sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-purple-600" />
                   </div>
-                  <span className="text-sm text-gray-700">Referrals</span>
+                  <span className="text-xs sm:text-sm text-gray-700 truncate">Referrals</span>
                 </div>
-                <span className="font-bold text-gray-900">2</span>
+                <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">2</span>
               </div>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-gray-100">
-              <Link 
-                href="/customer/unlisted/portfolio"
-                className="flex items-center justify-between text-[#2076C7] hover:text-[#1CADA3] font-semibold text-sm group"
-              >
-                View detailed portfolio
-                <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
             </div>
           </div>
         </div>
 
         {/* Last Updated Info */}
-        <div className="text-center text-xs text-gray-400">
+        <div className="text-center text-xs text-gray-400 mt-4 sm:mt-6">
           <span>Last updated: {lastUpdated || 'Just now'}</span>
         </div>
       </main>
@@ -410,6 +400,24 @@ const UserDashboard: React.FC = () => {
         }
         .animate-spin-slow {
           animation: spin-slow 3s linear infinite;
+        }
+        /* Custom breakpoint for extra small devices */
+        @media (min-width: 480px) {
+          .xs\\:inline {
+            display: inline;
+          }
+          .xs\\:flex {
+            display: flex;
+          }
+          .xs\\:flex-row {
+            flex-direction: row;
+          }
+          .xs\\:items-center {
+            align-items: center;
+          }
+          .xs\\:ml-0 {
+            margin-left: 0;
+          }
         }
       `}</style>
     </div>
