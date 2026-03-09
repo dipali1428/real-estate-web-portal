@@ -98,187 +98,245 @@ const ContactSection = () => {
     "Hyderabad", "Indore", "Surat", "Lucknow"
   ];
   return (
-    <section id="contact" className="bg-gray-50 pt-8">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-            Get In Touch
-          </h2>
-          <p className="text-gray-600">
-            We are here to help, contact us for a free consultation.
-          </p>
+<section id="contact" className="bg-white pt-12 pb-20">
+  <div className="container mx-auto px-4">
+
+    {/* Heading */}
+    <div className="text-center mb-14">
+      <h2 className="text-3xl md:text-4xl font-extrabold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+        Get In Touch
+      </h2>
+      <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-6"></div>
+
+      <p className="text-gray-600 text-lg">
+        We are here to help, contact us for a free consultation.
+      </p>
+    </div>
+
+
+    {/* CONTACT CARDS */}
+    <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+
+      {/* Call Us */}
+      <div className="bg-white rounded-2xl shadow-md p-8 text-center hover:shadow-lg transition">
+
+        <div className="w-16 h-16 mx-auto mb-4 bg-[#1CADA3]/10 rounded-2xl flex items-center justify-center">
+          <Phone className="w-7 h-7 text-[#1CADA3]" />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          <div>
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Our Address</h3>
-            <div className="space-y-4 mb-6">
-              <div className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-blue-600 mt-1 shrink-0" />
-                <p className="text-gray-600">
-                  1001 & 1201, 7 Business Square by Naiknavare,
-                  Ganeshkhind Rd, Near Datta Mandir, Model Colony,
-                  Shivajinagar, Pune, Maharashtra 411016
-                </p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-blue-600" />
-                <p className="text-gray-600">1800-532-7600</p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-blue-600" />
-                <p className="text-gray-600">info@infinityarthvishva.com</p>
-              </div>
-            </div>
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          Call Us
+        </h3>
 
-            {/* <div className="rounded-lg h-64 overflow-hidden">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3782.567683154472!2d73.83634507516995!3d18.543631682537887!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2c06cb7e90001%3A0x2c2f8f5e4e4e4e4e!2s7%20Business%20Square%20by%20Naiknavare%2C%20Ganeshkhind%20Road!5e0!3m2!1sen!2sin!4v1699000000000!5m2!1sen!2sin"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              // title="Office Location"
-              ></iframe>
-            </div> */}
-            <div className="rounded-lg h-64 overflow-hidden">
-              <iframe
-                src="https://www.google.com/maps?q=18.534151,73.839525&z=16&output=embed"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Office Location"
-              ></iframe>
-            </div>
+        <p className="text-[#1CADA3] font-semibold">
+          1800-532-7600
+        </p>
 
-          </div>
+        <p className="text-gray-500 text-sm mt-1">
+          Mon-Sat, 9 AM - 6 PM
+        </p>
 
-          {/* Right - Form */}
-          <div>
-            {!success ? (
-              <>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Send Us A Message</h3>
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Your Name"
-                    value={form.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
-                  />
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email Address"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
-                  />
-                  <input
-                    type="tel"
-                    name="phone"
-                    placeholder="Your Phone Number"
-                    value={form.phone}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900"
-                  />
-                  <textarea
-                    name="message"
-                    placeholder="Your Message"
-                    rows={4}
-                    value={form.message}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] placeholder:text-gray-500 text-gray-900 resize-none overflow-y-auto h-32"
-                  />
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-3 rounded font-semibold shadow-md hover:shadow-lg transition cursor-pointer">
-                    {loading ? "Sending..." : "Send Message"}
-                  </button>
-
-                  {error && <p className="text-red-600 text-sm font-medium mt-2">{error}</p>}
-                </form>
-              </>
-            ) : (
-              <div className="text-center py-10">
-                <h3 className="text-2xl font-semibold text-[#1CADA3] mb-3">Enquiry Received Successfully!</h3>
-                <p className="text-gray-700 text-base">
-                  Thank you for reaching out to <b>Infinity Arthvishva</b>.<br />
-                  Our team has received your enquiry and will contact you shortly.<br />
-                  We have also sent your <strong>Enquiry ID</strong> and additional details to your registered email address.
-                </p>
-              </div>
-            )}
-          </div>
-
-        </div>
       </div>
 
-      <section className="relative py-20 overflow-hidden rounded-2xl">
-        <div className="relative container mx-auto px-6 text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: -30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-            Our Pan-India Presence
-          </motion.h2>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-gray-700 max-w-2xl mx-auto mb-10 text-lg leading-relaxed">
-            With branches across <span className="font-semibold text-green-500">20+ cities</span>, Infinity Arthvishva is empowering clients nationwide through trusted financial solutions.
-          </motion.p>
+      {/* Email Us */}
+      <div className="bg-white rounded-2xl shadow-md p-8 text-center hover:shadow-lg transition">
 
-          {/* Cities grid */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            variants={{
-              hidden: { opacity: 0, scale: 0.9 },
-              visible: {
-                opacity: 1,
-                scale: 1,
-                transition: { staggerChildren: 0.05 },
-              },
-            }}
-            className="flex flex-wrap justify-center gap-3">
-            {cities.map((city, i) => (
-              <motion.span
-                key={i}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 },
-                }}
-                whileHover={{
-                  scale: 1.1,
-                  color: "#22c55e", // Tailwind green-500
-                  textShadow: "0 0 10px rgba(34,197,94,0.5)",
-                }}
-                transition={{ type: "spring", stiffness: 300 }}
-                className="px-4 py-2 text-sm md:text-base text-gray-700 rounded-full cursor-pointer border border-gray-200 hover:text-green-500 transition-all duration-300">
-                {city}
-              </motion.span>
-            ))}
-          </motion.div>
+        <div className="w-16 h-16 mx-auto mb-4 bg-[#1CADA3]/10 rounded-2xl flex items-center justify-center">
+          <Mail className="w-7 h-7 text-[#1CADA3]" />
         </div>
-      </section>
 
-    </section>
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          Email Us
+        </h3>
+
+        <p className="text-[#1CADA3] font-semibold">
+          info@infinityarthvishva.com
+        </p>
+
+        <p className="text-gray-500 text-sm mt-1">
+          Response within 24 hours
+        </p>
+
+      </div>
+
+
+      {/* Visit Us */}
+      <div className="bg-white rounded-2xl shadow-md p-8 text-center hover:shadow-lg transition">
+
+        <div className="w-16 h-16 mx-auto mb-4 bg-[#1CADA3]/10 rounded-2xl flex items-center justify-center">
+          <MapPin className="w-7 h-7 text-[#1CADA3]" />
+        </div>
+
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          Visit Us
+        </h3>
+
+        <p className="text-[#1CADA3] font-semibold">
+          7 Business Square, Pune
+        </p>
+
+        <p className="text-gray-500 text-sm mt-1">
+          Shivajinagar, MH 411016
+        </p>
+
+      </div>
+
+    </div>
+
+
+    {/* EXISTING ADDRESS + MAP SECTION */}
+    <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+
+      {/* LEFT SIDE */}
+      <div>
+        <h3 className="text-2xl font-bold text-gray-800 mb-6">
+          Our Address
+        </h3>
+
+        <div className="space-y-6 mb-8">
+
+          {/* Address */}
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 rounded-xl flex items-center justify-center shrink-0">
+              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1CADA3]" />
+            </div>
+
+            <p className="text-gray-600 leading-relaxed">
+              1001 & 1201, 7 Business Square by Naiknavare,
+              Ganeshkhind Rd, Near Datta Mandir, Model Colony,
+              Shivajinagar, Pune, Maharashtra 411016
+            </p>
+          </div>
+
+
+          {/* Phone */}
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 rounded-xl flex items-center justify-center shrink-0">
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1CADA3]" />
+            </div>
+
+            <p className="text-gray-700 font-medium">
+              1800-532-7600
+            </p>
+          </div>
+
+
+          {/* Email */}
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 rounded-xl flex items-center justify-center shrink-0">
+              <Mail className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1CADA3]" />
+            </div>
+
+            <p className="text-gray-700 font-medium">
+              info@infinityarthvishva.com
+            </p>
+          </div>
+
+        </div>
+
+
+        {/* Map */}
+        <div className="rounded-xl overflow-hidden shadow-sm h-64">
+          <iframe
+            src="https://www.google.com/maps?q=18.534151,73.839525&z=16&output=embed"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Office Location"
+          ></iframe>
+        </div>
+
+      </div>
+
+         {/* RIGHT SIDE FORM */}
+ <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(28,173,163,0.15)] hover:shadow-[0_10px_35px_rgba(32,118,199,0.18)] transition-all duration-300">
+
+  {!success ? (
+    <>
+      <h3 className="text-2xl font-bold text-gray-800 mb-6">
+        Send Us A Message
+      </h3>
+
+      <form className="space-y-5" onSubmit={handleSubmit}>
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Your Name"
+          value={form.name}
+          onChange={handleChange}
+          required
+          className="w-full px-5 py-4 bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-[#1CADA3] focus:shadow-[0_0_10px_rgba(28,173,163,0.25)] text-gray-900 placeholder-gray-500 transition"
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email Address"
+          value={form.email}
+          onChange={handleChange}
+          required
+          className="w-full px-5 py-4 bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-[#1CADA3] focus:shadow-[0_0_10px_rgba(28,173,163,0.25)] text-gray-900 placeholder-gray-500 transition"
+        />
+
+        <input
+          type="tel"
+          name="phone"
+          placeholder="Your Phone Number"
+          value={form.phone}
+          onChange={handleChange}
+          required
+          className="w-full px-5 py-4 bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-[#1CADA3] focus:shadow-[0_0_10px_rgba(28,173,163,0.25)] text-gray-900 placeholder-gray-500 transition"
+        />
+
+        <textarea
+          name="message"
+          placeholder="Your Message"
+          rows={4}
+          value={form.message}
+          onChange={handleChange}
+          required
+          className="w-full px-5 py-4 bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-[#1CADA3] focus:shadow-[0_0_10px_rgba(28,173,163,0.25)] text-gray-900 placeholder-gray-500 resize-none h-32 transition"
+        ></textarea>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 rounded-xl font-semibold shadow-md hover:shadow-[0_6px_20px_rgba(28,173,163,0.4)] transition cursor-pointer"
+        >
+          {loading ? "Sending..." : "Send Message"}
+        </button>
+
+        {error && (
+          <p className="text-red-600 text-sm font-medium mt-2">
+            {error}
+          </p>
+        )}
+
+      </form>
+    </>
+  ) : (
+    <div className="text-center py-10">
+      <h3 className="text-2xl font-semibold text-[#1CADA3] mb-3">
+        Enquiry Received Successfully!
+      </h3>
+      <p className="text-gray-700 text-base">
+        Thank you for reaching out to <b>Infinity Arthvishva</b>.<br />
+        Our team has received your enquiry and will contact you shortly.<br />
+        We have also sent your <strong>Enquiry ID</strong> and additional details to your registered email address.
+      </p>
+    </div>
+  )}
+
+</div> 
+    </div>
+
+  </div>
+</section>
   )
 };
 

@@ -179,12 +179,14 @@ export default function HomeLoanPage() {
                                 transition={{ duration: 1, ease: "easeOut" }}
                                 className="w-full lg:w-1/2 flex items-center justify-center"
                             >
-                                <div className="relative w-full aspect-square max-w-[500px]">
+                                {/* Added overflow-hidden and rounded-3xl here */}
+                                <div className="relative w-full aspect-square max-w-[500px] rounded-3xl overflow-hidden">
                                     <Image
                                         src={heroImage}
                                         alt="Dream Home Loan"
                                         fill
-                                        className="object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-700"
+                                        /* Added rounded-3xl here as well */
+                                        className="object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-700 rounded-3xl"
                                         priority
                                     />
 

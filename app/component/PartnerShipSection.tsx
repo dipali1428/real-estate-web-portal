@@ -30,7 +30,7 @@ const PartnershipSection = () => {
   return (
     <section
       id="partner"
-      className="relative py-24 bg-linear-to-br from-[#E8F6FA] via-[#F0FAFB] to-[#E9F8F6] overflow-hidden">
+      className="relative py-24 bg-white overflow-hidden">
       {/* Decorative Background Blobs */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute w-72 h-72 bg-[#1CADA3]/10 rounded-full blur-3xl top-10 left-10 animate-pulse" />
