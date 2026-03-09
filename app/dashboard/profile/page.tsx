@@ -122,27 +122,27 @@ export default function ProfileSection() {
         } catch (err: any) { triggerPopup("Link verification failed", "error"); } finally { setVerifyingLink(false); }
     };
 
-    const handleSendEmailOtp = async () => {
-        if (!profile?.email) return triggerPopup("Email not found", "error");
-        let popupId: string;
-        try {
-            setVerifyingEmail(true); popupId = triggerPopup("Sending Email OTP...", "loading");
-            const res = await DashboardService.sendEmailOtp();
-            if (res.status === "success" || res.code === 200) { setEmailOtpSent(true); triggerPopup("OTP sent to your email!", "success", popupId); }
-            else triggerPopup(res.message || "Failed to send OTP", "error", popupId);
-        } catch (err: any) { triggerPopup("Error sending OTP", "error"); } finally { setVerifyingEmail(false); }
-    };
+    // const handleSendEmailOtp = async () => {
+    //     if (!profile?.email) return triggerPopup("Email not found", "error");
+    //     let popupId: string;
+    //     try {
+    //         setVerifyingEmail(true); popupId = triggerPopup("Sending Email OTP...", "loading");
+    //         const res = await DashboardService.sendEmailOtp();
+    //         if (res.status === "success" || res.code === 200) { setEmailOtpSent(true); triggerPopup("OTP sent to your email!", "success", popupId); }
+    //         else triggerPopup(res.message || "Failed to send OTP", "error", popupId);
+    //     } catch (err: any) { triggerPopup("Error sending OTP", "error"); } finally { setVerifyingEmail(false); }
+    // };
 
-    const handleVerifyEmailOtp = async () => {
-        if (emailOtpInput.length < 4) return triggerPopup("Please enter a valid OTP", "error");
-        let popupId: string;
-        try {
-            setVerifyingEmail(true); popupId = triggerPopup("Verifying Email...", "loading");
-            const res = await DashboardService.verifyEmailOtp({ otp: emailOtpInput });
-            if (res.status === "success" || res.code === 200) { setEmailVerified(true); setEmailOtpSent(false); setEmailOtpInput(""); await refreshProfileData(); triggerPopup("Email verified!", "success", popupId); }
-            else triggerPopup(res.message || "Invalid OTP", "error", popupId);
-        } catch (err: any) { triggerPopup("Verification failed", "error"); } finally { setVerifyingEmail(false); }
-    };
+    // const handleVerifyEmailOtp = async () => {
+    //     if (emailOtpInput.length < 4) return triggerPopup("Please enter a valid OTP", "error");
+    //     let popupId: string;
+    //     try {
+    //         setVerifyingEmail(true); popupId = triggerPopup("Verifying Email...", "loading");
+    //         const res = await DashboardService.verifyEmailOtp({ otp: emailOtpInput });
+    //         if (res.status === "success" || res.code === 200) { setEmailVerified(true); setEmailOtpSent(false); setEmailOtpInput(""); await refreshProfileData(); triggerPopup("Email verified!", "success", popupId); }
+    //         else triggerPopup(res.message || "Invalid OTP", "error", popupId);
+    //     } catch (err: any) { triggerPopup("Verification failed", "error"); } finally { setVerifyingEmail(false); }
+    // };
 
     const handlePanVerification = async () => {
         if (!profile?.pan || !profile?.name_as_per_pan || !profile?.date_of_birth) return triggerPopup("Please enter all PAN details", "error");
@@ -152,7 +152,7 @@ export default function ProfileSection() {
         try {
             setVerifyingPan(true); popupId = triggerPopup("Verifying PAN...", "loading");
             const res = await DashboardService.verifyPan({ pan: profile.pan, name_as_per_pan: profile.name_as_per_pan, date_of_birth: formattedDate });
-            if (res.status === "success" || res.code === 200) { await refreshProfileData(); triggerPopup("PAN verified!", "success", popupId); }
+            if (res.data.status === "valid" || res.code === 200) { await refreshProfileData(); triggerPopup("PAN verified!", "success", popupId); }
             else triggerPopup(res.message || "Failed", "error", popupId);
         } catch (err: any) { triggerPopup("Verification failed", "error"); } finally { setVerifyingPan(false); }
     };
@@ -189,13 +189,36 @@ export default function ProfileSection() {
 
     const handleBankVerification = async () => {
         if (!profile?.bank_account || !profile?.ifsc) return triggerPopup("Enter Account & IFSC", "error");
-        let popupId: string;
+        
+        // 1. Initialize popupId outside the try block so it's accessible in catch
+        let popupId: string | undefined; 
+    
         try {
-            setVerifyingBank(true); popupId = triggerPopup("Verifying bank...", "loading");
-            const res = await DashboardService.verifyBankDetails({ bank_account_number: profile.bank_account, ifsc_code: profile.ifsc, bank_name: profile.bank_name });
-            if (res.status === "success") { setBankVerified(true); await refreshProfileData(); triggerPopup("Bank Verified!", "success", popupId); }
-            else triggerPopup(res.message || "Failed", "error", popupId);
-        } catch (err: any) { triggerPopup("Unable to verify", "error"); } finally { setVerifyingBank(false); }
+            setVerifyingBank(true); 
+            popupId = triggerPopup("Verifying bank...", "loading");
+    
+            const res = await DashboardService.verifyBankDetails({ 
+                bank_account_number: profile.bank_account, 
+                ifsc_code: profile.ifsc, 
+                bank_name: profile.bank_name 
+            });
+    
+            if (res.status === "success") { 
+                setBankVerified(true); 
+                await refreshProfileData(); 
+                triggerPopup("Bank Verified!", "success", popupId); // Correctly uses popupId
+            } else {
+                triggerPopup(res.message || "Failed", "error", popupId); // Correctly uses popupId
+            }
+        } catch (err: any) {
+            console.error("Bank verification error:", err.response?.data?.message);
+            
+            // FIX: Added popupId here so the loading popup is replaced/closed
+            const errorMessage = err.response?.data?.message || "An unexpected error occurred";
+            triggerPopup(errorMessage, "error", popupId); 
+        } finally {
+            setVerifyingBank(false);
+        }
     };
 
     const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -525,18 +548,18 @@ export default function ProfileSection() {
                                 <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><Mail className="text-[#1CADA3]" size={18} /> Email Verification</h3>
                                 <div className="space-y-4">
                                     <div className="relative">
-                                        <input disabled value={profile.email} className="w-full px-4 py-3 rounded-xl font-bold text-slate-700 bg-slate-50 border-2 border-transparent pr-20 truncate" />
-                                        <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                        <input disabled value={profile.email} className="w-full px-4 py-3 rounded-xl font-bold text-slate-700 bg-slate-50 border-2 border-transparent pr-2 truncate" />
+                                        {/* <div className="absolute right-2 top-1/2 -translate-y-1/2">
                                             {emailVerified ? <span className="text-[9px] font-black uppercase px-2 py-1 bg-emerald-50 text-emerald-600 rounded-lg">Verified</span> : <span className="text-[9px] font-black uppercase px-2 py-1 bg-amber-50 text-amber-600 rounded-lg">Unverified</span>}
-                                        </div>
+                                        </div> */}
                                     </div>
-                                    {!emailVerified && !emailOtpSent && <button onClick={handleSendEmailOtp} className="w-full py-3 bg-[#1CADA3] text-white font-bold rounded-xl">Send Verification OTP</button>}
+                                    {/* {!emailVerified && !emailOtpSent && <button onClick={handleSendEmailOtp} className="w-full py-3 bg-[#1CADA3] text-white font-bold rounded-xl">Send Verification OTP</button>}
                                     {emailOtpSent && !emailVerified && (
                                         <div className="flex gap-2">
                                             <input placeholder="Enter OTP" value={emailOtpInput} onChange={(e) => setEmailOtpInput(e.target.value)} className="flex-1 px-4 py-3 border-2 border-[#1CADA3] rounded-xl font-bold" />
                                             <button onClick={handleVerifyEmailOtp} className="px-6 bg-emerald-600 text-white font-bold rounded-xl">Verify</button>
                                         </div>
-                                    )}
+                                    )} */}
                                 </div>
                             </div>
                         </div>

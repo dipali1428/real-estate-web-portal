@@ -2,112 +2,111 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { PublicService } from "../../services/publicService";
-import Link from "next/link";
 
 // Temporary Mock Response based on your actual API structure
-const MOCK_RESPONSE = {
-    "status": {
-        "code": 200,
-        "type": "success",
-        "message": "Request processed successfully."
-    },
-    "message": "Request processed successfully.",
-    "cibil_score": "750", // Directly added for easier access
-    "data": {
-        "request_id": 18,
-        "customer_id": 987654321,
-    },
-    "cibilPayload": {
-        "data": {
-            "GetCustomerAssetsResponse": {
-                "ResponseStatus": "Success",
-                "ResponseKey": "XXXXXXXXXXXXXXXXXX",
-                "GetCustomerAssetsSuccess": {
-                    "Asset": {
-                        "Status": "Active",
-                        "SafetyCheckFailure": false,
-                        "ExpirationDate": "2028-01-16T11:10:14.833+05:30",
-                        "CreationDate": "2026-01-16T11:10:14.833+05:30",
-                        "TrueLinkCreditReport": {
-                            "ReferenceKey": "XXXXXXXXXX",
-                            "currentversion": "5.0",
-                            "Borrower": {
-                                "CreditScore": {
-                                    "riskScore": "764",
-                                    "scoreName": "CIBILTransUnionScore3"
-                                }
-                            },
-                            "TradeLinePartition": [
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "HDFC BANK",
-                                        "currentBalance": "175419",
-                                        "GrantedTrade": { "amountPastDue": "0" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "HDFC BANK",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "0" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "MANAPPURAM",
-                                        "dateClosed": "2019-04-30+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "0" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "SBI",
-                                        "dateClosed": "2022-04-28+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "-1" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "SBI",
-                                        "dateClosed": "2016-11-30+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "-1" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "BAJAJ FIN LTD",
-                                        "dateClosed": "2021-05-21+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "0" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "SBI",
-                                        "dateClosed": "2011-02-27+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "-1" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "SBI",
-                                        "dateClosed": "2008-02-19+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "-1" }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        }
-    }
-};
+// const MOCK_RESPONSE = {
+//     "status": {
+//         "code": 200,
+//         "type": "success",
+//         "message": "Request processed successfully."
+//     },
+//     "message": "Request processed successfully.",
+//     "cibil_score": "750", // Directly added for easier access
+//     "data": {
+//         "request_id": 18,
+//         "customer_id": 987654321,
+//     },
+//     "cibilPayload": {
+//         "data": {
+//             "GetCustomerAssetsResponse": {
+//                 "ResponseStatus": "Success",
+//                 "ResponseKey": "XXXXXXXXXXXXXXXXXX",
+//                 "GetCustomerAssetsSuccess": {
+//                     "Asset": {
+//                         "Status": "Active",
+//                         "SafetyCheckFailure": false,
+//                         "ExpirationDate": "2028-01-16T11:10:14.833+05:30",
+//                         "CreationDate": "2026-01-16T11:10:14.833+05:30",
+//                         "TrueLinkCreditReport": {
+//                             "ReferenceKey": "XXXXXXXXXX",
+//                             "currentversion": "5.0",
+//                             "Borrower": {
+//                                 "CreditScore": {
+//                                     "riskScore": "764",
+//                                     "scoreName": "CIBILTransUnionScore3"
+//                                 }
+//                             },
+//                             "TradeLinePartition": [
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "HDFC BANK",
+//                                         "currentBalance": "175419",
+//                                         "GrantedTrade": { "amountPastDue": "0" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "HDFC BANK",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "0" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "MANAPPURAM",
+//                                         "dateClosed": "2019-04-30+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "0" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "SBI",
+//                                         "dateClosed": "2022-04-28+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "-1" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "SBI",
+//                                         "dateClosed": "2016-11-30+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "-1" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "BAJAJ FIN LTD",
+//                                         "dateClosed": "2021-05-21+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "0" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "SBI",
+//                                         "dateClosed": "2011-02-27+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "-1" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "SBI",
+//                                         "dateClosed": "2008-02-19+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "-1" }
+//                                     }
+//                                 }
+//                             ]
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// };
 
 const CreditScorePage: React.FC = () => {
     const [formData, setFormData] = useState({
