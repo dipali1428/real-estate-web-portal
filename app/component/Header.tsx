@@ -70,7 +70,9 @@ const Header = () => {
     { label: "Marine Insurance", href: "/products/marine-insurance" },
     { label: "Corporate Insurance", href: "/products/corporate-insurance" },
     { label: "Loan Protector", href: "/products/loan-protector" },
+    { label: "Pet Insurance", href: "/products/pet-insurance" },
   ];
+
 
   const mutualFundOptions = [
     { label: "Mutual Fund", href: "/products/mutual-funds" },
