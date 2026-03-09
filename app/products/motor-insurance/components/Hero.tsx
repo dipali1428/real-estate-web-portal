@@ -5,29 +5,36 @@ import { ShieldCheck, ArrowRight, Check, Star } from "lucide-react";
 
 export default function Hero() {
     return (
-        <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#2076C7]/5 via-white to-[#1CADA3]/5 pt-20 pb-10">
-            <div className="absolute inset-0 z-0">
-                <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-[#2076C7]/10 rounded-full blur-[100px]" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-[#1CADA3]/10 rounded-full blur-[100px]" />
-            </div>
-
+        <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-white pt-20 pb-10">
             <div className="container mx-auto px-4 md:px-6 relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
                     {/* Left Column: Marketing Copy */}
                     <motion.div
                         initial={{ opacity: 0, x: -30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="flex flex-col items-start -translate-y-8"
+                        className="flex flex-col items-start lg:-translate-y-8"
                     >
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-[#2076C7] font-medium text-sm mb-6">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 mt-6 rounded-full bg-blue-50 border border-blue-100 text-[#2076C7] font-medium text-sm mb-6 lg:mb-8">
                             <ShieldCheck size={16} />
                             <span>Trusted by 10 Lakhs+ Happy Customers</span>
                         </div>
 
-                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-transparent bg-clip-text inline-block">
-                            Save up to 50%* on <br />
-                            Motor Insurance
+                        <h1
+                            className="text-4xl sm:text-5xl md:text-6xl lg:text-[72px] font-bold mb-4 sm:mb-6 leading-tight"
+                            style={{
+                                background: "linear-gradient(to right, #2076C7, #1CADA3, #2076C7)",
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                                backgroundClip: "text",
+                            }}
+                        >
+                            <span className="whitespace-nowrap">
+                                Save up to 50%* on
+                            </span>
+                            <span className="block">
+                                Motor Insurance
+                            </span>
                         </h1>
 
                         <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed max-w-xl">
@@ -35,7 +42,7 @@ export default function Hero() {
                         </p>
 
 
-                        <div className="relative w-full max-w-xs h-48 md:h-[240px] animate-float hidden lg:block -translate-y-4 translate-x-12">
+                        <div className="relative w-full max-w-xs h-48 md:h-[240px] animate-float hidden lg:block translate-x-12 -translate-y-12">
                             <img
                                 src="/motor-insurance/hero.jpg"
                                 alt="Motor Insurance"
@@ -50,12 +57,13 @@ export default function Hero() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
-                        className="w-full max-w-lg lg:ml-auto -translate-y-20"
+                        className="w-full max-w-lg lg:ml-auto lg:-translate-y-12"
                     >
                         <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-8 border border-gray-100 relative overflow-hidden">
                             <h3 className="text-2xl font-bold text-gray-800 mb-6">Get Instant Quote</h3>
 
                             {/* Vehicle Registration Number Input */}
+                         {/* Vehicle Registration Number Input */}
                             <div className="relative mb-6">
                                 <fieldset className="border-2 border-[#2076C7] rounded-xl px-4 pb-2 pt-1 group focus-within:border-[#1CADA3] transition-colors">
                                     <legend className="text-[#2076C7] text-xs font-bold px-1 ml-2 group-focus-within:text-[#1CADA3]">
@@ -64,7 +72,7 @@ export default function Hero() {
                                     <input
                                         type="text"
                                         placeholder="E.G. MH01AA1234"
-                                        className="w-full bg-transparent border-none focus:ring-0 text-gray-800 font-bold text-xl uppercase placeholder:text-gray-300 placeholder:normal-case h-10"
+                                        className="w-full bg-transparent border-none focus:ring-0 outline-none text-gray-800 font-bold text-xl uppercase placeholder:text-gray-300 placeholder:normal-case h-10"
                                     />
                                 </fieldset>
                                 <div className="flex justify-between mt-2 px-1">
@@ -109,8 +117,6 @@ export default function Hero() {
                                     </span>
                                 </label>
                             </div>
-
-
                         </div>
                     </motion.div>
                 </div>
@@ -118,3 +124,4 @@ export default function Hero() {
         </section>
     );
 }
+                                                                                    

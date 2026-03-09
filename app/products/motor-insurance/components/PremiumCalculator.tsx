@@ -170,21 +170,25 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
     };
 
     return (
-        <section id="calculator" className="py-2 mb-2 bg-gradient-to-br from-[#2076C7]/10 via-white to-[#1CADA3]/10 text-gray-900 relative overflow-hidden">
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#2076C7]/5 rounded-full blur-[100px] z-0" />
-
+        <section id="calculator" className="py-12 bg-white text-gray-900 relative overflow-hidden">
             <div className="container mx-auto px-4 md:px-6 relative z-10">
-                <div className="text-center max-w-3xl mx-auto mb-4">
-                    <h2 className="text-2xl md:text-3xl font-bold mb-1 bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-transparent bg-clip-text inline-block">
+                <div className="text-center max-w-3xl mx-auto mb-8">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-2 capitalize bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Calculate Your Estimated Premium
                     </h2>
-                    <p className="text-gray-600 leading-relaxed text-sm">
-                        We&apos;ve designed our calculator to give you the most accurate estimates based on your vehicle details and coverage preferences.
-                    </p>
                 </div>
 
-                <div className="max-w-7xl mx-auto">
-                    <div className="bg-white border border-gray-300 rounded-[2rem] p-4 md:p-6 shadow-2xl relative overflow-hidden">
+                <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto border border-gray-200">
+                    <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 px-4 sm:px-8 text-center">
+                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">
+                            Premium Calculator
+                        </h2>
+                        <p className="text-blue-100 text-sm sm:text-base">
+                            We&apos;ve designed our calculator to give you the most accurate estimates based on your vehicle details and coverage preferences.
+                        </p>
+                    </div>
+
+                    <div className="p-4 md:p-8 relative overflow-hidden">
                         {/* Top Selection Bar */}
                         <div className="flex flex-col lg:flex-row gap-4 items-center justify-between mb-3 pb-3 border-b border-gray-50">
                             <div className="w-full lg:w-1/3">
@@ -195,7 +199,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                             key={type}
                                             onClick={() => setPremiumType(type)}
                                             className={`flex-1 py-3 px-4 rounded-lg text-xs font-bold capitalize transition-all duration-300 ${premiumType === type
-                                                ? "bg-[#2076C7] text-white shadow-lg"
+                                                ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg"
                                                 : "text-gray-500 hover:text-gray-800 hover:bg-white"
                                                 }`}
                                         >
@@ -241,7 +245,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                     <div>
                                         <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Manufacturer</label>
                                         <select
-                                            className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                            className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                             value={make}
                                             onChange={(e) => setMake(e.target.value)}
                                         >
@@ -283,7 +287,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                             type="text"
                                             value={model}
                                             onChange={(e) => setModel(e.target.value)}
-                                            className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                            className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                             placeholder="Vehicle Model"
                                         />
                                     </div>
@@ -293,7 +297,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                             type="text"
                                             value={variant}
                                             onChange={(e) => setVariant(e.target.value)}
-                                            className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                            className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                             placeholder="Vehicle Variant"
                                         />
                                     </div>
@@ -307,14 +311,14 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                                     type="number"
                                                     value={engineCC}
                                                     onChange={(e) => setEngineCC(Number(e.target.value))}
-                                                    className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                                    className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                                     placeholder={vehicleType === "commercial" ? "e.g. 7500" : "e.g. 1200"}
                                                 />
                                             </div>
                                             <div>
                                                 <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Reg. Year</label>
                                                 <select
-                                                    className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                                    className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                                     value={regYear}
                                                     onChange={(e) => {
                                                         setRegYear(Number(e.target.value));
@@ -329,7 +333,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                             <div>
                                                 <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">RTO City</label>
                                                 <select
-                                                    className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                                    className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                                     value={city}
                                                     onChange={(e) => {
                                                         const selectedCity = e.target.value;
@@ -358,7 +362,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                             <div>
                                                 <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fuel Type</label>
                                                 <select
-                                                    className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                                    className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                                     value={fuelType}
                                                     onChange={(e) => setFuelType(e.target.value)}
                                                 >
@@ -370,7 +374,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                             <div>
                                                 <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Seating</label>
                                                 <select
-                                                    className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                                    className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                                     value={carSeating}
                                                     onChange={(e) => setCarSeating(Number(e.target.value))}
                                                 >
@@ -388,7 +392,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                             <div>
                                                 <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Category</label>
                                                 <select
-                                                    className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                                    className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                                     value={commCategory}
                                                     onChange={(e) => setCommCategory(e.target.value)}
                                                 >
@@ -405,7 +409,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                                         if (commCategory === "Goods Carrier") setGvw(Number(e.target.value));
                                                         else setCommSeating(Number(e.target.value));
                                                     }}
-                                                    className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                                    className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                                 />
                                             </div>
                                         </>
@@ -414,7 +418,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                     <div>
                                         <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">NCB (%)</label>
                                         <select
-                                            className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                            className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                             value={ncb}
                                             onChange={(e) => setNcb(Number(e.target.value))}
                                         >
@@ -426,7 +430,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                     <div>
                                         <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Owner Type</label>
                                         <select
-                                            className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                            className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                             value={ownerType}
                                             onChange={(e) => setOwnerType(e.target.value)}
                                         >
@@ -437,7 +441,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                     <div>
                                         <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Prev. Policy</label>
                                         <select
-                                            className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                            className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                             value={prevPolicyType}
                                             onChange={(e) => setPrevPolicyType(e.target.value)}
                                         >
@@ -449,7 +453,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                     <div>
                                         <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Policy Format</label>
                                         <select
-                                            className="w-full p-2 bg-gray-50 border border-gray-100 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/10"
+                                            className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 ring-blue-500/20 focus:border-[#2076C7] transition-all"
                                             value={policyFormat}
                                             onChange={(e) => setPolicyFormat(e.target.value)}
                                         >
@@ -492,7 +496,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                                 transition={{ duration: 0.3 }}
                                                 className="px-3 pb-3"
                                             >
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-2 border-t border-gray-50">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-2 border-t border-gray-200">
                                                     {[
                                                         "Electrical Accessory?",
                                                         "Non-Electrical Accessory?",
@@ -556,7 +560,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                                 transition={{ duration: 0.3 }}
                                                 className="px-3 pb-3"
                                             >
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-2 border-t border-gray-50">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-2 border-t border-gray-200">
                                                     {(vehicleType === "bike"
                                                         ? [
                                                             "Zero Depreciation Cover",
@@ -611,7 +615,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
 
                             {/* Section 3: Result & Value Summary */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch mt-2">
-                                <div className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col justify-center">
+                                <div className="bg-white p-4 rounded-[2rem] border border-gray-200 shadow-sm flex flex-col justify-center">
                                     <label className="text-gray-700 font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
                                         <IndianRupee size={20} className="text-[#2076C7]" /> Set Vehicle Value (IDV)
                                         <span className="text-[#2076C7] font-black text-xl ml-auto">₹{idv.toLocaleString("en-IN")}</span>
@@ -631,7 +635,7 @@ export default function PremiumCalculator({ vehicleType, setVehicleType, lockedT
                                     </div>
                                 </div>
 
-                                <div className="bg-gray-50 rounded-[1.5rem] p-4 border border-gray-100">
+                                <div className="bg-gray-50 rounded-[1.5rem] p-4 border border-gray-200">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
                                         <div>
                                             <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Estimated Premium</p>
