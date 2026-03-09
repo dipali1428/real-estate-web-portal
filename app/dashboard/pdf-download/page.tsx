@@ -36,31 +36,30 @@ export default function Downloads() {
     // Insurance - Motor Insurance
     {
       id: '1',
-      name: 'MAHARASHTRA_DSA_GRID_FEBRUARY_2026.pdf',
+      name: 'MAHARASHTRA_DSA_PAYOUT_GRID_MARCH_2026.pdf',
       type: 'pdf',
       size: '2.4 MB',
-      uploadDate: '2026-2-10',
+      uploadDate: '2026-3-8',
       category: 'payout',
-      month: 'february-2026',
+      month: 'march-2026',
       year: '2026',
       subCategory: 'motor-insurance',
-      filePath: '/pdfs/motorinsurancepdf/MAHARASHTRA_DSA_GRID_FEBRUARY_2026.pdf'
+      filePath: '/pdfs/motorinsurancepdf/MAHARASHTRA_DSA_GRID_MARCH_2026.pdf'
     },
-    //  {
-    //   id: '2',
-    //   name: 'Motor_Insurance_MAHARASHTRA_DSA_JANUARY_2026.pdf',
-    //   type: 'pdf',
-    //   size: '2.4 MB',
-    //   uploadDate: '2026-1-14',
-    //   category: 'payout',
-    //   month: 'january-2026',
-    //   year: '2026',
-    //   subCategory: 'motor-insurance',
-    //   filePath: '/pdfs/motorinsurancepdf/MAHARASHTRA_DSA_JANUARY_2026.pdf'
-    // },
-
+    {
+      id: '2',
+      name: 'DSA_GUJARAT_PAYOUT_GRID_MARCH_2026.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-3-8',
+      category: 'payout',
+      month: 'march-2026',
+      year: '2026',
+      subCategory: 'motor-insurance',
+      filePath: '/pdfs/motorinsurancepdf/DSA_GUJARAT_DD_&_DN_HO_GRID_MARCH_2026.pdf'
+    },
     // Insurance - Life Insurance
-  {
+    {
       id: '3',
       name: 'Axis_max_LI_Feb_2026.pdf',
       type: 'pdf',
@@ -103,7 +102,7 @@ export default function Downloads() {
       size: '2.4 MB',
       uploadDate: '2026-2-10',
       category: 'payout',
-      month:'february-2026',
+      month: 'february-2026',
       year: '2026',
       subCategory: 'life-insurance',
       filePath: '/pdfs/lifeinsurancepdf/DIGIT_LIFE_FEB_26.pdf'
@@ -231,13 +230,13 @@ export default function Downloads() {
     //   filePath: '/pdfs/homeloan/IA_Jan_Payout_Structure.pdf'
     // },
     // Loan - Business Loan
-    
+
 
     // Loan - LAP Loan
-    
+
 
     // Loan - Personal Loan
-    
+
 
     // Product Brochures
     {

@@ -31,9 +31,9 @@ const Header = () => {
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "About Us", href: "/page/about", component: AboutSection },
-    { label: "Events", href: "/page/event", component: AboutSection },
-    { label: "Careers", href: "/page/careers" },
+    { label: "Library", href: "/page/event", component: AboutSection },
     { label: "Cibil Check", href: "/page/cibil", component: CibilSection },
+    { label: "Careers", href: "/page/careers" },
   ];
 
   const calculatorOptions = [
@@ -48,7 +48,7 @@ const Header = () => {
 
   ];
 
-  const loansOptions = [
+ const loansOptions = [
     { label: "Home Loan", href: "/products/home-loan" },
     { label: "Personal Loan", href: "/products/personal-loan" },
     { label: "Business Loan", href: "/products/business-loan" },
@@ -59,11 +59,10 @@ const Header = () => {
     { label: "Loan Against Securities", href: "/products/loan-against-securities" },
   ];
 
-
-  
   const insuranceOptions = [
     { label: "Life Insurance", href: "/products/life-insurance" },
     { label: "Health Insurance", href: "/products/health-insurance" },
+    { label: "Motor Insurance", href: "/products/motor-insurance" },
     { label: "Motor Insurance", href: "/products/motor-insurance" },
     { label: "Travel Insurance", href: "/products/travel-insurance" },
     { label: "Fire Insurance", href: "/products/fire-insurance" },
@@ -97,7 +96,6 @@ const Header = () => {
   return (
     <header className="bg-linear-to-br from-[#E8F6FA] via-[#F0FAFB] to-[#E9F8F6] backdrop-blur-md shadow-sm sticky top-0 z-50 transition-all duration-300 border-b border-[#1CADA3]/20">
       <nav className="max-w-[1600px] container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex items-center justify-between">
-        {/* <nav className="max-w-[1600px] mx-auto px-4 xl:px-6 2xl:px-8 py-3 flex items-center justify-between"> */}
         {/* Logo Section */}
         <motion.div
             className="flex items-center space-x-2"
@@ -115,18 +113,13 @@ const Header = () => {
               priority
             />
           </Link>
-          {/* <Image
-            src="/logo.png"
-            alt="Infinity Arthviksha Logo"
-            href="/"
-            className="h-8 sm:h-10 md:h-12 lg:h-14 w-auto object-contain"
-          /> */}
         </motion.div>
 
         {/* Desktop Menu */}
         <div className="hidden lg:flex items-center space-x-0 xl:space-x-0.5 2xl:space-x-1 font-sans">
-          {/* Home Link */}
-          {navLinks.slice(0, 1).map((link, i) => (
+          
+          {/* Home & About Us */}
+          {navLinks.slice(0, 2).map((link, i) => (
             <motion.div
               key={i}
               whileHover={{ scale: 1.05, y: -2 }}
@@ -418,10 +411,10 @@ const Header = () => {
           </motion.div>
 
 
-          {/* Other Nav Links */}
-          {navLinks.slice(1).map((link, i) => (
+          {/* Events & Cibil Check */}
+          {navLinks.slice(2, 4).map((link, i) => (
             <motion.div
-              key={i + 1}
+              key={i + 2}
               whileHover={{ scale: 1.05, y: -2 }}
               transition={{ type: "spring", stiffness: 250, damping: 20 }}
               className="relative group rounded-lg overflow-hidden cursor-pointer">
@@ -488,6 +481,29 @@ const Header = () => {
               )}
             </AnimatePresence>
           </motion.div>
+
+          {/* Careers */}
+          {navLinks.slice(4).map((link, i) => (
+            <motion.div
+              key={i + 4}
+              whileHover={{ scale: 1.05, y: -2 }}
+              transition={{ type: "spring", stiffness: 250, damping: 20 }}
+              className="relative group rounded-lg overflow-hidden cursor-pointer">
+              <motion.div
+                className="absolute inset-0 rounded-lg bg-linear-to-r from-[#2076C7]/10 to-[#1CADA3]/10 opacity-0 group-hover:opacity-100 blur-sm"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 0, scale: 0.95 }}
+                whileHover={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.35 }}
+              />
+              <a
+                href={link.href}
+                className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
+                {link.label}
+              </a>
+              <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
+            </motion.div>
+          ))}
 
           {/* Contact Us */}
           <motion.div
@@ -559,8 +575,9 @@ const Header = () => {
             transition={{ duration: 0.3 }}
             className="lg:hidden bg-linear-to-br from-[#E8F6FA] via-[#F0FAFB] to-[#E9F8F6] backdrop-blur-md shadow-md">
             <div className="flex flex-col items-center space-y-3 py-4">
-              {/* Home Link */}
-              {navLinks.slice(0, 1).map((link, i) => (
+              
+              {/* Home & About */}
+              {navLinks.slice(0, 2).map((link, i) => (
                 <a
                   key={i}
                   href={link.href}
@@ -766,10 +783,10 @@ const Header = () => {
                 )}
               </div>
 
-              {/* Other Nav Links */}
-              {navLinks.slice(1).map((link, i) => (
+              {/* Events & Cibil */}
+              {navLinks.slice(2, 4).map((link, i) => (
                 <a
-                  key={i + 1}
+                  key={i + 2}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
                   className="text-gray-700 font-medium hover:text-[#1CADA3] transition text-base">
@@ -805,6 +822,17 @@ const Header = () => {
                   </div>
                 )}
               </div>
+
+              {/* Careers */}
+              {navLinks.slice(4).map((link, i) => (
+                <a
+                  key={i + 4}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="text-gray-700 font-medium hover:text-[#1CADA3] transition text-base">
+                  {link.label}
+                </a>
+              ))}
 
               {/* Contact Us */}
               <a

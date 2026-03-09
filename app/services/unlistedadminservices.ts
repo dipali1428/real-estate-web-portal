@@ -177,27 +177,8 @@ export const AdminService = {
     return response.data;
   },
 
-  /**
-   * Upload shares with history or daily mode
-   * POST → /api/unlisted/admin/shares/uploadSharesWithHistory?mode=history|daily
-   */
-  uploadSharesWithHistory: async (file: File, mode: "history" | "daily" = "history") => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const response = await api.post(
-      `/api/unlisted/admin/shares/uploadSharesWithHistory?mode=${mode}`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
-
-    return response.data;
-  },
-
   getSharePriceGraph: async (shareId: number): Promise<SharePriceGraphData> => {
-    const response = await api.get(`/api/unlisted/admin/shares/${shareId}/graph`);
+    const response = await api.get(`/api/unlisted/public/${shareId}/graph`);
     return response.data;
   },
 
@@ -293,5 +274,33 @@ export const AdminService = {
   getUserDemat: async (userId: number): Promise<{ success: boolean; data: DematDetails }> => {
     const response = await api.get(`/api/unlisted/admin/user/demat/${userId}`);
     return response.data;
+  },
+
+  /**
+   * Upload shares with history (Excel) - History Mode
+   * POST → /api/unlisted/admin/shares/uploadSharesWithHistory?mode=history
+   * Body: form-data with file field
+   */
+  uploadSharesWithHistoryMode: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post("/api/unlisted/admin/shares/uploadSharesWithHistory?mode=history", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data; // Returns { success, message, mode, applySoftDelete, rowsProcessed, rowsSkipped }
+  },
+
+  /**
+   * Upload shares with history (Excel) - Daily Mode
+   * POST → /api/unlisted/admin/shares/uploadSharesWithHistory?mode=daily
+   * Body: form-data with file field
+   */
+  uploadSharesWithDailyMode: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post("/api/unlisted/admin/shares/uploadSharesWithHistory?mode=daily", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data; // Returns { success, message, mode, applySoftDelete, rowsProcessed, rowsSkipped }
   },
 };
