@@ -2,112 +2,111 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { PublicService } from "../../services/publicService";
-import Link from "next/link";
 
 // Temporary Mock Response based on your actual API structure
-const MOCK_RESPONSE = {
-    "status": {
-        "code": 200,
-        "type": "success",
-        "message": "Request processed successfully."
-    },
-    "message": "Request processed successfully.",
-    "cibil_score": "764", // Directly added for easier access
-    "data": {
-        "request_id": 18,
-        "customer_id": 987654321,
-    },
-    "cibilPayload": {
-        "data": {
-            "GetCustomerAssetsResponse": {
-                "ResponseStatus": "Success",
-                "ResponseKey": "XXXXXXXXXXXXXXXXXX",
-                "GetCustomerAssetsSuccess": {
-                    "Asset": {
-                        "Status": "Active",
-                        "SafetyCheckFailure": false,
-                        "ExpirationDate": "2028-01-16T11:10:14.833+05:30",
-                        "CreationDate": "2026-01-16T11:10:14.833+05:30",
-                        "TrueLinkCreditReport": {
-                            "ReferenceKey": "XXXXXXXXXX",
-                            "currentversion": "5.0",
-                            "Borrower": {
-                                "CreditScore": {
-                                    "riskScore": "764",
-                                    "scoreName": "CIBILTransUnionScore3"
-                                }
-                            },
-                            "TradeLinePartition": [
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "HDFC BANK",
-                                        "currentBalance": "175419",
-                                        "GrantedTrade": { "amountPastDue": "0" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "HDFC BANK",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "0" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "MANAPPURAM",
-                                        "dateClosed": "2019-04-30+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "0" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "SBI",
-                                        "dateClosed": "2022-04-28+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "-1" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "SBI",
-                                        "dateClosed": "2016-11-30+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "-1" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "BAJAJ FIN LTD",
-                                        "dateClosed": "2021-05-21+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "0" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "SBI",
-                                        "dateClosed": "2011-02-27+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "-1" }
-                                    }
-                                },
-                                {
-                                    "Tradeline": {
-                                        "creditorName": "SBI",
-                                        "dateClosed": "2008-02-19+05:30",
-                                        "currentBalance": "0",
-                                        "GrantedTrade": { "amountPastDue": "-1" }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        }
-    }
-};
+// const MOCK_RESPONSE = {
+//     "status": {
+//         "code": 200,
+//         "type": "success",
+//         "message": "Request processed successfully."
+//     },
+//     "message": "Request processed successfully.",
+//     "cibil_score": "750", // Directly added for easier access
+//     "data": {
+//         "request_id": 18,
+//         "customer_id": 987654321,
+//     },
+//     "cibilPayload": {
+//         "data": {
+//             "GetCustomerAssetsResponse": {
+//                 "ResponseStatus": "Success",
+//                 "ResponseKey": "XXXXXXXXXXXXXXXXXX",
+//                 "GetCustomerAssetsSuccess": {
+//                     "Asset": {
+//                         "Status": "Active",
+//                         "SafetyCheckFailure": false,
+//                         "ExpirationDate": "2028-01-16T11:10:14.833+05:30",
+//                         "CreationDate": "2026-01-16T11:10:14.833+05:30",
+//                         "TrueLinkCreditReport": {
+//                             "ReferenceKey": "XXXXXXXXXX",
+//                             "currentversion": "5.0",
+//                             "Borrower": {
+//                                 "CreditScore": {
+//                                     "riskScore": "764",
+//                                     "scoreName": "CIBILTransUnionScore3"
+//                                 }
+//                             },
+//                             "TradeLinePartition": [
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "HDFC BANK",
+//                                         "currentBalance": "175419",
+//                                         "GrantedTrade": { "amountPastDue": "0" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "HDFC BANK",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "0" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "MANAPPURAM",
+//                                         "dateClosed": "2019-04-30+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "0" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "SBI",
+//                                         "dateClosed": "2022-04-28+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "-1" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "SBI",
+//                                         "dateClosed": "2016-11-30+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "-1" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "BAJAJ FIN LTD",
+//                                         "dateClosed": "2021-05-21+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "0" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "SBI",
+//                                         "dateClosed": "2011-02-27+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "-1" }
+//                                     }
+//                                 },
+//                                 {
+//                                     "Tradeline": {
+//                                         "creditorName": "SBI",
+//                                         "dateClosed": "2008-02-19+05:30",
+//                                         "currentBalance": "0",
+//                                         "GrantedTrade": { "amountPastDue": "-1" }
+//                                     }
+//                                 }
+//                             ]
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// };
 
 const CreditScorePage: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -116,7 +115,7 @@ const CreditScorePage: React.FC = () => {
         mobile: "", // Default verified mobile
         pan: "",
         gender: "",
-        dob: "", // Added dob
+        dob: "",
         consent: false,
     });
 
@@ -141,7 +140,13 @@ const CreditScorePage: React.FC = () => {
         controlNumber: "10397635617",
         outstanding: "₹0.00",
         overdue: "₹0.00",
-        lastChecked: "24-Feb-2026 06:05 pm"
+        lastChecked: new Date().toLocaleString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        })
     });
 
     const [id, setId] = useState<string | null>(null); // State for report ID
@@ -340,8 +345,8 @@ const CreditScorePage: React.FC = () => {
             const score = response.cibil_score || report.Borrower.CreditScore.riskScore;
 
             // Format dynamic date from CreationDate
-            const checkDate = new Date(asset.CreationDate);
-            const formattedDate = checkDate.toLocaleString('en-IN', {
+            // Format dynamic date using the current time
+            const formattedDate = new Date().toLocaleString('en-IN', {
                 day: '2-digit',
                 month: 'short',
                 year: 'numeric',
@@ -391,6 +396,14 @@ const CreditScorePage: React.FC = () => {
         } finally {
             setIsDownloading(false);
         }
+    };
+
+    const getCreditHealth = (score: string | null) => {
+        const s = parseInt(score || "0");
+        if (s >= 750) return { label: "EXCELLENT CREDIT HEALTH", color: "text-[#1CADA3]", bg: "bg-[#E6FFFA]" };
+        if (s >= 700) return { label: "GOOD CREDIT HEALTH", color: "text-emerald-600", bg: "bg-emerald-50" };
+        if (s >= 650) return { label: "AVERAGE CREDIT HEALTH", color: "text-orange-600", bg: "bg-orange-50" };
+        return { label: "POOR CREDIT HEALTH", color: "text-red-600", bg: "bg-red-50" };
     };
 
     const toggleFaq = (index: number) => setactiveFaq(activeFaq === index ? null : index);
@@ -453,7 +466,10 @@ const CreditScorePage: React.FC = () => {
                             </svg>
                         </button>
 
-                        <img src="/cibil-logo.svg" alt="Logo" className="h-8 mb-6 mx-auto" />
+                        <div className="flex flex-col items-center mb-6">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase mb-1 tracking-wider">Powered by</span>
+                            <img src="/cibil-logo.svg" alt="Logo" className="h-8" />
+                        </div>
                         <h4 className="text-2xl font-bold text-center text-gray-800 mb-2">Verify Mobile</h4>
                         <p className="text-center text-gray-500 mb-8">We'll send a 6-digit code to verify your identity.</p>
 
@@ -573,7 +589,7 @@ const CreditScorePage: React.FC = () => {
                                             strokeWidth="8"
                                             strokeLinecap="round"
                                             strokeDasharray="125.66"
-                                            strokeDashoffset={125.66 - (Math.min(Math.max((parseInt(scoreValue) - 300) / 600, 0), 1) * 125.66)}
+                                            strokeDashoffset={125.66 - (Math.min(Math.max((parseInt(scoreValue) - 299) / 600, 0), 1) * 125.66)}
                                             className="gauge-path"
                                         />
 
@@ -590,7 +606,13 @@ const CreditScorePage: React.FC = () => {
                                     <div className="absolute bottom-16 w-full flex justify-between px-10 text-[10px] font-bold text-gray-400"><span>300</span><span>900</span></div>
                                     <div className="absolute top-5 right-5 w-8 h-8 bg-[#1CADA3] rounded-full flex items-center justify-center text-white shadow-lg"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg></div>
                                 </div>
-                                <div className="mt-4 bg-[#E6FFFA] text-[#1CADA3] px-6 py-2 rounded-full flex items-center gap-2 font-bold text-xs"><svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>EXCELLENT CREDIT HEALTH</div>
+                                {/* Replace the old static div with this dynamic one */}
+                                <div className={`mt-4 ${getCreditHealth(scoreValue).bg} ${getCreditHealth(scoreValue).color} px-6 py-2 rounded-full flex items-center gap-2 font-bold text-xs`}>
+                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                    {getCreditHealth(scoreValue).label}
+                                </div>
                                 {/* <p className="text-gray-500 mt-6 text-center text-sm">Your score is in the top 15%<br />of all consumers.</p> */}
                             </div>
 
@@ -627,7 +649,7 @@ const CreditScorePage: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="mt-12 pt-8 border-t border-gray-100 flex justify-between items-end">
-                                    <div><p className="text-[9px] font-bold text-gray-400 uppercase">Last Checked</p><p className="font-bold text-gray-700 text-sm">{reportSummary.lastChecked}</p></div>
+                                    <div><p className="text-[9px] font-bold text-gray-400 uppercase">Checked Date</p><p className="font-bold text-gray-700 text-sm">{reportSummary.lastChecked}</p></div>
                                     <div className="text-left">
                                         <span className="text-[9px] font-bold text-gray-300 uppercase block mb-1">Powered by</span>
                                         <img src="/cibil-logo.svg" alt="CIBIL" className="h-10 ml-auto" />
@@ -639,7 +661,8 @@ const CreditScorePage: React.FC = () => {
                         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 relative overflow-hidden text-gray-600">
                             {/* SVG Logo from public folder at Top Left */}
                             <div className="absolute top-6 left-8">
-                                <img src="/cibil-logo.svg" alt="Logo" className="h-8 md:h-12 opacity-80" />
+                                <span className="text-[10px] font-bold text-gray-400 uppercase block mb-1 tracking-wider">Powered by</span>
+                                <img src="/cibil-logo.svg" alt="Logo" className="h-8 md:h-10 opacity-80" />
                             </div>
 
                             <h4 className="text-2xl font-bold text-center text-gray-800 mb-8 mt-12 md:mt-0">Complete Your Details</h4>
