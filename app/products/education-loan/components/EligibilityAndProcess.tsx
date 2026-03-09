@@ -31,8 +31,8 @@ const documentRequirements = [
     {
         title: 'Applicant (Student)',
         docs: ['Aadhaar & PAN Card', 'Class 10, 12 & Degree Marksheets', 'Admission / Offer Letter', 'Fee Structure', 'Entrance Exam Score (IELTS/GRE)'],
-        color: 'bg-purple-50 border-purple-200',
-        iconColor: 'text-purple-600',
+        color: 'bg-blue-50 border-blue-200',
+        iconColor: 'text-blue-600',
     },
     {
         title: 'Co-Applicant (Financial)',
@@ -43,14 +43,14 @@ const documentRequirements = [
     {
         title: 'Collateral Assets',
         docs: ['Property Title Deed', 'Valuation Report', 'Fixed Deposit Receipts', 'Insurance Policies', 'Encumbrance Certificate'],
-        color: 'bg-teal-50 border-teal-200',
-        iconColor: 'text-teal-600',
+        color: 'bg-blue-50 border-blue-200',
+        iconColor: 'text-blue-600',
     },
     {
         title: 'Overseas Specific',
         docs: ['Passport (Student)', 'I-20 Form (USA) / CAS Letter (UK)', 'Visa Copy', 'Proof of Funds (Visa Requirement)', 'University Accreditation Docs'],
-        color: 'bg-indigo-50 border-indigo-200',
-        iconColor: 'text-indigo-600',
+        color: 'bg-blue-50 border-blue-200',
+        iconColor: 'text-blue-600',
     },
 ];
 
@@ -58,18 +58,18 @@ export default function EligibilityAndProcess() {
     return (
         <>
             {/* ── How It Works ──────────────────────────────────────────── */}
-            <section className="py-12 bg-white relative overflow-hidden">
-                <div className="max-w-6xl mx-auto px-6 md:px-12">
+            <section className="py-10 md:py-16 bg-white relative overflow-hidden">
+                <div className="max-w-[1440px] mx-auto px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="text-center mb-10"
+                        className="text-center mb-3"
                     >
                         <span className="text-[#2076C7] font-black tracking-widest uppercase text-xs mb-4 block">Simple Process</span>
-                        <h2 className="text-3xl md:text-4xl font-extrabold mb-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                        <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
                             How to Apply in 4 Steps
                         </h2>
-                        <p className="text-slate-500 max-w-xl mx-auto font-medium text-base">
+                        <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
                             Our streamlined process ensures you get your education loan without unnecessary delays or paperwork.
                         </p>
                     </motion.div>
@@ -94,12 +94,9 @@ export default function EligibilityAndProcess() {
                                             <div className={`w-14 h-14 ${step.color} rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform`}>
                                                 <Icon size={26} strokeWidth={1.8} />
                                             </div>
-                                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-white border-2 border-blue-200 rounded-full flex items-center justify-center">
-                                                <span className="text-[8px] font-black text-[#2076C7]">{step.step}</span>
-                                            </div>
                                         </div>
-                                        <h3 className="text-base font-extrabold text-slate-800 mb-2 tracking-tight">{step.title}</h3>
-                                        <p className="text-slate-500 text-xs font-bold leading-relaxed">{step.desc}</p>
+                                        <h3 className="text-xl font-extrabold text-gray-700 mb-2 tracking-tight">{step.title}</h3>
+                                        <p className="text-slate-500 text-lg font-medium leading-relaxed">{step.desc}</p>
                                         {i < steps.length - 1 && (
                                             <IconArrowRight className="md:hidden mt-4 text-blue-300" size={20} />
                                         )}
@@ -112,18 +109,18 @@ export default function EligibilityAndProcess() {
             </section>
 
             {/* ── Eligibility Section ────────────────────────────────────── */}
-            <section id="eligibility" className="py-12 bg-[#fafcfe]">
-                <div className="max-w-6xl mx-auto px-6 md:px-12">
+            <section id="eligibility" className="py-10 md:py-16 bg-white border-t border-slate-50">
+                <div className="max-w-[1440px] mx-auto px-6 text-center items-center">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         className="text-center mb-10"
                     >
                         <span className="text-[#2076C7] font-black tracking-widest uppercase text-xs mb-4 block">Who Can Apply</span>
-                        <h2 className="text-3xl md:text-4xl font-extrabold mb-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                        <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
                             Eligibility Criteria
                         </h2>
-                        <p className="text-slate-500 max-w-xl mx-auto font-medium text-base">
+                        <p className="text-gray-600 max-w-xl mx-auto font-medium text-base md:text-lg leading-relaxed">
                             Open to all Indian students pursuing higher education — check if you meet the requirements below.
                         </p>
                     </motion.div>
@@ -136,7 +133,7 @@ export default function EligibilityAndProcess() {
                             viewport={{ once: true }}
                             className="bg-white rounded-[2rem] p-8 border border-blue-100 shadow-lg"
                         >
-                            <h3 className="text-lg font-extrabold text-slate-800 mb-6 flex items-center gap-3">
+                            <h3 className="text-xl font-extrabold text-gray-700 mb-6 flex items-center gap-3">
                                 <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center">
                                     <IconUserCheck size={20} className="text-blue-600" />
                                 </div>
@@ -144,11 +141,11 @@ export default function EligibilityAndProcess() {
                             </h3>
                             <ul className="space-y-3">
                                 {eligibility.student.map((item) => (
-                                    <li key={item} className="flex items-start gap-3">
-                                        <div className="w-5 h-5 bg-teal-100 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                                            <IconCheck size={12} className="text-teal-600" strokeWidth={3} />
+                                    <li key={item} className="flex items-start gap-4 text-left">
+                                        <div className="w-6 h-6 bg-teal-100 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                                            <IconCheck size={16} className="text-teal-600" strokeWidth={3} />
                                         </div>
-                                        <span className="text-sm font-bold text-slate-600 leading-relaxed">{item}</span>
+                                        <span className="text-lg font-medium text-slate-600 leading-relaxed">{item}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -169,11 +166,11 @@ export default function EligibilityAndProcess() {
                             </h3>
                             <ul className="space-y-3">
                                 {eligibility.abroad.map((item) => (
-                                    <li key={item} className="flex items-start gap-3">
-                                        <div className="w-5 h-5 bg-white/20 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                                            <IconCheck size={12} className="text-white" strokeWidth={3} />
+                                    <li key={item} className="flex items-start gap-4 text-left">
+                                        <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                                            <IconCheck size={16} className="text-white" strokeWidth={3} />
                                         </div>
-                                        <span className="text-sm font-bold text-white/90 leading-relaxed">{item}</span>
+                                        <span className="text-lg font-medium text-white/90 leading-relaxed">{item}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -187,10 +184,10 @@ export default function EligibilityAndProcess() {
                         viewport={{ once: true }}
                         className="mb-6"
                     >
-                        <h3 className="text-xl font-extrabold text-slate-800 mb-8 text-center">
+                        <h3 className="text-2xl font-extrabold text-gray-700 mb-8 text-center uppercase tracking-tight">
                             Document Requirements
                         </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                             {documentRequirements.map((type, i) => (
                                 <motion.div
                                     key={type.title}
@@ -198,13 +195,13 @@ export default function EligibilityAndProcess() {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: i * 0.1 }}
-                                    className={`rounded-[1.5rem] border p-5 ${type.color}`}
+                                    className={`rounded-[1.5rem] border p-4 sm:p-5 ${type.color}`}
                                 >
-                                    <h4 className={`font-extrabold text-sm mb-4 ${type.iconColor}`}>{type.title}</h4>
+                                    <h4 className={`font-extrabold text-sm mb-3 sm:mb-4 ${type.iconColor}`}>{type.title}</h4>
                                     <ul className="space-y-2">
                                         {type.docs.map((doc) => (
-                                            <li key={doc} className="flex items-start gap-2 text-[11px] font-bold text-slate-600">
-                                                <IconCheck size={12} className={`${type.iconColor} shrink-0 mt-0.5`} strokeWidth={3} />
+                                            <li key={doc} className="flex items-start gap-4 text-lg font-medium text-slate-600 text-left">
+                                                <IconCheck size={20} className={`${type.iconColor} shrink-0 mt-0.5`} strokeWidth={3} />
                                                 {doc}
                                             </li>
                                         ))}

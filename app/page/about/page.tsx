@@ -1,3 +1,5 @@
+import { title } from "process";
+
 const AboutSection = () => {
     const leaders = [
         {
@@ -17,6 +19,12 @@ const AboutSection = () => {
             title: "Regional Director, Hyderabad ",
             description: "K Krishna brings 18+ years of banking experience, driving strategic growth, operational excellence, and revenue expansion through high-performing teams and strong client-focused strategies.",
             image: "/leader/K-Krishna.jpeg"
+        },
+        {
+            name: "Dr. Sanjay Shaha",
+            title: "Director – Infinity Arthvishva",
+            description: "Dr. Sanjay Shaha, Director at Infinity Arthvishva, is a senior physician with 40+ years of experience. National Merit Winner, Gold Medalist & Vijay Ratna Awardee, bringing strategic vision and ethical leadership.",
+            image: "/leader/sanjay-shaha.jpeg"
         },
         {
             name: "Mr. Pravin Marathe",
@@ -39,13 +47,13 @@ const AboutSection = () => {
         {
             name: "Mr. Sharad Kulkarni",
             title: "Regional Business Head (Sangli Branch)",
-            description: "Mr. Satyen Mehta brings 25+ years of banking experience in Home Loans, LAP, Insurance, and Real Estate, leading overall strategy, revenue growth, operational excellence, and sustainable business expansion.",
+            description: "Mr. Sharad Kulkarni, Regional Business Head – Sangli, brings over 9 years of lending and 5 years of insurance experience, driving regional growth, high-performing teams, and strong client-focused business expansion.",
             image: "/leader/Sharad-Kulkarni.jpeg"
         },
         {
             name: "Mr. Anant Chachad",
             title: "Regional Business Head – Kolhapur",
-            description: "Mr. Sharad Kulkarni, Regional Business Head – Sangli, brings over 9 years of lending and 5 years of insurance experience, driving regional growth, high-performing teams, and strong client-focused business expansion.",
+            description: "Mr. Anant Madhusudan Chachad, Regional Business Head – Kolhapur, brings over 14 years of experience in financial services, leading Mortgage Loans for the West region with expertise in Home Loans, LAP, distribution network development, and strategic portfolio growth.",
             image: "/leader/Anant-Chachad.jpeg"
         },
         {
@@ -58,11 +66,11 @@ const AboutSection = () => {
             name: "Mr. Neeraj Mohata",
             title: "Regional Business Head – Nagpur",
             description: "Mr. Neeraj Mohata brings 11+ years of experience in lending and financial services, driving regional sales growth, channel expansion, and profitable business performance with strong leadership and market expertise.",
-            image: "/leader/Neeraj-Mohata.jpeg"
+            image: "/leader/Neeraj-Mohata1.jpeg"
         },
         {
             name: "Mr. Pravin Rautray",
-            title: "Business Head (Moshi PCMC Branch )",
+            title: "Business Head (Moshi Branch )",
             description: "Mr. Pravin Rautray drives growth across Loans and Insurance with a strong track record in building high-performing teams, expanding market reach, and delivering strategic, customer-focused revenue growth.",
             image: "/leader/Pravin-Rautray.jpeg"
         },
@@ -101,8 +109,9 @@ const AboutSection = () => {
                             </div>
 
                             {/* Row 1: 3 Leaders */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
-                                {leaders.slice(0, 3).map((leader, index) => (
+                            {/* Row 1: 4 Leaders - Rajesh, Rahul, Krishna, Sanjay */}
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
+                                {leaders.slice(0, 4).map((leader, index) => (
                                     <div
                                         key={index}
                                         className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
@@ -124,7 +133,7 @@ const AboutSection = () => {
 
                             {/* Row 2: 3 Leaders */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-                                {leaders.slice(3, 6).map((leader, index) => (
+                                {leaders.slice(4, 7).map((leader, index) => (
                                     <div
                                         key={index + 3}
                                         className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
@@ -154,7 +163,7 @@ const AboutSection = () => {
 
                             {/* Row 3: Remaining 5 Leaders */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-[95rem] mx-auto">
-                                {leaders.slice(6).map((leader, index) => (
+                                {leaders.slice(7).map((leader, index) => (
                                     <div
                                         key={index + 6}
                                         className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
@@ -255,6 +264,7 @@ const AboutSection = () => {
                         </p>
                     </div>
 
+                    {/* All branches in grid - MODIFIED: removed Moshi and Hyderabad from here */}
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {/* Kanpur Branch */}
                         <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
@@ -333,7 +343,6 @@ const AboutSection = () => {
                             </div>
                         </div>
 
-
                         {/* Ratnagiri Branch */}
                         <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
                             <div className="bg-white rounded-xl p-5 h-full">
@@ -346,6 +355,7 @@ const AboutSection = () => {
                                 </div>
                             </div>
                         </div>
+
                         {/* Sangli Branch */}
                         <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
                             <div className="bg-white rounded-xl p-5 h-full">
@@ -358,15 +368,32 @@ const AboutSection = () => {
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* NEW - Centered container for Moshi and Hyderabad branches */}
+                    <div className="flex justify-center gap-6 mt-6">
                         {/* Moshi Branch */}
-                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
                             <div className="bg-white rounded-xl p-5 h-full">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Moshi Branch</h3>
                                 <div className="text-gray-600 text-sm leading-relaxed space-y-2">
-                                    <p className="font-medium text-gray-700">1st Floor, Office No 104 </p>
+                                    <p className="font-medium text-gray-700">1st Floor, Office No 104</p>
                                     <p>Destination Ostiya</p>
-                                    <p>F Building , Alandi Moshi Road</p>
-                                    <p>Pune, Maharashtra - 412105 </p>
+                                    <p>F Building, Alandi Moshi Road</p>
+                                    <p>Pune, Maharashtra - 412105</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Hyderabad Branch */}
+                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                            <div className="bg-white rounded-xl p-5 h-full">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Hyderabad Branch</h3>
+                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
+                                    <p className="font-medium text-gray-700">Office No: 5B, 5th Floor</p>
+                                    <p>Vishwa Heritage Arcade</p>
+                                    <p>Near ESI Metro Station, Pillar No. 1010, SR Nagar,</p>
+                                    <p>Hyderabad, Telangana - 500038</p>
                                 </div>
                             </div>
                         </div>

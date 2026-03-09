@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, Filter } from "lucide-react";
 import React, { useState } from "react";
 import Link from "next/link";
 import { companiesData, vehicleTypes, planTypes, bikeCCSegments, carCCSegments, commercialCCSegments, miscCCSegments, commercialGVWSegments } from "./insuranceData";
@@ -105,320 +105,314 @@ export default function InsurancePlanComparison({
     };
 
     return (
-        <section id="plans" className="py-20 bg-[#F0F9FF]">
-            <div className="container mx-auto px-6 text-center">
-                <div className="mb-6">
-                    <h2 className="text-4xl font-black mb-8 capitalize bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
-                        Insurance plan starting prices<span className="text-xs align-top ml-1 text-gray-400">#1</span>
+        <section id="plans" className="py-12 md:py-16 bg-white font-sans">
+            <div className="container mx-auto px-4 md:px-6">
+                <div className="text-center max-w-3xl mx-auto mb-10">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                        Compare Insurance Starting Prices
                     </h2>
-
-                    {/* Vehicle Type Selection */}
-                    {showVehicleSelection && (
-                        <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
-                            {vehicleTypes.map((type) => {
-                                const Icon = type.icon;
-                                return (
-                                    <button
-                                        key={type.id}
-                                        onClick={() => {
-                                            setActiveVehicleType(type.id);
-                                            setShowAll(false);
-                                        }}
-                                        className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-bold transition-all duration-300 shadow-sm border ${activeVehicleType === type.id
-                                            ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white border-transparent scale-105 shadow-blue-500/20"
-                                            : "bg-gray-100/50 text-gray-400 border-gray-100 hover:bg-white hover:text-gray-600"
-                                            }`}
-                                    >
-                                        <Icon size={24} />
-                                        {type.label}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    )}
+                    <p className="text-gray-500 text-[15px] md:text-base max-w-2xl mx-auto leading-relaxed">
+                        Get instant quotes from top-rated insurers. Save up to 85% on your premium with our transparent comparison tool.
+                    </p>
                 </div>
 
-                {/* Pill Style Tabs */}
-                <div className="flex justify-center mb-4">
-                    <div className="inline-flex bg-white rounded-full p-1.5 shadow-sm border border-blue-50">
-                        {planTypes
-                            .filter(plan => {
-                                if ((activeVehicleType === 'commercial' || activeVehicleType === 'misc') && plan.id === 'ownDamage') {
-                                    return false;
-                                }
-                                return true;
-                            })
-                            .map((plan) => (
-                                <button
-                                    key={plan.id}
-                                    onClick={() => setActivePlanType(plan.id)}
-                                    className={`px-8 py-3 rounded-full text-sm font-bold transition-all duration-300 ${activePlanType === plan.id
-                                        ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md"
-                                        : "text-[#233E60]/60 hover:text-[#233E60]"
-                                        }`}
-                                >
-                                    {plan.label}
-                                </button>
-                            ))}
-                    </div>
-                </div>
-
-                {/* CC & IDV Filters */}
-                {(activeVehicleType === "bike" || activeVehicleType === "car" || activeVehicleType === "commercial" || activeVehicleType === "misc") && (
-                    <div className="flex flex-wrap items-start justify-center gap-4 lg:gap-8 mb-6 max-w-5xl mx-auto">
-                        {/* CC/GVW Selection */}
-                        <div className="flex flex-col items-center gap-2">
-                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#233E60]/40">
-                                {activeVehicleType === "commercial" ? "Select GVW" : "Select engine cc"}
-                            </span>
-                            <div className="inline-flex bg-white rounded-2xl p-1 shadow-sm border border-blue-50">
-                                {(() => {
-                                    if (activeVehicleType === "bike") return bikeCCSegments;
-                                    if (activeVehicleType === "car") return carCCSegments;
-                                    if (activeVehicleType === "commercial") return commercialGVWSegments;
-                                    if (activeVehicleType === "misc") return miscCCSegments;
-                                    return [];
-                                })().map((segment) => (
-                                    <button
-                                        key={segment.id}
-                                        onClick={() => handleCCChange(segment.id)}
-                                        className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 ${activeCC === segment.id
-                                            ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md"
-                                            : "text-[#233E60]/60 hover:text-[#233E60] hover:bg-gray-50"
-                                            }`}
-                                    >
-                                        {segment.label}
-                                    </button>
-                                ))}
+                <div className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto">
+                    {/* Left Sidebar - Filters */}
+                    <div className="w-full lg:w-1/4 xl:w-[280px] shrink-0">
+                        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm sticky top-28">
+                            <div className="flex items-center gap-2 mb-6 text-gray-800">
+                                <Filter size={18} strokeWidth={2.5} />
+                                <h3 className="font-bold text-base tracking-tight">Filters</h3>
                             </div>
-                        </div>
 
-                        {/* IDV Filter */}
-                        {(activeVehicleType === "car" || activeVehicleType === "commercial" || activeVehicleType === "misc") && (activePlanType === "comprehensive" || activePlanType === "ownDamage") && (
-                            <div className="flex flex-col items-center gap-2">
-                                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#233E60]/40">Select IDV</span>
-                                <div className="inline-flex items-center gap-3 px-3 py-1 bg-white/50 rounded-2xl border border-blue-50">
-                                    <div className="flex bg-white rounded-xl p-0.5 shadow-inner border border-blue-50">
-                                        {(() => {
-                                            if (activeVehicleType === "car") return [
-                                                { label: "3 Lac", value: 300000 },
-                                                { label: "6 Lac", value: 600000 },
-                                                { label: "10 Lac", value: 1000000 }
-                                            ];
-                                            if (activeVehicleType === "misc") return [
-                                                { label: "12 Lac", value: 1200000 },
-                                                { label: "15 Lac", value: 1500000 },
-                                                { label: "18 Lac", value: 1800000 }
-                                            ];
-                                            if (activeVehicleType === "commercial") return [
-                                                { label: "8 Lac", value: 800000 },
-                                                { label: "15 Lac", value: 1500000 },
-                                                { label: "25 Lac", value: 2500000 },
-                                                { label: "35 Lac", value: 3500000 },
-                                                { label: "45 Lac", value: 4500000 }
-                                            ];
-                                            return [
-                                                { label: "5 Lac", value: 500000 },
-                                                { label: "8 Lac", value: 800000 },
-                                                { label: "12 Lac", value: 1200000 }
-                                            ];
-                                        })().map((opt) => {
-                                            // Check if button should be disabled
-                                            let isLocked = false;
-                                            if (activeVehicleType === "car" && activePlanType === "comprehensive") {
-                                                if (activeCC === "upto-1000" && opt.value !== 300000) isLocked = true;
-                                                else if (activeCC === "1001-1500" && opt.value !== 600000) isLocked = true;
-                                                else if (activeCC === "above-1500" && opt.value !== 1000000) isLocked = true;
-                                            } else if (activeVehicleType === "commercial" && activePlanType === "comprehensive") {
-                                                if (activeCC === "upto-7500" && opt.value !== 800000) isLocked = true;
-                                                else if (activeCC === "7501-12000" && opt.value !== 1500000) isLocked = true;
-                                                else if (activeCC === "12001-20000" && opt.value !== 2500000) isLocked = true;
-                                                else if (activeCC === "20001-40000" && opt.value !== 3500000) isLocked = true;
-                                                else if (activeCC === "above-40000" && opt.value !== 4500000) isLocked = true;
-                                            } else if (activeVehicleType === "misc") {
-                                                if (activeCC === "upto-1500" && opt.value !== 1200000) isLocked = true;
-                                                else if (activeCC === "1501-2500" && opt.value !== 1500000) isLocked = true;
-                                                else if (activeCC === "above-2500" && opt.value !== 1800000) isLocked = true;
-                                            }
-
+                            {/* Vehicle Type */}
+                            {showVehicleSelection && (
+                                <div className="mb-8">
+                                    <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Vehicle Type</h4>
+                                    <div className="flex flex-col gap-2">
+                                        {vehicleTypes.map((type) => {
+                                            const Icon = type.icon;
+                                            const isActive = activeVehicleType === type.id;
                                             return (
                                                 <button
-                                                    key={opt.value}
-                                                    disabled={isLocked}
-                                                    onClick={() => !isLocked && setActiveIDV(opt.value)}
-                                                    className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${activeIDV === opt.value
-                                                        ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md"
-                                                        : isLocked
-                                                            ? "text-gray-200 cursor-not-allowed"
-                                                            : "text-[#233E60]/60 hover:text-[#233E60] hover:bg-gray-50"
+                                                    key={type.id}
+                                                    onClick={() => {
+                                                        setActiveVehicleType(type.id);
+                                                        setShowAll(false);
+                                                    }}
+                                                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
+                                                        ? "bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-500/20"
+                                                        : "bg-gray-50 text-gray-600 hover:bg-gray-100/80"
                                                         }`}
                                                 >
-                                                    {opt.label}
+                                                    <Icon size={18} className={isActive ? "text-white" : "text-gray-500"} />
+                                                    {type.label}
+                                                    {isActive && <Check size={16} className="ml-auto" strokeWidth={3} />}
                                                 </button>
                                             );
                                         })}
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                )}
+                            )}
 
-                {/* Insurer Type Filter */}
-                <div className="flex justify-center mb-6">
-                    <div className="inline-flex items-center gap-6 px-8 py-3 bg-white/50 rounded-full border border-blue-50">
-                        <span className="text-sm font-bold text-[#233E60]/60">Insurer :</span>
-                        <div className="flex items-center gap-6">
-                            {["private", "public"].map((type) => (
-                                <label key={type} className="flex items-center gap-2 cursor-pointer group">
-                                    <div className="relative w-5 h-5 flex items-center justify-center">
-                                        <input
-                                            type="radio"
-                                            name="insurerType"
-                                            value={type}
-                                            checked={insurerFilter === type}
-                                            onChange={(e) => setInsurerFilter(e.target.value)}
-                                            className="appearance-none w-5 h-5 rounded-full border-2 border-blue-200 checked:border-[#0066FF] transition-all cursor-pointer"
-                                        />
-                                        {insurerFilter === type && (
-                                            <div className="absolute w-2.5 h-2.5 bg-[#0066FF] rounded-full" />
-                                        )}
-                                    </div>
-                                    <span className={`text-sm font-bold capitalize transition-colors ${insurerFilter === type ? "text-[#233E60]" : "text-[#233E60]/60 group-hover:text-[#233E60]"}`}>
-                                        {type}
-                                    </span>
-                                </label>
-                            ))}
+                            {/* Insurer Type */}
+                            <div>
+                                <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Insurer Type</h4>
+                                <div className="flex flex-col gap-2">
+                                    {["private", "public"].map((type) => {
+                                        const isActive = insurerFilter === type;
+                                        return (
+                                            <label key={type} className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer ${isActive ? "bg-blue-50/50 text-[#2076C7]" : "text-gray-600 hover:bg-gray-50 bg-transparent"}`}>
+                                                <div className="relative flex items-center justify-center">
+                                                    <input
+                                                        type="radio"
+                                                        name="insurerType"
+                                                        value={type}
+                                                        checked={isActive}
+                                                        onChange={(e) => setInsurerFilter(e.target.value)}
+                                                        className={`appearance-none w-4 h-4 rounded-full border-2 transition-all ${isActive ? 'border-[#2076C7]' : 'border-gray-300'}`}
+                                                    />
+                                                    {isActive && <div className="absolute w-2 h-2 bg-[#2076C7] rounded-full" />}
+                                                </div>
+                                                <span className="capitalize">{type}</span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <p className="text-gray-400 mb-4 max-w-2xl mx-auto text-[11px] leading-relaxed">
-                    * Prices are indicative starting premiums for a {getVehicleBasisLabel(activeVehicleType)} with 0% NCB in Zone B.
-                    Actual premiums may vary based on vehicle model, age, location, and coverage selected.
-                </p>
+                    {/* Right Area - Main Content */}
+                    <div className="w-full lg:flex-1">
+                        {/* Top Bar - Plan Types & Filters */}
+                        <div className="bg-white rounded-2xl border border-gray-100 px-4 py-3 shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
 
-                {activeVehicleType === "commercial" && activePlanType === "thirdParty" && (
-                    <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-600 text-[11px] font-semibold px-4 py-2 rounded-full mb-4">
-                        <span>⚠️</span>
-                        <span>Prices shown are base TP premiums. 18% GST will be added at the time of purchase.</span>
-                    </div>
-                )}
+                            {/* Plan Types */}
+                            <div className="flex flex-wrap gap-1 bg-gray-50 p-1 rounded-xl">
+                                {planTypes
+                                    .filter(plan => {
+                                        if ((activeVehicleType === 'commercial' || activeVehicleType === 'misc') && plan.id === 'ownDamage') return false;
+                                        return true;
+                                    })
+                                    .map((plan) => (
+                                        <button
+                                            key={plan.id}
+                                            onClick={() => setActivePlanType(plan.id)}
+                                            className={`px-4 py-2 rounded-lg text-[13px] font-bold transition-all ${activePlanType === plan.id
+                                                ? "bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-500/20"
+                                                : "text-gray-500 hover:text-gray-700 hover:bg-white"
+                                                }`}
+                                        >
+                                            {plan.label}
+                                        </button>
+                                    ))}
+                            </div>
 
-                {/* Horizontal List of Cards */}
-                <div className="max-w-5xl mx-auto space-y-4 text-left">
-                    <AnimatePresence mode="popLayout">
-                        {displayedCompanies.map((company, index) => {
-                            const currentPrices = company.prices[activeVehicleType as keyof typeof company.prices];
-                            const basePrice = currentPrices[activePlanType as keyof typeof currentPrices];
+                            {/* CC & IDV Drops */}
+                            <div className="flex items-center gap-6 px-2 w-full md:w-auto overflow-hidden">
+                                {/* Engine Capacity */}
+                                {(activeVehicleType === "bike" || activeVehicleType === "car" || activeVehicleType === "commercial" || activeVehicleType === "misc") && (
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{activeVehicleType === "commercial" ? "GVW" : "Engine Capacity"}</span>
+                                        <select
+                                            value={activeCC}
+                                            onChange={(e) => handleCCChange(e.target.value)}
+                                            className="text-sm font-bold text-[#1C2024] bg-transparent border-none p-0 focus:ring-0 cursor-pointer outline-none w-full"
+                                        >
+                                            {(() => {
+                                                if (activeVehicleType === "bike") return bikeCCSegments;
+                                                if (activeVehicleType === "car") return carCCSegments;
+                                                if (activeVehicleType === "commercial") return commercialGVWSegments;
+                                                if (activeVehicleType === "misc") return miscCCSegments;
+                                                return [];
+                                            })().map(seg => <option key={seg.id} value={seg.id}>{seg.label}</option>)}
+                                        </select>
+                                    </div>
+                                )}
 
-                            let price = 0;
+                                {/* Selected IDV */}
+                                {(activeVehicleType === "car" || activeVehicleType === "commercial" || activeVehicleType === "misc") && (activePlanType === "comprehensive" || activePlanType === "ownDamage") && (
+                                    <div className="flex flex-col border-l border-gray-100 pl-6 shrink-0">
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Selected IDV</span>
+                                        <select
+                                            value={activeIDV}
+                                            onChange={(e) => setActiveIDV(Number(e.target.value))}
+                                            className="text-sm font-bold text-[#2076C7] bg-transparent border-none p-0 focus:ring-0 cursor-pointer outline-none w-full"
+                                        >
+                                            {(() => {
+                                                if (activeVehicleType === "car") return [
+                                                    { label: "₹ 3.0 Lac", value: 300000 },
+                                                    { label: "₹ 6.0 Lac", value: 600000 },
+                                                    { label: "₹ 10.0 Lac", value: 1000000 }
+                                                ];
+                                                if (activeVehicleType === "misc") return [
+                                                    { label: "₹ 12.0 Lac", value: 1200000 },
+                                                    { label: "₹ 15.0 Lac", value: 1500000 },
+                                                    { label: "₹ 18.0 Lac", value: 1800000 }
+                                                ];
+                                                if (activeVehicleType === "commercial") return [
+                                                    { label: "₹ 8.0 Lac", value: 800000 },
+                                                    { label: "₹ 15.0 Lac", value: 1500000 },
+                                                    { label: "₹ 25.0 Lac", value: 2500000 },
+                                                    { label: "₹ 35.0 Lac", value: 3500000 },
+                                                    { label: "₹ 45.0 Lac", value: 4500000 }
+                                                ];
+                                                return [];
+                                            })().map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
-                            if ((activeVehicleType === "car" || activeVehicleType === "commercial" || activeVehicleType === "misc") && (activePlanType === "comprehensive" || activePlanType === "ownDamage")) {
-                                if (activeVehicleType === "misc" && activePlanType === "comprehensive") {
-                                    if (activeIDV === 1200000) price = 48625;
-                                    else if (activeIDV === 1500000) price = 55705;
-                                    else if (activeIDV === 1800000) price = 62785;
-                                    else price = Math.round((20305 + activeIDV * 0.03) * 1.18);
-                                } else if (activeVehicleType === "misc" && activePlanType === "ownDamage") {
-                                    price = Math.round((activeIDV * 0.03) * 1.18);
-                                } else if (activeVehicleType === "commercial" && activePlanType === "comprehensive") {
-                                    if (activeCC === "upto-7500") price = 24049;
-                                    else if (activeCC === "7501-12000") price = 42186;
-                                    else if (activeCC === "12001-20000") price = 60313;
-                                    else if (activeCC === "20001-40000") price = 78950;
-                                    else if (activeCC === "above-40000") price = 89242;
-                                    else price = 24049;
-                                } else {
-                                    // Specific formula from image:
-                                    // Comprehensive: (TP + IDV * 3%) * 1.18
-                                    // Own Damage: (IDV * 3%) * 1.18
-                                    let tp = 0;
-                                    if (activePlanType === "comprehensive") {
-                                        if (activeVehicleType === "car") {
-                                            if (activeCC === "upto-1000") tp = 2094;
-                                            else if (activeCC === "1001-1500") tp = 3416;
-                                            else if (activeCC === "above-1500") tp = 7897;
-                                        } else if (activeVehicleType === "commercial") {
-                                            const gvw = commercialGVWSegments.find(s => s.id === activeCC);
-                                            tp = gvw ? gvw.baseTP : 16049;
+                        {/* Results Header */}
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4 px-2">
+                            <p className="text-[13px] text-gray-500 font-medium">
+                                Showing <strong className="text-gray-800">{displayedCompanies.length}</strong> of <strong className="text-gray-800">{filteredCompanies.length}</strong> plans for <strong className="text-[#2076C7]">{getVehicleBasisLabel(activeVehicleType)}</strong>
+                            </p>
+                        </div>
+
+                        {activeVehicleType === "commercial" && activePlanType === "thirdParty" && (
+                            <div className="bg-amber-50 border border-amber-200 text-amber-600 text-[11px] font-semibold px-4 py-2 rounded-lg mb-4 flex items-center gap-2">
+                                <span>⚠️</span>
+                                <span>Prices shown are base TP premiums. Final price will be shown at the time of purchase.</span>
+                            </div>
+                        )}
+
+                        {/* Cards List */}
+                        <div className="space-y-4">
+                            <AnimatePresence mode="popLayout">
+                                {displayedCompanies.map((company, index) => {
+                                    const currentPrices = company.prices[activeVehicleType as keyof typeof company.prices];
+                                    const basePrice = currentPrices[activePlanType as keyof typeof currentPrices];
+
+                                    let price = 0;
+
+                                    if ((activeVehicleType === "car" || activeVehicleType === "commercial" || activeVehicleType === "misc") && (activePlanType === "comprehensive" || activePlanType === "ownDamage")) {
+                                        if (activeVehicleType === "misc" && activePlanType === "comprehensive") {
+                                            if (activeIDV === 1200000) price = 48625;
+                                            else if (activeIDV === 1500000) price = 55705;
+                                            else if (activeIDV === 1800000) price = 62785;
+                                            else price = Math.round((20305 + activeIDV * 0.03) * 1.18);
+                                        } else if (activeVehicleType === "misc" && activePlanType === "ownDamage") {
+                                            price = Math.round((activeIDV * 0.03) * 1.18);
+                                        } else if (activeVehicleType === "commercial" && activePlanType === "comprehensive") {
+                                            if (activeCC === "upto-7500") price = 24049;
+                                            else if (activeCC === "7501-12000") price = 42186;
+                                            else if (activeCC === "12001-20000") price = 60313;
+                                            else if (activeCC === "20001-40000") price = 78950;
+                                            else if (activeCC === "above-40000") price = 89242;
+                                            else price = 24049;
+                                        } else {
+                                            let tp = 0;
+                                            if (activePlanType === "comprehensive") {
+                                                if (activeVehicleType === "car") {
+                                                    if (activeCC === "upto-1000") tp = 2094;
+                                                    else if (activeCC === "1001-1500") tp = 3416;
+                                                    else if (activeCC === "above-1500") tp = 7897;
+                                                } else if (activeVehicleType === "commercial") {
+                                                    const gvw = commercialGVWSegments.find(s => s.id === activeCC);
+                                                    tp = gvw ? gvw.baseTP : 16049;
+                                                }
+                                            }
+
+                                            const od = activeIDV * 0.03;
+                                            price = Math.round((tp + od) * 1.18);
                                         }
+                                    } else if (activeVehicleType === "commercial" && activePlanType === "thirdParty") {
+                                        const gvw = commercialGVWSegments.find(s => s.id === activeCC);
+                                        price = gvw ? gvw.baseTP : 16049;
+                                    } else if (activeVehicleType === "misc" && activePlanType === "thirdParty") {
+                                        price = 20305;
+                                    } else {
+                                        const ccSegments = activeVehicleType === "bike" ? bikeCCSegments : (activeVehicleType === "car" ? carCCSegments : (activeVehicleType === "commercial" ? commercialCCSegments : (activeVehicleType === "misc" ? miscCCSegments : [])));
+                                        const factor = (ccSegments.length > 0 && activeCC) ? (ccSegments.find(s => s.id === activeCC)?.factor || 1.0) : 1.0;
+                                        price = Math.round(basePrice * (factor || 1.0));
                                     }
 
-                                    const od = activeIDV * 0.03;
-                                    price = Math.round((tp + od) * 1.18);
-                                }
-                            } else if (activeVehicleType === "commercial" && activePlanType === "thirdParty") {
-                                const gvw = commercialGVWSegments.find(s => s.id === activeCC);
-                                price = gvw ? gvw.baseTP : 16049;
-                            } else if (activeVehicleType === "misc" && activePlanType === "thirdParty") {
-                                price = 20305;
-                            } else {
-                                // Original factor-based logic for other types
-                                const ccSegments = activeVehicleType === "bike" ? bikeCCSegments : (activeVehicleType === "car" ? carCCSegments : (activeVehicleType === "commercial" ? commercialCCSegments : (activeVehicleType === "misc" ? miscCCSegments : [])));
-                                const factor = (ccSegments.length > 0 && activeCC) ? (ccSegments.find(s => s.id === activeCC)?.factor || 1.0) : 1.0;
-                                price = Math.round(basePrice * (factor || 1.0));
-                            }
-
-                            return (
-                                <motion.div
-                                    key={company.id}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, scale: 0.95 }}
-                                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                                    className="bg-white rounded-[1.5rem] p-4 shadow-sm border border-blue-50 flex items-center justify-between hover:shadow-md transition-all group"
-                                >
-                                    {/* Left: Logo and Name */}
-                                    <div className="flex items-center gap-6 pl-2">
-                                        <div className="w-24 h-16 bg-white border border-gray-100 rounded-xl p-2 flex items-center justify-center shadow-xs">
-                                            <img
-                                                src={company.logo}
-                                                alt={company.name}
-                                                className="max-h-full max-w-full object-contain scale-[1.05]"
-                                                onError={(e) => {
-                                                    (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${company.name}&background=f0f9ff&color=2076C7&bold=true`;
-                                                }}
-                                            />
-                                        </div>
-                                        <h3 className="text-xl font-bold text-[#233E60] min-w-[140px] tracking-tight">{company.name}</h3>
-                                    </div>
-
-                                    {/* Middle: Price Label */}
-                                    <div className="flex-1 flex justify-center items-center">
-                                        <p className="text-[#233E60] font-bold text-lg">
-                                            Price starting @ <span className="text-xl font-black">₹ {price.toLocaleString("en-IN")}/-</span>
-                                        </p>
-                                    </div>
-
-                                    {/* Right: Button */}
-                                    <div className="pr-4">
-                                        <button
-                                            type="button"
-                                            className="px-10 py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black hover:opacity-95 transform hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group shadow-xl shadow-blue-500/20 whitespace-nowrap"
+                                    return (
+                                        <motion.div
+                                            key={company.id}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.98 }}
+                                            transition={{ duration: 0.3 }}
+                                            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4 overflow-hidden relative group hover:shadow-md transition-all"
                                         >
-                                            Check premium
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
-                    </AnimatePresence>
-                </div>
+                                            {/* Left Blue Accent Line */}
+                                            <div className="absolute left-0 top-6 bottom-6 w-1 bg-linear-to-b from-[#2076C7] to-[#1CADA3] rounded-r-full" />
 
-                {/* See More/Less Button */}
-                {filteredCompanies.length > 3 && (
-                    <div className="flex justify-center mt-12">
-                        <button
-                            onClick={() => setShowAll(!showAll)}
-                            className="bg-white px-8 py-3 rounded-full text-[#2076C7] font-bold text-sm border border-blue-100 shadow-sm hover:shadow-md transition-all flex items-center gap-2 group cursor-pointer"
-                        >
-                            {showAll ? "See less plans" : "See more plans"}
-                            <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showAll ? "rotate-180" : "group-hover:translate-y-0.5"}`} />
-                        </button>
+                                            {/* Left: Logo and Name */}
+                                            <div className="flex items-center gap-4 pl-4 w-full md:w-auto">
+                                                <div className="w-16 h-16 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center shrink-0 p-2 overflow-hidden">
+                                                    {company.logo ? (
+                                                        <img
+                                                            src={company.logo}
+                                                            alt={company.name}
+                                                            className="h-full w-full object-contain mix-blend-multiply"
+                                                            onError={(e) => {
+                                                                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${company.name}&background=f0f9ff&color=2076C7&bold=true`;
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <span className="font-bold text-[#2076C7] text-xl">{company.name.substring(0, 2).toUpperCase()}</span>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-base font-bold text-[#1C2024] mb-1">{company.name}</h3>
+                                                </div>
+                                            </div>
+
+                                            {/* Middle/Right Container */}
+                                            <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-gray-100 pt-4 md:pt-0 pb-1 pr-1">
+                                                {/* Price */}
+                                                <div className="text-right">
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 mr-1">Starting From</p>
+                                                    <p className="text-[#1C2024] font-bold text-gray-700 text-2xl flex items-end gap-1 leading-none">
+                                                        ₹ {price.toLocaleString("en-IN")}
+                                                        <span className="text-xs font-semibold text-gray-400 mb-0.5">/year</span>
+                                                    </p>
+                                                </div>
+
+                                                {/* Button */}
+                                                <button
+                                                    type="button"
+                                                    className="px-5 py-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] hover:opacity-90 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 whitespace-nowrap text-sm cursor-pointer ml-2"
+                                                >
+                                                    View Details
+                                                    <span className="text-lg leading-none">→</span>
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* See More/Less Button */}
+                        {filteredCompanies.length > 3 && (
+                            <div className="flex justify-center mt-6">
+                                <button
+                                    onClick={() => setShowAll(!showAll)}
+                                    className="bg-white px-6 py-2.5 rounded-xl text-[#2076C7] font-bold text-sm border border-gray-200 shadow-sm hover:border-[#2076C7] transition-all flex items-center gap-2 group cursor-pointer"
+                                >
+                                    {showAll ? "See less plans" : "See more plans"}
+                                    <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showAll ? "rotate-180" : "group-hover:translate-y-0.5"}`} />
+                                </button>
+                            </div>
+                        )}
+
+                        <div className="mt-8 p-5 bg-gray-50/50 border border-gray-100 rounded-2xl shadow-sm">
+                            <div className="text-gray-400 text-[11px] leading-relaxed flex items-start gap-3">
+                                <span className="shrink-0 w-4 h-4 rounded-full bg-[#2076C7] flex items-center justify-center text-[10px] leading-none mt-0.5 text-white font-bold italic font-sans px-0">i</span>
+                                <span>* Prices are indicative starting premiums for a {getVehicleBasisLabel(activeVehicleType)} with 0% NCB in Zone B. Actual premiums may vary based on vehicle model, age, location, and coverage selected. Insurance is a subject matter of solicitation.</span>
+                            </div>
+                        </div>
+
                     </div>
-                )}
-            </div >
-        </section >
+                </div>
+            </div>
+        </section>
     );
 }

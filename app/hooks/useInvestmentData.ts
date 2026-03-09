@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { investmentService } from '../products/mutualfunds/services/investmentService';
+import { investmentService } from '../products/mutual-funds/services/investmentService';
 // import { fetchTopPerformingFunds } from '../products/mutualfunds/services/mfApi';
 import api from '../services/api';
 

@@ -272,5 +272,11 @@ export const AdminService = {
     const response = await api.get("/api/admin/career-applications");
     return response.data;
   },
+  
+  // Update a Detailed Lead
+  updateDetailLead: async (id: number | string, payload: any) => {
+    const response = await api.put(`/api/admin/detail-leads/${id}`, payload);
+    return response.data;
+  },
 };
 

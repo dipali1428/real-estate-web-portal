@@ -28,13 +28,9 @@ interface InsurancePartnersProps {
 
 const InsurancePartners = ({ scrollingSpeed = 20 }: InsurancePartnersProps) => {
     return (
-        <section className="py-12 bg-white overflow-hidden relative">
-            {/* Attractive Background Elements */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-50 rounded-full blur-3xl opacity-60 -mr-48 -mt-24 z-0" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-50 rounded-full blur-3xl opacity-60 -ml-48 -mb-24 z-0" />
-
+        <section className="py-12 bg-white relative overflow-hidden">
             <div className="container mx-auto px-6 text-center relative z-10">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-transparent bg-clip-text inline-block">Our Insurance Partners</h2>
+                <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Our Insurance Partners</h2>
                 <p className="text-gray-500 mb-16 text-lg max-w-2xl mx-auto">
                     We&apos;ve partnered with India&apos;s leading insurance providers to bring you the most reliable and affordable coverage options for your vehicle.
                 </p>
@@ -60,7 +56,7 @@ const InsurancePartners = ({ scrollingSpeed = 20 }: InsurancePartnersProps) => {
                             {[...partners, ...partners].map((partner, index) => (
                                 <div
                                     key={`${partner.name}-r1-${index}`}
-                                    className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center min-w-[200px] h-28 p-4 group border-b-4 hover:border-b-[#1CADA3] transition-all duration-300"
+                                    className="bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center min-w-[200px] h-28 p-4 group border-b-4 hover:border-b-[#1CADA3] shadow-sm hover:shadow-md transition-all duration-300"
                                 >
                                     <img
                                         src={partner.logo}
@@ -91,7 +87,7 @@ const InsurancePartners = ({ scrollingSpeed = 20 }: InsurancePartnersProps) => {
                             {[...[...partners].reverse(), ...partners].map((partner, index) => (
                                 <div
                                     key={`${partner.name}-r2-${index}`}
-                                    className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center min-w-[200px] h-28 p-4 group border-b-4 hover:border-b-[#1CADA3] transition-all duration-200"
+                                    className="bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center min-w-[200px] h-28 p-4 group border-b-4 hover:border-b-[#1CADA3] shadow-sm hover:shadow-md transition-all duration-200"
                                 >
                                     <img
                                         src={partner.logo}
@@ -106,12 +102,6 @@ const InsurancePartners = ({ scrollingSpeed = 20 }: InsurancePartnersProps) => {
                     {/* Fades for smooth entry/exit */}
                     <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
                     <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-                </div>
-
-                <div className="mt-8 py-4 px-8 bg-gray-50/50 rounded-2xl border border-gray-100 inline-block max-w-3xl">
-                    <p className="text-gray-500 text-sm font-medium leading-relaxed">
-                        Your trust is our priority. All partner plans are IRDAI approved and subject to the policy&apos;s terms and conditions.
-                    </p>
                 </div>
             </div>
         </section>
