@@ -15,6 +15,7 @@ import {
   Clock,
   Files,
   CheckCircle2,
+  Pencil, // Added Pencil Icon
 } from 'lucide-react';
 
 interface Lead {
@@ -55,7 +56,6 @@ interface Lead {
     uploaded: boolean;
   }[];
   form_data?: any;
-  // NEW FIELDS FOR EXPORT
   disbursement_amount?: any;
   gross_payout_amount?: any;
   gst_amount?: any;
@@ -77,6 +77,12 @@ export default function LeadDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [docModalLead, setDocModalLead] = useState<Lead | null>(null);
+
+  // NEW STATES FOR EDITING
+  const [editingLead, setEditingLead] = useState<Lead | null>(null);
+  const [editFormData, setEditFormData] = useState<any>({});
+  const [updating, setUpdating] = useState(false);
+
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewType, setPreviewType] = useState<'image' | 'pdf' | 'other' | null>(null);
 
@@ -112,6 +118,50 @@ export default function LeadDashboard() {
     setCurrentPage(1);
   }, [searchTerm]);
 
+  // NEW EDIT HANDLERS
+  const handleEditClick = (lead: Lead) => {
+    setEditingLead(lead);
+    setEditFormData({ ...lead });
+  };
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, field: string, isFormData: boolean = false) => {
+    const value = e.target.value;
+    if (isFormData) {
+      setEditFormData((prev: any) => ({
+        ...prev,
+        form_data: {
+          ...prev.form_data,
+          [field]: value
+        }
+      }));
+    } else {
+      setEditFormData((prev: any) => ({
+        ...prev,
+        [field]: value
+      }));
+    }
+  };
+
+  const submitEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingLead) return;
+    setUpdating(true);
+    try {
+      const response = await AdminService.updateDetailLead(editingLead.id, editFormData);
+      if (response.success) {
+        alert("Lead updated successfully!");
+        setEditingLead(null);
+        fetchLeads();
+      } else {
+        alert(response.message || "Failed to update lead");
+      }
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Error updating lead");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const handlePreview = (url: string) => {
     const extension = url.split('.').pop()?.toLowerCase();
     if (['jpg', 'jpeg', 'png', 'webp'].includes(extension || '')) {
@@ -132,7 +182,6 @@ export default function LeadDashboard() {
       return;
     }
 
-    // List of specific fields to ensure are included in the export
     const extraFields = [
       'disbursement_amount',
       'gross_payout_amount',
@@ -149,27 +198,19 @@ export default function LeadDashboard() {
     ];
 
     const allKeys = new Set<string>();
-    
-    // Collect existing keys from the data
     dataToExport.forEach(lead => {
       Object.keys(lead).forEach(key => allKeys.add(key));
     });
-
-    // Explicitly add the requested fields to the header set
     extraFields.forEach(field => allKeys.add(field));
 
     const headers = Array.from(allKeys);
     const csvRows = [];
-
-    // Add Header row
     csvRows.push(headers.join(','));
 
-    // Add Data rows
     for (const lead of dataToExport) {
       const values = headers.map(header => {
         const val = (lead as any)[header];
         let cellValue = '';
-
         if (val === null || val === undefined) {
           cellValue = '';
         } else if (typeof val === 'object') {
@@ -177,7 +218,6 @@ export default function LeadDashboard() {
         } else {
           cellValue = String(val);
         }
-
         const escaped = cellValue.replace(/"/g, '""');
         return `"${escaped}"`;
       });
@@ -202,14 +242,12 @@ export default function LeadDashboard() {
     setUploading(true);
     try {
       const response = await AdminService.uploadDetailLeadsCSV(file);
-      console.log("Upload response:", response);
       if (response.success) {
         alert("CSV uploaded and processed successfully!");
       } else {
         alert(response.message || "Failed to upload CSV");
       }
     } catch (error: any) {
-      console.error("Upload error:", error);
       alert(error.response?.data?.message || "Error uploading file");
     } finally {
       setUploading(false);
@@ -270,7 +308,7 @@ export default function LeadDashboard() {
                 ))}
               </select>
             </div>
-            
+
             <div className="flex-1 md:flex-none">
               <input
                 type="file"
@@ -291,7 +329,7 @@ export default function LeadDashboard() {
                 {uploading ? 'Uploading...' : 'Upload CSV'}
               </label>
             </div>
-            
+
             <button
               onClick={downloadCSV}
               className="flex-1 md:flex-none inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium transition-colors shadow-sm cursor-pointer">
@@ -312,16 +350,16 @@ export default function LeadDashboard() {
               <table className="min-w-full divide-y divide-gray-200 table-auto">
                 <thead className="bg-gray-50 sticky top-0 z-30">
                   <tr>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Edit</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ID</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Lead ID</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">DSA Details</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Client Details</th>
-                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Referred RM</th>
                     {leadType !== 'my_lead' && (
                       <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Assigned RM</th>
                     )}
-                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Self Login</th>
+                  
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50">Acceptance</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Created At</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Documents</th>
@@ -333,6 +371,13 @@ export default function LeadDashboard() {
                     currentLeads.map((lead) => {
                       return (
                         <tr key={lead.id} className="hover:bg-gray-50 transition-colors relative group">
+                          {/* EDIT COLUMN */}
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 font-bold bg-white z-20">
+                            <button onClick={() => handleEditClick(lead)} className="p-1 hover:bg-blue-100 rounded-md text-blue-600 transition-colors">
+                              <Pencil size={16} />
+                            </button>
+                          </td>
+
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 font-bold bg-white z-20">
                             {lead.id}
                           </td>
@@ -354,14 +399,11 @@ export default function LeadDashboard() {
 
                           <td className="px-4 py-4 whitespace-nowrap text-sm">
                             <div className="font-bold text-gray-800">{lead.lead_name}</div>
-                            <div className="text-[11px] text-gray-600">{lead.email}</div>
-                            <div className="text-[10px] text-gray-500">{lead.contact_number}</div>
+                            {/* <div className="text-[11px] text-gray-600">{lead.email}</div>
+                            <div className="text-[10px] text-gray-500">{lead.contact_number}</div> */}
                           </td>
 
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {lead.referred_rm || 'N/A'}
-                          </td>
-
+                          
                           {leadType !== 'my_lead' && (
                             <td className="px-4 py-4 whitespace-nowrap text-sm text-purple-600 font-medium">
                               <div className="font-bold text-gray-800">{lead.assigned_rm_name}</div>
@@ -370,10 +412,7 @@ export default function LeadDashboard() {
                             </td>
                           )}
 
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {lead.is_self_login ? <span className="text-green-600 font-bold">Yes</span> : 'No'}
-                          </td>
-
+                          
                           <td className="px-4 py-4 whitespace-nowrap text-sm font-bold z-20 bg-white">
                             <span className={`${lead.rm_acceptance_status === 'ACCEPTED' ? 'text-green-600' : lead.rm_acceptance_status === 'PENDING' ? 'text-orange-500' : 'text-red-500'} text-[10px] tracking-wider uppercase`}>
                               {lead.rm_acceptance_status}
@@ -447,6 +486,94 @@ export default function LeadDashboard() {
                 <ChevronRight size={16} />
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* --- EDIT LEAD POPUP FORM --- */}
+        <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-300 ${editingLead ? 'visible opacity-100' : 'invisible opacity-0'}`}>
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !updating && setEditingLead(null)} />
+          <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col transition-all duration-300 transform ${editingLead ? 'scale-100' : 'scale-95'}`}>
+            {editingLead && (
+              /* Changed: Added flex-1 and min-h-0 to ensure the form respects the parent's max-height */
+              <form onSubmit={submitEdit} className="flex flex-col flex-1 min-h-0">
+                <div className="p-6 border-b flex items-center justify-between bg-white shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-50 rounded-lg text-blue-600"><Pencil size={20} /></div>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">Edit Lead</h3>
+                      <p className="text-xs text-gray-500 font-medium">{editingLead.detail_lead_id} • {editingLead.lead_name}</p>
+                    </div>
+                  </div>
+                  <button type="button" onClick={() => setEditingLead(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400"><X size={20} /></button>
+                </div>
+
+                {/* This div handles the scrolling */}
+                <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* CORE LEAD FIELDS */}
+                    <div className="col-span-full border-b pb-2"><h4 className="text-sm font-bold  text-[#1CADA3]">Core Information</h4></div>
+                    {[
+                        { label: 'DSA ID', key: 'dsa_id' },
+                      { label: 'Lead Name', key: 'lead_name' },
+                      { label: 'Contact Number', key: 'contact_number' },
+                      { label: 'RM ID', key: 'assigned_rm_id' },
+                       { label: 'Self Login', key: 'is_self_login' },
+                      { label: 'Lead Status', key: 'lead_status' },
+                      { label: 'Department ID', key: 'department_head_id' },
+                      { label: 'Department', key: 'department' },
+                      { label: 'Sub Category', key: 'sub_category' },
+                       { label: 'Payout ID', key: 'payout_id' },
+                      { label: 'Disbursement Amount', key: 'disbursement_amount' },
+                      { label: 'Gross Payout', key: 'gross_payout_amount' },
+                      { label: 'Net Payout', key: 'net_payout_amount' },
+                       { label: 'TDS Amount', key: 'tds_amount' },
+                       { label: 'GST Number', key: 'gst_amount' },
+                      { label: 'Policy Number', key: 'policy_number' },
+                      { label: 'Invoice Number', key: 'invoice_number' },
+                      { label: 'Transaction Ref', key: 'transaction_reference_no' },
+                      { label: 'Payment Mode', key: 'payment_mode' },
+                    ].map((field) => (
+                      <div key={field.key} className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider">{field.label}</label>
+                        <input
+                          type="text"
+                          value={editFormData[field.key] || ''}
+                          onChange={(e) => handleEditChange(e, field.key)}
+                          className="px-3 py-2 border text-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-[#1CADA3] outline-none bg-white"
+                        />
+                      </div>
+                    ))}
+
+                    {/* FORM DATA DYNAMIC FIELDS */}
+                    {editingLead.form_data && Object.keys(editingLead.form_data).length > 0 && (
+                      <>
+                        <div className="col-span-full border-b pb-2 mt-4"><h4 className="text-sm font-bold text-[#1CADA3]">Additional Form Data</h4></div>
+                        {Object.keys(editingLead.form_data).map((key) => (
+                          <div key={key} className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider">{key.replace(/_/g, ' ')}</label>
+                            <input
+                              type="text"
+                              value={editFormData.form_data?.[key] || ''}
+                              onChange={(e) => handleEditChange(e, key, true)}
+                              className="px-3 py-2 border text-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-[#1CADA3] outline-none bg-white"
+                            />
+                          </div>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-6 border-t bg-white flex justify-end gap-3 shrink-0">
+                  <button type="button" onClick={() => setEditingLead(null)} className="px-6 py-2.5 border text-gray-600 font-bold rounded-xl text-sm hover:bg-gray-100" disabled={updating}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="px-8 py-2.5 bg-[#1CADA3] text-white font-bold rounded-xl text-sm hover:bg-[#168f87] flex items-center gap-2" disabled={updating}>
+                    {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Changes'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
 

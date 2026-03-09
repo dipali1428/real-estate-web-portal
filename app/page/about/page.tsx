@@ -22,7 +22,7 @@ const AboutSection = () => {
         },
         {
             name: "Dr. Sanjay Shaha",
-            title: "MD | Director – Infinity Arthvishva",
+            title: "Director – Infinity Arthvishva",
             description: "Dr. Sanjay Shaha, Director at Infinity Arthvishva, is a senior physician with 40+ years of experience. National Merit Winner, Gold Medalist & Vijay Ratna Awardee, bringing strategic vision and ethical leadership.",
             image: "/leader/sanjay-shaha.jpeg"
         },
@@ -66,7 +66,7 @@ const AboutSection = () => {
             name: "Mr. Neeraj Mohata",
             title: "Regional Business Head – Nagpur",
             description: "Mr. Neeraj Mohata brings 11+ years of experience in lending and financial services, driving regional sales growth, channel expansion, and profitable business performance with strong leadership and market expertise.",
-            image: "/leader/Neeraj-Mohata.jpeg"
+            image: "/leader/Neeraj-Mohata1.jpeg"
         },
         {
             name: "Mr. Pravin Rautray",
