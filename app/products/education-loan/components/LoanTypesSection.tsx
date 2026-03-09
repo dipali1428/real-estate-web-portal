@@ -1,7 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { IconCheck, IconX, IconSchool, IconBuildingBank, IconWorld, IconAward, IconCurrencyRupee, IconPercentage, IconShieldCheck, IconClock, IconHistory, IconReceiptTax, IconFileText, IconFirstAidKit } from '@tabler/icons-react';
+import { useState } from 'react';
+import { IconCheck, IconX, IconSchool, IconBuildingBank, IconWorld, IconAward, IconCurrencyRupee, IconPercentage, IconShieldCheck, IconClock, IconHistory, IconReceiptTax, IconFileText, IconFirstAidKit, IconArrowRight, IconUser, IconPhone, IconBook, IconMapPin } from '@tabler/icons-react';
+import { useModal } from '../../../context/ModalContext';
 
 const loanTypes = [
     {
@@ -12,7 +14,7 @@ const loanTypes = [
         rate: '9.0% – 14% p.a.',
         tenure: 'Up to 15 years',
         color: 'from-blue-500 to-blue-700',
-        bg: 'bg-blue-50',
+        bg: 'bg-blue-50/30',
         border: 'border-blue-200',
         features: [
             'All UG, PG, diploma & professional courses',
@@ -29,8 +31,8 @@ const loanTypes = [
         rate: '8.5% – 18% p.a.',
         tenure: 'Up to 15 years',
         color: 'from-[#2076C7] to-[#1CADA3]',
-        bg: 'bg-gradient-to-br from-blue-50 to-teal-50',
-        border: 'border-blue-200',
+        bg: 'bg-gradient-to-br from-blue-50/30 to-teal-50/30',
+        border: 'border-blue-100',
         featured: true,
         features: [
             'USA, UK, Canada, Australia & 35+ countries',
@@ -47,7 +49,7 @@ const loanTypes = [
         rate: '11% – 15% p.a.',
         tenure: 'Up to 7 years',
         color: 'from-teal-500 to-teal-700',
-        bg: 'bg-teal-50',
+        bg: 'bg-teal-50/30',
         border: 'border-teal-200',
         features: [
             'ITI, polytechnic & short-term courses',
@@ -70,9 +72,11 @@ const comparison = [
 ];
 
 export default function LoanTypesSection() {
+    const { openLogin } = useModal();
+
     return (
-        <section className="py-12 bg-white relative overflow-hidden">
-            <div className="max-w-6xl mx-auto px-6 md:px-12">
+        <section className="py-2 bg-white relative overflow-hidden">
+            <div className="max-w-[1440px] mx-auto px-6 leading-relaxed">
 
                 {/* Header */}
                 <motion.div
@@ -85,10 +89,10 @@ export default function LoanTypesSection() {
                         <IconAward size={14} />
                         Loan Products
                     </span>
-                    <h2 className="text-3xl md:text-4xl font-extrabold mb-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
                         Choose Your Education Loan
                     </h2>
-                    <p className="text-slate-500 max-w-2xl mx-auto font-medium text-base leading-relaxed">
+                    <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
                         From domestic degrees to international programs — we have tailored loan products to match every aspiration and budget.
                     </p>
                 </motion.div>
@@ -104,42 +108,57 @@ export default function LoanTypesSection() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                                className={`relative rounded-[2rem] border ${loan.border} ${loan.bg} p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group ${loan.featured ? 'ring-2 ring-[#2076C7]/30 shadow-xl' : ''}`}
+                                className={`relative rounded-[2rem] border ${loan.border} ${loan.bg} p-8 pb-20 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group ${loan.featured ? 'ring-2 ring-[#2076C7]/30 shadow-xl' : ''}`}
                             >
                                 {loan.featured && (
                                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1 rounded-full shadow">
                                         Most Popular
                                     </div>
                                 )}
-                                <div className={`w-14 h-14 bg-gradient-to-br ${loan.color} rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
-                                    <Icon size={28} strokeWidth={1.8} className="text-white" />
+                                <div className="flex flex-col items-center text-center">
+                                    <div className={`w-14 h-14 bg-gradient-to-br ${loan.color} rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
+                                        <Icon size={28} strokeWidth={1.8} className="text-white" />
+                                    </div>
+                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{loan.subtitle}</div>
+                                    <h3 className="text-xl font-extrabold text-gray-700 mb-4 tracking-tight">{loan.title}</h3>
                                 </div>
-                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{loan.subtitle}</div>
-                                <h3 className="text-xl font-extrabold text-slate-800 mb-4 tracking-tight">{loan.title}</h3>
 
                                 <div className="space-y-2 mb-6">
                                     <div className="flex justify-between items-center py-2 border-b border-black/5">
-                                        <span className="text-xs font-bold text-slate-400 uppercase">Max Amount</span>
-                                        <span className="text-sm font-extrabold text-[#2076C7]">{loan.amount}</span>
+                                        <span className="text-sm font-bold text-slate-400 uppercase">Max Amount</span>
+                                        <span className="text-base font-extrabold text-[#2076C7]">{loan.amount}</span>
                                     </div>
                                     <div className="flex justify-between items-center py-2 border-b border-black/5">
-                                        <span className="text-xs font-bold text-slate-400 uppercase">Interest Rate</span>
-                                        <span className="text-sm font-extrabold text-slate-700">{loan.rate}</span>
+                                        <span className="text-sm font-bold text-slate-400 uppercase">Interest Rate</span>
+                                        <span className="text-base font-extrabold text-slate-700">{loan.rate}</span>
                                     </div>
                                     <div className="flex justify-between items-center py-2">
-                                        <span className="text-xs font-bold text-slate-400 uppercase">Tenure</span>
-                                        <span className="text-sm font-extrabold text-slate-700">{loan.tenure}</span>
+                                        <span className="text-sm font-bold text-slate-400 uppercase">Tenure</span>
+                                        <span className="text-base font-extrabold text-slate-700">{loan.tenure}</span>
                                     </div>
                                 </div>
 
-                                <ul className="space-y-2">
+                                <ul className="space-y-2 mb-8">
                                     {loan.features.map((f) => (
-                                        <li key={f} className="flex items-start gap-2 text-xs font-bold text-slate-600">
+                                        <li key={f} className="flex items-start gap-2 text-sm font-bold text-slate-600">
                                             <IconCheck size={14} className="text-teal-500 shrink-0 mt-0.5" strokeWidth={3} />
                                             {f}
                                         </li>
                                     ))}
                                 </ul>
+
+                                {/* Apply Now Button */}
+                                <button
+                                    onClick={openLogin}
+                                    className="absolute bottom-6 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-10 py-3.5 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group whitespace-nowrap"
+                                    style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
+                                >
+                                    <span className="relative z-6 flex items-center justify-center gap-1">
+                                        Apply Now
+                                        <IconArrowRight size={14} className="group-hover:translate-x-1 transition-transform" strokeWidth={3} />
+                                    </span>
+                                    <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
+                                </button>
                             </motion.div>
                         );
                     })}
@@ -150,10 +169,10 @@ export default function LoanTypesSection() {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mt-16"
+                    className="mt-14"
                 >
-                    <div className="text-center mb-10">
-                        <h3 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent inline-block">
+                    <div className="text-center mb-6">
+                        <h3 className="text-3xl md:text-4xl py-8 font-extrabold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent inline-block drop-shadow-sm tracking-tight leading-tight">
                             Domestic vs. Abroad — Quick Comparison
                         </h3>
                         <div className="w-24 h-1 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] mx-auto mt-4 rounded-full opacity-30" />
@@ -163,18 +182,18 @@ export default function LoanTypesSection() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm border-collapse">
                                 <thead>
-                                    <tr className="bg-blue-50/80">
-                                        <th className="text-left px-8 py-6 text-[11px] font-black text-[#2076C7]/60 uppercase tracking-[0.2em] border-b border-blue-100">Key Features</th>
-                                        <th className="text-center px-8 py-6 border-b border-blue-100">
+                                    <tr className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3]">
+                                        <th className="text-left px-4 sm:px-8 py-5 text-lg md:text-xl font-black text-white border-b border-white/10">Key Features</th>
+                                        <th className="text-center px-4 sm:px-8 py-5 border-b border-white/10">
                                             <div className="inline-flex flex-col items-center">
-                                                <span className="text-[11px] font-black text-[#2076C7] uppercase tracking-[0.2em]">Domestic Loan</span>
-                                                <div className="text-[10px] font-bold text-slate-400 lowercase mt-0.5 opacity-60">(study in india)</div>
+                                                <span className="text-lg md:text-xl font-black text-white">Domestic Loan</span>
+                                                <div className="text-[10px] font-bold text-white/90 mt-0.5">(study in india)</div>
                                             </div>
                                         </th>
-                                        <th className="text-center px-8 py-6 border-b border-blue-100">
+                                        <th className="text-center px-4 sm:px-8 py-5 border-b border-white/10">
                                             <div className="inline-flex flex-col items-center">
-                                                <span className="text-[11px] font-black text-[#1CADA3] uppercase tracking-[0.2em]">Abroad Loan</span>
-                                                <div className="text-[10px] font-bold text-slate-400 lowercase mt-0.5 opacity-60">(study overseas)</div>
+                                                <span className="text-lg md:text-xl font-black text-white">Abroad Loan</span>
+                                                <div className="text-[10px] font-bold text-white/90 mt-0.5">(study overseas)</div>
                                             </div>
                                         </th>
                                     </tr>
@@ -183,34 +202,34 @@ export default function LoanTypesSection() {
                                     {comparison.map((row, i) => {
                                         const FeatureIcon = row.icon;
                                         return (
-                                            <tr 
-                                                key={row.feature} 
+                                            <tr
+                                                key={row.feature}
                                                 className={`group transition-all duration-300 ${i === comparison.length - 1 ? '' : 'border-b border-slate-50'} hover:bg-blue-50/30`}
                                             >
-                                                <td className="px-8 py-5">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 rounded-xl bg-[#2076C7] flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-lg shadow-blue-200">
-                                                            <FeatureIcon size={20} strokeWidth={2.5} />
+                                                <td className="px-3 sm:px-8 py-4">
+                                                    <div className="flex items-center gap-3 md:gap-4">
+                                                        <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-md">
+                                                            <FeatureIcon size={18} strokeWidth={2.5} />
                                                         </div>
-                                                        <span className="font-extrabold text-slate-700 tracking-tight">{row.feature}</span>
+                                                        <span className="font-extrabold text-slate-700 tracking-tight text-sm md:text-lg">{row.feature}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-8 py-5 text-center">
+                                                <td className="px-4 sm:px-8 py-3.5 text-center">
                                                     {typeof row.domestic === 'boolean' ? (
-                                                        <div className={`w-8 h-8 rounded-full mx-auto flex items-center justify-center ${row.domestic ? 'bg-teal-50 text-teal-600' : 'bg-red-50 text-red-500'}`}>
-                                                            {row.domestic ? <IconCheck size={18} strokeWidth={3} /> : <IconX size={18} strokeWidth={3} />}
+                                                        <div className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center ${row.domestic ? 'bg-teal-50 text-teal-600' : 'bg-red-50 text-red-500'}`}>
+                                                            {row.domestic ? <IconCheck size={16} strokeWidth={3} /> : <IconX size={16} strokeWidth={3} />}
                                                         </div>
                                                     ) : (
-                                                        <span className="text-sm font-bold text-slate-500">{row.domestic}</span>
+                                                        <span className="text-base md:text-lg font-bold text-slate-500">{row.domestic}</span>
                                                     )}
                                                 </td>
-                                                <td className="px-8 py-5 text-center">
+                                                <td className="px-4 sm:px-8 py-3.5 text-center">
                                                     {typeof row.abroad === 'boolean' ? (
-                                                        <div className={`w-8 h-8 rounded-full mx-auto flex items-center justify-center ${row.abroad ? 'bg-teal-50 text-teal-600' : 'bg-red-50 text-red-500'}`}>
-                                                            {row.abroad ? <IconCheck size={18} strokeWidth={3} /> : <IconX size={18} strokeWidth={3} />}
+                                                        <div className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center ${row.abroad ? 'bg-teal-50 text-teal-600' : 'bg-red-50 text-red-500'}`}>
+                                                            {row.abroad ? <IconCheck size={16} strokeWidth={3} /> : <IconX size={16} strokeWidth={3} />}
                                                         </div>
                                                     ) : (
-                                                        <span className="text-sm font-black text-[#2076C7]">{row.abroad}</span>
+                                                        <span className="text-base md:text-lg font-black text-[#2076C7]">{row.abroad}</span>
                                                     )}
                                                 </td>
                                             </tr>
@@ -219,21 +238,7 @@ export default function LoanTypesSection() {
                                 </tbody>
                             </table>
                         </div>
-                        
-                        {/* Summary Footer */}
-                        <div className="bg-slate-50/50 p-6 border-t border-slate-100">
-                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">
-                                 <div className="flex items-center gap-2">
-                                     <div className="w-2 h-2 rounded-full bg-teal-500" />
-                                     <span>Instant Disbursal Available</span>
-                                 </div>
-                                 <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-slate-200" />
-                                 <div className="flex items-center gap-2">
-                                     <div className="w-2 h-2 rounded-full bg-[#2076C7]" />
-                                     <span>Customized Repayment Plans</span>
-                                 </div>
-                             </div>
-                        </div>
+
                     </div>
                 </motion.div>
             </div>

@@ -10,11 +10,11 @@ const productTypes = [
         icon: Bike,
         link: "plans",
         theme: {
-            bg: "bg-purple-100/50",
-            border: "border-purple-200",
-            icon: "text-purple-700",
-            iconBg: "bg-purple-100",
-            button: "bg-purple-400 hover:bg-purple-500 shadow-purple-600/20"
+            bg: "bg-[#1CADA3]/5",
+            border: "border-[#1CADA3]/20",
+            icon: "text-[#1CADA3]",
+            iconBg: "bg-[#1CADA3]/10",
+            button: "bg-[#1CADA3] hover:bg-[#1CADA3]/90 shadow-[#1CADA3]/20"
         }
     },
     {
@@ -23,11 +23,11 @@ const productTypes = [
         icon: Car,
         link: "plans",
         theme: {
-            bg: "bg-yellow-100/50",
-            border: "border-yellow-300",
-            icon: "text-yellow-700",
-            iconBg: "bg-yellow-100",
-            button: "bg-yellow-400 hover:bg-yellow-500 shadow-yellow-500/20"
+            bg: "bg-[#1CADA3]/5",
+            border: "border-[#1CADA3]/20",
+            icon: "text-[#1CADA3]",
+            iconBg: "bg-[#1CADA3]/10",
+            button: "bg-[#1CADA3] hover:bg-[#1CADA3]/90 shadow-[#1CADA3]/20"
         }
     },
     {
@@ -36,11 +36,11 @@ const productTypes = [
         icon: Truck,
         link: "plans",
         theme: {
-            bg: "bg-red-100/50",
-            border: "border-red-200",
-            icon: "text-red-700",
-            iconBg: "bg-red-100",
-            button: "bg-red-400 hover:bg-red-500 shadow-red-600/20"
+            bg: "bg-[#1CADA3]/5",
+            border: "border-[#1CADA3]/20",
+            icon: "text-[#1CADA3]",
+            iconBg: "bg-[#1CADA3]/10",
+            button: "bg-[#1CADA3] hover:bg-[#1CADA3]/90 shadow-[#1CADA3]/20"
         }
     },
     {
@@ -49,11 +49,11 @@ const productTypes = [
         icon: ShieldCheck,
         link: "plans",
         theme: {
-            bg: "bg-green-100/50",
-            border: "border-green-200",
-            icon: "text-green-700",
-            iconBg: "bg-green-100",
-            button: "bg-green-400 hover:bg-green-500 shadow-green-600/20"
+            bg: "bg-[#1CADA3]/5",
+            border: "border-[#1CADA3]/20",
+            icon: "text-[#1CADA3]",
+            iconBg: "bg-[#1CADA3]/10",
+            button: "bg-[#1CADA3] hover:bg-[#1CADA3]/90 shadow-[#1CADA3]/20"
         }
     }
 ];
@@ -63,7 +63,7 @@ export default function MotorProductTypes() {
         <section className="py-10 bg-white">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-5xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-transparent bg-clip-text inline-block">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Our Motor Insurance Products
                     </h2>
                     <p className="text-gray-500 text-lg max-w-2xl mx-auto">
@@ -80,20 +80,20 @@ export default function MotorProductTypes() {
                                 key={index}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
-                                whileHover={{ y: -10 }}
+                                whileHover={{ y: -5 }}
                                 transition={{ duration: 0.4, delay: index * 0.1 }}
                                 viewport={{ once: true }}
-                                className="flex flex-col items-center text-center p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-gray-300 shadow-sm transition-all duration-300 relative overflow-hidden group h-full hover:shadow-md hover:scale-[1.02]"
+                                className="flex flex-col items-center text-center p-4 sm:p-6 rounded-3xl border border-gray-300 shadow-sm transition-all duration-300 relative overflow-hidden group h-full hover:shadow-md hover:scale-[1.02]"
                             >
-                                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ${theme.iconBg} flex items-center justify-center mb-5 sm:mb-8 group-hover:scale-110 transition-transform duration-500`}>
-                                    <Icon size={36} className={theme.icon} />
+                                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${theme.iconBg} flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-500`}>
+                                    <Icon size={28} className={theme.icon} />
                                 </div>
 
-                                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 tracking-tight leading-tight">
+                                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3 tracking-tight leading-tight">
                                     {product.title}
                                 </h3>
 
-                                <p className="text-gray-600 text-sm leading-relaxed mb-8 sm:mb-10 flex-1">
+                                <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-1">
                                     {product.description}
                                 </p>
 

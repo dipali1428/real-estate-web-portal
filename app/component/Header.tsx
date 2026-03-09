@@ -73,7 +73,7 @@ const Header = () => {
   ];
 
   const mutualFundOptions = [
-    { label: "Mutual Fund", href: "/products/mutualfunds" },
+    { label: "Mutual Fund", href: "/products/mutual-funds" },
   ];
 
   const investmentOptions = [

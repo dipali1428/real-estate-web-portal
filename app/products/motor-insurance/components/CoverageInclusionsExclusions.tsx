@@ -48,10 +48,6 @@ const exclusions = [
         description: "Damage occurring as a consequence of the main accident (e.g., driving with oil leak).",
     },
     {
-        title: "War & Nuclear Perils",
-        description: "Damages caused by war, mutiny, or nuclear risks.",
-    },
-    {
         title: "Outside Geographical Area",
         description: "Accidents taking place outside the specified geographical limits.",
     },
@@ -59,13 +55,7 @@ const exclusions = [
 
 export default function CoverageInclusionsExclusions() {
     return (
-        <section className="py-12 relative overflow-hidden">
-            {/* Background Elements */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute top-1/4 -right-64 w-96 h-96 bg-brand-teal/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-1/4 -left-64 w-96 h-96 bg-brand-blue/10 rounded-full blur-3xl" />
-            </div>
-
+        <section className="py-12 bg-white relative overflow-hidden font-sans">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <motion.div
@@ -74,7 +64,7 @@ export default function CoverageInclusionsExclusions() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-transparent bg-clip-text inline-block">
+                        <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                             What's Covered & What's Not
                         </h2>
                         <p className="text-gray-500 mb-6 max-w-lg mx-auto">
@@ -93,14 +83,14 @@ export default function CoverageInclusionsExclusions() {
                             transition={{ duration: 0.6 }}
                             className="flex flex-col h-full"
                         >
-                            <div className="glass-card rounded-2xl px-5 py-6 border border-green-200 border-t-4 border-t-green-500 h-full shadow-sm">
+                            <div className="glass-card rounded-2xl px-5 py-6 border border-[#1CADA3]/20 border-t-4 border-t-[#1CADA3] h-full shadow-md hover:shadow-lg transition-shadow duration-300">
                                 <div className="flex items-center gap-3 mb-8">
-                                    <div className="p-3 rounded-full bg-green-100 text-green-600">
+                                    <div className="p-3 rounded-full bg-[#1CADA3]/10 text-[#1CADA3]">
                                         <ShieldCheck size={24} />
                                     </div>
                                     <div>
                                         <h3 className="text-2xl font-bold text-gray-900">Inclusions</h3>
-                                        <p className="text-green-600 font-medium">What we cover</p>
+                                        <p className="text-[#1CADA3] font-medium">What we cover</p>
                                     </div>
                                 </div>
 
@@ -114,7 +104,7 @@ export default function CoverageInclusionsExclusions() {
                                             transition={{ delay: 0.1 * index }}
                                             className="flex gap-4"
                                         >
-                                            <CheckCircle2 className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
+                                            <CheckCircle2 className="w-6 h-6 text-[#1CADA3] flex-shrink-0 mt-1" />
                                             <div>
                                                 <h4 className="font-semibold text-gray-900">{item.title}</h4>
                                                 <p className="text-sm text-gray-500 mt-1">{item.description}</p>
@@ -133,14 +123,14 @@ export default function CoverageInclusionsExclusions() {
                             transition={{ duration: 0.6 }}
                             className="flex flex-col h-full"
                         >
-                            <div className="glass-card rounded-2xl px-5 py-6 border border-red-200 border-t-4 border-t-red-500 h-full shadow-sm">
+                            <div className="glass-card rounded-2xl px-5 py-6 border border-[#1CADA3]/20 border-t-4 border-t-[#1CADA3] h-full shadow-md hover:shadow-lg transition-shadow duration-300">
                                 <div className="flex items-center gap-3 mb-8">
-                                    <div className="p-3 rounded-full bg-red-100 text-red-600">
+                                    <div className="p-3 rounded-full bg-[#1CADA3]/10 text-[#1CADA3]">
                                         <AlertOctagon size={24} />
                                     </div>
                                     <div>
                                         <h3 className="text-2xl font-bold text-gray-900">Exclusions</h3>
-                                        <p className="text-red-500 font-medium">What we don't cover</p>
+                                        <p className="text-[#1CADA3] font-medium">What we don't cover</p>
                                     </div>
                                 </div>
 
@@ -154,7 +144,7 @@ export default function CoverageInclusionsExclusions() {
                                             transition={{ delay: 0.1 * index }}
                                             className="flex gap-4"
                                         >
-                                            <XCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" />
+                                            <XCircle className="w-6 h-6 text-[#1CADA3] flex-shrink-0 mt-1" />
                                             <div>
                                                 <h4 className="font-semibold text-gray-900">{item.title}</h4>
                                                 <p className="text-sm text-gray-500 mt-1">{item.description}</p>
