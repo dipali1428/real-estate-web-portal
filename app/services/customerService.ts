@@ -163,12 +163,6 @@ const CustomerService = {
         return response.data;
     },
 
-    // ==================== USER SHARES ====================
-    getUserShares: async () => {
-        const response = await api.get("/api/unlisted/public/shares");
-        return response.data;
-    },
-
     // ==================== PROFILE ====================
     getProfile: async () => {
         const response = await api.get("/api/unlisted/user/profile");
