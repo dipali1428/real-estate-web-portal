@@ -115,7 +115,7 @@ const CreditScorePage: React.FC = () => {
         mobile: "", // Default verified mobile
         pan: "",
         gender: "",
-        dob: "", // Added dob
+        dob: "",
         consent: false,
     });
 
