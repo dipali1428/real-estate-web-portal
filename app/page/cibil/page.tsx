@@ -233,6 +233,7 @@ const CreditScorePage: React.FC = () => {
             // const response = true;
             if (response) {
                 setOtpSent(true);
+                setOtp(["", "", "", "", "", ""]);
                 setTimer(30);
                 setError(null);
             }
@@ -254,12 +255,12 @@ const CreditScorePage: React.FC = () => {
         setOtpLoading(true);
         try {
             // API Commented - Mocking response
-            
+
             const response = await PublicService.verifyOtp({
                 mobile: formData.mobile,
                 otp: fullOtp
             });
-            
+
             // const response = true;
             if (response) {
                 setIsMobileVerified(true);
@@ -517,6 +518,7 @@ const CreditScorePage: React.FC = () => {
                                             ))}
                                         </div>
                                     </div>
+
                                     <button
                                         onClick={handleVerifyOtp}
                                         disabled={otpLoading || otp.join("").length < 6}
@@ -524,6 +526,21 @@ const CreditScorePage: React.FC = () => {
                                     >
                                         {otpLoading ? "Verifying..." : "Verify OTP"}
                                     </button>
+                                    <div className="text-center space-y-3">
+                                        {timer > 0 ? (
+                                            <p className="text-sm text-gray-500 font-medium">
+                                                Resend OTP in <span className="text-[#1CADA3]">{timer}s</span>
+                                            </p>
+                                        ) : (
+                                            <button
+                                                onClick={handleSendOtp}
+                                                className="text-sm text-[#1CADA3] font-bold hover:underline decoration-2 underline-offset-4"
+                                            >
+                                                Resend OTP
+                                            </button>
+                                        )}
+                                    </div>
+
                                     <div className="text-center">
                                         <button onClick={() => { setOtpSent(false); setOtp(["", "", "", "", "", ""]) }} className="text-sm text-gray-400 font-medium hover:text-[#2076C7]">Change Number</button>
                                     </div>
@@ -724,6 +741,10 @@ const CreditScorePage: React.FC = () => {
                                             />
                                         </div>
                                     </div>
+
+                                    <p className="mb-6 text-[14px] text-gray-700 leading-relaxed italic border-l-2 border-[#1CADA3]/30 pl-3 bg-green-50 rounded-1xl">
+                                        Disclaimer: Checking your CIBIL score through this platform is a soft inquiry and will not affect or reduce your CIBIL score in any way.
+                                    </p>
 
                                     <div className="mb-6">
                                         <div className="flex items-start">
