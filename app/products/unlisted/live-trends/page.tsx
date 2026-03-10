@@ -16,11 +16,9 @@ import {
     TrendingUp,
     TrendingDown,
     BarChart3,
-    PieChart,
-    Activity,
-    Clock,
-    Users,
     IndianRupee,
+    Activity,
+    Users,
     Loader2
 } from 'lucide-react';
 import {
