@@ -33,77 +33,55 @@ const vehicleLoanFaqs = [
 
 const VehicleLoanFAQ = () => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
+    const [showAllFaqs, setShowAllFaqs] = useState(false);
 
     const toggleFAQ = (index: number) => {
         setActiveIndex(activeIndex === index ? null : index);
     };
 
     return (
-        <div className="py-20 bg-white">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-clip-text text-transparent drop-shadow-sm transition-all" style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Frequently Asked Questions</h2>
+        <div className="bg-white font-sans">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="text-center mb-8">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Frequently Asked Questions</h2>
                     <div className="w-24 h-1 mx-auto rounded-full mb-4" style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}></div>
-                    <p className="text-gray-600">Got questions about vehicle financing? We've got answers.</p>
+                    <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">Got questions about vehicle financing? We&apos;ve got answers.</p>
                 </div>
 
                 <div className="space-y-4">
-                    {vehicleLoanFaqs.map((faq, idx) => (
-                        <div key={idx} className="border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#1CADA3]/30 hover:shadow-md">
+                    {(showAllFaqs ? vehicleLoanFaqs : vehicleLoanFaqs.slice(0, 5)).map((faq, idx) => (
+                        <div key={idx} className="border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300 hover:border-blue-600/30 hover:shadow-md">
                             <button
                                 onClick={() => toggleFAQ(idx)}
-                                className="w-full px-4 sm:px-6 py-4 sm:py-5 text-left flex justify-between items-start gap-3 bg-gray-50 hover:bg-gray-100 transition-colors focus:outline-none cursor-pointer"
+                                className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left flex justify-between items-start gap-3 bg-gray-50 hover:bg-blue-50/50 transition-colors focus:outline-none cursor-pointer group"
                             >
-                                <span className="font-bold text-gray-800 text-base sm:text-lg pr-2">{faq.question}</span>
-                                <div className={`p-1 rounded-full bg-white border border-gray-200 text-[#2076C7] transition-transform duration-300 ${activeIndex === idx ? 'rotate-180' : ''}`}>
-                                    {activeIndex === idx ? <Minus size={20} /> : <Plus size={20} />}
+                                <span className="font-bold text-gray-700 text-base sm:text-lg pr-2 group-hover:text-blue-600 transition-colors text-balance">{faq.question}</span>
+                                <div className={`p-1.5 rounded-full bg-white border border-gray-300 text-gray-700 transition-transform duration-300 ${activeIndex === idx ? 'rotate-180' : ''}`}>
+                                    {activeIndex === idx ? <Minus size={18} strokeWidth={3} /> : <Plus size={18} strokeWidth={3} />}
                                 </div>
                             </button>
 
                             {activeIndex === idx && (
-                                <div className="px-6 py-5 bg-white text-gray-600 text-base leading-relaxed border-t border-gray-100 animate-fadeIn">
+                                <div className="px-6 py-3 bg-white text-gray-600 text-base leading-relaxed border-t border-gray-100 animate-fadeIn">
                                     {faq.answer}
                                 </div>
                             )}
                         </div>
                     ))}
                 </div>
-            </div>
 
-            <section className="mt-12 py-12 bg-[#1CADA3] relative overflow-hidden">
-                {/* Background Decorative Elements */}
-                <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                    <div className="absolute -top-24 -left-24 w-96 h-96 bg-white rounded-full blur-3xl" />
-                    <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-white rounded-full blur-3xl" />
-                </div>
-
-                <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        className="max-w-4xl mx-auto flex flex-col items-center"
-                    >
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
-                            Ready to Drive Your New Vehicle?
-                        </h2>
-                        <p className="text-white/90 text-base md:text-lg mb-8 max-w-2xl mx-auto font-medium leading-relaxed">
-                            Stop waiting and start driving. Apply today for a seamless vehicle financing experience with low interest rates and flexible tenures.
-                        </p>
-                        <motion.button
-                            whileHover={{ scale: 1.05, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => {
-                                const formElement = document.getElementById('apply-now-form');
-                                if (formElement) formElement.scrollIntoView({ behavior: 'smooth' });
-                            }}
-                            className="px-10 py-3.5 bg-white text-[#1CADA3] rounded-full font-bold text-base hover:bg-gray-50 transition-all shadow-lg"
+                {vehicleLoanFaqs.length > 5 && (
+                    <div className="text-center mt-8">
+                        <button
+                            onClick={() => setShowAllFaqs(!showAllFaqs)}
+                            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-50 text-[#2076C7] font-semibold hover:bg-blue-100 transition-colors cursor-pointer"
                         >
-                            Apply Now
-                        </motion.button>
-                    </motion.div>
-                </div>
-            </section>
+                            {showAllFaqs ? 'View Less' : 'View More'}
+                            <Plus size={18} className={`transition-transform duration-300 ${showAllFaqs ? 'rotate-45' : ''}`} />
+                        </button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
