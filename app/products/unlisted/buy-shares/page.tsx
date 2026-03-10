@@ -2,8 +2,8 @@
 import { useRef } from 'react';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-// Import services
-import { fetchAllShares, fetchIdGraphData, createEnquiry, GraphPoint, EnquiryPayload } from '../../../services/unlistedservices';
+// Import services - removed createEnquiry
+import { fetchAllShares, fetchIdGraphData, GraphPoint } from '../../../services/unlistedservices';
 import { 
   ArrowLeft, Search, Filter, CheckCircle, Package, Info,  
   Database, TrendingUp, X, User, FileText, ChevronDown, ChevronUp,
@@ -81,7 +81,7 @@ const BuyShares: React.FC = () => {
   const [graphData, setGraphData] = useState<GraphPoint[]>([]);
   const [isGraphLoading, setIsGraphLoading] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [graphTimeRange, setGraphTimeRange] = useState('1M');
+  const [graphTimeRange, setGraphTimeRange] = useState('All');
 
   // --- FILTER & SEARCH STATES ---
   const [searchTerm, setSearchTerm] = useState('');
@@ -89,27 +89,15 @@ const BuyShares: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
 
-  // --- MODAL STATES ---
+  // --- MODAL STATES - Kept only detail modal, removed enquiry related states ---
   const [detailCompany, setDetailCompany] = useState<ExtendedCompany | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'company'>('overview');
-  const [enquiryCompany, setEnquiryCompany] = useState<ExtendedCompany | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [enquiryError, setEnquiryError] = useState<string | null>(null);
   
   // --- NOTIFICATION STATE ---
   const [notifications, setNotifications] = useState<{ id: number; message: string }[]>([]);
   
   // --- FAQ STATE ---
   const [activeFaqs, setActiveFaqs] = useState<number[]>([]);
-  
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    quantity: '',
-    message: ''
-  });
 
   // NOTIFICATION HANDLER - Matching SellShares
   const showNotification = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -225,11 +213,11 @@ const BuyShares: React.FC = () => {
     loadGraphData();
   }, [detailCompany]);
 
-  // PREVENT SCROLL ON MODAL OPEN
+  // PREVENT SCROLL ON MODAL OPEN - Updated to only check detailCompany
   useEffect(() => {
-    document.body.style.overflow = (detailCompany || enquiryCompany || showSuccess) ? 'hidden' : 'unset';
+    document.body.style.overflow = detailCompany ? 'hidden' : 'unset';
     return () => { document.body.style.overflow = 'unset'; };
-  }, [detailCompany, enquiryCompany, showSuccess]);
+  }, [detailCompany]);
 
   // SEARCH DEBOUNCE
   useEffect(() => {
@@ -253,7 +241,7 @@ const BuyShares: React.FC = () => {
     // Filter data based on selected time range
     let filteredData = [...graphData];
     const now = new Date();
-    
+
     if (graphTimeRange === '1W') {
       const cutoffDate = new Date();
       cutoffDate.setDate(now.getDate() - 7);
@@ -266,12 +254,7 @@ const BuyShares: React.FC = () => {
       const cutoffDate = new Date();
       cutoffDate.setMonth(now.getMonth() - 3);
       filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
-    } else if (graphTimeRange === '1Y') {
-      const cutoffDate = new Date();
-      cutoffDate.setFullYear(now.getFullYear() - 1);
-      filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
     }
-
     // Sort data by date (oldest to newest for proper line chart)
     filteredData.sort((a, b) => new Date(a.price_date).getTime() - new Date(b.price_date).getTime());
 
@@ -377,77 +360,6 @@ const BuyShares: React.FC = () => {
     Array.from(new Set(companies.map(c => c.category))).sort()
   , [companies]);
 
-  // ENQUIRY HANDLERS
-  const handleOpenEnquiry = (company: ExtendedCompany) => {
-    setEnquiryCompany(company);
-    setEnquiryError(null);
-    setFormData({
-      fullName: '',
-      email: '',
-      phone: '',
-      quantity: company.lotSize.toString(),
-      message: `I'm interested in buying shares of ${company.name}`
-    });
-
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (enquiryError) setEnquiryError(null);
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!enquiryCompany) return;
-    
-    if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim()) {
-      setEnquiryError('Please fill in all required fields');
-      return;
-    }
-
-    const quantity = parseInt(formData.quantity);
-    if (isNaN(quantity) || quantity < enquiryCompany.lotSize) {
-      setEnquiryError(`Quantity must be at least ${enquiryCompany.lotSize} shares`);
-      return;
-    }
-
-    setIsSubmitting(true);
-    setEnquiryError(null);
-    
-    try {
-      const payload: EnquiryPayload = {
-        company_id: enquiryCompany.id,
-        enquiry_type: 'buy',
-        full_name: formData.fullName.trim(),
-        email: formData.email.trim(),
-        phone: formData.phone.trim(),
-        quantity: quantity,
-        message: formData.message.trim() || `Interested in buying shares of ${enquiryCompany.name}`
-      };
-
-      const response = await createEnquiry(payload);
-      
-      setShowSuccess(true);
-      setEnquiryCompany(null);
-      setFormData({
-        fullName: '',
-        email: '',
-        phone: '',
-        quantity: '',
-        message: ''
-      });
-      
-      showNotification('Purchase enquiry submitted successfully!', 'success');
-      
-    } catch {
-      setEnquiryError("Failed to submit enquiry. Please try again.");
-      showNotification('Failed to submit enquiry', 'error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   // FAQ TOGGLE - Matching SellShares
   const toggleFaq = (idx: number) => {
     setActiveFaqs(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
@@ -483,7 +395,6 @@ const BuyShares: React.FC = () => {
     setHoveredIndex(null);
   };
 
-  // Add this function near your other helper functions
   const getFilteredGraphData = () => {
     if (!graphData.length) return [];
     
@@ -503,11 +414,6 @@ const BuyShares: React.FC = () => {
       case '3M': {
         const cutoffDate = new Date();
         cutoffDate.setMonth(now.getMonth() - 3);
-        return graphData.filter(item => new Date(item.price_date) >= cutoffDate);
-      }
-      case '1Y': {
-        const cutoffDate = new Date();
-        cutoffDate.setFullYear(now.getFullYear() - 1);
         return graphData.filter(item => new Date(item.price_date) >= cutoffDate);
       }
       case 'All':
@@ -539,7 +445,6 @@ const BuyShares: React.FC = () => {
     return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
   };
 
-  // Add this helper function for shorter date format (DD MMM)
   const formatShortDate = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -782,13 +687,13 @@ const BuyShares: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Action Buttons - Side by Side */}
+                  {/* Action Buttons - Side by Side - Buy Now button restored */}
                   <div className="flex gap-3 w-full mt-auto">
                     <button
-                      onClick={() => handleOpenEnquiry(company)}
+                      onClick={() => {/* This would open enquiry modal */}}
                       className="flex-1 py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
                     >
-                      Enquire Now
+                      Buy Now
                     </button>
                     <button
                       onClick={() => setDetailCompany(company)}
@@ -864,206 +769,7 @@ const BuyShares: React.FC = () => {
         </section>
       </main>
 
-      {/* ENQUIRY MODAL - Updated to match SellShares styling */}
-      {enquiryCompany && (
-        <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-6 text-white flex justify-between items-center">
-              <div>
-                <h3 className="text-xl font-black uppercase tracking-tight">Buy Enquiry</h3>
-              </div>
-              <button 
-                onClick={() => setEnquiryCompany(null)} 
-                className="hover:bg-white/20 p-2 rounded-full transition-all"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            
-            <form className="p-6 space-y-4" onSubmit={handleFormSubmit}>
-              {enquiryError && (
-                <div className="bg-red-50 text-red-600 text-xs p-3 rounded-lg border border-red-200 flex items-start gap-2">
-                  <X className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-                  <span>{enquiryError}</span>
-                </div>
-              )}
-              
-              {/* Name Field - Full width */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                  Full Name <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input 
-                    required 
-                    type="text" 
-                    value={formData.fullName}
-                    onChange={(e) => handleInputChange('fullName', e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 text-sm text-gray-900 placeholder:text-gray-400 transition-all" 
-                    placeholder="Enter your full name" 
-                  />
-                </div>
-              </div>
-              
-              {/* Email & Phone - Side by side */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                    Email <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input 
-                      required 
-                      type="email" 
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 text-sm text-gray-900 placeholder:text-gray-400 transition-all" 
-                      placeholder="your@email.com" 
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                    Phone <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input 
-                      required 
-                      type="tel" 
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 text-sm text-gray-900 placeholder:text-gray-400 transition-all" 
-                      placeholder="+91 98765 43210" 
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              {/* Quantity with Quick Select */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-semibold text-gray-700">
-                    Quantity <span className="text-red-500">*</span>
-                  </label>
-                  <span className="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-                    Min: {enquiryCompany.lotSize} shares
-                  </span>
-                </div>
-                
-                <div className="relative">
-                  <Calculator className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input 
-                    type="number" 
-                    value={formData.quantity}
-                    onChange={(e) => handleInputChange('quantity', e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 text-sm text-gray-900 transition-all" 
-                    min={enquiryCompany.lotSize}
-                    step={enquiryCompany.lotSize}
-                    placeholder="Enter quantity"
-                  />
-                </div>
-                
-                {/* Investment summary card */}
-                <div className="mt-3 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-lg p-3 border border-blue-100/50">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Total Investment</p>
-                      <p className="text-base font-bold text-gray-900">
-                        {calculateMinInvestment(
-                          enquiryCompany.price, 
-                          parseInt(formData.quantity) || enquiryCompany.lotSize
-                        )}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Price per share</p>
-                      <p className="text-sm font-semibold text-gray-900">
-                        ₹{enquiryCompany.price.toLocaleString('en-IN')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Message - Compact */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                  Additional Message <span className="text-gray-400 font-normal">(optional)</span>
-                </label>
-                <div className="relative">
-                  <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                  <textarea 
-                    value={formData.message}
-                    onChange={(e) => handleInputChange('message', e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 text-sm text-gray-900 placeholder:text-gray-400 transition-all resize-none" 
-                    placeholder="Any specific requirements or questions..."
-                    rows={2}
-                  />
-                </div>
-              </div>
-              
-              {/* Action Buttons */}
-              <div className="flex items-center gap-3 pt-2">
-                <button 
-                  type="button"
-                  onClick={() => setEnquiryCompany(null)}
-                  className="flex-1 py-2.5 px-4 bg-white border border-gray-200 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-50 hover:border-gray-300 transition-all"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 py-2.5 px-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-medium text-sm hover:opacity-90 disabled:opacity-70 transition-all flex items-center justify-center gap-2 shadow-sm"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      Submit Enquiry
-                    </>
-                  )}
-                </button>
-              </div>
-              
-              {/* Trust message */}
-              <p className="text-[10px] text-gray-400 text-center pt-1">
-                ✓ Your information is secure and will not be shared
-              </p>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* SUCCESS MODAL - Updated to match SellShares styling */}
-      {showSuccess && (
-        <div className="fixed inset-0 z-[7000] bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white p-10 rounded-3xl max-w-sm w-full text-center shadow-2xl">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-10 h-10 text-green-600" />
-            </div>
-            <h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">Enquiry Sent!</h3>
-            <p className="text-gray-500 text-sm mb-8 leading-relaxed">
-              Our relationship manager will contact you within 24 hours with the latest quotes and procedure.
-            </p>
-            <button 
-              onClick={() => setShowSuccess(false)} 
-              className="w-full py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-black hover:opacity-90 transition-all"
-            >
-              Back to Marketplace
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* DETAIL MODAL */}
+      {/* DETAIL MODAL - Only modal remaining */}
       {detailCompany && (
         <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
           <div className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 animate-fadeIn overflow-hidden flex flex-col border border-gray-100">
@@ -1141,12 +847,12 @@ const BuyShares: React.FC = () => {
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-xs font-medium text-gray-500">Price History</span>
                           <span className="text-[10px] font-medium text-gray-400">•</span>
-                          <span className="text-[10px] font-medium text-gray-400">
-                            {graphTimeRange === '1W' ? 'Weekly' : 
-                             graphTimeRange === '1M' ? 'Monthly' : 
-                             graphTimeRange === '3M' ? 'Quarterly' : 
-                             graphTimeRange === '1Y' ? 'Yearly' : 'All Time'}
-                          </span>
+                            <span className="text-[10px] font-medium text-gray-400">
+                              {graphTimeRange === 'All' ? 'All Time' : 
+                              graphTimeRange === '3M' ? '3 Months' : 
+                              graphTimeRange === '1M' ? '1 Month' : 
+                              graphTimeRange === '1W' ? '1 Week' : ''}
+                            </span>
                         </div>
                         <div className="flex items-baseline gap-3">
                           <h3 className="text-2xl font-bold text-gray-900">
@@ -1161,7 +867,7 @@ const BuyShares: React.FC = () => {
                       
                       {/* Time Range Filters */}
                       <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80">
-                        {['1W', '1M', '3M', '1Y', 'All'].map(r => (
+                        {['All', '3M', '1M', '1W'].map(r => (
                           <button 
                             key={r} 
                             onClick={() => setGraphTimeRange(r)} 
@@ -1297,7 +1003,7 @@ const BuyShares: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Action Card */}
+                  {/* Action Card - Updated to keep investment info */}
                   <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm">
                     <h4 className="text-sm font-bold text-gray-900 mb-3">Ready to Invest?</h4>
                     <p className="text-xs text-gray-500 mb-6">

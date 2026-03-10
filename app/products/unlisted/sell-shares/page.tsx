@@ -24,7 +24,7 @@ import {
   Loader2,
   AlertCircle
 } from 'lucide-react';
-import { fetchAllShares, createEnquiry } from '../../../services/unlistedservices';
+import { fetchAllShares } from '../../../services/unlistedservices';
 
 // Define the Company type based on your API response
 interface ApiCompany {
@@ -45,17 +45,6 @@ interface CompanyStats {
   premium: number;
   volume: number;
   demand: 'High' | 'Medium' | 'Low';
-}
-
-// Define Enquiry type for API calls
-interface EnquiryPayload {
-  company_id: number;
-  enquiry_type: 'buy' | 'sell';
-  full_name: string;
-  email: string;
-  phone: string;
-  quantity: number;
-  message?: string;
 }
 
 // PROCESS STEPS DATA
@@ -93,9 +82,7 @@ const SellShares: React.FC = () => {
   const [sortBy, setSortBy] = useState('name-asc');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Modal States
-  const [showEnquiryModal, setShowEnquiryModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Modal States - Removed enquiry modal state, kept only success notification
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Fetch companies on mount
@@ -264,41 +251,7 @@ const SellShares: React.FC = () => {
     setTimeout(() => document.getElementById('resultsSection')?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
-  const handleSubmitEnquiry = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedCompany) return;
-    
-    setIsSubmitting(true);
-    try {
-      const form = e.target as HTMLFormElement;
-      const formData = new FormData(form);
-      
-      const payload: EnquiryPayload = {
-        company_id: selectedCompany.id,
-        enquiry_type: 'sell',
-        full_name: formData.get('fullName') as string,
-        email: formData.get('email') as string,
-        phone: formData.get('phone') as string,
-        quantity: parseInt(qtyToSell),
-        message: formData.get('message') as string || undefined
-      };
-      
-      // Use createEnquiry from unlistedServices
-      await createEnquiry(payload);
-      
-      setShowEnquiryModal(false);
-      setShowSuccess(true);
-      setCalcResult(null);
-      setSelectedCompany(null);
-      setQtyToSell('');
-      
-    } catch (err: any) {
-      console.error('Error submitting enquiry:', err);
-      showNotification(err.response?.data?.message || 'Failed to submit enquiry', 'error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  // Removed handleSubmitEnquiry function
 
   const toggleFaq = (idx: number) => {
     setActiveFaqs(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
@@ -319,6 +272,14 @@ const SellShares: React.FC = () => {
       case 'Medium': return 'bg-yellow-100 text-yellow-600';
       case 'Low': return 'bg-red-100 text-red-600';
       default: return 'bg-gray-100 text-gray-600';
+    }
+  };
+
+  // Handle Sell Now button click - placeholder for future functionality
+  const handleSellNow = () => {
+    if (calcResult) {
+      showNotification('Sell functionality coming soon!', 'success');
+      // You can add your sell logic here later
     }
   };
 
@@ -711,11 +672,11 @@ const SellShares: React.FC = () => {
                   </div>
                   <div className="text-center">
                     <button
-                      onClick={() => setShowEnquiryModal(true)}
+                      onClick={handleSellNow}
                       className="px-8 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-lg shadow-xl hover:opacity-90 transition-all flex items-center justify-center gap-3 mx-auto hover:scale-105 duration-200"
                     >
                       <Send className="w-5 h-5" />
-                      Submit Enquiry Form
+                      Sell Now
                     </button>
                   </div>
                 </div>
@@ -768,97 +729,6 @@ const SellShares: React.FC = () => {
           </div>
         )}
       </main>
-
-      {/* ENQUIRY MODAL */}
-      {showEnquiryModal && (
-        <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-6 text-white flex justify-between items-center">
-              <div>
-                <h3 className="text-xl font-black uppercase tracking-tight">Sell Enquiry</h3>
-                <p className="text-xs text-white/80">{selectedCompany?.shares_name} • {qtyToSell} Shares</p>
-              </div>
-              <button onClick={() => setShowEnquiryModal(false)} className="hover:bg-white/20 p-2 rounded-full transition-all">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            <form onSubmit={handleSubmitEnquiry} className="p-8 space-y-5">
-              <div>
-                <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">Full Name</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                  <input 
-                    name="fullName"
-                    required 
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-[#2076C7] text-sm text-black" 
-                    placeholder="John Doe" 
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">Email</label>
-                  <input 
-                    name="email"
-                    required 
-                    type="email" 
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-[#2076C7] text-sm text-black" 
-                    placeholder="john@email.com" 
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">Phone</label>
-                  <input 
-                    name="phone"
-                    required 
-                    type="tel" 
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-[#2076C7] text-sm text-black" 
-                    placeholder="+91..." 
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">Message (Optional)</label>
-                <textarea 
-                  name="message"
-                  className="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-[#2076C7] text-sm h-24 resize-none text-black" 
-                  placeholder="Is your share in Demat or Physical form?"
-                />
-              </div>
-              <button 
-                type="submit" 
-                disabled={isSubmitting} 
-                className="w-full py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-black text-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  'Confirm & Submit'
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* SUCCESS MODAL */}
-      {showSuccess && (
-        <div className="fixed inset-0 z-[7000] bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white p-10 rounded-3xl max-w-sm w-full text-center shadow-2xl">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-10 h-10 text-green-600" />
-            </div>
-            <h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">Enquiry Sent!</h3>
-            <p className="text-gray-500 text-sm mb-8 leading-relaxed">Our relationship manager will contact you within 24 hours with the best available buyback price.</p>
-            <button onClick={() => setShowSuccess(false)} className="w-full py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-black hover:opacity-90 transition-all">
-              Back to Dashboard
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Custom scrollbar styling */}
       <style jsx>{`
