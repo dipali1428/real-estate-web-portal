@@ -5,19 +5,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // Ticket Categories
 const ticketCategories = [
-    { id: 'mutual-funds', name: 'Mutual Funds', icon: '📈', color: 'from-blue-500 to-cyan-500' },
-    { id: 'pms', name: 'PMS', icon: '🏦', color: 'from-purple-500 to-pink-500' },
-    { id: 'aif', name: 'AIF', icon: '🏛️', color: 'from-yellow-500 to-orange-500' },
-    { id: 'fixed-income', name: 'Fixed Income', icon: '💰', color: 'from-indigo-500 to-purple-500' },
-    { id: 'nps', name: 'NPS', icon: '👴', color: 'from-red-500 to-pink-500' },
-    { id: 'real-estate', name: 'Real Estate', icon: '🏠', color: 'from-teal-500 to-green-500' },
-    { id: 'unlisted', name: 'Unlisted Shares', icon: '📄', color: 'from-gray-700 to-gray-900' },
-    { id: 'reports', name: 'Reports & Tax', icon: '📊', color: 'from-orange-500 to-red-500' },
-    { id: 'kyc', name: 'KYC & Account', icon: '🔐', color: 'from-cyan-500 to-blue-500' },
-    { id: 'technical', name: 'Technical', icon: '⚙️', color: 'from-gray-500 to-gray-700' },
+    { id: 'mutual-funds', name: 'Mutual Funds', icon: '📈', color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'pms', name: 'PMS', icon: '🏦', color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'aif', name: 'AIF', icon: '🏛️', color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'fixed-income', name: 'Fixed Income', icon: '💰', color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'nps', name: 'NPS', icon: '👴', color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'real-estate', name: 'Real Estate', icon: '🏠', color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'unlisted', name: 'Unlisted Shares', icon: '📄', color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'reports', name: 'Reports & Tax', icon: '📊', color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'kyc', name: 'KYC & Account', icon: '🔐', color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'technical', name: 'Technical', icon: '⚙️', color: 'from-[#2076C7] to-[#1CADA3]' },
 ];
 
-// FAQ Data
+// FAQ Data - Keeping as reference content since FAQs are static content
 const faqCategories = [
     {
         category: 'Mutual Funds',
@@ -74,13 +74,8 @@ const faqCategories = [
     }
 ];
 
-// Sample Tickets Data
-const recentTickets = [
-    { id: 'TKT001', subject: 'SIP installment failed', category: 'Mutual Funds', status: 'In Progress', priority: 'High', date: '2024-01-15', eta: '24 hours' },
-    { id: 'TKT002', subject: 'PAN update request', category: 'KYC & Account', status: 'Resolved', priority: 'Medium', date: '2024-01-14', eta: 'Resolved' },
-    { id: 'TKT003', subject: 'FD maturity proceeds not credited', category: 'Fixed Income', status: 'Open', priority: 'High', date: '2024-01-13', eta: '48 hours' },
-    { id: 'TKT004', subject: 'Portfolio statement download', category: 'Reports & Tax', status: 'Resolved', priority: 'Low', date: '2024-01-12', eta: 'Resolved' },
-];
+// Empty tickets array - No dummy data
+const recentTickets: any[] = [];
 
 export default function HelpSupport() {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -124,7 +119,7 @@ export default function HelpSupport() {
     };
 
     return (
-        <div className="flex-1 p-4 sm:p-6">
+        <div className="flex-1 p-4 sm:p-6 bg-[#f8fafc] min-h-screen">
             {/* Header Section */}
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -192,7 +187,7 @@ export default function HelpSupport() {
             {/* Navigation Tabs */}
             <div className="mb-6 overflow-x-auto scrollbar-hide">
                 <div className="flex space-x-2 pb-2">
-                    {['dashboard', 'my-tickets', 'faq', 'knowledge-center', 'documents', 'kyc-help'].map((tab) => (
+                    {['dashboard', 'my-tickets', 'faq', 'documents', 'kyc-help'].map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -240,7 +235,7 @@ export default function HelpSupport() {
                             ))}
                         </div>
 
-                        {/* Recent Tickets */}
+                        {/* Recent Tickets - Empty State */}
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-semibold text-gray-800">Recent Tickets</h3>
@@ -251,45 +246,20 @@ export default function HelpSupport() {
                                     View All
                                 </button>
                             </div>
-                            <div className="space-y-3">
-                                {recentTickets.map((ticket) => (
-                                    <div key={ticket.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div>
-                                            <div className="flex items-center space-x-2">
-                                                <span className="text-xs font-mono text-gray-500">{ticket.id}</span>
-                                                <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(ticket.status)}`}>
-                                                    {ticket.status}
-                                                </span>
-                                                <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(ticket.priority)}`}>
-                                                    {ticket.priority}
-                                                </span>
-                                            </div>
-                                            <div className="text-sm font-medium text-gray-800 mt-1">{ticket.subject}</div>
-                                            <div className="text-xs text-gray-500 mt-1">{ticket.category} • {ticket.date}</div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-xs text-gray-500">ETA</div>
-                                            <div className="text-sm font-medium text-gray-800">{ticket.eta}</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Knowledge Center Teaser */}
-                        <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-100">
-                            <div className="flex items-start justify-between">
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">📚 Knowledge Center</h3>
-                                    <p className="text-sm text-gray-600 mb-4">Learn about investments, tax planning, and more</p>
-                                    <button 
-                                        onClick={() => setActiveTab('knowledge-center')}
-                                        className="px-4 py-2 bg-[#2076C7] text-white rounded-xl text-sm font-medium hover:bg-[#1a5e9e]"
-                                    >
-                                        Explore Guides
-                                    </button>
+                            
+                            {/* Empty State */}
+                            <div className="text-center py-8">
+                                <div className="w-16 h-16 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
+                                    <span className="text-2xl">🎫</span>
                                 </div>
-                                <div className="text-5xl opacity-50">📖</div>
+                                <h4 className="text-sm font-medium text-gray-800 mb-1">No tickets yet</h4>
+                                <p className="text-xs text-gray-400 mb-3">Your support tickets will appear here</p>
+                                <button 
+                                    onClick={() => { setActiveTab('ticket'); setShowTicketForm(true); }}
+                                    className="px-4 py-2 bg-[#2076C7] text-white rounded-xl text-xs font-medium hover:bg-[#1a5e9e]"
+                                >
+                                    Raise a Ticket
+                                </button>
                             </div>
                         </div>
                     </motion.div>
@@ -404,7 +374,7 @@ export default function HelpSupport() {
                     </motion.div>
                 )}
 
-                {/* My Tickets View */}
+                {/* My Tickets View - Empty State */}
                 {activeTab === 'my-tickets' && (
                     <motion.div
                         key="my-tickets"
@@ -415,31 +385,21 @@ export default function HelpSupport() {
                     >
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">My Support Tickets</h3>
                         
-                        <div className="space-y-4">
-                            {recentTickets.map((ticket) => (
-                                <div key={ticket.id} className="border border-gray-100 rounded-xl p-4 hover:shadow-md transition-shadow">
-                                    <div className="flex items-start justify-between mb-2">
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-sm font-mono text-gray-500">{ticket.id}</span>
-                                            <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(ticket.status)}`}>
-                                                {ticket.status}
-                                            </span>
-                                            <span className={`text-xs px-2 py-1 rounded-full ${getPriorityColor(ticket.priority)}`}>
-                                                {ticket.priority}
-                                            </span>
-                                        </div>
-                                        <span className="text-xs text-gray-400">{ticket.date}</span>
-                                    </div>
-                                    <h4 className="font-medium text-gray-800 mb-2">{ticket.subject}</h4>
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-500">{ticket.category}</span>
-                                        <div className="flex items-center space-x-4">
-                                            <span className="text-xs text-gray-400">ETA: {ticket.eta}</span>
-                                            <button className="text-[#2076C7] hover:underline text-xs">View Details</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+                        {/* Empty State */}
+                        <div className="text-center py-12">
+                            <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                                <span className="text-3xl">🎫</span>
+                            </div>
+                            <h4 className="text-base font-medium text-gray-800 mb-2">No tickets found</h4>
+                            <p className="text-sm text-gray-400 mb-4 max-w-sm mx-auto">
+                                You haven't raised any support tickets yet. Create your first ticket and we'll get back to you shortly.
+                            </p>
+                            <button 
+                                onClick={() => { setActiveTab('ticket'); setShowTicketForm(true); }}
+                                className="px-6 py-2 bg-[#2076C7] text-white rounded-xl text-sm font-medium hover:bg-[#1a5e9e]"
+                            >
+                                Raise a Ticket
+                            </button>
                         </div>
 
                         {/* SLA Info */}
@@ -459,7 +419,7 @@ export default function HelpSupport() {
                     </motion.div>
                 )}
 
-                {/* FAQs View */}
+                {/* FAQs View - Keeping static content */}
                 {activeTab === 'faq' && (
                     <motion.div
                         key="faq"
@@ -508,59 +468,7 @@ export default function HelpSupport() {
                     </motion.div>
                 )}
 
-                {/* Knowledge Center */}
-                {activeTab === 'knowledge-center' && (
-                    <motion.div
-                        key="knowledge-center"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                    >
-                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">📈 Investment Basics</h3>
-                            <div className="space-y-3">
-                                {['What is Mutual Fund?', 'Equity vs Debt', 'Understanding SIP', 'Power of Compounding'].map((item) => (
-                                    <button key={item} className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <span className="text-sm font-medium text-gray-800">{item}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">📊 Tax Planning</h3>
-                            <div className="space-y-3">
-                                {['Capital Gains Tax', 'Tax Saving Funds (ELSS)', 'NPS Tax Benefits', 'Tax on FD Interest'].map((item) => (
-                                    <button key={item} className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <span className="text-sm font-medium text-gray-800">{item}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">🏠 Retirement Planning</h3>
-                            <div className="space-y-3">
-                                {['NPS vs Pension Plans', 'Retirement Corpus Calculator', 'Systematic Withdrawal Plans', 'Annuity Options'].map((item) => (
-                                    <button key={item} className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <span className="text-sm font-medium text-gray-800">{item}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚠️ Risk Management</h3>
-                            <div className="space-y-3">
-                                {['Understanding Risk Profile', 'Asset Allocation', 'Portfolio Diversification', 'Risk vs Return'].map((item) => (
-                                    <button key={item} className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <span className="text-sm font-medium text-gray-800">{item}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* Documents Section */}
+                {/* Documents Section - Static content */}
                 {activeTab === 'documents' && (
                     <motion.div
                         key="documents"
@@ -597,7 +505,7 @@ export default function HelpSupport() {
                     </motion.div>
                 )}
 
-                {/* KYC Help */}
+                {/* KYC Help - Static content */}
                 {activeTab === 'kyc-help' && (
                     <motion.div
                         key="kyc-help"
@@ -610,13 +518,13 @@ export default function HelpSupport() {
                         
                         <div className="space-y-4">
                             {/* KYC Status */}
-                            <div className="bg-green-50 rounded-xl p-4">
+                            <div className="bg-gray-50 rounded-xl p-4">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <div className="text-sm font-medium text-gray-800">KYC Status</div>
-                                        <div className="text-xs text-gray-500">Last updated: Jan 2024</div>
+                                        <div className="text-xs text-gray-400">Not available</div>
                                     </div>
-                                    <span className="px-3 py-1 bg-green-500 text-white text-xs font-medium rounded-full">Verified</span>
+                                    <span className="px-3 py-1 bg-gray-300 text-white text-xs font-medium rounded-full">--</span>
                                 </div>
                             </div>
 
@@ -665,7 +573,7 @@ export default function HelpSupport() {
             </motion.button>
 
             {/* Compliance Disclaimer */}
-            <div className="mt-6 text-center">
+            <div className="mt-2 text-center">
                 <p className="text-xs text-gray-400">
                     By raising a ticket, you agree to our <span className="text-[#2076C7] cursor-pointer hover:underline">Terms of Service</span> and <span className="text-[#2076C7] cursor-pointer hover:underline">Privacy Policy</span>
                 </p>
