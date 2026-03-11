@@ -11,7 +11,6 @@ import {
   Wallet,
   BarChart3,
   Building,
-  ChevronRight,
   Sparkles,
   Target,
   Users,
@@ -220,26 +219,11 @@ const UserDashboard: React.FC = () => {
             </div>
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
               <span>Welcome back, {userName}!</span>
-              <span className="text-xs sm:text-sm font-normal text-gray-500 sm:ml-2 hidden xs:inline">
-                Ready to grow your wealth?
-              </span>
             </h2>
             <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 flex items-center gap-1 sm:gap-2">
               <Sparkles size={14} className="text-[#2076C7] flex-shrink-0" />
               <span className="truncate">Here's your complete investment overview</span>
             </p>
-          </div>
-          
-          {/* Quick Stats Pills - Hidden on very small screens */}
-          <div className="hidden xs:flex items-center gap-2 mt-3 sm:mt-0 overflow-x-auto pb-2 sm:pb-0">
-            <div className="bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-gray-200 shadow-sm flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <Target size={12} className="text-[#2076C7]" />
-              <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Target: ₹10L</span>
-            </div>
-            <div className="bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-gray-200 shadow-sm flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <Award size={12} className="text-amber-500" />
-              <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Silver Tier</span>
-            </div>
           </div>
         </div>
 
@@ -267,10 +251,6 @@ const UserDashboard: React.FC = () => {
             <p className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 mb-2 break-words">
               {balanceVisible && dashboard ? formatCurrency(dashboard.total_invested) : '••••••'}
             </p>
-            <div className="flex items-center gap-1 sm:gap-2 text-xs text-emerald-600 bg-emerald-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full w-fit">
-              <TrendingUp size={12} className="sm:w-[14px] sm:h-[14px]" />
-              <span className="font-semibold whitespace-nowrap">+12.4% this month</span>
-            </div>
           </div>
 
           {/* Total Transactions Card */}
@@ -298,52 +278,8 @@ const UserDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Market Insights & Quick Links */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          
-          {/* Market Overview */}
-          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 lg:col-span-2">
-            <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-1 sm:gap-2">
-                <LineChart size={16} className="sm:w-[20px] sm:h-[20px] text-[#2076C7]" />
-                Market Overview
-              </h3>
-              <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full flex items-center gap-1 whitespace-nowrap">
-                <TrendingUp size={10} className="sm:w-[12px] sm:h-[12px]" />
-                +5.39% YTD
-              </span>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
-                <p className="text-xs text-gray-500 mb-1">Unlisted Index</p>
-                <p className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">₹2,010.17</p>
-                <p className="text-xs text-emerald-600 font-medium mt-1">+5.2% this month</p>
-              </div>
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
-                <p className="text-xs text-gray-500 mb-1">Total Volume</p>
-                <p className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">₹2.8K Cr</p>
-                <p className="text-xs text-gray-500 font-medium mt-1">24h volume</p>
-              </div>
-            </div>
-            
-            <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">
-              <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 xs:gap-3">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-                    <Flame size={12} className="sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-amber-600" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-medium text-gray-500">Trending</p>
-                    <p className="text-xs sm:text-sm font-bold text-gray-900 truncate">Zepto, OYO, PharmEasy</p>
-                  </div>
-                </div>
-                <Link href="/customer/unlisted/companies" className="text-xs text-[#2076C7] font-semibold hover:underline whitespace-nowrap ml-auto xs:ml-0">
-                  View all
-                </Link>
-              </div>
-            </div>
-          </div>
+        {/* Quick Stats - Only showing from API data */}
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 sm:gap-6 mb-6 sm:mb-8">
           
           {/* Quick Stats */}
           <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100">
@@ -360,7 +296,7 @@ const UserDashboard: React.FC = () => {
                   </div>
                   <span className="text-xs sm:text-sm text-gray-700 truncate">Active Investments</span>
                 </div>
-                <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">3</span>
+                <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">--</span>
               </div>
               
               <div className="flex items-center justify-between p-2 sm:p-3 hover:bg-gray-50 rounded-lg sm:rounded-xl transition-colors">
@@ -370,7 +306,7 @@ const UserDashboard: React.FC = () => {
                   </div>
                   <span className="text-xs sm:text-sm text-gray-700 truncate">Diversification</span>
                 </div>
-                <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">4 sectors</span>
+                <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">--</span>
               </div>
               
               <div className="flex items-center justify-between p-2 sm:p-3 hover:bg-gray-50 rounded-lg sm:rounded-xl transition-colors">
@@ -380,15 +316,10 @@ const UserDashboard: React.FC = () => {
                   </div>
                   <span className="text-xs sm:text-sm text-gray-700 truncate">Referrals</span>
                 </div>
-                <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">2</span>
+                <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">--</span>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Last Updated Info */}
-        <div className="text-center text-xs text-gray-400 mt-4 sm:mt-6">
-          <span>Last updated: {lastUpdated || 'Just now'}</span>
         </div>
       </main>
       

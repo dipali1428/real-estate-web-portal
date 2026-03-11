@@ -25,7 +25,7 @@ interface Company {
 }
 
 export default function UnlistedHomePage() {
-    const { openPartner } = useModal(); 
+    const { openPartner, openLogin } = useModal(); // Also get openLogin from context
     const [companies, setCompanies] = useState<Company[]>([]);
     const [loading, setLoading] = useState(true);
     const [enquiryCompany, setEnquiryCompany] = useState<Company | null>(null);
@@ -69,7 +69,11 @@ export default function UnlistedHomePage() {
 
     return (
         <main className="min-h-screen bg-gradient-to-br from-[#b5d9f3] via-white to-[#ecf5ec] text-slate-800 font-sans scroll-smooth">
-            <UnlistedHero onActionClick={openPartner} onApplyClick={openPartner} />
+            {/* Pass both props - onActionClick and onApplyClick */}
+            <UnlistedHero 
+                onActionClick={openPartner} 
+                onApplyClick={openLogin} // Pass openLogin for the Apply Now button
+            />
             
             {/* Sections are now seamless without borders or block backgrounds */}
             <FeaturedCompanies companies={companies} loading={loading} onEnquire={setEnquiryCompany} />
