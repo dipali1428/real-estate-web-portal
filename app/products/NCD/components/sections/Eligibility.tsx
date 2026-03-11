@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Users, Building2, UserCheck, Briefcase, FileText, CheckCircle2, CreditCard, PlayCircle } from 'lucide-react';
 
@@ -19,67 +19,61 @@ const Eligibility = () => {
 
     return (
         // Added px-4 to ensure side margins on mobile
-        <section className="py-16 md:py-24 bg-gray-50 px-4 sm:px-6 lg:px-8" id="eligibility">
-            <div className="container-custom mx-auto">
-                {/* Section 1: Who Can Invest */}
-                <div className="mb-16 md:mb-20">
-                    <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
-                        <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
-                            Who Can Invest
-                        </h2>
-                        <div className="w-20 md:w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
-
-                        <p className="text-gray-600 leading-relaxed text-base md:text-lg font-medium">
-                            NCDs are open to a wide range of investors. Whether you are an individual looking for monthly income or a company seeking better yield for surplus funds, there's an NCD for you.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                        {groups.map((group, idx) => (
-                            <div key={idx} className="bg-white p-6 md:p-8 rounded-3xl border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center group">
-                                <div className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mb-5 md:mb-6 group-hover:scale-110 transition-transform ${idx % 2 === 0 ? 'bg-[#2076C7]/10 text-[#2076C7]' : 'bg-[#1CADA3]/10 text-[#1CADA3]'}`}>
-                                    {group.icon}
-                                </div>
-                                <h4 className="font-extrabold text-[#0B1C2E] mb-2 text-lg md:text-xl">{group.name}</h4>
-                                <p className="text-sm text-gray-500 font-medium leading-relaxed">{group.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="mb-16 md:mb-24">
-                    <div className="bg-gradient-to-br from-[#F8FBFE] via-white to-[#F0F7FF] p-6 sm:p-10 md:p-12 lg:p-16 rounded-[2rem] md:rounded-[3rem] shadow-xl border border-blue-50 relative overflow-hidden">
-                        {/* Abstract Background Design */}
-                        <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-[#1CADA3]/5 rounded-full blur-[80px] md:blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-[250px] md:w-[400px] h-[250px] md:h-[400px] bg-[#2076C7]/5 rounded-full blur-[70px] md:blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-
-                        <div className="text-center mb-8 md:mb-10 relative z-10">
-                            <span className="text-[#2076C7] font-black text-[10px] uppercase tracking-[0.3em] mb-3 md:mb-4 block">Quick Preparation</span>
-                            <h3 className="text-xl md:text-4xl font-bold flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4">
-                                <span className="bg-[#2076C7] p-2 md:p-2.5 rounded-xl shadow-lg shadow-[#2076C7]/20">
-                                    <FileText className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                                </span>
-                                <span className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">Documents Required</span>
-                            </h3>
-                            <p className="text-gray-500 font-medium mt-3 md:mt-4 max-w-xl mx-auto italic text-xs md:text-sm">
-                                Keep these documents ready in digital format for a smooth, paperless verification process.
+        <section className="py-12 md:py-16 bg-gray-50 px-4 sm:px-6 lg:px-8 font-sans" id="eligibility">
+            <div className="container-custom mx-auto max-w-7xl">
+                {/* Side-by-Side: Who Can Invest & Documents Required */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 mb-20 md:mb-24">
+                    
+                    {/* Column 1: Who Can Invest */}
+                    <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-blue-900/5">
+                        <div className="mb-10">
+                            <h2 className="text-3xl md:text-4xl font-black mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                                Who Can Invest
+                            </h2>
+                            <p className="text-sm md:text-base text-slate-500 font-medium leading-relaxed">
+                                Indian residents, HUFs, NRIs (non-repatriation) and registered corporate bodies are eligible to invest in NCDs.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {groups.map((group, idx) => (
+                                <div key={idx} className="bg-slate-50 p-5 rounded-2xl border border-gray-100 flex flex-col items-start transition-all duration-300 hover:shadow-md group">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform ${idx % 2 === 0 ? 'bg-[#2076C7] text-white' : 'bg-[#1CADA3] text-white'}`}>
+                                        {group.icon}
+                                    </div>
+                                    <h4 className="font-extrabold text-[#0B1C2E] mb-1 text-base font-sans">{group.name}</h4>
+                                    <p className="text-[11px] text-gray-500 font-medium leading-tight">{group.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Column 2: Documents Required */}
+                    <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-blue-900/5 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#1CADA3]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                        
+                        <div className="mb-10 relative z-10">
+                            <h2 className="text-3xl md:text-4xl font-black mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                                Documents Required
+                            </h2>
+                            <p className="text-sm md:text-base text-slate-500 font-medium leading-relaxed">
+                                Keep these digital copies ready for a seamless paperless verification and allotment process.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
                             {[
-                                { label: "Identity Proof", detail: "PAN Card (Mandatory)", desc: "Original digital scan or photo", icon: <UserCheck className="w-5 h-5" /> },
-                                { label: "Address Proof", detail: "Aadhaar / Voter ID", desc: "For address verification", icon: <Building2 className="w-5 h-5" /> },
-                                { label: "Bank Account", detail: "Cancelled Cheque", desc: "With your name pre-printed", icon: <CreditCard className="w-5 h-5" /> },
-                                { label: "Demat Account", detail: "CMR / Statement", desc: "To credit your NCD units", icon: <Briefcase className="w-5 h-5" /> },
+                                { label: "Identity", detail: "PAN Card", desc: "Mandatory for all", icon: <UserCheck className="w-5 h-5" /> },
+                                { label: "Address", detail: "Aadhaar / Voter ID", desc: "For verification", icon: <Building2 className="w-5 h-5" /> },
+                                { label: "Bank", detail: "Cancelled Cheque", desc: "Pre-printed name", icon: <CreditCard className="w-5 h-5" /> },
+                                { label: "Investment", detail: "Demat Details", desc: "For unit credit", icon: <Briefcase className="w-5 h-5" /> },
                             ].map((doc, idx) => (
-                                <div key={idx} className="bg-white border border-blue-50 p-5 md:p-6 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${idx % 2 === 0 ? 'bg-[#2076C7]' : 'bg-[#1CADA3]'} text-white shadow-lg ${idx % 2 === 0 ? 'shadow-[#2076C7]/20' : 'shadow-[#1CADA3]/20'}`}>
+                                <div key={idx} className="bg-slate-50 p-5 rounded-2xl border border-blue-50/50 flex flex-col items-start hover:shadow-md transition-all group">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-transform group-hover:scale-110 ${idx % 2 === 0 ? 'bg-[#2076C7]' : 'bg-[#1CADA3]'} text-white`}>
                                         {doc.icon}
                                     </div>
-                                    <h5 className="text-[9px] md:text-[10px] font-black text-[#2076C7] uppercase tracking-widest mb-1">{doc.label}</h5>
-                                    <h4 className="text-sm md:text-base font-extrabold text-[#0B1C2E] mb-1 md:mb-2">{doc.detail}</h4>
-                                    <p className="text-[10px] md:text-[11px] text-gray-400 font-medium">{doc.desc}</p>
+                                    <h4 className="text-base font-extrabold text-[#0B1C2E] mb-1 font-sans">{doc.detail}</h4>
+                                    <p className="text-[11px] text-gray-400 font-medium">{doc.desc}</p>
                                 </div>
                             ))}
                         </div>
@@ -87,13 +81,12 @@ const Eligibility = () => {
                 </div>
 
                 {/* Bottom: Process Visualization */}
-                <div className="text-center mb-12 md:mb-16">
-                    <span className="text-[#2076C7] font-black text-[10px] md:text-xs uppercase tracking-[0.4em] mb-3 md:mb-4 block">Simple Flow</span>
-                    <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                <div className="text-center mb-16 md:mb-24">
+                    <span className="text-[#2076C7] font-black text-[10px] md:text-xs uppercase tracking-[0.4em] mb-4 md:mb-6 block">Simple Flow</span>
+                    <h2 className="text-3xl md:text-5xl font-black mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
                         4-Step Application Process
                     </h2>
-                    <div className="w-20 md:w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
-                    <p className="text-gray-600 font-medium max-w-xl mx-auto text-sm md:text-base">Getting started with NCDs is simple, fast, and 100% digital with our hand-held support.</p>
+                    <p className="text-slate-500 font-medium max-w-2xl mx-auto text-base md:text-xl leading-relaxed">Getting started with NCDs is simple, fast, and 100% digital with our hand-held support.</p>
                 </div>
 
                 <div className="relative max-w-6xl mx-auto mb-10">
@@ -110,13 +103,11 @@ const Eligibility = () => {
                                             {step.icon}
                                         </div>
                                     </div>
-                                    <div className="absolute -top-1 -right-1 w-7 h-7 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-100 font-black text-[#0B1C2E] text-[10px]">
-                                        0{idx + 1}
-                                    </div>
+
                                 </div>
 
                                 <div className="text-center max-w-[250px] md:max-w-none">
-                                    <h4 className="font-extrabold text-[#0B1C2E] mb-3 text-lg md:text-xl group-hover:text-[#2076C7] transition-colors">{step.title}</h4>
+                                    <h4 className="font-extrabold text-[#0B1C2E] mb-3 text-lg md:text-xl group-hover:text-[#2076C7] transition-colors font-sans">{step.title}</h4>
                                     <p className="text-sm text-gray-500 font-medium leading-relaxed px-2 md:px-4">{step.desc}</p>
                                 </div>
                             </div>

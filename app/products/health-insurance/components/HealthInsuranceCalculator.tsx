@@ -82,9 +82,10 @@ const HealthInsuranceCalculator = () => {
                                             key={type}
                                             onClick={() => setCoverageType(type)}
                                             className={`flex-1 h-14 rounded-lg font-bold transition-all border ${coverageType === type
-                                                ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
-                                                : 'bg-white border-gray-200 text-gray-500 hover:border-primary/30 hover:bg-primary/5'
+                                                ? 'border-transparent text-white shadow-lg'
+                                                : 'bg-white border-gray-200 text-gray-500 hover:border-[#1CADA3]/30 hover:bg-[#1CADA3]/5'
                                                 }`}
+                                            style={coverageType === type ? { background: 'linear-gradient(to right, #2076C7, #1CADA3)' } : {}}
                                         >
                                             {type}
                                         </button>
@@ -130,7 +131,7 @@ const HealthInsuranceCalculator = () => {
                             <div className="bg-gray-50/50 backdrop-blur-sm rounded-xl p-8 h-full border border-gray-100 flex flex-col justify-center border-dashed">
                                 {!isCalculated ? (
                                     <div className="text-center space-y-4 py-12">
-                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-300">
+                                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto text-[#2076C7] shadow-sm border border-gray-100">
                                             <Shield size={32} />
                                         </div>
                                         <p className="text-gray-400 font-medium">Enter your details to see <br /> estimated premiums</p>

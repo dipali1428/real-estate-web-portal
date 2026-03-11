@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { AlertTriangle, ShieldCheck, TrendingDown, RefreshCcw, Info, CheckCircle2 } from 'lucide-react';
@@ -46,23 +46,21 @@ const Risks = () => {
     ];
 
     return (
-        <section className="py-16 md:py-24 bg-white" id="risks">
-            {/* Added px-4 sm:px-6 lg:px-8 for responsive side margins */}
-            <div className="container-custom mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-                
-                <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+        <section className="py-12 md:py-16 bg-white font-sans px-4 sm:px-6 lg:px-8" id="risks">
+            <div className="container-custom mx-auto max-w-7xl">
+
+                <div className="text-center max-w-4xl mx-auto mb-16 px-4">
+                    <h2 className="text-3xl md:text-5xl font-black mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
                         Risk Assessment & Mitigation
                     </h2>
-                    <div className="w-20 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-6"></div>
 
-                    <p className="text-gray-600 text-base md:text-lg font-medium leading-relaxed">
+                    <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed max-w-2xl mx-auto">
                         Every investment carries some risk. Our goal is to help you identify, understand, and mitigate them effectively.
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-                    
+
                     {/* Risk Selectors - Stacks on mobile, 5 cols on large screens */}
                     <div className="lg:col-span-5 space-y-4 order-2 lg:order-1">
                         {risks.map((risk, idx) => (
@@ -70,8 +68,8 @@ const Risks = () => {
                                 key={idx}
                                 onClick={() => setActiveRisk(idx)}
                                 className={`w-full p-5 md:p-6 bg-white rounded-2xl border-2 text-left transition-all duration-300 flex items-center justify-between group 
-                                    ${activeRisk === idx 
-                                        ? `${risk.color} shadow-lg translate-x-0 md:translate-x-4` 
+                                    ${activeRisk === idx
+                                        ? `${risk.color} shadow-lg translate-x-0 md:translate-x-4`
                                         : 'border-transparent hover:border-gray-100 shadow-sm'
                                     }`}
                             >
@@ -82,7 +80,7 @@ const Risks = () => {
                                         </div>
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-[#2076C7] text-sm md:text-base">{risk.title}</h3>
+                                        <h3 className="font-bold text-[#2076C7] text-sm md:text-base font-sans">{risk.title}</h3>
                                         <span className={`text-[10px] uppercase font-black tracking-widest ${activeRisk === idx ? 'text-[#2076C7]' : 'text-gray-400'}`}>
                                             Severity: {risk.level}
                                         </span>
@@ -99,14 +97,14 @@ const Risks = () => {
                     <div className="lg:col-span-7 order-1 lg:order-2">
                         <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden min-h-auto lg:min-h-[500px] flex flex-col border border-gray-100">
                             <div className="h-2 md:h-3 w-full bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] opacity-20"></div>
-                            
+
                             <div className="p-6 md:p-10 flex-grow">
                                 <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 mb-8 md:mb-10 text-center sm:text-left">
                                     <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center shrink-0 ${risks[activeRisk].bg}`}>
                                         {risks[activeRisk].icon}
                                     </div>
                                     <div>
-                                        <h4 className="text-2xl md:text-3xl font-extrabold text-[#2076C7]">{risks[activeRisk].title}</h4>
+                                        <h4 className="text-2xl md:text-3xl font-extrabold text-[#2076C7] font-sans">{risks[activeRisk].title}</h4>
                                         <p className="text-xs md:text-sm font-bold text-[#1CADA3] uppercase tracking-wider mt-1">Impact Analysis</p>
                                     </div>
                                 </div>
@@ -124,11 +122,11 @@ const Risks = () => {
                                             <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4" />
                                             <span>MITIGATION STRATEGY</span>
                                         </div>
-                                        
+
                                         <p className="text-[#0B1C2E] mt-4 leading-relaxed font-bold text-base md:text-lg">
                                             {risks[activeRisk].mitigation}
                                         </p>
-                                        
+
                                         <ul className="mt-6 md:mt-8 space-y-3 md:space-y-4">
                                             <li className="flex items-start text-sm text-gray-500 font-medium">
                                                 <div className="w-2 h-2 rounded-full bg-[#1CADA3] mt-1.5 mr-3 shrink-0"></div>

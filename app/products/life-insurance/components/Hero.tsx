@@ -25,7 +25,7 @@ export default function Hero() {
   const orbY = useTransform(mouseYSpring, [0, 1200], [-30, 30]);
 
   return (
-    <section className="relative min-h-[70vh] flex items-center pt-20 pb-16 overflow-hidden bg-gradient-to-r from-blue-50 to-white font-sans">
+    <section className="relative min-h-[70vh] flex items-center pt-20 pb-16 overflow-hidden bg-white font-sans">
 
       {/* Background */}
       <div className="absolute inset-0 z-0">
@@ -113,13 +113,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
-        <div className="w-[1px] h-12 bg-gradient-to-b from-[#2076C7] to-transparent" />
-        <span className="text-[10px] font-black text-[#2076C7] uppercase tracking-[0.4em]">
-          Discover
-        </span>
-      </div>
+   
     </section>
   );
 }

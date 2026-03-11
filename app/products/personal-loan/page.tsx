@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft as IconArrowLeft } from 'lucide-react';
 
 // Shared Components
-import CTASection from '../../component/CTASection';
+import PersonalLoanCTA from './components/PersonalLoanCTA';
 import ScrollToTop from '../../component/ScrollToTop';
 import Chatbot from '../../component/chatbot/page';
 
@@ -96,7 +96,7 @@ export default function PersonalLoanPage() {
             </div>
 
             <FAQ />
-            <CTASection />
+            <PersonalLoanCTA />
 
             {/* Modals & Overlays */}
             {showBankModal && (

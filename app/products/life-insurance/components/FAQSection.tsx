@@ -92,7 +92,7 @@ const LifeInsuranceFAQ = () => {
                                 onClick={() => toggleFAQ(idx)}
                                 className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left flex justify-between items-start gap-3 bg-gray-50 hover:bg-blue-50/50 transition-colors focus:outline-none cursor-pointer group"
                             >
-                                <span className="font-sans font-black text-black text-base pr-8">
+                                <span className="font-sans font-semibold text-gray-800 text-base pr-8">
                                     {faq.question}
                                 </span>
 

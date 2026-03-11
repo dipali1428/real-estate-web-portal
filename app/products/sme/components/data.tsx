@@ -30,7 +30,6 @@ export type LoanProduct = {
   description: string;
   icon: React.ReactNode;
   features: string[];
-  rate: string;
   tenure: string;
 };
 
@@ -42,7 +41,6 @@ export const COMMERCIAL_PRODUCTS: LoanProduct[] = [
       "For day-to-day operations (buying raw materials, paying wages). Includes Cash Credit (CC) and Overdraft (OD) facilities.",
     icon: <Briefcase className="w-6 h-6" />,
     features: ["Cash Credit (CC)", "Overdraft (OD)", "Daily operations"],
-    rate: "10.5% - 15%",
     tenure: "12-36 Months",
   },
   {
@@ -51,7 +49,6 @@ export const COMMERCIAL_PRODUCTS: LoanProduct[] = [
       "Used for long-term investments like business expansion or buying office space.",
     icon: <Building2 className="w-6 h-6" />,
     features: ["Business expansion", "High value", "Structured EMI"],
-    rate: "10% - 14%",
     tenure: "Up to 60 Months",
   },
   {
@@ -60,7 +57,6 @@ export const COMMERCIAL_PRODUCTS: LoanProduct[] = [
       "Loans specifically to purchase plant machinery. The machine itself usually acts as the collateral.",
     icon: <Factory className="w-6 h-6" />,
     features: ["Machine as collateral", "Tax benefits", "Up to 80% funding"],
-    rate: "9.5% - 13%",
     tenure: "Up to 84 Months",
   },
   {
@@ -69,7 +65,6 @@ export const COMMERCIAL_PRODUCTS: LoanProduct[] = [
       "Allows you to get immediate cash by 'selling' your unpaid invoices to a lender.",
     icon: <FileText className="w-6 h-6" />,
     features: ["Immediate cash", "Unpaid invoices", "Short-term"],
-    rate: "12% - 20%",
     tenure: "30-90 Days",
   },
 ];
@@ -81,7 +76,6 @@ export const GOVT_SCHEMES: LoanProduct[] = [
       "Categorized into Shishu (up to 50k), Kishore (5L), Tarun (10L), and Tarun Plus (20L). No collateral required.",
     icon: <Users className="w-6 h-6" />,
     features: ["No collateral", "Up to ₹20 Lakh", "Micro-units"],
-    rate: "As per Banks",
     tenure: "Up to 5 Years",
   },
   {
@@ -90,7 +84,7 @@ export const GOVT_SCHEMES: LoanProduct[] = [
       "Provides a government guarantee to lenders, allowing MSMEs to get loans without traditional security/collateral.",
     icon: <ShieldCheck className="w-6 h-6" />,
     features: ["Govt guarantee", "Up to ₹5 Crore", "No security"],
-    rate: "Competitive",
+   
     tenure: "Based on Lender",
   },
   {
@@ -99,7 +93,6 @@ export const GOVT_SCHEMES: LoanProduct[] = [
       "A credit-linked subsidy scheme for new units; offers 15–35% subsidy on the project cost.",
     icon: <Target className="w-6 h-6" />,
     features: ["15-35% Subsidy", "Up to ₹50L (Mfg)", "New units"],
-    rate: "Subsidized",
     tenure: "3-7 Years",
   },
   {
@@ -108,7 +101,6 @@ export const GOVT_SCHEMES: LoanProduct[] = [
       "Specifically for SC/ST and Women entrepreneurs starting greenfield projects.",
     icon: <Award className="w-6 h-6" />,
     features: ["SC/ST & Women", "Up to ₹1 Crore", "Greenfield"],
-    rate: "Standard",
     tenure: "Up to 7 Years",
   },
   {
@@ -117,7 +109,6 @@ export const GOVT_SCHEMES: LoanProduct[] = [
       "An online portal for quick in-principle approval from Public Sector Banks.",
     icon: <Zap className="w-6 h-6" />,
     features: ["59 min app", "Up to ₹5 Crore", "PSB backed"],
-    rate: "Varies",
     tenure: "Varies",
   },
 ];
@@ -183,8 +174,8 @@ export const DOCUMENTS = [
     category: "Financial Documents",
     items: [
       "Last 12 Months GST Returns",
-      "12 Months Bank Statements (All Accts)",
-      "ITR & Audited Financials (Last 2-3 years)",
+      "12 Months Bank Statements ",
+      "ITR & Audited Financials ",
       "CMA Data / Projected Financials",
     ],
   },

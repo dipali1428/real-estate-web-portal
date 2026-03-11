@@ -17,11 +17,16 @@ import { ProcessSection } from "./components/ProcessSection";
 import { ClaimsAssistance } from "./components/ClaimsAssistance";
 import { BenefitsSection } from "./components/BenefitsSection";
 import { FAQSection } from "./components/FAQSection";
+import ScrollToTop from "../../component/ScrollToTop";
+import ChatBot from "../../component/chatbot/page";
 
 import CTASection from "../../component/CTASection";
 export default function CorporateInsurancePage() {
-  const { openQuote } = useModal();
+  const { openLogin } = useModal();
   const [isMobile, setIsMobile] = useState(false);
+  const [activeCalculator, setActiveCalculator] = useState<
+    "commercial" | "group-health"
+  >("commercial");
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -33,7 +38,7 @@ export default function CorporateInsurancePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <CorporateHero openQuote={openQuote} />
+      <CorporateHero openQuote={openLogin} />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 space-y-24 md:space-y-32 pb-24 md:pb-32">
         {/* Charts & Importance Section */}
@@ -44,17 +49,76 @@ export default function CorporateInsurancePage() {
         {/* Did You Know Facts */}
         <RiskInsights />
 
-        {/* Commercial Property / Package Calculator */}
-        <CorporatePremiumCalculator openQuote={openQuote} />
+        {/* Calculator Switcher section */}
+        <section className="space-y-12">
+          <div className="flex flex-col items-center justify-center space-y-8">
+            <div className="text-center max-w-2xl mx-auto space-y-4">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 font-sans leading-tight">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">
+                  Premium Calculators
+                </span>
+              </h2>
+              <p className="text-gray-600">
+                Choose a calculator to estimate your insurance premiums
+                instantly.
+              </p>
+            </div>
 
-        {/* Group Health Calculator */}
-        <GroupHealthCalculator openQuote={openQuote} />
+            <div className="inline-flex p-1.5 bg-gray-100 rounded-2xl shadow-inner relative z-10 w-full max-w-md mx-auto">
+              {["commercial", "group-health"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveCalculator(tab as any)}
+                  className={`
+                    relative flex-1 py-3.5 px-6 rounded-xl text-sm font-bold tracking-wide transition-all duration-500 overflow-hidden
+                    ${
+                      activeCalculator === tab
+                        ? "text-white shadow-lg"
+                        : "text-gray-500 hover:text-gray-800"
+                    }
+                  `}
+                >
+                  {/* Active Background Glow */}
+                  {activeCalculator === tab && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute inset-0 z-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3]"
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30,
+                      }}
+                    />
+                  )}
+                  <span className="relative z-10 uppercase">
+                    {tab === "commercial" ? "Commercial" : "Group Health"}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative pt-8">
+            <motion.div
+              key={activeCalculator}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              {activeCalculator === "commercial" ? (
+                <CorporatePremiumCalculator openQuote={openLogin} />
+              ) : (
+                <GroupHealthCalculator openQuote={openLogin} />
+              )}
+            </motion.div>
+          </div>
+        </section>
 
         {/* Top Insurers Section */}
-        <InsurersSection openQuote={openQuote} />
+        <InsurersSection openQuote={openLogin} />
 
         {/* Products Grid */}
-        <ProductGrid openQuote={openQuote} />
+        <ProductGrid openQuote={openLogin} />
 
         {/* Industry Focus */}
         <IndustryFocus />
@@ -93,7 +157,9 @@ export default function CorporateInsurancePage() {
         {/* FAQ Section */}
         <FAQSection />
       </main>
-      <CTASection onClick={openQuote} />
+      <CTASection />
+      <ScrollToTop/>
+      <ChatBot/>
     </div>
   );
 }

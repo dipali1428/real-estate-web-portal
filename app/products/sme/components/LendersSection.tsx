@@ -5,11 +5,11 @@ import { CheckCircle2, ExternalLink } from "lucide-react";
 import { LENDER_TYPES } from "./data";
 
 interface LendersSectionProps {
-  openSignup: () => void;
+  openLogin: () => void;
 }
 
 export const LendersSection: React.FC<LendersSectionProps> = ({
-  openSignup,
+  openLogin,
 }) => {
   return (
     <section className="py-12 md:py-16 bg-gradient-to-b from-white to-[#F8FCFC] relative">
@@ -50,8 +50,7 @@ export const LendersSection: React.FC<LendersSectionProps> = ({
                 {lender.features.map((feature, fIdx) => (
                   <div
                     key={fIdx}
-                    className="flex items-center justify-center gap-3 text-center"
-                  >
+className="flex items-start gap-3 text-left"                  >
                     <CheckCircle2
                       className={`w-5 h-5 flex-shrink-0 mt-0.5 ${idx % 2 === 0 ? "text-[#0056D2]" : "text-[#1FAD9F]"}`}
                     />
@@ -64,7 +63,7 @@ export const LendersSection: React.FC<LendersSectionProps> = ({
 
               <div className="mt-auto w-full pt-4 border-t border-black/5">
                 <button
-                  onClick={openSignup}
+                  onClick={openLogin}
                   className={`w-full py-3 bg-white rounded-lg text-sm font-bold border transition-all flex items-center justify-center gap-2 group/btn cursor-pointer ${lender.buttonColor}`}
                 >
                   Enquire Now

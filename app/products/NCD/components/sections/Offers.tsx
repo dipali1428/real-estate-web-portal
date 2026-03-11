@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { ncdData } from '../../data/ncdData';
@@ -27,26 +27,25 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
         filter === 'All' ? ncdData : ncdData.filter(o => o.status === filter);
 
     return (
-        // Added horizontal padding (px-4) for mobile side margins
-        <section className="py-14 bg-slate-50 px-4 sm:px-6 lg:px-8" id="offers">
+        <section className="py-12 md:py-16 bg-slate-50 px-4 sm:px-6 lg:px-8 font-sans" id="offers">
             <div className="max-w-7xl mx-auto">
 
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-10 pt-6">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                    <h2 className="text-3xl md:text-5xl font-black mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
                         Active Opportunities
                     </h2>
-                    <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
-                    <p className="text-base text-slate-600">
+                    <p className="text-base md:text-lg text-slate-500 font-medium">
                         Handpicked high-yield NCDs available for subscription right now.
                     </p>
                 </div>
 
-                {/* Filters - Responsive width */}
+                {/* Filters */}
                 <div className="flex justify-center mb-10">
                     <div className="flex flex-wrap justify-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 w-full sm:w-auto">
                         {['All', 'Open', 'Upcoming', 'Closed'].map(status => (
                             <button
+                                suppressHydrationWarning={true}
                                 key={status}
                                 onClick={() => setFilter(status)}
                                 className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${filter === status
@@ -72,12 +71,10 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                            hover:shadow-[0_14px_32px_rgba(0,0,0,0.06)]
                                            transition-shadow duration-300
                                            relative overflow-hidden">
-                                
-                                {/* Status Strip */}
+
                                 <div
                                     className={`absolute top-0 left-0 w-1 md:w-0.5 h-full ${getStatusColor(offer.status)
                                         .replace('text-', 'bg-')
-                                        .replace('bg-opacity-10', '')
                                         }`}
                                 />
 
@@ -98,7 +95,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                             </span>
                                         </div>
 
-                                        <h3 className="text-lg md:text-xl font-bold text-[#0B1C2E] leading-tight">
+                                        <h3 className="text-lg md:text-xl font-bold text-[#0B1C2E] leading-tight font-sans">
                                             {offer.title}
                                         </h3>
                                         <p className="text-sm text-slate-500 font-semibold mb-6">
@@ -107,32 +104,32 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
 
                                         {/* Data Grid: 2 columns on mobile, 4 on desktop */}
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
-                                            <div>
-                                                <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
+                                            <div className="bg-slate-50/50 p-3 rounded-lg border border-slate-100/50">
+                                                <div className="text-[9px] uppercase text-slate-400 font-black tracking-widest mb-1">
                                                     Returns
                                                 </div>
                                                 <div className="text-lg md:text-xl font-black text-[#1CADA3]">
                                                     {offer.interest}
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
+                                            <div className="bg-slate-50/50 p-3 rounded-lg border border-slate-100/50">
+                                                <div className="text-[9px] uppercase text-slate-400 font-black tracking-widest mb-1">
                                                     Tenure
                                                 </div>
                                                 <div className="text-sm md:text-base font-bold text-slate-700">
                                                     {offer.tenure}
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
+                                            <div className="bg-slate-50/50 p-3 rounded-lg border border-slate-100/50">
+                                                <div className="text-[9px] uppercase text-slate-400 font-black tracking-widest mb-1">
                                                     Min Inv.
                                                 </div>
                                                 <div className="text-sm md:text-base font-bold text-slate-700">
                                                     {offer.minInvest}
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">
+                                            <div className="bg-slate-50/50 p-3 rounded-lg border border-slate-100/50">
+                                                <div className="text-[9px] uppercase text-slate-400 font-black tracking-widest mb-1">
                                                     Payout
                                                 </div>
                                                 <div className="text-sm md:text-base font-bold text-slate-700">
@@ -142,10 +139,11 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                         </div>
                                     </div>
 
-                                    {/* Actions: Stacked full-width on mobile */}
+                                    {/* Actions */}
                                     <div className="flex flex-col gap-3 w-full md:w-auto mt-2 md:mt-0">
                                         {offer.status === 'Open' ? (
                                             <button
+                                                suppressHydrationWarning={true}
                                                 onClick={() => onApply(offer.id)}
                                                 className="w-full md:w-44 py-3.5 md:py-3 bg-[#1CADA3]
                                                            text-white font-bold rounded-xl
@@ -156,6 +154,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                             </button>
                                         ) : (
                                             <button
+                                                suppressHydrationWarning={true}
                                                 className="w-full md:w-44 py-3.5 md:py-3 bg-slate-100
                                                            text-slate-400 font-bold rounded-xl
                                                            cursor-not-allowed">
@@ -164,12 +163,13 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                         )}
 
                                         <button
+                                            suppressHydrationWarning={true}
                                             onClick={() => onInvest(offer.id)}
                                             className="w-full md:w-44 py-3.5 md:py-3 bg-white
                                                        text-[#1CADA3] font-bold rounded-xl
                                                        border border-[#1CADA3]/30
                                                        hover:bg-slate-50 transition">
-                                            Invest Now
+                                            View Details
                                         </button>
                                     </div>
                                 </div>
@@ -177,7 +177,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                         ))}
                     </div>
 
-                    {/* Sidebar: Hidden on mobile, visible on LG */}
+                    {/* Sidebar */}
                     <div className="hidden lg:block lg:col-span-3">
                         <div className="sticky top-28 space-y-6">
 
@@ -186,7 +186,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                 <div className="absolute top-0 right-0 bg-[#1CADA3] text-white text-[10px] px-2 py-1 rounded-bl-lg">
                                     Live
                                 </div>
-                                <h4 className="font-semibold text-slate-800 mb-4 flex items-center">
+                                <h4 className="font-semibold text-slate-800 mb-4 flex items-center font-sans">
                                     <ArrowUpRight className="w-4 h-4 mr-2 text-[#2076C7]" />
                                     Active Issues
                                 </h4>
@@ -228,7 +228,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
 
                             {/* Trust Badge */}
                             <div className="bg-[#1CADA3] p-5 rounded-xl text-white text-center shadow-lg shadow-[#1CADA3]/20">
-                                <h5 className="text-xs font-semibold uppercase tracking-wide mb-1">
+                                <h5 className="text-xs font-semibold uppercase tracking-wide mb-1 font-sans">
                                     Trusted by 50K+ Investors
                                 </h5>
                                 <p className="text-[11px] text-white/90">

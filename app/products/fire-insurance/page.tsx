@@ -10,7 +10,9 @@ import FireFAQ from "./components/FireFAQ";
 import FireAnalysis from "./components/FireAnalysis";
 import FireProductGrid from "./components/FireProductGrid";
 import FireInsuranceForm from "../../component/products/forms/insurance/fireinsuranceform";
-
+import ScrollToTop from "@/app/component/ScrollToTop";
+import ChatbotWidget from "@/app/component/chatbot/page";
+import FireCTA from "./components/FireCTA";
 export default function FireInsurancePage() {
     const [mounted, setMounted] = useState(false);
     const [showForm, setShowForm] = useState(false);
@@ -26,7 +28,7 @@ export default function FireInsurancePage() {
     const closeForm = () => setShowForm(false);
 
     return (
-        <main className="bg-white min-h-screen">
+        <main className="bg-white min-h-screen font-sans">
             {/* Hero Section */}
             <FireHero />
 
@@ -54,11 +56,14 @@ export default function FireInsurancePage() {
 
             {/* Frequently Asked Questions */}
             <FireFAQ />
+            <FireCTA />
 
             {/* Application Form Modal */}
             {showForm && (
                 <FireInsuranceForm onClose={closeForm} />
             )}
+            <ScrollToTop />
+            <ChatbotWidget />
         </main>
     );
 }

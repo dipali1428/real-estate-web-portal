@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { TrendingUp, ShieldCheck, IndianRupee, ArrowRight } from 'lucide-react';
 
@@ -33,35 +33,42 @@ const Hero = ({ onStart }: HeroProps) => {
     };
 
     return (
-        <section className="relative overflow-hidden pt-24 pb-12 font-sans">
+        <section className="relative overflow-hidden pt-12 pb-6 md:pt-16 md:pb-12 font-sans">
             {/* Brand Background Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#2076C7]/20 via-[#E6F7FF] to-[#1CADA3]/20 -z-10" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#2076C7]/10 via-[#F0F9FF] to-[#1CADA3]/10 -z-10" />
 
             {/* Subtle Light Effect */}
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/40 blur-3xl rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2 opacity-50" />
+            <div className="absolute top-0 right-0 w-[400px] md:w-[700px] h-[400px] md:h-[700px] bg-white/40 blur-3xl rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2 opacity-50" />
 
-            <div className="container-custom relative z-10">
+            <div className="container-custom relative z-10 px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl">
                 <div className="max-w-4xl mx-auto text-center">
+                    {/* SEO Tagline */}
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-linear-to-r from-[#2076C7]/5 to-[#1CADA3]/5 border border-[#2076C7]/10 mb-8 md:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#1CADA3] animate-pulse" />
+                        <span className="text-[10px] md:text-xs font-black text-[#2076C7] uppercase tracking-[0.3em]">High-Yield Fixed Income</span>
+                    </div>
+
                     {/* Title */}
-                    <h1 className="leading-[1.1] mb-8 tracking-tight font-sans px-4">
-                        <span className="block mb-3 text-[#2076C7] font-bold text-2xl sm:text-3xl md:text-5xl">
+                    <h1 className="leading-[1.1] mb-6 md:mb-10 tracking-tight font-sans">
+                        <span className="block mb-2 md:mb-4 text-[#2076C7] font-bold text-xl sm:text-2xl md:text-5xl">
                             Secure Your Future with
                         </span>
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#2076C7] to-[#1CADA3] font-black text-3xl sm:text-4xl md:text-7xl drop-shadow-sm">
-                            Trusted NCD Investments
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#2076C7] to-[#1CADA3] font-black text-4xl sm:text-5xl md:text-8xl drop-shadow-sm">
+                            Trusted NCDs
                         </span>
                     </h1>
 
-                    <p className="text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto font-medium">
+                    <p className="text-base md:text-2xl text-slate-600 mb-8 md:mb-12 leading-relaxed max-w-3xl mx-auto font-medium px-2">
                         Access premium, high-rated fixed-income instruments handpicked by experts.
                         Experience predictable{' '}
-                        <span className="text-[#2076C7] font-bold">8-12% annual returns</span> with absolute capital protection.
+                        <span className="text-[#2076C7] font-bold">8-12% annual returns</span> with capital protection.
                     </p>
 
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 px-6 sm:px-0">
                         {/* Primary CTA */}
                         <button
+                            suppressHydrationWarning={true}
                             onClick={handleGetStarted}
                             className="flex items-center justify-center gap-3 w-full sm:w-auto max-w-[280px] sm:max-w-none
                                        px-8 py-3.5 text-base md:text-lg font-semibold text-white
@@ -76,15 +83,15 @@ const Hero = ({ onStart }: HeroProps) => {
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-8 max-w-5xl mx-auto">
                         {stats.map((stat, idx) => (
-                            <div key={idx} className="glass-card p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] group">
+                            <div key={idx} className="bg-white/60 backdrop-blur-md p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] border border-white shadow-xl shadow-blue-900/5 group transition-all duration-500 hover:shadow-2xl">
                                 <div
-                                    className={`${stat.color} w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-4 md:mb-6 mx-auto group-hover:scale-110 transition-all duration-500`}>
+                                    className={`${stat.color} w-12 h-12 md:w-20 md:h-20 rounded-2xl flex items-center justify-center mb-4 md:mb-8 mx-auto group-hover:scale-110 transition-all duration-500 shadow-sm`}>
                                     {stat.icon}
                                 </div>
-                                <div className="text-2xl md:text-3xl font-black text-[#2076C7] mb-2 md:mb-3">{stat.value}</div>
-                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] md:tracking-[0.3em]">
+                                <h1 className="text-2xl md:text-4xl font-black text-[#0B1C2E] mb-1 md:mb-3 group-hover:text-[#2076C7] transition-colors font-sans">{stat.value}</h1>
+                                <div className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-[0.2em] md:tracking-[0.4em]">
                                     {stat.label}
                                 </div>
                             </div>

@@ -1,125 +1,124 @@
+'use client';
+
 import React from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { useRouter } from 'next/navigation';
 import Image from "next/image";
-import { ArrowLeft, CheckCircle } from "lucide-react";
-import corpPng from "./corp.png";
+import { 
+  IconArrowLeft, 
+  IconArrowRight, 
+  IconShieldCheck, 
+} from "@tabler/icons-react";
+
 
 interface CorporateHeroProps {
   openQuote: () => void;
 }
 
 export const CorporateHero: React.FC<CorporateHeroProps> = ({ openQuote }) => {
-  return (
-    <header className="relative w-full overflow-hidden pt-14 sm:pt-16 md:pt-20 pb-14 sm:pb-16 md:pb-20 bg-white">
-      {/* Back Button */}
-      <Link
-        href="/"
-        className="absolute top-4 left-4 sm:top-5 sm:left-6 z-20 inline-flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-full sm:rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-200 sm:border-gray-300 hover:bg-white shadow-sm hover:shadow-md active:scale-95 transition-all group"
-      >
-        <ArrowLeft
-          className="w-5 h-5 group-hover:-translate-x-1 transition-transform"
-          strokeWidth={2}
-        />
-        <span className="hidden sm:inline">Back to Home</span>
-      </Link>
+  const router = useRouter();
+  const handleBackHome = () => router.push('/');
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
-          {/* LEFT HERO TEXT */}
-          <div className="w-full lg:w-1/2 text-center lg:text-left space-y-8">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold bg-teal-50 border border-teal-200 text-teal-700 mb-2"
+  return (
+    <section className="relative min-h-[75vh] flex items-center bg-white overflow-hidden pt-8 pb-16">
+      {/* Back Button (Non-sticky) */}
+      <div className="absolute z-20 top-8 left-4 md:top-12 md:left-12">
+        <button
+          onClick={handleBackHome}
+          aria-label="Back to Home"
+          className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+        >
+          <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+            <IconArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+          </div>
+        </button>
+        <button
+          onClick={handleBackHome}
+          className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-[0_4px_16px_rgba(32,118,199,0.1)] hover:bg-white hover:border-[#2076C7]/40 active:scale-95 transition-all group"
+        >
+          <IconArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+          Back to Home
+        </button>
+      </div>
+
+      <div className="max-w-[1440px] mx-auto px-6 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-2 items-center">
+          
+          {/* Left: Content */}
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="space-y-6 flex flex-col items-center lg:items-start text-center lg:text-left lg:pl-12"
+          >
+            <div 
+              className="inline-flex items-center gap-2 px-4 py-2 bg-slate-20 border rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm mt-20" 
+              style={{ color: '#2076C7', borderColor: 'rgba(32, 118, 199, 0.2)' }}
             >
-              <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse inline-block" />
-              Comprehensive Business Protection
-            </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.7 }}
-              className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight font-sans"
-            >
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">
-                Protect your business with confidence.
-              </span>
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.7 }}
-              className="text-lg md:text-xl text-slate-700 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal"
-            >
-              Comprehensive insurance solutions for modern Indian businesses.
-              Protect your employees, assets, and operations with coverage from
-              top-rated insurers.
-            </motion.p>
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.7 }}
-              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4 w-full"
-            >
+              <IconShieldCheck size={12} />
+              Corporate Insurance • Infinity Arthvishva
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight" style={{
+              background: 'linear-gradient(to right, #2076C7, #1CADA3, #2076C7)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              Protect Your 
+              <br />
+              Business Assets
+            </h1>
+
+            <p className="text-lg sm:text-xl mb-6 text-gray-600 leading-relaxed max-w-lg">
+              Comprehensive insurance solutions for modern Indian businesses. Protect your employees, assets, and operations with coverage from top-rated insurers.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-4">
               <button
-                onClick={() => openQuote()}
-                className="group relative px-8 py-4 text-white font-bold rounded-xl overflow-hidden shadow-[0_10px_25px_-5px_rgb(32,118,199,0.4)] hover:shadow-[0_15px_30px_-5px_rgb(28,173,163,0.5)] transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                onClick={openQuote}
+                className="group relative text-white px-10 py-5 rounded-lg font-bold text-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer" 
+                style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3]"></span>
-                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#1CADA3] to-[#2076C7]"></span>
-                <span className="relative z-10">Get Quote</span>
+                <span className="relative z-10 flex items-center justify-center gap-1">
+                  Get Quote
+                </span>
+                <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
               </button>
 
-              <Link href="#products">
-                <button className="group relative bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 px-8 py-4 rounded-lg font-semibold text-lg border border-[#2076C7]/30 text-[#2076C7] hover:from-[#2076C7]/20 hover:to-[#1CADA3]/20 transform hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md w-full sm:w-auto">
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    View Products
-                    <svg
-                      className="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 7l5 5m0 0l-5 5m5-5H6"
-                      />
-                    </svg>
-                  </span>
-                </button>
-              </Link>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="flex items-center gap-6 pt-4 text-sm text-slate-600 font-medium"
-            >
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" /> IRDAI
-                Approved & Secure
-              </div>
-            </motion.div>
-          </div>
-          {/* RIGHT HERO GRAPHIC */}
-          <div className="w-full lg:w-1/2 flex items-center justify-center relative">
-            <div className="relative w-full max-w-[650px] h-[260px] sm:h-[320px] md:h-[420px] lg:h-[520px]">
+              <a
+                href="#products"
+                className="group relative bg-white px-7 py-5 rounded-lg font-semibold text-lg border-2 hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-1"
+                style={{ color: '#2076C7', borderColor: '#2076C7' }}
+              >
+                <span className="relative z-10 flex items-center justify-center gap-1">
+                  View Products
+                  <IconArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </span>
+              </a>
+            </div>
+          </motion.div>
+
+          {/* Right: Image Only */}
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="flex justify-center items-center mt-12 lg:mt-0"
+          >
+            <div className="relative w-full max-w-[650px] aspect-[5/4] flex items-center justify-center">
               <Image
-                src={corpPng}
-                alt="Corporate Insurance"
+                src="/insurance/corp.png"
+                alt="Corporate Insurance Illustration"
                 fill
                 className="object-contain"
                 priority
               />
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </header>
+    </section>
   );
 };

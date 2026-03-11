@@ -50,7 +50,7 @@ const HealthInsuranceComparison = () => {
                                     <tr key={fIdx} className={`hover:bg-blue-50/50 transition-colors ${fIdx % 2 === 0 ? 'bg-white' : 'bg-neutral-50/50'}`}>
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                                                <div className="w-8 h-8 rounded-md bg-white border border-gray-100 flex items-center justify-center text-[#2076C7] group-hover:bg-[#2076C7] group-hover:text-white transition-all shadow-sm">
                                                     {feature.icon}
                                                 </div>
                                                 <span className="text-sm font-bold text-gray-700 uppercase tracking-wide">

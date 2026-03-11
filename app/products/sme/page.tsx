@@ -16,39 +16,30 @@ import { DocumentsSection } from "./components/DocumentsSection";
 import { FAQSection } from "./components/FAQSection";
 
 export default function SMELoansPage() {
-  const { openSignup } = useModal();
+  const { openLogin } = useModal();
 
   return (
-    <div className="bg-white text-gray-800 font-sans selection:bg-[#2076C7]/10 selection:text-[#2076C7] relative w-full overflow-x-hidden">
-      
+    <main className="min-h-screen bg-white text-slate-800 font-sans scroll-smooth">
       {/* HERO SECTION */}
-      <SMEHero openSignup={openSignup} />
+      <SMEHero openLogin={openLogin} />
+
+      {/* PRODUCT SECTION */}
+      <ProductSection openLogin={openLogin} />
 
       {/* EMI CALCULATOR SECTION */}
-      <section className="py-12 md:py-16 relative overflow-hidden bg-slate-50/50">
-        <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
-          <div
-            className="relative bg-white rounded-3xl p-6 sm:p-8 md:p-12 border border-slate-100 shadow-sm"
-            style={{
-              boxShadow:
-                "0 2px 8px rgba(32,118,199,0.06), 0 8px 24px rgba(32,118,199,0.10), inset 0 1px 0 rgba(255,255,255,0.9)",
-            }}
-          >
+      <section className="py-24 bg-slate-50/50">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <div className="bg-white rounded-[2.5rem] p-8 md:p-16 border border-slate-100 shadow-2xl relative overflow-hidden">
             <EMICalculator />
           </div>
         </div>
       </section>
 
-      {/* PRODUCT SECTION */}
-      <ProductSection openSignup={openSignup} />
-
       {/* LENDERS SECTION */}
-      <LendersSection openSignup={openSignup} />
+      <LendersSection openLogin={openLogin} />
 
       {/* INDUSTRIES SECTION */}
       <IndustriesSection />
-
-   
 
       {/* ELIGIBILITY SECTION */}
       <EligibilitySection />
@@ -57,27 +48,26 @@ export default function SMELoansPage() {
       <DocumentsSection />
 
       {/* LEGAL DISCLAIMER SECTION */}
-      <section className="py-8 bg-slate-50 border-t border-slate-200/50">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="bg-yellow-50 border border-yellow-200 shadow-sm p-6 rounded-xl max-w-4xl mx-auto">
-            <p className="text-sm text-gray-700 text-center leading-relaxed">
-              <strong className="text-black">Disclaimer:</strong> Infinity
-              Arthvishva acts as a loan facilitator and connects borrowers with
-              lending partners. Loan approval, interest rates, and terms are
-              determined solely by the respective lender based on credit
-              assessment.
-            </p>
-          </div>
+      <div className="bg-white px-2 py-12">
+        <div className="max-w-[1440px] mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-8 shadow-sm">
+          <p className="text-sm text-gray-700 text-center leading-relaxed font-medium">
+            <strong className="text-black font-black">Disclaimer:</strong>{" "}
+            Infinity Arthvishva acts as a loan facilitator and connects
+            borrowers with lending partners. Loan approval, interest rates, and
+            terms are determined solely by the respective lender based on credit
+            assessment. Final terms may change based on lender policies and
+            applicant profile.
+          </p>
         </div>
-      </section>
+      </div>
 
       {/* FAQ SECTION */}
       <FAQSection />
 
-      <CTASection onClick={openSignup} />
+      <CTASection />
       <ScrollToTop />
       <Chatbot />
-    </div>
+    </main>
   );
 }
 /* --- END: MAIN PAGE COMPONENT --- */
