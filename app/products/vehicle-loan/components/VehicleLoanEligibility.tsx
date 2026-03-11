@@ -79,7 +79,7 @@ export default function VehicleLoanEligibility() {
                         </p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
                         {criteria.map((item, index) => (
                             <motion.div
                                 key={index}
@@ -133,7 +133,7 @@ export default function VehicleLoanEligibility() {
                         </p>
                     </motion.div>
 
-                    <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {documents.map((doc, idx) => (
                             <motion.div
                                 key={idx}

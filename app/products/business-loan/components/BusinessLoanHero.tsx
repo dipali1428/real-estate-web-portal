@@ -20,7 +20,7 @@ export default function BusinessLoanHero({
             </div>
 
             <div className="relative container mx-auto px-4 pt-24 pb-10 md:pt-12 md:pb-16 z-10">
-                <div className="text-center max-w-4xl mx-auto">
+                <div className="text-center max-w-6xl mx-auto">
 
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
@@ -45,7 +45,7 @@ export default function BusinessLoanHero({
                                 backgroundClip: "text",
                             }}
                         >
-                            <span className="whitespace-nowrap">
+                            <span className="sm:whitespace-nowrap">
                                 Empowering Business with
                             </span>
                             <span className="block">
@@ -90,7 +90,7 @@ export default function BusinessLoanHero({
                         </div>
 
                         {/* Stats */}
-                        <div className="mt-10 sm:mt-16 flex flex-wrap justify-center gap-10 md:gap-20 w-full max-w-4xl mx-auto">
+                        <div className="mt-10 sm:mt-16 flex flex-wrap justify-center gap-6 sm:gap-10 md:gap-20 w-full max-w-6xl mx-auto">
 
                             <div className="flex flex-col items-center">
                                 <div className="text-4xl font-extrabold mb-1 tracking-tight bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">

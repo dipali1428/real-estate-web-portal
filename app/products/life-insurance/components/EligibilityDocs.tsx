@@ -7,6 +7,8 @@ import {
     Briefcase, GraduationCap, ChevronDown, ShieldCheck,
     Lock, Smartphone, Zap, Clock, Landmark
 } from "lucide-react";
+import { useModal } from '@/app/context/ModalContext';
+
 
 const eligibilityCriteria = [
     { label: "Age", value: "18-65 Yrs", icon: UserCheck },
@@ -22,13 +24,14 @@ const requiredDocs = [
 ];
 
 const EligibilityDocs = () => {
+    const { openLogin } = useModal();
     return (
-        <section className="py-10 md:py-16 bg-[#F8FAFC] relative overflow-hidden" id="onboarding">
+        <section className="py-16 md:py-24 bg-white relative overflow-hidden font-sans" id="onboarding">
             {/* Elegant Background Elements */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-linear-to-r from-transparent via-[#2076C7]/10 to-transparent" />
             <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#2076C7]/3 rounded-full blur-[100px] pointer-events-none" />
 
-            <div className="container-custom relative z-10 px-4 md:px-6">
+            <div className="container-custom relative z-10 px-6 md:px-10 mx-auto max-w-7xl">
                 <div className="text-center max-w-5xl mx-auto mb-8 md:mb-12">
                     <motion.span
                         initial={{ opacity: 0, y: 10 }}
@@ -55,10 +58,9 @@ const EligibilityDocs = () => {
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="relative p-10 rounded-[3rem] bg-white border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] group hover:shadow-[0_40px_80px_rgba(32,118,199,0.06)] transition-all duration-700"
+                        className="relative p-6 md:p-8 rounded-[3rem] bg-white border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] group hover:shadow-[0_40px_80px_rgba(32,118,199,0.06)] transition-all duration-700"
                     >
-                        <div className="absolute top-8 right-10 text-5xl font-black text-slate-50 group-hover:text-blue-50/50 transition-colors">01</div>
-                        <h3 className="text-2xl font-black text-[#2076C7] mb-8 relative z-10">Instant Eligibility</h3>
+                        <h3 className="text-2xl font-black text-[#2076C7] mb-8 relative z-10 text-center">Instant Eligibility</h3>
                         <div className="grid grid-cols-2 gap-6 relative z-10">
                             {eligibilityCriteria.map((item, idx) => (
                                 <div key={idx} className="space-y-2">
@@ -77,10 +79,9 @@ const EligibilityDocs = () => {
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="relative p-10 rounded-[3rem] bg-white border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] group hover:shadow-[0_40px_80px_rgba(32,118,199,0.06)] transition-all duration-700"
+                        className="relative p-6 md:p-8 rounded-[3rem] bg-white border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] group hover:shadow-[0_40px_80px_rgba(32,118,199,0.06)] transition-all duration-700"
                     >
-                        <div className="absolute top-8 right-10 text-5xl font-black text-slate-50 group-hover:text-blue-50/50 transition-colors">02</div>
-                        <h3 className="text-2xl font-black text-[#2076C7] mb-8 relative z-10">Digital Dossier</h3>
+                        <h3 className="text-2xl font-black text-[#2076C7] mb-8 relative z-10 text-center">Digital Dossier</h3>
                         <div className="space-y-6 relative z-10">
                             {requiredDocs.map((doc, idx) => (
                                 <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 group/doc hover:bg-white hover:border-[#2076C7]/30 transition-all font-sans">
@@ -104,15 +105,13 @@ const EligibilityDocs = () => {
                         initial={{ opacity: 0, x: 30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="relative p-10 rounded-[3rem] bg-white border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] flex flex-col justify-between group"
+                        className="relative p-6 md:p-8 rounded-[3rem] bg-white border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] flex flex-col justify-between group"
                     >
-                        <div className="absolute top-8 right-10 text-5xl font-black text-slate-50 group-hover:text-blue-50/50 transition-colors">03</div>
-                        <div>
-                            <h3 className="text-2xl font-black text-[#2076C7] mb-6">Expert Review</h3>
-                            <p className="text-sm text-gray-400 font-medium leading-relaxed mb-8">
-                                Our dedicated relationship managers ensure 100% accurate data filling and instant verification for priority terminal-case support.
-                            </p>
-                        </div>
+                        <h3 className="text-2xl font-black text-[#2076C7] mb-6 text-center">Expert Review</h3>
+                        <p className="text-sm text-gray-400 font-medium leading-relaxed mb-8">
+                            Our dedicated relationship managers ensure 100% accurate data filling and instant verification for priority terminal-case support.
+                        </p>
+
 
                         <div className="space-y-4">
                             <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center gap-4">
@@ -125,16 +124,17 @@ const EligibilityDocs = () => {
                                 </div>
                             </div>
                             <button
+                                onClick={(e) => { e.preventDefault(); openLogin(); }}
                                 suppressHydrationWarning
-                                className="w-full py-5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black text-base shadow-xl shadow-[#2076C7]/20 hover:scale-[1.02] active:scale-95 transition-all"
+                                className="w-full font-sans py-5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black text-base shadow-xl shadow-[#2076C7]/20 hover:scale-[1.02] active:scale-95 transition-all"
                             >
                                 Start Application
                             </button>
                         </div>
                     </motion.div>
                 </div>
-            </div>
-        </section>
+            </div >
+        </section >
     );
 };
 

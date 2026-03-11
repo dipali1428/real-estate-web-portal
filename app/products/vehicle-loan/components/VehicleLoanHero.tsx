@@ -13,7 +13,7 @@ export default function VehicleLoanHero({ onApplyClick, onCalculateClick }: Vehi
         <section className="relative lg:h-[calc(100vh-64px)] flex items-center justify-center overflow-hidden pt-20 pb-8 font-sans">
 
             <div className="container mx-auto px-4 md:px-6 relative z-10 w-full">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-6xl mx-auto">
                     {/* Left Column: Content */}
                     <motion.div
                         initial={{ opacity: 0, x: -40 }}
@@ -82,7 +82,7 @@ export default function VehicleLoanHero({ onApplyClick, onCalculateClick }: Vehi
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                        className="relative hidden lg:flex items-center justify-center min-h-[900px]"
+                        className="relative hidden lg:flex items-center justify-center min-h-[600px]"
                     >
                         <motion.img
                             initial={{ opacity: 0, scale: 0.9 }}
@@ -90,7 +90,7 @@ export default function VehicleLoanHero({ onApplyClick, onCalculateClick }: Vehi
                             transition={{ duration: 1, delay: 0.5 }}
                             src="/loan/vehicle-loan image.jpeg"
                             alt="Vehicle Financing"
-                            className="w-[115%] max-w-[900px] h-auto object-contain drop-shadow-2xl rounded-3xl"
+                            className="w-full max-w-[650px] h-auto object-contain drop-shadow-2xl rounded-3xl"
                         />
                     </motion.div>
                 </div>

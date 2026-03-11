@@ -75,7 +75,7 @@ export default function VehicleLoanProcess() {
 
 
                     {/* Steps */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 relative z-10 max-w-6xl mx-auto">
 
                         {processSteps.map((step, idx) => (
                             <motion.div

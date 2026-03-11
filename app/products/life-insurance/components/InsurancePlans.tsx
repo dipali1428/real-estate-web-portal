@@ -78,7 +78,7 @@ const plans = [
 
 const InsurancePlans = () => {
     return (
-        <section className="py-24 md:py-32 bg-white relative overflow-hidden" id="plans">
+        <section className="py-24 md:py-32 bg-white relative overflow-hidden font-sans" id="plans">
             {/* Background Accents */}
             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#2076C7]/3 rounded-full blur-[140px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-[#1CADA3]/3 rounded-full blur-[140px] pointer-events-none" />
@@ -96,7 +96,7 @@ const InsurancePlans = () => {
                         Explore Every Type of <br />
                         <span className="text-transparent bg-clip-text bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-[length:200%_auto] animate-gradient-x">Life Protection.</span>
                     </h2>
-                    <p className="text-gray-500 text-lg md:text-xl font-medium max-w-2xl mx-auto">
+                    <p className="font-sans text-gray-500 text-lg md:text-xl font-medium max-w-2xl mx-auto">
                         From basic term plans to high-yield investment strategies, find the perfect blueprint for your financial legacy.
                     </p>
                 </div>
@@ -135,24 +135,24 @@ const InsurancePlans = () => {
                                 {plan.icon}
                             </div>
 
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 block">{plan.tag}</span>
-                            <h3 className="text-xl font-black text-[#0B1C2E] mb-4 group-hover:text-[#2076C7] transition-colors">{plan.title}</h3>
-                            <p className="text-sm text-gray-500 font-medium leading-relaxed mb-8 h-12 overflow-hidden">{plan.desc}</p>
+                            <span className="font-sans text-xs md:text-sm font-black uppercase tracking-[0.2em] text-[#2076C7] mb-2 block">{plan.tag}</span>
+                            <h3 className="font-sans text-xl md:text-2xl font-black text-[#0B1C2E] mb-4 group-hover:text-[#1CADA3] transition-colors">{plan.title}</h3>
+                            <p className="font-sans text-sm md:text-[15px] text-gray-500 font-medium leading-relaxed mb-8 min-h-[4.5rem]">{plan.desc}</p>
 
                             <div className="space-y-3 mb-8">
                                 {plan.highlights.map((h, i) => (
                                     <div key={i} className="flex items-center gap-2">
-                                        <div className={`w-1 h-1 rounded-full ${plan.color === 'blue' ? 'bg-[#2076C7]' : 'bg-[#1CADA3]'}`} />
-                                        <span className="text-[11px] font-bold text-slate-600">{h}</span>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${plan.color === 'blue' ? 'bg-[#2076C7]' : 'bg-[#1CADA3]'}`} />
+                                        <span className="font-sans text-xs md:text-sm font-bold text-slate-600">{h}</span>
                                     </div>
                                 ))}
                             </div>
 
                             <button
                                 suppressHydrationWarning
-                                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#2076C7] group-hover:gap-4 transition-all"
+                                className="font-sans flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[#2076C7] group-hover:gap-4 transition-all"
                             >
-                                Learn More <ArrowRight className="w-4 h-4" />
+                                Learn More <ArrowRight className="w-5 h-5" />
                             </button>
                         </motion.div>
                     ))}
@@ -163,17 +163,17 @@ const InsurancePlans = () => {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[80px] -mr-32 -mt-32" />
 
                     <div className="relative z-10 max-w-xl text-center md:text-left">
-                        <h4 className="text-2xl md:text-3xl font-black mb-4">Not sure which plan is right for you?</h4>
-                        <p className="text-white/80 font-medium text-sm md:text-base">Use our Premium Audit Hub to find the ideal coverage based on your current age, income, and lifestyle habits.</p>
+                        <h4 className="font-sans text-2xl md:text-3xl font-black mb-4">Not sure which plan is right for you?</h4>
+                        <p className="font-sans text-white/80 font-medium text-sm md:text-base">Use our Premium Audit Hub to find the ideal coverage based on your current age, income, and lifestyle habits.</p>
                     </div>
 
                     <div className="relative z-10">
                         <button
                             suppressHydrationWarning
                             onClick={() => document.getElementById('calculator')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="px-10 py-5 bg-white text-[#2076C7] rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:bg-slate-50 hover:scale-105 transition-all active:scale-95 flex items-center gap-3"
+                            className="font-sans px-10 py-5 bg-white text-[#2076C7] rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:bg-slate-50 hover:scale-105 transition-all active:scale-95 flex items-center gap-3"
                         >
-                            Quick Calculator <ArrowRight className="w-4 h-4" />
+                            Quick Calculator <ArrowRight className="w-5 h-5" />
                         </button>
                     </div>
                 </div>

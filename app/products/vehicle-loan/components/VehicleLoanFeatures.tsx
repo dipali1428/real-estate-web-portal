@@ -75,7 +75,7 @@ export default function VehicleLoanFeatures() {
                     </motion.p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
                     {features.map((feature, index) => (
                         <motion.div
                             key={index}
@@ -110,7 +110,7 @@ export default function VehicleLoanFeatures() {
                 </div>
 
                 {/* Call to Action Banner */}
-                <div className="mt-14 p-10 rounded-[3rem] bg-linear-to-br from-[#2076C7] to-[#1CADA3] text-white overflow-hidden relative group max-w-7xl mx-auto">
+                <div className="mt-14 p-10 rounded-[3rem] bg-linear-to-br from-[#2076C7] to-[#1CADA3] text-white overflow-hidden relative group max-w-6xl mx-auto">
                     <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -mr-40 -mt-40 group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl -ml-32 -mb-20 group-hover:scale-110 transition-transform duration-700" />
 

@@ -1,11 +1,15 @@
 "use client";
 import React from 'react';
 import { ShieldCheck, Clock, Percent, Zap, TrendingUp, CheckCircle, ArrowRight } from 'lucide-react';
+import { useModal } from '@/app/context/ModalContext';
+
 
 interface PersonalLoanHeroProps {
 }
 
 export default function PersonalLoanHero({ }: PersonalLoanHeroProps) {
+    const { openLogin } = useModal();
+
     return (
         <section className="relative bg-[#ffffff] pt-20 pb-12 lg:pt-28 lg:pb-20 font-sans overflow-hidden" style={{ fontFamily: 'var(--font-geist-sans)' }}>
 
@@ -32,13 +36,18 @@ export default function PersonalLoanHero({ }: PersonalLoanHeroProps) {
                             Access instant personal loans up to ₹50 Lakhs with Infinity Arthvishva. Realize your goals with industry-leading rates and a 100% paperless process.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-10 md:mb-12 max-w-xs sm:max-w-sm mx-auto lg:mx-0">
-                            <a
-                                href="#payout-structure"
-                                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white px-6 md:px-8 py-3.5 md:py-4 rounded-xl font-bold shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 hover:-translate-y-0.5 transition-all text-sm md:text-base"
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10">
+                            <button
+                                onClick={(e) => { e.preventDefault(); openLogin(); }}
+                                className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer inline-block text-center"
+                                style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
                             >
-                                Apply Now <ArrowRight size={18} />
-                            </a>
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                    Apply Now
+                                    <ArrowRight size={18} className="transform group-hover:translate-x-1 transition-transform" />
+                                </span>
+                                <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
+                            </button>
                         </div>
 
                         {/* Features Grid */}
@@ -75,7 +84,7 @@ export default function PersonalLoanHero({ }: PersonalLoanHeroProps) {
                         {/* Main Image Base */}
                         <div className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-xl md:shadow-2xl bg-white border border-gray-100 z-10 w-full h-[280px] sm:h-[350px] md:h-[500px]">
                             <img
-                                src="/personal-loan-hero-v2.png"
+                                src="/loan/personal-loan-hero.png"
                                 alt="Personal finance and loan calculation"
                                 className="w-full h-full object-cover object-center"
                             />

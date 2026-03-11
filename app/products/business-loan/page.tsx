@@ -64,7 +64,7 @@ export default function BusinessLoanProductPage() {
 
             {/* Disclaimer Section */}
             <div className="bg-white py-6 md:py-8 px-4">
-                <div className="max-w-4xl mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
+                <div className="max-w-6xl mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
                     <p className="text-sm text-gray-700 text-center leading-relaxed">
                         <strong className="text-black">Disclaimer:</strong> Rules are subject to PFRDA guidelines and may change. Please refer to official documentation.
                     </p>

@@ -78,7 +78,7 @@ export default function BusinessLoanPartners() {
 
     return (
         <section className="py-12 md:py-16 bg-gray-50/80 relative overflow-hidden font-sans">
-            <div className="container mx-auto px-4 max-w-7xl relative">
+            <div className="container mx-auto px-4 max-w-6xl relative">
 
                 {/* Header */}
                 <motion.div

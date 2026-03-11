@@ -190,7 +190,7 @@ export default function ProductComparison() {
     const [showAll, setShowAll] = useState(false);
 
     return (
-        <section className="py-20 md:py-28 bg-[#F8FAFF] relative overflow-hidden" id="product-comparison">
+        <section className="py-20 md:py-28 bg-[#F8FAFF] relative overflow-hidden font-sans" id="product-comparison">
             {/* BG blobs */}
             <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#2076C7]/4 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#1CADA3]/4 rounded-full blur-[120px] pointer-events-none" />
