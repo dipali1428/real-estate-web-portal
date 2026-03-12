@@ -472,11 +472,6 @@ export default function ProfilePage() {
     showNotification('Changes discarded', 'info');
   }, [originalProfile, showNotification]);
 
-  // ========== GO BACK TO DASHBOARD ==========
-  const goToDashboard = useCallback(() => {
-    router.push('/customer/unlisted');
-  }, [router]);
-
   // ========== PASSWORD STRENGTH HELPERS ==========
   const getPasswordStrengthColor = useCallback(() => {
     if (passwordStrength < 25) return 'bg-red-500';
@@ -551,12 +546,6 @@ export default function ProfilePage() {
       <header className="mb-10">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-center gap-4">
-            <button 
-              onClick={goToDashboard}
-              className="p-2 hover:bg-white rounded-xl transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-slate-600" />
-            </button>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">My Profile</h1>
               <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-500">Manage your personal information and security</p>

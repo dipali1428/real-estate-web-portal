@@ -78,14 +78,14 @@ export const Modals: React.FC<ModalsProps> = ({
             <form onSubmit={onPasswordUpdate} className="p-8 space-y-6">
               {/* Current Password */}
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Current Password</label>
+                <label className="text-xs font-black text-slate-700 uppercase tracking-widest">Current Password</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type={showCurrentPassword ? 'text' : 'password'}
                     value={passwordData.currentPassword}
                     onChange={(e) => onPasswordChange({ ...passwordData, currentPassword: e.target.value })}
-                    className="w-full pl-12 pr-12 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#1CADA3] transition-all"
+                    className="w-full pl-12 pr-12 py-3 bg-white border-2 border-slate-400 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#1CADA3] transition-all"
                     placeholder="Enter current password"
                     required
                   />
@@ -101,14 +101,14 @@ export const Modals: React.FC<ModalsProps> = ({
               
               {/* New Password */}
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">New Password</label>
+                <label className="text-xs font-black text-slate-700 uppercase tracking-widest">New Password</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type={showNewPassword ? 'text' : 'password'}
                     value={passwordData.newPassword}
                     onChange={(e) => onPasswordChange({ ...passwordData, newPassword: e.target.value })}
-                    className="w-full pl-12 pr-12 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#1CADA3] transition-all"
+                    className="w-full pl-12 pr-12 py-3 bg-white border-2 border-slate-400 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#1CADA3] transition-all"
                     placeholder="Enter new password"
                     required
                   />
@@ -143,14 +143,14 @@ export const Modals: React.FC<ModalsProps> = ({
               
               {/* Confirm Password */}
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Confirm Password</label>
+                <label className="text-xs font-black text-slate-700 uppercase tracking-widest">Confirm Password</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={passwordData.confirmPassword}
                     onChange={(e) => onPasswordChange({ ...passwordData, confirmPassword: e.target.value })}
-                    className="w-full pl-12 pr-12 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#1CADA3] transition-all"
+                    className="w-full pl-12 pr-12 py-3 bg-white border-2 border-slate-400 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#1CADA3] transition-all"
                     placeholder="Confirm new password"
                     required
                   />
@@ -179,7 +179,7 @@ export const Modals: React.FC<ModalsProps> = ({
               </div>
               
               <div className="flex gap-4 pt-4">
-                <button type="button" onClick={onClosePasswordModal} className="flex-1 py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-black uppercase tracking-widest transition-colors">
+                <button type="button" onClick={onClosePasswordModal} className="flex-1 py-3 border-2 border-slate-400 rounded-xl hover:bg-slate-50 text-gray-700 text-sm font-black uppercase tracking-widest transition-colors">
                   Cancel
                 </button>
                 <button type="submit" disabled={updatingPassword} className="flex-1 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest shadow-sm">
@@ -203,10 +203,10 @@ export const Modals: React.FC<ModalsProps> = ({
               <p className="text-sm text-slate-500 mb-8">This action cannot be undone. This will permanently delete your account and remove all associated data.</p>
               
               <div className="flex gap-4">
-                <button onClick={onCloseDeleteModal} className="flex-1 py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-black uppercase tracking-widest transition-colors">
+                <button onClick={onCloseDeleteModal} className="flex-1 py-3 border-2 border-slate-400 rounded-xl hover:bg-slate-50 text-gray-700 text-sm font-black uppercase tracking-widest transition-colors">
                   Cancel
                 </button>
-                <button onClick={onDeleteAccount} disabled={deleting} className="flex-1 py-3 bg-rose-500 text-white rounded-xl hover:bg-rose-600 disabled:opacity-50 text-sm font-black uppercase tracking-widest shadow-sm">
+                <button onClick={onDeleteAccount} disabled={deleting} className="flex-1 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest shadow-sm">
                   {deleting ? 'Deleting...' : 'Delete'}
                 </button>
               </div>
