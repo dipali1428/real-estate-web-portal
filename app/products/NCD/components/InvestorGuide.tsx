@@ -1,4 +1,4 @@
-﻿import { UserCheck, Search, Wallet, TrendingUp, ArrowRight } from 'lucide-react';
+﻿import { UserCheck, Search, Wallet, TrendingUp } from 'lucide-react';
 
 const InvestorGuide = () => {
     const steps = [

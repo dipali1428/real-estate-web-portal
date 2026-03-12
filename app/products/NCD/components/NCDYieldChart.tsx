@@ -10,8 +10,8 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from 'recharts';
-import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, Percent, ShieldCheck, Wallet, ArrowUpRight, ArrowDownRight, Info } from 'lucide-react';
+import { motion} from 'framer-motion';
+import { TrendingUp, ArrowUpRight, } from 'lucide-react';
 
 const NCDYieldChart = () => {
     const [principal, setPrincipal] = useState(100000);

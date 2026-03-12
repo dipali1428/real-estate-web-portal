@@ -70,7 +70,7 @@ const ServicesSection = () => {
       title: "Investments",
       description: "Strategic investment options to grow your wealth.",
       items: [
-        { name: "Mutual Funds", slug: "mutualfunds" },
+        { name: "Mutual Funds", slug: "mutual-funds" },
         { name: "Unlisted", slug: "unlisted" },
         { name: "PMS", slug: "pms" },
         { name: "AIF", slug: "aif" },

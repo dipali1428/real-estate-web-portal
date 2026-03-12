@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { TrendingUp, ShieldCheck, Clock, Banknote, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { TrendingUp, ShieldCheck, Clock, Banknote, ChevronDown, ChevronUp } from 'lucide-react';
 
 const Comparison = () => {
     const [isExpanded, setIsExpanded] = useState(false);

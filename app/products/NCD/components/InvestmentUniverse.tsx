@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Landmark, ShieldCheck, ArrowUpRight, TrendingUp, Info } from 'lucide-react';
+import { ShieldCheck, ArrowUpRight, } from 'lucide-react';
 
 const InvestmentUniverse = () => {
     const products = [
