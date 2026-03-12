@@ -3,7 +3,7 @@ import {
     Target,
     Download
 } from 'lucide-react';
-import { useModal } from '../../../../context/ModalContext';
+import { useModal } from '../../../context/ModalContext';
 
 // 1. Define the Profile interface to fix "implicit any" errors
 interface Profile {

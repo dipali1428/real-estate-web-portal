@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ncdData } from '../../data/ncdData';
+import { ncdData } from '../data/ncdData';
 import { ChevronRight, Star, ArrowUpRight } from 'lucide-react';
 import Calculator from './Calculator';
 
