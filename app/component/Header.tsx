@@ -97,43 +97,20 @@ const Header = () => {
 
   return (
     <header className="bg-linear-to-br from-[#E8F6FA] via-[#F0FAFB] to-[#E9F8F6] backdrop-blur-md shadow-sm sticky top-0 z-50 transition-all duration-300 border-b border-[#1CADA3]/20">
-     <nav className="max-w-[1600px] container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex items-center justify-center">
-        {/* Logo Section
-        <motion.div
-            className="flex items-center space-x-2"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}>
-
-          <Link href="/">
-            <Image
-              src="/logo.png"
-              alt="Infinity Arthvishva Logo"
-              width={200}
-              height={200}
-              className="h-8 sm:h-10 md:h-12 lg:h-14 w-auto object-contain"
-              priority
-            />
-          </Link>
-        </motion.div> */}
-
+<nav className="relative max-w-[1600px] container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex items-center justify-start lg:justify-center">
+      <Link href="/" className="flex items-center shrink-0">
+  <Image
+    src="/logo.png"
+    alt="Infinity Arthvishva Logo"
+    width={200}
+    height={200}
+    className="h-10 sm:h-8 md:h-10 lg:h-12 xl:h-14 w-auto object-contain"
+    priority
+  />
+</Link>
         {/* Desktop Menu */}
-   <div className="hidden lg:flex items-center space-x-3 xl:space-x-4 font-sans">
+ <div className="hidden lg:flex items-center space-x-2 xl:space-x-3 font-sans ml-6">
 
-  {/* Logo near Home */}
-  <Link href="/" className="flex items-center">
-    <Image
-      src="/logo.png"
-      alt="Infinity Arthvishva Logo"
-      width={200}
-      height={200}
-      className="h-8 sm:h-10 md:h-12 w-auto object-contain"
-      priority
-    />
-  </Link>
-
-          
-          
           {/* Home & About Us */}
           {navLinks.slice(0, 2).map((link, i) => (
             <motion.div
@@ -574,11 +551,12 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu Button */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden p-2 text-[#2076C7]">
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+<button
+  onClick={() => setIsOpen(!isOpen)}
+  className="lg:hidden absolute right-3 sm:right-4 p-3 text-[#2076C7]"
+>
+  {isOpen ? <X size={30} /> : <Menu size={30} />}
+</button>
       </nav>
 
       {/* Mobile Menu */}

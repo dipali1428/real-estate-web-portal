@@ -20,122 +20,16 @@ const GroupOfCompaniesPage = () => {
             </p>
           </div>
 
-          {/* Cards Row */}
-          <div className="flex gap-8 overflow-x-auto pb-4">
-
-            {/* ADVISORY CARD */}
-            <div className="group min-w-[280px] p-[1px] rounded-2xl bg-linear-to-br from-[#2076C7]/20 to-[#1CADA3]/20 hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-500 shadow-sm hover:shadow-xl">
+          {/* Cards Layout */}
+          <div className="flex flex-col items-center gap-10">
+   <h2 className="text-3xl md:text-2xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+              Group Of Companies
+            </h2>
+            {/* GROUP CARD - TOP CENTER */}
+            <div className="group min-w-[280px] max-w-[320px] p-[1px] rounded-2xl bg-linear-to-br from-[#2076C7]/20 to-[#1CADA3]/20 hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-500 shadow-sm hover:shadow-xl">
               <div className="bg-white rounded-[15px] p-10 h-full flex flex-col">
 
-                <h5 className="text-[16px] font-semibold text-gray-700 mb-8 leading-relaxed tracking-wider min-h-[60px]">
-                  INFINITY ARTHVISHVA <span className="text-[#2076C7]">ADVISORY</span>
-                  <br />
-                  PRIVATE LIMITED
-                </h5>
-
-                <div className="space-y-4 mt-auto">
-                  <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
-                    <div>
-                      <div className="font-semibold">CIN</div>
-                      <div className="font-mono text-xs mt-1">
-                        U66190PN2025PTC238981
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
-                    <div>
-                      <div className="font-semibold">GST</div>
-                      <div className="font-mono text-xs mt-1">
-                        27AAICI0723K1ZJ
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            {/* INSURANCE CARD */}
-            <div className="group min-w-[280px] p-[1px] rounded-2xl bg-linear-to-br from-[#2076C7]/20 to-[#1CADA3]/20 hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-500 shadow-sm hover:shadow-xl">
-              <div className="bg-white rounded-[15px] p-10 h-full flex flex-col">
-
-                <h5 className="text-[16px] font-semibold text-gray-700 mb-8 leading-relaxed tracking-wider min-h-[60px]">
-                  INFINITY ARTHVISHVA <span className="text-[#2076C7]">INSURANCE</span>
-                  <br />
-                  BROKER PRIVATE LIMITED
-                </h5>
-
-                <div className="space-y-4 mt-auto">
-                  <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
-                    <div>
-                      <div className="font-semibold">CIN</div>
-                      <div className="font-mono text-xs mt-1">
-                        U65110PN2025PTC241213
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
-                    <div>
-                      <div className="font-semibold">GST</div>
-                      <div className="font-mono text-xs mt-1">
-                        Under Process
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            {/* MUTUAL FUND CARD */}
-            <div className="group min-w-[280px] p-[1px] rounded-2xl bg-linear-to-br from-[#2076C7]/20 to-[#1CADA3]/20 hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-500 shadow-sm hover:shadow-xl">
-              <div className="bg-white rounded-[15px] p-10 h-full flex flex-col">
-
-                <h5 className="text-[16px] font-semibold text-gray-700 mb-8 leading-relaxed tracking-wider min-h-[60px]">
-                  INFINITY ARTHVISHVA <span className="text-[#2076C7]">MUTUAL FUND</span>
-                  <br />
-                  DISTRIBUTOR LLP
-                </h5>
-
-                <div className="space-y-4 mt-auto">
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
-                      <div>
-                        <div className="font-semibold">LLPIN</div>
-                        <div className="font-mono text-xs mt-1">ACP-0126</div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
-                      <div>
-                        <div className="font-semibold">ARN</div>
-                        <div className="font-mono text-xs mt-1">347839</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
-                    <div>
-                      <div className="font-semibold">GST</div>
-                      <div className="font-mono text-xs mt-1">
-                        27AALFI4941B1ZH
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-
-              </div>
-            </div>
-
-            {/* GROUP CARD */}
-            <div className="group min-w-[280px] p-[1px] rounded-2xl bg-linear-to-br from-[#2076C7]/20 to-[#1CADA3]/20 hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-500 shadow-sm hover:shadow-xl">
-              <div className="bg-white rounded-[15px] p-10 h-full flex flex-col">
-
-                <h5 className="text-[16px] font-semibold text-gray-700 mb-8 leading-relaxed tracking-wider min-h-[60px]">
+                <h5 className="text-[16px] font-semibold text-gray-700 mb-8 leading-relaxed tracking-wider min-h-[60px] text-center">
                   INFINITYARTHVISHVA <span className="text-[#2076C7]">GROUP</span>
                   <br />
                   PRIVATE LIMITED
@@ -166,6 +60,118 @@ const GroupOfCompaniesPage = () => {
               </div>
             </div>
 
+            {/* BOTTOM 3 CARDS */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+
+              {/* ADVISORY CARD */}
+              <div className="group min-w-[280px] p-[1px] rounded-2xl bg-linear-to-br from-[#2076C7]/20 to-[#1CADA3]/20 hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-500 shadow-sm hover:shadow-xl">
+                <div className="bg-white rounded-[15px] p-10 h-full flex flex-col">
+
+                  <h5 className="text-[16px] font-semibold text-gray-700 mb-8 leading-relaxed tracking-wider min-h-[60px]">
+                    INFINITY ARTHVISHVA <span className="text-[#2076C7]">ADVISORY</span>
+                    <br />
+                    PRIVATE LIMITED
+                  </h5>
+
+                  <div className="space-y-4 mt-auto">
+                    <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
+                      <div>
+                        <div className="font-semibold">CIN</div>
+                        <div className="font-mono text-xs mt-1">
+                          U66190PN2025PTC238981
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
+                      <div>
+                        <div className="font-semibold">GST</div>
+                        <div className="font-mono text-xs mt-1">
+                          27AAICI0723K1ZJ
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* INSURANCE CARD */}
+              <div className="group min-w-[280px] p-[1px] rounded-2xl bg-linear-to-br from-[#2076C7]/20 to-[#1CADA3]/20 hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-500 shadow-sm hover:shadow-xl">
+                <div className="bg-white rounded-[15px] p-10 h-full flex flex-col">
+
+                  <h5 className="text-[16px] font-semibold text-gray-700 mb-8 leading-relaxed tracking-wider min-h-[60px]">
+                    INFINITY ARTHVISHVA <span className="text-[#2076C7]">INSURANCE</span>
+                    <br />
+                    BROKER PRIVATE LIMITED
+                  </h5>
+
+                  <div className="space-y-4 mt-auto">
+                    <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
+                      <div>
+                        <div className="font-semibold">CIN</div>
+                        <div className="font-mono text-xs mt-1">
+                          U65110PN2025PTC241213
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
+                      <div>
+                        <div className="font-semibold">GST</div>
+                        <div className="font-mono text-xs mt-1">
+                          Under Process
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* MUTUAL FUND CARD */}
+              <div className="group min-w-[280px] p-[1px] rounded-2xl bg-linear-to-br from-[#2076C7]/20 to-[#1CADA3]/20 hover:from-[#2076C7] hover:to-[#1CADA3] transition-all duration-500 shadow-sm hover:shadow-xl">
+                <div className="bg-white rounded-[15px] p-10 h-full flex flex-col">
+
+                  <h5 className="text-[16px] font-semibold text-gray-700 mb-8 leading-relaxed tracking-wider min-h-[60px]">
+                    INFINITY ARTHVISHVA <span className="text-[#2076C7]">MUTUAL FUND</span>
+                    <br />
+                    DISTRIBUTOR LLP
+                  </h5>
+
+                  <div className="space-y-4 mt-auto">
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
+                        <div>
+                          <div className="font-semibold">LLPIN</div>
+                          <div className="font-mono text-xs mt-1">ACP-0126</div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
+                        <div>
+                          <div className="font-semibold">ARN</div>
+                          <div className="font-mono text-xs mt-1">347839</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white text-[#1CADA3] border-2 border-[#1CADA3] px-4 py-3 rounded-lg font-semibold text-center">
+                      <div>
+                        <div className="font-semibold">GST</div>
+                        <div className="font-mono text-xs mt-1">
+                          27AALFI4941B1ZH
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
           </div>
 
         </div>
