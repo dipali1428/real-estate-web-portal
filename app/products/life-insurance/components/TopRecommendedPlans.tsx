@@ -9,8 +9,9 @@ import {
   Briefcase, Gift, Landmark, Info,
   ChevronRight, Search, X, ArrowRight
 } from "lucide-react";
-import GetQuoteModal from "./GetQuoteModal";
+// import GetQuoteModal from "./GetQuoteModal";
 import PlanDetailsModal from "./PlanDetailsModal";
+import { useModal } from "../../../context/ModalContext";
 
 const allPlans = [
   {
@@ -252,7 +253,6 @@ const FILTER_TABS = ["All", "Term Insurance", "Guaranteed Savings", "Child Plan"
 export default function TopRecommendedPlans() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [quotePlan, setQuotePlan] = useState<typeof allPlans[0] | null>(null);
   const [detailsPlan, setDetailsPlan] = useState<typeof allPlans[0] | null>(null);
 
   const filtered = allPlans.filter(p => {
@@ -268,21 +268,21 @@ export default function TopRecommendedPlans() {
     return matchesCategory && matchesSearch;
   });
 
+  const { openLogin } = useModal();
   const handleAction = (plan: typeof allPlans[0], actionText: string) => {
     if (actionText === "View Details") {
       setDetailsPlan(plan);
     } else {
-      setQuotePlan(plan);
+      openLogin();
     }
   };
 
   return (
     <>
-      <GetQuoteModal plan={quotePlan} onClose={() => setQuotePlan(null)} />
       <PlanDetailsModal
         plan={detailsPlan}
         onClose={() => setDetailsPlan(null)}
-        onGetQuote={(plan) => setQuotePlan(plan as any)}
+        onGetQuote={() => openLogin()}
       />
       <section
         className="py-16 md:py-24 bg-neutral-50 relative overflow-hidden text-gray-700 font-sans"
