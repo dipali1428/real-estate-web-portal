@@ -1,6 +1,5 @@
 
 import {
-    Target,
     Download
 } from 'lucide-react';
 import { useModal } from '../../../context/ModalContext';
