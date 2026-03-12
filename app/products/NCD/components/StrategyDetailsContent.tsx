@@ -1,6 +1,6 @@
 'use client';
 
-import { strategyDetailsData } from '../../utils/StrategyDetailsData';
+import { strategyDetailsData } from "../utils/StrategyDetailsData";
 import { Shield, Target, TrendingUp, Landmark, Info, ArrowUpRight } from 'lucide-react';
 
 interface StrategyDetailsContentProps {
