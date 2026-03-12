@@ -32,10 +32,10 @@ const comparisonData = [
 const graphData = [
     { name: 'Cow', coverage: 50000, premium: 800, color: '#2076C7' },
     { name: 'Buffalo', coverage: 60000, premium: 950, color: '#1CADA3' },
-    { name: 'Bullock', coverage: 60000, premium: 400, color: '#4F46E5' },
-    { name: 'Goat/Sheep', coverage: 10000, premium: 60, color: '#e03d8eff' },
-    { name: 'Pig', coverage: 10000, premium: 125, color: '#F59E0B' },
-    { name: 'Horse/Mule', coverage: 50000, premium: 650, color: '#6366F1' },
+    { name: 'Bullock', coverage: 60000, premium: 400, color: '#2076C7' },
+    { name: 'Goat/Sheep', coverage: 10000, premium: 60, color: '#1CADA3' },
+    { name: 'Pig', coverage: 10000, premium: 125, color: '#2076C7' },
+    { name: 'Horse/Mule', coverage: 50000, premium: 650, color: '#1CADA3' },
 ];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -79,8 +79,8 @@ export default function ComparisonchartAndGraph() {
     return (
         <>
             {/* ── Comparison Table Section ─────────────────────────────── */}
-            <section className="py-12 bg-[#fafcfe] relative overflow-hidden">
-                <div className="max-w-6xl mx-auto px-6 md:px-12 relative z-10">
+            <section className="py-8 bg-[#fafcfe] relative overflow-hidden">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -88,7 +88,6 @@ export default function ComparisonchartAndGraph() {
                         transition={{ duration: 0.7 }}
                         className="text-center mb-12"
                     >
-                        <span className="text-primary-blue font-bold tracking-widest uppercase text-xs md:text-sm mb-4 block underline decoration-teal-400 decoration-4 underline-offset-8">Side-by-Side</span>
                         <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                             Plan Comparison Table
                         </h2>
@@ -101,13 +100,13 @@ export default function ComparisonchartAndGraph() {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-blue-50/50">
-                                    <th className="p-6 text-[10px] font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50">Animal Category</th>
-                                    <th className="p-6 text-[10px] font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50 text-center">Max Cover</th>
-                                    <th className="p-6 text-[10px] font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50 text-center">Premium (Est.)</th>
-                                    <th className="p-6 text-[10px] font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50 text-center">Accident</th>
-                                    <th className="p-6 text-[10px] font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50 text-center">Disease</th>
-                                    <th className="p-6 text-[10px] font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50 text-center">Wait Period</th>
-                                    <th className="p-6 text-[10px] font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50">Recommended For</th>
+                                    <th className="px-3 py-4 md:px-4 md:py-6 text-[10px] md:text-xs font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50 whitespace-nowrap">Animal Category</th>
+                                    <th className="px-3 py-4 md:px-4 md:py-6 text-[10px] md:text-xs font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50 text-center">Max Cover</th>
+                                    <th className="px-3 py-4 md:px-4 md:py-6 text-[10px] md:text-xs font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50 text-center">Premium (Est.)</th>
+                                    <th className="px-3 py-4 md:px-4 md:py-6 text-[10px] md:text-xs font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50 text-center">Accident</th>
+                                    <th className="px-3 py-4 md:px-4 md:py-6 text-[10px] md:text-xs font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50 text-center">Disease</th>
+                                    <th className="px-3 py-4 md:px-4 md:py-6 text-[10px] md:text-xs font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50 text-center">Wait Period</th>
+                                    <th className="px-3 py-4 md:px-4 md:py-6 text-[10px] md:text-xs font-black text-blue-600 uppercase tracking-widest border-b border-blue-100/50">Recommended For</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -120,55 +119,55 @@ export default function ComparisonchartAndGraph() {
                                         transition={{ duration: 0.3, delay: i * 0.05 }}
                                         className={`group transition-colors hover:bg-blue-50/30 ${i !== comparisonData.length - 1 ? 'border-b border-slate-50' : ''}`}
                                     >
-                                        <td className="p-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-1.5 h-6 bg-linear-to-b from-[#2076C7] to-[#1CADA3] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                <span className="font-black text-slate-800 text-base tracking-tight">{row.animal}</span>
+                                        <td className="px-3 py-4 md:px-4 md:py-6 whitespace-nowrap">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1 h-5 bg-linear-to-b from-[#2076C7] to-[#1CADA3] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                <span className="text-slate-500 text-base md:text-lg font-medium leading-relaxed">{row.animal}</span>
                                             </div>
                                         </td>
-                                        <td className="p-6 text-center">
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-black border border-blue-100 shadow-sm">
+                                        <td className="px-3 py-4 md:px-4 md:py-6 text-center">
+                                            <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] md:text-xs font-black border border-blue-100 shadow-sm">
                                                 {row.maxCover}
                                             </span>
                                         </td>
-                                        <td className="p-6 text-center">
-                                            <span className="text-slate-700 font-black text-sm">{row.premium}</span>
-                                            <span className="text-[10px] text-slate-400 block font-bold">/year</span>
+                                        <td className="px-3 py-4 md:px-4 md:py-6 text-center">
+                                            <span className="text-slate-700 font-semibold text-xs md:text-sm">{row.premium}</span>
+                                            <span className="text-[9px] md:text-[10px] text-slate-400 block font-bold">/year</span>
                                         </td>
-                                        <td className="p-6">
+                                        <td className="px-3 py-4 md:px-4 md:py-6">
                                             <div className="flex justify-center">
                                                 {row.accident ? (
-                                                    <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center border border-teal-100 text-teal-600">
-                                                        <IconCheck size={18} strokeWidth={3} />
+                                                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-teal-50 flex items-center justify-center border border-teal-100 text-teal-600 shadow-sm">
+                                                        <IconCheck size={16} strokeWidth={3} />
                                                     </div>
                                                 ) : (
-                                                    <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center border border-red-100 text-red-600">
-                                                        <IconX size={18} strokeWidth={3} />
+                                                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-red-50 flex items-center justify-center border border-red-100 text-red-600 shadow-sm">
+                                                        <IconX size={16} strokeWidth={3} />
                                                     </div>
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="p-6">
+                                        <td className="px-3 py-4 md:px-4 md:py-6">
                                             <div className="flex justify-center">
                                                 {row.disease ? (
-                                                    <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center border border-teal-100 text-teal-600">
-                                                        <IconCheck size={18} strokeWidth={3} />
+                                                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-teal-50 flex items-center justify-center border border-teal-100 text-teal-600 shadow-sm">
+                                                        <IconCheck size={16} strokeWidth={3} />
                                                     </div>
                                                 ) : (
-                                                    <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center border border-red-100 text-red-600">
-                                                        <IconX size={18} strokeWidth={3} />
+                                                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-red-50 flex items-center justify-center border border-red-100 text-red-600 shadow-sm">
+                                                        <IconX size={16} strokeWidth={3} />
                                                     </div>
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="p-6 text-center">
-                                            <span className="text-[11px] font-black text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                                        <td className="px-3 py-4 md:px-4 md:py-6 text-center">
+                                            <span className="text-[10px] md:text-xs font-black text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
                                                 {row.waiting}
                                             </span>
                                         </td>
-                                        <td className="p-6">
-                                            <div className="flex items-center gap-2 text-slate-500 font-bold text-xs italic">
-                                                <IconTerminal2 size={14} className="text-secondary-teal" />
+                                        <td className="px-3 py-4 md:px-4 md:py-6">
+                                            <div className="flex items-center gap-1.5 text-slate-500 font-bold text-[10px] md:text-xs italic">
+                                                <IconTerminal2 size={14} className="text-secondary-teal shrink-0" />
                                                 {row.bestFor}
                                             </div>
                                         </td>
@@ -192,8 +191,8 @@ export default function ComparisonchartAndGraph() {
             </section>
 
             {/* ── Graph Section ─────────────────────────────────────────── */}
-            <section className="py-12 bg-white relative overflow-hidden">
-                <div className="max-w-6xl mx-auto px-6 md:px-12 relative z-10">
+            <section className="py-8 bg-white relative overflow-hidden">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-center">
 
                         {/* Left: Info */}

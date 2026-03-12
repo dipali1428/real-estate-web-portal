@@ -36,8 +36,8 @@ const steps = [
 
 export default function ClaimsProcess() {
     return (
-        <section className="pt-8 pb-12 bg-white relative">
-            <div className="max-w-6xl mx-auto px-6 md:px-12">
+        <section className="py-8 bg-white relative">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -45,7 +45,6 @@ export default function ClaimsProcess() {
                     transition={{ duration: 0.7 }}
                     className="text-center mb-10"
                 >
-                    <span className="text-primary-blue font-bold tracking-widest uppercase text-xs md:text-sm mb-4 block">Hassle-Free</span>
                     <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Seamless Claims Process
                     </h2>
@@ -56,9 +55,8 @@ export default function ClaimsProcess() {
 
                 {/* Steps */}
                 <div className="relative">
-                    {/* Connector line */}
-                    <div className="hidden lg:block absolute top-[2.5rem] left-[15%] right-[15%] h-1 bg-slate-100 -z-0" />
-                    <div className="hidden lg:block absolute top-[2.5rem] left-[15%] right-[15%] h-1 bg-gradient-to-r from-blue-300 to-teal-300 -z-0 opacity-50" />
+                    {/* Connector line (Desktop) */}
+                    <div className="hidden lg:block absolute top-10 left-[10%] right-[10%] h-[2px] bg-[#1CADA3]/30 -z-0" />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative z-10">
                         {steps.map((step, i) => {
@@ -74,12 +72,9 @@ export default function ClaimsProcess() {
                                 >
                                     {/* Step number circle */}
                                     <div className="relative inline-flex items-center justify-center mb-8">
-                                        <div className={`w-20 h-20 rounded-3xl ${step.color} flex items-center justify-center shadow-[0_15px_30px_-5px_rgba(32,118,199,0.15)] border-4 border-white transition-transform duration-500 group-hover:rotate-[10deg]`}>
+                                        <div className={`w-20 h-20 rounded-full ${step.color} flex items-center justify-center shadow-[0_15px_30px_-5px_rgba(32,118,199,0.15)] border-4 border-white transition-transform duration-500 group-hover:rotate-[10deg]`}>
                                             <Icon size={30} strokeWidth={2} />
                                         </div>
-                                        <span className="absolute -top-3 -right-3 w-8 h-8 bg-slate-800 text-white text-xs font-extrabold rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                                            {step.step}
-                                        </span>
                                     </div>
 
                                     <h3 className="text-xl font-extrabold text-[#2076C7] mb-4 tracking-tight">{step.title}</h3>
@@ -96,18 +91,21 @@ export default function ClaimsProcess() {
                     </div>
                 </div>
 
-                {/* Important note */}
+                {/* Important note - Minimal & Centered */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="mt-20 p-8 bg-white rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(32,118,199,0.08)] border border-blue-50 relative overflow-hidden text-center"
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    className="mt-16 flex justify-center"
                 >
-                    <div className="absolute top-0 right-6 p-1 bg-red-500 text-white text-[8px] font-extrabold uppercase tracking-widest px-4 rounded-b-xl shadow-md">Critical Timeline</div>
-                    <p className="text-slate-600 font-bold text-sm md:text-base leading-relaxed px-4 md:px-8">
-                        ⚠️ <strong>Crucial Intimation Policy:</strong> Death of the animal must be reported within <strong>24 hours</strong>. Delay in reporting without a valid reason can lead to claim complications. Please do not dispose of the carcass before inspection.
-                    </p>
+                    <div className="max-w-2xl px-6 py-3 bg-slate-50/50 rounded-full border border-slate-100/50 flex items-center gap-3 shadow-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shrink-0" />
+                        <p className="text-slate-500 font-bold text-[10px] md:text-[11px] leading-tight tracking-wide text-center">
+                            <span className="text-red-600 uppercase tracking-widest mr-2">Mandatory Reporting Rule:</span>
+                            Death of the animal must be reported within 24 hours. Delay in reporting without a valid reason can lead to claim complications. Please do not dispose of the carcass before inspection.
+                        </p>
+                    </div>
                 </motion.div>
             </div>
         </section>

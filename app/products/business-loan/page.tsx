@@ -11,6 +11,7 @@ import { useModal } from '@/app/context/ModalContext';
 import CTASection from '@/app/component/CTASection';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
+import ScrollToTop from '@/app/component/ScrollToTop';
 
 export default function BusinessLoanProductPage() {
     const { openLogin } = useModal();
@@ -63,9 +64,9 @@ export default function BusinessLoanProductPage() {
 
             {/* Disclaimer Section */}
             <div className="bg-white py-6 md:py-8 px-4">
-                <div className="max-w-4xl mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
+                <div className="max-w-6xl mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
                     <p className="text-sm text-gray-700 text-center leading-relaxed">
-                        <strong className="text-black">Disclaimer:</strong> Loan details such as interest rates, amounts, and eligibility are indicative and may change based on lender policies, RBI guidelines, and applicant profile. Please verify terms with the respective bank or lender before applying.
+                        <strong className="text-black">Disclaimer:</strong> Rules are subject to PFRDA guidelines and may change. Please refer to official documentation.
                     </p>
                 </div>
             </div>
@@ -73,10 +74,11 @@ export default function BusinessLoanProductPage() {
             <BusinessLoanFAQ />
             <CTASection
                 title="Fuel Your Enterprise Growth Today"
-                description="Scale your operations, manage working capital, and take your business to the next level with our tailor-made financing solutions. Fast approvals, minimal paperwork."
+                description="From working capital to expansion plans-Scale your operations, manage working capital, and take your business to the next level with our tailor-made financing solutions. Fast approvals, minimal paperwork."
                 buttonText="Request a Callback"
                 buttonLink="/#contact"
             />
+            <ScrollToTop />
         </div>
     );
 }

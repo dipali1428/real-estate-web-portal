@@ -24,7 +24,7 @@ const HealthInsurancePlanCard: React.FC<PlanProps> = ({ name, price, features, i
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             whileHover={{ y: -5 }}
-            className={`relative flex flex-col h-full font-sans transition-all duration-300 w-full max-w-[320px] mx-auto`}
+            className={`relative flex flex-col h-full font-sans transition-all duration-300 w-full max-w-[280px] mx-auto`}
         >
             <div className={`flex flex-col h-full bg-white rounded-[2rem] border transition-all duration-300 ${isPopular ? 'border-blue-400 ring-[6px] ring-blue-50' : 'border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.03)]'}`}>
 
@@ -34,48 +34,48 @@ const HealthInsurancePlanCard: React.FC<PlanProps> = ({ name, price, features, i
                     </div>
                 )}
 
-                <div className="p-8 flex flex-col h-full">
+                <div className="p-5 flex flex-col h-full">
                     {/* Header: Category and Name */}
-                    <div className="mb-6 flex flex-col items-center text-center">
-                        <span className="px-4 py-1.5 bg-gray-50 text-gray-400 rounded-full text-[9px] font-bold uppercase tracking-widest mb-6 border border-gray-100">
+                    <div className="mb-3 flex flex-col items-center text-center">
+                        <span className="px-3 py-1 bg-gray-50 text-gray-400 rounded-full text-[8px] font-bold uppercase tracking-widest mb-3 border border-gray-100">
                             {bestFor}
                         </span>
-                        <h3 className="text-xl font-bold text-[#2076C7] uppercase leading-tight tracking-tight mb-6 h-12 flex items-center justify-center">
+                        <h3 className="text-lg font-bold text-[#2076C7] uppercase leading-tight tracking-tight mb-2 h-10 flex items-center justify-center">
                             {name}
                         </h3>
                     </div>
 
                     {/* Pricing */}
-                    <div className="mb-8 flex flex-col items-start px-2">
-                        <span className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Starting at</span>
+                    <div className="mb-4 flex flex-col items-start px-2">
+                        <span className="text-gray-400 text-[9px] font-bold uppercase tracking-wider mb-0">Starting at</span>
                         <div className="flex items-baseline gap-1">
-                            <span className="text-4xl font-black text-gray-900">{price}</span>
-                            <span className="text-gray-400 text-sm font-medium">/mo*</span>
+                            <span className="text-2xl font-black text-gray-900">{price}</span>
+                            <span className="text-gray-400 text-xs font-medium">/mo*</span>
                         </div>
                     </div>
 
                     {/* Highlights Cards */}
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                        <div className="bg-gray-50/70 p-4 rounded-2xl border border-gray-100/50">
-                            <p className="text-[8px] uppercase tracking-wider text-gray-400 font-bold mb-1">Sum Insured</p>
-                            <p className="text-[11px] font-black text-gray-800 leading-tight">{sumInsured}</p>
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                        <div className="bg-gray-50/70 p-3 rounded-xl border border-gray-100/50">
+                            <p className="text-[7px] uppercase tracking-wider text-gray-400 font-bold mb-0.5">Sum Insured</p>
+                            <p className="text-[10px] font-black text-gray-800 leading-tight">{sumInsured}</p>
                         </div>
-                        <div className="bg-gray-50/70 p-4 rounded-2xl border border-gray-100/50">
-                            <p className="text-[8px] uppercase tracking-wider text-gray-400 font-bold mb-1">Cashless</p>
-                            <p className="text-[11px] font-black text-gray-800 leading-tight">{cashlessHospitals}</p>
+                        <div className="bg-gray-50/70 p-3 rounded-xl border border-gray-100/50">
+                            <p className="text-[7px] uppercase tracking-wider text-gray-400 font-bold mb-0.5">Cashless</p>
+                            <p className="text-[10px] font-black text-gray-800 leading-tight">{cashlessHospitals}</p>
                         </div>
                     </div>
 
                     {/* CSR Section */}
-                    <div className="mb-10 flex justify-center">
-                        <div className="bg-[#EFFFFB] px-6 py-2.5 rounded-full border border-[#D1F7ED] flex items-center justify-center gap-2">
-                            <p className="text-[10px] uppercase tracking-wider text-[#1CADA3] font-bold">Claim Settlement Ratio</p>
-                            <p className="text-[11px] font-black text-[#1CADA3] tracking-tight">{claimSettlementRatio}</p>
+                    <div className="mb-5 flex justify-center">
+                        <div className="bg-[#EFFFFB] px-4 py-2 rounded-full border border-[#D1F7ED] flex items-center justify-center gap-2">
+                            <p className="text-[9px] uppercase tracking-wider text-[#1CADA3] font-bold">CSR</p>
+                            <p className="text-[10px] font-black text-[#1CADA3] tracking-tight">{claimSettlementRatio}</p>
                         </div>
                     </div>
 
                     {/* Features List */}
-                    <ul className="space-y-4 mb-10 flex-grow px-2">
+                    <ul className="space-y-2.5 mb-6 flex-grow px-2">
                         {features.map((feature, idx) => (
                             <motion.li
                                 key={idx}
@@ -84,7 +84,7 @@ const HealthInsurancePlanCard: React.FC<PlanProps> = ({ name, price, features, i
                                 transition={{ delay: idx * 0.05 }}
                                 className="flex items-start gap-3 text-[12px] text-gray-700 font-semibold text-left"
                             >
-                                <div className="shrink-0 w-6 h-6 rounded-full border-2 border-primary/20 flex items-center justify-center text-primary bg-blue-50/50 mt-0.5"
+                                <div className="shrink-0 w-6 h-6 rounded-full border-2 border-[#2076C7]/20 flex items-center justify-center text-[#2076C7] bg-blue-50/50 mt-0.5"
                                 >
                                     <Check size={14} strokeWidth={4} />
                                 </div>
@@ -97,7 +97,7 @@ const HealthInsurancePlanCard: React.FC<PlanProps> = ({ name, price, features, i
                     <div className="space-y-4 mt-auto">
                         <button
                             onClick={() => onApply?.(name)}
-                            className="group relative w-full h-14 rounded-2xl font-bold tracking-wider text-[13px] text-white shadow-[0_10px_20px_rgba(28,173,163,0.2)] transition-all duration-300 overflow-hidden cursor-pointer active:scale-95 border-none"
+                            className="group relative w-full h-12 rounded-xl font-bold tracking-wider text-[12px] text-white shadow-[0_10px_20px_rgba(28,173,163,0.2)] transition-all duration-300 overflow-hidden cursor-pointer active:scale-95 border-none"
                             style={{ background: 'linear-gradient(135deg, #2076C7, #1CADA3)' }}
                         >
                             <span className="relative z-10 flex items-center justify-center gap-2">

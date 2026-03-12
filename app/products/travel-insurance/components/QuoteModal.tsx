@@ -252,7 +252,7 @@ export default function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
                                                             name="countryCode"
                                                             value={formData.countryCode}
                                                             onChange={handleInputChange}
-                                                            className="w-full h-14 pl-4 pr-8 rounded-2xl border-2 border-slate-100 focus:border-blue-500 outline-none font-bold text-slate-900 appearance-none bg-white transition-all"
+                                                            className="w-full h-14 pl-4 pr-8 rounded-2xl border-2 border-slate-100 focus:border-[#2076C7] outline-none font-bold text-slate-900 appearance-none bg-white transition-all"
                                                         >
                                                             <option>+91</option><option>+1</option>
                                                         </select>
@@ -264,12 +264,12 @@ export default function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
                                                         onChange={handleInputChange}
                                                         type="text"
                                                         placeholder="Mobile number"
-                                                        className={`flex-1 h-14 px-5 rounded-2xl border-2 outline-none font-bold text-slate-900 placeholder:text-slate-400 transition-all ${showErrors && !formData.mobile ? 'border-red-100 bg-red-50/30' : 'border-slate-100 focus:border-blue-500'}`}
+                                                        className={`flex-1 h-14 px-5 rounded-2xl border-2 outline-none font-bold text-slate-900 placeholder:text-slate-400 transition-all ${showErrors && !formData.mobile ? 'border-red-100 bg-red-50/30' : 'border-slate-100 focus:border-[#2076C7]'}`}
                                                     />
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-2 text-indigo-600 justify-end">
+                                            <div className="flex items-center gap-2 text-[#2076C7] justify-end">
                                                 <IconInfoCircle size={16} />
                                                 <span className="text-[11px] font-bold">We will share the policy copy on this number</span>
                                             </div>
@@ -278,13 +278,13 @@ export default function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
                                                 <div className="flex items-center gap-3">
                                                     <IconBrandWhatsapp size={20} className="text-teal-600" />
                                                     <span className="text-sm font-bold text-slate-600">Get updates on WhatsApp</span>
-                                                    <button onClick={() => setWhatsappUpdates(!whatsappUpdates)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${whatsappUpdates ? 'bg-blue-600' : 'bg-slate-200'}`}>
+                                                    <button onClick={() => setWhatsappUpdates(!whatsappUpdates)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${whatsappUpdates ? 'bg-[#2076C7]' : 'bg-slate-200'}`}>
                                                         <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${whatsappUpdates ? 'right-1' : 'left-1'}`} />
                                                     </button>
                                                 </div>
                                                 <button
                                                     onClick={handleContinue}
-                                                    className="w-full max-w-sm h-14 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-black text-lg rounded-2xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                                    className="w-full max-w-sm h-14 bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white font-black uppercase tracking-widest text-[10px] rounded-2xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
                                                 >
                                                     Continue
                                                 </button>
@@ -332,7 +332,7 @@ export default function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
                                         <div className="flex flex-col items-center gap-4">
                                             <button
                                                 onClick={handleViewQuotes}
-                                                className="w-full max-w-sm h-14 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-black text-lg rounded-2xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                                className="w-full max-w-sm h-14 bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white font-black uppercase tracking-widest text-[10px] rounded-2xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
                                             >
                                                 View Quotes
                                             </button>
@@ -364,7 +364,7 @@ export default function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
                                         </div>
                                         <button
                                             onClick={onClose}
-                                            className="h-14 px-8 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-black text-lg rounded-2xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                            className="h-14 px-8 bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white font-black uppercase tracking-widest text-[10px] rounded-2xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
                                         >
                                             Close Form
                                         </button>

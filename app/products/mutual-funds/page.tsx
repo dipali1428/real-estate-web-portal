@@ -3,7 +3,6 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import { useModal } from "../../context/ModalContext";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   PieChart,
   TrendingUp,
@@ -16,13 +15,10 @@ import {
   Zap,
   LineChart,
   UserPlus,
-  ChevronDown,
   ArrowLeft,
   Sparkles,
-  Calendar,
   Layers,
   BarChart2,
-  Receipt,
   Coins,
   IndianRupee,
   Plus,
@@ -210,28 +206,6 @@ export default function MutualFundsLandingPage() {
     },
   ];
 
-  const steps = [
-    {
-      title: "Register & KYC",
-      desc: "Complete your simple one-time registration.",
-      icon: UserPlus,
-    },
-    {
-      title: "Select Fund",
-      desc: "Choose from our wide range of curated funds.",
-      icon: Search,
-    },
-    {
-      title: "Invest",
-      desc: "Start with as low as ₹500 via SIP or Lumpsum.",
-      icon: Zap,
-    },
-    {
-      title: "Track Growth",
-      desc: "Monitor your portfolio performance in real-time.",
-      icon: LineChart,
-    },
-  ];
 
   // Combined all NFOs from your prompt
   const nfos = [
@@ -364,15 +338,14 @@ export default function MutualFundsLandingPage() {
             <div className="w-full lg:w-1/2 text-center lg:text-left space-y-8">
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm border border-gray-300 hover:bg-white shadow-sm hover:shadow-md active:scale-95 transition-all group mb-2"
-              >
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm border border-gray-300 hover:bg-white shadow-sm hover:shadow-md active:scale-95 transition-all group mb-2">
                 <ArrowLeft
                   className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
                   strokeWidth={2}
                 />
                 Back to Home
               </Link>
-              <br/>
+              <br />
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -475,19 +448,17 @@ export default function MutualFundsLandingPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.5 }}
-                  className="absolute w-full max-w-md lg:max-w-xl"
-                >
+                  className="absolute w-full max-w-md lg:max-w-xl">
                   {/* DYNAMIC LABEL OUTSIDE BOUNDARY */}
                   <div className="absolute -top-10 left-0 right-0 flex justify-center z-20">
                     <div
-                      className={`px-4 py-1.5 rounded-full text-xs font-bold shadow-sm border ${
-                        getNfoStatus(
-                          nfos[currentNfoIndex].launchDate,
-                          nfos[currentNfoIndex].closeDate,
-                        ) === "LIVE NFO"
-                          ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
-                          : "bg-blue-100 text-blue-700 border-blue-200"
-                      }`}
+                      className={`px-4 py-1.5 rounded-full text-xs font-bold shadow-sm border ${getNfoStatus(
+                        nfos[currentNfoIndex].launchDate,
+                        nfos[currentNfoIndex].closeDate,
+                      ) === "LIVE NFO"
+                        ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
+                        : "bg-blue-100 text-blue-700 border-blue-200"
+                        }`}
                     >
                       {getNfoStatus(
                         nfos[currentNfoIndex].launchDate,
@@ -625,12 +596,11 @@ export default function MutualFundsLandingPage() {
                       </div>
                     </div>
                     <span
-                      className={`text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2 ${
-                        getNfoStatus(nfo.launchDate, nfo.closeDate) ===
+                      className={`text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2 ${getNfoStatus(nfo.launchDate, nfo.closeDate) ===
                         "LIVE NFO"
-                          ? "bg-green-100 text-green-700 animate-pulse"
-                          : "bg-blue-100 text-blue-700"
-                      }`}
+                        ? "bg-green-100 text-green-700 animate-pulse"
+                        : "bg-blue-100 text-blue-700"
+                        }`}
                     >
                       {getNfoStatus(nfo.launchDate, nfo.closeDate)}
                     </span>

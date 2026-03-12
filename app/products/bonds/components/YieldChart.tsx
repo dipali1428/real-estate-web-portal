@@ -15,7 +15,7 @@ import {
 } from "recharts";
 import { bondsData } from "../data/bondsData";
 import { motion } from "framer-motion";
-import { Percent, Award, TrendingUp } from "lucide-react";
+import { Percent, Award } from "lucide-react";
 
 export default function YieldChart() {
     // Process data: Sort by yield descending and take top 5 diverse ones + FD Benchmark
@@ -84,7 +84,6 @@ export default function YieldChart() {
                             viewport={{ once: true }}
                         >
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#2076C7] text-sm font-semibold mb-6">
-                                <TrendingUp size={16} />
                                 <span>High Returns, Low Risk</span>
                             </div>
                             <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#2076C7] to-[#1CADA3] mb-6 leading-tight">

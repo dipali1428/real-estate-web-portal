@@ -23,7 +23,7 @@ const initialFunds: FundData[] = [
   {
     schemeCode: 122639,
     name: "Parag Parikh Flexi Cap Fund - Direct Plan - Growth",
-    logo: "/Logos/parag.avif",
+    logo: "/Logos/Parag Parikh Financial Advisory Services Ltd (PPFAS).jpg",
     tag: "Equity Scheme Flexi Cap",
     color: "bg-white border-slate-100",
     return3Y: null,
@@ -36,7 +36,7 @@ const initialFunds: FundData[] = [
   {
     schemeCode: 119063,
     name: "Hdfc Nifty50 Index Fund",
-    logo: "/Logos/hdfc bank.png",
+    logo: "/Logos/HDFC Securities Limited Unlisted Shares.jpg",
     tag: "Index Funds",
     color: "bg-white border-slate-100",
     return3Y: null,
@@ -49,7 +49,7 @@ const initialFunds: FundData[] = [
   {
     schemeCode: 125494,
     name: "Sbi Small Cap Fund Regular Plan-Growth",
-    logo: "/Logos/sbi.png",
+    logo: "/Logos/SBI Mutual Fund Unlisted Shares.jpg",
     tag: "Mid Cap",
     color: "bg-white border-slate-100",
     return3Y: null,

@@ -1,4 +1,4 @@
-import { AlertTriangle } from "lucide-react";
+
 
 export default function RiskSection() {
     const risks = [
@@ -21,11 +21,10 @@ export default function RiskSection() {
     ];
 
     return (
-        <section className="py-24 bg-white border-t border-gray-100">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-10 md:py-16 bg-white border-t border-gray-100">
+            <div className="max-w-[1440px] mx-auto px-6">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex items-center gap-2 justify-center mb-12">
-                        <AlertTriangle className="text-[#1CADA3]" size={28} />
                         <h2 className="text-3xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#2076C7] to-[#1CADA3]">Risk Factors</h2>
                     </div>
 

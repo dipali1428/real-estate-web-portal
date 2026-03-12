@@ -1,22 +1,19 @@
 'use client';
 
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { IconChevronRight, IconCalendar, IconDog, IconCat, IconShieldCheck, IconHeart, IconAlertCircle, IconBone } from '@tabler/icons-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  IconChevronRight, IconCalendar, IconDog, IconAlertCircle, 
+  IconBone, IconArrowLeft, IconShieldCheck, IconWorld 
+} from '@tabler/icons-react';
 import { useState, useRef } from 'react';
-import PetQuoteModal from './PetQuoteModal';
-import heroImg from '../assets/hero-pet-illustration.png';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useModal } from '@/app/context/ModalContext';
 
 export default function HeroSection() {
+  const router = useRouter();
   const containerRef = useRef(null);
-  const { scrollY } = useScroll();
-
-  // Parallax effects for background elements
-  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
-  const y2 = useTransform(scrollY, [0, 500], [0, -150]);
-  const rotate = useTransform(scrollY, [0, 500], [0, 45]);
-
-  // Modal state
-  const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const { openLogin } = useModal();
 
   // Breed sub-options based on pet type
   const BREED_OPTIONS: Record<string, string[]> = {
@@ -34,78 +31,52 @@ export default function HeroSection() {
 
   const handlePetTypeChange = (val: string) => {
     setPetType(val);
-    setPetBreed(''); // reset breed when pet type changes
+    setPetBreed(''); 
     if (showError) setShowError(false);
   };
 
   const isFormValid = petType.trim() !== '' && petAge.trim() !== '' && petBreed.trim() !== '';
 
-  const handleGetFreeQuote = () => {
-    if (isFormValid) {
-      setShowQuoteModal(true);
-      setShowError(false);
-    } else {
-      setShowError(true);
-    }
-  };
-
   return (
-    <section ref={containerRef} className="relative min-h-[75vh] flex items-center justify-center pt-8 pb-16 overflow-hidden bg-[#fafcfe] px-2">
-
-      {/* --- Premium Background Elements --- */}
-
-      {/* Animated Mesh Gradients */}
-      <div className="absolute inset-0 z-0">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            x: [0, 100, 0],
-            y: [0, 50, 0],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-[#2076C7]/10 rounded-full blur-[120px]"
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            x: [0, -80, 0],
-            y: [0, 100, 0],
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-[-10%] left-[-5%] w-[700px] h-[700px] bg-[#1CADA3]/10 rounded-full blur-[140px]"
-        />
+    <section ref={containerRef} className="relative min-h-[60vh] flex items-center pt-24 md:pt-12 pb-14 overflow-hidden bg-white px-2">
+      
+      {/* Back Button (Non-sticky) */}
+      <div className="absolute z-[100] top-4 left-4 md:top-12 md:left-12">
+        <Link
+          href="/"
+          aria-label="Back to Home"
+          className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+        >
+          <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+            <IconArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+          </div>
+        </Link>
+        <Link
+          href="/"
+          className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-[0_4px_16px_rgba(32,118,199,0.1)] hover:bg-white hover:border-[#2076C7]/40 active:scale-95 transition-all group"
+        >
+          <IconArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+          Back to Home
+        </Link>
       </div>
 
-      {/* Hero Grid Pattern */}
-      <div className="absolute inset-0 z-0 opacity-[0.03]"
-        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232076c7' fill-opacity='1'%3E%3Cpath d='M36 34v2H20v-2h16zm0-8v2H20v-2h16zm-16 16v2h16v-2H20zm16-24v2H20v-2h16zM24 24h4v4h-4v-4zm0 8h4v4h-4v-4zm0 8h4v4h-4v-4zm8-16h4v4h-4v-4zm0 8h4v4h-4v-4zm0 8h4v4h-4v-4zM40 40v4H24v-4h16zm0-8v4H24v-4h16zm-16 16v4h16v-4H24zm16-24v4H24v-4h16z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}
-      />
-
-      {/* Floating Decorative Icons */}
-      <motion.div style={{ y: y1, rotate }} className="absolute top-[15%] right-[15%] text-blue-200/40 hidden lg:block">
-        <IconDog size={120} stroke={1} />
-      </motion.div>
-      <motion.div style={{ y: y2 }} className="absolute bottom-[25%] left-[10%] text-teal-200/40 hidden lg:block">
-        <IconShieldCheck size={100} stroke={1} />
-      </motion.div>
-
-      {/* --- Main Content --- */}
       <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 w-full">
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-
-          {/* Left Column: Text Content */}
+        <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+          
+          {/* Left Column (Text Content) */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:w-[70%] text-center lg:text-left"
+            transition={{ duration: 1 }}
+            className="lg:w-[65%] space-y-6 flex flex-col items-center lg:items-start text-center lg:text-left lg:pl-12"
           >
             {/* Animated Badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/60 backdrop-blur-md border border-[#2076C7]/20 shadow-sm text-[#2076C7] text-[10px] md:text-xs font-bold tracking-widest mb-6 lg:mb-8 uppercase"
+              className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-slate-20 border text-[#2076C7] text-[10px] md:text-xs font-black uppercase tracking-widest shadow-sm mt-16 md:mt-20 lg:mt-24 mb-6 lg:mb-8"
+              style={{ borderColor: 'rgba(32, 118, 199, 0.2)' }}
             >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1CADA3] opacity-75"></span>
@@ -114,243 +85,149 @@ export default function HeroSection() {
               Protect Your Furry Friend
             </motion.div>
 
-            <motion.h3
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tight mb-6 lg:mb-8 leading-[1.2] lg:leading-[1.1] gradient-text py-2"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight"
+              style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3, #2076C7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
             >
-           
-           
-              <span className="inline-block lg:block text-[#2076C7]"> Smart Protection for Happy Pets</span>
-            </motion.h3>
+              Smart Protection for Happy Pets
+            </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
-              className="text-base md:text-xl text-slate-500 mb-8 max-w-3xl font-medium leading-relaxed mx-auto lg:mx-0"
+              className="text-gray-600 font-medium text-base md:text-lg mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
             >
-              Get comprehensive coverage for accidents, illnesses, surgeries, and routine checkups. Affordable plans designed for dogs, cats, parrots, and all companions in between.
+              Get comprehensive coverage for accidents, illnesses, surgeries, and routine checkups. Affordable plans designed for all companions.
             </motion.p>
           </motion.div>
 
-          {/* Right Column: Illustration */}
-          <motion.div
-            initial={{ opacity: 0, x: 30, scale: 0.9 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="lg:w-[30%] relative flex justify-center lg:justify-end items-center"
-          >
-            <div className="relative w-full max-w-[380px] aspect-square flex items-center justify-center">
+          {/* Right Column (Circular Illustration) */}
+          <motion.div className="lg:w-[35%] relative flex justify-center lg:justify-end items-center">
+            <div className="relative w-full max-w-[420px] aspect-square flex items-center justify-center">
+              {/* Decorative Background Rings & Glow */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#2076C7]/10 via-transparent to-[#1CADA3]/10 blur-2xl" />
+              <div className="absolute inset-10 rounded-full border border-dashed border-[#2076C7]/20 animate-spin-slow" />
 
-              {/* Dashed Orbit Circle */}
-              <div className="absolute inset-4 rounded-full border-2 border-dashed border-slate-200/60 -z-0" />
+              {/* Main Illustration (Circular Form) */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="relative z-10 w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] lg:w-[400px] lg:h-[400px] rounded-full flex items-center justify-center shadow-2xl overflow-hidden"
+              >
+                {/* Subtle Gradient Inner Glow */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-[#2076C7]/5 to-[#1CADA3]/5" />
 
-              {/* Main Circular Image */}
-              <div className="relative w-[260px] h-[260px] sm:w-[320px] sm:h-[320px] lg:w-[380px] lg:h-[380px] rounded-full overflow-hidden shadow-2xl z-10 border-4 border-white">
                 <img
-                  src={heroImg.src}
+                  src="/insurance/pet.jpeg"
                   alt="Pet Protection Illustration"
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 ease-in-out"
+                  className="w-full h-full object-cover"
                 />
-              </div>
-
-              {/* Floating Icon: Heart (Top-Left) */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-2 left-6 z-20"
-              >
-                <div className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center border border-slate-100">
-                  <IconHeart size={22} className="text-[#1CADA3]" strokeWidth={1.5} />
-                </div>
               </motion.div>
 
-              {/* Verified Care Badge */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-4 right-4 bg-white p-2 rounded-lg shadow-lg flex items-center gap-1.5 border border-[#2076C7]/10 z-20"
-              >
-                <div className="w-6 h-6 bg-[#1CADA3] rounded-full flex items-center justify-center text-white">
-                  <IconShieldCheck size={12} />
-                </div>
+              {/* Floating Badges */}
+              <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute -top-4 -right-2 bg-white p-3 rounded-2xl shadow-xl flex items-center gap-3 border border-[#2076C7]/10 z-20">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#1CADA3] to-[#2076C7] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#1CADA3]/30"><IconShieldCheck size={18} /></div>
                 <div className="text-left">
-                  <div className="text-[7px] font-bold text-slate-400 uppercase tracking-widest leading-none">Pet Care</div>
-                  <div className="text-[10px] font-black text-slate-800 leading-tight">Verified Coverage</div>
+                  <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Protection</div>
+                  <div className="text-[12px] font-black text-slate-800 leading-tight">Secure Pet</div>
                 </div>
               </motion.div>
 
-              {/* Floating Icon: Dog (Bottom-Left) */}
-              <motion.div
-                animate={{ y: [0, -7, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute bottom-6 left-2 z-20"
-              >
-                <div className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center border border-slate-100">
-                  <IconDog size={22} className="text-slate-400" strokeWidth={1.5} />
+              <motion.div animate={{ y: [0, 12, 0] }} transition={{ duration: 5, repeat: Infinity, delay: 0.5 }} className="absolute bottom-2 -left-2 bg-white p-3 rounded-2xl shadow-xl flex items-center gap-3 border border-[#2076C7]/10 z-20">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#1CADA3] to-[#2076C7] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#2076C7]/30"><IconWorld size={18} /></div>
+                <div className="text-left">
+                  <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Global</div>
+                  <div className="text-[12px] font-black text-slate-800 leading-tight">Full Coverage</div>
                 </div>
               </motion.div>
-
-              {/* Floating Icon: Cat (Bottom-Right) */}
-              <motion.div
-                animate={{ y: [0, -9, 0] }}
-                transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-                className="absolute bottom-2 right-0 z-20"
-              >
-                <div className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center border border-slate-100">
-                  <IconCat size={22} className="text-slate-400" strokeWidth={1.5} />
-                </div>
-              </motion.div>
-
-              {/* Floating Bone Badge */}
-              <motion.div
-                animate={{ y: [0, -5, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-                className="absolute bottom-16 -right-2 z-30"
-              >
-                <div className="w-16 h-16 bg-gradient-to-br from-[#1CADA3] to-[#2076C7] rounded-full flex items-center justify-center shadow-xl border-4 border-white">
-                  <IconBone size={28} className="text-white" strokeWidth={1.8} />
-                </div>
-              </motion.div>
-
             </div>
           </motion.div>
         </div>
 
-        {/* --- Glassmorphism Quote Widget --- */}
+        {/* --- Quote Widget --- */}
         <div className="relative mt-4">
-          {/* Validation Alert */}
           <AnimatePresence>
-            {
-              showError && !isFormValid && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute -top-12 left-1/2 -translate-x-1/2 bg-red-500 text-white px-4 py-1.5 rounded-full shadow-lg flex items-center gap-2 z-30"
-                >
-                  <IconAlertCircle size={16} />
-                  <span className="text-xs font-bold">Please fill all pet details first</span>
-                </motion.div>
-              )
-            }
+            {showError && !isFormValid && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="absolute -top-12 left-1/2 -translate-x-1/2 bg-red-500 text-white px-4 py-1.5 rounded-full shadow-lg flex items-center gap-2 z-30"
+              >
+                <IconAlertCircle size={16} />
+                <span className="text-xs font-bold">Please fill all pet details first</span>
+              </motion.div>
+            )}
           </AnimatePresence>
 
-          {/* Animated Glowing Aura */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 rounded-[2.5rem] blur-2xl opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-
-          <div className="relative max-w-5xl mx-auto bg-white/70 backdrop-blur-2xl p-4 md:p-6 lg:p-4 rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(32,118,199,0.12)] border border-white/80 overflow-hidden">
+          <div className="relative max-w-5xl mx-auto bg-white/70 backdrop-blur-2xl p-4 md:p-9 lg:p-4 rounded-[2rem] border border-slate-200 overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-
-              {/* Pet Type Select */}
-              <div className="relative">
-                <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all duration-300 group/input ${showError && !petType ? 'border-red-200 bg-red-50/30' : 'border-slate-200 hover:border-[#2076C7]/40 hover:shadow-lg hover:shadow-[#2076C7]/5'}`}>
-                  <div className="flex items-center justify-center lg:justify-start gap-2 text-[#2076C7]">
-                    <IconDog size={18} stroke={2} />
-                    <span className="text-sm font-medium">Pet Type</span>
-                  </div>
-                  <select
-                    value={petType}
-                    onChange={(e) => handlePetTypeChange(e.target.value)}
-                    className={`bg-transparent w-full text-base font-extrabold outline-none appearance-none cursor-pointer py-0.5 text-center lg:text-left [text-align-last:center] lg:[text-align-last:left] ${petType ? 'text-slate-800' : 'text-slate-400'}`}
-                  >
-                    <option value="">Select Pet</option>
-                    <option value="Dog">Dog</option>
-                    <option value="Cat">Cat</option>
-                    <option value="Bird">Bird/Parrot</option>
-                    <option value="Other">Exotic Pet</option>
-                  </select>
-                </div>
+              
+              {/* Pet Type */}
+              <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all ${showError && !petType ? 'border-red-200 bg-red-50/30' : 'border-slate-200'}`}>
+                <div className="flex items-center gap-2 text-[#2076C7]"><IconDog size={18} /><span className="text-sm font-medium">Pet Type</span></div>
+                <select
+                  value={petType}
+                  onChange={(e) => handlePetTypeChange(e.target.value)}
+                  className={`bg-transparent w-full text-base font-extrabold outline-none appearance-none cursor-pointer py-0.5 ${petType ? 'text-slate-900' : 'text-slate-400'}`}
+                >
+                  <option value="">Select Pet</option>
+                  <option value="Dog">Dog</option>
+                  <option value="Cat">Cat</option>
+                  <option value="Bird">Bird/Parrot</option>
+                  <option value="Other">Exotic Pet</option>
+                </select>
               </div>
 
-              {/* Pet Breed Select */}
-              <div className="relative">
-                <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all duration-300 group/input ${showError && !petBreed ? 'border-red-200 bg-red-50/30' : 'border-slate-200 hover:border-[#2076C7]/40 hover:shadow-lg hover:shadow-[#2076C7]/5'}`}>
-                  <div className="flex items-center justify-center lg:justify-start gap-2 text-[#2076C7]">
-                    <IconBone size={18} stroke={2} />
-                    <span className="text-sm font-medium">Breed / Sub-Type</span>
-                  </div>
-                  <select
-                    value={petBreed}
-                    onChange={(e) => { setPetBreed(e.target.value); if (showError) setShowError(false); }}
-                    disabled={!petType}
-                    className={`bg-transparent w-full text-base font-extrabold outline-none appearance-none cursor-pointer py-0.5 text-center lg:text-left [text-align-last:center] lg:[text-align-last:left] ${petBreed ? 'text-slate-800' : 'text-slate-400'} ${!petType ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    <option value="">{petType ? 'Select Breed' : 'Select Pet Type First'}</option>
-                    {petType && BREED_OPTIONS[petType]?.map((breed) => (
-                      <option key={breed} value={breed}>{breed}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Pet Age Select */}
-              <div className="relative">
-                <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all duration-300 group/input ${showError && !petAge ? 'border-red-200 bg-red-50/30' : 'border-slate-200 hover:border-[#2076C7]/40 hover:shadow-lg hover:shadow-[#2076C7]/5'}`}>
-                  <div className="flex items-center justify-center lg:justify-start gap-2 text-[#2076C7]">
-                    <IconCalendar size={18} stroke={2} />
-                    <span className="text-sm font-medium">Pet Age</span>
-                  </div>
-                  <select
-                    value={petAge}
-                    onChange={(e) => { setPetAge(e.target.value); if (showError) setShowError(false); }}
-                    className={`bg-transparent w-full text-base font-extrabold outline-none appearance-none cursor-pointer py-0.5 text-center lg:text-left [text-align-last:center] lg:[text-align-last:left] ${petAge ? 'text-slate-800' : 'text-slate-400'}`}
-                  >
-                    <option value="">Select Age</option>
-                    <option value="Puppy/Kitten">Puppy/Kitten (&lt; 1 yr)</option>
-                    <option value="Adult">Adult (1 - 7 yrs)</option>
-                    <option value="Senior">Senior (7+ yrs)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Animated Button */}
-              <button
-                onClick={handleGetFreeQuote}
-                className="relative overflow-hidden bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black text-lg rounded-2xl shadow-[0_10px_30px_-10px_rgba(32,118,199,0.4)] hover:shadow-[0_20px_50px_-12px_rgba(32,118,199,0.5)] transition-all duration-300 group/btn h-full py-3 lg:py-0 hover:scale-[1.02] active:scale-[0.98]"
-              >
-                <span className="relative z-10 flex gap-3 items-center justify-center">
-                  Get Free Quote
-                  <IconChevronRight size={24} className="group-hover/btn:translate-x-2 transition-transform duration-300" />
-                </span>
-                <div className="absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover/btn:animate-[shimmer_1s_infinite]" />
-              </button>
-
-            </div>
-
-            {/* Bottom Info Bar */}
-            <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-center gap-4">
-              <div className="flex items-center gap-6">
-                <div className="flex -space-x-3">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 overflow-hidden ring-2 ring-blue-50/50">
-                      <img src={`https://i.pravatar.cc/100?u=${i + 20}`} alt="User" />
-                    </div>
+              {/* Breed */}
+              <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all ${showError && !petBreed ? 'border-red-200 bg-red-50/30' : 'border-slate-200'}`}>
+                <div className="flex items-center gap-2 text-[#2076C7]"><IconBone size={18} /><span className="text-sm font-medium">Breed</span></div>
+                <select
+                  value={petBreed}
+                  onChange={(e) => { setPetBreed(e.target.value); if (showError) setShowError(false); }}
+                  disabled={!petType}
+                  className={`bg-transparent w-full text-base font-extrabold outline-none appearance-none cursor-pointer py-0.5 ${petBreed ? 'text-slate-900' : 'text-slate-400'}`}
+                >
+                  <option value="">{petType ? 'Select Breed' : 'Select Type First'}</option>
+                  {petType && BREED_OPTIONS[petType]?.map((breed) => (
+                    <option key={breed} value={breed}>{breed}</option>
                   ))}
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[#2076C7] flex items-center justify-center text-[10px] font-bold text-white shadow-xl">+5k</div>
-                </div>
-                <p className="text-sm font-bold text-slate-500">
-                  <span className="text-[#2076C7] font-black">5,800+</span> pets protected this year
-                </p>
+                </select>
               </div>
+
+              {/* Age */}
+              <div className={`flex flex-col gap-1 p-2.5 rounded-2xl bg-white/50 border transition-all ${showError && !petAge ? 'border-red-200 bg-red-50/30' : 'border-slate-200'}`}>
+                <div className="flex items-center gap-2 text-[#2076C7]"><IconCalendar size={18} /><span className="text-sm font-medium">Pet Age</span></div>
+                <select
+                  value={petAge}
+                  onChange={(e) => { setPetAge(e.target.value); if (showError) setShowError(false); }}
+                  className={`bg-transparent w-full text-base font-extrabold outline-none appearance-none cursor-pointer py-0.5 ${petAge ? 'text-slate-900' : 'text-slate-400'}`}
+                >
+                  <option value="">Select Age</option>
+                  <option value="Puppy/Kitten">Puppy/Kitten (&lt; 1 yr)</option>
+                  <option value="Adult">Adult (1 - 7 yrs)</option>
+                  <option value="Senior">Senior (7+ yrs)</option>
+                </select>
+              </div>
+
+              {/* Button */}
+              <button
+                onClick={openLogin}
+                className="w-full lg:w-auto px-10 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest hover:shadow-[0_20px_40px_-10px_rgba(32,118,199,0.3)] hover:-translate-y-1 transition-all duration-300 shadow-lg active:scale-95"
+              >
+                <span className="relative z-10 flex gap-3 items-center justify-center">Get Quote & Apply <IconChevronRight size={18} strokeWidth={3} /></span>
+              </button>
             </div>
-
           </div>
-        </div >
-      </div >
+        </div>
+      </div>
 
-      <PetQuoteModal
-        isOpen={showQuoteModal}
-        onClose={() => {
-          setShowQuoteModal(false);
-          setPetType('');
-          setPetAge('');
-          setPetBreed('');
-          setShowError(false);
-        }}
-      />
-    </section >
+      {/* Unified Redirect to Login directly */}
+    </section>
   );
 }

@@ -52,7 +52,7 @@ const insurancePlans = [
 
 export default function InsuranceTypes() {
     return (
-        <section className="py-24 md:py-40 relative overflow-hidden bg-white" id="types">
+        <section className="py-24 md:py-40 relative overflow-hidden bg-white font-sans" id="types">
             {/* Ultra-Premium Ambient Background */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute -top-[500px] -left-[300px] w-[1000px] h-[1000px] bg-[#2076C7]/5 rounded-full blur-[150px]" />

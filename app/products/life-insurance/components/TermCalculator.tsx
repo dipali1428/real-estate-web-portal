@@ -93,7 +93,7 @@ export default function TermCalculator() {
     })();
 
     return (
-        <section className="py-24 bg-white relative overflow-hidden" id="calculator">
+        <section className="py-16 md:py-24 bg-white relative overflow-hidden font-sans" id="calculator">
             {/* Background Accents */}
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#2076C7]/5 rounded-full blur-[120px] pointer-events-none translate-x-1/2 -translate-y-1/2" />
             <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#1CADA3]/5 rounded-full blur-[120px] pointer-events-none -translate-x-1/2 translate-y-1/2" />
@@ -129,7 +129,7 @@ export default function TermCalculator() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="bg-white rounded-[3rem] border border-slate-100 shadow-[0_40px_100px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col lg:flex-row"
+                        className="bg-white rounded-[3rem] border border-slate-100 border-b-[6px] border-b-slate-200/50 shadow-[0_30px_80px_rgba(32,118,199,0.08)] hover:-translate-y-2 hover:shadow-[0_40px_100px_rgba(32,118,199,0.12)] transition-all duration-500 overflow-hidden flex flex-col lg:flex-row"
                     >
                         {/* Left Side: Inputs */}
                         <div className="lg:w-7/12 p-8 md:p-12 space-y-10">
@@ -162,7 +162,7 @@ export default function TermCalculator() {
                                                     />
                                                     <div className="absolute w-2.5 h-2.5 rounded-full bg-[#2076C7] scale-0 peer-checked:scale-100 transition-transform pointer-events-none" />
                                                 </div>
-                                                <span className={`text-sm font-bold capitalize transition-colors ${gender === g ? "text-[#2076C7]" : "text-slate-500 group-hover:text-slate-700"}`}>
+                                                <span className={`font-sans text-sm font-bold capitalize transition-colors ${gender === g ? "text-[#2076C7]" : "text-slate-500 group-hover:text-slate-700"}`}>
                                                     {g}
                                                 </span>
                                             </label>
@@ -191,7 +191,7 @@ export default function TermCalculator() {
                                                     />
                                                     <div className="absolute w-2.5 h-2.5 rounded-full bg-[#2076C7] scale-0 peer-checked:scale-100 transition-transform pointer-events-none" />
                                                 </div>
-                                                <span className={`text-sm font-bold capitalize transition-colors ${isSmoker === s ? "text-[#2076C7]" : "text-slate-500 group-hover:text-slate-700"}`}>
+                                                <span className={`font-sans text-sm font-bold capitalize transition-colors ${isSmoker === s ? "text-[#2076C7]" : "text-slate-500 group-hover:text-slate-700"}`}>
                                                     {s ? "Yes" : "No"}
                                                 </span>
                                             </label>
@@ -217,7 +217,7 @@ export default function TermCalculator() {
                                         <select
                                             value={age}
                                             onChange={(e) => setAge(parseInt(e.target.value))}
-                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:border-[#2076C7] transition-all cursor-pointer"
+                                            className="w-full font-sans bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:border-[#2076C7] transition-all cursor-pointer"
                                         >
                                             {[...Array(48)].map((_, i) => (
                                                 <option key={i} value={i + 18}>{i + 18} Years</option>
@@ -242,7 +242,7 @@ export default function TermCalculator() {
                                         <select
                                             value={coverage}
                                             onChange={(e) => setCoverage(parseInt(e.target.value))}
-                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:border-[#2076C7] transition-all cursor-pointer"
+                                            className="w-full font-sans bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:border-[#2076C7] transition-all cursor-pointer"
                                         >
                                             {coverageOptions.map((opt) => (
                                                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -267,7 +267,7 @@ export default function TermCalculator() {
                                         <select
                                             value={coverTillAge}
                                             onChange={(e) => setCoverTillAge(parseInt(e.target.value))}
-                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:border-[#2076C7] transition-all cursor-pointer"
+                                            className="w-full font-sans bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:border-[#2076C7] transition-all cursor-pointer"
                                         >
                                             {(() => {
                                                 const min = Math.max(28, age + 2);
@@ -320,7 +320,7 @@ export default function TermCalculator() {
                                 </div>
 
                                 <div>
-                                    <p className="text-sm font-bold text-slate-500 mb-2">Your personalized monthly premium starts from</p>
+                                    <p className="font-sans text-sm font-bold text-slate-500 mb-2">Your personalized monthly premium starts from</p>
                                     <div className="flex items-baseline justify-center gap-1">
                                         <span className="text-5xl md:text-6xl font-black text-[#2076C7]">₹{formatCurrency(premium)}</span>
                                         <span className="text-xl font-bold text-slate-400">/month*</span>

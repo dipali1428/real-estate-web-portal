@@ -40,7 +40,7 @@ const benefits = [
 
 export default function TaxBenefits() {
     return (
-        <section className="py-10 md:py-16 relative overflow-hidden bg-white" id="tax-benefits">
+        <section className="py-10 md:py-16 relative overflow-hidden bg-white font-sans" id="tax-benefits">
             {/* Ambient background glows */}
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#2076C7]/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
 

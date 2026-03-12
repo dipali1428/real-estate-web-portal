@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { TrendingUp, ShieldCheck, Clock, Banknote, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
@@ -15,15 +15,14 @@ const Comparison = () => {
     ];
 
     return (
-        <section className="py-12 bg-white" id="comparison">
-            <div className="container-custom">
-                <div className="text-center max-w-3xl mx-auto mb-8">
-                    <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+        <section className="py-12 md:py-16 bg-white font-sans px-4 sm:px-6 lg:px-8" id="comparison">
+            <div className="container-custom max-w-7xl mx-auto">
+                <div className="text-center max-w-4xl mx-auto mb-16 px-4">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         NCDs vs Fixed Deposits
                     </h2>
-                    <div className="w-20 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
 
-                    <p className="text-sm md:text-lg text-gray-600 font-medium">
+                    <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed max-w-2xl mx-auto">
                         See why modern investors are shifting to NCDs for better inflation-beating returns.
                     </p>
                 </div>
@@ -34,7 +33,7 @@ const Comparison = () => {
                         <div className="absolute top-0 right-0 px-4 py-1.5 md:px-6 md:py-2 bg-gray-200 text-gray-600 font-bold rounded-bl-2xl text-[10px] uppercase tracking-wider">
                             Traditional
                         </div>
-                        <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 md:mb-8 flex items-center gap-3">
+                        <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 md:mb-8 flex items-center gap-3 font-sans">
                             <Banknote className="w-6 h-6 md:w-8 md:h-8 text-gray-400" />
                             Bank Fixed Deposit
                         </h3>
@@ -83,7 +82,7 @@ const Comparison = () => {
                         {/* Subtle premium gradient overlay */}
                         <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-[#F8FBFE] via-white to-[#F0F7FF] -z-10" />
 
-                        <h3 className="text-xl md:text-2xl font-bold text-[#2076C7] mb-6 md:mb-8 flex items-center gap-3 relative z-10">
+                        <h3 className="text-xl md:text-2xl font-bold text-[#2076C7] mb-6 md:mb-8 flex items-center gap-3 relative z-10 font-sans">
                             <TrendingUp className="w-6 h-6 md:w-8 md:h-8 text-[#1CADA3]" />
                             Secured NCDs
                         </h3>
@@ -124,6 +123,7 @@ const Comparison = () => {
                         </div>
 
                         <button
+                            suppressHydrationWarning={true}
                             onClick={() => setIsExpanded(!isExpanded)}
                             className="w-full mt-8 py-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white font-extrabold rounded-2xl shadow-lg border border-white/10 flex items-center justify-center space-x-2 hover:translate-y-px transition-transform duration-200"
                         >
@@ -137,7 +137,7 @@ const Comparison = () => {
                 {isExpanded && (
                     <div className="max-w-4xl mx-auto mt-8 bg-white rounded-2xl md:rounded-3xl shadow-xl border border-gray-100 overflow-hidden animate-fade-in-up">
                         <div className="bg-gray-50 px-6 md:px-8 py-4 border-b border-gray-100">
-                            <h3 className="text-base md:text-lg font-bold text-gray-800">Detailed Comparison</h3>
+                            <h3 className="text-base md:text-lg font-bold text-gray-800 font-sans">Detailed Comparison</h3>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">

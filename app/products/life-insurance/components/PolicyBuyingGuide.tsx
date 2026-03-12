@@ -38,12 +38,12 @@ const PolicyBuyingGuide = () => {
     }, [income, age]);
 
     return (
-        <section className="py-8 md:py-12 bg-white relative overflow-hidden" id="buying-guide">
+        <section className="py-16 md:py-24 bg-white relative overflow-hidden font-sans" id="buying-guide">
             {/* Ambient background glows */}
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#2076C7]/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
             <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#1CADA3]/5 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2" />
 
-            <div className="container-custom relative z-10 px-4 md:px-6">
+            <div className="container-custom relative z-10 px-6 md:px-10">
                 <div className="text-center max-w-4xl mx-auto mb-6 md:mb-8">
                     <motion.span
                         initial={{ opacity: 0, y: 10 }}
@@ -64,7 +64,7 @@ const PolicyBuyingGuide = () => {
                     </p>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-6xl mx-auto">
+                <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-6xl mx-auto px-4 md:px-6">
                     {/* Tips Column */}
                     <motion.div
                         initial={{ opacity: 0, x: -30 }}

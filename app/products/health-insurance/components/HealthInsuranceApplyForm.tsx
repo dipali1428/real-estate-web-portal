@@ -75,35 +75,35 @@ const HealthInsuranceApplyForm: React.FC<ApplyFormProps> = ({ isOpen, onClose, p
                                         <div className="space-y-4">
                                             {/* Full Name */}
                                             <div className="relative group">
-                                                <User className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                                <User className="absolute left-6 top-1/2 -translate-y-1/2 text-[#2076C7]" size={20} />
                                                 <input
                                                     required
                                                     type="text"
                                                     placeholder="Full Name"
-                                                    className="w-full h-16 pl-16 pr-6 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/10 transition-all font-bold text-gray-700 placeholder:text-gray-400/80"
+                                                    className="w-full h-16 pl-16 pr-6 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-[#2076C7]/10 transition-all font-bold text-gray-700 placeholder:text-gray-400/80"
                                                 />
                                             </div>
 
                                             {/* Email */}
                                             <div className="relative group">
-                                                <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                                <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1CADA3]" size={20} />
                                                 <input
                                                     required
                                                     type="email"
                                                     placeholder="Email Address"
-                                                    className="w-full h-16 pl-16 pr-6 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/10 transition-all font-bold text-gray-700 placeholder:text-gray-400/80"
+                                                    className="w-full h-16 pl-16 pr-6 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-[#1CADA3]/10 transition-all font-bold text-gray-700 placeholder:text-gray-400/80"
                                                 />
                                             </div>
 
                                             <div className="grid grid-cols-5 gap-4">
                                                 {/* Phone */}
                                                 <div className="relative group col-span-3">
-                                                    <Phone className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                                    <Phone className="absolute left-6 top-1/2 -translate-y-1/2 text-[#2076C7]" size={20} />
                                                     <input
                                                         required
                                                         type="tel"
                                                         placeholder="Phone"
-                                                        className="w-full h-16 pl-16 pr-6 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/10 transition-all font-bold text-gray-700 placeholder:text-gray-400/80"
+                                                        className="w-full h-16 pl-16 pr-6 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-[#2076C7]/10 transition-all font-bold text-gray-700 placeholder:text-gray-400/80"
                                                     />
                                                 </div>
 
@@ -113,19 +113,19 @@ const HealthInsuranceApplyForm: React.FC<ApplyFormProps> = ({ isOpen, onClose, p
                                                         required
                                                         type="number"
                                                         placeholder="Age"
-                                                        className="w-full h-16 px-8 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/10 transition-all font-bold text-gray-700 placeholder:text-gray-400/80"
+                                                        className="w-full h-16 px-8 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-[#1CADA3]/10 transition-all font-bold text-gray-700 placeholder:text-gray-400/80"
                                                     />
                                                 </div>
                                             </div>
 
                                             {/* City */}
                                             <div className="relative group">
-                                                <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                                <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-[#2076C7]" size={20} />
                                                 <input
                                                     required
                                                     type="text"
                                                     placeholder="City"
-                                                    className="w-full h-16 pl-16 pr-6 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/10 transition-all font-bold text-gray-700 placeholder:text-gray-400/80"
+                                                    className="w-full h-16 pl-16 pr-6 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-[#2076C7]/10 transition-all font-bold text-gray-700 placeholder:text-gray-400/80"
                                                 />
                                             </div>
                                         </div>

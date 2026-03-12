@@ -77,7 +77,7 @@ export default function BusinessLoanEligibility() {
                         </p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
                         {criteria.map((item, index) => (
                             <motion.div
                                 key={index}
@@ -115,7 +115,7 @@ export default function BusinessLoanEligibility() {
             </section>
 
             {/* Documents Section (Full Width) */}
-            <section className="py-14 md:py-24 bg-white border-y border-gray-100">
+            <section className="py-14 md:py-24 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -131,7 +131,7 @@ export default function BusinessLoanEligibility() {
                         </p>
                     </motion.div>
 
-                    <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {documents.map((doc, idx) => (
                             <motion.div
                                 key={idx}
@@ -155,7 +155,7 @@ export default function BusinessLoanEligibility() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.4 }}
-                        className="mt-10 sm:mt-16 max-w-4xl mx-auto p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] bg-linear-to-br from-[#1CADA3]/10 to-[#2076C7]/10 border border-[#1CADA3]/20 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 shadow-sm text-center sm:text-left"
+                        className="mt-10 sm:mt-16 max-w-6xl mx-auto p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] bg-linear-to-br from-[#1CADA3]/10 to-[#2076C7]/10 border border-[#1CADA3]/20 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 shadow-sm text-center sm:text-left"
                     >
                         <div className="shrink-0 w-16 h-16 rounded-full bg-white flex items-center justify-center text-[#1CADA3] shadow-sm">
                             <BadgeCheck size={32} />

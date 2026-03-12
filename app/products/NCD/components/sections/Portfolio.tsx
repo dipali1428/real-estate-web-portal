@@ -1,14 +1,9 @@
-﻿import { useState } from 'react';
+
 import {
     Target,
-    PieChart as ChartIcon,
-    Zap,
-    Shield,
-    TrendingUp,
     Download
 } from 'lucide-react';
-import StrategyDetailsContent from './StrategyDetailsContent';
-import { strategyDetailsData } from '../../utils/StrategyDetailsData';
+import { useModal } from '../../../../context/ModalContext';
 
 // 1. Define the Profile interface to fix "implicit any" errors
 interface Profile {
@@ -17,25 +12,6 @@ interface Profile {
     desc: string;
     allocation: string;
 }
-
-// 2. Define data BEFORE the component so 'keyof typeof' works correctly
-const strategies = {
-    ladder: {
-        title: "Laddering Strategy",
-        icon: <Target className="w-6 h-6" />,
-        description: "Divide your investment across different maturities to balance liquidity and returns."
-    },
-    bullet: {
-        title: "Bullet Strategy",
-        icon: <Zap className="w-6 h-6" />,
-        description: "Concentrate investments in a specific maturity date to meet a future cash need."
-    },
-    barbell: {
-        title: "Barbell Strategy",
-        icon: <TrendingUp className="w-6 h-6" />,
-        description: "Invest in short-term and long-term bonds, avoiding the middle range."
-    }
-};
 
 const profiles: Profile[] = [
     {
@@ -59,37 +35,20 @@ const profiles: Profile[] = [
 ];
 
 const Portfolio = () => {
-    // 3. State types now reference the objects defined above
-    const [activeStrategy, setActiveStrategy] =
-        useState<keyof typeof strategies>('ladder');
-
-    const [printProfile, setPrintProfile] = 
-        useState<keyof typeof strategyDetailsData.profiles | null>(null);
+    const { openLogin } = useModal();
 
     const handleDownloadStrategy = (name: string) => {
-        // Narrow the string type to the specific keys allowed by strategyDetailsData
-        let profileKey: keyof typeof strategyDetailsData.profiles = 'Moderate';
-        
-        if (name === 'Conservative' || name === 'Moderate' || name === 'Aggressive') {
-            profileKey = name as keyof typeof strategyDetailsData.profiles;
-        }
-        
-        setPrintProfile(profileKey);
-
-        // Timeout to allow state to propagate before printing
-        setTimeout(() => {
-            window.print();
-        }, 150);
+        openLogin();
     };
 
     return (
-        <section className="py-12 bg-white" id="portfolio">
-            <div className="container-custom max-w-6xl mx-auto">
+        <section className="py-12 md:py-16 bg-white font-sans px-4 sm:px-6 lg:px-8" id="portfolio">
+            <div className="container-custom max-w-7xl mx-auto">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
-                       Investment Portfolios
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                        Investment Portfolios
                     </h2>
-                    
+
                     <p className="text-slate-500 max-w-2xl mx-auto font-medium">
                         Tailored NCD investment strategies based on your risk appetite and financial goals.
                     </p>
@@ -109,7 +68,7 @@ const Portfolio = () => {
                                 </div>
                             </div>
 
-                            <p className="text-slate-500 font-medium mb-8 leading-relaxed italic border-l-4 border-[#1CADA3]/20 pl-4 py-1">
+                            <p className="text-slate-500 font-medium mb-8 leading-relaxed border-l-4 border-[#1CADA3]/20 pl-4 py-1">
                                 "{p.desc}"
                             </p>
 
@@ -128,6 +87,7 @@ const Portfolio = () => {
                             </div>
 
                             <button
+                                suppressHydrationWarning={true}
                                 onClick={() => handleDownloadStrategy(p.name)}
                                 className="mt-auto w-full py-4 bg-white text-[#1CADA3] font-extrabold rounded-2xl border-2 border-[#1CADA3]/10 flex items-center justify-center gap-2 hover:bg-[#1CADA3] hover:text-white hover:border-[#1CADA3] transition-all duration-300 shadow-sm"
                             >
@@ -138,15 +98,9 @@ const Portfolio = () => {
                     ))}
                 </div>
             </div>
-
-            {/* Printable Strategy Details Content - Visible only during printing */}
-            {printProfile && (
-                <div className="absolute top-0 left-0 w-0 h-0 overflow-hidden opacity-0 pointer-events-none print:static print:w-full print:h-auto print:opacity-100 print:visible">
-                    <StrategyDetailsContent profileName={printProfile} />
-                </div>
-            )}
         </section>
     );
 };
+
 
 export default Portfolio;

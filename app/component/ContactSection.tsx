@@ -164,23 +164,29 @@ const ContactSection = () => {
       {/* Visit Us */}
       <div className="bg-white rounded-2xl shadow-md p-8 text-center hover:shadow-lg transition">
 
-        <div className="w-16 h-16 mx-auto mb-4 bg-[#1CADA3]/10 rounded-2xl flex items-center justify-center">
-          <MapPin className="w-7 h-7 text-[#1CADA3]" />
-        </div>
+  <a
+    href="https://www.google.com/maps/search/?api=1&query=7+Business+Square+Pune+Shivajinagar+411016"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <div className="w-16 h-16 mx-auto mb-4 bg-[#1CADA3]/10 rounded-2xl flex items-center justify-center hover:bg-[#1CADA3]/20 transition cursor-pointer">
+      <MapPin className="w-7 h-7 text-[#1CADA3]" />
+    </div>
+  </a>
 
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-          Visit Us
-        </h3>
+  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+    Visit Us
+  </h3>
 
-        <p className="text-[#1CADA3] font-semibold">
-          7 Business Square, Pune
-        </p>
+  <p className="text-[#1CADA3] font-semibold">
+    7 Business Square  by Naiknavare, shivajinagar, Pune
+  </p>
 
-        <p className="text-gray-500 text-sm mt-1">
-          Shivajinagar, MH 411016
-        </p>
+  <p className="text-gray-500 text-sm mt-1">
+    Shivajinagar, MH 411016
+  </p>
 
-      </div>
+</div>
 
     </div>
 

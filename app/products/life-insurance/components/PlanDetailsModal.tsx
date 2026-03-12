@@ -59,7 +59,7 @@ export default function PlanDetailsModal({ plan, onClose, onGetQuote }: PlanDeta
                         exit={{ opacity: 0, scale: 0.95, y: 30 }}
                         transition={{ type: "spring", stiffness: 300, damping: 28 }}
                         onClick={e => e.stopPropagation()}
-                        className="relative bg-white rounded-[2.5rem] shadow-[0_50px_100px_rgba(0,0,0,0.3)] w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                        className="relative bg-white rounded-[2.5rem] shadow-[0_50px_100px_rgba(0,0,0,0.3)] w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] font-sans"
                     >
                         {/* Header Image/Background */}
                         <div
@@ -186,7 +186,7 @@ export default function PlanDetailsModal({ plan, onClose, onGetQuote }: PlanDeta
                         <div className="p-8 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-4">
                             <button
                                 onClick={onClose}
-                                className="flex-1 py-4 px-6 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
+                                className="font-sans flex-1 py-4 px-6 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
                             >
                                 Close Details
                             </button>
@@ -195,7 +195,7 @@ export default function PlanDetailsModal({ plan, onClose, onGetQuote }: PlanDeta
                                     onClose();
                                     setTimeout(() => onGetQuote(plan), 300);
                                 }}
-                                className="flex-[1.5] py-4 px-8 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-white shadow-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-95"
+                                className="font-sans flex-[1.5] py-4 px-8 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-white shadow-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-95"
                                 style={{ backgroundColor: plan.accentColor, boxShadow: `0 10px 30px ${plan.accentColor}40` }}
                             >
                                 Get Personalized Quote

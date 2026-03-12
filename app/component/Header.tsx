@@ -31,7 +31,7 @@ const Header = () => {
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "About Us", href: "/page/about", component: AboutSection },
-    { label: "Library", href: "/page/event", component: AboutSection },
+    { label: "Media Center", href: "/page/event", component: AboutSection },
     { label: "Cibil Check", href: "/page/cibil", component: CibilSection },
     { label: "Careers", href: "/page/careers" },
   ];
@@ -62,7 +62,7 @@ const Header = () => {
   const insuranceOptions = [
     { label: "Life Insurance", href: "/products/life-insurance" },
     { label: "Health Insurance", href: "/products/health-insurance" },
-    { label: "Motor Insurance", href: "/products/motor-insurance" },
+    // { label: "Motor Insurance", href: "/products/motor-insurance" },
     { label: "Motor Insurance", href: "/products/motor-insurance" },
     { label: "Travel Insurance", href: "/products/travel-insurance" },
     { label: "Fire Insurance", href: "/products/fire-insurance" },
@@ -70,7 +70,9 @@ const Header = () => {
     { label: "Marine Insurance", href: "/products/marine-insurance" },
     { label: "Corporate Insurance", href: "/products/corporate-insurance" },
     { label: "Loan Protector", href: "/products/loan-protector" },
+    { label: "Pet Insurance", href: "/products/pet-insurance" },
   ];
+
 
   const mutualFundOptions = [
     { label: "Mutual Fund", href: "/products/mutual-funds" },
@@ -95,8 +97,8 @@ const Header = () => {
 
   return (
     <header className="bg-linear-to-br from-[#E8F6FA] via-[#F0FAFB] to-[#E9F8F6] backdrop-blur-md shadow-sm sticky top-0 z-50 transition-all duration-300 border-b border-[#1CADA3]/20">
-      <nav className="max-w-[1600px] container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex items-center justify-between">
-        {/* Logo Section */}
+     <nav className="max-w-[1600px] container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex items-center justify-center">
+        {/* Logo Section
         <motion.div
             className="flex items-center space-x-2"
           initial={{ opacity: 0, y: -10 }}
@@ -113,10 +115,24 @@ const Header = () => {
               priority
             />
           </Link>
-        </motion.div>
+        </motion.div> */}
 
         {/* Desktop Menu */}
-        <div className="hidden lg:flex items-center space-x-0 xl:space-x-0.5 2xl:space-x-1 font-sans">
+   <div className="hidden lg:flex items-center space-x-3 xl:space-x-4 font-sans">
+
+  {/* Logo near Home */}
+  <Link href="/" className="flex items-center">
+    <Image
+      src="/logo.png"
+      alt="Infinity Arthvishva Logo"
+      width={200}
+      height={200}
+      className="h-8 sm:h-10 md:h-12 w-auto object-contain"
+      priority
+    />
+  </Link>
+
+          
           
           {/* Home & About Us */}
           {navLinks.slice(0, 2).map((link, i) => (

@@ -48,7 +48,7 @@ const reasons = [
 
 export default function WhyBuyInsurance() {
     return (
-        <section className="py-24 relative overflow-hidden bg-white text-[#2076C7]" id="why">
+        <section className="py-24 relative overflow-hidden bg-white text-[#2076C7] font-sans" id="why">
             {/* Refined Background Accents */}
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_100%_0%,#2076C705_0%,transparent_50%)] pointer-events-none" />
 

@@ -1,24 +1,25 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, ChevronRight, Shield, TrendingUp, Wallet, Download, CheckCircle, MapPin, X, FileText } from 'lucide-react';
+import { Search, ChevronRight, Shield, TrendingUp, Wallet, Download, CheckCircle, MapPin } from 'lucide-react';
+import { IconArrowLeft, IconBuildingSkyscraper, IconStar, IconCheck } from '@tabler/icons-react';
+import heroIllustration from '../../../../public/realestate/realestate.jpeg';
 import { properties as staticProperties } from '../data/properties';
 
-interface HomeSectionProps {
+interface RealEstateHomeSectionProps {
     onPropertySelect?: (id: string) => void;
 }
 
-const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
+const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps) => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [showApplyForm, setShowApplyForm] = useState(false);
-    const [applyData, setApplyData] = useState({ name: '', email: '', phone: '', amount: '' });
     const router = useRouter();
 
     // Featured properties from static data
     const featuredProperties = useMemo(() => {
-        return staticProperties.filter(p => p.status !== 'closed').slice(0, 3);
+        return staticProperties.filter((p: any) => p.status !== 'closed').slice(0, 3);
     }, []);
 
     const handleDownloadGuide = () => {
@@ -29,29 +30,34 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>Infinity_Premium_Brochure</title>
+                    <title>Infinity_Premium_Brochure_2026</title>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
                     <style>
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px 50px; color: #1e293b; line-height: 1.6; max-width: 900px; margin: 0 auto; font-size: 20px; background: white; }
-                        .header { text-align: center; border-bottom: 5px solid #2076C7; padding-bottom: 20px; margin-bottom: 30px; }
-                        h1 { background: linear-gradient(to right, #2563eb, #14b8a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; font-size: 40px; text-transform: uppercase; letter-spacing: 2px; }
-                        .subtitle { color: #64748b; font-size: 24px; font-weight: 600; margin-top: 5px; }
-                        .section { margin-bottom: 40px; }
-                        h2 { background: linear-gradient(to right, #2563eb, #14b8a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-left: 6px solid #2076C7; padding-left: 20px; font-size: 28px; margin-bottom: 20px; display: inline-block; }
-                        .step { margin-bottom: 20px; display: block; margin-left: 10px; }
-                        .step-num { background: #2076C7; color: white; width: 35px; height: 35px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; font-size: 20px; vertical-align: middle; }
-                        .step-content { display: inline-block; vertical-align: middle; width: 85%; }
-                        .step-content b { display: block; font-size: 22px; color: #1e293b; margin-bottom: 5px; }
-                        .step-content p { margin: 0; color: #475569; font-size: 18px; }
-                        ul { padding-left: 30px; margin: 0; }
-                        li { margin-bottom: 12px; font-size: 18px; color: #475569; }
-                        .why-us-grid { display: block; }
-                        .why-us-item { background: #fff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 15px; }
-                        .why-us-item b { color: #2076C7; display: block; margin-bottom: 5px; font-size: 20px; }
-                        .why-us-item p { margin: 0; font-size: 17px; color: #64748b; line-height: 1.5; }
-                        .footer { margin-top: 60px; text-align: center; font-size: 16px; color: #1e293b; border-top: 2px solid #e2e8f0; padding: 40px 0 100px 0; }
-                        .social-links { margin: 20px 0; font-weight: 700; }
-                        .social-links a { margin: 0 15px; text-decoration: none; color: #2076C7 !important; border-bottom: 1px solid #2076C7; }
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px 50px; color: #1e293b; line-height: 1.6; max-width: 950px; margin: 0 auto; font-size: 18px; background: white; }
+                        .header { text-align: center; border-bottom: 5px solid #2076C7; padding-bottom: 30px; margin-bottom: 40px; position: relative; }
+                        .header::after { content: ''; position: absolute; bottom: -5px; right: 0; width: 50%; height: 5px; background: #1CADA3; }
+                        h1 { background: linear-gradient(to right, #2076C7, #1CADA3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; font-size: 48px; text-transform: uppercase; letter-spacing: 3px; font-weight: 900; }
+                        .subtitle { color: #64748b; font-size: 26px; font-weight: 600; margin-top: 10px; letter-spacing: 1px; }
+                        .section { margin-bottom: 50px; }
+                        h2 { background: linear-gradient(to right, #2076C7, #1CADA3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-left: 8px solid #2076C7; padding-left: 20px; font-size: 30px; margin-bottom: 25px; display: inline-block; font-weight: 800; }
+                        .market-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 30px; margin-bottom: 30px; display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
+                        .market-stat { text-align: center; padding: 15px; background: white; border-radius: 15px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+                        .market-stat b { display: block; font-size: 28px; color: #2076C7; margin-bottom: 5px; }
+                        .market-stat p { margin: 0; font-size: 14px; text-transform: uppercase; font-weight: 700; color: #64748b; }
+                        .step { margin-bottom: 25px; display: flex; align-items: flex-start; }
+                        .step-num { background: linear-gradient(135deg, #2076C7, #1CADA3); color: white; min-width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; margin-right: 20px; font-size: 20px; flex-shrink: 0; }
+                        .step-content b { display: block; font-size: 22px; color: #1e293b; margin-bottom: 8px; }
+                        .step-content p { margin: 0; color: #475569; font-size: 17px; }
+                        ul { padding-left: 25px; margin: 0; }
+                        li { margin-bottom: 15px; font-size: 17px; color: #475569; }
+                        li b { color: #1e293b; }
+                        .why-us-grid { display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
+                        .why-us-item { background: #fff; border: 1px solid #e2e8f0; padding: 25px; border-radius: 15px; height: 100%; transition: all 0.3s; }
+                        .why-us-item b { color: #2076C7; display: block; margin-bottom: 10px; font-size: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
+                        .why-us-item p { margin: 0; font-size: 16px; color: #64748b; line-height: 1.6; }
+                        .footer { margin-top: 80px; text-align: center; font-size: 16px; color: #1e293b; border-top: 3px solid #f1f5f9; padding: 50px 0 100px 0; background: #fafafa; border-radius: 30px 30px 0 0; }
+                        .social-links { margin: 25px 0; font-weight: 700; }
+                        .social-links a { margin: 0 20px; text-decoration: none; color: #2076C7 !important; border-bottom: 2px solid #1CADA3; padding-bottom: 2px; }
                         .page-break { page-break-before: always; }
                     </style>
                 </head>
@@ -59,77 +65,73 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
                     <div id="brochure-content">
                         <div class="header">
                             <h1>INFINITY ARTHVISHWA</h1>
-                            <div class="subtitle">Premium Investment Portfolio Guide</div>
+                            <div class="subtitle">Real Estate Portfolio Insights • 2026 Edition</div>
                         </div>
 
                         <div class="section">
-                            <h2>1. How to Invest (Steps to Wealth)</h2>
+                            <h2>2026 Market Analysis: Pune Growth Corridor</h2>
+                            <p style="margin-bottom: 25px; color: #475569;">The Pune real estate market has shown a resilient <b>11.5% YoY growth</b> in premium residential and commercial sectors. Our data-driven approach identifies micro-markets with high absorption rates.</p>
+                            <div class="market-box">
+                                <div class="market-stat"><b>12.8%</b><p>Avg. Capital Appreciation</p></div>
+                                <div class="market-stat"><b>8.4%</b><p>Commercial Rental Yield</p></div>
+                                <div class="market-stat"><b>₹2,500 Cr+</b><p>Managed Assets</p></div>
+                                <div class="market-stat"><b>98.5%</b><p>Occupancy Rate</p></div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <h2>1. Strategic Investment Roadmap</h2>
                             <div class="step">
                                 <div class="step-num">1</div>
-                                <div class="step-content"><b>Choose Property</b><p>Select your ideal premium asset from our curated portfolio of institutional-grade properties.</p></div>
+                                <div class="step-content"><b>Institutional Grade Selection</b><p>We filter Grade-A properties from top-tier developers, ensuring only high-liquidity assets enter our portfolio.</p></div>
                             </div>
                             <div class="step">
                                 <div class="step-num">2</div>
-                                <div class="step-content"><b>Allocate Funds</b><p>Invest based on your financial goals. We offer flexible entry barriers for premium real estate.</p></div>
+                                <div class="step-content"><b>Fractional Allocation</b><p>Invest in premium assets starting from ₹5 Lakh. Perfect for diversifying across multiple micro-markets.</p></div>
                             </div>
                             <div class="step">
                                 <div class="step-num">3</div>
-                                <div class="step-content"><b>Complete Paperwork</b><p>Secure legal ownership through our transparent and digital documentation process.</p></div>
+                                <div class="step-content"><b>SPV Governance</b><p>Secure ownership via a Special Purpose Vehicle (SPV), providing a bulletproof legal framework and tax efficiency.</p></div>
                             </div>
                             <div class="step">
                                 <div class="step-num">4</div>
-                                <div class="step-content"><b>Earn Passive Income</b><p>Start receiving monthly rental distributions and benefit from long-term capital appreciation.</p></div>
+                                <div class="step-content"><b>Wealth Generation</b><p>Monthly rental credits directly to your bank account with long-term capital gains on asset disposal.</p></div>
                             </div>
                         </div>
 
                         <div class="section page-break">
-                            <h2>2. Eligibility Criteria</h2>
+                            <h2>2. Fractional Advantage & Eligibility</h2>
                             <ul>
-                                <li><b>Investor Types:</b> High-net-worth Individuals (HNIs), Companies, and Institutional Funds.</li>
-                                <li><b>Investment Capacity:</b> Scalable options tailored to specific property asset values.</li>
-                                <li><b>Strategic Location:</b> Focus on Grade-A properties in rapidly developing approved areas.</li>
-                                <li><b>Legal Verification:</b> Only properties with 100% verified clear titles are listed.</li>
-                                <li><b>Financing Support:</b> Direct assistance with Home Loan and leverage eligibility.</li>
-                                <li><b>Residency Profile:</b> Open to all Indian Residents and Non-Resident Indians (NRIs).</li>
+                                <li><b>HNI & NRI Focus:</b> Custom structures for Resident Indians and NRI/OCI investors via NRE/NRO routes.</li>
+                                <li><b>Title Verification:</b> 100% cloud-accessible legal due diligence for every listed asset.</li>
+                                <li><b>Market Liquidity:</b> First-of-its-kind resale window and secondary market for fractional exits.</li>
+                                <li><b>Portfolio Diversification:</b> Spread capital across IT Parks, Luxury Retail, and Premium Residential.</li>
+                                <li><b>Tax Optimization:</b> Structured as LLPs for flow-through taxation benefits for investors.</li>
                             </ul>
                         </div>
 
                         <div class="section">
-                            <h2>3. Required Documents Checklist</h2>
-                            <ul>
-                                <li>Primary Identity and Address Verification (Aadhaar, Passport, PAN).</li>
-                                <li>Income Proof and Latest Income Tax Returns (ITR).</li>
-                                <li>Detailed Property-Specific Due Diligence (Provided by us).</li>
-                                <li>Comprehensive Title Audit and Legal Feasibility Reports.</li>
-                                <li>Proof of Financial Capacity and Asset Declaration.</li>
-                                <li>Verified Bank Statements for the last 6 months.</li>
-                                <li>Authorized Bank Account Confirmation & Cancelled Cheque.</li>
-                            </ul>
-                        </div>
-
-                        <div class="section page-break">
-                            <h2>4. Why Choose Infinity Arthvishva?</h2>
+                            <h2>3. Why Choose Infinity Arthvishwa?</h2>
                             <div class="why-us-grid">
-                                <div class="why-us-item"><b>Asset Security</b><p>Your investments are legally backed by physical property titles and RERA-regulated assets.</p></div>
-                                <div class="why-us-item"><b>Zero Management</b><p>We handle everything including tenant sourcing, building maintenance, and legal taxes.</p></div>
-                                <div class="why-us-item"><b>Diversification</b><p>Spread your capital across multiple high-yield residential and commercial assets.</p></div>
-                                <div class="why-us-item"><b>Expert Selection</b><p>Hand-picked opportunities by real estate experts with deep market insights in Pune.</p></div>
-                                <div class="why-us-item"><b>Resale Support</b><p>Complete assistance for liquidating or reselling your share whenever you choose.</p></div>
-                                <div class="why-us-item"><b>Full Transparency</b><p>Direct access to legal property audits and real-time performance tracking for all assets.</p></div>
+                                <div class="why-us-item"><b>Curated Selection</b><p>Only the top 1% of Pune's real estate deals pass our proprietary 50-point checklist.</p></div>
+                                <div class="why-us-item"><b>Digital First</b><p>Track performance, documents, and yields via our state-of-the-art investor dashboard.</p></div>
+                                <div class="why-us-item"><b>Full Stack Management</b><p>From facility management to legal compliance, we handle the dirty work.</p></div>
+                                <div class="why-us-item"><b>High Liquidity</b><p>Pre-planned exit strategies at the end of the holding period with professional resale support.</p></div>
                             </div>
                         </div>
 
                         <div class="footer">
-                             <p style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">Copyright 2026 Infinity Arthvishva | Authorized Professional Partners | Pune, Maharashtra</p>
-                            <div style="margin: 15px 0; color: #2076C7; font-weight: 800; font-size: 24px;">
-                                Toll Free Support: 1800-532-7600
+                             <p style="font-weight: 800; font-size: 20px; color: #2076C7; margin-bottom: 15px;">INFINITY ARTHVISHWA PREMIUM REALTY</p>
+                            <div style="margin: 20px 0; color: #1e293b; font-weight: 800; font-size: 26px;">
+                                <span style="color: #64748b; font-size: 16px;">TOLL FREE:</span> 1800-532-7600
                             </div>
                             <div class="social-links">
-                                <a href="https://facebook.com/infinityarthvishwa">Facebook</a>
-                                <a href="https://twitter.com/infinityarth">Twitter</a>
-                                <a href="https://instagram.com/infinityarthvishwa">Instagram</a>
+                                <a href="#">LinkedIn</a>
+                                <a href="#">Instagram</a>
+                                <a href="#">Facebook</a>
                             </div>
-                            <p style="margin-top: 20px; font-weight: 700; color: #475569;">
+                            <p style="margin-top: 30px; font-weight: 700; color: #64748b; font-size: 14px;">
+                                Head Office: Prime Square, Baner, Pune - 411045<br>
                                 www.infinityarthvishwa.com | contact@infinity.com
                             </p>
                         </div>
@@ -139,7 +141,7 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
                             const element = document.getElementById('brochure-content');
                             const opt = {
                                 margin: [10, 10, 20, 10],
-                                filename: 'How_To_Invest_Infinity_Arthvishva.pdf',
+                                filename: 'Infinity_Arthvishwa_Market_Report_2026.pdf',
                                 image: { type: 'jpeg', quality: 0.98 },
                                 html2canvas: { scale: 2, useCORS: true, letterRendering: true },
                                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
@@ -180,123 +182,140 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
 
     return (
         <div className="animate-fade-in">
-            {/* Hero Section - Redesigned with light theme */}
-            <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-blue-100 via-white to-white">
-                {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full -mr-64 -mt-64" />
-                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-teal-500/5 blur-[100px] rounded-full -ml-44 -mb-44" />
-
-                <div className="container mx-auto px-4 relative z-20 pt-16 text-center">
-                    <div className="max-w-7xl mx-auto">
-                        <div className='align-middle text-center mx-auto mb-10'>
-                        <span className=" text-blue-600 font-black uppercase tracking-[0.3em] text-xs mb-10 px-6 py-2 bg-blue-50 rounded-full">
-                            Infinity Arthvishva Premium Realty
-                        </span>
+            {/* Hero Section - Redesigned to match Education Loan style */}
+            <section className="relative min-h-[70vh] lg:min-h-[75vh] flex items-center bg-white overflow-hidden pt-12 md:pt-8 pb-16">
+                {/* Back Button (Non-sticky) */}
+                <div className="absolute z-10 top-8 left-4 md:top-12 md:left-12">
+                    <button
+                        onClick={() => router.push('/')}
+                        aria-label="Back to Home"
+                        className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+                    >
+                        <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all" >
+                            <IconArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
                         </div>
-                        <h3 className="text-4xl md:text-7xl font-sans font-bold mb-15  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                            Step Into Your Future with Fractional Real Estate Investment </h3>
+                    </button>
+                    <button
+                        onClick={() => router.push('/')}
+                        className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-[0_4px_16px_rgba(32,118,199,0.1)] hover:bg-white hover:border-[#2076C7]/40 active:scale-95 transition-all group"
+                    >
+                        <IconArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+                        Back to Home
+                    </button>
+                </div>
 
-                        {/* Navigation Links in Hero */}
-                        <div className="flex flex-wrap justify-center gap-4 mb-12">
-                            {[
-                                { name: 'Current Opportunities', path: '#properties' },
-                                { name: 'Closed Opportunities', path: '#closed' },
-                                { name: 'Calculator', path: '#calculator' },
-                                { name: 'How to Invest', onClick: handleDownloadGuide, isAction: true }
-                            ].map((link) => (
-                                link.isAction ? (
-                                    <button
-                                        key={link.name}
-                                        onClick={link.onClick}
-                                        className="
-                                                btn-brand
-                                                flex items-center gap-2
-                                                px-8 py-3 rounded-full text-sm font-semibold
-                                             text-white
-                                                shadow-lg
-                                                transition-all duration-300
-                                                active:scale-95
-                                                hover:shadow-xl"
-                                        style={{
-                                            background: 'linear-gradient(to right, #2076C7, #2076C7)'
-                                        }}>
-                                        <Download size={18} /> {link.name}
-                                    </button>
-
-
-                                ) : (
-                                    <Link
-                                        key={link.name}
-                                        href={link.path!}
-                                        className="px-8 py-3 rounded-full bg-white text-slate-800 font-bold hover:bg-blue-50 hover:text-blue-600 transition-all shadow-md border border-slate-100 text-sm">
-                                        {link.name}
-                                    </Link>
-                                )
-                            ))}
-                        </div>
-
-                        <p className="text-lg md:text-xl font-sans text-gray-600 mb-2 max-w-2xl mx-auto leading-relaxed font-medium">
-                            Experience the next generation of property acquisition. Immersive AR/VR tours and hand-picked high-yield assets await in India's prime growth corridors.
-                        </p>
-
-                        {/* Hero Search Bar */}
-                        {/* <div className="bg-white p-2 rounded-2xl max-w-2xl mx-auto flex flex-col md:flex-row gap-2 shadow-[0_20px_50px_rgba(8,112,184,0.1)] transition-transform hover:-translate-y-1 border border-slate-100">
-                            <div className="flex-1 flex items-center gap-3 px-6 py-3">
-                                <Search size={22} className="text-blue-600" />
-                                <input
-                                    type="text"
-                                    placeholder="Where would you like to invest?"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    onKeyDown={handleSearch}
-                                    className="w-full bg-transparent border-none outline-none text-lg font-bold text-slate-800 placeholder:text-slate-400"
-                                />
+                <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 pt-12 md:pt-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+                        {/* Left: Content */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -40 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8 }}
+                            className="space-y-6 flex flex-col items-center lg:items-start text-center lg:text-left lg:pl-12 w-full"
+                        >
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-20 border rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-sm mt-16 md:mt-24" style={{ color: '#2076C7', borderColor: 'rgba(32, 118, 199, 0.2)' }}>
+                                <IconBuildingSkyscraper size={12} />
+                                Fractional Real Estate • Infinity Arthvishwa
                             </div>
-                            <button onClick={handleSearch} className="btn-brand px-10 py-4 rounded-xl flex items-center justify-center gap-2 uppercase tracking-wider text-sm">
-                                Find Assets <ChevronRight size={18} />
-                            </button>
-                        </div> */}
+                            <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 sm:mb-6 leading-[1.1] sm:leading-tight" style={{
+                                background: 'linear-gradient(to right, #2076C7, #1CADA3, #2076C7)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text'
+                            }}>
+                                Fractional Real Estate
+                                <br className="hidden sm:block" />
+                                <span className="sm:hidden"> </span>
+                                Investments
+                            </h1>
+                            <p className="text-lg sm:text-xl mb-6 text-gray-600 leading-relaxed max-w-lg">
+                                Experience the next generation of property acquisition. Immersive high-yield assets await in India's prime growth corridors. Start investing from ₹5 Lakh.
+                            </p>
+
+                            {/* CTAs */}
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <Link
+                                    href="#properties"
+                                    className="group relative text-white px-8 md:px-10 py-4 md:py-5 rounded-lg font-bold text-lg md:text-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer flex items-center justify-center" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
+                                >
+                                    <span className="relative z-10 flex items-center justify-center gap-1">
+                                        View Opportunities 
+                                    </span>
+                                    <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
+                                </Link>
+                                <button
+                                    onClick={handleDownloadGuide}
+                                    className="group relative bg-white px-6 md:px-7 py-3.5 md:py-1.5 rounded-lg font-semibold text-base md:text-lg border-2 hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 transition-all"
+                                    style={{ color: '#2076C7', borderColor: '#2076C7' }}
+                                >
+                                    <Download size={18} className="group-hover:translate-y-1 transition-transform" />
+                                    How to Invest
+                                </button>
+                            </div>
+                        </motion.div>
+
+                        {/* Right: Illustration */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 40 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 1, ease: "easeOut" }}
+                            className="relative flex justify-center lg:justify-center items-center"
+                        >
+                            <div className="relative w-full max-w-[420px] aspect-square flex items-center justify-center">
+                                {/* Decorative Background Rings & Glow */}
+                                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#2076C7]/10 via-transparent to-[#1CADA3]/10 blur-2xl" />
+                                <div className="absolute inset-10 rounded-full border border-dashed border-[#2076C7]/20 animate-spin-slow" />
+
+                                {/* Main Illustration (Circular Form) */}
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    transition={{ duration: 0.8, ease: "easeOut" }}
+                                    className="relative z-10 w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] lg:w-[400px] lg:h-[400px] rounded-full flex items-center justify-center shadow-2xl overflow-hidden"
+                                >
+                                    {/* Subtle Gradient Inner Glow */}
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-[#2076C7]/5 to-[#1CADA3]/5" />
+
+                                    <img
+                                        src={heroIllustration.src}
+                                        alt="Real Estate Investment illustration"
+                                        className="w-full h-full object-cover drop-shadow-lg transition-transform duration-700 scale-110"
+                                    />
+                                </motion.div>
+
+                                {/* Floating Badges */}
+                                <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute -top-4 -right-2 bg-white p-3 rounded-2xl shadow-xl flex items-center gap-3 border border-[#2076C7]/10 z-20">
+                                    <div className="w-8 h-8 bg-[#1CADA3] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#1CADA3]/30"><IconStar size={18} /></div>
+                                    <div className="text-left">
+                                        <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Investors</div>
+                                        <div className="text-[12px] font-black text-slate-800 leading-tight">15,000+ Active</div>
+                                    </div>
+                                </motion.div>
+
+                                <motion.div animate={{ y: [0, 12, 0] }} transition={{ duration: 5, repeat: Infinity, delay: 0.5 }} className="absolute -bottom-4 -left-2 bg-white p-3 rounded-2xl shadow-xl flex items-center gap-3 border border-[#2076C7]/10 z-20">
+                                    <div className="w-8 h-8 bg-[#2076C7] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#2076C7]/30"><IconCheck size={18} /></div>
+                                    <div className="text-left">
+                                        <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Managed</div>
+                                        <div className="text-[12px] font-black text-slate-800 leading-tight">₹2,500 Cr+ Assets</div>
+                                    </div>
+                                </motion.div>
+                            </div>
+                        </motion.div>
                     </div>
                 </div>
             </section>
 
-            {/* How It Works Section */}
-            <section className="py-12 bg-slate-50">
-                <div className="container mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">How We Deliver Results</h2>
-                        <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                            Achieving your financial goals is our true achievement. We simplify the path to wealth through a structured and transparent investment process.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                        {[
-                            { icon: Search, title: 'Select Property', text: 'Browse our curated collection of high-yield properties.' },
-                            { icon: Wallet, title: 'Invest Amount', text: 'Choose your share and invest fractions of the total value.' },
-                            { icon: TrendingUp, title: 'Earn & Grow', text: 'Receive periodic rental income and capital appreciation.' }
-                        ].map((item, index) => (
-                            <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-shadow text-center group">
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-blue-50 text-blue-600 mb-6 group-hover:scale-110 transition-transform">
-                                    <item.icon size={32} />
-                                </div>
-                                <h3 className="text-xl font-bold mb-4 text-brand-gradient">{item.title}</h3>
-                                <p className="text-slate-600 leading-relaxed">{item.text}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
 
             {/* Investment Benefits Section */}
-            <section className="py-12 bg-white">
-                <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <section className="py-8 md:py-16 bg-white overflow-hidden">
+                <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                     <div>
-                        <h2 className="text-4xl font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Why Fractional Investment?</h2>
-                        <p className="text-lg text-slate-500 mb-12">
-                            Unlock premium real estate opportunities that were once reserved for high-net-worth individuals.
-                        </p>
-
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 sm:mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
+                         Why Fractional Investment?
+                    </h2>
+                    <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed mb-10">
+                        Unlock premium real estate opportunities that were once reserved for high-net-worth individuals.
+                    </p>
                         <div className="space-y-8">
                             {[
                                 { icon: Shield, title: 'Asset Backed Security', text: 'Your investments are secured by physical real estate assets.' },
@@ -319,7 +338,7 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
                     <div className="bg-white/50 backdrop-blur-xl p-12 rounded-3xl border border-slate-100 relative overflow-hidden shadow-2xl transition-all hover:-translate-y-2 hover:shadow-3xl">
                         <div className="absolute -top-1/4 -right-1/4 w-3/4 h-3/4 bg-teal-500/10 blur-[100px] -z-10" />
                         <div className="text-center">
-                            <h3 className="text-2xl font-bold font-sans text-gray-700 mb-8 text-brand-gradient">Platform Stats</h3>
+                            <h3 className="text-2xl font-bold font-sans text-gray-700 mb-8 text-brand-gradient"> Platform Current Status</h3>
                             <div className="grid grid-cols-2 gap-8">
                                 <div>
                                     <p className="text-4xl font-extrabold text-blue-600 mb-2">15k+</p>
@@ -344,10 +363,14 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
             </section>
 
             {/* Featured Properties (Existing) */}
-            <div className="container mx-auto px-4 py-12">
+            <div className="max-w-7xl mx-auto px-4 py-12">
                 <div className="text-center mb-12 max-w-3xl mx-auto">
-                    <h2 className="text-4xl font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Featured Properties</h2>
-                    <p className="text-slate-500 mb-8">Explore our hand-picked selection of premium investment opportunities.</p>
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
+                        Featured Properties
+                    </h2>
+                    <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
+                        Explore our hand-picked selection of premium investment opportunities.
+                    </p>
                     <Link href="#live" className="inline-flex items-center gap-2 px-6 py-2 bg-slate-100 text-blue-600 rounded-full font-semibold hover:bg-slate-200 transition-colors">
                         View all properties <ChevronRight size={20} />
                     </Link>
@@ -369,16 +392,16 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
                                         <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider block mb-1">Price</span>
                                         <span className="text-lg font-bold text-teal-600">
                                             ₹{property.price.toLocaleString('en-IN')}
-                                              {property.price && (
-                                                    <span className="text-black font-bold text-sm leading-none shrink-0 cursor-help pt-1" title="Star Marked — Potential for future value appreciation">*</span>
-                                                )}
+                                            {property.price && (
+                                                <span className="text-black font-bold text-sm leading-none shrink-0 cursor-help pt-1" title="Star Marked — Potential for future value appreciation">*</span>
+                                            )}
                                         </span>
                                     </div>
                                     {property.status !== 'closed' && (
                                         <button
                                             onClick={() => onPropertySelect && onPropertySelect(String(property.id))}
-                                            className="btn-brand px-6 py-2 rounded-lg text-xs">
-                                            Details
+                                            className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white px-6 py-2 rounded-lg text-xs font-semibold shadow-md hover:shadow-lg transition-all">
+                                            View Details
                                         </button>
                                     )}
                                 </div>
@@ -391,112 +414,8 @@ const HomeSection = ({ onPropertySelect }: HomeSectionProps) => {
                     ))}
                 </div>
             </div>
-
-            {/* Apply Modal */}
-            {showApplyForm && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
-                    {/* Back Button */}
-                    <button
-                        onClick={() => setShowApplyForm(false)}
-                        className="fixed top-6 left-6 flex items-center gap-2 px-4 py-2 bg-white rounded-xl font-bold text-slate-700 shadow-lg hover:bg-slate-50 transition-all z-[10000]"
-                    >
-                        <ChevronRight size={18} className="rotate-180" /> Back
-                    </button>
-
-                    <div className="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl animate-fade-in relative">
-                        <div className="flex justify-end mb-4">
-                            <button
-                                onClick={() => setShowApplyForm(false)}
-                                className="p-2 bg-slate-100 rounded-lg text-slate-500 hover:bg-slate-200 transition-colors"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <div className="text-center mb-8">
-                            <div className="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                <FileText size={28} />
-                            </div>
-                            <h2 className="text-2xl font-extrabold mb-2 text-brand-gradient">Investor Application</h2>
-                            <p className="text-slate-500 text-sm">Submit your interest and our legal team will reach out with the LLP agreement drafts.</p>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
-                                <input
-                                    type="text"
-                                    placeholder="e.g. Rahul Deshmukh"
-                                    value={applyData.name}
-                                    onChange={(e) => setApplyData({ ...applyData, name: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors"
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
-                                    <input
-                                        type="email"
-                                        placeholder="rahul@example.com"
-                                        value={applyData.email}
-                                        onChange={(e) => setApplyData({ ...applyData, email: e.target.value })}
-                                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-slate-700 mb-2">Phone Number</label>
-                                    <input
-                                        type="tel"
-                                        placeholder="+91 00000-00000"
-                                        value={applyData.phone}
-                                        onChange={(e) => setApplyData({ ...applyData, phone: e.target.value })}
-                                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Intent to Invest (₹)</label>
-                                <select
-                                    value={applyData.amount}
-                                    onChange={(e) => setApplyData({ ...applyData, amount: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors cursor-pointer"
-                                >
-                                    <option value="">Select range</option>
-                                    <option value="10-25">₹10 Lakhs - ₹25 Lakhs</option>
-                                    <option value="25-50">₹25 Lakhs - ₹50 Lakhs</option>
-                                    <option value="50-100">₹50 Lakhs - ₹1 Crore</option>
-                                    <option value="100+">Above ₹1 Crore</option>
-                                </select>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3 mt-2">
-                                <button
-                                    onClick={() => setShowApplyForm(false)}
-                                    className="w-full py-3.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        alert('Application submitted successfully! Our investment advisor will contact you within 24 hours.');
-                                        setShowApplyForm(false);
-                                        setApplyData({ name: '', email: '', phone: '', amount: '' });
-                                    }}
-                                    className="btn-brand w-full py-4 rounded-xl"
-                                >
-                                    Submit
-                                </button>
-                            </div>
-
-                            <p className="text-center text-xs text-slate-400 mt-2 flex items-center justify-center gap-1">
-                                <Shield size={12} /> Your data is protected by institutional-grade encryption.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
 
-export default HomeSection;
+export default RealEstateHomeSection;

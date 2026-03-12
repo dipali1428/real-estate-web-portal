@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { RotateCcw, Download, Lightbulb } from 'lucide-react';
@@ -75,7 +75,7 @@ const Calculator = ({ isWidget = false }) => {
 
             <div className={`p-6 ${isWidget ? 'pt-6' : 'md:p-10'}`}>
                 {isWidget && (
-                    <h3 className="text-xl font-bold text-[#2076C7] mb-6 flex items-center">
+                    <h3 className="text-xl font-bold text-[#2076C7] mb-6 flex items-center font-sans">
                         NCD Calculator
                     </h3>
                 )}
@@ -88,6 +88,7 @@ const Calculator = ({ isWidget = false }) => {
                             <div className="grid grid-cols-3 gap-2">
                                 {['Yearly', 'Quarterly', 'Monthly'].map((freq) => (
                                     <button
+                                        suppressHydrationWarning={true}
                                         key={freq}
                                         onClick={() => setFrequency(freq)}
                                         className={`py-3 rounded-xl text-[10px] sm:text-xs font-black border-2 transition-all ${frequency === freq
@@ -108,6 +109,7 @@ const Calculator = ({ isWidget = false }) => {
                                 <span className="text-lg font-bold text-[#2076C7]">{formatCurrency(amount)}</span>
                             </div>
                             <input
+                                suppressHydrationWarning={true}
                                 type="range"
                                 min="10000"
                                 max="5000000"
@@ -132,6 +134,7 @@ const Calculator = ({ isWidget = false }) => {
                                 <span className="text-lg font-bold text-[#1CADA3]">{rate}%</span>
                             </div>
                             <input
+                                suppressHydrationWarning={true}
                                 type="range"
                                 min="7"
                                 max="14"
@@ -149,6 +152,7 @@ const Calculator = ({ isWidget = false }) => {
                                 <span className="text-lg font-bold text-[#1CADA3]">{period} Years</span>
                             </div>
                             <input
+                                suppressHydrationWarning={true}
                                 type="range"
                                 min="1"
                                 max="10"
@@ -160,6 +164,7 @@ const Calculator = ({ isWidget = false }) => {
                         </div>
 
                         <button
+                            suppressHydrationWarning={true}
                             onClick={calculateReturns}
                             className="w-full py-4 bg-[#2076C7] text-white font-black rounded-xl shadow-xl shadow-[#2076C7]/20 hover:bg-[#1a65ab] hover:-translate-y-1 transition-all text-sm uppercase tracking-widest"
                         >
@@ -170,7 +175,7 @@ const Calculator = ({ isWidget = false }) => {
                     <div className="space-y-6 animate-fade-in">
                         <div className="text-center">
                             <p className="text-gray-500 font-bold mb-1 uppercase tracking-wide text-[10px]">Expected Maturity</p>
-                            <h3 className={`font-black text-[#2076C7] mb-2 ${isWidget ? 'text-3xl' : 'text-5xl'}`}>{formatCurrency(results.maturity)}</h3>
+                            <h3 className={`font-black text-[#2076C7] mb-2 font-sans ${isWidget ? 'text-3xl' : 'text-5xl'}`}>{formatCurrency(results.maturity)}</h3>
                             <p className="text-[#1CADA3] font-bold text-xs bg-[#1CADA3]/10 px-3 py-1 rounded-full inline-block">
                                 Net Yield: {rate}%
                             </p>
@@ -211,10 +216,10 @@ const Calculator = ({ isWidget = false }) => {
     if (isWidget) return content;
 
     return (
-        <section className={sectionClass} id="calculator">
+        <section className={sectionClass + " font-sans"} id="calculator">
             <div className={wrapperClass}>
                 <div className="text-center max-w-2xl mx-auto mb-8 px-4">
-                    <h2 className="text-2xl md:text-3xl font-extrabold text-[#2076C7] mb-3">
+                    <h2 className="text-2xl md:text-3xl font-extrabold text-[#2076C7] mb-3 font-sans">
                         NCD Returns <span className="heading-gradient">Calculator</span>
                     </h2>
                     <div className="w-24 h-1 mx-auto bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>

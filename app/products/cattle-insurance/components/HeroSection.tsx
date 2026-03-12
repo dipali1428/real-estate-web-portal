@@ -1,178 +1,173 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { IconShieldCheck, IconStar, IconArrowRight, IconHeartHandshake, IconHeartbeat, IconCurrencyRupee, IconAward, IconCheck } from '@tabler/icons-react';
-import heroImg from '../assets/icon.png';
+import { 
+  IconShieldCheck, IconArrowRight, IconArrowLeft, 
+  IconHeartHandshake, IconWorld 
+} from '@tabler/icons-react';
+import { useRouter } from 'next/navigation';
+import { useModal } from '../../../context/ModalContext';
 
 export default function HeroSection() {
+    const router = useRouter();
+    const { openLogin } = useModal();
+    
     return (
-        <section className="relative overflow-hidden bg-[#fafcfe] pt-12 pb-12">
-            {/* Background blobs - matching travel insurance style */}
-            <div className="absolute inset-0 z-0 text-right">
-                <motion.div
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        x: [0, 100, 0],
-                        y: [0, 50, 0],
-                    }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-[120px]"
-                />
-                <motion.div
-                    animate={{
-                        scale: [1, 1.3, 1],
-                        x: [0, -80, 0],
-                        y: [0, 100, 0],
-                    }}
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    className="absolute bottom-[-10%] left-[-5%] w-[700px] h-[700px] bg-teal-50/50 rounded-full blur-[140px]"
-                />
+        <section className="relative min-h-[60vh] flex items-center pt-24 md:pt-12 pb-14 overflow-hidden bg-white px-2">
+            
+            {/* Back Button (Non-sticky) */}
+            <div className="absolute z-10 top-4 left-4 md:top-12 md:left-12">
+                <button
+                    onClick={() => router.push('/')}
+                    aria-label="Back to Home"
+                    className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+                >
+                    <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all" >
+                        <IconArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+                    </div>
+                </button>
+                <button
+                    onClick={() => router.push('/')}
+                    className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-[0_4px_16px_rgba(32,118,199,0.1)] hover:bg-white hover:border-[#2076C7]/40 active:scale-95 transition-all group"
+                >
+                    <IconArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+                    Back to Home
+                </button>
             </div>
 
-            <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-                    {/* Left Content */}
+            <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 w-full">
+                <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+                    
+                    {/* Left Column (Text Content) */}
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="text-center lg:text-left flex flex-col items-center lg:items-start lg:pl-16"
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 1 }}
+                        className="lg:w-[65%] space-y-6 flex flex-col items-center lg:items-start text-center lg:text-left lg:pl-12"
                     >
+                        {/* Animated Badge */}
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.5 }}
-                            className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-blue-50/80 backdrop-blur-sm border border-blue-100 text-primary-blue font-bold tracking-widest uppercase text-[10px] mb-6 shadow-sm"
+                            className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-slate-20 border text-[#2076C7] font-black uppercase tracking-widest text-[10px] mt-16 md:mt-20 lg:mt-24 mb-6 lg:mb-8 shadow-sm"
+                            style={{ borderColor: 'rgba(32, 118, 199, 0.2)' }}
                         >
-                            <IconShieldCheck size={14} />
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1CADA3] opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#2076C7]"></span>
+                            </span>
                             Cattle Protection Scheme
                         </motion.div>
-                            <h1 className="text-3xl md:text-4xl lg:text-6xl font-extrabold tracking-tight leading-[1.2] lg:leading-[1.1] mb-6 py-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
-                                Protect Your Livestock Secure Your Income
-                            </h1>
-                        <p className="text-sm md:text-base text-slate-400 mb-8 max-w-3xl mx-auto lg:mx-0 leading-relaxed font-small">
+                        
+                        <motion.h1 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.3 }}
+                            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight"
+                            style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3, #2076C7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
+                        >
+                            Protect Your Livestock <br className="hidden md:block" /> Secure Your Income
+                        </motion.h1>
+                        
+                        <motion.p 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.6 }}
+                            className="text-gray-600 font-medium text-base md:text-lg mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
+                        >
                             Safeguard your cows, buffaloes, sheep and goats against unforeseen risks. Affordable premiums, quick claims, and complete peace of mind for your farm.
-                        </p>
+                        </motion.p>
 
-                        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-4 justify-center items-center mt-4">
-                            <a
-                                href="#coverage"
-                                className="inline-flex justify-center items-center gap-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white w-full sm:w-auto px-10 md:px-20 py-3 sm:py-2.5 rounded-2xl text-sm md:text-base font-black shadow-[0_10px_30px_-10px_rgba(32,118,199,0.4)] hover:shadow-[0_20px_50px_-12px_rgba(32,118,199,0.5)] transition-all duration-300 hover:scale-[1.02] whitespace-nowrap"
+                        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-4 justify-center lg:justify-start items-center">
+                            <button
+                                onClick={openLogin}
+                                className="w-full sm:w-auto inline-flex justify-center items-center gap-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white px-10 py-4 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest hover:shadow-[0_20px_40px_-10px_rgba(32,118,199,0.3)] hover:-translate-y-1 transition-all duration-300 shadow-lg active:scale-95 whitespace-nowrap"
                             >
-                                Explore Coverage <IconArrowRight size={18} className="shrink-0" />
-                            </a>
+                                Apply Now <IconArrowRight size={18} className="shrink-0" />
+                            </button>
                             <a
-                                href="#contact"
-                                className="inline-flex justify-center items-center gap-2 border-2 border-blue-600/20 bg-white text-blue-700 w-full sm:w-auto px-10 md:px-20 py-3 sm:py-2.5 rounded-2xl text-sm md:text-base font-bold hover:bg-blue-50 transition-all duration-300 whitespace-nowrap"
+                                href="/#contact"
+                                className="w-full sm:w-auto inline-flex justify-center items-center gap-3 border-2 border-[#2076C7]/20 bg-white text-[#2076C7] px-10 py-4 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest hover:bg-slate-50 hover:-translate-y-1 transition-all duration-300 shadow-lg active:scale-95 whitespace-nowrap"
                             >
                                 <IconHeartHandshake size={18} className="shrink-0" /> Talk to an Expert
                             </a>
                         </div>
-
-                        {/* Trust badge */}
-                        <div className="mt-10 flex items-center gap-3 justify-center">
-                            <div className="flex -space-x-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <IconStar key={i} size={16} className="text-yellow-400" fill="currentColor" />
-                                ))}
-                            </div>
-                            <span className="text-sm text-slate-500 font-bold">Trusted by 10,000+ farmers across India</span>
-                        </div>
                     </motion.div>
 
-                    {/* Right Column: Circular Image & Floating Icons - Matching Travel Insurance Style */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 30, scale: 0.9 }}
-                        animate={{ opacity: 1, x: 0, scale: 1 }}
-                        transition={{ duration: 1, delay: 0.2 }}
-                        className="relative flex justify-center items-center lg:-mt-64"
-                    >
-                        <div className="relative w-full max-w-[400px] aspect-square flex items-center justify-center">
+                    {/* Right Column (Circular Illustration) */}
+         <motion.div className="w-full lg:w-[50%] relative flex justify-center lg:justify-end items-center">
 
-                            {/* Dashed Orbit Circle */}
-                            <div className="absolute inset-8 rounded-full border-2 border-dashed border-slate-200/60 -z-0" />
+  <div className="relative w-full max-w-[300px] sm:max-w-[380px] md:max-w-[420px] lg:max-w-[500px] xl:max-w-[560px] aspect-square flex items-center justify-center">
 
-                            {/* Main Circular Image */}
-                            <div className="relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] md:w-[260px] md:h-[260px] rounded-full overflow-hidden shadow-2xl z-10 border-8 border-white bg-white group">
-                                <img
-                                    src={heroImg.src}
-                                    alt="Cattle Insurance Protection"
-                                    className="w-full h-full object-cover transition-transform duration-700 ease-out"
-                                />
-                            </div>
+    {/* Glow Background */}
+    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#2076C7]/10 via-transparent to-[#1CADA3]/10 blur-2xl" />
 
-                            {/* Floating Icon: Health (Top-Left) */}
-                            <motion.div
-                                animate={{ y: [0, -10, 0] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute top-12 left-10 md:top-16 md:left-14 z-20"
-                            >
-                                <div className="w-12 h-12 bg-white rounded-2xl shadow-lg flex items-center justify-center border border-slate-100">
-                                    <IconHeartbeat size={24} className="text-pink-500" strokeWidth={2} />
-                                </div>
-                            </motion.div>
+    {/* Spinning Ring */}
+    <div className="absolute inset-6 sm:inset-10 lg:inset-14 rounded-full border border-dashed border-[#2076C7]/20 animate-spin-slow" />
 
-                            <motion.div
-                                animate={{ y: [0, -10, 0] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute top-12 right-6 md:top-16 md:right-10 z-30"
-                            >
-                                <div className="w-14 h-14 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full flex items-center justify-center shadow-xl border-4 border-white">
-                                    <IconCheck size={28} className="text-white" strokeWidth={3} />
-                                </div>
-                            </motion.div>
+    {/* Main Circle */}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="relative z-10 w-[260px] h-[260px] sm:w-[320px] sm:h-[320px] md:w-[360px] md:h-[360px] lg:w-[460px] lg:h-[460px] xl:w-[520px] xl:h-[520px] rounded-full flex items-center justify-center shadow-2xl overflow-hidden bg-white"
+    >
 
-                            {/* Floating Icon: Claims (Bottom-Left) */}
-                            <motion.div
-                                animate={{ y: [0, -7, 0] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                                className="absolute bottom-16 left-8 md:bottom-22 md:left-12 z-20"
-                            >
-                                <div className="w-12 h-12 bg-white rounded-2xl shadow-lg flex items-center justify-center border border-slate-100">
-                                    <IconCurrencyRupee size={24} className="text-teal-500" strokeWidth={2} />
-                                </div>
-                            </motion.div>
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#2076C7]/5 to-[#1CADA3]/5" />
 
-                            {/* Floating Verified Badge (Bottom-Right) */}
-                            <motion.div
-                                animate={{ y: [0, -9, 0] }}
-                                transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-                                className="absolute bottom-14 right-8 md:bottom-18 md:right-12 z-20"
-                            >
-                                <div className="w-12 h-12 bg-white rounded-2xl shadow-lg flex items-center justify-center border border-slate-100">
-                                    <IconShieldCheck size={24} className="text-blue-600" strokeWidth={2} />
-                                </div>
-                            </motion.div>
+      <img
+        src="/insurance/cattle insurance.jpeg"
+        alt="Cattle Protection Illustration"
+        className="w-full h-full object-cover object-center"
+      />
 
+    </motion.div>
 
-                        </div>
-                    </motion.div>
+    {/* Floating Badge 1 */}
+    <motion.div
+      animate={{ y: [0, -10, 0] }}
+      transition={{ duration: 4, repeat: Infinity }}
+      className="absolute top-0 right-0 sm:-top-4 sm:-right-2 bg-white p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-lg flex items-center gap-2 border border-[#2076C7]/10 z-20"
+    >
+      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-[#1CADA3] to-[#2076C7] rounded-lg flex items-center justify-center text-white">
+        <IconShieldCheck size={16} />
+      </div>
+      <div className="text-left">
+        <div className="text-[7px] sm:text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+          Protection
+        </div>
+        <div className="text-[10px] sm:text-[12px] font-black text-slate-800 leading-tight">
+          Secure Livestock
+        </div>
+      </div>
+    </motion.div>
 
-                </div>
-            </div>
+    {/* Floating Badge 2 */}
+    <motion.div
+      animate={{ y: [0, 10, 0] }}
+      transition={{ duration: 5, repeat: Infinity }}
+      className="absolute bottom-0 left-0 sm:-bottom-2 sm:-left-2 bg-white p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-lg flex items-center gap-2 border border-[#2076C7]/10 z-20"
+    >
+      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-[#1CADA3] to-[#2076C7] rounded-lg flex items-center justify-center text-white">
+        <IconWorld size={16} />
+      </div>
+      <div className="text-left">
+        <div className="text-[7px] sm:text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+          Global
+        </div>
+        <div className="text-[10px] sm:text-[12px] font-black text-slate-800 leading-tight">
+          Full Coverage
+        </div>
+      </div>
+    </motion.div>
 
-            {/* Stats bar */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="relative z-10 mt-6 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8"
-            >
-                <div className="bg-white/60 backdrop-blur-2xl rounded-[2rem] p-4 shadow-xl border border-white/80 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                    {[
-                        { label: 'Cattle Covered', value: '20 Thousand+' },
-                        { label: 'States Active', value: '15+' },
-                        { label: 'Avg Claim Time', value: '5 Days' },
-                        { label: 'Premium From', value: '₹100/yr' },
-                    ].map((item) => (
-                        <div key={item.label}>
-                            <div className="text-2xl font-extrabold text-slate-800">{item.value}</div>
-                            <div className="text-[10px] text-slate-400 uppercase tracking-widest font-extrabold">{item.label}</div>
-                        </div>
-                    ))}
-                </div>
-            </motion.div>
-        </section>
-    );
+  </div>
+
+</motion.div>
+        </div>
+      </div>
+    </section>
+  );
 }

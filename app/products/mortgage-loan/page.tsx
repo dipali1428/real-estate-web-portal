@@ -13,7 +13,7 @@ import {
     Flame, HardHat, Building2, Trees, Gem, Landmark as Bank, Key, ShoppingBag,
     Stethoscope, Activity, Truck, MapPin, Search, Warehouse, Coins, BadgePercent,
     PiggyBank, BarChart3, Receipt, Scale, UserCheck, CircleDollarSign,
-    Repeat, Wrench, Construction, ChevronDown
+    Repeat, Wrench, Construction, ChevronDown, Plus, Minus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -24,6 +24,13 @@ import { AuthService } from "@/app/services/authService";
 import MortgageLoanForm from './components/MortgageLoanForm';
 import MortgageLoanCalculator from './components/MortgageLoanCalculator';
 import heroImage from './mortgage-loan-hero.png';
+import TiltCard from '../life-insurance/components/TiltCard';
+import CTASection from '@/app/component/CTASection';
+import { useModal } from '@/app/context/ModalContext';
+import ScrollToTop from '@/app/component/ScrollToTop';
+import Chatbot from '@/app/component/chatbot/page';
+
+
 
 const IconMap: Record<string, any> = {
     Home,
@@ -36,13 +43,45 @@ const IconMap: Record<string, any> = {
     Zap
 };
 
+const MORTGAGE_LOAN_FAQS = [
+    { question: "What property types can I pledge?", answer: "You can pledge Residential, Commercial, and Industrial properties including vacant plots (subject to bank policy). The property must have a clear title and should be located in an approved zone." },
+    { question: "How is the loan amount determined?", answer: "The loan amount is primarily based on the Market Value of your property (LTV) and your repayment capacity (Income). Typically, banks fund up to 60-70% of the property value." },
+    { question: "Can I use the funds for any purpose?", answer: "Yes, unlike home loans, Mortgage Loans have no end-use restriction. Use them for business capital, higher education abroad, debt consolidation, or weddings." },
+    { question: "What is Lease Rental Discounting (LRD)?", answer: "LRD is a specialized loan where you pledge the future rental income from your commercial property leased to reputed corporate / retail tenants. It offers the lowest interest rates in the mortgage category." },
+    { question: "Is pre-payment allowed on Mortgage Loans?", answer: "Yes, most lenders allow part-prepayment or full foreclosure. Salaried individuals usually enjoy zero foreclosure charges on floating rate loans, while businesses might have a small fee." },
+    { question: "What is the minimum and maximum tenure for a Mortgage Loan?", answer: "Tenure typically ranges from 1 year up to 15-20 years. Longer tenures are available to ensure lower EMIs, depending on the property type and applicant's age." },
+    { question: "Can I get a loan against a property that is currently rented?", answer: "Absolutely. In fact, if the property is rented to a reputable tenant, you can opt for Lease Rental Discounting (LRD), which often yields higher loan amounts and better rates." },
+    { question: "Are there any tax benefits on Mortgage Loans?", answer: "Tax benefits depend on the end-use. If the funds are used for business, the interest paid can be claimed as a business expense. If used for house construction/renovation, you might be eligible for deductions under Section 24." },
+    { question: "How long does it take for the loan to be disbursed?", answer: "Since it involves legal and technical valuation of the property, it usually takes 7-10 working days from the date of document submission and satisfactory valuation reports." }
+];
+
 export default function MortgageLoanPage() {
     const router = useRouter();
+    const { openLogin, openSignup } = useModal();
     const [isVerifying, setIsVerifying] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [verifiedUserData, setVerifiedUserData] = useState({ name: "", email: "", mobile: "" });
     const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]);
     const [openFaq, setOpenFaq] = useState<number | null>(null);
+    const [showAllFaqs, setShowAllFaqs] = useState(false);
+    const [showBackButton, setShowBackButton] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
+    const [isChecklistOpen, setIsChecklistOpen] = useState(false);
+
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        handleResize(); // Set initial value
+        window.addEventListener('resize', handleResize, { passive: true });
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+
+    useEffect(() => {
+        const handleScroll = () => setShowBackButton(window.scrollY < 80);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // Dynamic Filtered Partners based on Active Category
     const filteredPartners = useMemo(() => {
@@ -111,7 +150,7 @@ export default function MortgageLoanPage() {
     };
 
     const handleBackToOffers = () => router.push('/#services');
-    const handleApply = () => setIsVerifying(true);
+    const handleApply = () => openLogin();
 
     const handleVerificationSuccess = (userData: { name: string, email: string, mobile: string }) => {
         setVerifiedUserData(userData);
@@ -123,178 +162,297 @@ export default function MortgageLoanPage() {
         <>
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbStructuredData) }} />
             <div className="min-h-screen bg-neutral-100 font-sans">
-                {/* NAVIGATION & ACTION BUTTONS */}
-                <div className="fixed z-50 top-17 left-1 md:top-23 md:left-4">
-                    <button onClick={handleBackToOffers} aria-label="Back to Offers" className="md:hidden group flex items-center gap-2 p-2 text-gray-500">
+                {/* FIXED BACK BUTTON */}
+                <div className={`fixed z-50 top-20 left-4 md:top-24 md:left-8 transition-all duration-300 ${showBackButton ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                    <button
+                        onClick={() => router.push('/')}
+                        aria-label="Back to Home"
+                        className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+                    >
                         <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
-                            <ArrowLeft className="w-4 h-4 text-gray-700" />
+                            <ArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
                         </div>
                     </button>
-                    <button onClick={handleBackToOffers} className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg">
-                        <ArrowLeft className="w-4 h-4" /> Back to Offers
-                    </button>
-                </div>
-
-                <div className="fixed z-50 top-17 right-1 md:top-23 md:right-4">
-                    <button onClick={handleApply} className="flex items-center gap-2 px-4 py-2 md:px-6 md:py-2 text-sm md:text-base font-bold text-white bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full md:rounded-lg shadow-lg hover:opacity-90 active:scale-95 transition-all">
-                        Apply Now <Zap className="w-4 h-4 fill-current" />
+                    <button
+                        onClick={() => router.push('/')}
+                        className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group"
+                    >
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+                        Back to Home
                     </button>
                 </div>
 
                 {/* HERO SECTION */}
-                <header className="relative w-full overflow-hidden pt-24 md:pt-32 pb-16 bg-linear-to-r from-blue-50 to-white">
-                    <div className="absolute top-0 right-0 w-1/2 h-full bg-linear-to-l from-blue-50/20 to-transparent pointer-events-none" />
-                    <div className="max-w-7xl mx-auto px-6 relative z-10">
-                        <div className="flex flex-col lg:flex-row items-center gap-16">
+                <header className="relative w-full overflow-hidden pt-24 md:pt-32 pb-16 bg-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                        <div className="flex flex-col lg:flex-row items-center gap-12">
+                            {/* Left Column: Text & CTA */}
                             <motion.div
-                                initial={{ opacity: 0, x: -30 }}
+                                initial={{ opacity: 0, x: -50 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="w-full lg:w-1/2 space-y-8"
+                                transition={{ duration: 0.8, ease: "easeOut" }}
+                                className="w-full lg:w-1/2 text-left space-y-8"
                             >
-                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-[#2076C7] rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">
-                                    <Landmark size={12} /> Property Backed Funding
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E6F7F6] border border-[#1CADA3]/20 mb-6 w-fit">
+                                    <Landmark className="w-4 h-4 text-[#1CADA3]" />
+                                    <span className="text-xs font-bold text-[#1CADA3] tracking-wider uppercase">Property Backed Funding</span>
                                 </div>
-                                <h1 className="text-5xl md:text-7xl font-bold font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent leading-[1.1] mb-6 tracking-tight">
-                                    Unlock Your <br />
-                                    <span className="text-[#2076C7]">Property's Value</span> <br />
-                                    with Rates as <span className="text-[#1CADA3]">Lowest</span>
+
+                                <h1 className="text-5xl md:text-6xl lg:text-7xl font-sans font-bold bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-clip-text text-transparent leading-tight mb-6 tracking-tight">
+                                    <>
+                                        Unlock Your <br />
+                                        <span className="text-[#2076C7]">Property's Value</span> <br />
+                                        with Rates as <span className="text-[#1CADA3]">Lowest</span>
+                                    </>
                                 </h1>
-                                <p className="text-lg md:text-xl text-gray-500 font-medium leading-relaxed max-w-lg">
+
+                                <p className="text-lg md:text-xl lg:text-2xl text-gray-700 max-w-2xl leading-relaxed mb-10">
                                     {offer.description}
                                 </p>
+
                                 <div className="flex flex-wrap gap-5 pt-2">
-                                    <button onClick={handleApply} className="px-10 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-full font-bold shadow-lg hover:opacity-90 transition-all active:scale-95">
-                                        Apply Now
+                                    <button
+                                        onClick={handleApply}
+                                        className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                                    >
+                                        <span className="relative z-10 flex items-center gap-2">
+                                            Apply Now <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                        </span>
+                                    </button>
+                                    <button
+                                        onClick={handleApply}
+                                        className="group relative text-[#2076C7] bg-white px-8 py-4 rounded-lg font-semibold text-lg border-2 border-[#2076C7] shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                                    >
+                                        <span className="relative z-10 transition-colors duration-300 group-hover:text-white">Consult an Advisor</span>
+                                        <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}></div>
                                     </button>
                                 </div>
                             </motion.div>
 
+                            {/* Right Column: Visual Graphic */}
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
+                                initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="w-full lg:w-1/2 relative"
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className="w-full lg:w-1/2 flex items-center justify-center"
                             >
-                                <div className="relative aspect-square w-full max-w-[550px] mx-auto">
-                                    <div className="absolute inset-0 bg-linear-to-br from-[#1CADA3]/10 to-[#2076C7]/10 rounded-full blur-3xl animate-pulse" />
+                                <div className="relative w-full aspect-[4/3] max-w-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
                                     <Image
                                         src={heroImage}
                                         alt="Mortgage Loan"
                                         fill
-                                        className="object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
+                                        className="object-cover hover:scale-105 transition-transform duration-700"
                                         priority
                                     />
 
-                                    {/* Floating Badges */}
-                                    <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute -top-4 right-0 bg-white p-4 rounded-2xl shadow-2xl border border-gray-50 flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-[#1CADA3]"><TrendingUp size={20} /></div>
+                                    {/* Floating Interest Rate Badge */}
+                                    <motion.div
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{
+                                            opacity: 1,
+                                            x: 0,
+                                            y: isMobile ? 0 : [0, -10, 0]
+                                        }}
+                                        transition={{
+                                            opacity: { duration: 0.8, delay: 0.5 },
+                                            x: { duration: 0.8, delay: 0.5 },
+                                            y: isMobile ? { duration: 0.8, delay: 0.5 } : { duration: 3, repeat: Infinity, ease: "easeInOut" }
+                                        }}
+                                        className="absolute top-4 right-4 md:top-6 md:right-6 bg-white/90 backdrop-blur-md p-2.5 md:p-3.5 rounded-2xl shadow-xl border border-white/50 z-20 flex items-center gap-2.5 min-w-[140px]"
+                                    >
+                                        <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-[#2076C7] shrink-0">
+                                            <TrendingUp className="w-4 h-4" />
+                                        </div>
                                         <div>
-                                            <div className="text-[10px] font-black text-gray-400 uppercase">Rates From</div>
-                                            <div className="text-lg font-bold text-gray-800">8.20% <span className="text-xs font-medium">p.a.</span></div>
+                                            <div className="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Rates From</div>
+                                            <div className="text-sm font-extrabold text-[#2076C7]">8.20% <span className="text-[10px] font-medium text-gray-400">*</span></div>
                                         </div>
                                     </motion.div>
 
-                                    <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 3.5, repeat: Infinity }} className="absolute bottom-10 -left-6 bg-white p-4 rounded-2xl shadow-2xl border border-gray-50 flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#2076C7]"><ShieldCheck size={20} /></div>
+                                    {/* Floating Funding Badge */}
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{
+                                            opacity: 1,
+                                            x: 0,
+                                            y: isMobile ? 0 : [0, 10, 0]
+                                        }}
+                                        transition={{
+                                            opacity: { duration: 0.8, delay: 0.7 },
+                                            x: { duration: 0.8, delay: 0.7 },
+                                            y: isMobile ? { duration: 0.8, delay: 0.7 } : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }
+                                        }}
+                                        className="absolute bottom-4 left-4 md:bottom-6 md:left-6 bg-white/90 backdrop-blur-md p-2.5 md:p-3.5 rounded-2xl shadow-xl border border-white/50 z-20 flex items-center gap-2.5 min-w-[140px]"
+                                    >
+                                        <div className="w-8 h-8 rounded-xl bg-teal-100 flex items-center justify-center text-[#1CADA3] shrink-0">
+                                            <ShieldCheck className="w-4 h-4" />
+                                        </div>
                                         <div>
-                                            <div className="text-[10px] font-black text-gray-400 uppercase">Max Funding</div>
-                                            <div className="text-lg font-bold text-gray-800">70% <span className="text-xs font-medium text-gray-400">of Market Value</span></div>
+                                            <div className="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Max Funding</div>
+                                            <div className="text-sm font-extrabold text-[#2076C7]">Up to 70%</div>
                                         </div>
                                     </motion.div>
                                 </div>
                             </motion.div>
                         </div>
                     </div>
+
+                    {/* Bottom Wave Transition Shape */}
+                    <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
+                        <svg className="relative block w-full h-[80px]" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#FFFFFF"></path>
+                        </svg>
+                    </div>
                 </header>
 
                 {/* VARIANTS GRID */}
-                <section className="py-24 bg-neutral-50 px-6">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center mb-16">
-                            <h2 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-6">Choose Your Solution</h2>
-                            <p className="text-gray-500 font-medium max-w-2xl mx-auto">Different assets require different strategies. Explore our specialized mortgage programs.</p>
-                        </div>
+                <section className="py-12 md:py-16 bg-white relative overflow-hidden">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <motion.div
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="text-center mb-16"
+                        >
+                            <motion.h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                                Choose Your Solution
+                            </motion.h2>
+
+                            <motion.p className="text-xl text-gray-500 max-w-3xl mx-auto font-light leading-relaxed">
+                                Different assets require different strategies. Explore our specialized mortgage programs.
+                            </motion.p>
+                        </motion.div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {MORTGAGE_LOAN_TYPES.map((type, idx) => {
-                                const Icon = IconMap[type.icon] || Landmark;
+                            {MORTGAGE_LOAN_TYPES.map((type, index) => {
+                                const IconComponent = IconMap[type.icon] || Landmark;
                                 return (
-                                    <motion.div
-                                        key={idx}
-                                        whileHover={{ y: -10 }}
-                                        className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-[#1CADA3]/10 transition-all group flex flex-col h-full"
-                                    >
-                                        <div className={`w-14 h-14 rounded-2xl mb-6 flex items-center justify-center transition-transform group-hover:scale-110 ${type.color === 'blue' ? 'bg-blue-50 text-[#2076C7]' : 'bg-teal-50 text-[#1CADA3]'}`}>
-                                            <Icon size={28} />
-                                        </div>
-                                        <h3 className="text-xl font-bold text-gray-800 mb-4 group-hover:text-[#2076C7] transition-colors">{type.title}</h3>
-                                        <p className="text-sm text-gray-400 font-medium mb-6 flex-grow leading-relaxed">{type.description}</p>
-
-                                        <div className="space-y-3 mb-8">
-                                            {type.benefits.map((b, i) => (
-                                                <div key={i} className="flex items-center gap-2 text-xs font-bold text-gray-600">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-[#1CADA3]" /> {b}
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <button
-                                            onClick={() => {
-                                                setActiveCategory(type.category);
-                                                document.getElementById('partners-section')?.scrollIntoView({ behavior: 'smooth' });
-                                            }}
-                                            className="w-full py-4 rounded-2xl bg-neutral-50 text-gray-700 font-black text-xs uppercase tracking-widest hover:bg-[#2076C7] hover:text-white transition-all active:scale-95"
+                                    <TiltCard key={index}>
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 30 }}
+                                            whileInView={{ opacity: 1, y: -4 }}
+                                            viewport={{ once: true }}
+                                            transition={{ delay: index * 0.1 }}
+                                            className="group relative bg-white rounded-[2.5rem] p-6 border border-gray-200/50 shadow-xl transition-all duration-500 flex flex-col h-full overflow-hidden items-center text-center"
                                         >
-                                            Compare Plans
-                                        </button>
-                                    </motion.div>
-                                )
+
+                                            {/* Top corner decoration */}
+                                            <div className="absolute top-0 right-0 w-16 h-16 bg-[#F8FAFC] rounded-bl-[1.5rem] -mr-8 -mt-8" />
+
+                                            {/* Icon Box */}
+                                            <div className="self-center mb-4 w-14 h-14 rounded-2xl bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] flex items-center justify-center shrink-0">
+                                                <IconComponent className="w-7 h-7 text-white" />
+                                            </div>
+
+                                            {/* Content Header */}
+                                            <h3 className="text-xl font-extrabold font-sans text-gray-800 leading-tight mb-2 text-center w-full">
+                                                {type.title}
+                                            </h3>
+
+                                            <p className="text-gray-500 mb-4 leading-relaxed text-sm text-center w-full">
+                                                {type.description}
+                                            </p>
+
+                                            {/* Sections */}
+                                            <div className="space-y-4 flex-grow w-full max-w-[260px] mx-auto">
+                                                <div className="space-y-1.5 text-left">
+                                                    <span className="text-[10px] font-black text-[#1CADA3] uppercase tracking-[0.1em]">Benefits:</span>
+                                                    <ul className="space-y-2">
+                                                        {type.benefits.map((benefit, i) => (
+                                                            <li key={i} className="flex items-start gap-3 text-sm text-gray-600">
+                                                                <CheckCircle className="w-4 h-4 text-[#2076C7] mt-0.5 shrink-0" />
+                                                                <span className="font-medium">{benefit}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            {/* Action Button */}
+                                            <button
+                                                onClick={() => {
+                                                    openSignup();
+                                                }}
+                                                className="mt-8 relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-white rounded-2xl font-bold font-sans text-lg overflow-hidden transition-all duration-300 shadow-[0_15px_30px_-10px_rgba(28,173,163,0.4)] self-center group/btn cursor-pointer active:scale-95"
+                                            >
+                                                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out" />
+                                                <span className="relative z-10 flex items-center gap-2">
+                                                    Apply now
+                                                    <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                                                </span>
+                                            </button>
+                                        </motion.div>
+                                    </TiltCard>
+                                );
                             })}
                         </div>
                     </div>
                 </section>
 
-                {/* PARTNER BANKS SECTION */}
-                <section id="partners-section" className="py-24 bg-white px-6">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="bg-neutral-50 rounded-[48px] p-8 md:p-16 border border-gray-100 overflow-hidden relative">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-[#2076C7]/5 rounded-full blur-3xl -mr-32 -mt-32" />
 
-                            <div className="relative z-10 flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
-                                <div className="max-w-xl">
-                                    <h2 className="text-3xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">Our Partner Banks</h2>
-                                    <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">Top-tier banks supporting {activeCategory}</p>
+                {/* PARTNER BANKS SECTION */}
+                <section id="partners-section" className="py-12 md:py-16 bg-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-inner border border-gray-100 relative overflow-hidden">
+                            {/* Decorative Background */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-[#2076C7]/5 to-transparent rounded-full blur-3xl -mr-32 -mt-32" />
+
+                            <div className="relative z-10 flex flex-col items-center justify-center text-center gap-6 mb-12">
+                                <div className="text-center">
+                                    <h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Our Partner Banks</h2>
+
+                                    <p className="text-gray-500 font-medium">Top-rated financial institutions supporting your {activeCategory.toLowerCase()} needs</p>
                                 </div>
-                                <div className="flex gap-2 p-1.5 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto no-scrollbar max-w-full">
-                                    {CATEGORIES.map(c => (
+                            </div>
+
+                            {/* CATEGORY TABS FOR PARTNERS */}
+                            <div className="mb-10 relative z-10">
+                                <div className="flex flex-nowrap items-center gap-2 md:gap-4 p-2 bg-white rounded-2xl border border-gray-100 w-full overflow-x-auto no-scrollbar justify-start lg:justify-center">
+                                    {CATEGORIES.map((category) => (
                                         <button
-                                            key={c}
-                                            onClick={() => setActiveCategory(c)}
-                                            className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeCategory === c ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg' : 'text-gray-400 hover:text-gray-800'}`}
+                                            key={category}
+                                            onClick={() => setActiveCategory(category)}
+                                            className={`px-4 md:px-6 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeCategory === category
+                                                ? 'bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-white shadow-md'
+                                                : 'text-gray-500 hover:bg-white hover:text-[#2076C7]'
+                                                }`}
                                         >
-                                            {c}
+                                            {category}
                                         </button>
                                     ))}
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 relative z-10">
                                 <AnimatePresence mode="popLayout">
-                                    {filteredPartners.map((bank, i) => (
-                                        <motion.div
-                                            key={bank.name}
-                                            layout
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.9 }}
-                                            transition={{ delay: i * 0.05 }}
-                                            className="bg-white p-6 rounded-3xl border border-gray-100 flex items-center gap-4 hover:shadow-xl transition-all cursor-pointer group"
-                                        >
-                                            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-all" style={{ backgroundColor: `${bank.color}10` }}>
-                                                <Bank style={{ color: bank.color }} size={24} />
-                                            </div>
-                                            <span className="text-[11px] font-black text-gray-700 uppercase tracking-tight group-hover:text-[#2076C7]">{bank.name}</span>
-                                        </motion.div>
-                                    ))}
+                                    {filteredPartners.length > 0 ? (
+                                        filteredPartners.map((bank, index) => (
+                                            <TiltCard key={bank.name}>
+                                                <motion.div
+                                                    layout
+                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    exit={{ opacity: 0, scale: 0.9 }}
+                                                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                                                    className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center gap-4 hover:shadow-lg hover:shadow-gray-200/40 transition-all duration-300 group cursor-pointer h-full"
+                                                >
+                                                    <div
+                                                        className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
+                                                        style={{ backgroundColor: `${bank.color}10` }}
+                                                    >
+                                                        <Bank className="w-6 h-6" style={{ color: bank.color }} />
+                                                    </div>
+                                                    <span className="text-[11px] font-bold font-sans text-gray-700 leading-tight group-hover:text-[#2076C7] transition-colors uppercase">
+                                                        {bank.name}
+                                                    </span>
+                                                </motion.div>
+                                            </TiltCard>
+                                        ))
+                                    ) : (
+                                        <div className="col-span-full py-12 text-center text-gray-400 font-medium italic">
+                                            Exploring tailored partners for this category...
+                                        </div>
+                                    )}
                                 </AnimatePresence>
                             </div>
                         </div>
@@ -302,38 +460,49 @@ export default function MortgageLoanPage() {
                 </section>
 
                 {/* CALCULATOR SECTION */}
-                <section className="py-24 bg-neutral-50 px-6">
-                    <div className="max-w-5xl mx-auto">
-                        <div className="text-center mb-16">
-                            <h2 className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">Precision Planning</h2>
-                            <p className="text-gray-500 font-medium">Fine-tune your finances with our specialized LAP calculator.</p>
+                <section className="py-12 md:py-16 bg-white border-y border-gray-100">
+                    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <motion.div initial="hidden" whileInView="visible" className="text-center mb-16">
+                            <motion.h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                                Precision Planning
+                            </motion.h2>
+
+                            <motion.p className="text-xl text-gray-500 max-w-3xl mx-auto font-light leading-relaxed">
+                                Fine-tune your finances with our specialized LAP calculator.
+                            </motion.p>
+                        </motion.div>
+                        <div className="mb-12">
+                            <Suspense fallback={<div className="flex justify-center items-center py-12">Loading calculator...</div>}>
+                                <MortgageLoanCalculator />
+                            </Suspense>
                         </div>
-                        <MortgageLoanCalculator />
                     </div>
                 </section>
 
                 {/* DETAILED VARIANTS COMPARISON */}
-                <section className="py-24 bg-white px-6">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center mb-16">
-                            <h2 className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
+                <section className="py-12 md:py-16 bg-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <motion.div initial="hidden" whileInView="visible" className="text-center mb-16">
+                            <motion.h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                                 Explore Mortgage Variants
-                            </h2>
-                            <p className="text-gray-500 font-medium max-w-2xl mx-auto">
+                            </motion.h2>
+
+                            <motion.p className="text-xl text-gray-500 max-w-3xl mx-auto font-light leading-relaxed">
                                 A side-by-side analysis of our specialized mortgage solutions to help you find the perfect fit.
-                            </p>
-                        </div>
+                            </motion.p>
+                        </motion.div>
 
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            className="bg-neutral-50 rounded-[40px] p-4 md:p-10 shadow-inner border border-gray-100 overflow-hidden"
+                            viewport={{ once: true }}
+                            className="rounded-[2.5rem] border border-gray-100 overflow-hidden bg-white shadow-sm"
                         >
                             <div className="overflow-x-auto no-scrollbar">
                                 <table className="w-full text-left border-collapse min-w-[1000px]">
                                     <thead>
-                                        <tr className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white">
-                                            <th className="px-6 py-6 text-sm font-black uppercase tracking-widest text-white/90 whitespace-nowrap">Feature</th>
+                                        <tr className="bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-white">
+                                            <th className="px-6 py-6 text-[11px] font-black uppercase tracking-[0.15em] text-white/90 whitespace-nowrap">Feature</th>
                                             <th className="px-6 py-6 text-lg font-bold text-white">Residential LAP</th>
                                             <th className="px-6 py-6 text-lg font-bold text-white">Commercial LAP</th>
                                             <th className="px-6 py-6 text-lg font-bold text-white">LRD Facility</th>
@@ -368,27 +537,29 @@ export default function MortgageLoanPage() {
                 </section>
 
                 {/* COMPARISON SECTION */}
-                <section className="py-24 bg-neutral-50 border-y border-gray-100 px-6">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center mb-16">
-                            <h2 className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
+                <section className="py-12 md:py-16 bg-white border-y border-gray-100">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <motion.div initial="hidden" whileInView="visible" className="text-center mb-16">
+                            <motion.h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                                 Mortgage Loan vs Personal Loan vs LAP
-                            </h2>
-                            <p className="text-gray-500 font-medium max-w-2xl mx-auto">
+                            </motion.h2>
+
+                            <motion.p className="text-xl text-gray-500 max-w-3xl mx-auto font-light leading-relaxed">
                                 Analysis of property-backed funding compared to other major credit facilities.
-                            </p>
-                        </div>
+                            </motion.p>
+                        </motion.div>
 
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            className="bg-white rounded-[40px] p-4 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden"
+                            viewport={{ once: true }}
+                            className="rounded-[2.5rem] border border-gray-100 overflow-hidden bg-white shadow-sm"
                         >
                             <div className="overflow-x-auto no-scrollbar">
                                 <table className="w-full text-left border-collapse min-w-[600px]">
                                     <thead>
-                                        <tr className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white">
-                                            <th className="px-6 py-6 text-sm font-black uppercase tracking-widest text-white/90">Feature</th>
+                                        <tr className="bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-white">
+                                            <th className="px-6 py-6 text-[11px] font-black uppercase tracking-[0.15em] text-white/90">Feature</th>
                                             <th className="px-6 py-6 text-lg font-bold text-white">Mortgage Loan</th>
                                             <th className="px-6 py-6 text-lg font-bold text-white">Personal Loan</th>
                                             <th className="px-6 py-6 text-lg font-bold text-white">Business Loan</th>
@@ -428,86 +599,210 @@ export default function MortgageLoanPage() {
                 </section>
 
                 {/* ELIGIBILITY & DOCUMENTS */}
-                <section className="py-24 bg-white px-6">
-                    <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
-                        <div className="space-y-12">
-                            <div>
-                                <h2 className="text-3xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-8 uppercase tracking-tight">Eligibility Criteria</h2>
-                                <div className="space-y-4">
+                <section className="py-12 md:py-16 bg-white">
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="bg-white rounded-[40px] p-8 md:p-12 border border-gray-100 shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-blue-50/50 to-emerald-50/50 rounded-bl-full -mr-16 -mt-16 opacity-50" />
+
+                            <div className="relative z-10">
+                                <motion.h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight text-center">Eligibility Criteria</motion.h2>
+
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
                                     {offer.eligibility.map((item, i) => (
-                                        <motion.div whileHover={{ x: 10 }} key={i} className="flex items-center gap-4 p-5 bg-neutral-50 rounded-2xl border border-gray-100">
-                                            <div className="w-6 h-6 rounded-full bg-[#1CADA3] flex items-center justify-center text-white text-[10px] font-black">{i + 1}</div>
-                                            <span className="text-sm font-bold text-gray-600">{item}</span>
+                                        <motion.div
+                                            whileHover={{ y: -2, boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
+                                            key={i}
+                                            className="flex items-center gap-4 p-5 bg-gray-50/50 rounded-2xl border border-gray-100 transition-all"
+                                        >
+                                            <div className="w-6 h-6 rounded-full bg-white shadow-sm flex items-center justify-center text-[#2076C7] text-[10px] font-black border border-blue-100">{i + 1}</div>
+                                            <span className="text-sm font-bold text-gray-700">{item}</span>
                                         </motion.div>
                                     ))}
                                 </div>
-                            </div>
-                        </div>
 
-                        <div className="bg-neutral-50 rounded-[48px] p-8 md:p-12 border border-gray-100 shadow-inner relative overflow-hidden">
-                            <h2 className="text-3xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-12 uppercase tracking-tight">Document Bundle</h2>
-                            <div className="space-y-10 relative z-10">
-                                <div>
-                                    <h4 className="text-[10px] font-black text-[#2076C7] uppercase tracking-[0.2em] mb-4">Property Chain</h4>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        {offer.documents.propertyDocs.map((doc, i) => (
-                                            <div key={i} className="flex items-center gap-2 p-3 bg-white border border-gray-100 rounded-xl text-xs font-bold text-gray-500 hover:border-[#2076C7]/30 transition-all">
-                                                <FileText size={14} className="text-[#2076C7]" /> {doc}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                {/* Integrated Document Checklist Toggle */}
+                                <div className="flex flex-col items-center">
+                                    <button
+                                        onClick={() => setIsChecklistOpen(!isChecklistOpen)}
+                                        className="group relative flex items-center gap-3 px-8 py-4 bg-white border-2 border-[#2076C7]/20 hover:border-[#2076C7] rounded-2xl transition-all duration-300 text-[#2076C7] font-bold shadow-sm hover:shadow-md cursor-pointer overflow-hidden"
+                                    >
+                                        <div className="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <FileText className="relative z-10 w-5 h-5" />
+                                        <span className="relative z-10">{isChecklistOpen ? "Hide Required Documents" : "View Required Documents"}</span>
+                                        <ChevronDown className={`relative z-10 w-5 h-5 transition-transform duration-500 ${isChecklistOpen ? 'rotate-180' : ''}`} />
+                                    </button>
 
-                                <div>
-                                    <h4 className="text-[10px] font-black text-[#1CADA3] uppercase tracking-[0.2em] mb-4">Income Suite</h4>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        {offer.documents.incomeSelfEmployed.slice(0, 4).map((doc, i) => (
-                                            <div key={i} className="flex items-center gap-2 p-3 bg-white border border-gray-100 rounded-xl text-xs font-bold text-gray-500 hover:border-[#1CADA3]/30 transition-all">
-                                                <PieChart size={14} className="text-[#1CADA3]" /> {doc}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                    <AnimatePresence>
+                                        {isChecklistOpen && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.5, ease: "easeInOut" }}
+                                                className="w-full overflow-hidden"
+                                            >
+                                                <div className="pt-10 space-y-10">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                        <div>
+                                                            <h4 className="text-[10px] font-black text-[#2076C7] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-[#2076C7]" />
+                                                                Property Chain
+                                                            </h4>
+                                                            <div className="grid grid-cols-1 gap-2">
+                                                                {offer.documents.propertyDocs.map((doc, i) => (
+                                                                    <div key={i} className="flex items-center gap-2 p-3 bg-gray-50/80 border border-gray-100 rounded-xl text-xs font-bold text-gray-600">
+                                                                        <CheckCircle size={14} className="text-[#2076C7] shrink-0" /> {doc}
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
 
-                                <div className="pt-8 border-t border-gray-200">
-                                    <p className="text-xs text-gray-400 font-bold leading-relaxed italic">* Additional documents may be required based on specific profile or technical valuation of property.</p>
+                                                        <div>
+                                                            <h4 className="text-[10px] font-black text-[#1CADA3] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-[#1CADA3]" />
+                                                                Income Suite
+                                                            </h4>
+                                                            <div className="grid grid-cols-1 gap-2">
+                                                                {offer.documents.incomeSelfEmployed.slice(0, 4).map((doc, i) => (
+                                                                    <div key={i} className="flex items-center gap-2 p-3 bg-gray-50/80 border border-gray-100 rounded-xl text-xs font-bold text-gray-600">
+                                                                        <CheckCircle size={14} className="text-[#1CADA3] shrink-0" /> {doc}
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-4 bg-amber-50/50 border border-amber-100/50 rounded-2xl flex items-start gap-3">
+                                                        <Clock size={16} className="text-amber-500 mt-0.5 shrink-0" />
+                                                        <p className="text-[11px] text-amber-800 font-bold leading-relaxed italic">
+                                                            * Additional documents may be required based on specific profile or technical valuation of property. Processing time is usually 7-10 working days.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
+                {/* PROCESS OVERVIEW */}
+                <section className="py-12 md:py-16 bg-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <motion.div initial="hidden" whileInView="visible" className="text-center mb-16">
+                            <motion.h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                                Process Overview
+                            </motion.h2>
+
+                            <motion.p className="text-xl text-gray-500 max-w-3xl mx-auto font-light">
+                                A simple, transparent journey from application to disbursement.
+                            </motion.p>
+                        </motion.div>
+
+                        <motion.section
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="bg-white rounded-[40px] shadow-sm border border-gray-100 p-8 md:p-12"
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 relative">
+                                {[
+                                    { step: "1", title: "Check Eligibility", details: ["Share basic details like income, loan amount, and employment type", "Our team helps you check eligibility across multiple banks"] },
+                                    { step: "2", title: "Submit Documents", details: ["Provide required KYC and income documents", "Documents are verified by the bank"] },
+                                    { step: "3", title: "Application & Processing", details: ["Application is submitted to selected bank", "Bank evaluates credit score and property", "Legal & technical verification conducted"] },
+                                    { step: "4", title: "Loan Approval", details: ["Bank issues Sanction Letter", "Loan amount, rate & tenure confirmed"] },
+                                    { step: "5", title: "Loan Disbursement", details: ["Agreement signing", "Loan amount disbursed to seller / builder"] }
+                                ].map((item, index) => (
+                                    <TiltCard key={index}>
+                                        <motion.div
+                                            whileHover={{ y: -5, boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }}
+                                            className="relative z-10 flex flex-col items-center text-center p-4 bg-white rounded-xl border border-gray-100 hover:border-[#1CADA3] transition-all group h-full"
+                                        >
+                                            <div className="w-16 h-16 rounded-full bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] flex items-center justify-center text-white font-bold text-2xl mb-4 group-hover:scale-110 transition-transform">
+                                                {item.step}
+                                            </div>
+                                            <h3 className="font-bold text-gray-800 mb-3 text-sm md:text-base leading-tight min-h-[40px] flex items-center justify-center">
+                                                {item.title}
+                                            </h3>
+                                            <ul className="space-y-2 text-left">
+                                                {item.details.map((detail, idx) => (
+                                                    <li key={idx} className="text-xs text-gray-600 flex items-start gap-1.5">
+                                                        <span className="text-[#1CADA3] mt-1 shrink-0">•</span>
+                                                        {detail}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </motion.div>
+                                    </TiltCard>
+                                ))}
+                            </div>
+                        </motion.section>
+                    </div>
+                </section>
+
+                {/* Section Divider */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="h-0.5 bg-linear-to-r from-transparent to-transparent opacity-40 rounded-full" />
+                </div>
+
+                {/* DISCLAIMER SECTION */}
+                <section className="py-2 bg-white font-sans">
+                    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="bg-yellow-50 border border-yellow-100 rounded-xl p-3 md:p-4 flex flex-col md:flex-row items-center gap-3"
+                        >
+                            <div className="w-8 h-8 rounded-lg bg-white shadow-sm border border-yellow-100 flex items-center justify-center shrink-0">
+                                <ShieldCheck className="w-4 h-4 text-[#2076C7]" />
+                            </div>
+                            <div className="space-y-0.5 text-center md:text-left">
+                                <h3 className="text-sm font-bold text-black">Disclaimer:</h3>
+                                <p className="text-[10px] text-gray-700 leading-relaxed font-semibold">
+                                    The interest rates, loan amounts, and tenures mentioned are indicative and subject to the lender&apos;s final credit evaluation. Approval is at the sole discretion of the bank/HFC based on the property valuation, legal reports, and the applicant&apos;s financial profile.
+                                </p>
+                            </div>
+                        </motion.div>
+                    </div>
+                </section>
+
                 {/* FAQ SECTION */}
-                <section className="py-24 bg-neutral-50 px-6">
-                    <div className="max-w-4xl mx-auto">
-                        <div className="text-center mb-16">
-                            <h2 className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4 tracking-tight">FQA</h2>
-                            <p className="text-gray-500 font-medium uppercase tracking-widest text-[10px]">Your queries addressed by professionals</p>
+
+                <section className="py-12 md:py-16 bg-white">
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Frequently Asked Questions</h2>
+
+                            <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed font-light">Got questions about mortgage loans? We&apos;ve got answers.</p>
                         </div>
 
-                        <div className="space-y-6">
-                            {[
-                                { q: "What property types can I pledge?", a: "You can pledge Residential, Commercial, and Industrial properties including vacant plots (subject to bank policy). The property must have a clear title and should be located in an approved zone." },
-                                { q: "How is the loan amount determined?", a: "The loan amount is primarily based on the Market Value of your property (LTV) and your repayment capacity (Income). Typically, banks fund up to 60-70% of the property value." },
-                                { q: "Can I use the funds for any purpose?", a: "Yes, unlike home loans, Mortgage Loans have no end-use restriction. Use them for business capital, higher education abroad, debt consolidation, or weddings." },
-                                { q: "What is Lease Rental Discounting (LRD)?", a: "LRD is a specialized loan where you pledge the future rental income from your commercial property leased to reputed corporate / retail tenants. It offers the lowest interest rates in the mortgage category." }
-                            ].map((faq, i) => (
-                                <div key={i} className="bg-white rounded-3xl border border-gray-100 overflow-hidden">
+                        <div className="space-y-4">
+                            {(showAllFaqs ? MORTGAGE_LOAN_FAQS : MORTGAGE_LOAN_FAQS.slice(0, 5)).map((faq, idx) => (
+                                <div key={idx} className="border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#2076C7]/30 hover:shadow-md">
                                     <button
-                                        onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                                        className="w-full p-8 flex justify-between items-center text-left group transition-all"
+                                        onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                                        className="w-full px-6 py-4 sm:py-5 text-left flex justify-between items-start gap-4 bg-gray-50/50 hover:bg-blue-50/50 transition-colors focus:outline-none cursor-pointer group"
                                     >
-                                        <span className="text-lg font-bold text-gray-700 group-hover:text-[#2076C7] transition-colors">{faq.q}</span>
-                                        <div className={`p-2 rounded-full transition-all ${openFaq === i ? 'bg-[#2076C7] text-white rotate-180' : 'bg-[#2076C7]/5 text-[#2076C7]'}`}>
-                                            <ChevronDown size={20} />
+                                        <span className="font-bold text-gray-700 text-base sm:text-lg pr-2 group-hover:text-[#2076C7] transition-colors leading-tight">{faq.question}</span>
+                                        <div className={`p-1.5 rounded-full bg-white border border-gray-200 text-gray-700 transition-transform duration-300 shrink-0 ${openFaq === idx ? 'rotate-180 bg-[#2076C7] border-[#2076C7] text-white' : ''}`}>
+                                            {openFaq === idx ? <Minus size={18} strokeWidth={3} /> : <Plus size={18} strokeWidth={3} />}
                                         </div>
                                     </button>
+
                                     <AnimatePresence>
-                                        {openFaq === i && (
-                                            <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
-                                                <div className="px-8 pb-8 text-gray-500 font-medium leading-relaxed bg-neutral-50/50">
-                                                    <div className="h-0.5 w-12 bg-gray-200 mb-6" />
-                                                    {faq.a}
+                                        {openFaq === idx && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                className="overflow-hidden bg-white"
+                                            >
+                                                <div className="px-8 pb-6 text-gray-600 text-base leading-relaxed border-t border-gray-50 pt-4">
+                                                    {faq.answer}
                                                 </div>
                                             </motion.div>
                                         )}
@@ -515,32 +810,23 @@ export default function MortgageLoanPage() {
                                 </div>
                             ))}
                         </div>
+
+                        {MORTGAGE_LOAN_FAQS.length > 5 && (
+                            <div className="text-center mt-10">
+                                <button
+                                    onClick={() => setShowAllFaqs(!showAllFaqs)}
+                                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-blue-50 text-[#2076C7] font-bold hover:bg-blue-100 transition-all cursor-pointer shadow-sm active:scale-95"
+                                >
+                                    {showAllFaqs ? 'View Less' : 'View More Questions'}
+                                    <Plus className={`w-5 h-5 transition-transform duration-300 ${showAllFaqs ? 'rotate-45' : ''}`} />
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </section>
 
                 {/* FINAL CTA */}
-                <section className="py-24 bg-white px-6">
-                    <div className="max-w-4xl mx-auto">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            className="p-12 md:p-16 shadow-2xl rounded-3xl relative overflow-hidden bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-center"
-                        >
-                            <motion.h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Get Started?</motion.h2>
-                            <motion.p className="text-lg md:text-xl text-white/90 mb-10 leading-relaxed font-light mx-auto max-w-2xl">
-                                Apply now for {offer.title} and get expert guidance throughout the process.
-                            </motion.p>
-                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                <button onClick={handleApply} className="bg-white text-[#2076C7] hover:bg-white/90 px-10 py-4 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                                    Apply Now
-                                </button>
-                                <a href="/#contact" className="bg-transparent border-2 border-white text-white hover:bg-white/10 px-10 py-4 rounded-xl font-bold transition-all flex items-center justify-center">
-                                    Contact Us
-                                </a>
-                            </div>
-                        </motion.div>
-                    </div>
-                </section>
+                <CTASection />
 
                 {/* MODALS */}
                 {isVerifying && (
@@ -561,10 +847,13 @@ export default function MortgageLoanPage() {
                         </div>
                     </div>
                 )}
+                <Chatbot />
             </div>
+            <ScrollToTop />
         </>
     );
 }
+
 
 /**
  * 🔹 Verification Component (Internal Modal) - Shared Premium Style
