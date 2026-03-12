@@ -1,6 +1,6 @@
 "use client"
 
-import { taxGuideData } from "../utils/TaxGuideData";
+import { taxGuideData } from "../../../utils/TaxGuideData";
 import { ShieldCheck, Receipt, Percent, Info } from 'lucide-react';
 
 const TaxGuideContent = () => {
