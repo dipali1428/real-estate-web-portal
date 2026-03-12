@@ -213,30 +213,37 @@ const groupEventsByMonth = (eventsByYear: { [year: string]: Event[] }) => {
 
 const EventCard: React.FC<{ event: Event; index: number }> = ({ event }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden transition-transform duration-300 hover:scale-105 w-full">
-      <LazyImageCarousel
-        images={getEventImages(event)}
-        alt={`${event.city} Business Event`}
-        delay={3500}
-      />
-      <div className="p-6">
-        <h4 className="text-lg md:text-xl font-semibold text-gray-700 mb-2">
-          {event.city} Business Event
-        </h4>
-        <p className="text-gray-600 text-sm md:text-base mb-3">{event.desc}</p>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center text-sm text-gray-500">
-            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-            </svg>
-            {event.city}
-          </div>
-          <span className="bg-teal-100 text-teal-800 text-xs font-semibold px-2 py-1 rounded">
-            {event.date}
-          </span>
-        </div>
+ <div className="bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 transform hover:-translate-y-1 w-full font-sans border border-gray-100">
+  <LazyImageCarousel
+    images={getEventImages(event)}
+    alt={`${event.city} Business Event`}
+    delay={3500}
+  />
+  <div className="p-5">
+    {/* Date Tag moved to top for a cleaner look */}
+    <div className="flex justify-between items-start mb-2">
+      <h4 className="text-lg font-bold text-gray-900 tracking-tight leading-tight">
+        {event.city} Business Event
+      </h4>
+      <span className="bg-teal-50 text-teal-700 text-[10px] uppercase font-bold px-2 py-1 rounded-md border border-teal-100 whitespace-nowrap">
+        {event.date}
+      </span>
+    </div>
+
+    <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">
+      {event.desc}
+    </p>
+
+    <div className="flex items-center pt-3 border-t border-gray-50">
+      <div className="flex items-center text-xs font-medium text-gray-400">
+        <svg className="w-3.5 h-3.5 mr-1 text-teal-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+        </svg>
+        {event.city}
       </div>
     </div>
+  </div>
+</div>
   );
 };
 
@@ -406,21 +413,45 @@ const EventSection: React.FC = () => {
         </div>
 
         {/* ===== Events Section ===== */}
-        <div className="mb-16 pb-16 border-b border-gray-200">
-          <SectionHeader 
-            title="Business Events"
-            isOpen={expanded.events}
-            onToggle={() => toggle('events')}
-            description={<>Join <span className="font-semibold text-teal-600">Infinity Arthvishva</span> across India for networking, workshops, and business growth opportunities.</>}
-          />
-          {expanded.events && (
-            <div className="transition-all duration-500">
-              {Object.keys(eventsByMonth).map((month) => (
-                <EventMonthSection key={month} month={month} events={eventsByMonth[month]} />
-              ))}
-            </div>
-          )}
-        </div>
+<div className="mb-20 font-sans">
+  {/* Main Container - Removed inner padding to let content breathe */}
+  <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-8 md:p-12 transition-all duration-500">
+    
+    <SectionHeader
+      title="Business Events"
+      isOpen={expanded.events}
+      onToggle={() => toggle("events")}
+      description={
+        <span className="text-gray-500">
+          Join <span className="font-semibold text-teal-600">Infinity Arthvishva</span> across 
+          India for networking, workshops, and business growth opportunities.
+        </span>
+      }
+    />
+
+    {/* Elegant Divider */}
+    <div className="mt-8 mb-12 h-px w-full bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100" />
+
+    {expanded.events && (
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        {Object.keys(eventsByMonth).map((month) => (
+          <div
+            key={month}
+            className="group relative bg-white border border-gray-100 rounded-3xl p-8 transition-all duration-500 hover:border-teal-100 hover:shadow-lg hover:shadow-teal-500/5"
+          >
+            {/* Subtle Month Header Accent */}
+            <div className="absolute left-0 top-0 w-1.5 h-full bg-teal-500 rounded-l-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            <EventMonthSection
+              month={month}
+              events={eventsByMonth[month]}
+            />
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
 
         {/* ===== Life at Infinity Section ===== */}
         <div className="mb-16 pb-16 border-b border-gray-200">
@@ -460,15 +491,15 @@ const EventSection: React.FC = () => {
               <div className="text-gray-600">Total Events</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">127+</div>
+              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">134+</div>
               <div className="text-gray-600">Cities Covered</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">2</div>
+              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">3</div>
               <div className="text-gray-600">Years</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">10000+</div>
+              <div className="text-3xl md:text-4xl font-bold font-sans text-teal-600">15000+</div>
               <div className="text-gray-600">Participants</div>
             </div>
           </div>
