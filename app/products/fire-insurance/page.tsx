@@ -13,6 +13,7 @@ import FireInsuranceForm from "../../component/products/forms/insurance/fireinsu
 import ScrollToTop from "@/app/component/ScrollToTop";
 import ChatbotWidget from "@/app/component/chatbot/page";
 import FireCTA from "./components/FireCTA";
+import { useModal } from "../../context/ModalContext";
 export default function FireInsurancePage() {
     const [mounted, setMounted] = useState(false);
     const [showForm, setShowForm] = useState(false);
@@ -22,9 +23,11 @@ export default function FireInsurancePage() {
         window.scrollTo(0, 0);
     }, []);
 
+    const { openLogin } = useModal();
+
     if (!mounted) return null;
 
-    const openForm = () => setShowForm(true);
+    const openForm = () => openLogin();
     const closeForm = () => setShowForm(false);
 
     return (
