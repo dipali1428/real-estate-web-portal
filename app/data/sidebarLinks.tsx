@@ -146,6 +146,104 @@ export const sidebarLinks = {
                         },
                     ],
                 },
+                {
+                    label: "Insurance Panel",
+                    icon: <Users className="h-4 w-4 text-neutral-700" />,
+                    children: [
+                        {
+                            label: "Health Insurance",
+                            href: "/customer/insurance/health",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Life Insurance",
+                            href: "/customer/insurance/life",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                    ],
+                },
+                {
+                    label: "Loan Panel",
+                    icon: <Users className="h-4 w-4 text-neutral-700" />,
+                    children: [
+                        {
+                            label: "Home Loan",
+                            href: "/customer/insurance/home",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Personal Loan",
+                            href: "/customer/insurance/personal",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                    ],
+                },
+                {
+                    label: "Credit Panel",
+                    icon: <Users className="h-4 w-4 text-neutral-700" />,
+                    children: [
+                        {
+                            label: "Credit1",
+                            href: "/customer/insurance/credit1",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Credit2",
+                            href: "/customer/insurance/credit2",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                    ],
+                },
+                {
+                    label: "PMS Panel",
+                    icon: <Users className="h-4 w-4 text-neutral-700" />,
+                    children: [
+                        {
+                            label: "PMS1",
+                            href: "/customer/insurance/pms1",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "PMS2",
+                            href: "/customer/insurance/pms2",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                    ],
+                },
+                {
+                    label: "Investments Panel",
+                    icon: <Users className="h-4 w-4 text-neutral-700" />,
+                    children: [
+                        {
+                            label: "Investment1",
+                            href: "/customer/insurance/investment1",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Investment2",
+                            href: "/customer/insurance/investment2",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                    ],
+                },
+                                {
+                    label: "Real Estate Panel",
+                    icon: <Users className="h-4 w-4 text-neutral-700" />,
+                    children: [
+                        {
+                            label: "Real Estate1",
+                            href: "/customer/insurance/real-estate1",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Real Estate2",
+                            href: "/customer/insurance/real-estate2",
+                            icon: <Users className="h-4 w-4 text-neutral-700" />,
+                        },
+                    ],
+                },
+
+
             ],
         },
         { label: "Portfolio", href: "/customer/portfolio", icon: <User className="h-5 w-5 text-neutral-700" /> },
