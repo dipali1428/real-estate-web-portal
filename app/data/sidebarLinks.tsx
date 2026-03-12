@@ -127,12 +127,7 @@ export const sidebarLinks = {
                             label: "Transactions",
                             href: "/customer/unlisted/transactions",
                             icon: <Activity className="h-4 w-4 text-neutral-700" />,
-                        },
-                        {
-                            label: "Documents",
-                            href: "/customer/unlisted/documents",
-                            icon: <FolderOpen className="h-4 w-4 text-neutral-700" />,
-                        },               
+                        },  
                     ],
                 },
                 {
