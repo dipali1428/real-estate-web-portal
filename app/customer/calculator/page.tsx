@@ -483,50 +483,9 @@ export default function CalculatorPage({ type = 'calc-emi', onNavigate }: any) {
               Consult Advisor
             </button>
           </div>
-
-          <div className="bg-amber-50 rounded-xl p-4 border border-amber-100 flex gap-3">
-            <Info size={16} className="text-amber-600 shrink-0 mt-1" />
-            <p className="text-[11px] text-amber-800 leading-relaxed font-medium">
-              {results?.type === 'loan' ? 
-                "Paying just 5% extra every month can reduce your loan tenure by years and save lakhs in interest." : 
-                results?.type === 'sip-emi' ?
-                "The power of compounding: Even small monthly savings from EMI differences can create significant wealth over 30 years." :
-                "Compounding works best with time. Even a small SIP started now creates huge long-term wealth."}
-            </p>
-          </div>
+          
         </div>
       </div>
-
-      {/* Benefits Section */}
-      <section className="mt-16">
-        <SectionHeader 
-          title="Why Use Our Financial Calculators?" 
-          subtitle="Make informed decisions with our precise and easy-to-use planning tools."
-        />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-            <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-4">
-              <TrendingUp className="w-5 h-5 text-[#2076C7]" />
-            </div>
-            <h4 className="text-base font-bold text-gray-800 mb-2">Precision Planning</h4>
-            <p className="text-xs text-gray-500 leading-relaxed">Get exact figures for your monthly outgoings and total interest, helping you budget with confidence.</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-            <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-4">
-              <CalcIcon className="w-5 h-5 text-[#2076C7]" />
-            </div>
-            <h4 className="text-base font-bold text-gray-800 mb-2">Compare Scenarios</h4>
-            <p className="text-xs text-gray-500 leading-relaxed">Easily adjust interest rates and tenures to see how different loan options impact your finances.</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-            <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-4">
-              <CheckCircle2 className="w-5 h-5 text-[#2076C7]" />
-            </div>
-            <h4 className="text-base font-bold text-gray-800 mb-2">100% Free</h4>
-            <p className="text-xs text-gray-500 leading-relaxed">Access all our professional-grade financial tools for free, with no registration required.</p>
-          </div>
-        </div>
-      </section>
 
       {/* FAQ Section */}
       <section className="mt-16">
@@ -537,16 +496,6 @@ export default function CalculatorPage({ type = 'calc-emi', onNavigate }: any) {
         <div className="max-w-3xl mx-auto">
           <FAQ items={FAQS} />
         </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="mt-16">
-        <CTA 
-          title="Need Professional Financial Advice?" 
-          subtitle="Our experts can help you choose the right loan or investment plan based on your unique financial goals."
-          buttonText="Talk to an Expert"
-          onClick={() => onNavigate('contact')}
-        />
       </section>
     </div>
   );
