@@ -23,15 +23,15 @@ export default function BondDetailsView({ id, onApply, onBack }: Props) {
     }
 
     return (
-        <div className="py-12 bg-white min-h-screen">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="py-12 md:py-16 bg-white min-h-screen font-sans px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
                 {/* Navigation */}
                 <button
                     onClick={onBack}
-                    className="flex items-center gap-2 text-[#2076C7] font-bold mb-8 hover:gap-3 transition-all group"
+                    className="flex items-center gap-2 text-[#2076C7] font-bold mb-6 md:mb-8 hover:gap-3 transition-all group text-sm md:text-base"
                 >
-                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                    Back to Bonds
+                    <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 group-hover:-translate-x-1 transition-transform" />
+                    Back to Overview
                 </button>
 
                 <div className="grid lg:grid-cols-3 gap-12">
@@ -40,7 +40,7 @@ export default function BondDetailsView({ id, onApply, onBack }: Props) {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white rounded-[3rem] p-8 md:p-12 shadow-xl border border-gray-100"
+                            className="bg-white rounded-3xl md:rounded-[3rem] p-6 md:p-12 shadow-xl border border-gray-100"
                         >
                             <div className="flex flex-wrap gap-3 mb-6">
                                 {bond.featured && (
@@ -56,31 +56,31 @@ export default function BondDetailsView({ id, onApply, onBack }: Props) {
                                 </span>
                             </div>
 
-                            <h1 className="text-3xl md:text-5xl font-black text-[#0B1C2E] mb-4 leading-tight">
+                            <h1 className="text-2xl md:text-5xl font-black text-[#0B1C2E] mb-3 md:mb-4 leading-tight">
                                 {bond.company}
                             </h1>
                             <p className="text-gray-400 font-mono text-sm mb-10">ISIN: {bond.isin}</p>
 
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                                <div className="bg-blue-50/50 p-6 rounded-3xl border border-blue-100">
-                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Coupon (PA)</p>
-                                    <p className="text-3xl font-black text-[#2076C7]">{bond.coupon}</p>
-                                    <p className="text-[10px] text-blue-400 mt-1 font-bold">{bond.frequency}</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                                <div className="bg-blue-50/50 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-blue-100">
+                                    <p className="text-[9px] md:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1 md:mb-2">Coupon (PA)</p>
+                                    <p className="text-xl md:text-3xl font-black text-[#2076C7]">{bond.coupon}</p>
+                                    <p className="text-[9px] md:text-[10px] text-blue-400 mt-1 font-bold">{bond.frequency}</p>
                                 </div>
-                                <div className="bg-teal-50/50 p-6 rounded-3xl border border-teal-100">
-                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Yield (XIRR)</p>
-                                    <p className="text-3xl font-black text-[#1CADA3]">{bond.yield}</p>
-                                    <p className="text-[10px] text-teal-400 mt-1 font-bold">Annualized</p>
+                                <div className="bg-teal-50/50 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-teal-100">
+                                    <p className="text-[9px] md:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1 md:mb-2">Yield (XIRR)</p>
+                                    <p className="text-xl md:text-3xl font-black text-[#1CADA3]">{bond.yield}</p>
+                                    <p className="text-[9px] md:text-[10px] text-teal-400 mt-1 font-bold">Annualized</p>
                                 </div>
-                                <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
-                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Rating</p>
-                                    <p className="text-3xl font-black text-gray-900">{bond.rating}</p>
-                                    <p className="text-[10px] text-gray-400 mt-1 font-bold">Stable Outlook</p>
+                                <div className="bg-gray-50 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-100">
+                                    <p className="text-[9px] md:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1 md:mb-2">Rating</p>
+                                    <p className="text-xl md:text-3xl font-black text-gray-900">{bond.rating}</p>
+                                    <p className="text-[9px] md:text-[10px] text-gray-400 mt-1 font-bold">Stable Outlook</p>
                                 </div>
-                                <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
-                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Maturity</p>
-                                    <p className="text-xl font-black text-gray-900 leading-tight mt-1">{bond.maturity}</p>
-                                    <p className="text-[10px] text-gray-400 mt-1 font-bold">Full Term</p>
+                                <div className="bg-gray-50 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-100">
+                                    <p className="text-[9px] md:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1 md:mb-2">Maturity</p>
+                                    <p className="text-base md:text-xl font-black text-gray-900 leading-tight mt-1">{bond.maturity}</p>
+                                    <p className="text-[9px] md:text-[10px] text-gray-400 mt-1 font-bold">Full Term</p>
                                 </div>
                             </div>
                         </motion.div>
@@ -150,7 +150,7 @@ export default function BondDetailsView({ id, onApply, onBack }: Props) {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="bg-gradient-to-br from-[#0B1C2E] to-[#1a3a5a] rounded-[3rem] p-8 text-white shadow-2xl relative overflow-hidden sticky top-8"
+                            className="bg-gradient-to-br from-[#0B1C2E] to-[#1a3a5a] rounded-3xl md:rounded-[3rem] p-6 md:p-8 text-white shadow-2xl relative overflow-hidden sticky top-8"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl" />
 
@@ -188,7 +188,7 @@ export default function BondDetailsView({ id, onApply, onBack }: Props) {
                             </p>
                         </motion.div>
 
-                        <div className="bg-orange-50 border border-orange-100 rounded-[2.5rem] p-8">
+                        <div className="bg-orange-50 border border-orange-100 rounded-3xl md:rounded-[2.5rem] p-6 md:p-8">
                             <div className="flex items-center gap-3 mb-4">
                                 <AlertTriangle className="text-orange-500" size={20} />
                                 <h4 className="font-bold text-orange-900 text-sm italic">Risk Note</h4>

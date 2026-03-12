@@ -45,7 +45,7 @@ const Portfolio = () => {
         <section className="py-12 md:py-16 bg-white font-sans px-4 sm:px-6 lg:px-8" id="portfolio">
             <div className="container-custom max-w-7xl mx-auto">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-5xl font-black mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Investment Portfolios
                     </h2>
 
@@ -87,6 +87,7 @@ const Portfolio = () => {
                             </div>
 
                             <button
+                                suppressHydrationWarning={true}
                                 onClick={() => handleDownloadStrategy(p.name)}
                                 className="mt-auto w-full py-4 bg-white text-[#1CADA3] font-extrabold rounded-2xl border-2 border-[#1CADA3]/10 flex items-center justify-center gap-2 hover:bg-[#1CADA3] hover:text-white hover:border-[#1CADA3] transition-all duration-300 shadow-sm"
                             >

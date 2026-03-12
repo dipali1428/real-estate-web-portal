@@ -19,7 +19,7 @@ const InvestmentUniverse = () => {
         <section className="py-12 md:py-16 font-sans px-4 sm:px-6 lg:px-8" id="investment-universe">
             <div className="container-custom mx-auto max-w-7xl">
                 <div className="text-center max-w-3xl mx-auto mb-12 px-4">
-                    <h2 className="text-3xl md:text-5xl font-black mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Explore Our Investment Universe
                     </h2>
                     <p className="text-lg text-gray-600 font-medium">
@@ -91,6 +91,7 @@ const InvestmentUniverse = () => {
 
                                 {/* CTA */}
                                 <button
+                                    suppressHydrationWarning={true}
                                     onClick={() => handleLearnMore(product.type)}
                                     className="w-full py-3 rounded-xl
                            flex items-center justify-center gap-2

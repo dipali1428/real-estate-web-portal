@@ -36,7 +36,7 @@ const HowItWorks = ({ onStart }: HowItWorksProps) => {
             <div className="container-custom relative z-10 px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl">
                 {/* Section Heading */}
                 <div className="text-center max-w-4xl mx-auto mb-20 px-4">
-                    <h2 className="text-3xl md:text-5xl font-black mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Invest in 3 Simple Steps
                     </h2>
 

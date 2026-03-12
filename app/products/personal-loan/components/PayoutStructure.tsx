@@ -1,13 +1,15 @@
 "use client";
 import React, { useState } from 'react';
 import { Landmark, ChevronDown, ChevronUp } from 'lucide-react';
+import { useModal } from '@/app/context/ModalContext';
 
 interface PayoutStructureProps {
-    openBankModal: (bankName: string) => void;
+    openBankModal?: (bankName: string) => void;
 }
 
 export default function PayoutStructure({ openBankModal }: PayoutStructureProps) {
     const [isExpanded, setIsExpanded] = useState(false);
+    const { openLogin } = useModal();
 
     const partnerBanks = [
         { name: 'ADITYA BIRLA FINANCE', color: 'bg-teal-50 text-[#1CADA3]' },
@@ -84,7 +86,7 @@ export default function PayoutStructure({ openBankModal }: PayoutStructureProps)
                         {displayBanks.map((bank, idx) => (
                             <div
                                 key={idx}
-                                onClick={() => openBankModal(bank.name)}
+                                onClick={() => openLogin()}
                                 className="group bg-white rounded-2xl md:rounded-3xl border border-gray-50 p-4 md:p-5 flex items-center gap-4 hover:shadow-xl hover:border-blue-100 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                             >
                                 <div className={`w-11 h-11 md:w-14 md:h-14 rounded-2xl ${bank.color} flex items-center justify-center shrink-0 shadow-sm transition-transform duration-500 group-hover:scale-110`}>

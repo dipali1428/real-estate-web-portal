@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useModal } from "../../../context/ModalContext";
 import { Megaphone, Calendar, TrendingUp } from "lucide-react";
 
 const updates = [
@@ -28,18 +29,19 @@ const updates = [
 ];
 
 export default function MarketUpdates() {
+    const { openLogin } = useModal();
     return (
-        <section className="bg-[#fff] border-b border-gray-100 py-4 overflow-hidden relative">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-4">
+        <section className="bg-[#fff] py-2 overflow-hidden relative font-sans px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
 
                 {/* Label */}
-                <div className="flex items-center gap-2 bg-[#1CADA3]/10 text-[#1CADA3] px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border border-[#1CADA3]/20 shadow-sm animate-pulse">
-                    <Megaphone size={14} />
+                <div className="flex items-center gap-2 bg-[#1CADA3]/10 text-[#1CADA3] px-3 py-1 rounded-full text-[10px] md:text-xs font-black whitespace-nowrap border border-[#1CADA3]/20 shadow-sm animate-pulse">
+                    <Megaphone size={12} className="md:w-[14px] md:h-[14px]" />
                     <span>MARKET INSIGHTS</span>
                 </div>
 
                 {/* Ticker / Slider */}
-                <div className="flex-1 overflow-hidden relative h-8 w-full">
+                <div className="flex-1 overflow-hidden relative h-7 md:h-8 w-full">
                     {/* Mask gradients for fading effect */}
                     <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 hidden md:block" />
                     <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 hidden md:block" />
@@ -59,7 +61,10 @@ export default function MarketUpdates() {
                 </div>
 
                 {/* CTA */}
-                <button className="hidden md:flex items-center gap-1 text-xs font-bold text-[#1CADA3] hover:underline whitespace-nowrap">
+                <button 
+                  onClick={openLogin}
+                  suppressHydrationWarning={true}
+                  className="hidden md:flex items-center gap-1 text-xs font-bold text-[#1CADA3] hover:underline whitespace-nowrap cursor-pointer">
                     Read More Updates <TrendingUp size={12} />
                 </button>
             </div>

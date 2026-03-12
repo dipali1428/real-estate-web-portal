@@ -50,7 +50,7 @@ const Risks = () => {
             <div className="container-custom mx-auto max-w-7xl">
 
                 <div className="text-center max-w-4xl mx-auto mb-16 px-4">
-                    <h2 className="text-3xl md:text-5xl font-black mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Risk Assessment & Mitigation
                     </h2>
 
@@ -66,6 +66,7 @@ const Risks = () => {
                         {risks.map((risk, idx) => (
                             <button
                                 key={idx}
+                                suppressHydrationWarning={true}
                                 onClick={() => setActiveRisk(idx)}
                                 className={`w-full p-5 md:p-6 bg-white rounded-2xl border-2 text-left transition-all duration-300 flex items-center justify-between group 
                                     ${activeRisk === idx

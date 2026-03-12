@@ -32,7 +32,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
 
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-10 pt-6">
-                    <h2 className="text-3xl md:text-5xl font-black mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Active Opportunities
                     </h2>
                     <p className="text-base md:text-lg text-slate-500 font-medium">
@@ -217,6 +217,7 @@ const Offers = ({ onInvest, onApply, onViewAll }: OffersProps) => {
                                 </div>
 
                                 <button
+                                    suppressHydrationWarning={true}
                                     onClick={onViewAll}
                                     className="w-full py-2.5 bg-[#2076C7] text-white text-xs font-medium rounded-lg hover:bg-[#1a65ab] transition">
                                     View All Offers

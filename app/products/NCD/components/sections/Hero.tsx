@@ -49,13 +49,9 @@ const Hero = ({ onStart }: HeroProps) => {
                     </div>
 
                     {/* Title */}
-                    <h1 className="leading-[1.1] mb-6 md:mb-10 tracking-tight font-sans">
-                        <span className="block mb-2 md:mb-4 text-[#2076C7] font-bold text-xl sm:text-2xl md:text-5xl">
-                            Secure Your Future with
-                        </span>
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#2076C7] to-[#1CADA3] font-black text-4xl sm:text-5xl md:text-8xl drop-shadow-sm">
-                            Trusted NCDs
-                        </span>
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight tracking-tight bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-[length:200%_auto] animate-gradient-x bg-clip-text text-transparent">
+                        Secure Your Future with <br />
+                        Trusted NCDs
                     </h1>
 
                     <p className="text-base md:text-2xl text-slate-600 mb-8 md:mb-12 leading-relaxed max-w-3xl mx-auto font-medium px-2">

@@ -1,12 +1,14 @@
 "use client";
 import React from 'react';
 import { CheckCircle, Briefcase, Calendar, CreditCard, ArrowRight } from 'lucide-react';
+import { useModal } from '@/app/context/ModalContext';
 
 interface EligibilityCriteriaProps {
     openForm: () => void;
 }
 
 export default function EligibilityCriteria({ openForm }: EligibilityCriteriaProps) {
+    const { openLogin } = useModal();
     const criteria = [
         {
             icon: Briefcase,
@@ -93,7 +95,7 @@ export default function EligibilityCriteria({ openForm }: EligibilityCriteriaPro
 
                 <div className="flex justify-center px-4">
                     <button
-                        onClick={openForm}
+                        onClick={openLogin}
                         suppressHydrationWarning
                         className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#1CADA3] text-white px-8 md:px-10 py-3.5 md:py-4 rounded-xl font-bold shadow-lg shadow-teal-500/30 hover:bg-[#2076C7] hover:-translate-y-1 transition-all text-base md:text-lg"
                     >

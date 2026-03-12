@@ -15,7 +15,7 @@ const TaxBenefits = () => {
 
                 {/* Centered Heading Section */}
                 <div className="text-center max-w-4xl mx-auto mb-16 px-4">
-                    <h2 className="text-3xl md:text-5xl font-black mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Tax Benefit & Efficiency
                     </h2>
 

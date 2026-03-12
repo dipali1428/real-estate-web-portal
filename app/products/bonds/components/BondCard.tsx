@@ -30,9 +30,10 @@ export default function BondCard({ bond, onInvest }: Props) {
 
     return (
         <motion.div
-            whileHover={{ scale: 1.02, y: -5 }}
-            transition={{ duration: 0.3 }}
-            className="bg-white rounded-[2rem] shadow-lg hover:shadow-2xl hover:shadow-blue-200/50 p-6 border border-gray-100 flex flex-col h-full relative overflow-hidden group"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-white rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 hover:border-blue-200 hover:shadow-[0_20px_50px_-12px_rgba(32,118,199,0.1)] transition-all duration-500 group flex flex-col h-full relative overflow-hidden p-5 md:p-8 font-sans"
         >
             {/* Top Badges */}
             <div className="flex gap-2 mb-4">
@@ -50,25 +51,25 @@ export default function BondCard({ bond, onInvest }: Props) {
 
             {/* Header */}
             <div className="mb-6">
-                <h3 className="text-xl font-bold text-[#2076C7] line-clamp-2 min-h-[3.5rem] leading-tight">
+                <h3 className="text-lg md:text-xl font-bold text-[#2076C7] line-clamp-2 min-h-[3rem] md:min-h-[3.5rem] leading-tight">
                     {bond.company}
                 </h3>
                 {bond.isin && (
-                    <p className="text-[10px] text-gray-400 font-mono mt-1">ISIN: {bond.isin}</p>
+                    <p className="text-[9px] md:text-[10px] text-gray-400 font-mono mt-1">ISIN: {bond.isin}</p>
                 )}
             </div>
 
             {/* Main Stats Grid */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
-                    <p className="text-xs text-gray-500 font-bold uppercase mb-1">Coupon</p>
-                    <p className="text-2xl font-black text-[#2076C7]">{bond.coupon}</p>
-                    <p className="text-[10px] text-gray-400 mt-1">{bond.frequency}</p>
+            <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6">
+                <div className="bg-blue-50/50 p-3 md:p-4 rounded-xl md:rounded-2xl border border-blue-100">
+                    <p className="text-[10px] md:text-xs text-gray-500 font-bold uppercase mb-1">Coupon</p>
+                    <p className="text-xl md:text-2xl font-black text-[#2076C7]">{bond.coupon}</p>
+                    <p className="text-[9px] md:text-[10px] text-gray-400 mt-1">{bond.frequency}</p>
                 </div>
-                <div className="bg-teal-50/50 p-4 rounded-2xl border border-teal-100">
-                    <p className="text-xs text-gray-500 font-bold uppercase mb-1">Yield</p>
-                    <p className="text-2xl font-black text-[#1CADA3]">{bond.yield}</p>
-                    <p className="text-[10px] text-gray-400 mt-1">Annualized</p>
+                <div className="bg-teal-50/50 p-3 md:p-4 rounded-xl md:rounded-2xl border border-teal-100">
+                    <p className="text-[10px] md:text-xs text-gray-500 font-bold uppercase mb-1">Yield</p>
+                    <p className="text-xl md:text-2xl font-black text-[#1CADA3]">{bond.yield}</p>
+                    <p className="text-[9px] md:text-[10px] text-gray-400 mt-1">Annualized</p>
                 </div>
             </div>
 
@@ -100,15 +101,20 @@ export default function BondCard({ bond, onInvest }: Props) {
 
             {/* Action */}
             <div className="mt-auto">
-                <div className="flex justify-between items-center mb-4">
-                    <p className="text-xs text-gray-400">Min Investment</p>
-                    <p className="text-sm font-bold text-gray-900">{bond.minInvestment}</p>
+                <div className="flex justify-between items-center mb-6 border-t border-black/5 pt-4">
+                    <span className="text-sm font-bold text-slate-400 uppercase">Min Investment</span>
+                    <span className="text-base font-extrabold text-[#2076C7]">{bond.minInvestment}</span>
                 </div>
                 <button
                     onClick={handleInvest}
-                    className="w-full bg-[#2076C7] hover:bg-[#1CADA3] text-white py-4 rounded-xl font-bold transition-all duration-300 shadow-md hover:shadow-lg flex justify-center items-center gap-2 group-hover:scale-[1.02]"
+                    suppressHydrationWarning={true}
+                    className="relative w-full text-white px-10 py-3.5 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group"
+                    style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
                 >
-                    Invest Now
+                    <span className="relative z-10 flex items-center justify-center gap-1">
+                        Invest Now
+                    </span>
+                    <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
                 </button>
             </div>
         </motion.div>

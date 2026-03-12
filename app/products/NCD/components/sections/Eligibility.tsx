@@ -27,7 +27,7 @@ const Eligibility = () => {
                     {/* Column 1: Who Can Invest */}
                     <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-blue-900/5">
                         <div className="mb-10">
-                            <h2 className="text-3xl md:text-4xl font-black mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                                 Who Can Invest
                             </h2>
                             <p className="text-sm md:text-base text-slate-500 font-medium leading-relaxed">
@@ -53,7 +53,7 @@ const Eligibility = () => {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-[#1CADA3]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                         
                         <div className="mb-10 relative z-10">
-                            <h2 className="text-3xl md:text-4xl font-black mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                                 Documents Required
                             </h2>
                             <p className="text-sm md:text-base text-slate-500 font-medium leading-relaxed">
@@ -83,7 +83,7 @@ const Eligibility = () => {
                 {/* Bottom: Process Visualization */}
                 <div className="text-center mb-16 md:mb-24">
                     <span className="text-[#2076C7] font-black text-[10px] md:text-xs uppercase tracking-[0.4em] mb-4 md:mb-6 block">Simple Flow</span>
-                    <h2 className="text-3xl md:text-5xl font-black mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         4-Step Application Process
                     </h2>
                     <p className="text-slate-500 font-medium max-w-2xl mx-auto text-base md:text-xl leading-relaxed">Getting started with NCDs is simple, fast, and 100% digital with our hand-held support.</p>

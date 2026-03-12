@@ -83,7 +83,7 @@ const NCDYieldChart = () => {
                         Wealth Projection 2024-2029
                     </motion.div>
 
-                    <h2 className="text-3xl md:text-5xl font-black mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Compare Your Wealth Growth
                     </h2>
 

@@ -53,7 +53,7 @@ const FAQ = () => {
 
                 {/* Heading */}
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-5xl font-black mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent font-sans">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Frequently Asked Questions
                     </h2>
 
@@ -72,6 +72,7 @@ const FAQ = () => {
                                     }`}
                             >
                                 <button
+                                    suppressHydrationWarning={true}
                                     onClick={() => toggleFAQ(idx)}
                                     className="w-full px-6 py-5 text-left flex justify-between items-center gap-4 group"
                                 >
@@ -110,6 +111,7 @@ const FAQ = () => {
                 {ncdFaqs.length > 5 && (
                     <div className="text-center mt-10">
                         <button
+                            suppressHydrationWarning={true}
                             onClick={() => setShowAllFaqs(!showAllFaqs)}
                             className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-white text-[#2076C7] font-black shadow-md border border-slate-100 hover:shadow-lg transition-all"
                         >
