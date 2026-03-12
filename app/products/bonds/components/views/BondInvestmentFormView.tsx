@@ -126,8 +126,8 @@ export default function BondInvestmentFormView({ id, onBack, onSuccess }: Props)
     }
 
     return (
-        <div className="py-20 bg-gray-50/50 min-h-screen">
-            <div className="max-w-4xl mx-auto px-4">
+        <div className="py-12 md:py-16 bg-gray-50/50 min-h-screen font-sans px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
                 {/* Header Area */}
                 <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>

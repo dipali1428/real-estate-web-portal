@@ -1,81 +1,88 @@
 import { title } from "process";
 
 const AboutSection = () => {
-    const leaders = [
-        {
-            name: "Mr. Rajesh Parkhi",
-            title: "Executive Director",
-            description: "25+ years of experience in retail finance, MBA in Marketing, with strong expertise in retail loan structuring and driving sustainable business growth.",
-            image: "/leader/Image 8.jpeg"
-        },
-        {
-            name: "Mr. Rahul Kangane",
-            title: "Chairman and Managing Director",
-            description: "15 years of experience in broking and wealth management, specializing in portfolio strategy and delivering strong market insights that drive company growth.",
-            image: "/leader/rahulsir4.jpeg"
-        },
-        {
-            name: "Mr. K Krishna",
-            title: "Regional Director, Hyderabad ",
-            description: "K Krishna brings 18+ years of banking experience, driving strategic growth, operational excellence, and revenue expansion through high-performing teams and strong client-focused strategies.",
-            image: "/leader/K-Krishna.jpeg"
-        },
-        {
-            name: "Dr. Sanjay Shaha",
-            title: "Director – Infinity Arthvishva",
-            description: "Dr. Sanjay Shaha, Director at Infinity Arthvishva, is a senior physician with 40+ years of experience. National Merit Winner, Gold Medalist & Vijay Ratna Awardee, bringing strategic vision and ethical leadership.",
-            image: "/leader/sanjay-shaha.jpeg"
-        },
-        {
-            name: "Mr. Pravin Marathe",
-            title: "Chief Financial Officer ",
-            description: "Mr. Pravin Marathe, CFO at Infinity Arthvishva, has 18+ years of experience in financial markets with expertise in mutual funds, PMS, and AIFs.",
-            image: "/leader/Img3.jpeg"
-        },
-        {
-            name: "Mr. Sandip Powar",
-            title: "Vice President",
-            description: "Mr. Sandip Powar, Vice President, brings 11+ years of expertise in Home Loans and Insurance, leading Pan-India expansion, branch development, and strategic growth with a strong customer-focused approach.",
-            image: "/leader/Sandip-Powar.jpeg"
-        },
-        {
-            name: "Mr. Satyen Mehta",
-            title: "General Manager",
-            description: "Mr. Satyen Mehta brings 25+ years of banking experience in Home Loans, LAP, Insurance, and Real Estate, leading overall strategy, revenue growth, operational excellence, and sustainable business expansion.",
-            image: "/leader/Satyen-Mehta (2).jpeg"
-        },
-        {
-            name: "Mr. Sharad Kulkarni",
-            title: "Regional Business Head (Sangli Branch)",
-            description: "Mr. Sharad Kulkarni, Regional Business Head – Sangli, brings over 9 years of lending and 5 years of insurance experience, driving regional growth, high-performing teams, and strong client-focused business expansion.",
-            image: "/leader/Sharad-Kulkarni.jpeg"
-        },
-        {
-            name: "Mr. Anant Chachad",
-            title: "Regional Business Head – Kolhapur",
-            description: "Mr. Anant Madhusudan Chachad, Regional Business Head – Kolhapur, brings over 14 years of experience in financial services, leading Mortgage Loans for the West region with expertise in Home Loans, LAP, distribution network development, and strategic portfolio growth.",
-            image: "/leader/Anant-Chachad.jpeg"
-        },
-        {
-            name: "Mr. Kailas Patil",
-            title: "Assistant Vice President (AVP) – Nashik",
-            description: "Mr. Kailas Eknath Patil is a finance professional with 15+ years of experience in Home Loans, LAP, and Business Loans, driving regional growth through strong sales leadership, channel partnerships, and operational excellence.",
-            image: "/leader/Kailas-Patil.jpeg"
-        },
-        {
-            name: "Mr. Neeraj Mohata",
-            title: "Regional Business Head – Nagpur",
-            description: "Mr. Neeraj Mohata brings 11+ years of experience in lending and financial services, driving regional sales growth, channel expansion, and profitable business performance with strong leadership and market expertise.",
-            image: "/leader/Neeraj-Mohata1.jpeg"
-        },
-        {
-            name: "Mr. Pravin Rautray",
-            title: "Business Head (Moshi Branch )",
-            description: "Mr. Pravin Rautray drives growth across Loans and Insurance with a strong track record in building high-performing teams, expanding market reach, and delivering strategic, customer-focused revenue growth.",
-            image: "/leader/Pravin-Rautray.jpeg"
-        },
+   const leaders = [
+{
+    name: "Mr. Rajesh Parkhi",
+    title: "Executive Director",
+    description: "25+ years of experience in retail finance, MBA in Marketing, with strong expertise in retail loan structuring and driving sustainable business growth.",
+    image: "/leader/Image 8.jpeg"
+},
+{
+    name: "Mr. Rahul Kangane",
+    title: "Chairman and Managing Director",
+    description: "15 years of experience in broking and wealth management, specializing in portfolio strategy and delivering strong market insights that drive company growth.",
+    image: "/leader/rahulsir4.jpeg"
+},
+{
+    name: "Mr. K Krishna",
+    title: "Telangana State Director, Hyderabad ",
+    description: "K Krishna brings 18+ years of banking experience, driving strategic growth, operational excellence, and revenue expansion through high-performing teams and strong client-focused strategies.",
+    image: "/leader/K-Krishna.jpeg"
+},
+{
+    name: "Dr. Sanjay Shaha",
+    title: "Director – Infinity Arthvishva",
+    description: "Dr. Sanjay Shaha, Director at Infinity Arthvishva, is a senior physician with 40+ years of experience. National Merit Winner, Gold Medalist & Vijay Ratna Awardee, bringing strategic vision and ethical leadership.",
+    image: "/leader/sanjay-shaha.jpeg"
+},
 
-    ];
+{
+    name: "Mr. Arun Job",
+    title: "Regional Director (Hyderabad)",
+    description: "With over 20 years of leadership across telecommunications, manufacturing, pharma packaging and banking sectors, Arun Job drives transformative growth and operational excellence. An IIMA alumnus known for building high-performing teams, strategic partnerships, and revenue expansion.",
+    image: "/leader/arun job.jpeg"
+},
+
+{
+    name: "Mr. Pravin Marathe",
+    title: "Chief Financial Officer ",
+    description: "Mr. Pravin Marathe, CFO at Infinity Arthvishva, has 18+ years of experience in financial markets with expertise in mutual funds, PMS, and AIFs.",
+    image: "/leader/Img3.jpeg"
+},
+{
+    name: "Mr. Sandip Powar",
+    title: "Vice President",
+    description: "Mr. Sandip Powar, Vice President, brings 11+ years of expertise in Home Loans and Insurance, leading Pan-India expansion, branch development, and strategic growth with a strong customer-focused approach.",
+    image: "/leader/Sandip-Powar.jpeg"
+},
+{
+    name: "Mr. Satyen Mehta",
+    title: "General Manager",
+    description: "Mr. Satyen Mehta brings 25+ years of banking experience in Home Loans, LAP, Insurance, and Real Estate, leading overall strategy, revenue growth, operational excellence, and sustainable business expansion.",
+    image: "/leader/Satyen-Mehta (2).jpeg"
+},
+{
+    name: "Mr. Sharad Kulkarni",
+    title: "Regional Business Head (Sangli Branch)",
+    description: "Mr. Sharad Kulkarni, Regional Business Head – Sangli, brings over 9 years of lending and 5 years of insurance experience, driving regional growth, high-performing teams, and strong client-focused business expansion.",
+    image: "/leader/Sharad-Kulkarni.jpeg"
+},
+{
+    name: "Mr. Anant Chachad",
+    title: "Regional Business Head – Kolhapur",
+    description: "Mr. Anant Madhusudan Chachad, Regional Business Head – Kolhapur, brings over 14 years of experience in financial services, leading Mortgage Loans for the West region with expertise in Home Loans, LAP, distribution network development, and strategic portfolio growth.",
+    image: "/leader/Anant-Chachad.jpeg"
+},
+{
+    name: "Mr. Kailas Patil",
+    title: "Assistant Vice President (AVP) – Nashik",
+    description: "Mr. Kailas Eknath Patil is a finance professional with 15+ years of experience in Home Loans, LAP, and Business Loans, driving regional growth through strong sales leadership, channel partnerships, and operational excellence.",
+    image: "/leader/Kailas-Patil.jpeg"
+},
+{
+    name: "Mr. Neeraj Mohata",
+    title: "Regional Business Head – Nagpur",
+    description: "Mr. Neeraj Mohata brings 11+ years of experience in lending and financial services, driving regional sales growth, channel expansion, and profitable business performance with strong leadership and market expertise.",
+    image: "/leader/Neeraj-Mohata1.jpeg"
+},
+{
+    name: "Mr. Pravin Rautray",
+    title: "Business Head (Moshi Branch )",
+    description: "Mr. Pravin Rautray drives growth across Loans and Insurance with a strong track record in building high-performing teams, expanding market reach, and delivering strategic, customer-focused revenue growth.",
+    image: "/leader/Pravin-Rautray.jpeg"
+}
+];
 
     return (
         <div>

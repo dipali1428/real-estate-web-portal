@@ -36,11 +36,11 @@ const steps = [
 
 const ClaimProcess = () => {
     return (
-        <section className="py-10 md:py-16 bg-white relative overflow-hidden" id="claim-process">
+        <section className="py-16 md:py-24 bg-white relative overflow-hidden font-sans" id="claim-process">
             {/* Background decoration */}
             <div className="absolute top-1/2 left-0 w-full h-[1px] bg-linear-to-r from-transparent via-gray-100 to-transparent -translate-y-1/2 hidden lg:block" />
 
-            <div className="container-custom relative z-10 px-4 md:px-6">
+            <div className="container-custom relative z-10 px-6 md:px-10">
                 <div className="text-center max-w-4xl mx-auto mb-8 md:mb-12">
                     <motion.span
                         initial={{ opacity: 0, y: 10 }}
@@ -61,7 +61,7 @@ const ClaimProcess = () => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {steps.map((step, idx) => (
                         <motion.div
                             key={idx}
@@ -69,27 +69,23 @@ const ClaimProcess = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.1 }}
-                            className="relative flex flex-col items-center text-center p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.04)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] transition-all duration-500 overflow-hidden"
+                            className="relative flex flex-col items-center text-center p-6 md:p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.04)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] transition-all duration-500 overflow-hidden"
                         >
-                            {/* Accent bar */}
-                            <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-[#2076C7] to-[#1CADA3] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-
-                            <div className="mb-6 w-16 h-16 rounded-2xl flex items-center justify-center bg-slate-50 border border-gray-100 group-hover:scale-110 group-hover:bg-[#2076C7] transition-all duration-500">
-                                <step.icon className="w-6 h-6 group-hover:text-white transition-colors" style={{ color: step.color }} />
+                            <div className="mb-6 w-16 h-16 rounded-2xl flex items-center justify-center bg-slate-50 border border-gray-100 group-hover:bg-white group-hover:border-[#2076C7]/20 transition-all duration-500">
+                                <step.icon className="w-6 h-6 transition-colors" style={{ color: step.color }} />
                             </div>
 
-                            {/* Step indicator + time */}
-                            <div className="absolute top-6 right-8 flex flex-col items-end">
-                                <span className="text-3xl font-black text-gray-50 group-hover:text-blue-50 transition-colors">0{idx + 1}</span>
-                                <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full mt-1" style={{ backgroundColor: `${step.color}10`, color: step.color }}>
+                            {/* Time badge only */}
+                            <div className="absolute top-6 right-8">
+                                <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-slate-50 text-slate-400 group-hover:bg-[#1CADA3] group-hover:text-white transition-all duration-300">
                                     {step.time}
                                 </span>
                             </div>
 
-                            <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight">
+                            <h3 className="font-sans text-xl font-bold text-gray-900 mb-3 leading-tight">
                                 {step.title}
                             </h3>
-                            <p className="text-sm text-gray-500 leading-relaxed font-light">
+                            <p className="font-sans text-sm text-gray-500 leading-relaxed font-light">
                                 {step.desc}
                             </p>
                         </motion.div>
@@ -101,7 +97,7 @@ const ClaimProcess = () => {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto px-4"
+                    className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto"
                 >
                     <div className="flex items-center gap-4 p-6 bg-[#1CADA3]/5 rounded-2xl border border-[#1CADA3]/10">
                         <div className="w-12 h-12 rounded-xl bg-[#1CADA3] flex items-center justify-center">

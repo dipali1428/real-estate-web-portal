@@ -4,25 +4,26 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
-    IconCalculator,
-    IconCheck,
-    IconInfoCircle,
-    IconClock,
-    IconShieldCheck,
-    IconArrowRight,
-    IconArrowLeft,
-    IconStethoscope,
-    IconDog,
-    IconCat,
-    IconBone,
-    IconVaccine,
-    IconHeart,
-    IconFeather,
-    IconPaw
+    IconCheck, IconShieldCheck, IconArrowRight, IconArrowLeft,
+    IconInfoCircle, IconDog, IconCat, IconBone, IconCalendar,
+    IconWorld, IconChevronDown, IconBolt, IconPaw, IconFeather,
+    IconCurrencyRupee
 } from '@tabler/icons-react';
-import { useModal } from '@/app/context/ModalContext';
+import {
+    PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend
+} from 'recharts';
+import Link from 'next/link';
+import { useModal } from '../../../context/ModalContext';
 
-const PET_TYPES = [
+// --- Pet Calculator Data ---
+interface PetType {
+    id: string;
+    label: string;
+    baseRate: number;
+    icon: React.ElementType;
+}
+
+const PET_TYPES: PetType[] = [
     { id: 'dog', label: 'Dog', baseRate: 299, icon: IconDog },
     { id: 'cat', label: 'Cat', baseRate: 199, icon: IconCat },
     { id: 'bird', label: 'Bird/Parrot', baseRate: 149, icon: IconFeather },
@@ -48,441 +49,372 @@ const SUM_INSURED_OPTIONS = [
     { label: '₹5 Lakhs', value: 500000, factor: 2.2 },
 ];
 
-const PROVIDERS = [
-    {
-        name: 'Digit Pet',
-        brandColor: 'bg-[#2076C7]',
-        planName: 'Digit Compassion',
-        medical: '100% of Cover',
-        surgery: '50% of Cover',
-        recovery: 'Up to ₹10k',
-        wellness: 'Optional',
-        factor: 1.0
-    },
-    {
-        name: 'Bajaj Allianz',
-        brandColor: 'bg-[#1CADA3]',
-        planName: 'Pet Elite',
-        medical: '100% of Cover',
-        surgery: '80% of Cover',
-        recovery: 'Up to ₹15k',
-        wellness: '₹5k Limit',
-        factor: 1.15
-    },
-    {
-        name: 'Oriental Ins.',
-        brandColor: 'bg-[#2076C7]',
-        planName: 'Traditional Paws',
-        medical: '80% of Cover',
-        surgery: '50% of Cover',
-        recovery: 'Up to ₹5k',
-        wellness: 'Not Available',
-        factor: 0.85
-    },
-];
+const COLORS = ['#2076C7', '#1CADA3'];
+
+const fmt = (n: number) => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(n);
 
 export default function PetInsuranceCalculator() {
-    const { openPartner } = useModal();
+    const { openLogin } = useModal();
     const [step, setStep] = useState(1);
-    const [petType, setPetType] = useState(PET_TYPES[0]);
     const [petName, setPetName] = useState('');
-    const [petBreed, setPetBreed] = useState('');
+    const [petType, setPetType] = useState(PET_TYPES[0]);
     const [petSubType, setPetSubType] = useState('');
     const [ageGroup, setAgeGroup] = useState(AGE_GROUPS[1]);
     const [sumInsured, setSumInsured] = useState(SUM_INSURED_OPTIONS[0]);
     const [hasOPD, setHasOPD] = useState(false);
     const [totalPremium, setTotalPremium] = useState(0);
     const [showPlans, setShowPlans] = useState(false);
-    const [carouselIndex, setCarouselIndex] = useState(0);
 
     // Premium Calculation Logic
     useEffect(() => {
         let calculatedPremium = petType.baseRate * ageGroup.multiplier * sumInsured.factor;
         if (hasOPD) calculatedPremium *= 1.3; // 30% loading for OPD
-
-        // Applying GST (18%) and rounding
         const withGst = calculatedPremium * 1.18;
         setTotalPremium(Math.round(withGst));
     }, [petType, ageGroup, sumInsured, hasOPD]);
 
-    const nextStep = () => setStep(s => Math.min(s + 1, 3));
-    const prevStep = () => setStep(s => Math.max(s - 1, 1));
+    const nextStep = () => setStep(s => Math.min(3, s + 1));
+    const prevStep = () => setStep(s => Math.max(1, s - 1));
 
     const isStepValid = () => {
         if (step === 1) return petName.trim() !== '';
         return true;
     };
 
+    const basePremium = Math.round(totalPremium / 1.18);
+    const gstAmount = totalPremium - basePremium;
+    const chartData = [
+        { name: 'Base Premium', value: basePremium },
+        { name: 'GST (18%)', value: gstAmount },
+    ];
+
     return (
-        <section id="calculator" className="pt-24 pb-12 px-4 sm:px-6 bg-slate-50 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#2076C7]/10 rounded-full blur-[120px] -z-0" />
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#1CADA3]/10 rounded-full blur-[120px] -z-0" />
+        <>
+            <section id="calculator" className="py-10 md:py-10 bg-slate-50 relative overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+                <div className="bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden">
 
-            <div className="max-w-6xl mx-auto relative z-10">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="text-center mb-10 md:mb-16"
-                >
-                    <span className="text-[#2076C7] font-bold tracking-widest uppercase text-xs md:text-sm">Instant Estimates</span>
-                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm px-2">
-                        Pet Premium Calculator
-                    </h2>
-                    <p className="text-base md:text-lg text-slate-500 mt-4 max-w-2xl mx-auto px-4 md:px-0">
-                        Get personalized insurance quotes for your pet in just a few clicks. Fast, accurate, and completely free.
-                    </p>
-                </motion.div>
+                    {/* Header */}
+                    <div className="bg-white border-b border-slate-50 py-8 sm:py-10 px-4 sm:px-6 text-center">
+                        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                            <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
+                                Pet Premium Calculator
+                            </h2>
+                            <div className="w-24 h-1 bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] mx-auto rounded-full mb-6 opacity-30" />
+                            <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
+                                Get personalized quotes for your companion in 3 simple steps.
+                            </p>
+                        </motion.div>
+                    </div>
 
-                {/* Multi-step Navigation Bar */}
-                <div className="max-w-xs md:max-w-md mx-auto mb-10 md:mb-12 flex items-center justify-between relative px-2">
-                    <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -translate-y-1/2 -z-10" />
-                    {[1, 2, 3].map((num) => (
-                        <div key={num} className="relative bg-slate-50 p-1 md:p-2">
-                            <div
-                                className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs md:text-base font-black transition-all duration-300 ${step >= num ? 'bg-gradient-to-br from-[#2076C7] to-[#1CADA3] text-white shadow-lg' : 'bg-white text-slate-300 border-2 border-slate-200'
-                                    }`}
-                            >
-                                {num}
-                            </div>
-                            <span className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 text-[8px] md:text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${step >= num ? 'text-[#2076C7]' : 'text-slate-300'
-                                }`}>
-                                {num === 1 ? 'Pet Info' : num === 2 ? 'Profile' : 'Coverage'}
-                            </span>
-                        </div>
-                    ))}
-                </div>
+                    <div className="p-5 sm:p-6 lg:p-10">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
 
-                <div className="grid lg:grid-cols-2 gap-12 items-start">
-                    {/* Main Calculator Card */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="bg-white p-5 sm:p-6 md:p-11 rounded-[2rem] md:rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(32,118,199,0.08)] border border-slate-100 min-h-[480px] md:min-h-[560px] flex flex-col relative overflow-hidden"
-                    >
-                        <AnimatePresence mode="wait">
-                            {step === 1 && (
-                                <motion.div
-                                    key="step1"
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    className="space-y-8 flex-grow"
-                                >
-                                    <div>
-                                        <label className="flex items-center gap-2 text-sm font-black text-slate-900 uppercase tracking-widest mb-4">
-                                            <IconHeart className="text-[#1CADA3]" size={20} />
-                                            What's your pet's name?
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={petName}
-                                            onChange={(e) => setPetName(e.target.value)}
-                                            placeholder="Enter Pet Name"
-                                            className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-[#2076C7]/30 text-lg shadow-sm"
-                                        />
-                                    </div>
+                            {/* Left Column: Controls */}
+                            <div className="space-y-8 lg:pr-8 lg:border-r border-slate-100 flex flex-col">
+                                {/* Step Indicator */}
+                                <div className="relative flex justify-between items-center max-w-xs mx-auto mb-4 w-full px-2">
+                                    <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-slate-200 -translate-y-1/2" />
+                                    <div className="absolute top-1/2 left-0 h-[3px] bg-gradient-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-500 -translate-y-1/2" style={{ width: `${((step - 1) / 2) * 100}%` }} />
+                                    {[1, 2, 3].map(n => (
+                                        <div key={n} className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center font-black text-sm transition-all border-4 border-white ${step >= n ? 'bg-gradient-to-br from-[#2076C7] to-[#1CADA3] text-white shadow-lg' : 'bg-slate-100 text-slate-300'}`}>{n}</div>
+                                    ))}
+                                </div>
 
-                                    <div>
-                                        <label className="flex items-center gap-2 text-sm font-black text-slate-900 uppercase tracking-widest mb-4">
-                                            <IconDog className="text-[#2076C7]" size={20} />
-                                            Pet Type
-                                        </label>
-                                        <div className="grid grid-cols-2 lg:grid-cols-4 lg:gap-3 gap-4">
-                                            {PET_TYPES.map((type) => (
-                                                <button
-                                                    key={type.id}
-                                                    onClick={() => setPetType(type)}
-                                                    className={`py-6 px-4 rounded-2xl border-2 font-bold transition-all flex flex-col items-center gap-2 ${petType.id === type.id
-                                                        ? 'border-[#2076C7] bg-blue-50 text-[#2076C7] shadow-sm'
-                                                        : 'border-slate-100 bg-slate-50 text-slate-400 hover:border-blue-200'
-                                                        }`}
-                                                >
-                                                    <type.icon size={32} />
-                                                    {type.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
+                                <AnimatePresence mode="wait">
+                                    {step === 1 && (
+                                        <motion.div key="1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+                                            {/* Pet Name */}
+                                            <div className="space-y-4">
+                                                <label className="block text-base md:text-lg font-extrabold text-[#2076C7]">Pet's Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={petName}
+                                                    onChange={(e) => setPetName(e.target.value)}
+                                                    placeholder="Enter Pet Name"
+                                                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#2076C7]/5"
+                                                />
+                                            </div>
 
-                                    {/* Breed / Sub-Type Dropdown */}
-                                    <div className="mt-8">
-                                        <label className="flex items-center gap-2 text-sm font-black text-slate-900 uppercase tracking-widest mb-4">
-                                            <IconBone className="text-[#1CADA3]" size={20} />
-                                            Breed / Sub-Type
-                                        </label>
-                                        <select
-                                            value={petSubType}
-                                            onChange={(e) => setPetSubType(e.target.value)}
-                                            className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-[#2076C7]/30 text-lg shadow-sm appearance-none cursor-pointer"
-                                        >
-                                            <option value="">Select Breed / Sub-Type</option>
-                                            {BREED_OPTIONS[petType.id]?.map((breed) => (
-                                                <option key={breed} value={breed}>{breed}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            {step === 2 && (
-                                <motion.div
-                                    key="step2"
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    className="space-y-8 flex-grow"
-                                >
-                                    <div>
-                                        <label className="flex items-center gap-2 text-sm font-black text-slate-900 uppercase tracking-widest mb-4">
-                                            <IconClock className="text-[#2076C7]" size={20} />
-                                            Pet Age
-                                        </label>
-                                        <div className="grid grid-cols-1 gap-3">
-                                            {AGE_GROUPS.map((g) => (
-                                                <button
-                                                    key={g.label}
-                                                    onClick={() => setAgeGroup(g)}
-                                                    className={`py-4 px-6 rounded-2xl border-2 font-bold transition-all text-left flex justify-between items-center ${ageGroup.label === g.label
-                                                        ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]'
-                                                        : 'border-slate-100 bg-slate-50 text-slate-500'
-                                                        }`}
-                                                >
-                                                    {g.label}
-                                                    {ageGroup.label === g.label && <IconCheck size={20} />}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="flex items-center gap-2 text-sm font-black text-slate-900 uppercase tracking-widest mb-4">
-                                            <IconBone className="text-[#2076C7]" size={20} />
-                                            Pet Breed (Optional)
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={petBreed}
-                                            onChange={(e) => setPetBreed(e.target.value)}
-                                            placeholder="Enter Breed"
-                                            className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-[#2076C7]/30"
-                                        />
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            {step === 3 && (
-                                <motion.div
-                                    key="step3"
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    className="space-y-8 flex-grow"
-                                >
-                                    <div>
-                                        <label className="flex items-center gap-2 text-sm font-black text-slate-900 uppercase tracking-widest mb-6">
-                                            <IconShieldCheck className="text-[#2076C7]" size={20} />
-                                            Sum Insured (Annually)
-                                        </label>
-                                        <div className="grid grid-cols-1 gap-3">
-                                            {SUM_INSURED_OPTIONS.map((opt) => (
-                                                <button
-                                                    key={opt.value}
-                                                    onClick={() => setSumInsured(opt)}
-                                                    className={`py-4 px-6 rounded-2xl border-2 font-black transition-all flex justify-between items-center ${sumInsured.value === opt.value
-                                                        ? 'border-[#2076C7] bg-blue-50 text-[#2076C7]'
-                                                        : 'border-slate-100 bg-slate-50 text-slate-500'
-                                                        }`}
-                                                >
-                                                    {opt.label}
-                                                    {sumInsured.value === opt.value && <IconCheck size={20} />}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <IconVaccine className="text-[#2076C7]" size={24} />
-                                                <div>
-                                                    <p className="text-sm font-black text-slate-900">Add OPD Cover?</p>
-                                                    <p className="text-[10px] text-slate-500 font-bold uppercase">Routine Checkups & Consultations</p>
+                                            {/* Pet Type */}
+                                            <div className="space-y-4">
+                                                <label className="block text-base md:text-lg font-extrabold text-[#2076C7]">Pet Type</label>
+                                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                                    {PET_TYPES.map(type => (
+                                                        <button key={type.id} onClick={() => setPetType(type)} className={`p-4 rounded-xl border-2 font-bold text-sm transition-all flex flex-col items-center gap-2 ${petType.id === type.id ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'bg-slate-50 text-slate-500 border-slate-200 hover:border-slate-300'}`}>
+                                                            <type.icon size={24} />
+                                                            <span className="text-[10px] uppercase tracking-wider">{type.label}</span>
+                                                        </button>
+                                                    ))}
                                                 </div>
                                             </div>
-                                            <button
-                                                onClick={() => setHasOPD(!hasOPD)}
-                                                className={`w-14 h-8 rounded-full relative transition-colors ${hasOPD ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3]' : 'bg-slate-200'
-                                                    }`}
-                                            >
-                                                <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${hasOPD ? 'left-7' : 'left-1'
-                                                    }`} />
-                                            </button>
-                                        </div>
+
+                                            {/* Breed */}
+                                            <div className="space-y-4">
+                                                <label className="block text-base md:text-lg font-extrabold text-[#2076C7]">Breed / Sub-Type</label>
+                                                <div className="relative">
+                                                    <select 
+                                                        value={petSubType} 
+                                                        onChange={(e) => setPetSubType(e.target.value)}
+                                                        className="w-full pl-5 pr-12 py-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none appearance-none cursor-pointer"
+                                                    >
+                                                        <option value="">Select Breed</option>
+                                                        {BREED_OPTIONS[petType.id]?.map((breed) => (
+                                                            <option key={breed} value={breed}>{breed}</option>
+                                                        ))}
+                                                    </select>
+                                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><IconChevronDown size={18} strokeWidth={3} /></div>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+
+                                    {step === 2 && (
+                                        <motion.div key="2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                                            <label className="block text-base md:text-lg font-extrabold text-[#2076C7]">Pet Age Group</label>
+                                            <div className="grid grid-cols-1 gap-3">
+                                                {AGE_GROUPS.map((g) => (
+                                                    <button
+                                                        key={g.label}
+                                                        onClick={() => setAgeGroup(g)}
+                                                        className={`p-5 rounded-xl border-2 text-left flex justify-between items-center transition-all ${ageGroup.label === g.label ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'}`}
+                                                    >
+                                                        <span className="font-bold">{g.label}</span>
+                                                        {ageGroup.label === g.label && <IconCheck size={20} />}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+
+                                    {step === 3 && (
+                                        <motion.div key="3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+                                            {/* Sum Insured */}
+                                            <div className="space-y-4">
+                                                <label className="block text-base md:text-lg font-extrabold text-[#2076C7]">Sum Insured (Annually)</label>
+                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                    {SUM_INSURED_OPTIONS.map(opt => (
+                                                        <button key={opt.value} onClick={() => setSumInsured(opt)} className={`p-4 rounded-xl border-2 font-black text-sm transition-all ${sumInsured.value === opt.value ? 'border-[#2076C7] bg-blue-50 text-[#2076C7]' : 'bg-slate-50 text-slate-500 border-slate-200 hover:border-slate-300'}`}>
+                                                            {opt.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* OPD Cover */}
+                                            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                                                <div>
+                                                    <p className="font-black text-slate-900">Add OPD Cover?</p>
+                                                    <p className="text-xs text-slate-400 font-bold mt-0.5">Routine Checkups & Consultations</p>
+                                                </div>
+                                                <button onClick={() => setHasOPD(!hasOPD)} className={`w-12 h-7 rounded-full relative transition-colors duration-300 ${hasOPD ? 'bg-[#1CADA3]' : 'bg-slate-200'}`}>
+                                                    <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all duration-300 ${hasOPD ? 'left-6' : 'left-1'}`} />
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                {/* Nav Buttons */}
+                                <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+                                    <button onClick={prevStep} disabled={step === 1} className="w-14 h-14 bg-slate-50 border border-slate-200 rounded-xl flex shrink-0 items-center justify-center disabled:opacity-0 hover:bg-blue-50 hover:text-[#2076C7] transition-all">
+                                        <IconArrowLeft size={20} />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (isStepValid()) {
+                                                if (step < 3) {
+                                                    nextStep();
+                                                } else {
+                                                    setShowPlans(true);
+                                                    setTimeout(() => {
+                                                        document.getElementById('recommended-plans')?.scrollIntoView({ behavior: 'smooth' });
+                                                    }, 100);
+                                                }
+                                            } else {
+                                                toast.error("Please enter pet's name");
+                                            }
+                                        }}
+                                        className="w-full max-w-[260px] md:max-w-[300px] mx-4 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black uppercase tracking-widest text-xs md:text-sm rounded-xl shadow-lg hover:shadow-[0_20px_40px_-10px_rgba(32,118,199,0.3)] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 md:gap-3"
+                                    >
+                                        {step === 3 ? 'View Recommended Plans' : 'Continue'}
+                                        <IconArrowRight size={18} strokeWidth={3} />
+                                    </button>
+                                    <div className="w-14 h-14 shrink-0 pointer-events-none opacity-0" />
+                                </div>
+
+                                {/* Key Insights Box */}
+                                <div className="p-6 rounded-[2rem] bg-gradient-to-br from-blue-50/50 to-teal-50/50 border border-[#2076C7]/10 mt-8 flex-grow flex flex-col justify-center">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <IconBolt size={20} className="text-[#2076C7]" />
+                                        <h4 className="font-extrabold text-slate-800 text-base">Key Pet Insights</h4>
                                     </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        <div className="mt-8 flex gap-4 pt-8 border-t border-slate-100">
-                            {step > 1 && (
-                                <button
-                                    onClick={prevStep}
-                                    className="flex-shrink-0 w-14 h-14 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200"
-                                >
-                                    <IconArrowLeft size={24} />
-                                </button>
-                            )}
-                            <button
-                                onClick={() => {
-                                    if (!isStepValid()) {
-                                        toast.error("Please enter your pet's name");
-                                        return;
-                                    }
-                                    if (step < 3) {
-                                        nextStep();
-                                    } else {
-                                        setShowPlans(true);
-                                        setTimeout(() => document.getElementById('recommended-plans')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                                    }
-                                }}
-                                className={`flex-grow py-4 font-black rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 ${isStepValid() ? 'bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed hover:scale-100'}`}
-                            >
-                                {step === 3 ? 'View Detailed Quotes' : 'Next Step'}
-                                <IconArrowRight size={20} />
-                            </button>
-                        </div>
-                    </motion.div>
-
-                    {/* Quick Summary Card */}
-                    <div className="space-y-6 lg:sticky lg:top-24">
-                        <motion.div
-                            layout
-                            className="bg-white p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] shadow-2xl relative overflow-hidden group"
-                        >
-                            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform duration-1000">
-                                <IconCalculator size={180} className="text-slate-200" />
+                                    <ul className="space-y-3.5">
+                                        <li className="flex items-start gap-3 text-xs md:text-sm text-slate-600 font-medium leading-relaxed">
+                                            <div className="w-2 h-2 rounded-full bg-[#1CADA3] mt-1.5 shrink-0 shadow-sm shadow-[#1CADA3]/30" />
+                                            <span><strong className="text-slate-800">Cashless network</strong> of top veterinary clinics and hospitals.</span>
+                                        </li>
+                                        <li className="flex items-start gap-3 text-xs md:text-sm text-slate-600 font-medium leading-relaxed">
+                                            <div className="w-2 h-2 rounded-full bg-[#1CADA3] mt-1.5 shrink-0 shadow-sm shadow-[#1CADA3]/30" />
+                                            <span><strong className="text-slate-800">Accident & Illness</strong> coverage included in all base plans.</span>
+                                        </li>
+                                        <li className="flex items-start gap-3 text-xs md:text-sm text-slate-600 font-medium leading-relaxed">
+                                            <div className="w-2 h-2 rounded-full bg-[#1CADA3] mt-1.5 shrink-0 shadow-sm shadow-[#1CADA3]/30" />
+                                            <span><strong className="text-slate-800">No medical tests</strong> required for pets under 7 years of age.</span>
+                                        </li>
+                                        <li className="flex items-start gap-3 text-xs md:text-sm text-slate-600 font-medium leading-relaxed">
+                                            <div className="w-2 h-2 rounded-full bg-[#1CADA3] mt-1.5 shrink-0 shadow-sm shadow-[#1CADA3]/30" />
+                                            <span><strong className="text-slate-800">Lifetime Renewability</strong> ensures your senior companions stay protected.</span>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
 
-                            <div className="relative z-10">
-                                <span className="text-[12px] font-black tracking-[0.3em] text-[#2076C7] mb-2 block uppercase">Monthly Premium</span>
-
-                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mt-3">
-                                    <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
-                                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                                            <petType.icon size={24} className="text-[#2076C7]" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg md:text-xl font-black text-slate-900">{petName || 'Your Pet'}</h3>
-                                            <p className="text-[10px] md:text-xs font-bold text-slate-400">{petType.label} | {ageGroup.label.split(' ')[0]}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-baseline gap-2 mb-4 md:mb-6 pb-4 md:pb-6 border-b border-slate-100">
-                                        <span className="text-4xl md:text-6xl font-black text-slate-900">₹{totalPremium.toLocaleString()}</span>
-                                        <span className="text-xs md:text-sm font-bold text-slate-400">/mo</span>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-2 md:gap-3">
-                                        <div className="bg-slate-50 p-3 md:p-4 rounded-xl border border-slate-100">
-                                            <div className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Coverage</div>
-                                            <div className="text-sm md:text-lg font-black text-slate-800">{sumInsured.label}</div>
-                                        </div>
-                                        <div className="bg-slate-50 p-3 md:p-4 rounded-xl border border-slate-100">
-                                            <div className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">OPD Cover</div>
-                                            <div className="text-sm md:text-lg font-black text-slate-800">{hasOPD ? 'Yes' : 'No'}</div>
-                                        </div>
+                            {/* Right Column: Visuals & Summary */}
+                            <div className="flex flex-col">
+                                {/* Donut Chart */}
+                                <div className="h-[240px] md:h-[280px] w-full mb-6 relative flex items-center justify-center">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie data={[{ value: 100 }]} cx="50%" cy="50%" innerRadius="70%" outerRadius="85%" fill="#f1f5f9" dataKey="value" stroke="none" isAnimationActive={false} />
+                                            <Pie data={chartData} cx="50%" cy="50%" innerRadius="70%" outerRadius="85%" dataKey="value" stroke="none" animationDuration={1200}>
+                                                {chartData.map((_, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} formatter={(value: any) => `₹${fmt(Number(value) || 0)}`} />
+                                            <Legend verticalAlign="bottom" height={36} iconType="circle" formatter={(value) => <span className="text-xs md:text-sm font-bold text-slate-500 uppercase tracking-widest ml-1">{value}</span>} />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                    {/* Central Label */}
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-8">
+                                        <div className="text-[10px] md:text-sm font-black text-slate-400 uppercase tracking-widest mb-1">Monthly Premium</div>
+                                        <div className="text-2xl font-black text-[#2076C7]">₹{fmt(totalPremium)}</div>
                                     </div>
                                 </div>
 
-                                <button
-                                    onClick={openPartner}
-                                    className="w-full mt-6 py-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white font-black rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-lg"
-                                >
-                                    Get This Plan
-                                    <IconArrowRight className="text-white" size={24} />
-                                </button>
-                            </div>
-                        </motion.div>
+                                {/* Summary Box */}
+                                <div className="bg-slate-50/50 rounded-[2.5rem] border border-blue-100/50 p-6 sm:p-8 shadow-sm flex-grow flex flex-col">
+                                    <div className="flex items-center gap-4 mb-6 border-l-4 border-[#2076C7] pl-5">
+                                        <h3 className="text-2xl font-extrabold text-gray-700 tracking-tight">Quote Summary</h3>
+                                    </div>
+                                    <div className="space-y-4 mb-6">
+                                        <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                                            <span className="text-sm font-bold text-slate-500">Pet Name</span>
+                                            <span className="text-base font-extrabold text-[#1CADA3]">{petName || '—'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                                            <span className="text-sm font-bold text-slate-500">Pet Type</span>
+                                            <span className="text-base font-extrabold text-[#1CADA3]">{petType.label}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                                            <span className="text-sm font-bold text-slate-500">Age Group</span>
+                                            <span className="text-base font-extrabold text-[#1CADA3]">{ageGroup.label.split(' ')[0]}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                                            <span className="text-sm font-bold text-slate-500">Sum Insured</span>
+                                            <span className="text-base font-extrabold text-[#1CADA3]">{sumInsured.label}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center py-2">
+                                            <span className="text-sm font-bold text-slate-500">Premium (incl. GST)</span>
+                                            <span className="text-lg md:text-xl font-extrabold text-[#1CADA3]">₹{fmt(totalPremium)}</span>
+                                        </div>
+                                    </div>
 
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl"
-                        >
-                            <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-start gap-4">
-                                <IconInfoCircle className="text-[#2076C7] flex-shrink-0 mt-0.5" size={20} />
-                                <p className="text-[11px] text-slate-600 leading-relaxed font-bold">
-                                    Premium is subject to change based on actual medical checkup results (if required). Taxes are included in the estimate.
-                                </p>
+                                    <button
+                                        onClick={openLogin}
+                                        className="w-full mt-auto py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black uppercase tracking-widest text-sm md:text-base shadow-[0_20px_40px_-10px_rgba(32,118,199,0.3)] hover:shadow-[0_25px_50px_-10px_rgba(32,118,199,0.4)] hover:-translate-y-1.5 transition-all duration-500 group"
+                                    >
+                                        Apply For Pet Insurance
+                                        <IconArrowRight size={16} className="inline-block ml-3 group-hover:translate-x-1.5 transition-transform" />
+                                    </button>
+                                </div>
+
+                                {/* Disclaimer */}
+                                <div className="mt-6 p-5 bg-yellow-50/50 border border-yellow-100 rounded-[1.5rem] text-xs md:text-sm leading-relaxed text-slate-500">
+                                    <p>* Figures are indicative. Final premium is subject to medical checkup results and insurer approval.</p>
+                                </div>
                             </div>
-                        </motion.div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                {/* --- Plan Comparison --- */}
-                {showPlans && (
-                    <motion.div
-                        id="recommended-plans"
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-20 border-t border-slate-200 pt-16"
-                    >
-                        <div className="text-center mb-12">
-                            <h3 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm leading-tight px-2">
-                                Compare Top Pet Plans
-                            </h3>
-                            <div className="w-24 h-1 mx-auto bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] rounded-full mt-4 mb-4" />
-                            <p className="text-base md:text-lg text-slate-500 font-bold mt-4 px-4 md:px-0">Recommended for {petName || 'your pet'}'s profile</p>
+        {/* Recommended Plans Section */}
+        <AnimatePresence>
+            {showPlans && (
+                <section id="recommended-plans" className="py-20 bg-white border-t border-slate-100">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6">
+                        <div className="text-center mb-16">
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                                 <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                        Recommended Pet Plans
+                    </h2>
+                            </motion.div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {PROVIDERS.map((p, idx) => (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {[
+                                { name: 'Digit Pet Care', ratio: '97.5%', network: '5,000+', color: '#2076C7', price: totalPremium },
+                                { name: 'Bajaj Allianz Pet', ratio: '98.2%', network: '4,500+', color: '#1CADA3', price: Math.round(totalPremium * 1.05) },
+                                { name: 'Future Generali', ratio: '96.8%', network: '3,800+', color: '#2076C7', price: Math.round(totalPremium * 0.95) }
+                            ].map((plan, idx) => (
                                 <motion.div
                                     key={idx}
-                                    whileHover={{ y: -8 }}
-                                    className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl flex flex-col h-full"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.1 }}
+                                    className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden flex flex-col group hover:border-[#2076C7]/30 transition-all duration-500"
                                 >
-                                    <div className="flex items-center gap-4 mb-8">
-                                        <div className={`w-14 h-14 flex-shrink-0 ${p.brandColor} rounded-2xl flex items-center justify-center text-white font-black text-xl`}>
-                                            {p.name.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <h4 className="text-xl font-black text-slate-900 leading-tight">{p.name}</h4>
-                                            <p className="text-xs font-bold text-[#1CADA3]">{p.planName}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-4 mb-8 flex-grow">
-                                        {[
-                                            { label: 'Medical Illness', val: p.medical },
-                                            { label: 'Surgery Limit', val: p.surgery },
-                                            { label: 'Recovery Benefit', val: p.recovery },
-                                            { label: 'Wellness Cover', val: p.wellness }
-                                        ].map((item, i) => (
-                                            <div key={i} className="flex justify-between items-center py-3 border-b border-slate-50">
-                                                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{item.label}</span>
-                                                <span className="text-sm font-black text-slate-900">{item.val}</span>
+                                    <div className="p-8">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-800 shadow-sm group-hover:scale-110 transition-transform duration-500">
+                                                <IconShieldCheck size={28} style={{ color: plan.color }} />
                                             </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="pt-6 mt-auto">
-                                        <div className="flex items-baseline justify-between mb-6">
-                                            <span className="text-sm font-bold text-slate-400">Monthly</span>
-                                            <span className="text-3xl font-black text-[#2076C7]">₹{Math.round(totalPremium * p.factor).toLocaleString()}</span>
+                                            <div className="px-3 py-1 bg-teal-50 text-[#1CADA3] text-[10px] font-black uppercase tracking-widest rounded-full border border-teal-100">
+                                                {plan.ratio} Claims
+                                            </div>
                                         </div>
-                                        <button onClick={openPartner} className="w-full py-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white font-black rounded-xl shadow-md hover:shadow-lg transition-all">
-                                            Apply Now
+                                        <h3 className="text-xl font-black text-[#2076C7] mb-2">{plan.name}</h3>
+                                        <p className="text-sm text-slate-400 font-bold mb-6">Network hospitals: {plan.network}</p>
+                                        
+                                        <div className="py-6 border-y border-slate-50 mb-8">
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-4xl font-black text-[#1CADA3]">₹{fmt(plan.price)}</span>
+                                                <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">/ monthly</span>
+                                            </div>
+                                        </div>
+
+                                        <ul className="space-y-4 mb-10">
+                                            {['Accidental Injury cover', 'Illness & Disease cover', 'Surgery & OT charges'].map((feature, i) => (
+                                                <li key={i} className="flex items-center gap-3 text-sm text-slate-600 font-bold">
+                                                    <div className="w-5 h-5 bg-blue-50 text-[#2076C7] rounded-full flex items-center justify-center shrink-0">
+                                                        <IconCheck size={12} strokeWidth={4} />
+                                                    </div>
+                                                    {feature}
+                                                </li>
+                                            ))}
+                                        </ul>
+
+                                        <button 
+                                            onClick={() => document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' })}
+                                            className="w-full py-4 bg-slate-50 border border-slate-100 rounded-2xl font-black uppercase tracking-widest text-xs text-slate-600 group-hover:bg-[#2076C7] group-hover:text-white group-hover:border-[#2076C7] group-hover:shadow-[0_20px_40px_-10px_rgba(32,118,199,0.3)] transition-all duration-500"
+                                        >
+                                            Select Plan
                                         </button>
                                     </div>
                                 </motion.div>
                             ))}
                         </div>
-                    </motion.div>
-                )}
-            </div>
-        </section >
+                        
+                        <div className="mt-16 text-center">
+                            <p className="text-sm text-slate-400 font-medium">Need help choosing? <Link href="/#contact" className="text-[#2076C7] font-black decoration-2">Talk to an expert</Link></p>
+                        </div>
+                    </div>
+                </section>
+            )}
+        </AnimatePresence>
+        </>
     );
 }

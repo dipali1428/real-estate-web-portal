@@ -1,5 +1,4 @@
-﻿import { Receipt, Calculator as CalcIcon, Percent, FileText, ArrowRight } from 'lucide-react';
-import TaxGuideContent from './TaxGuideContent';
+import { Receipt, Calculator as CalcIcon, Percent, FileText } from 'lucide-react';
 
 const TaxBenefits = () => {
     const taxData = [
@@ -8,29 +7,26 @@ const TaxBenefits = () => {
         { type: 'Long Term Capital Gains (LTCG)', rate: '10% (Without Indexation)', tenure: '> 12 Months', detail: 'Applicable if NCD sold on stock exchange after 1 year of holding' },
     ];
 
-    const handleDownload = () => {
-        window.print();
-    };
+
 
     return (
-        <section className="py-16 md:py-24 bg-white" id="tax">
-            {/* Added px-4 and max-w-7xl to ensure side margins on all screens */}
-            <div className="container-custom mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-                
+        <section className="py-12 md:py-16 bg-white font-sans px-4 sm:px-6 lg:px-8" id="tax">
+            <div className="container-custom mx-auto max-w-7xl">
+
                 {/* Centered Heading Section */}
-                <div className="text-center max-w-3xl mx-auto mb-12 md:mb-20">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
-                        Tax Benefits & Efficiency
+                <div className="text-center max-w-4xl mx-auto mb-16 px-4">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                        Tax Benefit & Efficiency
                     </h2>
-                    <div className="w-20 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-6"></div>
-                    <p className="text-gray-600 text-base md:text-lg font-medium leading-relaxed">
-                        Understanding the tax treatment of NCDs is crucial for maximizing your post-tax returns. NCDs offer attractive capital gains taxation compared to traditional FDs.
+
+                    <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed max-w-2xl mx-auto">
+                        Understand how NCDs can help you optimize your post-tax returns through smart investment planning.
                     </p>
                 </div>
 
                 {/* Main Content Grid: Stacks on mobile (flex-col), side-by-side on large (lg:flex-row) */}
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch">
-                    
+
                     {/* Left Section */}
                     <div className="lg:w-2/5 flex flex-col justify-between space-y-6">
                         <div className="space-y-6">
@@ -39,7 +35,7 @@ const TaxBenefits = () => {
                                     <div className="bg-[#1CADA3] text-white p-3 rounded-xl md:rounded-2xl shadow-lg shadow-[#1CADA3]/20 flex items-center justify-center shrink-0">
                                         <Percent className="w-5 h-5 md:w-6 md:h-6" />
                                     </div>
-                                    <h4 className="font-extrabold text-[#2076C7] text-lg md:text-xl">
+                                    <h4 className="font-extrabold text-[#2076C7] text-lg md:text-xl font-sans">
                                         Tax Efficient Alternative
                                     </h4>
                                 </div>
@@ -53,7 +49,7 @@ const TaxBenefits = () => {
                                     <div className="bg-[#2076C7] text-white p-3 rounded-xl md:rounded-2xl shadow-lg shadow-[#2076C7]/20 flex items-center justify-center shrink-0">
                                         <FileText className="w-5 h-5 md:w-6 md:h-6" />
                                     </div>
-                                    <h4 className="font-extrabold text-[#2076C7] text-lg md:text-xl">
+                                    <h4 className="font-extrabold text-[#2076C7] text-lg md:text-xl font-sans">
                                         TDS Management
                                     </h4>
                                 </div>
@@ -63,18 +59,6 @@ const TaxBenefits = () => {
                             </div>
                         </div>
 
-                        {/* Download Link - Centered on mobile, left-aligned on desktop */}
-                        <div className="mt-6 md:mt-10 flex justify-center lg:justify-start">
-                            <button
-                                onClick={handleDownload}
-                                className="flex items-center space-x-3 text-[#2076C7] font-extrabold group hover:text-[#1CADA3] transition-colors text-sm md:text-base"
-                            >
-                                <span className="border-b-2 border-transparent group-hover:border-[#1CADA3]">
-                                    Download Comprehensive Tax Guide
-                                </span>
-                                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-2" />
-                            </button>
-                        </div>
                     </div>
 
                     {/* Right Section */}
@@ -83,7 +67,7 @@ const TaxBenefits = () => {
                             {/* Background decoration - hidden on very small screens for clarity */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-[#1CADA3]/5 rounded-full blur-[80px] pointer-events-none" />
 
-                            <h3 className="text-xl md:text-2xl text-slate-500 font-extrabold mb-6 md:mb-8 flex items-center relative z-10">
+                            <h3 className="text-xl md:text-2xl text-slate-500 font-extrabold mb-6 md:mb-8 flex items-center relative z-10 font-sans">
                                 <Receipt className="w-5 h-5 md:w-6 md:h-6 mr-3 text-[#2076C7]" />
                                 Tax Treatment Table
                             </h3>
@@ -106,7 +90,7 @@ const TaxBenefits = () => {
                                             <CalcIcon className="w-4 h-4 mr-2" />
                                             Holding Period: {item.tenure}
                                         </div>
-                                        <p className="text-xs text-gray-500 font-medium leading-relaxed italic">
+                                        <p className="text-xs text-gray-500 font-medium leading-relaxed">
                                             {item.detail}
                                         </p>
                                     </div>
@@ -126,10 +110,7 @@ const TaxBenefits = () => {
                 </div>
             </div>
 
-            {/* Printable Tax Guide Content */}
-            <div className="hidden print:block print:static print:w-full print:h-auto">
-                <TaxGuideContent />
-            </div>
+
         </section>
     );
 };

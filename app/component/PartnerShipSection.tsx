@@ -7,7 +7,7 @@ const stats = [
   {
     icon: <Users className="w-14 h-14 text-[#1CADA3]" />,
     title: "Trusted Partnerships",
-    value: "2700+",
+    value: "3000+",
     subtitle: "Active DSA & Partners",
   },
   {
@@ -19,7 +19,7 @@ const stats = [
   {
     icon: <MapPin className="w-14 h-14 text-[#1CADA3]" />,
     title: "Cities Covered",
-    value: "127+",
+    value: "134+",
     subtitle: "Across India",
   },
 ];

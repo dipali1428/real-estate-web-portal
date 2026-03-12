@@ -14,7 +14,7 @@ const TaxGuideContent = () => {
                         alt="Infinity Arthvishva Logo"
                         className="h-20 w-auto mb-6"
                     />
-                    <h1 className="text-4xl font-black text-[#2076C7] uppercase tracking-tighter">
+                    <h1 className="text-4xl font-black text-[#2076C7] uppercase tracking-tighter font-sans">
                         {taxGuideData.title}
                     </h1>
                 </div>
@@ -31,7 +31,7 @@ const TaxGuideContent = () => {
                 </div>
                 <div>
                     <p className="text-xs font-black uppercase tracking-[0.2em] mb-1 opacity-80">PRO TIP: Tax Optimization</p>
-                    <p className="text-xl font-black italic leading-tight">
+                    <p className="text-xl font-black leading-tight">
                         "{taxGuideData.sections[4].content}"
                     </p>
                 </div>
@@ -41,7 +41,7 @@ const TaxGuideContent = () => {
             <div className="space-y-8">
                 {/* Interest Income */}
                 <div className="section-block" style={{ pageBreakInside: 'avoid' }}>
-                    <h2 className="text-2xl font-black text-[#0B1C2E] mb-4 border-l-8 border-[#2076C7] pl-4 flex items-center gap-3">
+                    <h2 className="text-2xl font-black text-[#0B1C2E] mb-4 border-l-8 border-[#2076C7] pl-4 flex items-center gap-3 font-sans">
                         <Receipt className="w-7 h-7 text-[#2076C7]" />
                         {taxGuideData.sections[0].title}
                     </h2>
@@ -54,7 +54,7 @@ const TaxGuideContent = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8" style={{ pageBreakInside: 'avoid' }}>
                     <div className="p-8 border-2 border-slate-100 rounded-[2.5rem] bg-white shadow-sm overflow-hidden relative">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-[#2076C7]/5 rounded-bl-full" />
-                        <h3 className="text-xl font-black text-[#0B1C2E] mb-4 flex items-center gap-3">
+                        <h3 className="text-xl font-black text-[#0B1C2E] mb-4 flex items-center gap-3 font-sans">
                             <span className="w-8 h-8 bg-[#2076C7] text-white rounded-lg flex items-center justify-center text-sm">ST</span>
                             {taxGuideData.sections[1].title}
                         </h3>
@@ -65,7 +65,7 @@ const TaxGuideContent = () => {
 
                     <div className="p-8 border-2 border-[#1CADA3]/20 rounded-[2.5rem] bg-[#1CADA3]/5 shadow-sm overflow-hidden relative">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-[#1CADA3]/10 rounded-bl-full" />
-                        <h3 className="text-xl font-black text-[#0B1C2E] mb-4 flex items-center gap-3">
+                        <h3 className="text-xl font-black text-[#0B1C2E] mb-4 flex items-center gap-3 font-sans">
                             <span className="w-8 h-8 bg-[#1CADA3] text-white rounded-lg flex items-center justify-center text-sm">LT</span>
                             {taxGuideData.sections[2].title}
                         </h3>
@@ -80,7 +80,7 @@ const TaxGuideContent = () => {
 
                 {/* TDS & Exemptions */}
                 <div className="section-block" style={{ pageBreakInside: 'avoid' }}>
-                    <h2 className="text-2xl font-black text-[#0B1C2E] mb-6 border-l-8 border-[#1CADA3] pl-4">
+                    <h2 className="text-2xl font-black text-[#0B1C2E] mb-6 border-l-8 border-[#1CADA3] pl-4 font-sans">
                         {taxGuideData.sections[3].title}
                     </h2>
                     <div className="space-y-4">
@@ -97,7 +97,7 @@ const TaxGuideContent = () => {
 
                 {/* Documentation Section */}
                 <div className="p-8 bg-[#2076C7]/5 border-L-4 border-[#2076C7] rounded-[2rem]" style={{ pageBreakInside: 'avoid' }}>
-                    <h2 className="text-2xl font-black text-[#0B1C2E] mb-2 flex items-center gap-3">
+                    <h2 className="text-2xl font-black text-[#0B1C2E] mb-2 flex items-center gap-3 font-sans">
                         <Info className="w-7 h-7 text-[#2076C7]" />
                         Ready to Optimize?
                     </h2>
@@ -113,7 +113,7 @@ const TaxGuideContent = () => {
                     Official Tax Compliance Resource
                 </p>
                 <div className="bg-slate-50 p-6 rounded-2xl">
-                    <p className="text-[10px] text-slate-500 font-medium leading-loose max-w-2xl mx-auto italic">
+                    <p className="text-[10px] text-slate-500 font-medium leading-loose max-w-2xl mx-auto">
                         {taxGuideData.disclaimer}
                     </p>
                 </div>

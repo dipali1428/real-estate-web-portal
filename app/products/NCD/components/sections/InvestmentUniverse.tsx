@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Landmark, ShieldCheck, ArrowUpRight, TrendingUp, Info } from 'lucide-react';
@@ -16,13 +16,12 @@ const InvestmentUniverse = () => {
     };
 
     return (
-        <section className="py-12" id="investment-universe">
-            <div className="container-custom">
+        <section className="py-12 md:py-16 font-sans px-4 sm:px-6 lg:px-8" id="investment-universe">
+            <div className="container-custom mx-auto max-w-7xl">
                 <div className="text-center max-w-3xl mx-auto mb-12 px-4">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Explore Our Investment Universe
                     </h2>
-                    <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
                     <p className="text-lg text-gray-600 font-medium">
                         A curated selection of the most trusted, high-yield Non-Convertible Debentures (NCDs) available in the Indian market today.
                     </p>
@@ -58,7 +57,7 @@ const InvestmentUniverse = () => {
                                         {product.safety} Safety
                                     </span>
 
-                                    <h4 className="text-lg font-extrabold text-[#0B1C2E] leading-snug line-clamp-1">
+                                    <h4 className="text-lg font-extrabold text-[#0B1C2E] leading-snug line-clamp-1 font-sans">
                                         {product.issuer}
                                     </h4>
 
@@ -92,6 +91,7 @@ const InvestmentUniverse = () => {
 
                                 {/* CTA */}
                                 <button
+                                    suppressHydrationWarning={true}
                                     onClick={() => handleLearnMore(product.type)}
                                     className="w-full py-3 rounded-xl
                            flex items-center justify-center gap-2
@@ -116,7 +116,7 @@ const InvestmentUniverse = () => {
                                 <ShieldCheck className="w-8 h-8 text-[#1CADA3]" />
                             </div>
                             <div>
-                                <h5 className="text-xl font-extrabold text-[#0B1C2E]">Safety-First Approach</h5>
+                                <h5 className="text-xl font-extrabold text-[#0B1C2E] font-sans">Safety-First Approach</h5>
                                 <p className="text-gray-600 font-medium max-w-lg">All instruments are handpicked based on rigorous credit analysis.</p>
                             </div>
                         </div>

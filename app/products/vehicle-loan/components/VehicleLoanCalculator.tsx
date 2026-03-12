@@ -206,12 +206,11 @@ export default function VehicleLoanCalculator() {
 
     const { paymentAmount, totalInterest, totalPayment, effectiveAnnualRate } = loanResults;
 
-    useEffect(() => {
-        if (chartRef.current) {
-            chartRef.current.data.datasets[0].data = [loanAmount, totalInterest];
-            chartRef.current.update('none');
-        }
-    }, [loanAmount, totalInterest]);
+    // Calculate slider background gradient
+    const getSliderBackground = (value: number, min: number, max: number) => {
+        const percentage = ((value - min) / (max - min)) * 100;
+        return `linear-gradient(to right, #1CADA3 0%, #1CADA3 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
+    };
 
     useEffect(() => {
         if (canvasRef.current && !chartRef.current) {
@@ -220,20 +219,21 @@ export default function VehicleLoanCalculator() {
                 chartRef.current = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Principal Amount', 'Total Interest'],
+                        labels: ['Loan Amount', 'Total Interest'],
                         datasets: [{
-                            data: [loanAmount, totalInterest],
-                            backgroundColor: ['#1CADA3', '#2076C7'],
+                            data: [loanAmount, totalInterest > 0 ? totalInterest : loanAmount * 0.3],
+                            backgroundColor: ['#1CADA3', '#E5E7EB'],
+                            hoverBackgroundColor: ['#17b8ae', '#d1d5db'],
                             borderWidth: 0
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        cutout: '78%',
                         plugins: {
                             legend: {
-                                position: 'bottom' as const,
-                                labels: { font: { family: "'Inter', sans-serif" } }
+                                display: false
                             },
                             tooltip: {
                                 callbacks: {
@@ -257,7 +257,15 @@ export default function VehicleLoanCalculator() {
                 chartRef.current = null;
             }
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (chartRef.current) {
+            chartRef.current.data.datasets[0].data = [loanAmount, totalInterest > 0 ? totalInterest : 0];
+            chartRef.current.update('active');
+        }
+    }, [loanAmount, totalInterest]);
 
     const handleLoanAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => setLoanAmount(Number(e.target.value));
     const handleInterestRateChange = (e: React.ChangeEvent<HTMLInputElement>) => setAnnualInterestRate(Number(e.target.value));
@@ -298,10 +306,10 @@ export default function VehicleLoanCalculator() {
     };
 
     return (
-        <section className="py-24 bg-gray-50 relative overflow-hidden" id="calculator">
+        <section className="py-16 md:py-20 bg-white relative overflow-hidden" id="calculator">
             <div className="container mx-auto px-4">
-                <div className="max-w-3xl mx-auto text-center mb-16 px-4">
-                    <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-linear-to-r from-[#2076C7] to-[#1CADA3]">
+                <div className="max-w-3xl mx-auto text-center mb-10 px-4">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Vehicle Loan EMI Calculator
                     </h2>
                     <p className="text-lg text-gray-500 font-medium">
@@ -309,194 +317,328 @@ export default function VehicleLoanCalculator() {
                     </p>
                 </div>
 
-                <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden max-w-7xl mx-auto border border-gray-100">
-                    <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
-                        <h1 className="text-3xl font-bold mb-2">Estimate Your EMI</h1>
-                        <p className="text-blue-100 font-medium font-sans">Get complete clarity on your repayment schedule</p>
+                <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
+                    <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 px-4 sm:px-8 text-center">
+                        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">Vehicle Loan Calculator</h1>
+                        <p className="text-blue-100 text-sm sm:text-base">Calculate your Loan EMI and Payment Schedule</p>
                     </div>
 
-                    <div className="flex flex-col lg:flex-row p-6 lg:p-10 font-sans gap-8 lg:gap-12">
+                    <div className="flex flex-col lg:flex-row p-4 lg:p-5 font-sans">
                         {/* Input Section */}
                         <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
 
                             {/* Loan Amount */}
-                            <div className="mb-8">
-                                <label htmlFor="loanAmount" className="block text-[#2076C7] font-bold text-lg mb-3">
-                                    Loan Amount
+                            <div className="mb-2">
+                                <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-1">
+                                    Loan Amount (₹)
                                 </label>
-                                <div className="relative mb-4">
-                                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-lg">₹</span>
+                                <div className="slider-container mb-2">
+                                    <input
+                                        type="range"
+                                        id="loanAmount"
+                                        min="10000"
+                                        max="5000000"
+                                        step="10000"
+                                        value={loanAmount}
+                                        onChange={handleLoanAmountChange}
+                                        className="w-full h-2 rounded-lg cursor-pointer slider accent-teal-600 appearance-none"
+                                        style={{
+                                            background: getSliderBackground(loanAmount, 10000, 5000000)
+                                        }}
+                                    />
+                                    <div className="flex justify-between text-sm text-gray-600 mt-1">
+                                        <span>₹10,000</span>
+                                        <span>₹50,00,000</span>
+                                    </div>
+                                </div>
+                                <div className="relative">
                                     <input
                                         type="text"
                                         id="loanAmountInput"
                                         value={getLoanAmountDisplayValue()}
                                         onChange={handleLoanAmountInputChange}
                                         onWheel={handleWheel}
-                                        className="w-full px-4 py-4 pl-10 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#2076C7] bg-gray-50 focus:bg-white transition-all text-gray-900 font-bold text-xl placeholder:text-gray-400 shadow-inner"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 transition-colors pr-12 text-gray-800 placeholder:text-gray-400"
                                         placeholder="Enter loan amount"
                                     />
-                                </div>
-                                <div className="slider-container px-2">
-                                    <input
-                                        type="range"
-                                        id="loanAmount"
-                                        min="50000"
-                                        max="5000000"
-                                        step="10000"
-                                        value={loanAmount}
-                                        onChange={handleLoanAmountChange}
-                                        className="w-full h-2.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#2076C7]"
-                                    />
-                                    <div className="flex justify-between text-xs font-semibold text-gray-500 mt-2 uppercase tracking-wide">
-                                        <span>₹50K</span>
-                                        <span>₹50L</span>
-                                    </div>
+                                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
                                 </div>
                             </div>
 
                             {/* Interest Rate */}
-                            <div className="mb-8">
-                                <label htmlFor="interestRate" className="block text-[#1CADA3] font-bold text-lg mb-3">
-                                    Annual Interest Rate
+                            <div className="mb-2">
+                                <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-1">
+                                    Annual Interest Rate (%)
                                 </label>
-                                <div className="relative mb-4">
+                                <div className="slider-container mb-2">
+                                    <input
+                                        type="range"
+                                        id="interestRate"
+                                        min="0.1"
+                                        max="30"
+                                        step="0.1"
+                                        value={annualInterestRate}
+                                        onChange={handleInterestRateChange}
+                                        className="w-full h-2 rounded-lg cursor-pointer slider accent-teal-600 appearance-none"
+                                        style={{
+                                            background: getSliderBackground(annualInterestRate, 0.1, 30)
+                                        }}
+                                    />
+                                    <div className="flex justify-between text-sm text-gray-600 mt-1">
+                                        <span>0.1%</span>
+                                        <span>30%</span>
+                                    </div>
+                                </div>
+                                <div className="relative">
                                     <input
                                         type="number"
                                         id="interestRateInput"
                                         min="0.1"
-                                        max="25"
+                                        max="30"
                                         step="0.1"
                                         value={getInterestRateDisplayValue()}
                                         onChange={handleInterestRateInputChange}
                                         onWheel={handleNumberInputWheel}
-                                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#1CADA3] bg-gray-50 focus:bg-white transition-all pr-12 text-gray-900 font-bold text-xl placeholder:text-gray-400 shadow-inner"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 transition-colors pr-12 text-gray-800"
                                     />
-                                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-lg">%</span>
-                                </div>
-                                <div className="slider-container px-2">
-                                    <input
-                                        type="range"
-                                        id="interestRate"
-                                        min="5"
-                                        max="20"
-                                        step="0.1"
-                                        value={annualInterestRate}
-                                        onChange={handleInterestRateChange}
-                                        className="w-full h-2.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#1CADA3]"
-                                    />
-                                    <div className="flex justify-between text-xs font-semibold text-gray-500 mt-2 uppercase tracking-wide">
-                                        <span>5%</span>
-                                        <span>20%</span>
-                                    </div>
+                                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
                                 </div>
                             </div>
 
                             {/* Loan Tenure */}
-                            <div className="mb-8">
-                                <label htmlFor="loanTerm" className="block text-gray-800 font-bold text-lg mb-3">
-                                    Loan Tenure
+                            <div className="mb-2">
+                                <label htmlFor="loanTerm" className="block text-[#2076C7] font-semibold mb-1">
+                                    Loan Tenure (Months)
                                 </label>
-                                <div className="relative mb-4">
+                                <div className="slider-container mb-2">
+                                    <input
+                                        type="range"
+                                        id="loanTerm"
+                                        min="1"
+                                        max="120"
+                                        step="1"
+                                        value={loanTermMonths}
+                                        onChange={handleTenureChange}
+                                        className="w-full h-2 rounded-lg cursor-pointer slider accent-teal-600 appearance-none"
+                                        style={{
+                                            background: getSliderBackground(loanTermMonths, 1, 120)
+                                        }}
+                                    />
+                                    <div className="flex justify-between text-sm text-gray-600 mt-1">
+                                        <span>1 Month</span>
+                                        <span>120 Months</span>
+                                    </div>
+                                </div>
+                                <div className="relative">
                                     <input
                                         type="number"
                                         id="loanTermInput"
-                                        min="12"
-                                        max="84"
+                                        min="1"
+                                        max="120"
                                         step="1"
                                         value={getTenureDisplayValue()}
                                         onChange={handleTenureInputChange}
                                         onWheel={handleNumberInputWheel}
-                                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-gray-800 bg-gray-50 focus:bg-white transition-all pr-24 text-gray-900 font-bold text-xl placeholder:text-gray-400 shadow-inner"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 transition-colors pr-24 text-gray-800"
                                     />
-                                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-base">
+                                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                                         Months
                                     </span>
                                 </div>
-                                <div className="slider-container px-2">
-                                    <input
-                                        type="range"
-                                        id="loanTerm"
-                                        min="12"
-                                        max="84"
-                                        step="1"
-                                        value={loanTermMonths}
-                                        onChange={handleTenureChange}
-                                        className="w-full h-2.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gray-800"
-                                    />
-                                    <div className="flex justify-between text-xs font-semibold text-gray-500 mt-2 uppercase tracking-wide">
-                                        <span>12 Months (1Y)</span>
-                                        <span>84 Months (7Y)</span>
-                                    </div>
+                            </div>
+
+                            {/* Payment Frequency */}
+                            <div className="mb-4">
+                                <label className="block text-[#2076C7] font-semibold mb-1">
+                                    Payment Frequency
+                                </label>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                                    {frequencyOptions.slice(0, 3).map((option) => (
+                                        <button
+                                            key={option.value}
+                                            type="button"
+                                            onClick={() => setPaymentFrequency(option.value)}
+                                            className={`py-1 px-4 rounded-lg border transition-all ${paymentFrequency === option.value ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
+                                        >
+                                            <div className="text-[13px] font-semibold">{option.label.split('(')[0]}</div>
+                                            <div className="text-[10px] mt-0.5 opacity-75">
+                                                {option.label.includes('(') ? option.label.split('(')[1].replace(')', '') : ''}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-2">
+                                    {frequencyOptions.slice(3, 6).map((option) => (
+                                        <button
+                                            key={option.value}
+                                            type="button"
+                                            onClick={() => setPaymentFrequency(option.value)}
+                                            className={`py-1 px-4 rounded-lg border transition-all ${paymentFrequency === option.value ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
+                                        >
+                                            <div className="text-[13px] font-semibold">{option.label.split('(')[0]}</div>
+                                            <div className="text-[10px] mt-0.5 opacity-75">
+                                                {option.label.includes('(') ? option.label.split('(')[1].replace(')', '') : ''}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-2">
+                                    {frequencyOptions.slice(6).map((option) => (
+                                        <button
+                                            key={option.value}
+                                            type="button"
+                                            onClick={() => setPaymentFrequency(option.value)}
+                                            className={`py-1 px-4 rounded-lg border transition-all ${paymentFrequency === option.value ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
+                                        >
+                                            <div className="text-[13px] font-semibold">{option.label.split('(')[0]}</div>
+                                            <div className="text-[10px] mt-0.5 opacity-75">
+                                                {option.label.includes('(') ? option.label.split('(')[1].replace(')', '') : ''}
+                                            </div>
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Results & Visualization Section */}
-                        <div className="flex-1 min-w-0 flex flex-col justify-between">
-                            <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 mb-8">
-                                <div className="text-center">
-                                    <div className="text-sm text-gray-600 font-semibold mb-2 uppercase tracking-wider">Your Estimated EMI</div>
-                                    <div className="text-4xl sm:text-5xl font-extrabold text-[#2076C7] font-sans drop-shadow-sm">
+                        {/* Visualization Section */}
+                        <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0">
+                            <div className="chart-container h-44 sm:h-56 mb-4 sm:mb-6 relative flex items-center justify-center">
+                                <canvas ref={canvasRef}></canvas>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <div className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+                                        ESTIMATED EMI
+                                    </div>
+                                    <div className="text-xl sm:text-3xl font-extrabold text-[#009B91] font-sans">
                                         {paymentAmount > 0 ? formatCurrency(paymentAmount) : '₹0'}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="chart-container h-64 mb-8">
-                                <canvas ref={canvasRef}></canvas>
+                            <div className="flex justify-center gap-8 mb-6">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 rounded-full bg-[#1CADA3]"></div>
+                                    <span className="text-sm font-bold text-gray-700">Loan Amount</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 rounded-full bg-[#E5E7EB]"></div>
+                                    <span className="text-sm font-bold text-gray-700">Total Interest</span>
+                                </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center">
-                                    <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Total Principal</div>
-                                    <div className="text-lg font-bold text-gray-900">{formatCurrency(loanAmount)}</div>
-                                </div>
-                                <div className="bg-teal-50/50 p-4 rounded-xl border border-teal-100 text-center">
-                                    <div className="text-xs text-[#1CADA3] font-semibold uppercase tracking-wider mb-1">Total Interest</div>
-                                    <div className="text-lg font-bold text-[#1CADA3]">{formatCurrency(totalInterest)}</div>
-                                </div>
-                                <div className="col-span-2 bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200 flex justify-between items-center shadow-sm">
-                                    <div className="text-sm text-gray-600 font-semibold uppercase tracking-wider">Total Amount Payable</div>
-                                    <div className="text-xl font-bold text-gray-900">{formatCurrency(totalPayment)}</div>
+                            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
+                                <h5 className="font-semibold mb-4 text-lg bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">Loan Summary</h5>
+                                <div className="space-y-1.5">
+                                    <div className="flex justify-between pb-1 border-b border-gray-200">
+                                        <span className="text-gray-600 text-sm">Loan Amount</span>
+                                        <span className="font-medium font-sans text-sm text-[#1CADA3]">
+                                            {loanAmount > 0 ? formatCurrency(loanAmount) : '₹0'}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between pb-1 border-b border-gray-200">
+                                        <span className="text-gray-600 text-sm">Interest Rate</span>
+                                        <span className="font-medium font-sans text-sm text-[#1CADA3]">
+                                            {annualInterestRate > 0 ? `${annualInterestRate}%` : '0%'}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between pb-1 border-b border-gray-200">
+                                        <span className="text-gray-600 text-sm">Loan Tenure</span>
+                                        <span className="font-medium font-sans text-sm text-[#1CADA3]">
+                                            {loanTermMonths > 0 ? formatLoanTerm(loanTermMonths) : '0'}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between pb-1 border-b border-gray-200">
+                                        <span className="text-gray-600 text-sm">Payment Frequency</span>
+                                        <span className="font-medium font-sans text-sm text-[#1CADA3] capitalize">
+                                            {paymentFrequency}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between pb-1 border-b border-gray-200">
+                                        <span className="text-gray-600 text-sm">Total Payments</span>
+                                        <span className="font-medium font-sans text-sm text-[#1CADA3]">
+                                            {calculateTotalPayments()}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between pb-1 border-b border-gray-200 text-sm">
+                                        <span className="text-gray-600">Effective Annual Rate</span>
+                                        <span className="font-medium font-sans text-[#1CADA3]">
+                                            {effectiveAnnualRate > 0 ? `${effectiveAnnualRate.toFixed(2)}%` : '0%'}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between pt-2">
+                                        <span className="text-gray-600 font-semibold text-sm">Total Interest</span>
+                                        <span className="font-bold font-sans text-sm text-[#1CADA3]">
+                                            {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Insights Box specific to Vehicle Loan */}
-                <div className="max-w-7xl mx-auto mt-12 mb-8">
-                    <div className="bg-white rounded-[2rem] border-2 border-[#1CADA3]/20 shadow-lg p-8 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#1CADA3]/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+                    {/* Insights Section Integrated */}
+                    <div className="border-t border-gray-100 p-5 lg:p-6 bg-gray-50/30">
+                        <h2 className="text-xl font-bold mb-2 flex items-center gap-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                            <span className="text-yellow-500">
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.477.859h4z" />
+                                </svg>
+                            </span>
+                            Key Insights
+                        </h2>
 
-                        <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                            <span className="bg-[#1CADA3]/10 text-[#1CADA3] p-2 rounded-lg"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></span>
-                            Smart Vehicle Financing Insights
-                        </h3>
+                        <div className="text-sm text-gray-700 leading-relaxed">
+                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 list-disc pl-5 mb-4">
+                                <li>
+                                    Your vehicle EMI will be{' '}
+                                    <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                                        {paymentAmount > 0 ? formatCurrency(paymentAmount) : '₹0'}
+                                    </span>{' '}
+                                    for {loanTermMonths > 0 ? formatLoanTerm(loanTermMonths) : '0 months'}
+                                </li>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="flex gap-4 items-start">
-                                <div className="w-2 h-2 rounded-full bg-[#2076C7] mt-2 shrink-0" />
-                                <p className="text-gray-700 font-medium">
-                                    By paying an extra <strong>{formatCurrency(paymentAmount * 0.1)}</strong> (10% more) each month, you could own your vehicle <strong className="text-[#2076C7]">{Math.floor(loanTermMonths * 0.15)} months earlier</strong> and save significantly on interest.
-                                </p>
-                            </div>
-                            <div className="flex gap-4 items-start">
-                                <div className="w-2 h-2 rounded-full bg-[#1CADA3] mt-2 shrink-0" />
-                                <p className="text-gray-700 font-medium">
-                                    Interest constitutes <strong>{loanAmount > 0 ? ((totalInterest / totalPayment) * 100).toFixed(1) : '0'}%</strong> of your total repayment. Opting for a higher down payment can drastically reduce this burden.
-                                </p>
-                            </div>
-                            <div className="flex gap-4 items-start">
-                                <div className="w-2 h-2 rounded-full bg-amber-500 mt-2 shrink-0" />
-                                <p className="text-gray-700 font-medium">
-                                    If this loan is for an Electric Vehicle (EV), you might be eligible for tax deductions under Section 80EEB up to ₹1.5 Lakhs annually.
-                                </p>
-                            </div>
-                            <div className="flex gap-4 items-start md:col-span-2 bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                <p className="text-[#2076C7] font-semibold text-sm">
-                                    💡 Tip: Before applying, check your CIBIL score. A score above 750 can help you negotiate the interest rate down by 0.5% to 1%, saving you roughly {formatCurrency(totalInterest * 0.1)} over the loan tenure.
-                                </p>
+                                <li>
+                                    Interest constitutes{' '}
+                                    <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                                        {loanAmount > 0 && totalPayment > 0 ? ((totalInterest / totalPayment) * 100).toFixed(1) : '0'}%
+                                    </span>{' '}
+                                    of your total repayment amount
+                                </li>
+
+                                <li>
+                                    By paying an extra{' '}
+                                    <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                                        {formatCurrency(paymentAmount * 0.1)}
+                                    </span>{' '}
+                                    per month, you could own your vehicle{' '}
+                                    <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                                        {Math.floor(loanTermMonths * 0.15)} months earlier
+                                    </span>
+                                </li>
+
+                                <li>
+                                    Effective annual borrowing cost is{' '}
+                                    <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                                        {effectiveAnnualRate > 0 ? effectiveAnnualRate.toFixed(2) : '0.00'}%
+                                    </span>{' '}
+                                    (considers {paymentFrequency} compounding)
+                                </li>
+                            </ul>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
+                                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                                    <p className="text-sm text-yellow-800">
+                                        <strong className="block mb-1 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">💡 CIBIL Score Tip:</strong>
+                                        A score above 750 can help you negotiate the interest rate down by 0.5%–1%, saving roughly{' '}
+                                        <span className="font-semibold">{formatCurrency(totalInterest * 0.1)}</span> over the loan tenure.
+                                    </p>
+                                </div>
+
+                                <div className="p-4 bg-blue-50/50 border border-blue-100 rounded-xl">
+                                    <p className="text-sm text-gray-600">
+                                        <strong className="block mb-1 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">Note for EV Buyers:</strong>
+                                        If this is for an Electric Vehicle, you may be eligible for tax deductions under Section 80EEB up to ₹1.5 Lakhs annually.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>

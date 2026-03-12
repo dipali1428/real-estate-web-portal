@@ -24,65 +24,65 @@ const InsurersMarquee = () => {
     if (!mounted) return null;
 
     return (
-        <section className="py-6 bg-white border-b border-slate-50 overflow-hidden select-none min-h-[160px] flex flex-col justify-center">
-            <div className="container-custom px-4 mb-6">
+        <section className="py-6 bg-white border-b border-slate-50 overflow-hidden select-none min-h-[160px] flex flex-col justify-center font-sans">
+            <div className="container-custom px-6 md:px-10 mx-auto max-w-7xl">
                 <p className="text-[10px] font-black text-[#2076C7]/60 uppercase tracking-[0.4em] text-center mb-2">Institutional Partners</p>
-                <div className="flex items-center justify-center gap-4">
+                <div className="flex items-center justify-center gap-4 mb-8">
                     <div className="h-[1px] w-8 md:w-16 bg-slate-100" />
                     <h3 className="text-sm font-bold text-gray-400 text-center uppercase tracking-widest px-4">Trusted Claims & Service Data</h3>
                     <div className="h-[1px] w-8 md:w-16 bg-slate-100" />
                 </div>
-            </div>
 
-            <div className="relative flex overflow-hidden">
-                <motion.div
-                    className="flex whitespace-nowrap gap-12 md:gap-24 py-4"
-                    animate={{
-                        x: [0, -2500],
-                    }}
-                    transition={{
-                        x: {
-                            repeat: Infinity,
-                            repeatType: "loop",
-                            duration: 50,
-                            ease: "linear",
-                        },
-                    }}
-                >
-                    {/* Triple sets for perfect infinite loop flow */}
-                    {[...partners, ...partners, ...partners].map((partner, idx) => (
-                        <div
-                            key={idx}
-                            className="flex flex-col items-center justify-center gap-3 transition-all duration-300 hover:scale-105 group/item px-4 border-r border-slate-50 last:border-0"
-                        >
-                            <div className="h-8 md:h-10 flex items-center justify-center mb-1">
-                                <img
-                                    src={partner.logo}
-                                    alt={partner.name}
-                                    className="h-full w-auto object-contain grayscale group-hover/item:grayscale-0 transition-all duration-500 opacity-60 group-hover/item:opacity-100"
-                                    onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.style.display = 'none';
-                                        const fallback = target.nextElementSibling as HTMLElement;
-                                        if (fallback) fallback.classList.remove('hidden');
-                                    }}
-                                />
-                                <span className="hidden text-xs font-black text-[#2076C7] uppercase tracking-tighter">{partner.name}</span>
+                <div className="relative flex overflow-hidden">
+                    <motion.div
+                        className="flex whitespace-nowrap gap-12 md:gap-24 py-4"
+                        animate={{
+                            x: [0, -2500],
+                        }}
+                        transition={{
+                            x: {
+                                repeat: Infinity,
+                                repeatType: "loop",
+                                duration: 50,
+                                ease: "linear",
+                            },
+                        }}
+                    >
+                        {/* Triple sets for perfect infinite loop flow */}
+                        {[...partners, ...partners, ...partners].map((partner, idx) => (
+                            <div
+                                key={idx}
+                                className="flex flex-col items-center justify-center gap-3 transition-all duration-300 hover:scale-105 group/item px-4 border-r border-slate-50 last:border-0"
+                            >
+                                <div className="h-8 md:h-10 flex items-center justify-center mb-1">
+                                    <img
+                                        src={partner.logo}
+                                        alt={partner.name}
+                                        className="h-full w-auto object-contain grayscale group-hover/item:grayscale-0 transition-all duration-500 opacity-60 group-hover/item:opacity-100"
+                                        onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.style.display = 'none';
+                                            const fallback = target.nextElementSibling as HTMLElement;
+                                            if (fallback) fallback.classList.remove('hidden');
+                                        }}
+                                    />
+                                    <span className="hidden text-xs font-black text-[#2076C7] uppercase tracking-tighter">{partner.name}</span>
+                                </div>
+
+                                <div className="flex flex-col items-center gap-1">
+                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest group-hover/item:text-[#2076C7] transition-colors">{partner.name}</span>
+                                    <span className="text-[8px] font-bold bg-[#1CADA3]/10 text-[#1CADA3] px-2 py-0.5 rounded-full tracking-tighter shadow-sm group-hover/item:bg-[#1CADA3] group-hover/item:text-white transition-all duration-500">
+                                        {partner.stat}
+                                    </span>
+                                </div>
                             </div>
+                        ))}
+                    </motion.div>
 
-                            <div className="flex flex-col items-center gap-1">
-                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest group-hover/item:text-[#2076C7] transition-colors">{partner.name}</span>
-                                <span className="text-[8px] font-bold bg-[#1CADA3]/10 text-[#1CADA3] px-2 py-0.5 rounded-full tracking-tighter shadow-sm group-hover/item:bg-[#1CADA3] group-hover/item:text-white transition-all duration-500">
-                                    {partner.stat}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-                </motion.div>
-
-                {/* Visual fade edges for professional glass look */}
-                <div className="absolute top-0 left-0 w-24 md:w-64 h-full bg-linear-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
-                <div className="absolute top-0 right-0 w-24 md:w-64 h-full bg-linear-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
+                    {/* Visual fade edges - adjusted for constrained layout */}
+                    <div className="absolute top-0 left-0 w-12 md:w-24 h-full bg-linear-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
+                    <div className="absolute top-0 right-0 w-12 md:w-24 h-full bg-linear-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
+                </div>
             </div>
         </section>
     );

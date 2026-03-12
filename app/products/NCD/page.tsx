@@ -1,7 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { ArrowLeft as IconArrowLeft } from 'lucide-react';
 
 import Hero from './components/sections/Hero';
 import WhyInvest from './components/sections/WhyInvest';
@@ -12,123 +13,109 @@ import Eligibility from './components/sections/Eligibility';
 import TaxBenefits from './components/sections/TaxBenefits';
 import Risks from './components/sections/Risks';
 import Portfolio from './components/sections/Portfolio';
-import InvestorGuide from './components/sections/InvestorGuide';
 import FAQ from './components/sections/FAQ';
-import Trust from './components/sections/Trust';
 import HowItWorks from './components/sections/HowItWorks';
+import NCDYieldChart from './components/sections/NCDYieldChart';
+import Disclaimer from './components/sections/Disclaimer';
+import CTASection from '../../component/CTASection';
 
-import ActiveIssuesView from './components/views/ActiveIssuesView';
-import NCDDetailsView from './components/views/NCDDetailsView';
-import InvestmentFormView from './components/views/InvestmentFormView';
-
-type ViewType = 'home' | 'active-issues' | 'details' | 'apply';
+import { useModal } from '../../context/ModalContext';
 
 function HomeContent() {
-    const searchParams = useSearchParams();
-    const isEmbedded = searchParams.get('embed') === 'true';
+    const { openLogin } = useModal();
+    const router = useRouter();
 
-    const [view, setView] = useState<ViewType>('home');
-    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const handleBackHome = () => {
+        router.push('/');
+    };
 
-    useEffect(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, [view]);
-
-    const handleStartInvesting = () => setView('active-issues');
+    const handleStartInvesting = () => {
+        openLogin();
+    };
 
     const handleInvestNow = (id: string) => {
-        setSelectedId(id);
-        setView('details');
+        openLogin();
     };
 
     const handleApplyNow = (id: string) => {
-        setSelectedId(id);
-        setView('apply');
+        openLogin();
     };
 
 
     return (
         <div className="flex min-h-screen flex-col bg-white font-sans">
+            {/* Back to Home Button */}
+            <div className="fixed z-50 top-16 left-4 md:top-24 md:left-8">
+                <button
+                    onClick={handleBackHome}
+                    aria-label="Back to Home"
+                    className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+                >
+                    <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+                        <IconArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+                    </div>
+                </button>
+                <button
+                    onClick={handleBackHome}
+                    className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group font-sans"
+                >
+                    <IconArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+                    Back to Home
+                </button>
+            </div>
+
             <main className="grow">
 
-                {view === 'home' && (
-                    <>
-                        {/* Hero stays full-width */}
-                        <Hero onStart={handleStartInvesting} />
+                <Hero onStart={handleStartInvesting} />
 
-                        {/* Content Sections */}
-                        {/* Content Sections */}
-                        <Trust />
-                        <div className="space-y-0">
-                            <WhyInvest />
-                            <HowItWorks />
-                            <Comparison />
-                            <InvestmentUniverse />
+                <div className="space-y-0">
+                    {/* NEW SEQUENCE:
+                        1. Hero
+                        2. Active opportunities (Offers)
+                        3. NCD Graph (NCDYieldChart)
+                        4. Invest in 3 simple (HowItWorks)
+                        5. Explore our investment universe (InvestmentUniverse)
+                        6. Who can invest / Documents / 4 steps (Eligibility)
+                        7. Investment portfolios (Portfolio)
+                        8. Tax benefit and efficiency (TaxBenefits)
+                        9. Risk assessment (Risks)
+                        10. Why invest in NCD (WhyInvest)
+                        11. NCD vs FD (Comparison)
+                        12. FAQ
+                        13. CTA
+                    */}
 
-                            <Offers
-                                onInvest={handleInvestNow}
-                                onApply={handleApplyNow}
-                                onViewAll={handleStartInvesting}
-                            />
-
-                            <Eligibility />
-                            <TaxBenefits />
-                            <Risks />
-                            <InvestorGuide />
-                            <Portfolio />
-                            <FAQ />
-                        </div>
-
-                        {/* Global CTA */}
-                        <section className="relative overflow-hidden py-20 md:py-24">
-                            {/* Background */}
-                            <div className="absolute inset-0 -z-10 bg-linear-to-br from-[#F0F7FF] via-white to-[#E8F7F6]" />
-
-                            <div className="container-custom text-center px-4">
-                                <h2 className="mb-6 text-2xl md:text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
-                                    Ready to Secure Your Financial Future?
-                                </h2>
-
-                                <p className="mx-auto mb-10 max-w-2xl text-base md:text-xl text-gray-600 leading-relaxed">
-                                    Join thousands of investors who trust Infinity Arthvishva for high-yield, secure fixed income investments.
-                                </p>
-
-                                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 px-6">
-                                    <button
-                                        onClick={handleStartInvesting}
-                                        className="w-full sm:w-auto max-w-[280px] sm:max-w-none rounded-xl bg-[#1CADA3] px-6 py-3 md:px-10 md:py-4 text-sm md:text-lg font-bold text-white shadow-xl transition-all hover:bg-[#168a82] hover:shadow-2xl active:scale-95">
-                                        Start Investing Now
-                                    </button>
-                                </div>
-                            </div>
-                        </section>
-
-                    </>
-                )}
-
-                {view === 'active-issues' && (
-                    <ActiveIssuesView
+                    <Offers
                         onInvest={handleInvestNow}
                         onApply={handleApplyNow}
-                        onBack={() => setView('home')}
+                        onViewAll={handleStartInvesting}
                     />
-                )}
 
-                {view === 'details' && selectedId && (
-                    <NCDDetailsView
-                        id={selectedId}
-                        onApply={handleApplyNow}
-                        onBack={handleStartInvesting}
-                    />
-                )}
+                    <NCDYieldChart />
 
-                {view === 'apply' && selectedId && (
-                    <InvestmentFormView
-                        id={selectedId}
-                        onBack={() => setView('details')}
-                        onSuccess={handleStartInvesting}
-                    />
-                )}
+                    <HowItWorks onStart={handleStartInvesting} />
+
+                    <InvestmentUniverse />
+
+                    <Eligibility />
+
+                    <Portfolio />
+
+                    <TaxBenefits />
+
+                    <Risks />
+
+                    <WhyInvest />
+
+                    <Comparison />
+
+                    <Disclaimer />
+
+                    <FAQ />
+                </div>
+
+                {/* Global CTA */}
+                <CTASection />
 
             </main>
         </div>

@@ -5,25 +5,30 @@ import HeroSection from './components/HeroSection';
 import { PetInsuranceOverview, HowItWorks, PetEligibility } from './components/PetInfoSections';
 import { ProviderComparison, PetPlanTypes, PetClaimsProcess, PetDocumentsSection } from './components/PetPolicyDetails';
 import PetInsuranceCalculator from './components/PetInsuranceCalculator';
-import { PetFAQSection, PetContactSection, PetDisclaimer } from './components/PetSupportSections';
+import { PetFAQSection } from './components/PetSupportSections';
+import CTASection from '../../component/CTASection';
+import ScrollToTop from '../../component/ScrollToTop';
 
 export default function PetInsurancePage() {
     return (
-        <main className="min-h-screen bg-white text-slate-800 font-sans scroll-smooth max-w-[1536px] mx-auto shadow-2xl overflow-hidden relative">
+        <main className="min-h-screen bg-white text-slate-800 font-sans scroll-smooth shadow-2xl overflow-hidden relative w-full">
             <Toaster position="bottom-right" />
             <HeroSection />
             <PetPlanTypes />
             <PetInsuranceOverview />
-            {/* <ProviderComparison /> */}
-            <HowItWorks />
-
-            <PetEligibility />
+            <ProviderComparison />
             <PetInsuranceCalculator />
+            <HowItWorks />
+            <PetEligibility />
             <PetClaimsProcess />
             <PetDocumentsSection />
             <PetFAQSection />
-            <PetContactSection />
-            <PetDisclaimer />
+            <CTASection 
+                title="Your Pet's Health is Our Priority"
+                description="From routine checkups to emergency surgeries, ensure your furry friend gets the best care without financial worry. Join thousands of happy pet parents who trust Infinity Arthvishva for comprehensive pet protection."
+                buttonText="Get Pet Consultation"
+            />
+            <ScrollToTop />
         </main>
     );
 }

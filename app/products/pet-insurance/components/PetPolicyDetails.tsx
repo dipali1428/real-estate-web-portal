@@ -59,9 +59,9 @@ const providers = [
 ];
 
 export function ProviderComparison() {
-    const { openPartner } = useModal();
+    const { openLogin } = useModal();
     return (
-        <section className="py-12 px-4 sm:px-6 bg-slate-50">
+        <section className="py-10 px-4 sm:px-6 bg-slate-50">
             <div className="max-w-7xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
@@ -69,12 +69,10 @@ export function ProviderComparison() {
                     viewport={{ once: true }}
                     className="text-center max-w-3xl mx-auto mb-10 md:mb-12"
                 >
-                    <span className="text-[#2076C7] font-bold tracking-widest uppercase text-xs md:text-sm">Market Comparison</span>
                     <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                        Compare Top Pet Insurers
+                         Compare Top Pet Insurers
                     </h2>
-                    <div className="w-24 h-1 mx-auto bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] rounded-full mt-4 mb-4" />
-                    <p className="text-base md:text-lg text-slate-500 mt-4 px-4 md:px-0">
+                    <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
                         We've analyzed the leading pet insurance providers in India to help you find the best value for your pet's needs.
                     </p>
                 </motion.div>
@@ -103,10 +101,10 @@ export function ProviderComparison() {
                                 >
                                     <td className="p-4 md:p-6">
                                         <div className="flex items-center gap-3 md:gap-4">
-                                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl ${provider.color} text-white flex items-center justify-center font-bold text-base md:text-lg shadow-md flex-shrink-0`}>
+                                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-[#2076C7] to-[#1CADA3] text-white flex items-center justify-center font-bold text-base md:text-lg shadow-md flex-shrink-0">
                                                 {provider.name.charAt(0)}
                                             </div>
-                                            <span className="font-bold text-slate-900 text-base md:text-lg">{provider.name}</span>
+                                            <span className="font-bold text-[#2076C7] text-base md:text-lg">{provider.name}</span>
                                         </div>
                                     </td>
                                     <td className="p-4 md:p-6 text-center">
@@ -132,7 +130,7 @@ export function ProviderComparison() {
                                         <div className="text-[10px] md:text-xs text-slate-400">per month</div>
                                     </td>
                                     <td className="p-4 md:p-6 text-center">
-                                        <button onClick={openPartner} className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-[#1CADA3] hover:text-white transition-all">
+                                        <button onClick={openLogin} className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-[#1CADA3] hover:text-white transition-all">
                                             <IconExternalLink size={20} />
                                         </button>
                                     </td>
@@ -196,10 +194,10 @@ const plans = [
 ];
 
 export function PetPlanTypes() {
-    const { openPartner } = useModal();
+    const { openLogin } = useModal();
 
     return (
-        <section id="plans" className="py-12 px-4 sm:px-6 bg-white">
+        <section id="plans" className="py-10 px-4 sm:px-6 bg-white">
             <div className="max-w-7xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
@@ -208,13 +206,12 @@ export function PetPlanTypes() {
                     className="flex flex-col items-center text-center mb-12 gap-6 mx-auto"
                 >
                     <div className="max-w-3xl">
-                        <span className="text-[#2076C7] font-bold tracking-widest uppercase text-sm">Pet Plans</span>
-                        <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                            Tailored plans for Your Pet's Life
-                        </h2>
-                        <p className="text-base md:text-lg text-slate-500 mt-4 px-4 md:px-0">
-                            Choose the perfect plan for your furry family member. Each plan comes with 24/7 support and easy online claims.
-                        </p>
+                         <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                        Tailored plans for Your Pet's Life
+                    </h2>
+                    <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
+                        Choose the perfect plan for your furry family member. Each plan comes with 24/7 support and easy online claims.
+                    </p>
                     </div>
                 </motion.div>
 
@@ -228,48 +225,49 @@ export function PetPlanTypes() {
                             transition={{ delay: idx * 0.1 }}
                             className="relative overflow-hidden rounded-3xl border-2 border-blue-200 bg-white hover:border-blue-400 transition-all duration-500 shadow-[0_10px_30px_-10px_rgba(32,118,199,0.15)] hover:shadow-[0_20px_50px_-12px_rgba(32,118,199,0.25)] flex flex-col h-full"
                         >
-                            <div className="p-5 sm:p-8 flex flex-col h-full">
-                                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-6 text-center sm:text-left">
+                            <div className="p-5 sm:p-8 flex flex-col h-full items-center text-center">
+                                {/* Centered Icon Container */}
+                                <div className="flex flex-col items-center gap-4 mb-6">
                                     <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
                                         <plan.icon size={28} />
                                     </div>
                                     {plan.popular && (
-                                        <span className="text-[10px] font-black underline decoration-2 underline-offset-4 text-grey-600 uppercase tracking-widest">
+                                        <span className="text-[10px] font-black underline decoration-2 underline-offset-4 text-slate-600 uppercase tracking-widest">
                                             (Most Popular)
                                         </span>
                                     )}
                                 </div>
 
-                                <h3 className="text-xl md:text-2xl font-extrabold text-[#1CADA3] text-center sm:text-left">{plan.title}</h3>
-                                <p className="text-xs md:text-sm text-slate-500 font-medium mt-1 text-center sm:text-left">{plan.tagline}</p>
-                                <p className="text-sm text-slate-600 mt-4 leading-relaxed min-h-[60px] text-center sm:text-left">{plan.desc}</p>
+                                <h3 className="text-xl md:text-2xl font-extrabold text-[#1CADA3]">{plan.title}</h3>
+                                <p className="text-xs md:text-sm text-slate-500 font-medium mt-1">{plan.tagline}</p>
+                                <p className="text-sm text-slate-600 mt-4 leading-relaxed min-h-[60px]">{plan.desc}</p>
 
-                                <div className="mt-6 border-t border-slate-100 pt-6">
-                                    <div className="flex items-baseline gap-1">
+                                <div className="w-full mt-6 border-t border-slate-100 pt-6">
+                                    <div className="flex items-baseline justify-center gap-1">
                                         <span className="text-3xl font-extrabold text-slate-900">{plan.price}</span>
                                         <span className="text-sm text-slate-400 font-medium">/{plan.duration}</span>
                                     </div>
                                 </div>
 
-                                <ul className="mt-6 space-y-3 flex-grow">
+                                <ul className="mt-6 space-y-3 flex-grow text-left w-full">
                                     {plan.features.map((f, i) => (
                                         <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
                                             <div className="w-5 h-5 bg-teal-50 text-[#1CADA3] rounded-full flex items-center justify-center flex-shrink-0">
-                                                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M8.5 2.5L4 7.5L1.5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+                                                    <path d="M8.5 2.5L4 7.5L1.5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
                                             </div>
                                             {f}
                                         </li>
                                     ))}
                                 </ul>
 
+                                {/* Standardized Color for All Buttons */}
                                 <button
-                                    onClick={openPartner}
-                                    className={`mt-8 w-full block text-center py-3.5 rounded-xl font-bold transition-all ${plan.popular
-                                        ? 'bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg hover:shadow-xl hover:scale-[1.02]'
-                                        : 'bg-slate-100 text-slate-700 hover:bg-linear-to-r hover:from-[#2076C7] hover:to-[#1CADA3] hover:text-white'
-                                        }`}
+                                    onClick={openLogin}
+                                    className="mt-8 w-full block text-center py-3.5 rounded-xl font-bold transition-all bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg hover:shadow-xl hover:scale-[1.02]"
                                 >
-                                    Start your application
+                                    Apply Now
                                 </button>
                             </div>
                         </motion.div>
@@ -366,9 +364,9 @@ const lineVariants = {
 };
 
 export function PetClaimsProcess() {
-    const { openPartner } = useModal();
+    const { openLogin } = useModal();
     return (
-        <section className="py-12 bg-white overflow-hidden">
+        <section className="py-10 bg-white overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
@@ -377,12 +375,11 @@ export function PetClaimsProcess() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-10 md:mb-16"
                 >
-                    <span className="text-[#2076C7] font-bold tracking-widest uppercase text-xs md:text-sm">Reimbursement Made Easy</span>
-                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                     <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Simple 4-Step Claims Process
                     </h2>
-                    <p className="text-base md:text-lg text-slate-500 mt-4 max-w-2xl mx-auto px-4 md:px-0">
-                        We know vet emergencies are stressful. Our digital-first claims process ensures you get your money back as fast as possible.
+                    <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
+                       We know vet emergencies are stressful. Our digital-first claims process ensures you get your money back as fast as possible.
                     </p>
                 </motion.div>
 
@@ -396,7 +393,7 @@ export function PetClaimsProcess() {
                     {/* Animated Connecting Line (Desktop) */}
                     <motion.div
                         variants={lineVariants}
-                        className="hidden md:block absolute top-16 left-[12%] right-[12%] h-1 bg-gradient-to-r from-[#2076C7] via-[#2076C7] to-[#1CADA3] rounded-full origin-left"
+                        className="hidden md:block absolute top-10 left-[12%] right-[12%] h-1 bg-gradient-to-r from-[#2076C7] via-[#2076C7] to-[#1CADA3] rounded-full origin-left"
                         style={{ zIndex: 0 }}
                     />
 
@@ -418,26 +415,15 @@ export function PetClaimsProcess() {
                                     rotate: [0, -5, 5, -5, 0],
                                     transition: { duration: 0.5 },
                                 }}
-                                className={`w-20 h-20 sm:w-28 sm:h-28 bg-gradient-to-br ${step.gradient} rounded-full flex items-center justify-center mb-6 shadow-xl ${step.shadow} relative`}
+                                className={`w-14 h-14 sm:w-20 sm:h-20 bg-gradient-to-br ${step.gradient} rounded-full flex items-center justify-center mb-6 shadow-xl ${step.shadow} relative`}
                             >
                                 {/* Animated Pulse Ring */}
                                 <span className={`absolute inset-0 rounded-full ring-4 ${step.ring} animate-ping opacity-20`} />
                                 {/* Soft Glow Ring */}
                                 <span className={`absolute -inset-1 rounded-full ring-2 ${step.ring} opacity-40`} />
 
-                                <step.icon size={32} className="text-white drop-shadow-lg sm:hidden" strokeWidth={1.8} />
-                                <step.icon size={44} className="text-white drop-shadow-lg hidden sm:block" strokeWidth={1.8} />
-
-                                {/* Step Number Badge */}
-                                <motion.div
-                                    initial={{ scale: 0 }}
-                                    whileInView={{ scale: 1 }}
-                                    viewport={{ once: true }}
-                                    transition={{ type: 'spring', stiffness: 300, delay: 0.4 + index * 0.15 }}
-                                    className="absolute -top-1 -right-1 w-9 h-9 bg-white text-slate-900 rounded-full flex items-center justify-center font-extrabold text-sm shadow-lg border-2 border-slate-100"
-                                >
-                                    {index + 1}
-                                </motion.div>
+                                <step.icon size={22} className="text-white drop-shadow-lg sm:hidden" strokeWidth={1.8} />
+                                <step.icon size={30} className="text-white drop-shadow-lg hidden sm:block" strokeWidth={1.8} />
                             </motion.div>
 
                             {/* Title with hover color */}
@@ -469,10 +455,10 @@ export function PetClaimsProcess() {
                     className="mt-16 text-center"
                 >
                     <motion.button
-                        onClick={openPartner}
+                        onClick={openLogin}
                         whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(32,118,199,0.3)' }}
                         whileTap={{ scale: 0.98 }}
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-xl shadow-lg transition-all text-sm md:text-base"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-xl shadow-lg transition-all text-sm md:text-base"
                     >
                         Notify a New Claim
                     </motion.button>
@@ -534,13 +520,11 @@ export function PetDocumentsSection() {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="text-center mb-10 md:mb-16"
-                >
-                    <span className="text-[#2076C7] font-bold tracking-widest uppercase text-xs md:text-sm">Requirements</span>
-                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                        Documents Checklist
+                    className="text-center mb-10 md:mb-16">
+                     <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                         Documents Checklist
                     </h2>
-                    <p className="text-base md:text-lg text-slate-500 mt-4 max-w-2xl mx-auto">
+                    <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
                         Keep these documents handy for a smooth application and fast claim settlement experience.
                     </p>
                 </motion.div>

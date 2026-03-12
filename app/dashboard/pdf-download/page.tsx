@@ -58,9 +58,34 @@ export default function Downloads() {
       subCategory: 'motor-insurance',
       filePath: '/pdfs/motorinsurancepdf/DSA_GUJARAT_DD_&_DN_HO_GRID_MARCH_2026.pdf'
     },
-    // Insurance - Life Insurance
     {
       id: '3',
+      name: 'DSA_RAJASTHAN_GRID_MARCH_2026.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-3-8',
+      category: 'payout',
+      month: 'march-2026',
+      year: '2026',
+      subCategory: 'motor-insurance',
+      filePath: '/pdfs/motorinsurancepdf/DSA_RAJASTHAN_GRID_MARCH_2026.pdf'
+    },
+    {
+      id: '4',
+      name: 'DSA_WEST_BENGAL_GRID_MARCH_2026.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      uploadDate: '2026-3-8',
+      category: 'payout',
+      month: 'march-2026',
+      year: '2026',
+      subCategory: 'motor-insurance',
+      filePath: '/pdfs/motorinsurancepdf/DSA_WEST_BENGAL_GRID_MARCH_2026.pdf'
+    },
+    
+    // Insurance - Life Insurance
+    {
+      id: '5',
       name: 'Axis_max_LI_Feb_2026.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -72,7 +97,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/Axis_max_LI_Feb_2026.pdf'
     },
     {
-      id: '4',
+      id: '6',
       name: 'HDFC_LIFE_FEB_26.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -84,7 +109,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE_FEB_26.pdf'
     },
     {
-      id: '5',
+      id: '7',
       name: 'ICICI_PRUDENTIAL_LIFE_FEB_26.pd',
       type: 'pdf',
       size: '2.4 MB',
@@ -96,7 +121,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/ICICI_PRUDENTIAL_LIFE_FEB_26.pdf'
     },
     {
-      id: '6',
+      id: '8',
       name: 'DIGIT_LIFE_FEB_26.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -108,7 +133,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/DIGIT_LIFE_FEB_26.pdf'
     },
     {
-      id: '7',
+      id: '9',
       name: 'BAJAJ_ALLIANZ_LIFE_FEB_26.pdf',
       type: 'pdf',
       size: '2.4 MB',
@@ -120,7 +145,7 @@ export default function Downloads() {
       filePath: '/pdfs/lifeinsurancepdf/BAJAJ_ALLIANZ_LIFE_FEB_26.pdf'
     },
     {
-      id: '8',
+      id: '10',
       name: 'TATA_LIFE_FEB_26.pd',
       type: 'pdf',
       size: '2.4 MB',

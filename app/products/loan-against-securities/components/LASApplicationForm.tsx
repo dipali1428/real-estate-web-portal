@@ -24,58 +24,59 @@ export default function LASApplicationForm({
             className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50/50">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight text-gray-800">
-                  Loan Against Securities Application
+            <div className="flex items-center justify-between p-8 border-b border-blue-50 bg-white relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#2076C7] to-[#1CADA3]" />
+              <div className="relative z-10">
+                <h2 className="text-3xl font-black tracking-tight bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                  Loan Against Securities
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Get instant liquidity without selling your investments
+                <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest leading-none">
+                  Instant Liquidity • Digital Application
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors"
+                className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:bg-slate-50 hover:text-[#2076C7] hover:border-[#2076C7]/30 transition-all shadow-sm active:scale-90"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
             {/* Content (Scrollable) */}
-            <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar flex-1 bg-white">
-              <form className="space-y-12">
+            <div className="p-8 md:p-12 overflow-y-auto custom-scrollbar flex-1 bg-white">
+              <form className="space-y-16">
                 {/* Section 1 */}
                 <section>
-                  <div className="mb-6 pb-2 border-b border-gray-100">
-                    <h3 className="text-xl font-bold text-[#2076C7] flex items-center gap-2">
-                      <span className="w-8 h-8 rounded-full bg-[#2076C7]/10 flex items-center justify-center text-sm">
+                  <div className="mb-8 pb-4 border-b border-slate-50">
+                    <h3 className="text-xl font-extrabold text-[#2076C7] flex items-center gap-3 tracking-tight">
+                      <span className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-sm text-white shadow-lg">
                         1
                       </span>
                       Basic Information
                     </h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
                         Full Name (as per PAN) *
                       </label>
                       <input
                         type="text"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] transition-all"
+                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-[#2076C7]/10 focus:border-[#2076C7] text-slate-700 font-bold placeholder:text-slate-300 transition-all outline-none"
                         placeholder="Enter full name"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
                         Mobile Number *
                       </label>
                       <div className="flex">
-                        <span className="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-gray-200 bg-gray-50 text-gray-500 text-sm">
+                        <span className="inline-flex items-center px-5 rounded-l-2xl border border-r-0 border-slate-200 bg-slate-50 text-slate-500 font-bold text-sm">
                           +91
                         </span>
                         <input
                           type="tel"
-                          className="w-full px-4 py-3 rounded-r-xl border border-gray-200 focus:ring-2 focus:ring-[#2076C7]/20 focus:border-[#2076C7] transition-all"
+                          className="w-full px-5 py-4 rounded-r-2xl border border-slate-200 focus:ring-4 focus:ring-[#2076C7]/10 focus:border-[#2076C7] text-slate-700 font-bold placeholder:text-slate-300 transition-all outline-none"
                           placeholder="10-digit number"
                         />
                       </div>
@@ -460,44 +461,6 @@ export default function LASApplicationForm({
                         eligibility.
                       </span>
                     </label>
-                  </div>
-                </section>
-
-                {/* Section 5 */}
-                <section>
-                  <div className="mb-6 pb-2 border-b border-gray-100 flex items-end justify-between">
-                    <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                      <span className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-sm">
-                        5
-                      </span>
-                      Document Upload
-                    </h3>
-                    <span className="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded">
-                      OPTIONAL FOR NOW
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {[
-                      { id: "pan", title: "PAN Card" },
-                      { id: "aadhaar", title: "Aadhaar Card" },
-                      { id: "demat", title: "Demat Statement (3M)" },
-                      { id: "bank", title: "Bank Statement (3M)" },
-                      { id: "income", title: "Income Proof" },
-                    ].map((doc) => (
-                      <div
-                        key={doc.id}
-                        className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center text-center hover:border-[#2076C7] hover:bg-[#2076C7]/5 transition-all cursor-pointer group"
-                      >
-                        <UploadCloud className="w-6 h-6 text-gray-400 group-hover:text-[#2076C7] mb-2" />
-                        <span className="text-sm font-medium text-gray-700">
-                          {doc.title}
-                        </span>
-                        <span className="text-xs text-gray-400 mt-1">
-                          PDF or Image &lt; 5MB
-                        </span>
-                      </div>
-                    ))}
                   </div>
                 </section>
               </form>

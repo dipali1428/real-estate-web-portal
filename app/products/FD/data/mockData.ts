@@ -29,11 +29,11 @@ export const bankData: BankCategory[] = [
                 logo: "https://www.sbi.co.in/documents/16012/1123512/sbi-logo.png",
                 tenures: {
                     short: { rate: "6.00%", senior: "6.50%" },
-                    medium: { rate: "7.00%", senior: "7.50%" },
+                    medium: { rate: "6.80%", senior: "7.30%" },
                     long: { rate: "6.75%", senior: "7.25%" },
-                    mega: { rate: "6.50%", senior: "7.50%" }
+                    mega: { rate: "6.50%", senior: "7.00%" }
                 },
-                specialRate: "7.60% (Amrit Kalash)"
+                specialRate: "7.10% (Amrit Vrishti 444 Days)"
             },
             {
                 name: "Bank of Baroda",
@@ -122,33 +122,33 @@ export const bankData: BankCategory[] = [
                 logo: "https://www.hdfcbank.com/content/api/contentstream-id/723fb80a-2dde-42a3-9793-7ae1be57c87f/652f7584-6028-4f81-9b7e-c5ee779fdfa7/Footer/Logo/HDFCBank_Logo.png",
                 tenures: {
                     short: { rate: "6.00%", senior: "6.50%" },
-                    medium: { rate: "7.25%", senior: "7.75%" },
-                    long: { rate: "7.00%", senior: "7.50%" },
-                    mega: { rate: "7.00%", senior: "7.75%" }
+                    medium: { rate: "6.50%", senior: "7.00%" },
+                    long: { rate: "6.50%", senior: "7.00%" },
+                    mega: { rate: "6.50%", senior: "7.00%" }
                 },
-                specialRate: "7.90% (Senior Citizen)"
+                specialRate: "7.00% (55 months)"
             },
             {
                 name: "ICICI Bank",
                 logo: "https://www.icicibank.com/content/dam/icicibank/india/assets/images/header/logo.png",
                 tenures: {
                     short: { rate: "6.00%", senior: "6.50%" },
-                    medium: { rate: "7.20%", senior: "7.75%" },
+                    medium: { rate: "7.10%", senior: "7.60%" },
                     long: { rate: "7.00%", senior: "7.50%" },
-                    mega: { rate: "6.90%", senior: "7.50%" }
+                    mega: { rate: "7.00%", senior: "7.50%" }
                 },
-                specialRate: "7.75% (15 months)"
+                specialRate: "7.25% (15 months)"
             },
             {
                 name: "Axis Bank",
                 logo: "https://www.axisbank.com/assets/images/logo.png",
                 tenures: {
                     short: { rate: "6.00%", senior: "6.50%" },
-                    medium: { rate: "7.20%", senior: "7.70%" },
+                    medium: { rate: "7.10%", senior: "7.60%" },
                     long: { rate: "7.10%", senior: "7.60%" },
                     mega: { rate: "7.00%", senior: "7.75%" }
                 },
-                specialRate: "8.00% (17 months)"
+                specialRate: "7.75% (Tax-saving FDs)"
             },
             {
                 name: "YES Bank",
@@ -431,5 +431,17 @@ export const faqs = [
     {
         question: "Can I get a loan against my Fixed Deposit?",
         answer: "Yes, you can typically get a loan or overdraft of up to 90-95% of your FD value without breaking the deposit. This is a quick way to get liquidity while your FD continues to earn interest."
+    },
+    {
+        question: "Who is eligible to open a Fixed Deposit?",
+        answer: "Any resident individual (sole or joint), Hindu Undivided Family (HUF), minor (through a guardian), or senior citizen can open an FD. Many banks also allow partnership firms, companies, and trusts to invest in FDs."
+    },
+    {
+        question: "What documents are required for opening an FD?",
+        answer: "Standard KYC documents are required: 1. Identity Proof (Aadhar, PAN, Passport), 2. Address Proof (Utility bills, Voter ID), 3. Recent Photographs. Most banks now offer digital FD opening via Aadhar-based e-KYC."
+    },
+    {
+        question: "What is the difference between Cumulative and Non-Cumulative FD?",
+        answer: "In a Cumulative FD, interest is compounded and paid along with the principal at maturity. In a Non-Cumulative FD, interest is paid out at regular intervals (monthly, quarterly, or yearly), which is ideal for those seeking a regular income stream."
     }
 ];

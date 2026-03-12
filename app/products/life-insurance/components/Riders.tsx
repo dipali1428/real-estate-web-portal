@@ -31,7 +31,7 @@ const riders = [
 ];
 export default function Riders() {
     return (
-        <section className="py-10 md:py-16 bg-white relative overflow-hidden" id="riders">
+        <section className="py-10 md:py-16 bg-white relative overflow-hidden font-sans" id="riders">
             {/* Ambient background accent */}
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#2076C7]/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
 

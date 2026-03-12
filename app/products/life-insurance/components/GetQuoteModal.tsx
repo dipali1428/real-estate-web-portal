@@ -137,7 +137,7 @@ export default function GetQuoteModal({ plan, onClose }: GetQuoteModalProps) {
                         exit={{ opacity: 0, scale: 0.94, y: 20 }}
                         transition={{ type: "spring", stiffness: 300, damping: 28 }}
                         onClick={e => e.stopPropagation()}
-                        className="relative bg-white rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.2)] w-full max-w-lg overflow-hidden"
+                        className="relative bg-white rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.2)] w-full max-w-lg overflow-hidden font-sans"
                     >
                         {/* Top accent bar */}
                         <div
@@ -326,7 +326,7 @@ export default function GetQuoteModal({ plan, onClose }: GetQuoteModalProps) {
                                     <button
                                         onClick={() => setStep(2)}
                                         disabled={!isStep1Valid}
-                                        className="w-full py-4 rounded-2xl font-black text-sm text-white flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-40 hover:opacity-90"
+                                        className="font-sans w-full py-4 rounded-2xl font-black text-sm text-white flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-40 hover:opacity-90"
                                         style={{ backgroundColor: plan.accentColor, boxShadow: `0 10px 30px ${plan.accentColor}30` }}
                                     >
                                         Next — Plan Details <ChevronRight className="w-4 h-4" />
@@ -431,14 +431,14 @@ export default function GetQuoteModal({ plan, onClose }: GetQuoteModalProps) {
                                     <div className="flex gap-3 mt-2">
                                         <button
                                             onClick={() => setStep(1)}
-                                            className="flex-1 py-4 rounded-2xl font-black text-sm text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all"
+                                            className="font-sans flex-1 py-4 rounded-2xl font-black text-sm text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all"
                                         >
                                             ← Back
                                         </button>
                                         <button
                                             onClick={handleSubmit}
                                             disabled={!isStep2Valid || submitting}
-                                            className="flex-2 flex-grow py-4 rounded-2xl font-black text-sm text-white flex items-center justify-center gap-2 transition-all disabled:opacity-40 hover:opacity-90"
+                                            className="font-sans flex-2 flex-grow py-4 rounded-2xl font-black text-sm text-white flex items-center justify-center gap-2 transition-all disabled:opacity-40 hover:opacity-90"
                                             style={{ backgroundColor: plan.accentColor, boxShadow: `0 10px 30px ${plan.accentColor}30` }}
                                         >
                                             {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</> : <>Get My Quote <ChevronRight className="w-4 h-4" /></>}
@@ -481,7 +481,7 @@ export default function GetQuoteModal({ plan, onClose }: GetQuoteModalProps) {
 
                                     <button
                                         onClick={onClose}
-                                        className="mt-6 px-8 py-3 rounded-xl text-sm font-black text-white transition-all hover:opacity-90"
+                                        className="font-sans mt-6 px-8 py-3 rounded-xl text-sm font-black text-white transition-all hover:opacity-90"
                                         style={{ backgroundColor: plan.accentColor }}
                                     >
                                         Done

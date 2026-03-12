@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingUp, ArrowUpRight, Activity, DollarSign, BarChart3, Globe, Landmark, Euro, PoundSterling, TrendingDown, Gauge } from "lucide-react";
+import { TrendingUp, ArrowUpRight, Activity, DollarSign, BarChart3, Globe, Landmark, Euro, PoundSterling, TrendingDown, Gauge, IndianRupee } from "lucide-react";
 
 // Data from HR Snapshot + New Additions
 const data = [
@@ -9,8 +9,8 @@ const data = [
     { title: "SENSEX", value: "83,580", icon: <BarChart3 size={20} />, change: "84,178 High", color: "text-green-600", bg: "bg-green-50" },
     { title: "BANK NIFTY", value: "53,980", icon: <Landmark size={20} />, change: "0.85% Up", color: "text-green-600", bg: "bg-green-50" },
     { title: "INDIA VIX", value: "12.45", icon: <Gauge size={20} />, change: "-2.10%", color: "text-red-500", bg: "bg-red-50" },
-    { title: "GOLD (24K)", value: "₹78,500", icon: <DollarSign size={20} />, change: "10g", color: "text-yellow-600", bg: "bg-yellow-50" },
-    { title: "SILVER", value: "₹96,200", icon: <DollarSign size={20} />, change: "1kg", color: "text-gray-600", bg: "bg-gray-100" },
+    { title: "GOLD (24K)", value: "₹78,500", icon: <IndianRupee size={20} />, change: "10g", color: "text-yellow-600", bg: "bg-yellow-50" },
+    { title: "SILVER", value: "₹96,200", icon: <IndianRupee size={20} />, change: "1kg", color: "text-gray-600", bg: "bg-gray-100" },
     { title: "US 10Y YIELD", value: "4.22%", icon: <Globe size={20} />, change: "Yield", color: "text-indigo-600", bg: "bg-indigo-50" },
     { title: "USD/INR", value: "₹83.95", icon: <ArrowUpRight size={20} />, change: "Forex", color: "text-teal-600", bg: "bg-teal-50" },
     { title: "BRENT CRUDE", value: "$71.50", icon: <TrendingDown size={20} />, change: "BBL", color: "text-orange-600", bg: "bg-orange-50" },
@@ -19,13 +19,10 @@ const data = [
 
 export default function MarketSnapshot() {
     return (
-        <section className="py-8 bg-white border-b border-gray-100">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-12 md:py-16 bg-white border-b border-gray-100 font-sans px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-linear-to-br from-blue-50 to-teal-50 rounded-lg text-[#2076C7] shadow-ms">
-                            <Activity size={24} />
-                        </div>
                         <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-[#2076C7] to-[#1CADA3]">
                             Market Snapshot
                         </h2>

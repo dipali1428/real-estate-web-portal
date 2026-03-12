@@ -1,37 +1,34 @@
 'use client';
 
 import { Toaster } from 'react-hot-toast';
-import HeroSection from './components/HeroSection';
-import HowItWorks from './components/HowDeliverResult';
-import InsuranceTypes from './components/TravelPlans';
-import DocumentsSection from './components/DocumentsSection';
-import FAQSection from './components/FAQSection';
-import ContactSection from './components/ContactSection';
-import ClaimsProcess from './components/ClaimsProcess';
-import KeyCoverageHighlights from './components/NeedOfTravelInsurace';
-import WhyTravelInsurance from './components/WhyTravelInsurance';
-import GlobalEligibility from './components/GlobalEligibility';
-import ProviderComparison from './components/ProviderComparison';
-import TravelDisclaimer from './components/TravelDisclaimer';
-import TravelCalculator from './components/TravelCalculator';
+import { useRouter } from 'next/navigation';
+import { IconArrowLeft } from '@tabler/icons-react';
+import HeroAndHighlights from './components/HeroAndHighlights';
+import ProvidersAndPlans from './components/ProvidersAndPlans';
+import CoverageHighlights from './components/CoverageHighlights';
+import CalculatorAndProcess from './components/CalculatorAndProcess';
+import BenefitsAndEligibility from './components/BenefitsAndEligibility';
+import ClaimsAndDocuments from './components/ClaimsAndDocuments';
+import SupportAndFaqs from './components/SupportAndFaqs';
+import ScrollToTop from '../../component/ScrollToTop';
 
 export default function TravelInsurancePage() {
+    const router = useRouter();
+    const handleBackHome = () => router.push('/');
+
     return (
         <main className="min-h-screen bg-white text-slate-800 font-sans scroll-smooth">
             <Toaster position="bottom-right" />
-            <HeroSection />
-            <KeyCoverageHighlights />
-            <ProviderComparison />
-            <InsuranceTypes />
-            <TravelCalculator />
-            <HowItWorks />
-            <WhyTravelInsurance />
-            <GlobalEligibility />
-            <ClaimsProcess />
-            <DocumentsSection />
-            <FAQSection />
-            <ContactSection />
-            <TravelDisclaimer />
+
+
+            <HeroAndHighlights />
+            <ProvidersAndPlans />
+            <CoverageHighlights />
+            <CalculatorAndProcess />
+            <BenefitsAndEligibility />
+            <ClaimsAndDocuments />
+            <SupportAndFaqs />
+            <ScrollToTop />
         </main>
     );
 }
