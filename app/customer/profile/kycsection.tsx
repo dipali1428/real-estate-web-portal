@@ -1,15 +1,21 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { 
-  CreditCard, Landmark, CheckCircle2, 
-  AlertCircle, Fingerprint, Loader2,
-  Clock, ArrowLeft, Info, X,
-  Database, Save, Phone, Mail, MapPin
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  CreditCard,
+  Landmark,
+  CheckCircle2,
+  AlertCircle,
+  Fingerprint,
+  Loader2,
+  Clock,
+  Info,
+  Database,
+  Save,
+  X
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import CustomerService from '../../../services/customerService';
-import { useRouter } from 'next/navigation';
+import customerService from '../../services/customerService';
 
 type VerificationStatus = 'NOT_STARTED' | 'PENDING' | 'VERIFIED' | 'FAILED';
 
@@ -20,53 +26,47 @@ interface DematDetails {
   demat_name: string;
 }
 
-interface ProfileData {
-  id?: number;
-  name: string;
-  email: string;
-  mobile?: string;
-  adv_id?: string;
-  city?: string;
-  state?: string;
-  pan?: string;
-  aadhaar?: string;
-  gst_number?: string;
-  bank_name?: string;
-  bank_account?: string;
-  ifsc?: string;
-  pan_verified?: boolean;
-  name_as_per_pan?: string;
-  date_of_birth?: string;
-}
-
 interface PopupMessage {
   id: string;
   message: string;
   type: "success" | "error" | "loading";
 }
 
-export default function KYCVerificationPage() {
-  const router = useRouter();
+// Add props interface to receive refresh function from parent
+interface KYCSectionProps {
+  onRefresh?: () => Promise<void>;
+  externalPanVerified?: boolean;
+  externalAadhaarVerified?: boolean;
+  externalBankVerified?: boolean;
+  externalDematAdded?: boolean;
+}
+
+export const KYCSection: React.FC<KYCSectionProps> = ({ 
+  onRefresh,
+  externalPanVerified,
+  externalAadhaarVerified,
+  externalBankVerified,
+  externalDematAdded 
+}) => {
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [loadingSection, setLoadingSection] = useState<string | null>(null);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [profile, setProfile] = useState<any>(null);
   
-  // PAN Verification States
+  // PAN States
   const [panDetails, setPanDetails] = useState({
     pan: '',
     name_as_per_pan: '',
     date_of_birth: ''
   });
 
-  // Aadhaar Verification States
+  // Aadhaar States
   const [aadhaarNumber, setAadhaarNumber] = useState('');
   const [referenceId, setReferenceId] = useState<string | null>(null);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [otpSent, setOtpSent] = useState(false);
   const [otpExpiry, setOtpExpiry] = useState<number | null>(null);
 
-  // Bank Verification States
+  // Bank States
   const [bankDetails, setBankDetails] = useState({
     bank_name: '',
     bank_account_number: '',
@@ -83,16 +83,25 @@ export default function KYCVerificationPage() {
   const [savingDemat, setSavingDemat] = useState(false);
   const [dematAdded, setDematAdded] = useState(false);
 
-  // Status States - Initialize from profile data
-  const [panStatus, setPanStatus] = useState<VerificationStatus>('NOT_STARTED');
-  const [aadhaarStatus, setAadhaarStatus] = useState<VerificationStatus>('NOT_STARTED');
-  const [bankStatus, setBankStatus] = useState<VerificationStatus>('NOT_STARTED');
+  // Status States - Use external props if provided, otherwise use local state
+  const [panStatus, setPanStatus] = useState<VerificationStatus>(
+    externalPanVerified ? 'VERIFIED' : 'NOT_STARTED'
+  );
+  const [aadhaarStatus, setAadhaarStatus] = useState<VerificationStatus>(
+    externalAadhaarVerified ? 'VERIFIED' : 'NOT_STARTED'
+  );
+  const [bankStatus, setBankStatus] = useState<VerificationStatus>(
+    externalBankVerified ? 'VERIFIED' : 'NOT_STARTED'
+  );
 
   // IFSC Lookup
   const [fetchingBankDetails, setFetchingBankDetails] = useState(false);
 
   // Popup States
   const [popups, setPopups] = useState<PopupMessage[]>([]);
+  
+  // Track if initial fetch has been done
+  const hasFetched = useRef(false);
 
   // ========== POPUP FUNCTIONS ==========
   const removePopup = (id: string) => {
@@ -101,7 +110,6 @@ export default function KYCVerificationPage() {
 
   const triggerPopup = (message: string, type: "success" | "error" | "loading" = "success", manualId?: string) => {
     const id = manualId || Math.random().toString(36).substring(2, 9);
-
     setPopups(prev => {
       const exists = prev.find(p => p.id === id);
       if (exists) {
@@ -109,55 +117,50 @@ export default function KYCVerificationPage() {
       }
       return [...prev, { id, message, type }];
     });
-
     if (type !== "loading") {
       setTimeout(() => removePopup(id), 4000);
     }
     return id;
   };
 
-  // ========== FETCH PROFILE DATA ==========
+  // ========== REFRESH KYC DATA ==========
+  const refreshKYCData = async () => {
+    try {
+      const profileData = await customerService.getProfile();
+      if (profileData) {
+        setProfile(profileData);
+        setPanDetails({
+          pan: profileData.pan || '',
+          name_as_per_pan: profileData.name_as_per_pan || profileData.name || '',
+          date_of_birth: profileData.date_of_birth || ''
+        });
+        setAadhaarNumber(profileData.aadhaar || '');
+        setBankDetails({
+          bank_name: profileData.bank_name || '',
+          bank_account_number: profileData.bank_account || '',
+          ifsc_code: profileData.ifsc || ''
+        });
+        
+        // Update statuses from backend
+        if (profileData.pan_verified) setPanStatus('VERIFIED');
+        if (profileData.aadhaar_verified) setAadhaarStatus('VERIFIED');
+        if (profileData.bank_verified) setBankStatus('VERIFIED');
+        if (profileData.demat_added) setDematAdded(true);
+      }
+    } catch (error) {
+      console.error('Failed to refresh KYC:', error);
+    }
+  };
+
+  // ========== FETCH PROFILE DATA (with hasFetched guard) ==========
   useEffect(() => {
-    const fetchProfileData = async () => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const profileData = await CustomerService.getProfile();
-        console.log('Profile data:', profileData);
-        
-        if (profileData) {
-          setProfile(profileData);
-          
-          // Pre-fill PAN details if available
-          setPanDetails({
-            pan: profileData.pan || '',
-            name_as_per_pan: profileData.name_as_per_pan || profileData.name || '',
-            date_of_birth: profileData.date_of_birth || ''
-          });
-          
-          // Pre-fill Aadhaar if available
-          setAadhaarNumber(profileData.aadhaar || '');
-          
-          // Pre-fill Bank if available
-          setBankDetails({
-            bank_name: profileData.bank_name || '',
-            bank_account_number: profileData.bank_account || '',
-            ifsc_code: profileData.ifsc || ''
-          });
-          
-          // Set verification statuses
-          if (profileData.pan_verified) {
-            setPanStatus('VERIFIED');
-          }
-          
-          // You might want to check if these fields exist to set status
-          if (profileData.aadhaar) {
-            setAadhaarStatus('VERIFIED');
-          }
-          
-          if (profileData.bank_name && profileData.bank_account && profileData.ifsc) {
-            setBankStatus('VERIFIED');
-          }
-        }
+        await refreshKYCData();
       } catch (error) {
         console.error('Failed to fetch profile:', error);
         triggerPopup('Failed to load profile data', 'error');
@@ -165,11 +168,10 @@ export default function KYCVerificationPage() {
         setLoading(false);
       }
     };
-
-    fetchProfileData();
+    fetchData();
   }, []);
 
-  // OTP Expiry Timer
+  // ========== OTP EXPIRY TIMER ==========
   useEffect(() => {
     if (otpExpiry && otpExpiry > Date.now()) {
       const timer = setTimeout(() => {
@@ -182,7 +184,7 @@ export default function KYCVerificationPage() {
     }
   }, [otpExpiry]);
 
-  // Auto-fetch bank details from IFSC
+  // ========== IFSC AUTO-FETCH ==========
   useEffect(() => {
     const fetchBankFromIFSC = async () => {
       if (bankDetails.ifsc_code.length === 11) {
@@ -191,10 +193,7 @@ export default function KYCVerificationPage() {
           const response = await fetch(`https://ifsc.razorpay.com/${bankDetails.ifsc_code}`);
           const data = await response.json();
           if (data.BANK) {
-            setBankDetails(prev => ({
-              ...prev,
-              bank_name: data.BANK
-            }));
+            setBankDetails(prev => ({ ...prev, bank_name: data.BANK }));
           }
         } catch (error) {
           console.error('Failed to fetch bank details');
@@ -203,12 +202,10 @@ export default function KYCVerificationPage() {
         }
       }
     };
-
     fetchBankFromIFSC();
   }, [bankDetails.ifsc_code]);
 
-  // ==================== API HANDLERS ====================
-
+  // ========== PAN VERIFICATION ==========
   const handleVerifyPan = async () => {
     if (!panDetails.pan || panDetails.pan.length !== 10) {
       triggerPopup('Please enter a valid 10-digit PAN number', 'error');
@@ -231,7 +228,6 @@ export default function KYCVerificationPage() {
       return;
     }
 
-    // Convert date to DD/MM/YYYY if it's in YYYY-MM-DD format
     let formattedDate = panDetails.date_of_birth;
     if (panDetails.date_of_birth.includes('-')) {
       const [year, month, day] = panDetails.date_of_birth.split('-');
@@ -240,12 +236,22 @@ export default function KYCVerificationPage() {
 
     setLoadingSection('pan');
     try {
-      const response = await CustomerService.verifyPan({
+      const response = await customerService.verifyPan({
         pan: panDetails.pan,
         name_as_per_pan: panDetails.name_as_per_pan,
         date_of_birth: formattedDate
       });
+      
       setPanStatus('VERIFIED');
+      
+      // Refresh data from backend
+      await refreshKYCData();
+      
+      // Also call parent refresh if provided
+      if (onRefresh) {
+        await onRefresh();
+      }
+      
       triggerPopup(response.message || 'PAN verified successfully!', 'success');
     } catch (error: any) {
       setPanStatus('FAILED');
@@ -255,6 +261,7 @@ export default function KYCVerificationPage() {
     }
   };
 
+  // ========== AADHAAR OTP GENERATION ==========
   const handleGenerateAadhaarOtp = async () => {
     if (!aadhaarNumber || aadhaarNumber.length !== 12) {
       triggerPopup('Please enter a valid 12-digit Aadhaar number', 'error');
@@ -263,14 +270,12 @@ export default function KYCVerificationPage() {
 
     setLoadingSection('aadhaar-otp');
     try {
-      const response = await CustomerService.generateAadhaarOtp(aadhaarNumber);
-      
+      const response = await customerService.generateAadhaarOtp(aadhaarNumber);
       if (response.reference_id || response["Reference ID"]) {
         setReferenceId(response.reference_id || response["Reference ID"]);
       }
-      
       setOtpSent(true);
-      setOtpExpiry(Date.now() + 180000);
+      setOtpExpiry(Date.now() + 180000); // 3 minutes
       triggerPopup('OTP sent to your registered mobile number', 'success');
     } catch (error: any) {
       setAadhaarStatus('FAILED');
@@ -280,6 +285,7 @@ export default function KYCVerificationPage() {
     }
   };
 
+  // ========== AADHAAR OTP VERIFICATION ==========
   const handleVerifyAadhaarOtp = async () => {
     const otpString = otp.join('');
     if (otpString.length !== 6) {
@@ -294,7 +300,7 @@ export default function KYCVerificationPage() {
 
     setLoadingSection('aadhaar-verify');
     try {
-      const response = await CustomerService.verifyAadhaarOtp({
+      const response = await customerService.verifyAadhaarOtp({
         reference_id: referenceId,
         otp: otpString,
         aadhaar_number: aadhaarNumber
@@ -304,6 +310,15 @@ export default function KYCVerificationPage() {
       setOtpSent(false);
       setOtpExpiry(null);
       setOtp(['', '', '', '', '', '']);
+      
+      // Refresh data from backend
+      await refreshKYCData();
+      
+      // Also call parent refresh if provided
+      if (onRefresh) {
+        await onRefresh();
+      }
+      
       triggerPopup('Aadhaar verified successfully', 'success');
     } catch (error: any) {
       setAadhaarStatus('FAILED');
@@ -313,6 +328,7 @@ export default function KYCVerificationPage() {
     }
   };
 
+  // ========== BANK VERIFICATION ==========
   const handleVerifyBank = async () => {
     if (!bankDetails.bank_name || !bankDetails.bank_account_number || !bankDetails.ifsc_code) {
       triggerPopup('Please fill all bank details', 'error');
@@ -331,8 +347,18 @@ export default function KYCVerificationPage() {
 
     setLoadingSection('bank');
     try {
-      const response = await CustomerService.verifyBankPennyDrop(bankDetails);
+      const response = await customerService.verifyBankPennyDrop(bankDetails);
+      
       setBankStatus('VERIFIED');
+      
+      // Refresh data from backend
+      await refreshKYCData();
+      
+      // Also call parent refresh if provided
+      if (onRefresh) {
+        await onRefresh();
+      }
+      
       triggerPopup(response.message, 'success');
       if (response.data?.utr) {
         triggerPopup(`₹${response.data.amount_deposited} deposited. UTR: ${response.data.utr}`, 'success');
@@ -345,50 +371,61 @@ export default function KYCVerificationPage() {
     }
   };
 
+  // ========== ADD DEMAT ==========
   const handleAddDemat = async () => {
     if (!dematDetails.dp_id || !dematDetails.client_id || !dematDetails.demat_name) {
-        triggerPopup('Please fill all required fields (DP ID, Client ID, and Name on Demat)', 'error');
-        return;
+      triggerPopup('Please fill all required fields (DP ID, Client ID, and Name on Demat)', 'error');
+      return;
     }
 
     if (!dematDetails.dp_id.match(/^[A-Z0-9]{6,}$/)) {
-        triggerPopup('Invalid DP ID format', 'error');
-        return;
+      triggerPopup('Invalid DP ID format', 'error');
+      return;
     }
 
     if (!dematDetails.client_id.match(/^[0-9]{8,}$/)) {
-        triggerPopup('Client ID should be at least 8 digits', 'error');
-        return;
+      triggerPopup('Client ID should be at least 8 digits', 'error');
+      return;
     }
 
     setSavingDemat(true);
     try {
-        const response = await CustomerService.addDematAccount({
-            dp_id: dematDetails.dp_id,
-            client_id: dematDetails.client_id,
-            depository: dematDetails.depository,
-            demat_name: dematDetails.demat_name
-        });
+      const response = await customerService.addDematAccount({
+        dp_id: dematDetails.dp_id,
+        client_id: dematDetails.client_id,
+        depository: dematDetails.depository,
+        demat_name: dematDetails.demat_name
+      });
+      
+      if (response) {
+        setDematAdded(true);
         
-        if (response) {
-            setDematAdded(true);
-            triggerPopup('Demat account added successfully!', 'success');
+        // Refresh data from backend
+        await refreshKYCData();
+        
+        // Also call parent refresh if provided
+        if (onRefresh) {
+          await onRefresh();
         }
+        
+        triggerPopup('Demat account added successfully!', 'success');
+      }
     } catch (error: any) {
-        console.error('Error adding demat:', error);
-        triggerPopup(error.response?.data?.message || 'Failed to add demat account', 'error');
+      console.error('Error adding demat:', error);
+      triggerPopup(error.response?.data?.message || 'Failed to add demat account', 'error');
     } finally {
-        setSavingDemat(false);
+      setSavingDemat(false);
     }
   };
 
-  // ========== SAVE ALL CHANGES ==========
-  // NOTE: This function is kept but not used. Each section saves independently.
-  // If you need a global save, you'll need a new API endpoint that accepts all KYC data.
+  // ========== HELPER FUNCTIONS ==========
+  const resetAadhaarOtp = () => {
+    setOtpSent(false);
+    setOtp(['', '', '', '', '', '']);
+    setReferenceId(null);
+  };
 
-  // ==================== HELPER FUNCTIONS ====================
-
-  const getCompletedSteps = () => {
+  const getKYCCompletedSteps = () => {
     let count = 0;
     if (panStatus === 'VERIFIED') count++;
     if (aadhaarStatus === 'VERIFIED') count++;
@@ -397,23 +434,35 @@ export default function KYCVerificationPage() {
     return count;
   };
 
-  const progressPercentage = (getCompletedSteps() / 4) * 100;
+  const kycProgressPercentage = (getKYCCompletedSteps() / 4) * 100;
 
-  // ========== LOADING STATE ==========
+  // Update status when external props change
+  useEffect(() => {
+    if (externalPanVerified !== undefined) {
+      setPanStatus(externalPanVerified ? 'VERIFIED' : 'NOT_STARTED');
+    }
+    if (externalAadhaarVerified !== undefined) {
+      setAadhaarStatus(externalAadhaarVerified ? 'VERIFIED' : 'NOT_STARTED');
+    }
+    if (externalBankVerified !== undefined) {
+      setBankStatus(externalBankVerified ? 'VERIFIED' : 'NOT_STARTED');
+    }
+    if (externalDematAdded !== undefined) {
+      setDematAdded(externalDematAdded);
+    }
+  }, [externalPanVerified, externalAadhaarVerified, externalBankVerified, externalDematAdded]);
+
   if (loading) {
     return (
-      <main className="max-w-[1440px] mx-auto px-4 md:px-8 py-8 bg-[#F8FAFC] min-h-screen flex items-center justify-center">
-        <div className="flex justify-center items-center h-[60vh]">
-          <div className="w-10 h-10 border-4 border-[#1CADA3] border-t-transparent rounded-full animate-spin" />
-        </div>
-      </main>
+      <div className="mt-12 flex justify-center items-center h-64">
+        <div className="w-10 h-10 border-4 border-[#1CADA3] border-t-transparent rounded-full animate-spin" />
+      </div>
     );
   }
 
   return (
-    <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 bg-[#F8FAFC] min-h-screen relative">
-      
-      {/* --- CUSTOM NOTIFICATION POPUPS --- */}
+    <div className="mt-12">
+      {/* KYC Custom Notification Popups */}
       <div className="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none">
         {popups.map((p) => (
           <div
@@ -438,16 +487,10 @@ export default function KYCVerificationPage() {
         ))}
       </div>
 
-      {/* Header */}
+      {/* KYC Header */}
       <header className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <button 
-              onClick={() => router.back()}
-              className="p-2 hover:bg-white rounded-xl transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-slate-600" />
-            </button>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-slate-800">KYC & Demat Verification</h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Complete your verification to start investing</p>
@@ -457,32 +500,32 @@ export default function KYCVerificationPage() {
           {/* Step Counter */}
           <div className="flex items-center gap-3 self-start sm:self-auto">
             <span className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest whitespace-nowrap ${
-              getCompletedSteps() === 4 
+              getKYCCompletedSteps() === 4 
                 ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
                 : "bg-amber-50 text-amber-600 border border-amber-200"
             }`}>
-              {getCompletedSteps() === 4 ? "All Completed" : `${getCompletedSteps()}/4 Steps Done`}
+              {getKYCCompletedSteps() === 4 ? "All Completed" : `${getKYCCompletedSteps()}/4 Steps Done`}
             </span>
           </div>
         </div>
       </header>
 
-      {/* Progress Bar */}
+      {/* KYC Progress Bar */}
       <div className="mb-6 sm:mb-8 bg-white rounded-xl p-4 sm:p-5 border border-slate-100 shadow-sm">
         <div className="flex justify-between items-center mb-2">
           <span className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest">Overall Progress</span>
-          <span className="text-xs sm:text-sm font-bold text-[#1CADA3]">{getCompletedSteps()}/4 Steps</span>
+          <span className="text-xs sm:text-sm font-bold text-[#1CADA3]">{getKYCCompletedSteps()}/4 Steps</span>
         </div>
         <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
           <motion.div 
             initial={{ width: 0 }}
-            animate={{ width: `${progressPercentage}%` }}
+            animate={{ width: `${kycProgressPercentage}%` }}
             className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full"
           />
         </div>
       </div>
 
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className="w-full max-w-7xl mx-auto px-0 py-6 space-y-6">
 
         {/* PAN Verification Card - Step 1 */}
         <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
@@ -670,11 +713,7 @@ export default function KYCVerificationPage() {
                         {loadingSection === 'aadhaar-verify' ? "Verifying..." : "Verify OTP"}
                       </button>
                       <button
-                        onClick={() => {
-                          setOtpSent(false);
-                          setOtp(['', '', '', '', '', '']);
-                          setReferenceId(null);
-                        }}
+                        onClick={resetAadhaarOtp}
                         className="px-4 py-2.5 border border-rose-200 text-rose-600 text-xs font-bold rounded-xl hover:bg-rose-50 transition-colors"
                       >
                         Edit
@@ -753,16 +792,7 @@ export default function KYCVerificationPage() {
                   <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 animate-spin" />
                 )}
               </div>
-              
             </div>
-          </div>
-          
-          {/* Info Notice */}
-          <div className="mt-4 flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-100">
-            <Info className="text-amber-600 w-4 h-4 flex-shrink-0 mt-0.5" />
-            <p className="text-xs font-medium text-amber-700">
-              We'll deposit ₹1.00 to verify your account. This amount will be refunded within 24 hours.
-            </p>
           </div>
 
           {/* Bank Verified Status */}
@@ -912,6 +942,6 @@ export default function KYCVerificationPage() {
         </div>
 
       </div>
-    </main>
+    </div>
   );
-}
+};

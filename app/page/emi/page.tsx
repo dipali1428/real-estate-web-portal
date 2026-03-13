@@ -1,16 +1,33 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
+import { TrendingUp, PieChart, Calculator, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
 
 // Register Chart.js components
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
+
+// Calculator options for dropdown
+const CALCULATOR_OPTIONS = [
+  { id: 'emi', label: 'EMI Calculator', icon: Calculator, desc: 'Calculate your Equated Monthly Installment with precision.', path: '/page/emi' },
+  { id: 'sip', label: 'SIP Calculator', icon: TrendingUp, desc: 'Plan your mutual fund investments and estimate future wealth.', path: '/page/sip' },
+  { id: 'sipVsEmi', label: 'EMI VS SIP', icon: Timer, desc: 'Compare how different loan tenures affect your finances.', path: '/page/sipVsEmi' },
+  { id: 'homeloan', label: 'Home Loan', icon: Home, desc: 'Estimate your home loan EMI and total interest payable.', path: '/page/homeloan' },
+  { id: 'personalloan', label: 'Personal Loan', icon: User, desc: 'Calculate your personal loan EMI and repayment schedule.', path: '/page/personalloan' },
+  { id: 'businessloan', label: 'Business Loan', icon: Building2, desc: 'Plan your business expansion with our business loan calculator.', path: '/page/businessloan' },
+  { id: 'fd', label: 'FD Calculator', icon: PieChart, desc: 'Calculate the maturity amount of your fixed deposits.', path: '/page/fd' },
+  { id: 'CompoundInterest', label: 'Compound Interest', icon: LineChart, desc: 'See how your money grows over time with compound interest.', path: '/page/CompoundInterest' },
+];
 
 const EMICalculator: React.FC = () => {
   // State for loan parameters
   const [loanAmount, setLoanAmount] = useState<number>(1000000);
   const [interestRate, setInterestRate] = useState<number>(8.5);
   const [loanTenure, setLoanTenure] = useState<number>(20);
+  
+  // Dropdown state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // State for calculated values
   const [emi, setEmi] = useState<number>(0);
@@ -20,6 +37,8 @@ const EMICalculator: React.FC = () => {
   // Chart reference
   const chartRef = useRef<Chart<'doughnut'> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'emi') || CALCULATOR_OPTIONS[0];
 
   // Format currency for display
   const formatCurrency = (value: number): string => {
@@ -180,6 +199,10 @@ const EMICalculator: React.FC = () => {
     return loanAmount === 0 ? '' : loanAmount.toString();
   };
 
+  const handleCalculatorChange = (path: string) => {
+    window.location.href = path;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
 
@@ -189,6 +212,67 @@ const EMICalculator: React.FC = () => {
           <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
             <h1 className="text-3xl font-bold  mb-2">EMI Calculator</h1>
             <p className="text-blue-100">Calculate your Equated Monthly Installment</p>
+          </div>
+
+          {/* Dropdown - Added here */}
+          <div className="px-8 pt-4 pb-2 max-w-md mx-auto">
+            <div className="relative">
+              <button 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
+                    <activeData.icon className="w-5 h-5 text-teal-600" />
+                  </div>
+                  <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
+                </div>
+                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto"
+                  >
+                    {CALCULATOR_OPTIONS.map((calc) => (
+                      <button
+                        key={calc.id}
+                        onClick={() => {
+                          handleCalculatorChange(calc.path);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                          calc.id === 'emi' ? 'bg-teal-500/5' : ''
+                        }`}
+                      >
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                          calc.id === 'emi' 
+                            ? 'bg-teal-500 text-white' 
+                            : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <calc.icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <span className={`font-medium ${
+                            calc.id === 'emi' ? 'text-teal-600' : 'text-gray-700'
+                          }`}>
+                            {calc.label}
+                          </span>
+                          <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
+                        </div>
+                        {calc.id === 'emi' && (
+                          <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
+                        )}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">

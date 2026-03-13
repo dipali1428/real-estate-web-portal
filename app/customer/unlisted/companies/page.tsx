@@ -34,6 +34,12 @@ interface DepositoryBadge {
   label: string;
 }
 
+interface ApiResponse {
+  success: boolean;
+  data: Company[];
+  message?: string;
+}
+
 // ==================== HELPER FUNCTIONS ====================
 
 const getTokenFromCookie = (): string | null => {
@@ -72,12 +78,10 @@ const getCompanyInitials = (name: string): string => {
 };
 
 const getDepositoryBadge = (depository: string | null): DepositoryBadge => {
-  // Handle null, undefined, or empty string
   if (!depository) {
     return { bg: 'bg-gray-50', text: 'text-gray-700', label: 'Not Specified' };
   }
   
-  // Clean up the depository string (remove &amp; and extra spaces)
   const cleanDepository = depository.replace(/&amp;/g, '&').trim();
   
   if (cleanDepository.includes('NSDL') && cleanDepository.includes('CDSL')) {
@@ -124,7 +128,7 @@ type PriceRangeOption = typeof PRICE_RANGES[number]['value'];
 
 // ==================== MAIN COMPONENT ====================
 
-export default function UserDashboard() {
+export default function CompaniesPage() {
   const router = useRouter();
   
   // State
@@ -138,59 +142,120 @@ export default function UserDashboard() {
   const [sortBy, setSortBy] = useState<SortOption>('name-asc');
   const [showFilters, setShowFilters] = useState(false);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+  const [retryCount, setRetryCount] = useState(0);
 
   // ========== FETCH COMPANIES ==========
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      setLoading(true);
-      setError(null);
+  const fetchCompanies = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    setError(null);
+    
+    try {
+      // Get token from cookie
+      const token = getTokenFromCookie();
       
-      try {
-        const token = getTokenFromCookie();
-        
-        if (!token) {
-          router.push('/');
-          return;
-        }
-
-        localStorage.setItem('token', token);
-        
-        const response = await customerService.getAllCompanies();
-        
-        if (response?.success && Array.isArray(response.data)) {
-          setCompanies(response.data);
-          setFilteredCompanies(response.data);
-          setLastUpdated(new Date().toLocaleTimeString('en-IN', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-          }));
-        } else {
-          setError('Failed to load companies');
-        }
-      } catch (err: any) {
-        console.error('Companies fetch error:', err);
-        
-        if (err.response?.status === 401) {
-          removeTokenCookie();
-          localStorage.removeItem('token');
-          router.push('/');
-        } else {
-          setError(err.response?.data?.message || 'Failed to load companies');
-        }
-      } finally {
-        setLoading(false);
+      if (!token) {
+        console.log('No authentication token found');
+        router.push('/');
+        return;
       }
-    };
 
+      // Set token in localStorage for API service
+      localStorage.setItem('token', token);
+      
+      console.log('Fetching companies...');
+      
+      // Call the API
+      const response = await customerService.getAllCompanies();
+      console.log('API Response:', response);
+      
+      // Handle different response structures
+      let companiesData: Company[] = [];
+      
+      if (response?.data && Array.isArray(response.data)) {
+        // Response format: { success: true, data: [...] }
+        companiesData = response.data;
+      } else if (Array.isArray(response)) {
+        // Response format: direct array
+        companiesData = response;
+      } else if (response?.success && response?.data) {
+        // Alternative format
+        companiesData = response.data;
+      } else {
+        console.error('Unexpected response format:', response);
+        throw new Error('Invalid data format received from server');
+      }
+      
+      if (companiesData.length > 0) {
+        setCompanies(companiesData);
+        setFilteredCompanies(companiesData);
+        setLastUpdated(new Date().toLocaleTimeString('en-IN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        }));
+        setError(null);
+      } else {
+        setCompanies([]);
+        setFilteredCompanies([]);
+        setLastUpdated(new Date().toLocaleTimeString('en-IN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        }));
+      }
+      
+    } catch (err: any) {
+      console.error('Companies fetch error:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        stack: err.stack
+      });
+      
+      // Handle specific error cases
+      if (err.response?.status === 401) {
+        console.log('Unauthorized access - clearing token');
+        removeTokenCookie();
+        localStorage.removeItem('token');
+        router.push('/');
+        return;
+      } else if (err.response?.status === 404) {
+        setError('API endpoint not found. Please check server configuration.');
+      } else if (err.code === 'ECONNABORTED') {
+        setError('Request timeout. Server is taking too long to respond.');
+      } else if (err.message?.includes('Network Error')) {
+        setError('Network error. Please check your internet connection.');
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.message) {
+        setError(err.message);
+      } else {
+        setError('Failed to load companies. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial fetch
+  useEffect(() => {
     fetchCompanies();
     
-    const interval = setInterval(fetchCompanies, 60000);
+    // Auto refresh every 60 seconds
+    const interval = setInterval(() => {
+      fetchCompanies(false);
+    }, 60000);
+    
     return () => clearInterval(interval);
-  }, [router]);
+  }, [router, retryCount]); // Add retryCount to dependencies
 
   // ========== APPLY FILTERS AND SEARCH ==========
   useEffect(() => {
+    if (!companies.length) {
+      setFilteredCompanies([]);
+      return;
+    }
+    
     let filtered = [...companies];
     
     // Apply search
@@ -275,6 +340,12 @@ export default function UserDashboard() {
     setSortBy('name-asc');
   };
 
+  // ========== HANDLE RETRY ==========
+  const handleRetry = (): void => {
+    setRetryCount(prev => prev + 1);
+    fetchCompanies();
+  };
+
   // ========== CALCULATE STATS ==========
   const totalCompanies = companies.length;
   
@@ -328,7 +399,7 @@ export default function UserDashboard() {
           </h3>
           <p className="text-gray-600 mb-6">{error}</p>
           <button 
-            onClick={() => window.location.reload()}
+            onClick={handleRetry}
             className="w-full py-3 px-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-semibold rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2"
           >
             <RefreshCw size={18} />
@@ -423,7 +494,7 @@ export default function UserDashboard() {
               Avg. Price
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {formatCurrency(avgPrice.toFixed(2))}
+              {avgPrice > 0 ? formatCurrency(avgPrice.toFixed(2)) : 'N/A'}
             </p>
           </div>
           
@@ -433,7 +504,7 @@ export default function UserDashboard() {
               Price Range
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {formatCurrency(minPrice.toFixed(2))} - {formatCurrency(maxPrice.toFixed(2))}
+              {minPrice > 0 ? formatCurrency(minPrice.toFixed(2)) : 'N/A'} - {maxPrice > 0 ? formatCurrency(maxPrice.toFixed(2)) : 'N/A'}
             </p>
           </div>
           
@@ -443,7 +514,7 @@ export default function UserDashboard() {
               Last Updated
             </div>
             <p className="text-lg font-bold text-gray-900">
-              {lastUpdated?.split(' ')[0] || 'Now'}
+              {lastUpdated || 'Just now'}
             </p>
           </div>
         </div>
@@ -606,25 +677,24 @@ export default function UserDashboard() {
               <div className="px-6 py-12 text-center">
                 <Database className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-600 mb-2">No companies found</p>
-                <button
-                  onClick={clearFilters}
-                  className="text-[#2076C7] text-sm font-semibold hover:underline"
-                >
-                  Clear filters
-                </button>
+                {companies.length === 0 ? (
+                  <button
+                    onClick={handleRetry}
+                    className="text-[#2076C7] text-sm font-semibold hover:underline flex items-center gap-1 mx-auto"
+                  >
+                    <RefreshCw size={14} />
+                    Refresh data
+                  </button>
+                ) : (
+                  <button
+                    onClick={clearFilters}
+                    className="text-[#2076C7] text-sm font-semibold hover:underline"
+                  >
+                    Clear filters
+                  </button>
+                )}
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Footer Note */}
-        <div className="mt-6 text-center">
-          <div className="inline-flex items-center gap-2 text-xs text-gray-400">
-            <RefreshCw size={12} className="animate-spin-slow" />
-            <span>Auto-updates every 60 seconds</span>
-            <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-            <Clock size={12} />
-            <span>Last updated: {lastUpdated || 'Just now'}</span>
           </div>
         </div>
       </main>
