@@ -1,39 +1,51 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import {
-  User,
-  Mail,
-  Award,
-  Shield,
-  CheckCircle,
-  AlertCircle,
-  Loader2,
-  Edit2,
-  Save,
-  X,
-  XCircle,
-  Key,
-  Eye,
-  EyeOff,
-  Trash2,
-  Bell,
-  Lock,
-  Camera,
-  ArrowLeft,
-  ChevronRight
-} from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import {
+  AlertCircle,
+  ArrowLeft,
+  Bell,
+  CheckCircle,
+  Loader2
+} from 'lucide-react';
 import customerService from '../../services/customerService';
+import { ProfileSection } from './profilesection';
+import { KYCSection } from './kycsection';
+import { Modals } from './modal';
 
 // ==================== TYPES ====================
-interface ProfileData {
+export interface ProfileData {
   id?: number;
   name: string;
   mobile: string;
   email?: string;
   profile_image?: string;
+  // KYC fields (optional, for refresh)
+  pan_verified?: boolean;
+  aadhaar_verified?: boolean;
+  bank_verified?: boolean;
+  demat_added?: boolean;
+  pan?: string;
+  aadhaar?: string;
+  bank_name?: string;
+  bank_account?: string;
+  ifsc?: string;
+  gst_number?: string;
+  name_as_per_pan?: string;
+  date_of_birth?: string;
+}
+
+export interface PasswordData {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface Notification {
+  id: number;
+  message: string;
+  type: 'success' | 'error' | 'info';
 }
 
 // ==================== HELPER FUNCTIONS ====================
@@ -48,17 +60,33 @@ const removeTokenCookie = () => {
   document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
 };
 
-// ==================== MAIN COMPONENT ====================
+const getBaseURL = (): string => {
+  const baseURL = (customerService as any).defaults?.baseURL || '';
+  return baseURL.replace(/\/api$/, '');
+};
+
+const validateMobile = (mobile: string): string | null => {
+  if (!mobile) return 'Mobile number is required';
+  if (!/^\d{10}$/.test(mobile)) return 'Please enter a valid 10-digit mobile number';
+  return null;
+};
+
 export default function ProfilePage() {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const BACKEND_URL = "http://192.168.1.69:5000";
-  
+  const baseURL = getBaseURL();
+  const fileInputRef = useRef<HTMLInputElement>(null!);
+
   // Profile State
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [originalProfile, setOriginalProfile] = useState<ProfileData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  
+
+  // KYC Verification States
+  const [panVerified, setPanVerified] = useState(false);
+  const [aadhaarVerified, setAadhaarVerified] = useState(false);
+  const [bankVerified, setBankVerified] = useState(false);
+  const [dematAdded, setDematAdded] = useState(false);
+
   // UI State
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -67,7 +95,7 @@ export default function ProfilePage() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [passwordData, setPasswordData] = useState({
+  const [passwordData, setPasswordData] = useState<PasswordData>({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -77,21 +105,22 @@ export default function ProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [updatingPassword, setUpdatingPassword] = useState(false);
-  const [notifications, setNotifications] = useState<{ id: number; message: string; type: 'success' | 'error' | 'info' }[]>([]);
-  
-  // Validation State
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [mobileError, setMobileError] = useState<string | null>(null);
 
+  // Track if initial fetch has been done
+  const hasFetched = useRef(false);
+
   // ========== COMPLETED STEPS ==========
-  const getCompletedSteps = () => {
+  const getCompletedSteps = useCallback(() => {
     let count = 0;
     if (profile?.mobile && profile.mobile.trim() !== '') count++;
     if (profile?.name && profile.name.trim() !== '') count++;
     if (profile?.profile_image) count++;
     return count;
-  };
+  }, [profile]);
 
-  const progressPercentage = (getCompletedSteps() / 3) * 100;
+  const progressPercentage = useMemo(() => (getCompletedSteps() / 3) * 100, [getCompletedSteps]);
 
   // ========== CHECK IF FORM HAS CHANGES ==========
   const hasChanges = useMemo(() => {
@@ -100,12 +129,12 @@ export default function ProfilePage() {
   }, [profile, originalProfile]);
 
   // ========== IMAGE URL HELPER ==========
-  const getImageUrl = (path: string | undefined) => {
+  const getImageUrl = useCallback((path: string | undefined) => {
     if (!path) return null;
     if (path.startsWith('http')) return path;
-    if (path.startsWith('/')) return `${BACKEND_URL}${path}`;
-    return `${BACKEND_URL}/uploads/${path}`;
-  };
+    if (path.startsWith('/')) return `${baseURL}${path}`;
+    return `${baseURL}/uploads/${path}`;
+  }, [baseURL]);
 
   // ========== SHOW NOTIFICATION ==========
   const showNotification = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -116,17 +145,61 @@ export default function ProfilePage() {
     }, 4000);
   }, []);
 
-  // ========== VALIDATE MOBILE ==========
-  const validateMobile = (mobile: string): string | null => {
-    if (!mobile) return 'Mobile number is required';
-    if (!/^\d{10}$/.test(mobile)) return 'Please enter a valid 10-digit mobile number';
-    return null;
-  };
+  // ========== REFRESH PROFILE DATA FROM BACKEND ==========
+  const refreshProfileData = useCallback(async () => {
+    try {
+      const response = await customerService.getProfile();
+      
+      if (response) {
+        let profileData = response;
+        if (response.data) profileData = response.data;
+        if (response.user) profileData = response.user;
+        
+        const storedImageUrl = localStorage.getItem('profile_image_url');
+        
+        // Create updated profile object with ALL fields from backend
+        const updatedProfile: ProfileData = {
+          id: profileData.id || profileData.user_id,
+          name: profileData.name || profileData.full_name || '',
+          mobile: profileData.mobile || profileData.phone || profileData.mobile_number || '',
+          email: profileData.email || '',
+          profile_image: storedImageUrl || profileData.profile_image || profileData.avatar || profileData.profile_pic,
+          
+          // Add KYC/verification fields
+          pan_verified: profileData.pan_verified,
+          aadhaar_verified: profileData.aadhaar_verified,
+          bank_verified: profileData.bank_verified,
+          demat_added: profileData.demat_added,
+          pan: profileData.pan,
+          aadhaar: profileData.aadhaar,
+          bank_name: profileData.bank_name,
+          bank_account: profileData.bank_account,
+          ifsc: profileData.ifsc,
+          gst_number: profileData.gst_number,
+          name_as_per_pan: profileData.name_as_per_pan,
+          date_of_birth: profileData.date_of_birth
+        };
+        
+        // Update ALL state variables with fresh data
+        setProfile(updatedProfile);
+        setOriginalProfile(updatedProfile);
+        
+        // Update verification statuses
+        setPanVerified(!!profileData.pan_verified);
+        setAadhaarVerified(!!profileData.aadhaar_verified);
+        setBankVerified(!!profileData.bank_verified);
+        setDematAdded(!!profileData.demat_added);
+      }
+    } catch (error) {
+      console.error('Failed to refresh profile:', error);
+    }
+  }, []);
 
-  // ========== FETCH PROFILE DATA ==========
+  // ========== INITIAL FETCH PROFILE DATA ==========
   useEffect(() => {
-    let isMounted = true;
-    
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -141,44 +214,9 @@ export default function ProfilePage() {
 
         localStorage.setItem('token', token);
         
-        const response = await customerService.getProfile();
-        
-        if (!isMounted) return;
-        
-        if (response) {
-          // Handle different response structures
-          let profileData = response;
-          
-          // If response has a data property, use that
-          if (response.data) {
-            profileData = response.data;
-          }
-          
-          // If response has a user property, use that
-          if (response.user) {
-            profileData = response.user;
-          }
-          
-          const storedImageUrl = localStorage.getItem('profile_image_url');
-          
-          // Create profile object with proper mapping
-          const mappedProfile: ProfileData = {
-            id: profileData.id || profileData.user_id,
-            name: profileData.name || profileData.full_name || '',
-            mobile: profileData.mobile || profileData.phone || profileData.mobile_number || '',
-            email: profileData.email || '',
-            profile_image: storedImageUrl || profileData.profile_image || profileData.avatar || profileData.profile_pic
-          };
-          
-          setProfile(mappedProfile);
-          setOriginalProfile(mappedProfile);
-        } else {
-          setError('Failed to load profile data');
-        }
+        await refreshProfileData();
 
       } catch (err: any) {
-        if (!isMounted) return;
-        
         if (err.response?.status === 401) {
           removeTokenCookie();
           localStorage.removeItem('token');
@@ -188,18 +226,12 @@ export default function ProfilePage() {
           setError(err.message || 'Failed to load profile');
         }
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
     fetchData();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [router]);
+  }, [router, refreshProfileData]);
 
   // ========== CHECK PASSWORD STRENGTH ==========
   useEffect(() => {
@@ -207,20 +239,20 @@ export default function ProfilePage() {
       setPasswordStrength(0);
       return;
     }
-    
+
     let strength = 0;
     const password = passwordData.newPassword;
-    
+
     if (password.length >= 8) strength += 25;
     if (/[A-Z]/.test(password)) strength += 25;
     if (/[0-9]/.test(password)) strength += 25;
     if (/[^A-Za-z0-9]/.test(password)) strength += 25;
-    
+
     setPasswordStrength(Math.min(strength, 100));
   }, [passwordData.newPassword]);
 
   // ========== HANDLE PROFILE UPDATE ==========
-    const handleProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!profile) {
@@ -228,13 +260,11 @@ export default function ProfilePage() {
         return;
     }
 
-    // Validate name
     if (!profile.name?.trim()) {
         showNotification('Name is required', 'error');
         return;
     }
 
-    // Validate mobile
     const mobileValidationError = validateMobile(profile.mobile);
     if (mobileValidationError) {
         setMobileError(mobileValidationError);
@@ -242,7 +272,6 @@ export default function ProfilePage() {
         return;
     }
 
-    // Check if any data has actually changed
     if (!hasChanges) {
         showNotification('No changes detected', 'info');
         setIsEditing(false);
@@ -253,71 +282,48 @@ export default function ProfilePage() {
         setUpdating(true);
         
         const response = await customerService.updateProfile({
-        name: profile.name,
-        mobile: profile.mobile,
+          name: profile.name,
+          mobile: profile.mobile,
         });
 
         if (response?.success || response?.message?.includes('success')) {
-        setIsEditing(false);
-        setOriginalProfile(profile);
-        showNotification(response.message || 'Profile updated successfully!', 'success');
-        setMobileError(null);
-        
-        // Refresh profile data
-        const refreshedResponse = await customerService.getProfile();
-        if (refreshedResponse) {
-            let refreshedData = refreshedResponse;
-            if (refreshedResponse.data) {
-            refreshedData = refreshedResponse.data;
-            }
-            
-            const refreshedProfile: ProfileData = {
-            id: refreshedData.id || profile.id,
-            name: refreshedData.name || profile.name,
-            mobile: refreshedData.mobile || profile.mobile,
-            email: refreshedData.email || profile.email,
-            profile_image: profile.profile_image
-            };
-            
-            setProfile(refreshedProfile);
-            setOriginalProfile(refreshedProfile);
-        }
+          setIsEditing(false);
+          setOriginalProfile(profile);
+          showNotification(response.message || 'Profile updated successfully!', 'success');
+          setMobileError(null);
+          
+          await refreshProfileData();
         } else {
-        showNotification('Failed to update profile', 'error');
+          showNotification('Failed to update profile', 'error');
         }
 
     } catch (error: any) {
-        
         if (error.response?.status === 401) {
-        showNotification('Session expired. Please login again.', 'error');
-        removeTokenCookie();
-        localStorage.removeItem('token');
-        localStorage.removeItem('profile_image_url');
-        router.push('/');
+          showNotification('Session expired. Please login again.', 'error');
+          removeTokenCookie();
+          localStorage.removeItem('token');
+          localStorage.removeItem('profile_image_url');
+          router.push('/');
         } else if (error.response?.status === 400) {
-        const errorMessage = error.response.data?.message;
-        
-        if (errorMessage?.includes('Mobile number already exists')) {
-            // Show the number that was attempted
-            const attemptedNumber = profile.mobile;
-            const lastFourDigits = attemptedNumber.slice(-4);
-            const maskedNumber = `XXXXXX${lastFourDigits}`;
-            
-            setMobileError(`Mobile number ${maskedNumber} is already registered with another account`);
-            showNotification(`Mobile number ${maskedNumber} is already registered`, 'error');
-            
-            // Keep the entered number visible in the field (don't restore original)
-            // This allows user to see what they typed and correct it
+          const errorMessage = error.response.data?.message;
+          
+          if (errorMessage?.includes('Mobile number already exists')) {
+              const attemptedNumber = profile.mobile;
+              const lastFourDigits = attemptedNumber.slice(-4);
+              const maskedNumber = `XXXXXX${lastFourDigits}`;
+              
+              setMobileError(`Mobile number ${maskedNumber} is already registered with another account`);
+              showNotification(`Mobile number ${maskedNumber} is already registered`, 'error');
+          } else {
+              showNotification(errorMessage || 'Invalid data provided', 'error');
+          }
         } else {
-            showNotification(errorMessage || 'Invalid data provided', 'error');
-        }
-        } else {
-        showNotification('Failed to update profile', 'error');
+          showNotification('Failed to update profile', 'error');
         }
     } finally {
         setUpdating(false);
     }
-    };
+  };
 
   // ========== HANDLE PROFILE IMAGE UPLOAD ==========
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -354,44 +360,38 @@ export default function ProfilePage() {
         
         showNotification(response.message || 'Profile picture updated!', 'success');
       } else {
-        const refreshedProfile = await customerService.getProfile();
-        if (refreshedProfile) {
-          setProfile(refreshedProfile);
-          setOriginalProfile(refreshedProfile);
-        }
+        await refreshProfileData();
         showNotification('Profile picture updated!', 'success');
       }
     } catch (err: any) {
       showNotification(err.response?.data?.message || 'Failed to upload image', 'error');
     } finally { 
       setUploadingImage(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
   // ========== HANDLE PASSWORD UPDATE ==========
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       showNotification('New passwords do not match', 'error');
       return;
     }
-    
+
     if (passwordData.newPassword.length < 8) {
       showNotification('Password must be at least 8 characters', 'error');
       return;
     }
-    
+
     if (passwordStrength < 75) {
       showNotification('Please choose a stronger password', 'error');
       return;
     }
-    
+
     setUpdatingPassword(true);
-    
+
     try {
       const response = await customerService.changePassword({
         currentPassword: passwordData.currentPassword,
@@ -423,7 +423,7 @@ export default function ProfilePage() {
   // ========== HANDLE ACCOUNT DELETION ==========
   const handleDeleteAccount = async () => {
     setDeleting(true);
-    
+
     try {
       const response = await customerService.deleteAccount();
       
@@ -449,13 +449,11 @@ export default function ProfilePage() {
   // ========== HANDLE PROFILE CHANGE ==========
   const handleProfileChange = (field: keyof ProfileData, value: string) => {
     if (!profile) return;
-    
+
     if (field === 'mobile') {
-      // Only allow digits and limit to 10 characters
       const cleanValue = value.replace(/\D/g, '').slice(0, 10);
       setProfile({ ...profile, [field]: cleanValue });
       
-      // Validate in real-time
       if (cleanValue && !/^\d{10}$/.test(cleanValue)) {
         setMobileError('Please enter a valid 10-digit mobile number');
       } else {
@@ -466,55 +464,28 @@ export default function ProfilePage() {
     }
   };
 
-  // ========== CANCEL EDIT ==========
-  const cancelEdit = () => {
-    setProfile(originalProfile);
-    setIsEditing(false);
-    setMobileError(null);
-    showNotification('Edit cancelled', 'info');
-  };
-
   // ========== DISCARD CHANGES ==========
-  const discardChanges = () => {
+  const discardChanges = useCallback(() => {
     setProfile(originalProfile);
     setIsEditing(false);
     setMobileError(null);
     showNotification('Changes discarded', 'info');
-  };
-
-  // ========== GO BACK TO DASHBOARD ==========
-  const goToDashboard = () => {
-    router.push('/customer/unlisted');
-  };
-
-  // ========== HANDLE LOGOUT ==========
-  const handleLogout = async () => {
-    try {
-      await customerService.logout();
-      removeTokenCookie();
-      localStorage.removeItem('token');
-      localStorage.removeItem('profile_image_url');
-      showNotification('Logged out successfully', 'success');
-      router.push('/');
-    } catch (err) {
-      showNotification('Failed to logout', 'error');
-    }
-  };
+  }, [originalProfile, showNotification]);
 
   // ========== PASSWORD STRENGTH HELPERS ==========
-  const getPasswordStrengthColor = () => {
+  const getPasswordStrengthColor = useCallback(() => {
     if (passwordStrength < 25) return 'bg-red-500';
     if (passwordStrength < 50) return 'bg-orange-500';
     if (passwordStrength < 75) return 'bg-yellow-500';
     return 'bg-emerald-500';
-  };
+  }, [passwordStrength]);
 
-  const getPasswordStrengthText = () => {
+  const getPasswordStrengthText = useCallback(() => {
     if (passwordStrength < 25) return 'Very Weak';
     if (passwordStrength < 50) return 'Weak';
     if (passwordStrength < 75) return 'Medium';
     return 'Strong';
-  };
+  }, [passwordStrength]);
 
   // ========== LOADING STATE ==========
   if (loading) {
@@ -538,7 +509,7 @@ export default function ProfilePage() {
           <AlertCircle className="w-12 h-12 text-rose-500 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-slate-900 mb-2">Unable to Load Profile</h3>
           <p className="text-slate-600 mb-6">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-6 py-2 bg-[#2076C7] text-white rounded-xl hover:opacity-90 text-xs font-black uppercase tracking-widest"
           >
@@ -549,7 +520,6 @@ export default function ProfilePage() {
     );
   }
 
-  // ========== MAIN RENDER ==========
   return (
     <main className="max-w-[1440px] mx-auto px-4 md:px-8 py-8 bg-[#F8FAFC] min-h-screen relative">
       
@@ -576,12 +546,6 @@ export default function ProfilePage() {
       <header className="mb-10">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-center gap-4">
-            <button 
-              onClick={goToDashboard}
-              className="p-2 hover:bg-white rounded-xl transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-slate-600" />
-            </button>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">My Profile</h1>
               <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-500">Manage your personal information and security</p>
@@ -606,391 +570,63 @@ export default function ProfilePage() {
           <span className="text-sm font-bold text-[#1CADA3]">{getCompletedSteps()}/3 Fields</span>
         </div>
         <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPercentage}%` }}
-            className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full"
+          <div 
+            style={{ width: `${progressPercentage}%` }}
+            className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full transition-all duration-500"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column - Profile Image */}
-        <div className="lg:col-span-4 space-y-6">
-          {/* Profile Image Card */}
-          <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 pb-8">
-            <div className="h-28 bg-[#1CADA3] relative mb-14">
-              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                <div className="relative group">
-                  <div className="w-24 h-24 rounded-2xl bg-slate-100 border-4 border-white overflow-hidden shadow-md flex items-center justify-center">
-                    {uploadingImage ? (
-                      <div className="flex flex-col items-center gap-1">
-                        <Loader2 className="w-6 h-6 animate-spin text-[#1CADA3]" />
-                        <span className="text-[8px] font-bold text-slate-400">UPDATING</span>
-                      </div>
-                    ) : profile?.profile_image ? (
-                      <img 
-                        src={getImageUrl(profile.profile_image)!} 
-                        alt="Profile" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <User className="w-12 h-12 text-slate-300" />
-                    )}
-                  </div>
-                  <label className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#1CADA3] rounded-full border-2 border-white flex items-center justify-center text-white shadow-lg cursor-pointer hover:scale-110 transition-transform active:scale-95">
-                    <input 
-                      type="file" 
-                      ref={fileInputRef}
-                      className="hidden" 
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                    <Camera size={14} strokeWidth={2.5} />
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div className="px-6 text-center mt-2">
-              <h2 className="text-xl font-extrabold text-[#0f172a]">Profile Photo</h2>
-              <p className="text-slate-400 text-[10px] font-bold tracking-widest uppercase mt-1">Upload your photo</p>
-              <div className="mt-6 text-left">
-                <p className="text-xs text-slate-500 font-medium">Upload a clear passport size photo (max 5MB)</p>
-              </div>
-            </div>
-          </div>
+      {/* Profile Section */}
+      <ProfileSection
+        profile={profile}
+        isEditing={isEditing}
+        updating={updating}
+        uploadingImage={uploadingImage}
+        mobileError={mobileError}
+        hasChanges={hasChanges}
+        fileInputRef={fileInputRef}
+        getImageUrl={getImageUrl}
+        onEdit={() => setIsEditing(true)}
+        onDiscard={discardChanges}
+        onProfileChange={handleProfileChange}
+        onImageChange={handleImageChange}
+        onProfileUpdate={handleProfileUpdate}
+        onShowPasswordModal={() => setShowPasswordModal(true)}
+        onShowDeleteModal={() => setShowDeleteModal(true)}
+      />
 
-          {/* Account Summary Card */}
-          <div className="bg-gradient-to-br from-[#2076C7] to-[#1CADA3] rounded-3xl p-6 text-white shadow-sm">
-            <h3 className="font-bold mb-6 flex items-center gap-2 text-lg">
-              <Award size={20} />
-              Account Summary
-            </h3>
-            
-            <div className="space-y-4">
-              <div className="flex justify-between py-3 border-b border-white/20">
-                <span className="text-sm opacity-90 font-medium">Investor ID</span>
-                <span className="font-bold">#{profile?.id || 'N/A'}</span>
-              </div>
-              
-              <div className="flex justify-between py-3">
-                <span className="text-sm opacity-90 font-medium">Account Status</span>
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-500/20 text-emerald-100 rounded-lg text-xs font-bold">
-                  <CheckCircle className="w-3 h-3" />
-                  Active
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* KYC Section - With refresh and verification props */}
+      <KYCSection 
+        onRefresh={refreshProfileData}
+        externalPanVerified={panVerified}
+        externalAadhaarVerified={aadhaarVerified}
+        externalBankVerified={bankVerified}
+        externalDematAdded={dematAdded}
+      />
 
-        {/* Right Column - Profile Details */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* Personal Information Card */}
-          <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-emerald-50 text-emerald-500 rounded-2xl">
-                  <User size={24} />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900">Personal Information</h3>
-                  <p className="text-sm text-slate-500">Update your personal details</p>
-                </div>
-              </div>
-
-              {!isEditing ? (
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(true)}
-                  className="px-6 py-3 bg-[#2076C7] text-white rounded-xl hover:opacity-90 flex items-center gap-2 text-xs font-black uppercase tracking-widest shadow-sm"
-                >
-                  <Edit2 size={14} />
-                  Edit Profile
-                </button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={discardChanges}
-                    className="px-6 py-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 text-xs font-black uppercase tracking-widest flex items-center gap-2"
-                  >
-                    <X size={14} />
-                    Discard
-                  </button>
-                  <button
-                    type="submit"
-                    form="profile-form"
-                    disabled={updating || !hasChanges || !!mobileError}
-                    className={`px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 disabled:opacity-50 flex items-center gap-2 text-xs font-black uppercase tracking-widest shadow-sm ${
-                      !hasChanges || mobileError ? 'cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {updating ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                    {updating ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Form */}
-            <form id="profile-form" onSubmit={handleProfileUpdate}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Name Field */}
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                    Full Name
-                  </label>
-
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={profile?.name || ""}
-                      onChange={(e) => handleProfileChange("name", e.target.value)}
-                      className="w-full px-4 py-3 bg-white border-2 border-[#1CADA3] rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#158f87] transition-all"
-                      placeholder="Enter your full name"
-                      required
-                    />
-                  ) : (
-                    <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-bold text-slate-700">
-                      {profile?.name || "Not provided"}
-                    </div>
-                  )}
-                </div>
-
-                {/* Mobile Field */}
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                    Mobile Number
-                  </label>
-
-                  {isEditing ? (
-                    <div>
-                      <input
-                        type="tel"
-                        value={profile?.mobile || ""}
-                        onChange={(e) => handleProfileChange("mobile", e.target.value)}
-                        className={`w-full px-4 py-3 bg-white border-2 ${
-                          mobileError ? 'border-rose-500' : 'border-[#1CADA3]'
-                        } rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#158f87] transition-all`}
-                        placeholder="Enter your mobile number"
-                        required
-                        maxLength={10}
-                      />
-                      {mobileError && (
-                        <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
-                          <AlertCircle size={12} />
-                          {mobileError}
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-bold text-slate-700">
-                      {profile?.mobile || "Not provided"}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </form>
-          </div>
-
-          {/* Security Card */}
-          <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="p-3 bg-emerald-50 text-emerald-500 rounded-2xl">
-                <Shield size={24} />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-slate-900">Security Settings</h3>
-                <p className="text-sm text-slate-500">Manage your account security</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Change Password Card */}
-              <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 hover:border-[#1CADA3] transition-all cursor-pointer group"
-                   onClick={() => setShowPasswordModal(true)}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-white rounded-xl shadow-sm">
-                    <Key size={20} className="text-[#2076C7]" />
-                  </div>
-                  <ChevronRight size={20} className="text-slate-400 group-hover:text-[#1CADA3] transition-colors" />
-                </div>
-                <h4 className="font-bold text-slate-900 mb-1">Change Password</h4>
-                <p className="text-xs text-slate-500">Update your password regularly</p>
-              </div>
-
-              {/* Delete Account Card */}
-              <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 hover:border-rose-500 transition-all cursor-pointer group"
-                   onClick={() => setShowDeleteModal(true)}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 bg-white rounded-xl shadow-sm">
-                    <Trash2 size={20} className="text-rose-500" />
-                  </div>
-                  <ChevronRight size={20} className="text-slate-400 group-hover:text-rose-500 transition-colors" />
-                </div>
-                <h4 className="font-bold text-slate-900 mb-1">Delete Account</h4>
-                <p className="text-xs text-slate-500">Permanently remove your account</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Password Change Modal */}
-      {showPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-xl">
-            <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-6 text-white rounded-t-3xl flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <Key size={24} />
-                <h3 className="text-xl font-bold">Change Password</h3>
-              </div>
-              <button onClick={() => setShowPasswordModal(false)} className="p-2 hover:bg-white/20 rounded-xl transition-colors">
-                <X size={20} />
-              </button>
-            </div>
-            
-            <form onSubmit={handlePasswordUpdate} className="p-8 space-y-6">
-              {/* Current Password */}
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Current Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type={showCurrentPassword ? 'text' : 'password'}
-                    value={passwordData.currentPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                    className="w-full pl-12 pr-12 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#1CADA3] transition-all"
-                    placeholder="Enter current password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
-              
-              {/* New Password */}
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">New Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type={showNewPassword ? 'text' : 'password'}
-                    value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                    className="w-full pl-12 pr-12 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#1CADA3] transition-all"
-                    placeholder="Enter new password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                
-                {passwordData.newPassword && (
-                  <div className="mt-3 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-slate-500">Password Strength:</span>
-                      <span className={`text-xs font-black px-2 py-1 rounded-lg ${
-                        passwordStrength < 25 ? 'bg-red-50 text-red-600' :
-                        passwordStrength < 50 ? 'bg-orange-50 text-orange-600' :
-                        passwordStrength < 75 ? 'bg-yellow-50 text-yellow-600' :
-                        'bg-emerald-50 text-emerald-600'
-                      }`}>
-                        {getPasswordStrengthText()}
-                      </span>
-                    </div>
-                    <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                      <div className={`h-full ${getPasswordStrengthColor()}`} style={{ width: `${passwordStrength}%` }} />
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Confirm Password */}
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Confirm Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                    className="w-full pl-12 pr-12 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#1CADA3] transition-all"
-                    placeholder="Confirm new password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                
-                {passwordData.confirmPassword && (
-                  <div className="mt-2">
-                    {passwordData.newPassword === passwordData.confirmPassword ? (
-                      <p className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                        <CheckCircle size={12} /> Passwords match
-                      </p>
-                    ) : (
-                      <p className="text-xs font-bold text-rose-600 flex items-center gap-1">
-                        <XCircle size={12} /> Passwords do not match
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex gap-4 pt-4">
-                <button type="button" onClick={() => setShowPasswordModal(false)} className="flex-1 py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-black uppercase tracking-widest transition-colors">
-                  Cancel
-                </button>
-                <button type="submit" disabled={updatingPassword} className="flex-1 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest shadow-sm">
-                  {updatingPassword ? <Loader2 size={16} className="animate-spin" /> : 'Update'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Account Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-md w-full p-8 shadow-xl">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-rose-100">
-                <Trash2 size={40} className="text-rose-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">Delete Account?</h3>
-              <p className="text-sm text-slate-500 mb-8">This action cannot be undone. This will permanently delete your account and remove all associated data.</p>
-              
-              <div className="flex gap-4">
-                <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-black uppercase tracking-widest transition-colors">
-                  Cancel
-                </button>
-                <button onClick={handleDeleteAccount} disabled={deleting} className="flex-1 py-3 bg-rose-500 text-white rounded-xl hover:bg-rose-600 disabled:opacity-50 text-sm font-black uppercase tracking-widest shadow-sm">
-                  {deleting ? 'Deleting...' : 'Delete'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modals */}
+      <Modals
+        showPasswordModal={showPasswordModal}
+        showDeleteModal={showDeleteModal}
+        passwordData={passwordData}
+        updatingPassword={updatingPassword}
+        deleting={deleting}
+        passwordStrength={passwordStrength}
+        showCurrentPassword={showCurrentPassword}
+        showNewPassword={showNewPassword}
+        showConfirmPassword={showConfirmPassword}
+        onClosePasswordModal={() => setShowPasswordModal(false)}
+        onCloseDeleteModal={() => setShowDeleteModal(false)}
+        onPasswordChange={setPasswordData}
+        onPasswordUpdate={handlePasswordUpdate}
+        onDeleteAccount={handleDeleteAccount}
+        onToggleCurrentPassword={() => setShowCurrentPassword(!showCurrentPassword)}
+        onToggleNewPassword={() => setShowNewPassword(!showNewPassword)}
+        onToggleConfirmPassword={() => setShowConfirmPassword(!showConfirmPassword)}
+        getPasswordStrengthColor={getPasswordStrengthColor}
+        getPasswordStrengthText={getPasswordStrengthText}
+      />
     </main>
   );
 }
