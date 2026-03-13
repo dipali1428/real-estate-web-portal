@@ -3,6 +3,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "https://api.infinityarthvishva.com",
+  // "https://api.infinityarthvishva.com",
   // "http://192.168.1.83:5000"
   // "https://api.infinityarthvishva.com"
   // withCredentials: true, // ⭐ SEND COOKIES AUTOMATICALLY
