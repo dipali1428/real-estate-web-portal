@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Smartphone, LockKeyhole, ArrowRight, KeyRound, ChevronLeft } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
 import { useRouter } from "next/navigation";
+import { useModal } from "../../context/ModalContext";
 
 // Animation Variants
 const containerVariants = {
@@ -46,6 +47,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
     const router = useRouter();
+    const { openSignup } = useModal();
 
     const phoneRegex = /^[0-9]{10}$/;
 
@@ -323,6 +325,23 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                         </>
                                     )}
                                 </motion.button>
+
+                                {/* Signup Link */}
+<motion.div variants={itemVariants} className="text-center mt-4">
+  <p className="text-sm text-gray-500">
+    Don’t have an account?{" "}
+    <button
+      type="button"
+      onClick={() => {
+        onClose();
+        openSignup();
+      }}
+      className="text-[#2076C7] font-semibold hover:underline"
+    >
+      Signup
+    </button>
+  </p>
+</motion.div>
                             </form>
                         </div>
                     </motion.div>
