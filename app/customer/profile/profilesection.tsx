@@ -98,29 +98,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             </div>
           </div>
         </div>
-
-        {/* Account Summary Card */}
-        <div className="bg-gradient-to-br from-[#2076C7] to-[#1CADA3] rounded-3xl p-6 text-white shadow-sm">
-          <h3 className="font-bold mb-6 flex items-center gap-2 text-lg">
-            <Award size={20} />
-            Account Summary
-          </h3>
-          
-          <div className="space-y-4">
-            <div className="flex justify-between py-3 border-b border-white/20">
-              <span className="text-sm opacity-90 font-medium">Investor ID</span>
-              <span className="font-bold">#{profile?.id || 'N/A'}</span>
-            </div>
-            
-            <div className="flex justify-between py-3">
-              <span className="text-sm opacity-90 font-medium">Account Status</span>
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-500/20 text-emerald-100 rounded-lg text-xs font-bold">
-                <CheckCircle className="w-3 h-3" />
-                Active
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Right Column - Profile Details */}
@@ -209,14 +186,18 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                     <input
                       type="tel"
                       value={profile?.mobile || ""}
-                      onChange={(e) => onProfileChange("mobile", e.target.value)}
+                      onChange={(e) => {
+                        console.log("Mobile Number:", e.target.value);
+                        onProfileChange("mobile", e.target.value);
+                      }}
                       className={`w-full px-4 py-3 bg-white border-2 ${
-                        mobileError ? 'border-rose-500' : 'border-[#1CADA3]'
+                        mobileError ? "border-rose-500" : "border-[#1CADA3]"
                       } rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#158f87] transition-all`}
                       placeholder="Enter your mobile number"
                       required
                       maxLength={10}
                     />
+
                     {mobileError && (
                       <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
                         <X size={12} />
@@ -226,7 +207,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                   </div>
                 ) : (
                   <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-bold text-slate-700">
-                    {profile?.mobile || "Not provided"}
+                    {profile?.mobile ? profile.mobile : "Not provided"}
                   </div>
                 )}
               </div>
@@ -261,7 +242,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             </div>
 
             {/* Delete Account Card */}
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 hover:border-rose-500 transition-all cursor-pointer group"
+            {/* <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 hover:border-rose-500 transition-all cursor-pointer group"
                  onClick={onShowDeleteModal}>
               <div className="flex items-start justify-between mb-4">
                 <div className="p-2 bg-white rounded-xl shadow-sm">
@@ -271,7 +252,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
               </div>
               <h4 className="font-bold text-slate-900 mb-1">Delete Account</h4>
               <p className="text-xs text-slate-500">Permanently remove your account</p>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

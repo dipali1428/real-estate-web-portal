@@ -840,7 +840,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                     </span>
                   )}
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">Demat Account</h3>
+                <h3 className="text-lg font-bold text-slate-900">Demat Account (Optional)</h3>
                 <p className="text-xs text-slate-500">Link your Demat account for trading</p>
               </div>
             </div>

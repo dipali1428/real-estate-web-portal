@@ -255,73 +255,41 @@ export default function ProfilePage() {
   const handleProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!profile) {
-        showNotification('Profile data not found', 'error');
-        return;
-    }
-
-    if (!profile.name?.trim()) {
-        showNotification('Name is required', 'error');
-        return;
-    }
-
-    const mobileValidationError = validateMobile(profile.mobile);
-    if (mobileValidationError) {
-        setMobileError(mobileValidationError);
-        showNotification(mobileValidationError, 'error');
-        return;
-    }
-
-    if (!hasChanges) {
-        showNotification('No changes detected', 'info');
-        setIsEditing(false);
-        return;
-    }
+    if (!profile) return;
 
     try {
-        setUpdating(true);
-        
-        const response = await customerService.updateProfile({
-          name: profile.name,
+      setUpdating(true);
+
+      const response = await customerService.updateProfile({
+        name: profile.name,
+        mobile: profile.mobile,
+      });
+
+      if (response?.success) {
+
+        const updatedProfile = {
+          ...profile,
           mobile: profile.mobile,
-        });
+          name: profile.name
+        };
 
-        if (response?.success || response?.message?.includes('success')) {
-          setIsEditing(false);
-          setOriginalProfile(profile);
-          showNotification(response.message || 'Profile updated successfully!', 'success');
-          setMobileError(null);
-          
-          await refreshProfileData();
-        } else {
-          showNotification('Failed to update profile', 'error');
-        }
+        setProfile(updatedProfile);
+        setOriginalProfile(updatedProfile);
 
-    } catch (error: any) {
-        if (error.response?.status === 401) {
-          showNotification('Session expired. Please login again.', 'error');
-          removeTokenCookie();
-          localStorage.removeItem('token');
-          localStorage.removeItem('profile_image_url');
-          router.push('/');
-        } else if (error.response?.status === 400) {
-          const errorMessage = error.response.data?.message;
-          
-          if (errorMessage?.includes('Mobile number already exists')) {
-              const attemptedNumber = profile.mobile;
-              const lastFourDigits = attemptedNumber.slice(-4);
-              const maskedNumber = `XXXXXX${lastFourDigits}`;
-              
-              setMobileError(`Mobile number ${maskedNumber} is already registered with another account`);
-              showNotification(`Mobile number ${maskedNumber} is already registered`, 'error');
-          } else {
-              showNotification(errorMessage || 'Invalid data provided', 'error');
-          }
-        } else {
-          showNotification('Failed to update profile', 'error');
-        }
+        setIsEditing(false);
+        setMobileError(null);
+
+        showNotification("Profile updated successfully", "success");
+
+      } else {
+        showNotification("Failed to update profile", "error");
+      }
+
+    } catch (err) {
+      console.error(err);
+      showNotification("Update failed", "error");
     } finally {
-        setUpdating(false);
+      setUpdating(false);
     }
   };
 
@@ -447,20 +415,25 @@ export default function ProfilePage() {
   };
 
   // ========== HANDLE PROFILE CHANGE ==========
-  const handleProfileChange = (field: keyof ProfileData, value: string) => {
+    const handleProfileChange = (field: keyof ProfileData, value: string) => {
     if (!profile) return;
 
-    if (field === 'mobile') {
-      const cleanValue = value.replace(/\D/g, '').slice(0, 10);
-      setProfile({ ...profile, [field]: cleanValue });
-      
+    if (field === "mobile") {
+      const cleanValue = value.replace(/\D/g, "").slice(0, 10);
+
+      setProfile(prev =>
+        prev ? { ...prev, mobile: cleanValue } : prev
+      );
+
       if (cleanValue && !/^\d{10}$/.test(cleanValue)) {
-        setMobileError('Please enter a valid 10-digit mobile number');
+        setMobileError("Please enter a valid 10-digit mobile number");
       } else {
         setMobileError(null);
       }
     } else {
-      setProfile({ ...profile, [field]: value });
+      setProfile(prev =>
+        prev ? { ...prev, [field]: value } : prev
+      );
     }
   };
 

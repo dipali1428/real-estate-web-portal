@@ -192,7 +192,7 @@ export const Modals: React.FC<ModalsProps> = ({
       )}
 
       {/* Delete Account Modal */}
-      {showDeleteModal && (
+      {/* {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl max-w-md w-full p-8 shadow-xl">
             <div className="text-center">
@@ -213,7 +213,7 @@ export const Modals: React.FC<ModalsProps> = ({
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 };

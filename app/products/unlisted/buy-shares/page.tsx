@@ -647,18 +647,6 @@ const BuyShares: React.FC = () => {
                   <h3 className="text-xl font-bold text-gray-900 mb-1">{company.name}</h3>
                   <div className="text-sm text-gray-500 mb-4">{company.category}</div>
 
-                  {/* Price Section - Centered */}
-                  <div className="mb-4">
-                    <div className="text-3xl font-bold text-[#10b981] mb-1">
-                      ₹{company.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                    <div className="flex items-center justify-center gap-1">
-                      <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">
-                        +1.25% Today
-                      </span>
-                    </div>
-                  </div>
-
                   {/* Stats Grid - 2x2 Centered */}
                   <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
                     <div className="text-center">
@@ -706,15 +694,6 @@ const BuyShares: React.FC = () => {
               ))}
             </div>
           </div>
-          
-          {/* Scroll indicator */}
-          {filteredCompanies.length > 12 && (
-            <div className="sticky bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none flex justify-center items-end pb-2">
-              <span className="text-xs text-gray-400 bg-white/80 px-3 py-1 rounded-full shadow-sm">
-                Scroll for more ▼
-              </span>
-            </div>
-          )}
         </div>
 
         {/* EMPTY STATE */}

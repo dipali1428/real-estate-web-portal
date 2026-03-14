@@ -19,13 +19,13 @@ const CALCULATOR_OPTIONS = [
   { id: 'personalloan', label: 'Personal Loan', icon: User, desc: 'Calculate your personal loan EMI and repayment schedule.', path: '/page/personalloan' },
   { id: 'businessloan', label: 'Business Loan', icon: Building2, desc: 'Plan your business expansion with our business loan calculator.', path: '/page/businessloan' },
   { id: 'fd', label: 'FD Calculator', icon: PieChart, desc: 'Calculate the maturity amount of your fixed deposits.', path: '/page/fd' },
-  { id: 'CompoundInterest', label: 'Compound Interest', icon: LineChart, desc: 'See how your money grows over time with compound interest.', path: '/page/CompoundInterest' },
+  { id: 'compoundinterest', label: 'Compound Interest', icon: LineChart, desc: 'See how your money grows over time with compound interest.', path: '/page/compoundinterest' },
 ];
 
-const CompoundInterestCalculator: React.FC = () => {
-  // Dropdown state
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+// =============================================
+// CONTENT ONLY VERSION (no header, no dropdown)
+// =============================================
+export const CompoundInterestCalculatorContent: React.FC = () => {
   // State for investment parameters with proper initialization
   const [principal, setPrincipal] = useState<number>(100000);
   const [interestRate, setInterestRate] = useState<number>(7.5);
@@ -53,8 +53,6 @@ const CompoundInterestCalculator: React.FC = () => {
   const principalSliderRef = useRef<HTMLInputElement>(null);
   const interestRateSliderRef = useRef<HTMLInputElement>(null);
   const tenureSliderRef = useRef<HTMLInputElement>(null);
-
-  const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'CompoundInterest') || CALCULATOR_OPTIONS[0];
 
   // Frequency mapping
   const frequencyMap: Record<string, number> = {
@@ -456,6 +454,406 @@ const CompoundInterestCalculator: React.FC = () => {
     return tenureUnit === 'years' ? 'Years' : 'Months';
   };
 
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
+        <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
+          {/* Input Section */}
+          <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
+            
+            {/* Principal Amount */}
+            <div className="mb-6">
+              <label htmlFor="principal" className="block text-[#2076C7] font-semibold mb-2">
+                Principal Amount (₹)
+              </label>
+              <div className="slider-container mb-2">
+                <input
+                  ref={principalSliderRef}
+                  type="range"
+                  id="principal"
+                  min="1000"
+                  max="10000000"
+                  step="1000"
+                  value={principal}
+                  onChange={handlePrincipalChange}
+                  className="w-full h-2 rounded-lg cursor-pointer custom-slider"
+                  style={{
+                    background: getSliderBackground(principal, 1000, 10000000)
+                  }}
+                />
+                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                  <span>₹1,000</span>
+                  <span>₹1,00,00,000</span>
+                </div>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="principalInput"
+                  value={getPrincipalDisplayValue()}
+                  onChange={handlePrincipalInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  placeholder="Enter principal amount"
+                />
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
+              </div>
+            </div>
+
+            {/* Interest Rate */}
+            <div className="mb-6">
+              <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2">
+                Annual Interest Rate (%)
+              </label>
+              <div className="slider-container mb-2">
+                <input
+                  ref={interestRateSliderRef}
+                  type="range"
+                  id="interestRate"
+                  min="1"
+                  max="25"
+                  step="0.1"
+                  value={interestRate}
+                  onChange={handleInterestRateChange}
+                  className="w-full h-2 rounded-lg cursor-pointer custom-slider"
+                  style={{
+                    background: getSliderBackground(interestRate, 1, 25)
+                  }}
+                />
+                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                  <span>1%</span>
+                  <span>25%</span>
+                </div>
+              </div>
+              <div className="relative">
+                <input
+                  type="number"
+                  id="interestRateInput"
+                  min="1"
+                  max="25"
+                  step="0.1"
+                  value={getInterestRateDisplayValue()}
+                  onChange={handleInterestRateInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                />
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
+              </div>
+            </div>
+
+            {/* Tenure */}
+            <div className="mb-6">
+              <label htmlFor="tenureValue" className="block text-[#2076C7] font-semibold mb-2">
+                Time Period ({getTenureLabel()})
+              </label>
+              <div className="slider-container mb-2">
+                <input
+                  ref={tenureSliderRef}
+                  type="range"
+                  id="tenureValue"
+                  min="1"
+                  max={getTenureMax()}
+                  step={getTenureStep()}
+                  value={tenureValue}
+                  onChange={handleTenureValueChange}
+                  className="w-full h-2 rounded-lg cursor-pointer custom-slider"
+                  style={{
+                    background: getSliderBackground(tenureValue, 1, getTenureMax())
+                  }}
+                />
+                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                  <span>1 {tenureUnit}</span>
+                  <span>{getTenureMax()} {tenureUnit}</span>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    id="tenureValueInput"
+                    min="1"
+                    max={getTenureMax()}
+                    value={getTenureValueDisplayValue()}
+                    onChange={handleTenureValueInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors text-gray-800 placeholder:text-gray-500"
+                  />
+                </div>
+                <select
+                  value={tenureUnit}
+                  onChange={(e) => setTenureUnit(e.target.value)}
+                  className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors text-gray-800"
+                >
+                  <option value="years">Years</option>
+                  <option value="months">Months</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Compounding Frequency */}
+            <div className="mb-8">
+              <label className="block text-[#2076C7] font-semibold mb-3">
+                Compounding Frequency
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { id: 'yearly', label: 'Yearly' },
+                  { id: 'halfyearly', label: 'Half-Yearly' },
+                  { id: 'quarterly', label: 'Quarterly' },
+                  { id: 'monthly', label: 'Monthly' }
+                ].map((freq) => (
+                  <button
+                    key={freq.id}
+                    onClick={() => setFrequency(freq.id)}
+                    className={`py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
+                      frequency === freq.id 
+                        ? 'bg-[#1CADA3] text-white border-[#1CADA3] shadow-md' 
+                        : 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    <div className="text-sm font-medium">{freq.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Results Section */}
+            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
+              <div className="text-3xl font-bold text-[#1CADA3] font-sans text-center mb-6">
+                {finalAmount > 0 ? formatCurrency(finalAmount) : '₹0'}
+              </div>
+              <div className="flex justify-between">
+                <div className="text-center flex-1 px-4">
+                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                    {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                  </div>
+                  <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
+                </div>
+                <div className="text-center flex-1 px-4">
+                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                    {principal > 0 ? formatCurrency(principal) : '₹0'}
+                  </div>
+                  <div className="text-sm text-[#1CADA3] mt-1">Principal</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Visualization Section */}
+          <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0 space-y-6">
+            {/* Doughnut Chart */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
+              <h5 className="text-[#2076C7] font-semibold mb-4 text-lg text-center">Investment Breakdown</h5>
+              <div className="chart-container h-64">
+                <canvas ref={doughnutCanvasRef}></canvas>
+              </div>
+              <div className="flex justify-center space-x-6 mt-4">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full mr-2 bg-[#1CADA3]"></div>
+                  <span className="text-sm text-gray-600">Principal</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full mr-2 bg-[#2076C7]"></div>
+                  <span className="text-sm text-gray-600">Interest</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
+              <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Investment Summary</h5>
+              <div className="space-y-4">
+                <div className="flex justify-between pb-3 border-b border-gray-200">
+                  <span className="text-gray-600">Principal Amount</span>
+                  <span className="font-medium font-sans text-[#1CADA3]">
+                    {principal > 0 ? formatCurrency(principal) : '₹0'}
+                  </span>
+                </div>
+                <div className="flex justify-between pb-3 border-b border-gray-200">
+                  <span className="text-gray-600">Total Interest Earned</span>
+                  <span className="font-medium font-sans text-[#1CADA3]">
+                    {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                  </span>
+                </div>
+                <div className="flex justify-between pb-3 border-b border-gray-200">
+                  <span className="text-gray-600">Compounding Frequency</span>
+                  <span className="font-medium font-sans text-[#1CADA3] capitalize">
+                    {frequency}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Final Amount</span>
+                  <span className="font-medium font-sans text-[#1CADA3]">
+                    {finalAmount > 0 ? formatCurrency(finalAmount) : '₹0'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Insights */}
+      <div className="max-w-6xl mx-auto mt-8">
+        <div className="bg-white rounded-xl border shadow-md p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <i className="fas fa-lightbulb text-yellow-500"></i>
+            Key Insights
+          </h2>
+
+          <div className="text-gray-700 leading-relaxed">
+            <ul className="list-disc pl-5 mb-4 space-y-3">
+              <li>
+                <span className="font-medium">💡 The magic of interest earning interest</span> - Your investment grows from{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                  {formatCurrency(principal)}
+                </span>{' '}
+                to{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                  {formatCurrency(finalAmount)}
+                </span>
+              </li>
+              
+              <li>
+                <span className="font-medium">✅ Start early - Time is your biggest advantage</span> - If you started 5 years earlier, your investment would be worth{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                  {(() => {
+                    const years = tenureUnit === 'years' ? tenureValue : tenureValue / 12;
+                    const n = frequencyMap[frequency] || 1;
+                    const r = interestRate / 100;
+                    const extraYears = years + 5;
+                    const amountWithExtraTime = principal * Math.pow(1 + r / n, n * extraYears);
+                    return formatCurrency(amountWithExtraTime - finalAmount);
+                  })()}
+                </span>{' '}
+                more
+              </li>
+              
+              <li>
+                <span className="font-medium">✅ Monthly compounding beats yearly significantly</span> - With{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">{frequency}</span>{' '}
+                compounding, you earn{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                  {(() => {
+                    if (frequency !== 'yearly') {
+                      const years = tenureUnit === 'years' ? tenureValue : tenureValue / 12;
+                      const currentN = frequencyMap[frequency] || 1;
+                      const yearlyN = 1;
+                      const r = interestRate / 100;
+                      
+                      const currentAmount = finalAmount;
+                      const yearlyAmount = principal * Math.pow(1 + r / yearlyN, yearlyN * years);
+                      const extraEarnings = currentAmount - yearlyAmount;
+                      
+                      return formatCurrency(extraEarnings);
+                    }
+                    return '₹0';
+                  })()}
+                </span>{' '}
+                more than yearly compounding
+              </li>
+              
+              <li>
+                <span className="font-medium">✅ The Rule of 72</span> - At{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">{interestRate}%</span>{' '}
+                interest, your money doubles in approximately{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                  {(72 / interestRate).toFixed(1)} years
+                </span>
+              </li>
+              
+              <li>
+                <span className="font-medium">✅ Consistency matters more than timing</span> - Your investment earns{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                  {formatCurrency(totalInterest)}
+                </span>{' '}
+                in interest, which is{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                  {((totalInterest / principal) * 100).toFixed(1)}%
+                </span>{' '}
+                of your principal
+              </li>
+              
+              {/* Additional dynamic insight */}
+              <li>
+                With simple interest, you would earn only{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                  {formatCurrency(
+                    principal * (interestRate / 100) * (tenureUnit === 'years' ? tenureValue : tenureValue / 12)
+                  )}
+                </span>{' '}
+                - that's{' '}
+                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
+                  {formatCurrency(
+                    totalInterest - (principal * (interestRate / 100) * (tenureUnit === 'years' ? tenureValue : tenureValue / 12))
+                  )}
+                </span>{' '}
+                less than compound interest!
+              </li>
+            </ul>
+            
+            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                <strong>💡 Pro Tip:</strong> Start investing early, stay consistent, and let compounding work its magic over time.
+                Even small, regular investments can grow into significant wealth.
+              </p>
+            </div>
+            
+            <p className="text-sm text-gray-600 mt-4">
+              <strong>Note:</strong> This calculation assumes consistent returns and doesn't account for inflation or taxes. 
+              Actual returns may vary based on market conditions.
+            </p>
+          </div>
+        </div>
+      </div>       
+
+      <style jsx>{`
+        .custom-slider {
+          -webkit-appearance: none;
+          height: 8px;
+          border-radius: 4px;
+        }
+
+        .custom-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #2076C7;
+          cursor: pointer;
+          border: 3px solid white;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          transition: all 0.2s ease;
+        }
+
+        .custom-slider::-webkit-slider-thumb:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .custom-slider::-moz-range-thumb {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #2076C7;
+          cursor: pointer;
+          border: 3px solid white;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-slider::-moz-range-track {
+          background: transparent;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// =============================================
+// STANDALONE VERSION (with header and dropdown)
+// =============================================
+const CompoundInterestCalculatorStandalone: React.FC = () => {
+  // Dropdown state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
+  const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'compoundinterest') || CALCULATOR_OPTIONS[0];
+
   const handleCalculatorChange = (path: string) => {
     window.location.href = path;
   };
@@ -470,7 +868,7 @@ const CompoundInterestCalculator: React.FC = () => {
             <p className="text-blue-100">Calculate your investment growth with compounding</p>
           </div>
 
-          {/* Dropdown - Added here */}
+          {/* Dropdown */}
           <div className="px-8 pt-4 pb-2 max-w-md mx-auto">
             <div className="relative">
               <button 
@@ -531,401 +929,13 @@ const CompoundInterestCalculator: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
-            {/* Input Section */}
-            <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
-              
-              {/* Principal Amount */}
-              <div className="mb-6">
-                <label htmlFor="principal" className="block text-[#2076C7] font-semibold mb-2">
-                  Principal Amount (₹)
-                </label>
-                <div className="slider-container mb-2">
-                  <input
-                    ref={principalSliderRef}
-                    type="range"
-                    id="principal"
-                    min="1000"
-                    max="10000000"
-                    step="1000"
-                    value={principal}
-                    onChange={handlePrincipalChange}
-                    className="w-full h-2 rounded-lg cursor-pointer custom-slider"
-                    style={{
-                      background: getSliderBackground(principal, 1000, 10000000)
-                    }}
-                  />
-                  <div className="flex justify-between text-sm text-gray-600 mt-1">
-                    <span>₹1,000</span>
-                    <span>₹1,00,00,000</span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <input
-                    type="text"
-                    id="principalInput"
-                    value={getPrincipalDisplayValue()}
-                    onChange={handlePrincipalInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
-                    placeholder="Enter principal amount"
-                  />
-                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
-                </div>
-              </div>
-
-              {/* Interest Rate */}
-              <div className="mb-6">
-                <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2">
-                  Annual Interest Rate (%)
-                </label>
-                <div className="slider-container mb-2">
-                  <input
-                    ref={interestRateSliderRef}
-                    type="range"
-                    id="interestRate"
-                    min="1"
-                    max="25"
-                    step="0.1"
-                    value={interestRate}
-                    onChange={handleInterestRateChange}
-                    className="w-full h-2 rounded-lg cursor-pointer custom-slider"
-                    style={{
-                      background: getSliderBackground(interestRate, 1, 25)
-                    }}
-                  />
-                  <div className="flex justify-between text-sm text-gray-600 mt-1">
-                    <span>1%</span>
-                    <span>25%</span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <input
-                    type="number"
-                    id="interestRateInput"
-                    min="1"
-                    max="25"
-                    step="0.1"
-                    value={getInterestRateDisplayValue()}
-                    onChange={handleInterestRateInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
-                  />
-                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
-                </div>
-              </div>
-
-              {/* Tenure */}
-              <div className="mb-6">
-                <label htmlFor="tenureValue" className="block text-[#2076C7] font-semibold mb-2">
-                  Time Period ({getTenureLabel()})
-                </label>
-                <div className="slider-container mb-2">
-                  <input
-                    ref={tenureSliderRef}
-                    type="range"
-                    id="tenureValue"
-                    min="1"
-                    max={getTenureMax()}
-                    step={getTenureStep()}
-                    value={tenureValue}
-                    onChange={handleTenureValueChange}
-                    className="w-full h-2 rounded-lg cursor-pointer custom-slider"
-                    style={{
-                      background: getSliderBackground(tenureValue, 1, getTenureMax())
-                    }}
-                  />
-                  <div className="flex justify-between text-sm text-gray-600 mt-1">
-                    <span>1 {tenureUnit}</span>
-                    <span>{getTenureMax()} {tenureUnit}</span>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <input
-                      type="number"
-                      id="tenureValueInput"
-                      min="1"
-                      max={getTenureMax()}
-                      value={getTenureValueDisplayValue()}
-                      onChange={handleTenureValueInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors text-gray-800 placeholder:text-gray-500"
-                    />
-                  </div>
-                  <select
-                    value={tenureUnit}
-                    onChange={(e) => setTenureUnit(e.target.value)}
-                    className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors text-gray-800"
-                  >
-                    <option value="years">Years</option>
-                    <option value="months">Months</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Compounding Frequency */}
-              <div className="mb-8">
-                <label className="block text-[#2076C7] font-semibold mb-3">
-                  Compounding Frequency
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { id: 'yearly', label: 'Yearly', color: 'bg-[#1CADA3] text-white' },
-                    { id: 'halfyearly', label: 'Half-Yearly', color: 'bg-[#1CADA3] text-white' },
-                    { id: 'quarterly', label: 'Quarterly', color: 'bg-[#1CADA3] text-white' },
-                    { id: 'monthly', label: 'Monthly', color: 'bg-[#1CADA3] text-white' }
-                  ].map((freq) => (
-                    <button
-                      key={freq.id}
-                      onClick={() => setFrequency(freq.id)}
-                      className={`py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                        frequency === freq.id 
-                          ? `${freq.color} border-white transform scale-[1.02] shadow-md` 
-                          : 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-700'
-                      }`}
-                    >
-                      <div className="text-sm font-medium">{freq.label}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Results Section */}
-              <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
-                <div className="text-3xl font-bold text-[#1CADA3] font-sans text-center mb-6">
-                  {finalAmount > 0 ? formatCurrency(finalAmount) : '₹0'}
-                </div>
-                <div className="flex justify-between">
-                  <div className="text-center flex-1 px-4">
-                    <div className="text-lg font-medium font-sans text-[#1CADA3]">
-                      {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
-                    </div>
-                    <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
-                  </div>
-                  <div className="text-center flex-1 px-4">
-                    <div className="text-lg font-medium font-sans text-[#1CADA3]">
-                      {principal > 0 ? formatCurrency(principal) : '₹0'}
-                    </div>
-                    <div className="text-sm text-[#1CADA3] mt-1">Principal</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Visualization Section */}
-            <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0 space-y-6">
-              {/* Doughnut Chart */}
-              <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
-                <h5 className="text-[#2076C7] font-semibold mb-4 text-lg text-center">Investment Breakdown</h5>
-                <div className="chart-container h-64">
-                  <canvas ref={doughnutCanvasRef}></canvas>
-                </div>
-                <div className="flex justify-center space-x-6 mt-4">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full mr-2 bg-[#1CADA3]"></div>
-                    <span className="text-sm text-gray-600">Principal</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full mr-2 bg-[#2076C7]"></div>
-                    <span className="text-sm text-gray-600">Interest</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Line Chart - Commented out as in original */}
-              {/* <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
-                <h5 className="text-[#1CADA3] font-semibold mb-4 text-lg text-center">Growth Over Time</h5>
-                <div className="chart-container h-64">
-                  <canvas ref={lineCanvasRef}></canvas>
-                </div>
-              </div> */}
-
-              {/* Summary */}
-              <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
-                <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Investment Summary</h5>
-                <div className="space-y-4">
-                  <div className="flex justify-between pb-3 border-b border-gray-200">
-                    <span className="text-gray-600">Principal Amount</span>
-                    <span className="font-medium font-sans text-[#1CADA3]">
-                      {principal > 0 ? formatCurrency(principal) : '₹0'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between pb-3 border-b border-gray-200">
-                    <span className="text-gray-600">Total Interest Earned</span>
-                    <span className="font-medium font-sans text-[#1CADA3]">
-                      {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between pb-3 border-b border-gray-200">
-                    <span className="text-gray-600">Compounding Frequency</span>
-                    <span className="font-medium font-sans text-[#1CADA3] capitalize">
-                      {frequency}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Final Amount</span>
-                    <span className="font-medium font-sans text-[#1CADA3]">
-                      {finalAmount > 0 ? formatCurrency(finalAmount) : '₹0'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Calculator Content */}
+          <CompoundInterestCalculatorContent />
         </div>
-        {/* Insights */}
-        <div className="max-w-6xl mx-auto mt-8">
-          <div className="bg-white rounded-xl border shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <i className="fas fa-lightbulb text-yellow-500"></i>
-              Key Insights
-            </h2>
-
-            <div className="text-gray-700 leading-relaxed">
-              <ul className="list-disc pl-5 mb-4 space-y-3">
-                <li>
-                  <span className="font-medium">💡 The magic of interest earning interest</span> - Your investment grows from{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {formatCurrency(principal)}
-                  </span>{' '}
-                  to{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {formatCurrency(finalAmount)}
-                  </span>
-                </li>
-                
-                <li>
-                  <span className="font-medium">✅ Start early - Time is your biggest advantage</span> - If you started 5 years earlier, your investment would be worth{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {(() => {
-                      const years = tenureUnit === 'years' ? tenureValue : tenureValue / 12;
-                      const n = frequencyMap[frequency] || 1;
-                      const r = interestRate / 100;
-                      const extraYears = years + 5;
-                      const amountWithExtraTime = principal * Math.pow(1 + r / n, n * extraYears);
-                      return formatCurrency(amountWithExtraTime - finalAmount);
-                    })()}
-                  </span>{' '}
-                  more
-                </li>
-                
-                <li>
-                  <span className="font-medium">✅ Monthly compounding beats yearly significantly</span> - With{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">{frequency}</span>{' '}
-                  compounding, you earn{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {(() => {
-                      if (frequency !== 'yearly') {
-                        const years = tenureUnit === 'years' ? tenureValue : tenureValue / 12;
-                        const currentN = frequencyMap[frequency] || 1;
-                        const yearlyN = 1;
-                        const r = interestRate / 100;
-                        
-                        const currentAmount = finalAmount;
-                        const yearlyAmount = principal * Math.pow(1 + r / yearlyN, yearlyN * years);
-                        const extraEarnings = currentAmount - yearlyAmount;
-                        
-                        return formatCurrency(extraEarnings);
-                      }
-                      return '₹0';
-                    })()}
-                  </span>{' '}
-                  more than yearly compounding
-                </li>
-                
-                <li>
-                  <span className="font-medium">✅ The Rule of 72</span> - At{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">{interestRate}%</span>{' '}
-                  interest, your money doubles in approximately{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {(72 / interestRate).toFixed(1)} years
-                  </span>
-                </li>
-                
-                <li>
-                  <span className="font-medium">✅ Consistency matters more than timing</span> - Your investment earns{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {formatCurrency(totalInterest)}
-                  </span>{' '}
-                  in interest, which is{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {((totalInterest / principal) * 100).toFixed(1)}%
-                  </span>{' '}
-                  of your principal
-                </li>
-                
-                {/* Additional dynamic insight */}
-                <li>
-                  With simple interest, you would earn only{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {formatCurrency(
-                      principal * (interestRate / 100) * (tenureUnit === 'years' ? tenureValue : tenureValue / 12)
-                    )}
-                  </span>{' '}
-                  - that's{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {formatCurrency(
-                      totalInterest - (principal * (interestRate / 100) * (tenureUnit === 'years' ? tenureValue : tenureValue / 12))
-                    )}
-                  </span>{' '}
-                  less than compound interest!
-                </li>
-              </ul>
-              
-              <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm text-yellow-800">
-                  <strong>💡 Pro Tip:</strong> Start investing early, stay consistent, and let compounding work its magic over time.
-                  Even small, regular investments can grow into significant wealth.
-                </p>
-              </div>
-              
-              <p className="text-sm text-gray-600 mt-4">
-                <strong>Note:</strong> This calculation assumes consistent returns and doesn't account for inflation or taxes. 
-                Actual returns may vary based on market conditions.
-              </p>
-            </div>
-          </div>
-        </div>       
       </div>
-
-      <style jsx>{`
-        .custom-slider {
-          -webkit-appearance: none;
-          height: 8px;
-          border-radius: 4px;
-        }
-
-        .custom-slider::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          background: #2076C7;
-          cursor: pointer;
-          border: 3px solid white;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-          transition: all 0.2s ease;
-        }
-
-        .custom-slider::-webkit-slider-thumb:hover {
-          transform: scale(1.1);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .custom-slider::-moz-range-thumb {
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          background: #2076C7;
-          cursor: pointer;
-          border: 3px solid white;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .custom-slider::-moz-range-track {
-          background: transparent;
-        }
-      `}</style>
     </div>
   );
 };
 
-export default CompoundInterestCalculator;
+// Export both versions
+export default CompoundInterestCalculatorStandalone;

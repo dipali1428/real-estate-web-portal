@@ -92,25 +92,6 @@ export default function UnlistedHomePage() {
             <UnlistedCTA />
             <ScrollToTop />
 
-            {/* Modal Logic (Same as before) */}
-            {enquiryCompany && (
-                <div className="fixed inset-0 z-[4000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden relative">
-                         <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-6 text-white flex justify-between">
-                            <h2 className="text-xl font-black">Enquire: {enquiryCompany.name}</h2>
-                            <button onClick={() => setEnquiryCompany(null)}><X size={24} /></button>
-                         </div>
-                         <form onSubmit={handleEnquiry} className="p-8 space-y-4">
-                            <input required placeholder="Name" className="w-full p-3 bg-gray-50 rounded-xl" value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} />
-                            <input required placeholder="Email" className="w-full p-3 bg-gray-50 rounded-xl" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-                            <input required placeholder="Phone" className="w-full p-3 bg-gray-50 rounded-xl" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-                            <input required type="number" className="w-full p-3 bg-gray-50 rounded-xl" value={formData.quantity} onChange={e => setFormData({...formData, quantity: e.target.value})} />
-                            <button className="w-full py-4 bg-[#2076C7] text-white font-bold rounded-xl">{isSubmitting ? 'Submitting...' : 'Enquire Now'}</button>
-                         </form>
-                    </div>
-                </div>
-            )}
-
             {showSuccess && (
                 <div className="fixed inset-0 z-[5000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
                     <div className="bg-white rounded-[2.5rem] p-10 text-center">

@@ -1,53 +1,44 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
+import { motion, AnimatePresence } from 'motion/react';
 import { TrendingUp, PieChart, Calculator, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
 
 // Register Chart.js components
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
-// Calculator options for dropdown
+// Calculator options for dropdown (only used in standalone version)
 const CALCULATOR_OPTIONS = [
   { id: 'emi', label: 'EMI Calculator', icon: Calculator, desc: 'Calculate your Equated Monthly Installment with precision.', path: '/page/emi' },
   { id: 'sip', label: 'SIP Calculator', icon: TrendingUp, desc: 'Plan your mutual fund investments and estimate future wealth.', path: '/page/sip' },
-  { id: 'sipVsEmi', label: 'EMI VS SIP', icon: Timer, desc: 'Compare how different loan tenures affect your finances.', path: '/page/sipVsEmi' },
-  { id: 'homeloan', label: 'Home Loan', icon: Home, desc: 'Estimate your home loan EMI and total interest payable.', path: '/page/homeloan' },
-  { id: 'personalloan', label: 'Personal Loan', icon: User, desc: 'Calculate your personal loan EMI and repayment schedule.', path: '/page/personalloan' },
-  { id: 'businessloan', label: 'Business Loan', icon: Building2, desc: 'Plan your business expansion with our business loan calculator.', path: '/page/businessloan' },
+  { id: 'sip-vs-emi', label: 'EMI VS SIP', icon: Timer, desc: 'Compare how different loan tenures affect your finances.', path: '/page/sip-vs-emi' },
+  { id: 'home-loan', label: 'Home Loan', icon: Home, desc: 'Estimate your home loan EMI and total interest payable.', path: '/page/home-loan' },
+  { id: 'personal-loan', label: 'Personal Loan', icon: User, desc: 'Calculate your personal loan EMI and repayment schedule.', path: '/page/personal-loan' },
+  { id: 'business-loan', label: 'Business Loan', icon: Building2, desc: 'Plan your business expansion with our business loan calculator.', path: '/page/business-loan' },
   { id: 'fd', label: 'FD Calculator', icon: PieChart, desc: 'Calculate the maturity amount of your fixed deposits.', path: '/page/fd' },
-  { id: 'CompoundInterest', label: 'Compound Interest', icon: LineChart, desc: 'See how your money grows over time with compound interest.', path: '/page/CompoundInterest' },
+  { id: 'compound-interest', label: 'Compound Interest', icon: LineChart, desc: 'See how your money grows over time with compound interest.', path: '/page/compound-interest' },
 ];
 
-const EMICalculator: React.FC = () => {
-  // State for loan parameters
+// Main Calculator Component (without any header/dropdown)
+const EMICalculatorContent: React.FC = () => {
+  // All your existing calculator logic and state remains EXACTLY the same
   const [loanAmount, setLoanAmount] = useState<number>(1000000);
   const [interestRate, setInterestRate] = useState<number>(8.5);
   const [loanTenure, setLoanTenure] = useState<number>(20);
-  
-  // Dropdown state
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // State for calculated values
   const [emi, setEmi] = useState<number>(0);
   const [totalPayment, setTotalPayment] = useState<number>(0);
   const [totalInterest, setTotalInterest] = useState<number>(0);
 
-  // Chart reference
   const chartRef = useRef<Chart<'doughnut'> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'emi') || CALCULATOR_OPTIONS[0];
-
-  // Format currency for display
   const formatCurrency = (value: number): string => {
     return '₹' + value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
-  // ✅ Handle input changes for number inputs
   const handleInputChange = (field: string, value: string) => {
-    // If the value is empty, set it to 0 to allow clearing
     if (value === '') {
       switch (field) {
         case 'loanAmount':
@@ -63,12 +54,9 @@ const EMICalculator: React.FC = () => {
       return;
     }
 
-    // Remove any non-numeric characters except decimal point
     const cleanValue = value.replace(/[^\d.]/g, '');
-
-    // Ensure only one decimal point
     const parts = cleanValue.split('.');
-    if (parts.length > 2) return; // Invalid input
+    if (parts.length > 2) return;
 
     const numValue = parseFloat(cleanValue);
     if (!isNaN(numValue)) {
@@ -86,9 +74,7 @@ const EMICalculator: React.FC = () => {
     }
   };
 
-  // Calculate EMI and related values
   const calculateEMI = () => {
-    // Validate inputs before calculation
     if (!loanAmount || loanAmount < 100000 || loanAmount === 0) {
       return;
     }
@@ -104,7 +90,6 @@ const EMICalculator: React.FC = () => {
     const monthlyInterestRate = interestRate / 12 / 100;
     const tenureMonths = loanTenure * 12;
 
-    // EMI formula: [P x R x (1+R)^N]/[(1+R)^N-1]
     const emiValue = loanAmount * monthlyInterestRate *
       Math.pow(1 + monthlyInterestRate, tenureMonths) /
       (Math.pow(1 + monthlyInterestRate, tenureMonths) - 1);
@@ -116,11 +101,9 @@ const EMICalculator: React.FC = () => {
     setTotalPayment(totalPaymentValue);
     setTotalInterest(totalInterestValue);
 
-    // Update chart
     updateChart(loanAmount, totalInterestValue);
   };
 
-  // Update the chart with new data
   const updateChart = (principal: number, interest: number) => {
     if (chartRef.current) {
       chartRef.current.data.datasets[0].data = [principal, interest];
@@ -128,7 +111,6 @@ const EMICalculator: React.FC = () => {
     }
   };
 
-  // Initialize chart
   useEffect(() => {
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d');
@@ -163,12 +145,10 @@ const EMICalculator: React.FC = () => {
     };
   }, []);
 
-  // Calculate EMI when parameters change
   useEffect(() => {
     calculateEMI();
   }, [loanAmount, interestRate, loanTenure]);
 
-  // Handle slider changes
   const handleLoanAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoanAmount(Number(e.target.value));
   };
@@ -181,7 +161,6 @@ const EMICalculator: React.FC = () => {
     setLoanTenure(Number(e.target.value));
   };
 
-  // ✅ Fixed input change handlers
   const handleLoanAmountInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange('loanAmount', e.target.value);
   };
@@ -194,252 +173,177 @@ const EMICalculator: React.FC = () => {
     handleInputChange('loanTenure', e.target.value);
   };
 
-  // ✅ Format loan amount for display (remove commas for editing)
   const getLoanAmountDisplayValue = () => {
     return loanAmount === 0 ? '' : loanAmount.toString();
   };
 
-  const handleCalculatorChange = (path: string) => {
-    window.location.href = path;
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      {/* EMI Calculator */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-          <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
-            <h1 className="text-3xl font-bold  mb-2">EMI Calculator</h1>
-            <p className="text-blue-100">Calculate your Equated Monthly Installment</p>
-          </div>
-
-          {/* Dropdown - Added here */}
-          <div className="px-8 pt-4 pb-2 max-w-md mx-auto">
-            <div className="relative">
-              <button 
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
-                    <activeData.icon className="w-5 h-5 text-teal-600" />
-                  </div>
-                  <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
+    <div className="container mx-auto px-4 py-8">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
+        <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
+          {/* Input Section */}
+          <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
+            {/* Loan Amount */}
+            <div className="mb-6">
+              <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-2">
+                Loan Amount (₹)
+              </label>
+              <div className="slider-container mb-2">
+                <input
+                  type="range"
+                  id="loanAmount"
+                  min="100000"
+                  max="50000000"
+                  step="10000"
+                  value={loanAmount}
+                  onChange={handleLoanAmountChange}
+                  className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
+                />
+                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                  <span>₹1,00,000</span>
+                  <span>₹5,00,00,000</span>
                 </div>
-                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="loanAmountInput"
+                  value={getLoanAmountDisplayValue()}
+                  onChange={handleLoanAmountInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  placeholder="Enter loan amount"
+                />
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
+              </div>
+            </div>
 
-              <AnimatePresence>
-                {isDropdownOpen && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto"
-                  >
-                    {CALCULATOR_OPTIONS.map((calc) => (
-                      <button
-                        key={calc.id}
-                        onClick={() => {
-                          handleCalculatorChange(calc.path);
-                          setIsDropdownOpen(false);
-                        }}
-                        className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
-                          calc.id === 'emi' ? 'bg-teal-500/5' : ''
-                        }`}
-                      >
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          calc.id === 'emi' 
-                            ? 'bg-teal-500 text-white' 
-                            : 'bg-gray-100 text-gray-500'
-                        }`}>
-                          <calc.icon className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1">
-                          <span className={`font-medium ${
-                            calc.id === 'emi' ? 'text-teal-600' : 'text-gray-700'
-                          }`}>
-                            {calc.label}
-                          </span>
-                          <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
-                        </div>
-                        {calc.id === 'emi' && (
-                          <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
-                        )}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            {/* Interest Rate */}
+            <div className="mb-6">
+              <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2">
+                Interest Rate (% per annum)
+              </label>
+              <div className="slider-container mb-2">
+                <input
+                  type="range"
+                  id="interestRate"
+                  min="7"
+                  max="50"
+                  step="0.1"
+                  value={interestRate}
+                  onChange={handleInterestRateChange}
+                  className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
+                />
+                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                  <span>7%</span>
+                  <span>50%</span>
+                </div>
+              </div>
+              <div className="relative">
+                <input
+                  type="number"
+                  id="interestRateInput"
+                  min="7"
+                  max="50"
+                  step="0.1"
+                  value={interestRate === 0 ? '' : interestRate}
+                  onChange={handleInterestRateInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                />
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
+              </div>
+            </div>
+
+            {/* Loan Tenure */}
+            <div className="mb-8">
+              <label htmlFor="loanTenure" className="block text-[#2076C7] font-semibold mb-2">
+                Loan Tenure (Years)
+              </label>
+              <div className="slider-container mb-2">
+                <input
+                  type="range"
+                  id="loanTenure"
+                  min="1"
+                  max="30"
+                  step="1"
+                  value={loanTenure}
+                  onChange={handleLoanTenureChange}
+                  className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
+                />
+                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                  <span>1 Year</span>
+                  <span>30 Years</span>
+                </div>
+              </div>
+              <div className="relative">
+                <input
+                  type="number"
+                  id="loanTenureInput"
+                  min="1"
+                  max="30"
+                  value={loanTenure === 0 ? '' : loanTenure}
+                  onChange={handleLoanTenureInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-20 text-gray-800 placeholder:text-gray-500"
+                />
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">Years</span>
+              </div>
+            </div>
+
+            {/* Results Section */}
+            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
+              <div className="text-3xl font-bold text-[#1CADA3] font-sans text-center mb-6">
+                {emi > 0 ? formatCurrency(emi) : '₹0'}
+              </div>
+              <div className="flex justify-between">
+                <div className="text-center flex-1 px-4">
+                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                    {totalPayment > 0 ? formatCurrency(totalPayment) : '₹0'}
+                  </div>
+                  <div className="text-sm text-[#1CADA3] mt-1">Total Payment</div>
+                </div>
+                <div className="text-center flex-1 px-4">
+                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                    {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                  </div>
+                  <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
-            {/* Input Section */}
-            <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
+          {/* Visualization Section */}
+          <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0">
+            <div className="chart-container h-64 mb-6">
+              <canvas ref={canvasRef}></canvas>
+            </div>
 
-              {/* Loan Amount */}
-              <div className="mb-6">
-                <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-2">
-                  Loan Amount (₹)
-                </label>
-                <div className="slider-container mb-2">
-                  <input
-                    type="range"
-                    id="loanAmount"
-                    min="100000"
-                    max="50000000"
-                    step="10000"
-                    value={loanAmount}
-                    onChange={handleLoanAmountChange}
-                    className="w-full h-2 bg-gray-300  rounded-lg cursor-pointer slider"
-                  />
-                  <div className="flex justify-between text-sm  text-gray-600 mt-1">
-                    <span>₹1,00,000</span>
-                    <span>₹5,00,00,000</span>
-                  </div>
+            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
+              <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Loan Summary</h5>
+              <div className="space-y-4">
+                <div className="flex justify-between pb-3 border-b border-gray-200">
+                  <span className="text-gray-600">Principal Amount</span>
+                  <span className="font-medium font-sans text-[#1CADA3]">
+                    {loanAmount > 0 ? formatCurrency(loanAmount) : '₹0'}
+                  </span>
                 </div>
-                <div className="relative">
-                  <input
-                    type="text"
-                    id="loanAmountInput"
-                    value={getLoanAmountDisplayValue()}
-                    onChange={handleLoanAmountInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12  text-gray-800 placeholder:text-gray-500"
-                    placeholder="Enter loan amount"
-                  />
-                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2  text-gray-600 font-medium">₹</span>
-                </div>
-              </div>
-
-              {/* Interest Rate */}
-              <div className="mb-6">
-                <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2">
-                  Interest Rate (% per annum)
-                </label>
-                <div className="slider-container mb-2">
-                  <input
-                    type="range"
-                    id="interestRate"
-                    min="7"
-                    max="50"
-                    step="0.1"
-                    value={interestRate}
-                    onChange={handleInterestRateChange}
-                    className="w-full h-2 bg-gray-300 border border-gray-300 focus:outline-none focus:border-[#1CADA3] rounded-lg cursor-pointer slider"
-                  />
-                  <div className="flex justify-between text-sm text-gray-600 mt-1">
-                    <span>7%</span>
-                    <span>50%</span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <input
-                    type="number"
-                    id="interestRateInput"
-                    min="7"
-                    max="50"
-                    step="0.1"
-                    value={interestRate === 0 ? '' : interestRate}
-                    onChange={handleInterestRateInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3]  bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12  text-gray-800 placeholder:text-gray-500"
-                  />
-                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
-                </div>
-              </div>
-
-              {/* Loan Tenure */}
-              <div className="mb-8">
-                <label htmlFor="loanTenure" className="block text-[#2076C7] font-semibold mb-2">
-                  Loan Tenure (Years)
-                </label>
-                <div className="slider-container mb-2">
-                  <input
-                    type="range"
-                    id="loanTenure"
-                    min="1"
-                    max="30"
-                    step="1"
-                    value={loanTenure}
-                    onChange={handleLoanTenureChange}
-                    className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
-                  />
-                  <div className="flex justify-between text-sm text-gray-600 mt-1">
-                    <span>1 Year</span>
-                    <span>30 Years</span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <input
-                    type="number"
-                    id="loanTenureInput"
-                    min="1"
-                    max="30"
-                    value={loanTenure === 0 ? '' : loanTenure}
-                    onChange={handleLoanTenureInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3]  bg-gray-100 focus:bg-white  focus:ring-0 focus:ring-teal-200 transition-colors pr-20 text-gray-800 placeholder:text-gray-500"
-                  />
-                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">Years</span>
-                </div>
-              </div>
-
-              {/* Results Section */}
-              <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
-                <div className="text-3xl font-bold text-[#1CADA3] font-sans text-center mb-6">
-                  {emi > 0 ? formatCurrency(emi) : '₹0'}
+                <div className="flex justify-between pb-3 border-b border-gray-200">
+                  <span className="text-gray-600">Total Interest Payable</span>
+                  <span className="font-medium font-sans text-[#1CADA3]">
+                    {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <div className="text-center flex-1 px-4">
-                    <div className="text-lg font-medium font-sans text-[#1CADA3]">
-                      {totalPayment > 0 ? formatCurrency(totalPayment) : '₹0'}
-                    </div>
-                    <div className="text-sm text-[#1CADA3] mt-1">Total Payment</div>
-                  </div>
-                  <div className="text-center flex-1 px-4">
-                    <div className="text-lg font-medium font-sans text-[#1CADA3]">
-                      {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
-                    </div>
-                    <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Visualization Section */}
-            <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0">
-              <div className="chart-container h-64 mb-6">
-                <canvas ref={canvasRef}></canvas>
-              </div>
-
-              <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
-                <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Loan Summary</h5>
-                <div className="space-y-4">
-                  <div className="flex justify-between pb-3 border-b border-gray-200">
-                    <span className="text-gray-600">Principal Amount</span>
-                    <span className="font-medium font-sans text-[#1CADA3]">
-                      {loanAmount > 0 ? formatCurrency(loanAmount) : '₹0'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between pb-3 border-b border-gray-200">
-                    <span className="text-gray-600">Total Interest Payable</span>
-                    <span className="font-medium font-sans text-[#1CADA3]">
-                      {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Amount Payable</span>
-                    <span className="font-medium font-sans text-[#1CADA3]">
-                      {totalPayment > 0 ? formatCurrency(totalPayment) : '₹0'}
-                    </span>
-                  </div>
+                  <span className="text-gray-600">Total Amount Payable</span>
+                  <span className="font-medium font-sans text-[#1CADA3]">
+                    {totalPayment > 0 ? formatCurrency(totalPayment) : '₹0'}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      
-      {/* Insights Section - Properly aligned with calculator */}
+      </div>
+    
+      {/* Insights Section */}
       <div className="max-w-6xl mx-auto mt-8">
         <div className="bg-white rounded-xl border shadow-md p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -519,7 +423,6 @@ const EMICalculator: React.FC = () => {
                 </span>
               </li>
               
-              {/* Additional insight about interest proportion */}
               <li>
                 For every ₹100 you repay,{' '}
                 <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
@@ -548,8 +451,93 @@ const EMICalculator: React.FC = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+// Standalone version with header and dropdown (for direct access)
+const EMICalculatorStandalone: React.FC = () => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'emi') || CALCULATOR_OPTIONS[0];
+
+  const handleCalculatorChange = (path: string) => {
+    window.location.href = path;
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
+        <h1 className="text-3xl font-bold mb-2">EMI Calculator</h1>
+        <p className="text-blue-100">Calculate your Equated Monthly Installment</p>
+      </div>
+
+      {/* Dropdown */}
+      <div className="container mx-auto px-4 py-4 max-w-md">
+        <div className="relative">
+          <button 
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
+                <activeData.icon className="w-5 h-5 text-teal-600" />
+              </div>
+              <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
+            </div>
+            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto"
+              >
+                {CALCULATOR_OPTIONS.map((calc) => (
+                  <button
+                    key={calc.id}
+                    onClick={() => {
+                      handleCalculatorChange(calc.path);
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                      calc.id === 'emi' ? 'bg-teal-500/5' : ''
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      calc.id === 'emi' 
+                        ? 'bg-teal-500 text-white' 
+                        : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      <calc.icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <span className={`font-medium ${
+                        calc.id === 'emi' ? 'text-teal-600' : 'text-gray-700'
+                      }`}>
+                        {calc.label}
+                      </span>
+                      <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
+                    </div>
+                    {calc.id === 'emi' && (
+                      <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
+                    )}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Calculator Content */}
+      <EMICalculatorContent />
     </div>
   );
 };
 
-export default EMICalculator;
+// Export both versions
+export { EMICalculatorContent };
+export default EMICalculatorStandalone;

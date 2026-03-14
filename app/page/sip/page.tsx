@@ -15,9 +15,11 @@ const CALCULATOR_OPTIONS = [
   { id: 'CompoundInterest', label: 'Compound Interest', icon: LineChart, desc: 'See how your money grows over time with compound interest.', path: '/page/CompoundInterest' },
 ];
 
-const SIPLumpsumCalculator: React.FC = () => {
+// =============================================
+// CONTENT ONLY VERSION (no header, no dropdown)
+// =============================================
+export const SIPCalculatorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'sip' | 'lumpsum'>('sip');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   // SIP Calculator State
   const [sipAmount, setSipAmount] = useState(5000);
@@ -41,8 +43,6 @@ const SIPLumpsumCalculator: React.FC = () => {
     estimatedReturns: 210585,
     totalValue: 310585
   });
-
-  const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'sip') || CALCULATOR_OPTIONS[0];
 
   // Format currency function
   const formatCurrency = useCallback((amount: number): string => {
@@ -110,6 +110,424 @@ const SIPLumpsumCalculator: React.FC = () => {
   const sipBarHeight = getBarHeight(sipResults.totalValue, maxChartValue);
   const lumpsumBarHeight = getBarHeight(lumpsumResults.totalValue, maxChartValue);
 
+  return (
+    <div className="max-w-6xl mx-auto">
+      {/* Tabs */}
+      <div className="flex bg-white rounded-2xl p-2 mb-8 max-w-md mx-auto">
+        <button
+          className={`flex-1 py-4 px-5 text-center cursor-pointer rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
+            activeTab === 'sip' 
+              ? 'bg-teal-500 text-white shadow-lg shadow-teal-200' 
+              : 'text-gray-600'
+          }`}
+          onClick={() => setActiveTab('sip')}
+        >
+          <i className="fas fa-chart-line"></i>
+          <span>SIP Calculator</span>
+        </button>
+
+        <button
+          className={`flex-1 py-4 px-5 text-center cursor-pointer rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
+            activeTab === 'lumpsum' 
+              ? 'bg-teal-500 text-white shadow-lg shadow-teal-200' 
+              : 'text-gray-600'
+          }`}
+          onClick={() => setActiveTab('lumpsum')}
+        >
+          <i className="fas fa-coins"></i>
+          <span>Lumpsum Calculator</span>
+        </button>
+      </div>
+
+      {/* SIP Calculator */}
+      {activeTab === 'sip' && (
+        <section className="animate-fade-in">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            {/* Input Card */}
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
+                <div className="w-12 h-12 bg-teal-50 rounded-lg flex items-center justify-center text-teal-500 text-xl mr-4">
+                  <i className="fas fa-piggy-bank"></i>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">SIP Calculator</h2>
+                  <p className="text-gray-600">Calculate returns on your monthly investments</p>
+                </div>
+              </div>
+
+              {/* Monthly Investment */}
+              <div className="mb-6">
+                <div className="flex justify-between mb-3">
+                  <span className="font-semibold text-gray-800">Monthly Investment</span>
+                  <span className="font-bold font-sans text-teal-500">{formatCurrency(sipAmount)}</span>
+                </div>
+                <input
+                  type="range"
+                  min="500"
+                  max="100000"
+                  step="500"
+                  value={sipAmount}
+                  onChange={(e) => setSipAmount(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                />
+                <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
+                  <span>₹500</span>
+                  <span>₹1,00,000</span>
+                </div>
+              </div>
+
+              {/* Investment Period */}
+              <div className="mb-6">
+                <div className="flex justify-between mb-3">
+                  <span className="font-semibold text-gray-800">Investment Period</span>
+                  <span className="font-bold font-sans text-teal-500">{sipDuration} Years</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="30"
+                  value={sipDuration}
+                  onChange={(e) => setSipDuration(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                />
+                <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
+                  <span>1 Year</span>
+                  <span>30 Years</span>
+                </div>
+              </div>
+
+              {/* Expected Return */}
+              <div className="mb-6">
+                <div className="flex justify-between mb-3">
+                  <span className="font-semibold text-gray-800">Expected Annual Return</span>
+                  <span className="font-bold font-sans text-teal-500">{sipReturn}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="30"
+                  step="0.1"
+                  value={sipReturn}
+                  onChange={(e) => setSipReturn(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                />
+                <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
+                  <span>1%</span>
+                  <span>30%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Results Card */}
+            <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-lg">
+              <h3 className="text-xl font-bold mb-5 flex items-center gap-3">
+                <i className="fas fa-chart-pie"></i>
+                <span>Investment Summary</span>
+              </h3>
+
+              <div className="flex justify-between items-center mb-5 pb-4 border-b border-teal-400">
+                <span className="text-lg">Total Investment</span>
+                <span className="text-xl font-sans font-bold">{formatCurrency(sipResults.totalInvestment)}</span>
+              </div>
+
+              <div className="flex justify-between items-center mb-5 pb-4 border-b border-teal-400">
+                <span className="text-lg">Est. Returns</span>
+                <span className="text-xl font-sans font-bold">{formatCurrency(sipResults.estimatedReturns)}</span>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="text-lg">Total Value</span>
+                <span className="text-xl font-sans font-bold">{formatCurrency(sipResults.totalValue)}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Lumpsum Calculator */}
+      {activeTab === 'lumpsum' && (
+        <section className="animate-fade-in">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            {/* Input */}
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
+                <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 text-xl mr-4">
+                  <i className="fas fa-hand-holding-usd"></i>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">Lumpsum Calculator</h2>
+                  <p className="text-gray-600">Calculate returns on your one-time investment</p>
+                </div>
+              </div>
+
+              {/* Investment */}
+              <div className="mb-6">
+                <div className="flex justify-between mb-3 font-sans">
+                  <span className="font-semibold text-gray-800">Investment Amount</span>
+                  <span className="font-bold text-teal-500">{formatCurrency(lumpsumAmount)}</span>
+                </div>
+                <input
+                  type="range"
+                  min="1000"
+                  max="5000000"
+                  step="1000"
+                  value={lumpsumAmount}
+                  onChange={(e) => setLumpsumAmount(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                />
+                <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
+                  <span>₹1,000</span>
+                  <span>₹50,00,000</span>
+                </div>
+              </div>
+
+              {/* Duration */}
+              <div className="mb-6">
+                <div className="flex justify-between mb-3 font-sans">
+                  <span className="font-semibold text-gray-800">Investment Period</span>
+                  <span className="font-bold text-teal-500">{lumpsumDuration} Years</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="30"
+                  value={lumpsumDuration}
+                  onChange={(e) => setLumpsumDuration(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                />
+                <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
+                  <span>1 Year</span>
+                  <span>30 Years</span>
+                </div>
+              </div>
+
+              {/* Return */}
+              <div className="mb-6">
+                <div className="flex justify-between mb-3 font-sans">
+                  <span className="font-semibold text-gray-800">Expected Annual Return</span>
+                  <span className="font-bold text-teal-500">{lumpsumReturn}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="30"
+                  step="0.1"
+                  value={lumpsumReturn}
+                  onChange={(e) => setLumpsumReturn(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                />
+                <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
+                  <span>1%</span>
+                  <span>30%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-lg">
+              <h3 className="text-xl font-bold mb-5 flex items-center gap-3">
+                <i className="fas fa-chart-pie"></i>
+                <span>Investment Summary</span>
+              </h3>
+
+              <div className="flex justify-between items-center mb-5 pb-4 border-b border-teal-400">
+                <span className="text-lg">Total Investment</span>
+                <span className="text-xl font-sans font-bold">{formatCurrency(lumpsumResults.totalInvestment)}</span>
+              </div>
+
+              <div className="flex justify-between items-center mb-5 pb-4 border-b border-teal-400">
+                <span className="text-lg">Est. Returns</span>
+                <span className="text-xl font-sans font-bold">{formatCurrency(lumpsumResults.estimatedReturns)}</span>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="text-lg">Total Value</span>
+                <span className="text-xl font-sans font-bold">{formatCurrency(lumpsumResults.totalValue)}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Comparison Chart */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 mt-8">
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Investment Comparison</h2>
+        <div className="flex items-end justify-center gap-16 py-6">
+          {/* SIP Bar */}
+          <div className="flex flex-col items-center">
+            <div 
+              className="w-16 bg-gradient-to-t from-teal-500 to-teal-600 rounded-t-lg relative shadow-lg shadow-teal-200 transition-all duration-1000"
+              style={{ height: `${sipBarHeight}px` }}
+            >
+              <div className="absolute -top-8 left-0 w-full text-center font-bold font-sans text-gray-800 text-lg">
+                {formatCurrency(sipResults.totalValue)}
+              </div>
+            </div>
+            <div className="mt-4 font-semibold text-gray-800">SIP Investment</div>
+          </div>
+
+          {/* Lumpsum Bar */}
+          <div className="flex flex-col items-center">
+            <div 
+              className="w-16 bg-gradient-to-t from-blue-500 to-blue-600 rounded-t-lg relative shadow-lg shadow-blue-200 transition-all duration-1000"
+              style={{ height: `${lumpsumBarHeight}px` }}
+            >
+              <div className="absolute -top-8 left-0 w-full text-center font-bold font-sans text-gray-800 text-lg">
+                {formatCurrency(lumpsumResults.totalValue)}
+              </div>
+            </div>
+            <div className="mt-4 font-semibold text-gray-800">Lumpsum Investment</div>
+          </div>
+        </div>
+
+        {/* Legend */}
+        <div className="flex justify-center gap-8 mt-8">
+          <div className="flex items-center gap-3">
+            <div className="w-4 h-4 bg-teal-500 rounded"></div>
+            <span className="text-gray-700">SIP Investment</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-4 h-4 bg-blue-500 rounded"></div>
+            <span className="text-gray-700">Lumpsum Investment</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Insight Cards */}
+      <div className="mt-8 space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+            <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
+              <i className="fas fa-rocket"></i>
+            </div>
+            <div className="text-gray-600 text-sm mb-2">Wealth Gain</div>
+            <div className="font-bold text-xl font-sans text-gray-800">
+              {formatCurrency(activeTab === 'sip' ? sipResults.estimatedReturns : lumpsumResults.estimatedReturns)}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+            <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
+              <i className="fas fa-percentage"></i>
+            </div>
+            <div className="text-gray-600 text-sm mb-2">Annualized Return</div>
+            <div className="font-bold text-xl font-sans text-gray-800">
+              {activeTab === 'sip' ? sipReturn : lumpsumReturn}%
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+            <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
+              <i className="fas fa-calendar-alt"></i>
+            </div>
+            <div className="text-gray-600 text-sm mb-2">Investment Period</div>
+            <div className="font-bold text-xl font-sans text-gray-800">
+              {activeTab === 'sip' ? sipDuration : lumpsumDuration} Years
+            </div>
+          </div>
+        </div>
+
+        {/* KEY INSIGHTS */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+            <i className="fas fa-lightbulb text-yellow-500 text-xl"></i>
+            Key Insights
+          </h2>
+
+          <ul className="space-y-4 text-gray-700 text-base leading-relaxed">
+            <li className="flex gap-3">
+              <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+              <span>
+                Your total investment amounts to{" "}
+                <strong className="font-sans">
+                  {formatCurrency(
+                    activeTab === "sip"
+                      ? sipResults.totalInvestment
+                      : lumpsumResults.totalInvestment
+                  )}
+                </strong>
+              </span>
+            </li>
+
+            <li className="flex gap-3">
+              <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+              <span>
+                Your estimated returns are{" "}
+                <strong className="font-sans">
+                  {formatCurrency(
+                    activeTab === "sip"
+                      ? sipResults.estimatedReturns
+                      : lumpsumResults.estimatedReturns
+                  )}
+                </strong>.
+              </span>
+            </li>
+
+            <li className="flex gap-3">
+              <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+              <span>
+                Your total future value will be{" "}
+                <strong className="font-sans">
+                  {formatCurrency(
+                    activeTab === "sip"
+                      ? sipResults.totalValue
+                      : lumpsumResults.totalValue
+                  )}
+                </strong>.
+              </span>
+            </li>
+
+            <li className="flex gap-3">
+              <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+              <span>
+                SIP grows steadily due to <strong>monthly compounding</strong>.
+              </span>
+            </li>
+
+            <li className="flex gap-3">
+              <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+              <span>
+                Lumpsum investing benefits hugely from <strong>time in the market</strong>.
+              </span>
+            </li>
+
+            <li className="flex gap-3">
+              <i className="fas fa-check-circle text-teal-500 mt-1"></i>
+              <span>
+                Higher returns dramatically increase wealth over <strong>10+ years</strong>.
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Font Awesome */}
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+      
+      {/* Fade Animation */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// =============================================
+// STANDALONE VERSION (with header and dropdown)
+// =============================================
+const SIPLumpsumCalculatorStandalone: React.FC = () => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
+  const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'sip') || CALCULATOR_OPTIONS[0];
+
   const handleCalculatorChange = (path: string) => {
     window.location.href = path;
   };
@@ -131,7 +549,7 @@ const SIPLumpsumCalculator: React.FC = () => {
           </p>
         </header>
 
-        {/* Dropdown - Added here */}
+        {/* Dropdown */}
         <div className="mb-6 max-w-md mx-auto relative">
           <button 
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -190,419 +608,12 @@ const SIPLumpsumCalculator: React.FC = () => {
           </AnimatePresence>
         </div>
 
-        {/* Tabs */}
-        <div className="flex bg-white rounded-2xl p-2 mb-8 max-w-md mx-auto">
-          <button
-            className={`flex-1 py-4 px-5 text-center cursor-pointer rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
-              activeTab === 'sip' 
-                ? 'bg-teal-500 text-white shadow-lg shadow-teal-200' 
-                : 'text-gray-600'
-            }`}
-            onClick={() => setActiveTab('sip')}
-          >
-            <i className="fas fa-chart-line"></i>
-            <span>SIP Calculator</span>
-          </button>
-
-          <button
-            className={`flex-1 py-4 px-5 text-center cursor-pointer rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
-              activeTab === 'lumpsum' 
-                ? 'bg-teal-500 text-white shadow-lg shadow-teal-200' 
-                : 'text-gray-600'
-            }`}
-            onClick={() => setActiveTab('lumpsum')}
-          >
-            <i className="fas fa-coins"></i>
-            <span>Lumpsum Calculator</span>
-          </button>
-        </div>
-
-        {/* SIP Calculator */}
-        {activeTab === 'sip' && (
-          <section className="animate-fade-in">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              
-              {/* Input Card */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
-                  <div className="w-12 h-12 bg-teal-50 rounded-lg flex items-center justify-center text-teal-500 text-xl mr-4">
-                    <i className="fas fa-piggy-bank"></i>
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-800">SIP Calculator</h2>
-                    <p className="text-gray-600">Calculate returns on your monthly investments</p>
-                  </div>
-                </div>
-
-                {/* Monthly Investment */}
-                <div className="mb-6">
-                  <div className="flex justify-between mb-3">
-                    <span className="font-semibold text-gray-800">Monthly Investment</span>
-                    <span className="font-bold font-sans text-teal-500">{formatCurrency(sipAmount)}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="500"
-                    max="100000"
-                    step="500"
-                    value={sipAmount}
-                    onChange={(e) => setSipAmount(Number(e.target.value))}
-                    className="w-full h-2  bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
-                  />
-                  <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
-                    <span>₹500</span>
-                    <span>₹1,00,000</span>
-                  </div>
-                </div>
-
-                {/* Investment Period */}
-                <div className="mb-6">
-                  <div className="flex justify-between mb-3">
-                    <span className="font-semibold text-gray-800">Investment Period</span>
-                    <span className="font-bold font-sans text-teal-500">{sipDuration} Years</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="30"
-                    value={sipDuration}
-                    onChange={(e) => setSipDuration(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
-                  />
-                  <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
-                    <span>1 Year</span>
-                    <span>30 Years</span>
-                  </div>
-                </div>
-
-                {/* Expected Return */}
-                <div className="mb-6">
-                  <div className="flex justify-between mb-3">
-                    <span className="font-semibold text-gray-800">Expected Annual Return</span>
-                    <span className="font-bold font-sans text-teal-500">{sipReturn}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="30"
-                    step="0.1"
-                    value={sipReturn}
-                    onChange={(e) => setSipReturn(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
-                  />
-                  <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
-                    <span>1%</span>
-                    <span>30%</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Results Card */}
-              <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-lg">
-                <h3 className="text-xl font-bold mb-5 flex items-center gap-3">
-                  <i className="fas fa-chart-pie"></i>
-                  <span>Investment Summary</span>
-                </h3>
-
-                <div className="flex justify-between items-center mb-5 pb-4 border-b border-teal-400">
-                  <span className="text-lg">Total Investment</span>
-                  <span className="text-xl font-sans font-bold">{formatCurrency(sipResults.totalInvestment)}</span>
-                </div>
-
-                <div className="flex justify-between items-center mb-5 pb-4 border-b border-teal-400">
-                  <span className="text-lg">Est. Returns</span>
-                  <span className="text-xl  font-sans font-bold">{formatCurrency(sipResults.estimatedReturns)}</span>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-lg">Total Value</span>
-                  <span className="text-xl font-sans font-bold">{formatCurrency(sipResults.totalValue)}</span>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Lumpsum Calculator */}
-        {activeTab === 'lumpsum' && (
-          <section className="animate-fade-in">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              
-              {/* Input */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
-                  <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 text-xl mr-4">
-                    <i className="fas fa-hand-holding-usd"></i>
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-800">Lumpsum Calculator</h2>
-                    <p className="text-gray-600">Calculate returns on your one-time investment</p>
-                  </div>
-                </div>
-
-                {/* Investment */}
-                <div className="mb-6">
-                  <div className="flex justify-between mb-3 font-sans">
-                    <span className="font-semibold  text-gray-800">Investment Amount</span>
-                    <span className="font-bold text-teal-500">{formatCurrency(lumpsumAmount)}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1000"
-                    max="5000000"
-                    step="1000"
-                    value={lumpsumAmount}
-                    onChange={(e) => setLumpsumAmount(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
-                  />
-                  <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
-                    <span>₹1,000</span>
-                    <span>₹50,00,000</span>
-                  </div>
-                </div>
-
-                {/* Duration */}
-                <div className="mb-6">
-                  <div className="flex justify-between mb-3 font-sans">
-                    <span className="font-semibold text-gray-800">Investment Period</span>
-                    <span className="font-bold text-teal-500">{lumpsumDuration} Years</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="30"
-                    value={lumpsumDuration}
-                    onChange={(e) => setLumpsumDuration(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
-                  />
-                  <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
-                    <span>1 Year</span>
-                    <span>30 Years</span>
-                  </div>
-                </div>
-
-                {/* Return */}
-                <div className="mb-6">
-                  <div className="flex justify-between mb-3 font-sans">
-                    <span className="font-semibold text-gray-800">Expected Annual Return</span>
-                    <span className="font-bold text-teal-500">{lumpsumReturn}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="30"
-                    step="0.1"
-                    value={lumpsumReturn}
-                    onChange={(e) => setLumpsumReturn(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
-                  />
-                  <div className="flex justify-between mt-2 text-sm font-sans text-gray-500">
-                    <span>1%</span>
-                    <span>30%</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Summary */}
-              <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-lg">
-                <h3 className="text-xl font-bold mb-5 flex items-center gap-3">
-                  <i className="fas fa-chart-pie"></i>
-                  <span>Investment Summary</span>
-                </h3>
-
-                <div className="flex justify-between items-center mb-5 pb-4 border-b border-teal-400">
-                  <span className="text-lg">Total Investment</span>
-                  <span className="text-xl font-sans font-bold">{formatCurrency(lumpsumResults.totalInvestment)}</span>
-                </div>
-
-                <div className="flex justify-between items-center mb-5 pb-4 border-b border-teal-400">
-                  <span className="text-lg">Est. Returns</span>
-                  <span className="text-xl font-sans font-bold">{formatCurrency(lumpsumResults.estimatedReturns)}</span>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-lg">Total Value</span>
-                  <span className="text-xl font-sans font-bold">{formatCurrency(lumpsumResults.totalValue)}</span>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Comparison Chart */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mt-8">
-          <h2 className="text-2xl font-bold text-center  text-gray-800 mb-6">Investment Comparison</h2>
-          <div className="flex items-end justify-center gap-16 py-6">
-            {/* SIP Bar */}
-            <div className="flex flex-col items-center">
-              <div 
-                className="w-16 bg-gradient-to-t from-teal-500 to-teal-600 rounded-t-lg relative shadow-lg shadow-teal-200 transition-all duration-1000"
-                style={{ height: `${sipBarHeight}px` }}
-              >
-                <div className="absolute -top-8 left-0 w-full text-center font-bold font-sans text-gray-800 text-lg">
-                  {formatCurrency(sipResults.totalValue)}
-                </div>
-              </div>
-              <div className="mt-4 font-semibold  text-gray-800">SIP Investment</div>
-            </div>
-
-            {/* Lumpsum Bar */}
-            <div className="flex flex-col items-center">
-              <div 
-                className="w-16 bg-gradient-to-t from-blue-500 to-blue-600 rounded-t-lg relative shadow-lg shadow-blue-200 transition-all duration-1000"
-                style={{ height: `${lumpsumBarHeight}px` }}
-              >
-                <div className="absolute -top-8 left-0 w-full text-center font-bold font-sans text-gray-800 text-lg">
-                  {formatCurrency(lumpsumResults.totalValue)}
-                </div>
-              </div>
-              <div className="mt-4 font-semibold text-gray-800">Lumpsum Investment</div>
-            </div>
-          </div>
-
-          {/* Legend */}
-          <div className="flex justify-center gap-8 mt-8">
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 bg-teal-500 rounded"></div>
-              <span className="text-gray-700">SIP Investment</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 bg-blue-500 rounded"></div>
-              <span className="text-gray-700">Lumpsum Investment</span>
-            </div>
-          </div>
-        </div>
-
-
-        {/* FIXED Insight + Key Insights Container */}
-        <div className="mt-8 space-y-8">
-
-          {/* 3 Insight Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-              <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
-                <i className="fas fa-rocket"></i>
-              </div>
-              <div className="text-gray-600 text-sm mb-2">Wealth Gain</div>
-              <div className="font-bold text-xl font-sans text-gray-800">
-                {formatCurrency(activeTab === 'sip' ? sipResults.estimatedReturns : lumpsumResults.estimatedReturns)}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-              <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
-                <i className="fas fa-percentage"></i>
-              </div>
-              <div className="text-gray-600 text-sm mb-2">Annualized Return</div>
-              <div className="font-bold text-xl font-sans text-gray-800">
-                {activeTab === 'sip' ? sipReturn : lumpsumReturn}%
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-              <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-500 text-xl mx-auto mb-4">
-                <i className="fas fa-calendar-alt"></i>
-              </div>
-              <div className="text-gray-600 text-sm mb-2">Investment Period</div>
-              <div className="font-bold text-xl font-sans text-gray-800">
-                {activeTab === 'sip' ? sipDuration : lumpsumDuration} Years
-              </div>
-            </div>
-          </div>
-
-          {/* ⭐ KEY INSIGHTS FIXED */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-              <i className="fas fa-lightbulb text-yellow-500 text-xl"></i>
-              Key Insights
-            </h2>
-
-            <ul className="space-y-4 text-gray-700 text-base leading-relaxed">
-
-              <li className="flex gap-3">
-                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
-                <span>
-                  Your total investment amounts to{" "}
-                  <strong className="font-sans">
-                    {formatCurrency(
-                      activeTab === "sip"
-                        ? sipResults.totalInvestment
-                        : lumpsumResults.totalInvestment
-                    )}
-                  </strong>
-                </span>
-              </li>
-
-              <li className="flex gap-3">
-                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
-                <span>
-                  Your estimated returns are{" "}
-                  <strong className="font-sans">
-                    {formatCurrency(
-                      activeTab === "sip"
-                        ? sipResults.estimatedReturns
-                        : lumpsumResults.estimatedReturns
-                    )}
-                  </strong>.
-                </span>
-              </li>
-
-              <li className="flex gap-3">
-                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
-                <span>
-                  Your total future value will be{" "}
-                  <strong className="font-sans">
-                    {formatCurrency(
-                      activeTab === "sip"
-                        ? sipResults.totalValue
-                        : lumpsumResults.totalValue
-                    )}
-                  </strong>.
-                </span>
-              </li>
-
-              <li className="flex gap-3">
-                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
-                <span>
-                  SIP grows steadily due to <strong>monthly compounding</strong>.
-                </span>
-              </li>
-
-              <li className="flex gap-3">
-                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
-                <span>
-                  Lumpsum investing benefits hugely from <strong>time in the market</strong>.
-                </span>
-              </li>
-
-              <li className="flex gap-3">
-                <i className="fas fa-check-circle text-teal-500 mt-1"></i>
-                <span>
-                  Higher returns dramatically increase wealth over <strong>10+ years</strong>.
-                </span>
-              </li>
-
-            </ul>
-          </div>
-        </div>
-
+        {/* Calculator Content */}
+        <SIPCalculatorContent />
       </div>
-
-      {/* Font Awesome */}
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-      
-      {/* Fade Animation */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.5s ease;
-        }
-      `}</style>
     </div>
   );
 };
 
-export default SIPLumpsumCalculator;
+// Export both versions
+export default SIPLumpsumCalculatorStandalone;
