@@ -227,6 +227,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 ) : (
                   <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-bold text-slate-700">
                     {profile?.mobile || "Not provided"}
+                  
                   </div>
                 )}
               </div>
