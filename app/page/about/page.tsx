@@ -31,7 +31,7 @@ const AboutSection = () => {
     name: "Mr. Arun Job",
     title: "Regional Director (Hyderabad)",
     description: "With over 20 years of leadership across telecommunications, manufacturing, pharma packaging and banking sectors, Arun Job drives transformative growth and operational excellence. An IIMA alumnus known for building high-performing teams, strategic partnerships, and revenue expansion.",
-    image: "/leader/arun job.jpeg"
+    image: "/leader/arun-job.png"
 },
 
 {
