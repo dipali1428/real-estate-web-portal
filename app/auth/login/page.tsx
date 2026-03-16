@@ -89,7 +89,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
         if (data?.token) {
             document.cookie = `authToken=${data.token}; path=/; SameSite=Lax`;
 
-            try {
+            /* try {
                 const { getFirebaseMessaging } = await import("@/app/lib/firebase");
                 const { getToken } = await import("firebase/messaging");
 
@@ -109,7 +109,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                 }
             } catch (err) {
                 console.error("FCM Registration failed:", err);
-            }
+            } */
             redirectByRole(data.user.role);
             onClose();
         }
