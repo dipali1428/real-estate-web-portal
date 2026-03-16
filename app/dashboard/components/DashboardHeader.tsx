@@ -7,7 +7,7 @@ import { MobileSidebar, SidebarProvider } from "../../component/ui/sidebar";
 import { useRouter, usePathname } from "next/navigation";
 import { getSidebarLinks } from "@/app/utils/getSidebarLinks";
 import type { Role } from "../../utils/getSidebarLinks";
-import { NotificationPanel } from "./NotificationPanel";
+// import { NotificationPanel } from "./NotificationPanel";
 import { DashboardService } from "@/app/services/dashboardService";
 
 
