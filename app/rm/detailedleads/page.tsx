@@ -28,6 +28,16 @@ import {
   XCircle
 } from 'lucide-react';
 
+// --- Status Styles from Second Code ---
+const statusStyles: Record<string, string> = {
+  completed: "bg-blue-50 text-blue-700 border-blue-200",
+  submitted: "bg-green-50 text-green-700 border-green-200",
+  in_progress: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  rejected: "bg-red-50 text-red-700 border-red-200",
+  follow_up: "bg-orange-50 text-orange-700 border-orange-200",
+};
+const ALLOWED_STATUSES = ["SUBMITTED", "IN_PROGRESS", "FOLLOW_UP", "COMPLETED", "REJECTED"];
+
 // --- Types ---
 interface Lead {
   assigned_rm_mobile: string;
@@ -96,7 +106,7 @@ export default function LeadDashboard() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewType, setPreviewType] = useState<'image' | 'pdf' | 'other' | null>(null);
 
-const [openStatusDropdown, setOpenStatusDropdown] = useState<number | null>(null);
+  const [openStatusDropdown, setOpenStatusDropdown] = useState<number | null>(null);
   // --- Pagination States ---
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -129,25 +139,25 @@ const [openStatusDropdown, setOpenStatusDropdown] = useState<number | null>(null
       setLoading(false);
     }
   };
-const handleStatusUpdate = async (leadId: number, status: string) => {
-  try {
-    setProcessingId(leadId);
+  const handleStatusUpdate = async (leadId: number, status: string) => {
+    try {
+      setProcessingId(leadId);
 
-    const response = await RmService.updateDetailLeadStatus(leadId, status);
-console.log("Status update response:", response);
-    if (response.success) {
-      fetchLeads();
-      setOpenStatusDropdown(null);
-    } else {
-      alert(response.message || "Failed to update status");
+      const response = await RmService.updateDetailLeadStatus(leadId, status);
+      console.log("Status update response:", response);
+      if (response.success) {
+        fetchLeads();
+        setOpenStatusDropdown(null);
+      } else {
+        alert(response.message || "Failed to update status");
+      }
+    } catch (error: any) {
+      // console.error("Error updating status:", error);
+      //  alert(error.response?.data?.message || "Server error");
+    } finally {
+      setProcessingId(null);
     }
-  } catch (error: any) {
-    // console.error("Error updating status:", error);
-    //  alert(error.response?.data?.message || "Server error");
-  } finally {
-    setProcessingId(null);
-  }        
-};
+  };
 
 
   useEffect(() => {
@@ -317,59 +327,23 @@ console.log("Status update response:", response);
                             {lead.detail_lead_id}
                           </td>
 
-                          {/* 3. Status */}
+                          {/* 3. Status - MODIFIED TO MATCH SECOND CODE STYLE */}
                           <td
-                              className={`px-4 py-4 whitespace-nowrap transition-all duration-300 relative 
+                            className={`px-4 py-4 whitespace-nowrap transition-all duration-300 relative 
                               ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}
-                            >
-
-                              {/* NORMAL VIEW → Show Status Badge */}
-                              {openStatusDropdown !== lead.id ? (
-                                <span
-                                  onClick={() => setOpenStatusDropdown(lead.id)}
-                                  className={`cursor-pointer px-2 py-0.5 rounded-full text-[10px] font-bold border
-                                    ${lead.lead_status === 'SUBMITTED'
-                                      ? 'bg-green-50 text-green-700 border-green-200'
-                                      : lead.lead_status === 'IN_PROGRESS'
-                                      ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
-                                      : lead.lead_status === 'FOLLOW_UP'
-                                      ? 'bg-orange-50 text-orange-700 border-orange-200'
-                                      : lead.lead_status === 'COMPLETED'
-                                      ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                      : lead.lead_status === 'REJECTED'
-                                      ? 'bg-red-50 text-red-700 border-red-200'
-                                      : 'bg-gray-50 text-gray-700 border-gray-200'
-                                    
-                                    }`}
-                                >
-                                  {lead.lead_status}
-                                </span>
-                              ) : (
-                                /* DROPDOWN VIEW */
-                                <div className="absolute bg-white border text-gray-600  rounded-lg shadow-lg z-50 w-36">
-                                 {['SUBMITTED', 'IN_PROGRESS', 'FOLLOW_UP', 'COMPLETED', 'REJECTED'].map((status) => (
-
-                                    <button
-                                      key={status}
-                                      onClick={() => handleStatusUpdate(lead.id, status)}
-                                      disabled={processingId === lead.id}
-                                      className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-100"
-                                    >
-                                      {status}
-                                    </button>
-                                  ))}
-
-                                  {/* Cancel Option */}
-                                  <button
-                                    onClick={() => setOpenStatusDropdown(null)}
-                                    className="block w-full text-left px-3 py-2 text-xs text-red-500 hover:bg-gray-100"
-                                  >
-                                    Cancel
-                                  </button>
-                                </div>
-                              )}
-
-                            </td>
+                          >
+                             <select
+                                value={lead.lead_status?.toUpperCase() || ""}
+                                onChange={(e) => handleStatusUpdate(lead.id, e.target.value)}
+                                disabled={processingId === lead.id}
+                                className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border cursor-pointer focus:outline-none transition-colors ${
+                                  statusStyles[lead.lead_status?.toLowerCase() || ""] || "bg-gray-50 text-gray-700 border-gray-100"
+                                }`}
+                              >
+                                <option value="" disabled>Select</option>
+                                {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                              </select>
+                          </td>
 
 
                           {/* 4. DSA Info */}
@@ -433,7 +407,7 @@ console.log("Status update response:", response);
                               </span>
                             )}
                           </td>
-                         
+
                           {/* 10. Created At */}
                           <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>
                             {new Date(lead.created_at).toLocaleDateString('en-GB')}
@@ -643,7 +617,7 @@ console.log("Status update response:", response);
           </div>
         </div>
 
-        {/* --- LEAD VIEW FORM (MINIMAL) --- */}
+        {/* --- LEAD VIEW FORM (DYNAMIC) --- */}
         <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${selectedLead ? 'visible opacity-100' : 'invisible opacity-0'}`}>
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedLead(null)} />
           <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transition-all duration-300 transform ${selectedLead ? 'scale-100' : 'scale-95'}`}>
@@ -669,29 +643,55 @@ console.log("Status update response:", response);
 
                 <div className="flex-1 overflow-y-auto p-8">
                   <div className="grid grid-cols-2 gap-y-8 gap-x-12">
-                    {[
-                      { label: 'Other Loan', value: selectedLead.form_data?.hasOtherLoan ? 'Yes' : 'No' },
-                      { label: 'Loan ADOB', value: selectedLead.form_data?.dob || 'N/A' },
-                      { label: 'Employment Type', value: selectedLead.form_data?.employmentType || 'N/A' },
-                      { label: 'Has Omount', value: selectedLead.form_data?.loanAmount ? `₹${parseFloat(selectedLead.form_data.loanAmount).toLocaleString('en-IN')}` : 'N/A' },
-                      { label: 'Loan Type', value: selectedLead.form_data?.loanType || 'N/A' },
-                      { label: 'Location', value: selectedLead.form_data?.location || 'N/A' },
-                      { label: 'Other Income', value: selectedLead.form_data?.otherIncome ? 'Yes' : 'No' },
-                      { label: 'Other Income Amount', value: selectedLead.form_data?.otherIncomeAmount ? `₹${parseFloat(selectedLead.form_data.otherIncomeAmount).toLocaleString('en-IN')}` : 'N/A' },
-                      { label: 'Other Loan Amount', value: selectedLead.form_data?.otherLoanAmount ? `₹${parseFloat(selectedLead.form_data.otherLoanAmount).toLocaleString('en-IN')}` : 'N/A' },
-                    ].map((item, i) => (
-                      <div key={i} className="space-y-1">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{item.label}</p>
-                        <p className="text-sm font-bold text-gray-800">{item.value}</p>
-                      </div>
-                    ))}
+                    {Object.entries(selectedLead.form_data || {}).map(([key, value]) => {
+                      // 1. Format the label
+                      const label = key
+                        .replace(/([A-Z])/g, ' $1')
+                        .replace(/^./, (str) => str.toUpperCase());
+
+                      // 2. Logic for display value
+                      let displayValue: string | number = 'N/A';
+
+                      if (value === true || value === 'true') {
+                        displayValue = 'Yes';
+                      } else if (value === false || value === 'false') {
+                        displayValue = 'No';
+                      } else if (value !== null && value !== undefined && value !== '') {
+                        // Check if it's a currency/amount field
+                        if (key.toLowerCase().includes('amount')) {
+                          const numValue = Number(value); // Convert to number safely
+                          if (!isNaN(numValue)) {
+                            displayValue = `₹${numValue.toLocaleString('en-IN')}`;
+                          } else {
+                            displayValue = String(value);
+                          }
+                        } else {
+                          displayValue = String(value);
+                        }
+                      }
+
+                      return (
+                        <div key={key} className="space-y-1">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
+                          <p className="text-sm font-bold text-gray-800 break-words">
+                            {displayValue}
+                          </p>
+                        </div>
+                      );
+                    })}
                   </div>
+
+                  {/* Fallback if form_data is empty */}
+                  {Object.keys(selectedLead.form_data || {}).length === 0 && (
+                    <div className="text-center py-10 text-gray-400">
+                      No additional form data available.
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-6 border-t bg-gray-50 flex gap-3">
-                  <button className="flex-1 bg-[#1CADA3] text-white font-bold py-2.5 rounded-xl text-sm hover:shadow-lg transition-all">Process Lead</button>
+                  {/* <button className="flex-1 bg-[#1CADA3] text-white font-bold py-2.5 rounded-xl text-sm hover:shadow-lg transition-all">Process Lead</button> */}
                   <button onClick={() => setSelectedLead(null)} className="px-6 py-2.5 bg-white border text-gray-600 font-bold rounded-xl text-sm hover:bg-gray-100 transition-all">Close</button>
-
                 </div>
               </>
             )}

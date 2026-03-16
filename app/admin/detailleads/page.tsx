@@ -15,7 +15,7 @@ import {
   Clock,
   Files,
   CheckCircle2,
-  Pencil, // Added Pencil Icon
+  Pencil,
 } from 'lucide-react';
 
 interface Lead {
@@ -78,7 +78,6 @@ export default function LeadDashboard() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [docModalLead, setDocModalLead] = useState<Lead | null>(null);
 
-  // NEW STATES FOR EDITING
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
   const [editFormData, setEditFormData] = useState<any>({});
   const [updating, setUpdating] = useState(false);
@@ -88,22 +87,31 @@ export default function LeadDashboard() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [totalLeads, setTotalLeads] = useState(0); // Added for Server-side Pagination
 
   const [uploading, setUploading] = useState(false);
 
+  // Updated to support API Pagination
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const response = await AdminService.getAllDetailLeads();
+      const response = await AdminService.getAllDetailLeads({
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm
+      });
       console.log("Fetched Leads:", response);
       if (response && response.success) {
         setLeads(response.detail_leads || []);
+        setTotalLeads(response.total_count || 0); // Assuming backend sends total_count
       } else {
         setLeads([]);
+        setTotalLeads(0);
       }
     } catch (error) {
       console.error("Error fetching leads:", error);
       setLeads([]);
+      setTotalLeads(0);
     } finally {
       setLoading(false);
     }
@@ -111,14 +119,8 @@ export default function LeadDashboard() {
 
   useEffect(() => {
     fetchLeads();
-    setCurrentPage(1);
-  }, []);
+  }, [currentPage, itemsPerPage, searchTerm]); // Trigger fetch on any control change
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  // NEW EDIT HANDLERS
   const handleEditClick = (lead: Lead) => {
     setEditingLead(lead);
     setEditFormData({ ...lead });
@@ -174,66 +176,39 @@ export default function LeadDashboard() {
     setPreviewUrl(url);
   };
 
-  const downloadCSV = () => {
-    const dataToExport = filteredLeads;
+  const downloadCSV = async () => {
+  try {
+    const response = await AdminService.exportDetailLeads();
 
-    if (dataToExport.length === 0) {
-      alert("No data available to download");
-      return;
+    const blob = new Blob([response.data], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+
+    // get filename from backend if available
+    const contentDisposition = response.headers["content-disposition"];
+    let fileName = `all_leads_export_${new Date().toISOString().split("T")[0]}.csv`;
+
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="?(.+)"?/);
+      if (match?.length === 2) {
+        fileName = match[1];
+      }
     }
 
-    const extraFields = [
-      'disbursement_amount',
-      'gross_payout_amount',
-      'gst_amount',
-      'tds_amount',
-      'net_payout_amount',
-      'payout_date',
-      'payout_id',
-      'payment_mode',
-      'transaction_reference_no',
-      'invoice_number',
-      'invoice_date',
-      'policy_number'
-    ];
-
-    const allKeys = new Set<string>();
-    dataToExport.forEach(lead => {
-      Object.keys(lead).forEach(key => allKeys.add(key));
-    });
-    extraFields.forEach(field => allKeys.add(field));
-
-    const headers = Array.from(allKeys);
-    const csvRows = [];
-    csvRows.push(headers.join(','));
-
-    for (const lead of dataToExport) {
-      const values = headers.map(header => {
-        const val = (lead as any)[header];
-        let cellValue = '';
-        if (val === null || val === undefined) {
-          cellValue = '';
-        } else if (typeof val === 'object') {
-          cellValue = JSON.stringify(val);
-        } else {
-          cellValue = String(val);
-        }
-        const escaped = cellValue.replace(/"/g, '""');
-        return `"${escaped}"`;
-      });
-      csvRows.push(values.join(','));
-    }
-
-    const csvString = csvRows.join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `all_leads_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute("download", fileName);
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
-  };
+
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+  } catch (error) {
+    console.error("Error exporting leads:", error);
+    alert("Failed to export leads.");
+  }
+};
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -244,6 +219,7 @@ export default function LeadDashboard() {
       const response = await AdminService.uploadDetailLeadsCSV(file);
       if (response.success) {
         alert("CSV uploaded and processed successfully!");
+        fetchLeads();
       } else {
         alert(response.message || "Failed to upload CSV");
       }
@@ -255,16 +231,10 @@ export default function LeadDashboard() {
     }
   };
 
-  const filteredLeads = leads.filter(lead =>
-    lead.lead_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.detail_lead_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.contact_number?.includes(searchTerm)
-  );
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentLeads = filteredLeads.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
+  // Logic adjusted for server-side pagination
+  const totalPages = Math.ceil(totalLeads / itemsPerPage);
+  const indexOfFirstItem = (currentPage - 1) * itemsPerPage;
+  const indexOfLastItem = indexOfFirstItem + leads.length;
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -288,7 +258,7 @@ export default function LeadDashboard() {
             <input
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
               placeholder="Search by Lead ID, Client or Number..."
               className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none bg-white text-gray-900 focus:ring-2 focus:ring-[#1CADA3] text-sm"
             />
@@ -367,8 +337,8 @@ export default function LeadDashboard() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {currentLeads.length > 0 ? (
-                    currentLeads.map((lead) => {
+                  {leads.length > 0 ? (
+                    leads.map((lead) => {
                       return (
                         <tr key={lead.id} className="hover:bg-gray-50 transition-colors relative group">
                           {/* EDIT COLUMN */}
@@ -399,8 +369,6 @@ export default function LeadDashboard() {
 
                           <td className="px-4 py-4 whitespace-nowrap text-sm">
                             <div className="font-bold text-gray-800">{lead.lead_name}</div>
-                            {/* <div className="text-[11px] text-gray-600">{lead.email}</div>
-                            <div className="text-[10px] text-gray-500">{lead.contact_number}</div> */}
                           </td>
 
                           
@@ -449,7 +417,7 @@ export default function LeadDashboard() {
           <div className="px-4 py-4 border-t border-gray-100 flex items-center justify-end bg-gray-50/50">
             <div className="flex items-center gap-4 mr-6">
               <span className="text-xs text-gray-500 font-medium">
-                Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredLeads.length)} of {filteredLeads.length} leads
+                Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, totalLeads)} of {totalLeads} leads
               </span>
             </div>
 
@@ -494,7 +462,6 @@ export default function LeadDashboard() {
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !updating && setEditingLead(null)} />
           <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col transition-all duration-300 transform ${editingLead ? 'scale-100' : 'scale-95'}`}>
             {editingLead && (
-              /* Changed: Added flex-1 and min-h-0 to ensure the form respects the parent's max-height */
               <form onSubmit={submitEdit} className="flex flex-col flex-1 min-h-0">
                 <div className="p-6 border-b flex items-center justify-between bg-white shrink-0">
                   <div className="flex items-center gap-3">
@@ -507,27 +474,26 @@ export default function LeadDashboard() {
                   <button type="button" onClick={() => setEditingLead(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400"><X size={20} /></button>
                 </div>
 
-                {/* This div handles the scrolling */}
                 <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* CORE LEAD FIELDS */}
                     <div className="col-span-full border-b pb-2"><h4 className="text-sm font-bold  text-[#1CADA3]">Core Information</h4></div>
                     {[
-                        { label: 'DSA ID', key: 'dsa_id' },
+                      { label: 'DSA ID', key: 'dsa_id' },
                       { label: 'Lead Name', key: 'lead_name' },
                       { label: 'Contact Number', key: 'contact_number' },
                       { label: 'RM ID', key: 'assigned_rm_id' },
-                       { label: 'Self Login', key: 'is_self_login' },
+                      { label: 'Self Login', key: 'is_self_login' },
                       { label: 'Lead Status', key: 'lead_status' },
                       { label: 'Department ID', key: 'department_head_id' },
                       { label: 'Department', key: 'department' },
                       { label: 'Sub Category', key: 'sub_category' },
-                       { label: 'Payout ID', key: 'payout_id' },
+                      { label: 'Payout ID', key: 'payout_id' },
                       { label: 'Disbursement Amount', key: 'disbursement_amount' },
                       { label: 'Gross Payout', key: 'gross_payout_amount' },
                       { label: 'Net Payout', key: 'net_payout_amount' },
-                       { label: 'TDS Amount', key: 'tds_amount' },
-                       { label: 'GST Number', key: 'gst_amount' },
+                      { label: 'TDS Amount', key: 'tds_amount' },
+                      { label: 'GST Number', key: 'gst_amount' },
                       { label: 'Policy Number', key: 'policy_number' },
                       { label: 'Invoice Number', key: 'invoice_number' },
                       { label: 'Transaction Ref', key: 'transaction_reference_no' },

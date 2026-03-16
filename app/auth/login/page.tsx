@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Smartphone, LockKeyhole, ArrowRight, KeyRound, ChevronLeft } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
 import { useRouter } from "next/navigation";
+import { useModal } from "../../context/ModalContext";
 
 // Animation Variants
 const containerVariants = {
@@ -34,7 +35,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     const [emailOrPhone, setEmailOrPhone] = useState("");
     const [otp, setOtp] = useState("");
     const [password, setPassword] = useState("");
-    
+
     // Forgot Password State
     const [forgotStep, setForgotStep] = useState(1);
     const [newPassword, setNewPassword] = useState("");
@@ -46,6 +47,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
     const router = useRouter();
+    const { openSignup } = useModal();
 
     const phoneRegex = /^[0-9]{10}$/;
 
@@ -59,7 +61,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
         setPassword("");
         setNewPassword("");
         setForgotStep(1);
-        if (method !== 'FORGOT') setEmailOrPhone(""); 
+        if (method !== 'FORGOT') setEmailOrPhone("");
     };
 
     // 1. WEB OTP API
@@ -119,12 +121,12 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                     setLoading(false);
                     return;
                 }
-                
+
                 let processedIdentifier = emailOrPhone.trim();
                 if (/^ADV[\s_.-]?\d+$/i.test(processedIdentifier)) {
                     const digits = processedIdentifier.match(/\d+/)?.[0];
                     processedIdentifier = `ADV_${digits}`;
-                } 
+                }
                 else if (/^\d+$/.test(processedIdentifier) && processedIdentifier.length !== 10) {
                     processedIdentifier = `ADV_${processedIdentifier}`;
                 }
@@ -225,11 +227,11 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                         variants={containerVariants} initial={{ scale: 0.9, opacity: 0, y: -20 }} animate="visible" exit="exit"
                         className="relative w-full max-w-[95%] sm:max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3]" />
-                        
+
                         {loginMethod === 'FORGOT' && (
-                             <button onClick={() => handleMethodSwitch('PASSWORD')} className="absolute top-4 left-4 p-2 text-gray-400 hover:text-[#2076C7] transition-colors z-10">
+                            <button onClick={() => handleMethodSwitch('PASSWORD')} className="absolute top-4 left-4 p-2 text-gray-400 hover:text-[#2076C7] transition-colors z-10">
                                 <ChevronLeft size={20} />
-                             </button>
+                            </button>
                         )}
 
                         <button onClick={onClose} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors z-10">
@@ -308,7 +310,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                 )}
 
                                 {error && (
-                                    <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} 
+                                    <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
                                         className={`p-3 rounded-lg border ${isSuccess ? "bg-green-50 border-green-100" : "bg-red-50 border-red-100"}`}>
                                         <p className={`${isSuccess ? "text-green-600" : "text-red-600"} text-sm text-center font-medium`}>{error}</p>
                                     </motion.div>
@@ -323,6 +325,22 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                         </>
                                     )}
                                 </motion.button>
+
+                                {/* Signup Link */}
+                                <motion.div variants={itemVariants} className="text-center mt-4">
+                                    <p className="text-sm text-gray-500">
+                                        Don&apos;t have an account?{" "}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                onClose();
+                                                openSignup();
+                                            }}
+                                            className="text-[#2076C7] font-semibold hover:underline">
+                                            Signup
+                                        </button>
+                                    </p>
+                                </motion.div>
                             </form>
                         </div>
                     </motion.div>

@@ -243,7 +243,7 @@ export const AdminService = {
 
   uploadDetailLeadsCSV: async (file: File) => {
     const formData = new FormData();
-    formData.append("file", file); 
+    formData.append("file", file);
     const res = await api.post("/api/admin/upload-detail-leads-csv", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -257,11 +257,11 @@ export const AdminService = {
     const response = await api.get("/api/admin/get-cibil-request");
     return response.data;
   },
-   // Fetch all detailed leads
-  getAllDetailLeads: async () => {
-    const response = await api.get("/api/admin/get-all-detail-leads");
-    return response.data;
-  },
+  // // Fetch all detailed leads
+  // getAllDetailLeads: async () => {
+  //   const response = await api.get("/api/admin/get-all-detail-leads");
+  //   return response.data;
+  // },
 
   getAllReferralLeads: async () => {
     const response = await api.get("/api/admin/get-all-referral-leads");
@@ -272,11 +272,28 @@ export const AdminService = {
     const response = await api.get("/api/admin/career-applications");
     return response.data;
   },
-  
-  // Update a Detailed Lead
-  updateDetailLead: async (id: number | string, payload: any) => {
-    const response = await api.put(`/api/admin/detail-leads/${id}`, payload);
+
+
+  // Updated to accept pagination and search params
+  getAllDetailLeads: async (params?: { page?: number; limit?: number; search?: string }) => {
+    const response = await api.get("/api/admin/get-all-detail-leads", { params });
     return response.data;
   },
+
+  exportDetailLeads: async () => {
+  return await api.get("/api/admin/get-all-detail-leads/export", {
+    responseType: "blob",
+    headers: {
+      Accept: "text/csv",
+    },
+  });
+},
+  // Update a Detailed Lead
+  updateDetailLead: async (id: number | string, payload: any) => {
+    const response = await api.put(`/api/admin/get-all-detail-leads/${id}`, payload);
+    return response.data;
+  },
+
+ 
 };
 

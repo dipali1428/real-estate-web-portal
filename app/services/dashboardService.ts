@@ -125,11 +125,11 @@ export const DashboardService = {
         return response.data;
     },
 
-// 🔹 Get Completed Detail Leads (For Payout History)
-getCompletedDetailLeads: async () => {
-    const response = await api.get("/api/dashboard/get-completed-detail-leads");
-    return response.data;
-},
+    // 🔹 Get Completed Detail Leads (For Payout History)
+    getCompletedDetailLeads: async () => {
+        const response = await api.get("/api/dashboard/get-completed-detail-leads");
+        return response.data;
+    },
 
     // 🔹 Generate Aadhaar OTP
     generateAadhaarOtp: async (aadhaar_number: string) => {
@@ -154,7 +154,7 @@ getCompletedDetailLeads: async () => {
         return response.data;
     },
 
-    
+
     // // 🔹 SEND OTP FOR REGISTER
     // sendOtp: async (data: { mobile: string;}) => {
     //     const response = await api.post("/api/dashboard/send-mobile-otp", data);
