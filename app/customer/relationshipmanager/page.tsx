@@ -172,18 +172,6 @@ export default function RMPanel() {
                             Welcome back, {rmName} • Last login: {lastLogin}
                         </p>
                     </div>
-                    
-                    {/* RM Status */}
-                    <div className="bg-white/20 px-4 py-2 rounded-xl flex items-center space-x-3">
-                        <div className="flex items-center space-x-2">
-                            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                            <span className="text-sm">Online</span>
-                        </div>
-                        <div className="h-4 w-px bg-white/30"></div>
-                        <div className="text-sm">
-                            <span className="opacity-70">Employee ID:</span> {rmId || 'RM001'}
-                        </div>
-                    </div>
                 </div>
 
                 {/* Quick Stats - ALL ZERO */}
