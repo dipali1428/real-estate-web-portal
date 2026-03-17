@@ -149,9 +149,16 @@ export const productCards: ProductCards = {
       converted: 0
     },
     { 
-      title: "PMS / AIF", 
+      title: "PMS", 
       description: "PMS offers personalized investment services. AIFs invest in assets like private equity.",
       onClick: () => {},
+      activeLeads: 0,
+      converted: 0
+    },
+    {
+      title: "AIF",
+      description: "Alternative Investment Funds (AIFs) invest in assets like private equity, hedge funds, and real estate.",
+      onClick: () => { },
       activeLeads: 0,
       converted: 0
     },

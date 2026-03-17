@@ -25,6 +25,7 @@ import LoanAgainstSecuritiesForm from "./forms/loanagainstsecuritiesform";
 import MutualFundForm from "./forms/MutualFundForm";
 import WealthManagementForm from "./forms/WealthManagementForm";
 import PMSAIFForm from "./forms/PMSAIFForm";
+import AIFForm from "./forms/aifform";
 import BondsForm from "./forms/bondsfrom";
 import FixedDepositForm from "./forms/fineddf";
 import RealEstateForm from "./forms/realestate";
@@ -57,6 +58,7 @@ export default function LeadManagementPage() {
   const [showMutualFundForm, setShowMutualFundForm] = useState(false);
   const [showWealthManagementForm, setShowWealthManagementForm] = useState(false);
   const [showPMSAIFForm, setShowPMSAIFForm] = useState(false);
+  const [showAIFForm, setShowAIFForm] = useState(false);
   const [showFixedDepositForm, setShowFixedDepositForm] = useState(false);
   const [showBondsForm, setShowBondsForm] = useState(false);
   const [showRealEstateForm, setShowRealEstateForm] = useState(false);
@@ -86,7 +88,8 @@ export default function LeadManagementPage() {
       "Loan Protector": () => setShowLoanProtectorForm(true),
       "Mutual Fund": () => setShowMutualFundForm(true),
       "Wealth Management": () => setShowWealthManagementForm(true),
-      "PMS / AIF": () => setShowPMSAIFForm(true),
+      "PMS": () => setShowPMSAIFForm(true),
+      "AIF": () => setShowAIFForm(true),
       "Fixed Deposit": () => setShowFixedDepositForm(true),
       "Bonds": () => setShowBondsForm(true),
       "Real Estate": () => setShowRealEstateForm(true),
@@ -121,6 +124,7 @@ export default function LeadManagementPage() {
   if (showMutualFundForm) return <MutualFundForm onClose={() => setShowMutualFundForm(false)} />;
   if (showWealthManagementForm) return <WealthManagementForm onClose={() => setShowWealthManagementForm(false)} />;
   if (showPMSAIFForm) return <PMSAIFForm onClose={() => setShowPMSAIFForm(false)} />;
+  if (showAIFForm) return <AIFForm onClose={() => setShowAIFForm(false)} />;
   if (showFixedDepositForm) return <FixedDepositForm onClose={() => setShowFixedDepositForm(false)} />;
   if (showBondsForm) return <BondsForm onClose={() => setShowBondsForm(false)} />;
   if (showRealEstateForm) return <RealEstateForm onClose={() => setShowRealEstateForm(false)} />;
