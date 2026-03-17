@@ -21,7 +21,7 @@ export interface ProfileData {
   mobile: string;
   email?: string;
   profile_image?: string;
-  // KYC fields (optional, for refresh)
+  // KYC fields
   pan_verified?: boolean;
   aadhaar_verified?: boolean;
   bank_verified?: boolean;
@@ -31,9 +31,10 @@ export interface ProfileData {
   bank_name?: string;
   bank_account?: string;
   ifsc?: string;
-  gst_number?: string;
   name_as_per_pan?: string;
   date_of_birth?: string;
+  // Add kycDetails as an optional property
+  kycDetails?: any;
 }
 
 export interface PasswordData {
@@ -151,44 +152,47 @@ export default function ProfilePage() {
       const response = await customerService.getProfile();
       
       if (response) {
-        let profileData = response;
-        if (response.data) profileData = response.data;
-        if (response.user) profileData = response.user;
+        // The response structure from your console is
+        const userData = response.user || {};
+        const kycData = response.kycDetails || {};
         
         const storedImageUrl = localStorage.getItem('profile_image_url');
         
         // Create updated profile object with ALL fields from backend
         const updatedProfile: ProfileData = {
-          id: profileData.id || profileData.user_id,
-          name: profileData.name || profileData.full_name || '',
-          mobile: profileData.mobile || profileData.phone || profileData.mobile_number || '',
-          email: profileData.email || '',
-          profile_image: storedImageUrl || profileData.profile_image || profileData.avatar || profileData.profile_pic,
+          id: userData.id || userData.user_id,
+          name: userData.name || userData.full_name || '',
+          mobile: userData.mobile || userData.phone || userData.mobile_number || '',
+          email: userData.email || '',
+          profile_image: storedImageUrl || userData.profile_image || userData.avatar || userData.profile_pic,
           
-          // Add KYC/verification fields
-          pan_verified: profileData.pan_verified,
-          aadhaar_verified: profileData.aadhaar_verified,
-          bank_verified: profileData.bank_verified,
-          demat_added: profileData.demat_added,
-          pan: profileData.pan,
-          aadhaar: profileData.aadhaar,
-          bank_name: profileData.bank_name,
-          bank_account: profileData.bank_account,
-          ifsc: profileData.ifsc,
-          gst_number: profileData.gst_number,
-          name_as_per_pan: profileData.name_as_per_pan,
-          date_of_birth: profileData.date_of_birth
+          // Add KYC/verification fields from userData
+          pan_verified: userData.pan_verified,
+          aadhaar_verified: userData.aadhaar_verified,
+          bank_verified: userData.bank_verified,
+          demat_added: userData.demat_added,
+          pan: userData.pan,
+          aadhaar: userData.aadhaar,
+          bank_name: userData.bank_name,
+          bank_account: userData.bank_account,
+          ifsc: userData.ifsc,
+          name_as_per_pan: userData.name_as_per_pan,
+          date_of_birth: userData.date_of_birth
         };
         
+        // Also include the full kycDetails in the profile object
+        // Add this as a custom property to ProfileData type
+        (updatedProfile as any).kycDetails = kycData;
+        
         // Update ALL state variables with fresh data
-        setProfile(updatedProfile);
-        setOriginalProfile(updatedProfile);
+        setProfile(updatedProfile as ProfileData);
+        setOriginalProfile(updatedProfile as ProfileData);
         
         // Update verification statuses
-        setPanVerified(!!profileData.pan_verified);
-        setAadhaarVerified(!!profileData.aadhaar_verified);
-        setBankVerified(!!profileData.bank_verified);
-        setDematAdded(!!profileData.demat_added);
+        setPanVerified(!!userData.pan_verified);
+        setAadhaarVerified(!!userData.aadhaar_verified || !!kycData.aadhaar_verified);
+        setBankVerified(!!userData.bank_verified || !!kycData.bank_verified);
+        setDematAdded(!!userData.demat_added);
       }
     } catch (error) {
       console.error('Failed to refresh profile:', error);
@@ -287,7 +291,7 @@ export default function ProfilePage() {
 
     } catch (err) {
       console.error(err);
-      showNotification("Update failed", "error");
+      showNotification("Mobile number already exists", "error");
     } finally {
       setUpdating(false);
     }
@@ -571,6 +575,7 @@ export default function ProfilePage() {
 
       {/* KYC Section - With refresh and verification props */}
       <KYCSection 
+        profile={profile}
         onRefresh={refreshProfileData}
         externalPanVerified={panVerified}
         externalAadhaarVerified={aadhaarVerified}

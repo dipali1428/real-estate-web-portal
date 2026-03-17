@@ -165,7 +165,7 @@ const CustomerService = {
 
     // ==================== PROFILE ====================
     getProfile: async () => {
-        const response = await api.get("/api/unlisted/user/profile");
+        const response = await api.get("/api/dashboard/profile");
         return response.data;
     },
 

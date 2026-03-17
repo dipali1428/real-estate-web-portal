@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CreditCard,
   Landmark,
@@ -12,7 +12,20 @@ import {
   Info,
   Database,
   Save,
-  X
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Hash,
+  Building2,
+  FileText,
+  IdCard,
+  Globe,
+  Home,
+  Map,
+  Briefcase,
+  Asterisk
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import customerService from '../../services/customerService';
@@ -32,8 +45,8 @@ interface PopupMessage {
   type: "success" | "error" | "loading";
 }
 
-// Add props interface to receive refresh function from parent
 interface KYCSectionProps {
+  profile?: any;
   onRefresh?: () => Promise<void>;
   externalPanVerified?: boolean;
   externalAadhaarVerified?: boolean;
@@ -41,16 +54,62 @@ interface KYCSectionProps {
   externalDematAdded?: boolean;
 }
 
-export const KYCSection: React.FC<KYCSectionProps> = ({ 
+// Verified Details Component
+const VerifiedDetailsCard: React.FC<{ 
+  title: string;
+  icon: React.ReactNode;
+  color: string;
+  children: React.ReactNode;
+}> = ({ title, icon, color, children }) => (
+  <div className="bg-white rounded-xl border border-slate-100 overflow-hidden shadow-sm">
+    <div className={`px-4 py-3 bg-gradient-to-r ${color} border-b border-white/10`}>
+      <div className="flex items-center gap-2">
+        <div className="p-1.5 bg-white/20 rounded-lg">
+          {icon}
+        </div>
+        <h3 className="text-sm font-bold text-white">{title}</h3>
+      </div>
+    </div>
+    <div className="p-4">
+      {children}
+    </div>
+  </div>
+);
+
+// Detail Row Component
+const DetailRow: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
+  masked?: boolean;
+}> = ({ icon, label, value, masked = false }) => {
+  if (!value) return null;
+  
+  const displayValue = masked && typeof value === 'string' 
+    ? `•••• ${value.slice(-4)}` 
+    : value;
+    
+  return (
+    <div className="flex items-start gap-3 py-2 border-b border-slate-50 last:border-0">
+      <div className="text-slate-400 mt-0.5">{icon}</div>
+      <div className="flex-1">
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
+        <p className="text-sm font-medium text-slate-700">{displayValue}</p>
+      </div>
+    </div>
+  );
+};
+
+export const KYCSection: React.FC<KYCSectionProps> = ({
+  profile,
   onRefresh,
   externalPanVerified,
   externalAadhaarVerified,
   externalBankVerified,
-  externalDematAdded 
+  externalDematAdded
 }) => {
   const [loading, setLoading] = useState(true);
   const [loadingSection, setLoadingSection] = useState<string | null>(null);
-  const [profile, setProfile] = useState<any>(null);
   
   // PAN States
   const [panDetails, setPanDetails] = useState({
@@ -83,7 +142,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
   const [savingDemat, setSavingDemat] = useState(false);
   const [dematAdded, setDematAdded] = useState(false);
 
-  // Status States - Use external props if provided, otherwise use local state
+  // Status States
   const [panStatus, setPanStatus] = useState<VerificationStatus>(
     externalPanVerified ? 'VERIFIED' : 'NOT_STARTED'
   );
@@ -94,14 +153,14 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
     externalBankVerified ? 'VERIFIED' : 'NOT_STARTED'
   );
 
+  // Store KYC details from profile
+  const [kycDetails, setKycDetails] = useState<any>(null);
+
   // IFSC Lookup
   const [fetchingBankDetails, setFetchingBankDetails] = useState(false);
 
   // Popup States
   const [popups, setPopups] = useState<PopupMessage[]>([]);
-  
-  // Track if initial fetch has been done
-  const hasFetched = useRef(false);
 
   // ========== POPUP FUNCTIONS ==========
   const removePopup = (id: string) => {
@@ -123,53 +182,45 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
     return id;
   };
 
-  // ========== REFRESH KYC DATA ==========
-  const refreshKYCData = async () => {
-    try {
-      const profileData = await customerService.getProfile();
-      if (profileData) {
-        setProfile(profileData);
-        setPanDetails({
-          pan: profileData.pan || '',
-          name_as_per_pan: profileData.name_as_per_pan || profileData.name || '',
-          date_of_birth: profileData.date_of_birth || ''
-        });
-        setAadhaarNumber(profileData.aadhaar || '');
-        setBankDetails({
-          bank_name: profileData.bank_name || '',
-          bank_account_number: profileData.bank_account || '',
-          ifsc_code: profileData.ifsc || ''
-        });
-        
-        // Update statuses from backend
-        if (profileData.pan_verified) setPanStatus('VERIFIED');
-        if (profileData.aadhaar_verified) setAadhaarStatus('VERIFIED');
-        if (profileData.bank_verified) setBankStatus('VERIFIED');
-        if (profileData.demat_added) setDematAdded(true);
-      }
-    } catch (error) {
-      console.error('Failed to refresh KYC:', error);
-    }
-  };
-
-  // ========== FETCH PROFILE DATA (with hasFetched guard) ==========
   useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
+    if (!profile) {
+      setLoading(false);
+      return;
+    }
     
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        await refreshKYCData();
-      } catch (error) {
-        console.error('Failed to fetch profile:', error);
-        triggerPopup('Failed to load profile data', 'error');
-      } finally {
-        setLoading(false);
+    // Extract kycDetails from profile
+    if (profile.kycDetails) {
+      setKycDetails(profile.kycDetails);
+      
+      // Set aadhaar number from kycDetails
+      if (profile.kycDetails.aadhaar_number) {
+        setAadhaarNumber(profile.kycDetails.aadhaar_number);
       }
-    };
-    fetchData();
-  }, []);
+      
+      // Set bank details from kycDetails
+      if (profile.kycDetails.bank_name) {
+        setBankDetails({
+          bank_name: profile.kycDetails.bank_name || '',
+          bank_account_number: profile.kycDetails.bank_account_number || '',
+          ifsc_code: profile.kycDetails.ifsc_code || ''
+        });
+      }
+    }
+
+    setPanDetails({
+      pan: profile.pan || profile.user?.pan || '',
+      name_as_per_pan: profile.name_as_per_pan || profile.user?.name || profile.name || '',
+      date_of_birth: profile.date_of_birth || profile.user?.date_of_birth || ''
+    });
+
+    // Update verification statuses
+    setPanStatus(profile.pan_verified || profile.user?.pan_verified ? 'VERIFIED' : 'NOT_STARTED');
+    setAadhaarStatus(profile.aadhaar_verified || profile.kycDetails?.aadhaar_verified ? 'VERIFIED' : 'NOT_STARTED');
+    setBankStatus(profile.bank_verified || profile.kycDetails?.bank_verified ? 'VERIFIED' : 'NOT_STARTED');
+    setDematAdded(!!profile.demat_added);
+
+    setLoading(false);
+  }, [profile]);
 
   // ========== OTP EXPIRY TIMER ==========
   useEffect(() => {
@@ -227,12 +278,14 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
       triggerPopup('Please enter your date of birth', 'error');
       return;
     }
-
-    let formattedDate = panDetails.date_of_birth;
-    if (panDetails.date_of_birth.includes('-')) {
-      const [year, month, day] = panDetails.date_of_birth.split('-');
-      formattedDate = `${day}/${month}/${year}`;
+    
+    const dobRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (!dobRegex.test(panDetails.date_of_birth)) {
+      triggerPopup('Date must be in DD/MM/YYYY format', 'error');
+      return;
     }
+
+    const formattedDate = panDetails.date_of_birth;
 
     setLoadingSection('pan');
     try {
@@ -242,16 +295,9 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
         date_of_birth: formattedDate
       });
       
+      if (onRefresh) await onRefresh();
       setPanStatus('VERIFIED');
-      
-      // Refresh data from backend
-      await refreshKYCData();
-      
-      // Also call parent refresh if provided
-      if (onRefresh) {
-        await onRefresh();
-      }
-      
+    
       triggerPopup(response.message || 'PAN verified successfully!', 'success');
     } catch (error: any) {
       setPanStatus('FAILED');
@@ -312,12 +358,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
       setOtp(['', '', '', '', '', '']);
       
       // Refresh data from backend
-      await refreshKYCData();
-      
-      // Also call parent refresh if provided
-      if (onRefresh) {
-        await onRefresh();
-      }
+      if (onRefresh) await onRefresh();
       
       triggerPopup('Aadhaar verified successfully', 'success');
     } catch (error: any) {
@@ -352,12 +393,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
       setBankStatus('VERIFIED');
       
       // Refresh data from backend
-      await refreshKYCData();
-      
-      // Also call parent refresh if provided
-      if (onRefresh) {
-        await onRefresh();
-      }
+      if (onRefresh) await onRefresh();
       
       triggerPopup(response.message, 'success');
       if (response.data?.utr) {
@@ -401,12 +437,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
         setDematAdded(true);
         
         // Refresh data from backend
-        await refreshKYCData();
-        
-        // Also call parent refresh if provided
-        if (onRefresh) {
-          await onRefresh();
-        }
+        if (onRefresh) await onRefresh();
         
         triggerPopup('Demat account added successfully!', 'success');
       }
@@ -430,11 +461,13 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
     if (panStatus === 'VERIFIED') count++;
     if (aadhaarStatus === 'VERIFIED') count++;
     if (bankStatus === 'VERIFIED') count++;
-    if (dematAdded) count++;
+    // Demat is optional, so don't include in mandatory count
     return count;
   };
 
-  const kycProgressPercentage = (getKYCCompletedSteps() / 4) * 100;
+  const mandatoryStepsCompleted = getKYCCompletedSteps();
+  const mandatoryProgressPercentage = (mandatoryStepsCompleted / 3) * 100;
+  const allMandatoryCompleted = mandatoryStepsCompleted === 3;
 
   // Update status when external props change
   useEffect(() => {
@@ -493,51 +526,172 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
           <div className="flex items-center gap-3">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-slate-800">KYC & Demat Verification</h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Complete your verification to start investing</p>
             </div>
           </div>
           
           {/* Step Counter */}
           <div className="flex items-center gap-3 self-start sm:self-auto">
             <span className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest whitespace-nowrap ${
-              getKYCCompletedSteps() === 4 
+              allMandatoryCompleted 
                 ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
                 : "bg-amber-50 text-amber-600 border border-amber-200"
             }`}>
-              {getKYCCompletedSteps() === 4 ? "All Completed" : `${getKYCCompletedSteps()}/4 Steps Done`}
+              {allMandatoryCompleted ? "✓ KYC Completed" : `${mandatoryStepsCompleted}/3 Mandatory Steps`}
             </span>
+            {dematAdded && (
+              <span className="px-3 py-1.5 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-lg text-xs font-black uppercase tracking-widest">
+                Demat Added
+              </span>
+            )}
           </div>
         </div>
       </header>
 
-      {/* KYC Progress Bar */}
+      {/* KYC Progress Bar - Now shows only mandatory steps */}
       <div className="mb-6 sm:mb-8 bg-white rounded-xl p-4 sm:p-5 border border-slate-100 shadow-sm">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest">Overall Progress</span>
-          <span className="text-xs sm:text-sm font-bold text-[#1CADA3]">{getKYCCompletedSteps()}/4 Steps</span>
+          <span className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+            <Asterisk size={10} className="text-rose-500" />
+            Mandatory KYC Progress
+          </span>
+          <span className="text-xs sm:text-sm font-bold text-[#1CADA3]">{mandatoryStepsCompleted}/3 Steps</span>
         </div>
         <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
           <motion.div 
             initial={{ width: 0 }}
-            animate={{ width: `${kycProgressPercentage}%` }}
+            animate={{ width: `${mandatoryProgressPercentage}%` }}
             className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full"
           />
         </div>
       </div>
 
-      <div className="w-full max-w-7xl mx-auto px-0 py-6 space-y-6">
+      {/* Verified KYC Summary Cards - Show only verified mandatory items */}
+      {(panStatus === 'VERIFIED' || aadhaarStatus === 'VERIFIED' || bankStatus === 'VERIFIED') && (
+        <div className="mb-8">
+          <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+            Verified Information
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            {/* PAN Card - Mandatory */}
+            {panStatus === 'VERIFIED' && (
+              <VerifiedDetailsCard 
+                title="PAN Card" 
+                icon={<CreditCard className="w-4 h-4 text-white" />}
+                color="from-blue-600 to-blue-500"
+              >
+                <DetailRow 
+                  icon={<IdCard className="w-4 h-4" />}
+                  label="PAN Number" 
+                  value={panDetails.pan} 
+                />
+                <DetailRow 
+                  icon={<User className="w-4 h-4" />}
+                  label="Name on PAN" 
+                  value={panDetails.name_as_per_pan} 
+                />
+                <DetailRow 
+                  icon={<Calendar className="w-4 h-4" />}
+                  label="Date of Birth" 
+                  value={panDetails.date_of_birth} 
+                />
+              </VerifiedDetailsCard>
+            )}
 
-        {/* PAN Verification Card - Step 1 */}
+            {/* Aadhaar Card - Mandatory */}
+            {aadhaarStatus === 'VERIFIED' && kycDetails?.aadhaar_kyc_data && (
+              <VerifiedDetailsCard 
+                title="Aadhaar Card" 
+                icon={<Fingerprint className="w-4 h-4 text-white" />}
+                color="from-purple-600 to-purple-500"
+              >
+                <DetailRow 
+                  icon={<User className="w-4 h-4" />}
+                  label="Name" 
+                  value={kycDetails.aadhaar_kyc_data.name} 
+                />
+                <DetailRow 
+                  icon={<Hash className="w-4 h-4" />}
+                  label="Aadhaar Number" 
+                  value={kycDetails.aadhaar_number}
+                  masked={true}
+                />
+                <DetailRow 
+                  icon={<Calendar className="w-4 h-4" />}
+                  label="Date of Birth" 
+                  value={kycDetails.aadhaar_kyc_data.date_of_birth} 
+                />
+              </VerifiedDetailsCard>
+            )}
+
+            {/* Bank Account - Mandatory */}
+            {bankStatus === 'VERIFIED' && kycDetails && (
+              <VerifiedDetailsCard 
+                title="Bank Account" 
+                icon={<Landmark className="w-4 h-4 text-white" />}
+                color="from-emerald-600 to-emerald-500"
+              >
+                <DetailRow 
+                  icon={<Building2 className="w-4 h-4" />}
+                  label="Bank Name" 
+                  value={kycDetails.bank_name} 
+                />
+                <DetailRow 
+                  icon={<Hash className="w-4 h-4" />}
+                  label="Account Number" 
+                  value={kycDetails.bank_account_number}
+                  masked={true}
+                />
+                <DetailRow 
+                  icon={<FileText className="w-4 h-4" />}
+                  label="IFSC Code" 
+                  value={kycDetails.ifsc_code} 
+                />
+              </VerifiedDetailsCard>
+            )}
+
+            {/* Demat Account - Optional - Only show if added */}
+            {dematAdded && (
+              <VerifiedDetailsCard 
+                title="Demat Account" 
+                icon={<Database className="w-4 h-4 text-white" />}
+                color="from-indigo-600 to-indigo-500"
+              >
+                <DetailRow 
+                  icon={<IdCard className="w-4 h-4" />}
+                  label="DP ID" 
+                  value={dematDetails.dp_id} 
+                />
+                <DetailRow 
+                  icon={<Hash className="w-4 h-4" />}
+                  label="Client ID" 
+                  value={dematDetails.client_id} 
+                />
+                <DetailRow 
+                  icon={<Building2 className="w-4 h-4" />}
+                  label="Depository" 
+                  value={dematDetails.depository} 
+                />
+              </VerifiedDetailsCard>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="w-full max-w-7xl mx-auto px-0 py-6 space-y-6">
+        {/* PAN Verification Card - Step 1 - Mandatory */}
         <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center relative">
                 <CreditCard className="w-6 h-6 text-blue-600" />
+                <Asterisk size={14} className="absolute -top-1 -right-1 text-rose-500" />
               </div>
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
-                    Step 1 of 4
+                    Step 1 of 3
                   </span>
                   <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
                     panStatus === 'VERIFIED' 
@@ -549,7 +703,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                     {panStatus === 'VERIFIED' ? "Verified" : panStatus === 'FAILED' ? "Failed" : "Pending"}
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">PAN Card Verification</h3>
+                <h3 className="text-lg font-bold text-slate-900">PAN Card Verification <span className="text-rose-500 text-sm">*</span></h3>
                 <p className="text-xs text-slate-500">Verify your PAN card for tax compliance</p>
               </div>
             </div>
@@ -558,7 +712,9 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">PAN Number</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                  PAN Number <span className="text-rose-500">*</span>
+                </label>
                 <input
                   className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100 uppercase"
                   value={panDetails.pan}
@@ -572,7 +728,9 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
               {panStatus !== 'VERIFIED' && (
                 <>
                   <div className="md:col-span-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Full Name as per PAN</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                      Full Name as per PAN <span className="text-rose-500">*</span>
+                    </label>
                     <input
                       className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
                       value={panDetails.name_as_per_pan}
@@ -582,13 +740,29 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                   </div>
 
                   <div className="md:col-span-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Date of Birth</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                      Date of Birth <span className="text-rose-500">*</span>
+                    </label>
                     <div className="flex gap-2">
                       <input
-                        type="date"
+                        type="text"
+                        placeholder="DD/MM/YYYY"
                         className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
                         value={panDetails.date_of_birth}
-                        onChange={(e) => setPanDetails({...panDetails, date_of_birth: e.target.value})}
+                        onChange={(e) => {
+                          let value = e.target.value.replace(/\D/g, '').slice(0, 8);
+
+                          if (value.length > 4) {
+                            value = `${value.slice(0, 2)}/${value.slice(2, 4)}/${value.slice(4)}`;
+                          } else if (value.length > 2) {
+                            value = `${value.slice(0, 2)}/${value.slice(2)}`;
+                          }
+
+                          setPanDetails({
+                            ...panDetails,
+                            date_of_birth: value
+                          });
+                        }}
                       />
                       <button
                         onClick={handleVerifyPan}
@@ -624,17 +798,18 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
           </div>
         </div>
 
-        {/* Aadhaar Verification Card - Step 2 */}
+        {/* Aadhaar Verification Card - Step 2 - Mandatory */}
         <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center relative">
                 <Fingerprint className="w-6 h-6 text-purple-600" />
+                <Asterisk size={14} className="absolute -top-1 -right-1 text-rose-500" />
               </div>
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
-                    Step 2 of 4
+                    Step 2 of 3
                   </span>
                   <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
                     aadhaarStatus === 'VERIFIED' 
@@ -646,7 +821,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                     {aadhaarStatus === 'VERIFIED' ? "Verified" : aadhaarStatus === 'FAILED' ? "Failed" : "Pending"}
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">Aadhaar Authentication</h3>
+                <h3 className="text-lg font-bold text-slate-900">Aadhaar Authentication <span className="text-rose-500 text-sm">*</span></h3>
                 <p className="text-xs text-slate-500">Verify your Aadhaar for identity proof</p>
               </div>
             </div>
@@ -656,7 +831,9 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
             {!otpSent && aadhaarStatus !== 'VERIFIED' && (
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Aadhaar Number</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                    Aadhaar Number <span className="text-rose-500">*</span>
+                  </label>
                   <input
                     className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
                     value={aadhaarNumber}
@@ -733,17 +910,18 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
           </div>
         </div>
 
-        {/* Bank Verification Card - Step 3 */}
+        {/* Bank Verification Card - Step 3 - Mandatory */}
         <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center relative">
                 <Landmark className="w-6 h-6 text-emerald-600" />
+                <Asterisk size={14} className="absolute -top-1 -right-1 text-rose-500" />
               </div>
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
-                    Step 3 of 4
+                    Step 3 of 3
                   </span>
                   <span className={`flex items-center gap-1 text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
                     bankStatus === 'VERIFIED' 
@@ -751,10 +929,10 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                       : "text-amber-600 bg-amber-50 border border-amber-100"
                   }`}>
                     {bankStatus === 'VERIFIED' ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />} 
-                    {bankStatus === 'VERIFIED' ? "Verified" : "Pending Verification"}
+                    {bankStatus === 'VERIFIED' ? "Verified" : "Pending"}
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">Bank Account Verification</h3>
+                <h3 className="text-lg font-bold text-slate-900">Bank Account Verification <span className="text-rose-500 text-sm">*</span></h3>
                 <p className="text-xs text-slate-500">Verify your bank account to enable transactions</p>
               </div>
             </div>
@@ -762,31 +940,40 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Bank Name</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                Bank Name <span className="text-rose-500">*</span>
+              </label>
               <input 
                 value={bankDetails.bank_name} 
                 onChange={(e) => setBankDetails({...bankDetails, bank_name: e.target.value})} 
                 placeholder="Enter Bank Name" 
                 className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100" 
+                disabled={bankStatus === 'VERIFIED'}
               />
             </div>
             <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Account Number</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                Account Number <span className="text-rose-500">*</span>
+              </label>
               <input 
                 value={bankDetails.bank_account_number} 
                 onChange={(e) => setBankDetails({...bankDetails, bank_account_number: e.target.value.replace(/\D/g, '')})} 
                 placeholder="Enter Account Number" 
                 className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100" 
+                disabled={bankStatus === 'VERIFIED'}
               />
             </div>
             <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">IFSC Code</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                IFSC Code <span className="text-rose-500">*</span>
+              </label>
               <div className="relative">
                 <input 
                   value={bankDetails.ifsc_code} 
                   onChange={(e) => setBankDetails({...bankDetails, ifsc_code: e.target.value.toUpperCase()})} 
                   placeholder="Enter IFSC Code" 
                   className="w-full px-4 py-2.5 rounded-xl text-sm font-medium tracking-widest text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100 pr-10" 
+                  disabled={bankStatus === 'VERIFIED'}
                 />
                 {fetchingBankDetails && (
                   <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 animate-spin" />
@@ -821,7 +1008,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
           )}
         </div>
 
-        {/* Demat Account Card - Step 4 */}
+        {/* Demat Account Card - Step 4 - Optional */}
         <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-4">
@@ -830,8 +1017,8 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
               </div>
               <div>
                 <div className="flex items-center gap-3 mb-1">
-                  <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-blue-100">
-                    Step 4 of 4
+                  <span className="px-2.5 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-indigo-100">
+                    Optional
                   </span>
                   {dematAdded && (
                     <span className="flex items-center gap-1 text-[10px] font-black uppercase px-2.5 py-1 rounded-full text-emerald-600 bg-emerald-50 border border-emerald-100">
@@ -840,7 +1027,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                     </span>
                   )}
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">Demat Account (Optional)</h3>
+                <h3 className="text-lg font-bold text-slate-900">Demat Account <span className="text-slate-400 text-sm font-normal">(Optional)</span></h3>
                 <p className="text-xs text-slate-500">Link your Demat account for trading</p>
               </div>
             </div>
@@ -861,7 +1048,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
-                    DP ID <span className="text-rose-500">*</span>
+                    DP ID
                   </label>
                   <input
                     type="text"
@@ -873,7 +1060,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                 </div>
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
-                    Client ID <span className="text-rose-500">*</span>
+                    Client ID
                   </label>
                   <input
                     type="text"
@@ -885,7 +1072,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                 </div>
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
-                    Depository <span className="text-rose-500">*</span>
+                    Depository
                   </label>
                   <select
                     value={dematDetails.depository}
@@ -898,7 +1085,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                 </div>
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
-                    Name on Demat <span className="text-rose-500">*</span>
+                    Name on Demat
                   </label>
                   <input
                     type="text"
@@ -934,13 +1121,12 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
           )}
         </div>
 
-        {/* Note: Global Save Button Removed - Each section saves independently */}
+        {/* Note */}
         <div className="flex justify-end pt-4">
           <p className="text-xs text-slate-400">
-            Each section saves automatically when you click Verify/Add
+            <span className="text-rose-500">*</span> Mandatory fields • Demat account is optional
           </p>
         </div>
-
       </div>
     </div>
   );
