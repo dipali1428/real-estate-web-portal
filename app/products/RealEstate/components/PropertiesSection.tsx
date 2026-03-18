@@ -7,7 +7,7 @@ import { properties as staticProperties, Property } from '../data/properties';
 import {
     Filter, Search, ChevronRight, Share2, Calculator,
     Info, Target, ExternalLink, Download, TrendingUp,
-    Clock, Shield, MapPin, X, Star, CheckCircle, Wallet, ChevronDown, ChevronUp, HelpCircle, Plus, Minus, IndianRupee, MinusSquare, PlusSquare, ChevronLeft
+    Clock, Shield, MapPin, X, Star, CheckCircle, Wallet, ChevronDown, ChevronUp, HelpCircle, Plus, Minus, IndianRupee, MinusSquare, PlusSquare, ChevronLeft, Layout, Zap
 } from 'lucide-react';
 
 
@@ -53,14 +53,6 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
         return staticProperties.filter(p => p.status === 'closed');
     }, []);
 
-    // Calculator State
-    const [calcData, setCalcData] = useState({
-        amount: 800000,
-        duration: 12,
-        loanRatio: 90, // Default 90%
-        yield: 8,
-        appreciation: 11.0975
-    });
 
     const [mounted, setMounted] = useState(false);
 
@@ -68,23 +60,6 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
         setMounted(true);
     }, []);
 
-    const handleIncrement = (field: 'amount' | 'loanRatio' | 'duration') => {
-        setCalcData(prev => {
-            if (field === 'amount') return { ...prev, amount: Math.min(prev.amount + 50000, 50000000) };
-            if (field === 'loanRatio') return { ...prev, loanRatio: Math.min(prev.loanRatio + 5, 95) };
-            if (field === 'duration') return { ...prev, duration: Math.min(prev.duration + 1, 120) };
-            return prev;
-        });
-    };
-
-    const handleDecrement = (field: 'amount' | 'loanRatio' | 'duration') => {
-        setCalcData(prev => {
-            if (field === 'amount') return { ...prev, amount: Math.max(prev.amount - 50000, 100000) };
-            if (field === 'loanRatio') return { ...prev, loanRatio: Math.max(prev.loanRatio - 5, 50) };
-            if (field === 'duration') return { ...prev, duration: Math.max(prev.duration - 1, 3) };
-            return prev;
-        });
-    };
 
     const faqs = [
         {
@@ -129,51 +104,45 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
         }
     ];
 
-    // Calculate graph data for investment projection
-    const graphData = useMemo(() => {
-        const data = [];
-        const principal = calcData.amount;
-        const monthlyYield = (calcData.yield / 100) / 12;
-        const appreciationRate = calcData.appreciation / 100;
 
-        // Duration in months
-        const totalMonths = calcData.duration;
-        const step = totalMonths <= 12 ? 1 : totalMonths <= 24 ? 3 : 12; // Monthly, Quarterly or Yearly steps
-
-        for (let m = 0; m <= totalMonths; m += step) {
-            const timeInYears = m / 12;
-            const totalValue = principal * Math.pow(1 + appreciationRate, timeInYears);
-            const appreciation = totalValue - principal;
-            const cumulativeRental = principal * (monthlyYield * m);
-
-            let label = '';
-            if (m === 0) label = 'Start';
-            else if (totalMonths <= 24) label = `${m}M`;
-            else label = `Yr ${Math.floor(m / 12)}`;
-
-            data.push({
-                year: label,
-                Principal: Math.round(principal),
-                Appreciation: Math.round(appreciation),
-                'Rental Income': Math.round(cumulativeRental),
-                Total: Math.round(totalValue + cumulativeRental)
-            });
-
-            // Ensure we hit the final month
-            if (m < totalMonths && m + step > totalMonths) {
-                const finalY = totalMonths / 12;
-                const finalVal = principal * Math.pow(1 + appreciationRate, finalY);
-                data.push({
-                    year: `${totalMonths}M`,
-                    Principal: Math.round(principal),
-                    Appreciation: Math.round(finalVal - principal),
-                    'Rental Income': Math.round(principal * (monthlyYield * totalMonths)),
-                    Total: Math.round(finalVal + (principal * (monthlyYield * totalMonths)))
-                });
-            }
+    const fractionalBenefits = [
+        {
+            title: "High Rental Yields",
+            description: "Earn stable passive income with institutional-grade commercial and residential assets.",
+            icon: TrendingUp,
+            color: "blue"
+        },
+        {
+            title: "Capital Appreciation",
+            description: "Benefit from the rising property values in India's top growth corridors.",
+            icon: Zap,
+            color: "teal"
+        },
+        {
+            title: "Low Entry Barrier",
+            description: "Access premium real estate with investments starting as low as ₹1 Lakh.",
+            icon: Wallet,
+            color: "indigo"
+        },
+        {
+            title: "Portfolio Diversification",
+            description: "Reduce risk by spreading your investment across multiple premium properties.",
+            icon: Layout,
+            color: "purple"
+        },
+        {
+            title: "Professional Management",
+            description: "Hassle-free ownership with end-to-end property and tenant management.",
+            icon: Shield,
+            color: "emerald"
+        },
+        {
+            title: "RERA Registered",
+            description: "Every project undergoes a 3-tier legal audit and is RERA-compliant.",
+            icon: CheckCircle,
+            color: "cyan"
         }
-        return data;
-    }, [calcData]);
+    ];
 
     const handleFilterChange = (field: string, value: string) => {
         setFilters(prev => ({ ...prev, [field]: value }));
@@ -183,9 +152,8 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
         setFilters({ search: '', type: '', minPrice: '', maxPrice: '' });
     };
 
-
     return (
-        <div id="properties" className="animate-fade-in">
+        <div id="properties" className="animate-fade-in font-sans">
             <div className="py-8 md:py-12 mb-6 md:mb-8 bg-white">
                 <div className="max-w-7xl mx-auto px-4 text-center">
                     <h1 className="text-4xl md:text-5xl font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
@@ -201,7 +169,7 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                 {/* Section: Live Opportunities */}
                 <div id="live" className="mb-12 scroll-mt-32">
                     <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
-                        <h2 className="text-4xl font-extrabold font-sans text-blue-600 text-brand-gradient">Live Projects</h2>
+                        <h2 className="text-4xl md:text-4xl font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Live Projects</h2>
 
                         <div className="flex gap-4 w-full md:w-auto max-w-xl justify-end">
                             <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-sm border border-slate-200 flex items-center px-4 flex-1 md:w-80 transition-all focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500">
@@ -272,7 +240,7 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                                 <div className="relative">
                                     <img src={property.image} alt={property.title} className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110" />
                                     <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-xs font-bold uppercase tracking-wider text-teal-600 border border-teal-100">
-                                        {property.type}
+                                        {property.type.split(' ')[0]}
                                     </div>
                                 </div>
 
@@ -430,6 +398,26 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                                 </div>
                             ))}
                         </div>
+
+                        {/* Dynamic Count Badge */}
+                        {closedProperties.length > 0 && (
+                            <div className="mt-8 flex justify-end pr-2">
+                                <div className="bg-white/80 backdrop-blur-md px-5 py-3 rounded-2xl border border-slate-200 shadow-[0_10px_30px_-10px_rgba(32,118,199,0.1)] flex items-center gap-4 animate-fade-in group hover:border-blue-300 transition-all duration-300">
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em] leading-none mb-1 group-hover:text-blue-500 transition-colors">Success Rate</span>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-2xl font-black text-slate-800 leading-none">
+                                                {String(closedProperties.length).padStart(2, '0')}
+                                            </span>
+                                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Assets Closed</span>
+                                        </div>
+                                    </div>
+                                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-[#2076C7] shadow-inner">
+                                        <CheckCircle size={22} strokeWidth={2.5} />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {closedProperties.length === 0 && (
@@ -440,257 +428,214 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                     )}
                 </div>
 
-                {/* Section: Feedback & Calculator */}
-                <section id="calculator" className="py-8 md:py-12 bg-slate-50 relative overflow-hidden md:-mx-8 px-4 md:px-8 mb-8 md:mb-12 rounded-[2rem] md:rounded-[3rem]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden">
+                {/* Section: Fractional Real Estate Benefits Carousel */}
+                <div className="mb-20 pt-12 border-t border-slate-200">
+    <div className="text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-extrabold mb-10 text-center text-brand-gradient font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+            Fractional Real Estate Benefits
+        </h2>
+        <p className="text-gray-600 max-w-4xl mx-auto font-medium text-lg">
+            Experience the advantages of modern property investment simplified for everyone.
+        </p>
+    </div>
 
-                            {/* Header */}
-                            <div className="bg-white border-b border-slate-50 py-8 sm:py-10 px-4 sm:px-6 text-center">
-                                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                                    <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
-                                        Investment Calculator
-                                    </h2>
-                                    <div className="w-24 h-1 bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] mx-auto rounded-full mb-6 opacity-30" />
-                                    <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
-                                        Calculate your potential returns and track your projected growth.
+    {/* Scroll Container */}
+    <div className="px-6 sm:px-10 lg:px-8">
+        <div
+            className="flex gap-8 overflow-x-auto scroll-smooth pb-4 px-2 custom-scrollbar"
+        >
+            {fractionalBenefits.map((benefit, idx) => (
+                <div
+                    key={idx}
+                    className="bg-white p-6 rounded-[1.5rem] shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 min-w-[150px] sm:min-w-[250px] max-w-[250px] shrink-0 group hover:-translate-y-3 text-center"
+                >
+                    <div className="w-16 h-16 rounded-2xl bg-blue-50 text-[#2076C7] mb-8 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-inner mx-auto">
+                        <benefit.icon size={32} strokeWidth={2.5} />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-4 text-gray-700">
+                        {benefit.title}
+                    </h3>
+                    <p className="text-slate-600 leading-relaxed font-medium text-lg">
+                        {benefit.description}
+                    </p>
+                </div>
+            ))}
+        </div>
+    </div>
+</div>
+                {/* Section: Investment Comparison */}
+                <div className="mb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+                    <div className="max-w-6xl mx-auto">
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl md:text-5xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
+                                Traditional vs Fractional
+                            </h2>
+                            <p className="text-gray-500 font-medium text-lg md:text-xl">
+                                Why smart investors are switching to fractional ownership.
+                            </p>
+                        </div>
+
+                        <div className="relative flex flex-col lg:flex-row gap-8 lg:gap-0 items-center">
+                            {/* Traditional Column */}
+                            <div className="w-full lg:w-1/2 bg-white rounded-[3rem] lg:rounded-r-none p-8 md:p-12 border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] lg:border-r-0 relative z-0">
+                                <div className="text-center mb-10">
+                                    <span className="px-5 py-2 bg-slate-100 rounded-full text-slate-500 font-bold text-xs uppercase tracking-widest">Traditional Way</span>
+                                    <h3 className="text-2xl font-black text-slate-600 mt-4 leading-tight">Single Property<br/>Investment</h3>
+                                    <p className="text-gray-600 font-medium text-base md:text-lg leading-relaxed mt-4">
+                                        Achieving your financial goals is our true achievement. We simplify the path to wealth through a structured and transparent investment process.
                                     </p>
-                                </motion.div>
+                                </div>
+                                
+                              <div className="space-y-10">
+                   {[
+                        { label: 'Min. Investment', value: '₹1 Cr - ₹10 Cr+', icon: Wallet },
+                        { label: 'Management', value: 'High Effort (Self)', icon: Shield },
+                        { label: 'Returns', value: 'Lower (2-3% Yield)', icon: TrendingUp },
+                        { label: 'Liquidity', value: 'Very Slow (Months)', icon: Zap },
+                        { label: 'Risk', value: 'High (Single Asset)', icon: Layout }
+                    ].map((item, i) => (
+                        <div key={i} className="flex items-center gap-8 group">
+            
+                           {/* Icon */}
+                                <div className="w-14 h-14 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-slate-100 group-hover:text-slate-400 transition-colors">
+                                    <item.icon size={26} />
+                                </div>
+
+                             {/* Text */}
+                                <div>
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+                                        {item.label}
+                                    </p>
+                                    <p className="text-lg md:text-xl font-semibold text-gray-700 leading-relaxed">
+                    {item.value}
+                </p>
+            </div>
+        </div>
+    ))}
+</div>
                             </div>
 
-                            <div className="p-4 sm:p-6 lg:p-10">
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-
-                                    {/* Left Column: Controls */}
-                                    <div className="space-y-8 lg:pr-8 lg:border-r border-slate-100 flex flex-col justify-center">
-                                        <div className="space-y-12">
-                                            {/* Investment Amount */}
-                                            <div className="space-y-4">
-                                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2">
-                                                    <label className="block text-lg md:text-xl font-extrabold text-gray-700">Investment Amount (₹)</label>
-                                                    <div className="flex items-center text-[#1CADA3] font-black text-xl sm:text-2xl md:text-3xl border border-slate-200 rounded-xl px-3 py-1.5 bg-white shadow-sm focus-within:border-[#2076C7] focus-within:ring-2 focus-within:ring-[#2076C7]/20 transition-all w-full sm:w-auto">
-                                                        <span>₹</span>
-                                                        <input 
-                                                            type="text" 
-                                                            value={calcData.amount.toLocaleString('en-IN')}
-                                                            onChange={(e) => {
-                                                                const val = e.target.value.replace(/[^0-9]/g, '');
-                                                                setCalcData({ ...calcData, amount: val ? parseInt(val) : 0 });
-                                                            }}
-                                                            className="bg-transparent outline-none text-right w-full sm:w-[140px] md:w-[180px] appearance-none"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-4 mt-2">
-                                                    <button onClick={() => handleDecrement('amount')} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-[#2076C7] transition-colors shrink-0 shadow-sm">
-                                                        <Minus size={16} strokeWidth={3} />
-                                                    </button>
-                                                    <div className="flex-grow">
-                                                        <input
-                                                            type="range"
-                                                            min="100000"
-                                                            max="50000000"
-                                                            step="50000"
-                                                            value={calcData.amount}
-                                                            onChange={(e) => setCalcData({ ...calcData, amount: parseInt(e.target.value) })}
-                                                            className="w-full h-2.5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[5px] [&::-webkit-slider-thumb]:border-[#2076C7] hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
-                                                            style={{
-                                                                background: `linear-gradient(to right, #2076C7 ${Math.min(100, Math.max(0, ((calcData.amount - 100000) / (50000000 - 100000)) * 100))}%, #e2e8f0 ${Math.min(100, Math.max(0, ((calcData.amount - 100000) / (50000000 - 100000)) * 100))}%, #e2e8f0 100%)`
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <button onClick={() => handleIncrement('amount')} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-[#2076C7] transition-colors shrink-0 shadow-sm">
-                                                        <Plus size={16} strokeWidth={3} />
-                                                    </button>
-                                                </div>
-                                                <div className="flex justify-between text-xs font-bold text-slate-400 px-12">
-                                                    <span>₹1 Lakh</span>
-                                                    <span>₹5 Cr</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Loan to LLP Ratio */}
-                                            <div className="space-y-4">
-                                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2">
-                                                    <label className="block text-lg md:text-xl font-extrabold text-gray-700">Loan to LLP Ratio (%)</label>
-                                                    <div className="flex items-center text-[#1CADA3] font-black text-xl sm:text-2xl md:text-3xl border border-slate-200 rounded-xl px-3 py-1.5 bg-white shadow-sm focus-within:border-[#2076C7] focus-within:ring-2 focus-within:ring-[#2076C7]/20 transition-all w-full sm:w-auto">
-                                                        <input 
-                                                            type="text" 
-                                                            value={calcData.loanRatio}
-                                                            onChange={(e) => {
-                                                                const val = e.target.value.replace(/[^0-9]/g, '');
-                                                                setCalcData({ ...calcData, loanRatio: val ? parseInt(val) : 0 });
-                                                            }}
-                                                            className="bg-transparent outline-none text-right w-full sm:w-[60px] md:w-[80px] appearance-none"
-                                                        />
-                                                        <span>%</span>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-4 mt-2">
-                                                    <button onClick={() => handleDecrement('loanRatio')} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-[#2076C7] transition-colors shrink-0 shadow-sm">
-                                                        <Minus size={16} strokeWidth={3} />
-                                                    </button>
-                                                    <div className="flex-grow">
-                                                        <input
-                                                            type="range"
-                                                            min="50"
-                                                            max="95"
-                                                            step="5"
-                                                            value={calcData.loanRatio}
-                                                            onChange={(e) => setCalcData({ ...calcData, loanRatio: parseInt(e.target.value) })}
-                                                            className="w-full h-2.5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[5px] [&::-webkit-slider-thumb]:border-[#2076C7] hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
-                                                            style={{
-                                                                background: `linear-gradient(to right, #2076C7 ${Math.min(100, Math.max(0, ((calcData.loanRatio - 50) / (95 - 50)) * 100))}%, #e2e8f0 ${Math.min(100, Math.max(0, ((calcData.loanRatio - 50) / (95 - 50)) * 100))}%, #e2e8f0 100%)`
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <button onClick={() => handleIncrement('loanRatio')} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-[#2076C7] transition-colors shrink-0 shadow-sm">
-                                                        <Plus size={16} strokeWidth={3} />
-                                                    </button>
-                                                </div>
-                                                <div className="flex justify-between text-xs font-bold text-slate-400 px-12">
-                                                    <span>50%</span>
-                                                    <span>95% Trend</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Duration */}
-                                            <div className="space-y-4">
-                                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2">
-                                                    <label className="block text-lg md:text-xl font-extrabold text-gray-700">Duration</label>
-                                                    <div className="flex items-center text-[#1CADA3] font-black text-xl sm:text-2xl md:text-3xl border border-slate-200 rounded-xl px-3 py-1.5 bg-white shadow-sm focus-within:border-[#2076C7] focus-within:ring-2 focus-within:ring-[#2076C7]/20 transition-all w-full sm:w-auto">
-                                                        <input 
-                                                            type="text" 
-                                                            value={calcData.duration}
-                                                            onChange={(e) => {
-                                                                const val = e.target.value.replace(/[^0-9]/g, '');
-                                                                setCalcData({ ...calcData, duration: val ? parseInt(val) : 0 });
-                                                            }}
-                                                            className="bg-transparent outline-none text-right w-full sm:w-[60px] md:w-[80px] appearance-none"
-                                                        />
-                                                        <span className="ml-2 text-lg sm:text-xl md:text-2xl mt-1">Months</span>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-4 mt-2">
-                                                    <button onClick={() => handleDecrement('duration')} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-[#2076C7] transition-colors shrink-0 shadow-sm">
-                                                        <Minus size={16} strokeWidth={3} />
-                                                    </button>
-                                                    <div className="flex-grow">
-                                                        <input
-                                                            type="range"
-                                                            min="3"
-                                                            max="120"
-                                                            step="1"
-                                                            value={calcData.duration}
-                                                            onChange={(e) => setCalcData({ ...calcData, duration: parseInt(e.target.value) })}
-                                                            className="w-full h-2.5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[5px] [&::-webkit-slider-thumb]:border-[#2076C7] hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
-                                                            style={{
-                                                                background: `linear-gradient(to right, #2076C7 ${Math.min(100, Math.max(0, ((calcData.duration - 3) / (120 - 3)) * 100))}%, #e2e8f0 ${Math.min(100, Math.max(0, ((calcData.duration - 3) / (120 - 3)) * 100))}%, #e2e8f0 100%)`
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <button onClick={() => handleIncrement('duration')} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-[#2076C7] transition-colors shrink-0 shadow-sm">
-                                                        <Plus size={16} strokeWidth={3} />
-                                                    </button>
-                                                </div>
-                                                <div className="flex justify-between text-xs font-bold text-slate-400 px-12">
-                                                    <span>3 Months</span>
-                                                    <span>10 Years</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Right Column: Visuals & Summary */}
-                                    <div className="flex flex-col">
-                                        {/* Summary Box */}
-                                        <div className="rounded-[1.5rem] sm:rounded-[2.5rem] border p-5 sm:p-8 flex-grow flex flex-col bg-gradient-to-br from-[#f0f9ff] to-[#e0f2fe] border-[#bae6fd] shadow-[0_10px_25px_-5px_rgba(32,118,199,0.1)]">
-                                            <div className="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-6 border-l-4 border-[#2076C7] pl-4 sm:pl-5">
-                                                <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#2076C7] tracking-tight">Projected Returns</h3>
-                                            </div>
-                                            <div className="space-y-3 sm:space-y-4 mb-5 sm:mb-6">
-                                                <div className="flex justify-between items-center py-2 border-b border-blue-100">
-                                                    <span className="text-sm sm:text-base font-bold text-slate-600">Total Cost</span>
-                                                    <span className="text-base sm:text-lg font-extrabold text-[#1e293b]">₹{calcData.amount.toLocaleString('en-IN')}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center py-2 border-b border-blue-100">
-                                                    <span className="text-sm sm:text-base font-bold text-slate-600">Capital</span>
-                                                    <span className="text-base sm:text-lg font-extrabold text-[#1e293b]">₹{Math.round(calcData.amount * ((100 - calcData.loanRatio) / 100)).toLocaleString('en-IN')}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center py-2 border-b border-blue-100">
-                                                    <span className="text-sm sm:text-base font-bold text-slate-600">Loan ({calcData.loanRatio}%)</span>
-                                                    <span className="text-base sm:text-lg font-extrabold text-[#1e293b]">₹{Math.round(calcData.amount * (calcData.loanRatio / 100)).toLocaleString('en-IN')}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center py-2 border-b border-blue-100">
-                                                    <span className="text-sm sm:text-base font-bold text-slate-600">Interest</span>
-                                                    <span className="text-base sm:text-lg font-extrabold text-green-600">+₹{Math.round(calcData.amount * (calcData.loanRatio / 100) * 0.08 * (calcData.duration / 12)).toLocaleString('en-IN')}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center py-2 border-b border-blue-100">
-                                                    <span className="text-sm sm:text-base font-bold text-slate-600">Cap. Gain</span>
-                                                    <span className="text-base sm:text-lg font-extrabold text-[#1e293b]">₹{Math.round(calcData.amount * 0.110975).toLocaleString('en-IN')}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center py-2 border-b border-blue-100">
-                                                    <span className="text-sm sm:text-base font-bold text-slate-600">Tax</span>
-                                                    <span className="text-base sm:text-lg font-extrabold text-red-500">-₹{Math.round(calcData.amount * 0.110975 * (calcData.duration > 24 ? 0.20 : 0.312)).toLocaleString('en-IN')}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center py-3 bg-yellow-100/80 rounded-xl px-4 mt-2">
-                                                    <span className="text-sm sm:text-base font-black text-slate-800">Post Tax XIRR</span>
-                                                    <span className="text-lg sm:text-xl md:text-2xl font-black text-[#1e3a8a]">{calcData.duration > 24 ? '16.5%' : '14.84%'}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center py-4 mt-4 border-t-2 border-blue-200">
-                                                    <span className="text-base sm:text-lg font-black text-slate-700 uppercase">Total In-Hand</span>
-                                                    <span className="text-xl sm:text-2xl md:text-3xl font-black text-[#2076C7]">₹{Math.round(calcData.amount + (calcData.amount * (calcData.loanRatio / 100) * 0.08 * (calcData.duration / 12)) + (calcData.amount * 0.110975 * (1 - (calcData.duration > 24 ? 0.20 : 0.312)))).toLocaleString('en-IN')}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                    </div>
+                            {/* VS Badge */}
+                            <div className="relative lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-20 flex items-center justify-center">
+                                <div className="hidden lg:block absolute h-[110%] w-px bg-slate-100 left-1/2 -translate-x-1/2 -top-[5%]"></div>
+                                <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full shadow-[0_10px_40px_rgba(32,118,199,0.2)] border-2 border-slate-50 flex items-center justify-center relative z-10">
+                                    <span className="text-2xl md:text-3xl font-black bg-linear-to-br from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">VS</span>
                                 </div>
                             </div>
+
+                            {/* Fractional Column */}
+                           <div className="w-full lg:w-1/2 bg-gradient-to-br from-blue-50/50 via-white to-blue-50/30 rounded-[3rem] lg:rounded-l-none p-8 md:p-12 border-2 border-[#1CADA3]/20 shadow-[0_30px_70px_rgba(28,173,163,0.1)] relative z-10 lg:-ml-0.5 scale-100 lg:scale-105">
+    
+    {/* Header */}
+    <div className="text-center mb-8">
+        <span className="px-6 py-2 bg-teal-50 text-[#1CADA3] rounded-full font-bold text-sm uppercase tracking-widest border border-teal-100">
+            Smart Choice
+        </span>
+
+        <h3 className="text-3xl md:text-4xl font-black text-[#1CADA3] mt-4 leading-tight">
+            Fractional<br/>Ownership
+        </h3>
+
+        <p className="text-gray-600 font-medium text-lg md:text-xl leading-relaxed mt-3 max-w-md mx-auto">
+            Achieving your financial goals is our true achievement. We simplify the path to wealth through a structured & transparent investment process.
+        </p>
+    </div>
+
+    {/* Features */}
+    <div className="space-y-6">
+        {[
+            { label: 'Min. Investment', value: 'Starts at ₹8 Lakh', icon: Wallet },
+            { label: 'Management', value: 'Zero Effort (Experts)', icon: Shield },
+            { label: 'Returns', value: 'High (8-10% Yield)', icon: TrendingUp },
+            { label: 'Liquidity', value: 'Fast (Marketplace)', icon: Zap },
+            { label: 'Risk', value: 'Low (Diversified)', icon: Layout }
+        ].map((item, i) => (
+            <div key={i} className="flex items-center gap-8 group">
+                
+                {/* Icon */}
+                <div className="w-14 h-14 rounded-xl bg-teal-50 flex items-center justify-center text-[#1CADA3] group-hover:bg-[#1CADA3] group-hover:text-white transition-all duration-300 shadow-inner">
+                    <item.icon size={26} />
+                </div>
+
+                {/* Text */}
+                <div>
+                    <p className="text-xs font-bold text-teal-400 uppercase tracking-wider mb-1">
+                        {item.label}
+                    </p>
+                    <p className="text-xl md:text-2xl font-black text-slate-600 leading-snug">
+                        {item.value}
+                    </p>
+                </div>
+            </div>
+        ))}
+    </div>
+    
+    {/* CTA */}
+    <div className="mt-8 pt-6 border-t border-blue-100 text-center">
+        <button
+            onClick={() => {
+                const el = document.getElementById('live');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="text-[#2076C7] font-bold text-base uppercase tracking-[0.2em] hover:tracking-[0.25em] transition-all flex items-center justify-center gap-3 mx-auto group"
+        >
+            Check Opportunities
+            <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                <Plus size={16} />
+            </div>
+        </button>
+    </div>
+
+</div>
                         </div>
                     </div>
-                </section>
+                </div>
 
-                    {/* Legal & Tax Explanation Section */}
-                    <div className="mt-12 md:mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
-                        <div className="bg-white p-6 sm:p-8 md:p-10 rounded-3xl md:rounded-[2.5rem] border border-slate-200 shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:shadow-[0_30px_70px_rgba(0,0,0,0.08)] hover:border-blue-300 hover:-translate-y-1 cursor-pointer transition-all duration-300">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="p-3 bg-blue-50/50 rounded-2xl">
-                                    <Shield size={28} className="text-blue-600" />
+                {/* Legal & Tax Explanation Section */}
+                    <div className="mt-12 md:mt-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+                        <div className="group relative bg-gradient-to-br from-blue-50/80 via-white to-blue-50/30 p-10 rounded-[3rem] border border-blue-100/50 shadow-[0_20px_60px_-15px_rgba(32,118,199,0.08)] hover:shadow-[0_40px_80px_-20px_rgba(32,118,199,0.15)] hover:border-blue-300 hover:-translate-y-2 transition-all duration-500 overflow-hidden text-center">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100/20 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-blue-200/40 transition-colors"></div>
+                            
+                            <div className="relative z-10">
+                                <div className="inline-flex p-5 bg-white rounded-[2rem] shadow-sm mb-8 group-hover:scale-110 transition-transform duration-500 border border-blue-50">
+                                    <Shield size={36} className="text-[#2076C7]" />
                                 </div>
-                                <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Legal Structure (LLP)</h3>
+                                <h3 className="text-2xl font-extrabold text-slate-800 mb-6 tracking-tight">Legal Structure (LLP)</h3>
+                                <p className="text-slate-600 leading-relaxed text-lg font-medium">
+                                    You directly become a <b className="text-[#2076C7]">legal partner</b> in the property. Your name is registered on the verified documents,
+                                    giving you legal co-ownership of the asset just like owning a share of the property itself.
+                                </p>
                             </div>
-                            <p className="text-slate-600 leading-relaxed text-base sm:text-lg">
-                                You directly become a <b className="text-blue-600">legal partner</b> in the property. Your name is registered on the verified documents,
-                                giving you legal co-ownership of the asset just like owning a share of the property itself.
-                            </p>
                         </div>
 
-                        <div className="bg-white p-6 sm:p-8 md:p-10 rounded-3xl md:rounded-[2.5rem] border border-slate-200 shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:shadow-[0_30px_70px_rgba(0,0,0,0.08)] hover:border-teal-300 hover:-translate-y-1 cursor-pointer transition-all duration-300">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="p-3 bg-teal-50/50 rounded-2xl">
-                                    <TrendingUp size={28} className="text-teal-600" />
+                        <div className="group relative bg-gradient-to-br from-teal-50/80 via-white to-teal-50/30 p-10 rounded-[3rem] border border-teal-100/50 shadow-[0_20px_60px_-15px_rgba(28,173,163,0.08)] hover:shadow-[0_40px_80px_-20px_rgba(28,173,163,0.15)] hover:border-teal-300 hover:-translate-y-2 transition-all duration-500 overflow-hidden text-center">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-teal-100/20 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-teal-200/40 transition-colors"></div>
+                            
+                            <div className="relative z-10">
+                                <div className="inline-flex p-5 bg-white rounded-[2rem] shadow-sm mb-8 group-hover:scale-110 transition-transform duration-500 border border-teal-50">
+                                    <TrendingUp size={36} className="text-[#1CADA3]" />
                                 </div>
-                                <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Buy-Back Agreement</h3>
+                                <h3 className="text-2xl font-extrabold text-slate-800 mb-6 tracking-tight">Buy-Back Agreement</h3>
+                                <p className="text-slate-600 leading-relaxed text-lg font-medium">
+                                    We guarantee your exit. At the end of the term, your share is <b className="text-[#1CADA3]">bought back at a higher price</b>
+                                    (Principal + Appreciation), ensuring your investment returns are safe and timely.
+                                </p>
                             </div>
-                            <p className="text-slate-600 leading-relaxed text-base sm:text-lg">
-                                We guarantee your exit. At the end of the term, your share is <b className="text-teal-600">bought back at a higher price</b>
-                                (Principal + Appreciation), ensuring your investment returns are safe and timely.
-                            </p>
                         </div>
 
-                        <div className="bg-white p-6 sm:p-8 md:p-10 rounded-3xl md:rounded-[2.5rem] border border-slate-200 shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:shadow-[0_30px_70px_rgba(0,0,0,0.08)] hover:border-indigo-300 hover:-translate-y-1 cursor-pointer transition-all duration-300">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="p-3 bg-indigo-50/50 rounded-2xl">
-                                    <IndianRupee size={28} className="text-indigo-600" />
+                        <div className="group relative bg-gradient-to-br from-indigo-50/80 via-white to-indigo-50/30 p-10 rounded-[3rem] border border-indigo-100/50 shadow-[0_20px_60px_-15px_rgba(79,70,229,0.08)] hover:shadow-[0_40px_80px_-20px_rgba(79,70,229,0.15)] hover:border-indigo-300 hover:-translate-y-2 transition-all duration-500 overflow-hidden text-center">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-100/20 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-indigo-200/40 transition-colors"></div>
+                            
+                            <div className="relative z-10">
+                                <div className="inline-flex p-5 bg-white rounded-[2rem] shadow-sm mb-8 group-hover:scale-110 transition-transform duration-500 border border-indigo-50">
+                                    <IndianRupee size={36} className="text-indigo-600" />
                                 </div>
-                                <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Tax Knowledge</h3>
+                                <h3 className="text-2xl font-extrabold text-slate-800 mb-6 tracking-tight">Tax Knowledge</h3>
+                                <p className="text-slate-600 leading-relaxed text-lg font-medium">
+                                    Tax is simple. <b className="text-indigo-600">10% TDS</b> is deducted on monthly interest. You get <b>90% directly in your bank</b>.
+                                    Capital gains tax applies only on the final profit when you exit.
+                                </p>
                             </div>
-                            <p className="text-slate-600 leading-relaxed text-base sm:text-lg">
-                                Tax is simple. <b className="text-indigo-600">10% TDS</b> is deducted on monthly interest. You get <b>90% directly in your bank</b>.
-                                Capital gains tax applies only on the final profit when you exit.
-                            </p>
                         </div>
                     </div>
 
@@ -705,6 +650,7 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                         </p>
                     </div>
                 </div>
+
 
                 {/* FAQ Section */}
                 <section id="faq" className="py-6 mt-10 border-t border-slate-200 pt-10">
@@ -775,91 +721,89 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
             </div>
 
             {/* Feedback Form Modal */}
-            {
-                showFeedbackForm && (
-                    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4" onClick={() => setShowFeedbackForm(false)}>
-                        <div className="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl relative animate-fade-in" onClick={e => e.stopPropagation()}>
-                            <button
-                                onClick={() => setShowFeedbackForm(false)}
-                                className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"
-                            >
-                                <X size={20} />
+            {showFeedbackForm && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4" onClick={() => setShowFeedbackForm(false)}>
+                    <div className="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl relative animate-fade-in" onClick={e => e.stopPropagation()}>
+                        <button
+                            onClick={() => setShowFeedbackForm(false)}
+                            className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"
+                        >
+                            <X size={20} />
+                        </button>
+
+                        <h3 className="text-3xl font-extrabold mb-2 text-brand-gradient">Share Feedback</h3>
+                        <p className="text-slate-500 mb-8">We value your input! Tell us about your investment experience.</p>
+
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            alert("Thank you for your valuable feedback! It will be listed after moderation.");
+                            setShowFeedbackForm(false);
+                            setNewFeedback({ name: '', role: '', text: '', rating: 5 });
+                        }} className="space-y-6">
+                            <div>
+                                <label className="block font-bold text-slate-800 mb-2">Full Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="Enter your name"
+                                    value={newFeedback.name}
+                                    onChange={(e) => setNewFeedback({ ...newFeedback, name: e.target.value })}
+                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block font-bold text-slate-800 mb-2">Professional Role</label>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="e.g. Software Engineer"
+                                    value={newFeedback.role}
+                                    onChange={(e) => setNewFeedback({ ...newFeedback, role: e.target.value })}
+                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block font-bold text-slate-800 mb-2">Rating</label>
+                                <div className="flex gap-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            type="button"
+                                            onClick={() => setNewFeedback({ ...newFeedback, rating: star })}
+                                            className="focus:outline-none transition-transform hover:scale-110"
+                                        >
+                                            <Star
+                                                size={32}
+                                                fill={star <= newFeedback.rating ? "#F59E0B" : "none"}
+                                                color={star <= newFeedback.rating ? "#F59E0B" : "#cbd5e1"}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block font-bold text-slate-800 mb-2">Your Review</label>
+                                <textarea
+                                    required
+                                    rows={4}
+                                    placeholder="Share your thoughts..."
+                                    value={newFeedback.text}
+                                    onChange={(e) => setNewFeedback({ ...newFeedback, text: e.target.value })}
+                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors resize-none"
+                                ></textarea>
+                            </div>
+
+                            <button type="submit" className="btn-brand w-full py-4 rounded-xl text-base">
+                                Submit Feedback
                             </button>
-
-                            <h3 className="text-3xl font-extrabold mb-2 text-brand-gradient">Share Feedback</h3>
-                            <p className="text-slate-500 mb-8">We value your input! Tell us about your investment experience.</p>
-
-                            <form onSubmit={(e) => {
-                                e.preventDefault();
-                                alert("Thank you for your valuable feedback! It will be listed after moderation.");
-                                setShowFeedbackForm(false);
-                                setNewFeedback({ name: '', role: '', text: '', rating: 5 });
-                            }} className="space-y-6">
-                                <div>
-                                    <label className="block font-bold text-slate-800 mb-2">Full Name</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="Enter your name"
-                                        value={newFeedback.name}
-                                        onChange={(e) => setNewFeedback({ ...newFeedback, name: e.target.value })}
-                                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block font-bold text-slate-800 mb-2">Professional Role</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="e.g. Software Engineer"
-                                        value={newFeedback.role}
-                                        onChange={(e) => setNewFeedback({ ...newFeedback, role: e.target.value })}
-                                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block font-bold text-slate-800 mb-2">Rating</label>
-                                    <div className="flex gap-2">
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <button
-                                                key={star}
-                                                type="button"
-                                                onClick={() => setNewFeedback({ ...newFeedback, rating: star })}
-                                                className="focus:outline-none transition-transform hover:scale-110"
-                                            >
-                                                <Star
-                                                    size={32}
-                                                    fill={star <= newFeedback.rating ? "#F59E0B" : "none"}
-                                                    color={star <= newFeedback.rating ? "#F59E0B" : "#cbd5e1"}
-                                                />
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block font-bold text-slate-800 mb-2">Your Review</label>
-                                    <textarea
-                                        required
-                                        rows={4}
-                                        placeholder="Share your thoughts..."
-                                        value={newFeedback.text}
-                                        onChange={(e) => setNewFeedback({ ...newFeedback, text: e.target.value })}
-                                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors resize-none"
-                                    ></textarea>
-                                </div>
-
-                                <button type="submit" className="btn-brand w-full py-4 rounded-xl text-base">
-                                    Submit Feedback
-                                </button>
-                            </form>
-                        </div>
+                        </form>
                     </div>
-                )
-            }
-        </div >
+                </div>
+            )}
+        </div>
     );
 };
 

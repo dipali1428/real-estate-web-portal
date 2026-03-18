@@ -9,7 +9,7 @@ export default function StrategyAllocationCalculator() {
     const [totalInvestment, setTotalInvestment] = useState(20000000); // ₹2 Cr
     const [strategies, setStrategies] = useState([
         { id: 'ntdop', name: 'NTDOP Strategy', allocation: 40, expectedReturn: 15, risk: 'High', color: 'bg-primary' },
-        { id: 'value', name: 'Value Migration', allocation: 30, expectedReturn: 12, risk: 'Medium', color: 'bg-teal-500' },
+        { id: 'value', name: 'Value Migration', allocation: 30, expectedReturn: 12, risk: 'Medium', color: 'bg-[#1CADA3]' },
         { id: 'founders', name: 'Founders Portfolio', allocation: 20, expectedReturn: 18, risk: 'High', color: 'bg-indigo-500' },
         { id: 'ethical', name: 'Ethical Strategy', allocation: 10, expectedReturn: 10, risk: 'Low', color: 'bg-amber-500' }
     ]);
@@ -92,7 +92,7 @@ export default function StrategyAllocationCalculator() {
                             <div className="flex justify-between text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">
                                 <span>₹{new Intl.NumberFormat('en-IN').format(Math.round(totalInvestment * strategy.allocation / 100))}</span>
                                 <span className="flex gap-2">
-                                    Risk: <span className={strategy.risk === 'High' ? 'text-red-500' : strategy.risk === 'Medium' ? 'text-amber-500' : 'text-teal-500'}>{strategy.risk}</span>
+                                    Risk: <span className={strategy.risk === 'High' ? 'text-red-500' : strategy.risk === 'Medium' ? 'text-amber-500' : 'text-[#1CADA3]'}>{strategy.risk}</span>
                                     <span className="text-gray-200">|</span>
                                     Exp: {strategy.expectedReturn}%
                                 </span>
@@ -140,7 +140,7 @@ export default function StrategyAllocationCalculator() {
                         </div>
                     </div>
 
-                    <div className="p-8 bg-blue-50/50 rounded-[2.5rem] border border-blue-100">
+                    <div className="p-8 bg-[#2076C7]/5 rounded-[2.5rem] border border-[#2076C7]/10">
                         <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2">
                             <Target size={14} /> Allocation Insight
                         </h4>

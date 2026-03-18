@@ -4,7 +4,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { properties as staticProperties } from '../data/properties';
-import { MapPin, CheckCircle, Info, Layout, Shield, Dumbbell, Zap, Coffee, X, Share2, Download, Loader } from 'lucide-react';
+import { MapPin, CheckCircle, Info, Layout, Shield, Dumbbell, Zap, Coffee, X, Share2, Download, Loader, Calculator, FileText } from 'lucide-react';
+import InvestmentCalculator, { calculateInvestmentData } from './InvestmentCalculator';
 
 interface RealEstatePropertyDetailsModalProps {
     propertyId: string;
@@ -13,9 +14,17 @@ interface RealEstatePropertyDetailsModalProps {
 }
 
 const PropertyInfographic = ({ property }: { property: any }) => {
+    const calcData = calculateInvestmentData(
+        property.price,
+        property.irr_percentage || 12.5,
+        property.yield_percentage || 8,
+        property.holding_period
+    );
+
     return (
         <div className="bg-white border-2 border-slate-200 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl w-full font-sans text-slate-800 mb-8 mx-auto">
             <div className="flex flex-col lg:flex-row">
+                {/* ... (points section unchanged) */}
                 {/* Left Side: Educational Points */}
                 <div className="w-full lg:w-[35%] bg-blue-50/30 p-6 sm:p-8 border-b-2 lg:border-b-0 lg:border-r-2 border-slate-100">
                     <div className="space-y-12">
@@ -38,37 +47,35 @@ const PropertyInfographic = ({ property }: { property: any }) => {
                         ))}
                     </div>
 
-                    {/* Partner Logos */}
-                    <div className="mt-16 pt-8 border-t border-slate-200">
-                        <div className="grid grid-cols-4 gap-4 items-center">
+                    {/* Required Documents Section */}
+                    <div className="mt-16 pt-10 border-t-2 border-slate-100">
+                        <div className="flex items-center gap-4 mb-10 group">
+                            <div className="text-[#1CADA3] drop-shadow-sm">
+                                <FileText size={22} strokeWidth={3} />
+                            </div>
+                            <span className="text-[16px] font-black text-[#2076C7] tracking-wider uppercase">DOCUMENTS REQUIRED TO INVEST</span>
+                        </div>
+                        <div className="grid grid-cols-1 gap-5">
                             {[
-                                { label: 'Legal Advisor', img: '/Logos/legal_advisor.png' },
-                                { label: 'Security Trustee', img: '/Logos/security_trustee.png' },
-                                { label: 'KYC Partner', img: '/Logos/kyc_partner.png' },
-                                { label: 'Land Record', img: '/Logos/it_partner.png' }
-                            ].map((partner, i) => (
-                                <div key={i} className="text-center">
-                                    <div className="h-10 w-full bg-slate-50 rounded flex items-center justify-center mb-1 overflow-hidden border border-slate-100">
-                                        <img src={partner.img} alt={partner.label} className="h-full w-full object-contain opacity-80" />
+                                "PAN CARD COPY",
+                                "AADHAAR NUMBER WITH ADDRESS",
+                                "EMAIL ID",
+                                "MOBILE NUMBER LINKED WITH AADHAAR",
+                                "PHOTO"
+                            ].map((doc, i) => (
+                                <div key={i} className="flex items-center gap-4 py-1 transition-all">
+                                    <div className="text-[#2076C7]">
+                                        <CheckCircle size={18} strokeWidth={3} />
                                     </div>
-                                    <span className="text-[7px] font-black uppercase text-slate-400 block leading-none">{partner.label}</span>
+                                    <span className="text-[13px] font-black text-slate-700 tracking-wide uppercase leading-none">{doc}</span>
                                 </div>
                             ))}
                         </div>
-                        <div className="grid grid-cols-4 gap-4 items-center mt-6">
-                            {[
-                                { label: 'IT Partner', img: '/Logos/it_partner.png' },
-                                { label: 'Developer Due Diligence', img: '/Logos/legal_advisor.png' },
-                                { label: 'Digital Doc Partner', img: '/Logos/kyc_partner.png' },
-                                { label: 'Sales Partner', img: '/Logos/security_trustee.png' }
-                            ].map((partner, i) => (
-                                <div key={i} className="text-center">
-                                    <div className="h-10 w-full bg-slate-50 rounded flex items-center justify-center mb-1 overflow-hidden border border-slate-100">
-                                        <img src={partner.img} alt={partner.label} className="h-full w-full object-contain opacity-80" />
-                                    </div>
-                                    <span className="text-[7px] font-black uppercase text-slate-400 block leading-none">{partner.label}</span>
-                                </div>
-                            ))}
+                        <div className="mt-10 text-[12px] font-bold text-slate-500 italic flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                                <Info size={16} className="text-[#2076C7]" />
+                            </div>
+                            Digital documents are accepted
                         </div>
                     </div>
                 </div>
@@ -91,19 +98,13 @@ const PropertyInfographic = ({ property }: { property: any }) => {
                     </div>
 
                     <div className="flex flex-col sm:flex-row">
-                        {/* Property Image */}
-                        <div className="w-full sm:w-[38%] p-2">
-                            <div className="rounded-xl overflow-hidden border-2 border-slate-100 h-full shadow-inner">
-                                <img src={property.image} className="w-full h-full object-cover" />
-                            </div>
-                        </div>
 
                         {/* Property Data Table */}
-                        <div className="w-full sm:w-[62%] p-2">
+                        <div className="w-full p-2">
                             <div className="space-y-4 p-2">
                                 {[
                                     { label: 'NAME OF DEVELOPER', value: property.developer },
-                                    { label: 'TYPE OF PROJECT', value: (property.type || 'Residential') + ' PROJECT' },
+                                    { label: 'TYPE OF PROJECT', value: property.type?.toUpperCase().includes('PROJECT') ? property.type : (property.type || 'Residential') + ' PROJECT' },
                                     { label: 'CURRENT STATUS', value: 'RCC & BRICK WORK COMPLETED, INTERNAL WORK GOING ON', highlight: true },
                                     { label: 'RERA', value: 'YES' },
                                     { label: 'SANCTIONS OBTAINED', value: property.sanctions_obtained || 'YES' },
@@ -129,7 +130,7 @@ const PropertyInfographic = ({ property }: { property: any }) => {
                                     { label: 'MARKET PRICE (ALL INCL.)', value: `Rs. ${(property.market_price ? property.market_price / 10000000 : 1).toFixed(2)} CR. (Rs. ${(property.market_price && property.area ? Math.round(property.market_price / property.area) : 5500)} / SQ. FT.)` },
                                     { label: 'DISCOUNTED PRICE (ALL INCL.)', value: `Rs. ${(property.price / 10000000).toFixed(2)} CR. (Rs. ${Math.round(property.price / (property.area || 1000))} / SQ. FT.)`, brand: true },
                                     { label: 'BUY BACK DURATION', value: property.holding_period || '12 MONTHS' },
-                                    { label: 'BUY BACK PRICE (ALL INCL.)', value: `Rs. ${(property.price * 1.2 / 10000000).toFixed(2)} CR. (Rs. ${Math.round(property.price * 1.2 / (property.area || 1000))} / SQ. FT.)`, teal: true },
+                                    { label: 'BUY BACK PRICE (ALL INCL.)', value: `Rs. ${(calcData.buyBack / 10000000).toFixed(2)} CR. (Rs. ${Math.round(calcData.buyBack / (property.area || 1000))} / SQ. FT.)`, teal: true },
                                     { label: 'MINIMUM CONTRIBUTION', value: `Rs. ${property.min_contribution?.toLocaleString('en-IN') || '8,00,000'}/-.\nYOU SHARE PROFITS PROPORTIONATE TO YOUR CONTRIBUTION`, blueText: true },
                                     { label: 'OWNERSHIP STRUCTURE', value: property.ownership_structure || 'JOINT-OWNERSHIP THROUGH LLP' },
                                     { label: 'TRUST FACTOR', value: property.trust_factor || 'Administered By MITCON CREDENTIA. Access All Due Diligence Documents Free.', highlightText: true },
@@ -165,136 +166,263 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
     const loading = false; // Static data is always loaded
 
     const handleDownloadGuide = () => {
+        if (!property) return;
         const printWindow = window.open('', '_blank');
         if (!printWindow) return;
 
         const content = `
             <!DOCTYPE html>
-            <html>
+            <html lang="en">
                 <head>
-                    <title>Infinity_Premium_Brochure_2026</title>
+                    <meta charset="UTF-8">
+                    <title>Infinity_Institutional_Report_${property.title?.replace(/\s+/g, '_')}</title>
+                    <link rel="preconnect" href="https://fonts.googleapis.com">
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
                     <style>
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px 50px; color: #1e293b; line-height: 1.6; max-width: 950px; margin: 0 auto; font-size: 18px; background: white; }
-                        .header { text-align: center; border-bottom: 5px solid #2076C7; padding-bottom: 30px; margin-bottom: 40px; position: relative; }
-                        .header::after { content: ''; position: absolute; bottom: -5px; right: 0; width: 50%; height: 5px; background: #1CADA3; }
-                        h1 { background: linear-gradient(to right, #2076C7, #1CADA3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; font-size: 48px; text-transform: uppercase; letter-spacing: 3px; font-weight: 900; }
-                        .subtitle { color: #64748b; font-size: 26px; font-weight: 600; margin-top: 10px; letter-spacing: 1px; }
-                        .section { margin-bottom: 50px; }
-                        h2 { background: linear-gradient(to right, #2076C7, #1CADA3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-left: 8px solid #2076C7; padding-left: 20px; font-size: 30px; margin-bottom: 25px; display: inline-block; font-weight: 800; }
-                        .market-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 30px; margin-bottom: 30px; display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
-                        .market-stat { text-align: center; padding: 15px; background: white; border-radius: 15px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-                        .market-stat b { display: block; font-size: 28px; color: #2076C7; margin-bottom: 5px; }
-                        .market-stat p { margin: 0; font-size: 14px; text-transform: uppercase; font-weight: 700; color: #64748b; }
-                        .step { margin-bottom: 25px; display: flex; align-items: flex-start; }
-                        .step-num { background: linear-gradient(135deg, #2076C7, #1CADA3); color: white; min-width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; margin-right: 20px; font-size: 20px; flex-shrink: 0; }
-                        .step-content b { display: block; font-size: 22px; color: #1e293b; margin-bottom: 8px; }
-                        .step-content p { margin: 0; color: #475569; font-size: 17px; }
-                        ul { padding-left: 25px; margin: 0; }
-                        li { margin-bottom: 15px; font-size: 17px; color: #475569; }
-                        li b { color: #1e293b; }
-                        .why-us-grid { display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
-                        .why-us-item { background: #fff; border: 1px solid #e2e8f0; padding: 25px; border-radius: 15px; height: 100%; transition: all 0.3s; }
-                        .why-us-item b { color: #2076C7; display: block; margin-bottom: 10px; font-size: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
-                        .why-us-item p { margin: 0; font-size: 16px; color: #64748b; line-height: 1.6; }
-                        .footer { margin-top: 80px; text-align: center; font-size: 16px; color: #1e293b; border-top: 3px solid #f1f5f9; padding: 50px 0 100px 0; background: #fafafa; border-radius: 30px 30px 0 0; }
-                        .social-links { margin: 25px 0; font-weight: 700; }
-                        .social-links a { margin: 0 20px; text-decoration: none; color: #2076C7 !important; border-bottom: 2px solid #1CADA3; padding-bottom: 2px; }
+                        :root {
+                            --brand-blue: #2076C7;
+                            --deep-navy: #0f172a;
+                            --teal-accent: #1CADA3;
+                            --slate-light: #f8fafc;
+                            --border-color: #e2e8f0;
+                        }
+                        body { 
+                            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+                            padding: 40px 60px; 
+                            color: var(--deep-navy); 
+                            line-height: 1.5; 
+                            max-width: 1000px; 
+                            margin: 0 auto; 
+                            background: white; 
+                            -webkit-print-color-adjust: exact;
+                        }
+                        .header { 
+                            display: flex; 
+                            justify-content: space-between; 
+                            align-items: center; 
+                            border-bottom: 2px solid var(--border-color); 
+                            padding-bottom: 20px; 
+                            margin-bottom: 30px; 
+                        }
+                        .brand-logo { 
+                            font-size: 24px; 
+                            font-weight: 900; 
+                            letter-spacing: -1px; 
+                        }
+                        .brand-quikr { color: var(--brand-blue); }
+                        .brand-propx { color: #f97316; }
+                        
+                        .report-meta { 
+                            text-align: right; 
+                            font-size: 11px; 
+                            text-transform: uppercase; 
+                            font-weight: 700; 
+                            color: #64748b; 
+                        }
+
+                        h1 { 
+                            font-size: 32px; 
+                            font-weight: 800; 
+                            color: var(--deep-navy); 
+                            margin: 0 0 5px 0; 
+                            letter-spacing: -0.5px;
+                        }
+                        .property-id { 
+                            font-size: 14px; 
+                            font-weight: 600; 
+                            color: var(--brand-blue); 
+                            text-transform: uppercase; 
+                            margin-bottom: 30px; 
+                        }
+
+                        .section-title { 
+                            font-size: 10px; 
+                            font-weight: 900; 
+                            text-transform: uppercase; 
+                            letter-spacing: 1px; 
+                            color: #64748b; 
+                            margin-bottom: 12px; 
+                            border-bottom: 1px solid var(--border-color);
+                            padding-bottom: 6px;
+                        }
+
+                        .asset-card { 
+                            display: grid; 
+                            grid-template-columns: 1.2fr 1fr; 
+                            gap: 40px; 
+                            margin-bottom: 40px; 
+                        }
+                        .asset-image { 
+                            width: 100%; 
+                            height: 320px; 
+                            object-fit: cover; 
+                            border-radius: 12px; 
+                            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); 
+                        }
+                        
+                        .data-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+                        .data-item { display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; }
+                        .data-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+                        .data-value { font-size: 14px; font-weight: 700; color: var(--deep-navy); }
+
+                        .scorecard { 
+                            display: grid; 
+                            grid-template-columns: repeat(4, 1fr); 
+                            gap: 20px; 
+                            margin-bottom: 40px; 
+                        }
+                        .score-item { 
+                            background: var(--slate-light); 
+                            padding: 20px; 
+                            border-radius: 16px; 
+                            border: 1px solid var(--border-color); 
+                            text-align: center; 
+                        }
+                        .score-label { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 8px; }
+                        .score-value { font-size: 20px; font-weight: 900; color: var(--brand-blue); }
+
+                        .trust-bar { 
+                            display: flex; 
+                            justify-content: space-around; 
+                            background: #f0fdf4; 
+                            border: 1px solid #bcf0da; 
+                            border-radius: 12px; 
+                            padding: 15px; 
+                            margin-bottom: 30px; 
+                        }
+                        .trust-item { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; color: #065f46; }
+
+                        .description-box { 
+                            background: white; 
+                            border-left: 4px solid var(--brand-blue); 
+                            padding: 20px; 
+                            margin-bottom: 40px; 
+                            font-size: 14px; 
+                            color: #475569; 
+                            font-style: italic;
+                        }
+
+                        .footer { 
+                            margin-top: 60px; 
+                            border-top: 2px solid var(--deep-navy); 
+                            padding-top: 30px; 
+                            display: flex; 
+                            justify-content: space-between; 
+                            font-size: 10px; 
+                            color: #64748b; 
+                        }
+                        .legal-note { max-width: 60%; line-height: 1.4; }
+                        
                         .page-break { page-break-before: always; }
                     </style>
                 </head>
                 <body>
                     <div id="brochure-content">
                         <div class="header">
-                            <h1>INFINITY ARTHVISHWA</h1>
-                            <div class="subtitle">Real Estate Portfolio Insights • 2026 Edition</div>
-                        </div>
-
-                        <div class="section">
-                            <h2>2026 Market Analysis: Pune Growth Corridor</h2>
-                            <p style="margin-bottom: 25px; color: #475569;">The Pune real estate market has shown a resilient <b>11.5% YoY growth</b> in premium residential and commercial sectors. Our data-driven approach identifies micro-markets with high absorption rates.</p>
-                            <div class="market-box">
-                                <div class="market-stat"><b>12.8%</b><p>Avg. Capital Appreciation</p></div>
-                                <div class="market-stat"><b>8.4%</b><p>Commercial Rental Yield</p></div>
-                                <div class="market-stat"><b>₹2,500 Cr+</b><p>Managed Assets</p></div>
-                                <div class="market-stat"><b>98.5%</b><p>Occupancy Rate</p></div>
+                            <div class="brand-logo">
+                                <span class="brand-quikr">INFINITY</span> ARTHVISHWA
+                            </div>
+                            <div class="report-meta">
+                                Institutional Grade Investment Summary<br>
+                                Generated: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                             </div>
                         </div>
 
-                        <div class="section">
-                            <h2>1. Strategic Investment Roadmap</h2>
-                            <div class="step">
-                                <div class="step-num">1</div>
-                                <div class="step-content"><b>Institutional Grade Selection</b><p>We filter Grade-A properties from top-tier developers, ensuring only high-liquidity assets enter our portfolio.</p></div>
-                            </div>
-                            <div class="step">
-                                <div class="step-num">2</div>
-                                <div class="step-content"><b>Fractional Allocation</b><p>Invest in premium assets starting from ₹5 Lakh. Perfect for diversifying across multiple micro-markets.</p></div>
-                            </div>
-                            <div class="step">
-                                <div class="step-num">3</div>
-                                <div class="step-content"><b>SPV Governance</b><p>Secure ownership via a Special Purpose Vehicle (SPV), providing a bulletproof legal framework and tax efficiency.</p></div>
-                            </div>
-                            <div class="step">
-                                <div class="step-num">4</div>
-                                <div class="step-content"><b>Wealth Generation</b><p>Monthly rental credits directly to your bank account with long-term capital gains on asset disposal.</p></div>
+                        <div class="section-title">Investment Profile</div>
+                        <h1>${property.title}</h1>
+                        <div class="property-id">Asset Node: ${property.llp_name || 'REDEVPUNE 3'}</div>
+
+                        <div class="asset-card">
+                            <img src="${window.location.origin}${property.image}" class="asset-image" />
+                            <div class="data-grid">
+                                <div class="data-item">
+                                    <div class="data-label">Developer</div>
+                                    <div class="data-value">${property.developer}</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Location</div>
+                                    <div class="data-value">${property.location}</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">RERA Registration</div>
+                                    <div class="data-value">${property.rera_reg_no || 'P52100077901'}</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Completion Date</div>
+                                    <div class="data-value">${property.completion_date || 'Q4 2027'}</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Total Asset Value</div>
+                                    <div class="data-value">₹ ${property.price?.toLocaleString('en-IN')}</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Minimum Contribution</div>
+                                    <div class="data-value">₹ ${property.min_contribution?.toLocaleString('en-IN')}</div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="section page-break">
-                            <h2>2. Fractional Advantage & Eligibility</h2>
-                            <ul>
-                                <li><b>HNI & NRI Focus:</b> Custom structures for Resident Indians and NRI/OCI investors via NRE/NRO routes.</li>
-                                <li><b>Title Verification:</b> 100% cloud-accessible legal due diligence for every listed asset.</li>
-                                <li><b>Market Liquidity:</b> First-of-its-kind resale window and secondary market for fractional exits.</li>
-                                <li><b>Portfolio Diversification:</b> Spread capital across IT Parks, Luxury Retail, and Premium Residential.</li>
-                                <li><b>Tax Optimization:</b> Structured as LLPs for flow-through taxation benefits for investors.</li>
-                            </ul>
+                        <div class="section-title">Performance Scorecard</div>
+                        <div class="scorecard">
+                            <div class="score-item">
+                                <div class="score-label">Target IRR</div>
+                                <div class="score-value">${property.irr_percentage}%</div>
+                            </div>
+                            <div class="score-item">
+                                <div class="score-label">Current Yield</div>
+                                <div class="score-value">${property.yield_percentage}%</div>
+                            </div>
+                            <div class="score-item">
+                                <div class="score-label">Holding Period</div>
+                                <div class="score-value">${property.holding_period}</div>
+                            </div>
+                            <div class="score-item">
+                                <div class="score-label">Asset Class</div>
+                                <div class="score-value">Residential</div>
+                            </div>
                         </div>
 
-                        <div class="section">
-                            <h2>3. Why Choose Infinity Arthvishwa?</h2>
-                            <div class="why-us-grid">
-                                <div class="why-us-item"><b>Curated Selection</b><p>Only the top 1% of Pune's real estate deals pass our proprietary 50-point checklist.</p></div>
-                                <div class="why-us-item"><b>Digital First</b><p>Track performance, documents, and yields via our state-of-the-art investor dashboard.</p></div>
-                                <div class="why-us-item"><b>Full Stack Management</b><p>From facility management to legal compliance, we handle the dirty work.</p></div>
-                                <div class="why-us-item"><b>High Liquidity</b><p>Pre-planned exit strategies at the end of the holding period with professional resale support.</p></div>
-                            </div>
+                        <div class="section-title">Compliance & Rigour</div>
+                        <div class="trust-bar">
+                            <div class="trust-item">✓ CLEAR TITLE</div>
+                            <div class="trust-item">✓ LITIGATION FREE</div>
+                            <div class="trust-item">✓ RERA REGISTERED</div>
+                            <div class="trust-item">✓ SANCTIONS OBTAINED</div>
+                        </div>
+
+                        <div class="section-title">Asset Commentary</div>
+                        <div class="description-box">
+                            "${property.description}"
                         </div>
 
                         <div class="footer">
-                             <p style="font-weight: 800; font-size: 20px; color: #2076C7; margin-bottom: 15px;">INFINITY ARTHVISHWA PREMIUM REALTY</p>
-                            <div style="margin: 20px 0; color: #1e293b; font-weight: 800; font-size: 26px;">
-                                <span style="color: #64748b; font-size: 16px;">TOLL FREE:</span> 1800-532-7600
+                            <div class="legal-note">
+                                <b>Disclaimer:</b> This report is generated strictly for informational purposes. Real estate investments involve risks. Past performance is not indicative of future results. All transactions are subject to legal verification and due diligence.
                             </div>
-                            <div class="social-links">
-                                <a href="#">LinkedIn</a>
-                                <a href="#">Instagram</a>
-                                <a href="#">Facebook</a>
+                            <div style="text-align: right;">
+                                <b>INFINITY ARTHVISHWA PREMIUM REALTY</b><br>
+                                baner, Pune - 411045<br>
+                                contact@infinityarthvishwa.com
                             </div>
-                            <p style="margin-top: 30px; font-weight: 700; color: #64748b; font-size: 14px;">
-                                Head Office: Prime Square, Baner, Pune - 411045<br>
-                                www.infinityarthvishwa.com | contact@infinity.com
-                            </p>
                         </div>
                     </div>
+
                     <script>
                         window.onload = function() {
                             const element = document.getElementById('brochure-content');
                             const opt = {
-                                margin: [10, 10, 20, 10],
-                                filename: 'Infinity_Arthvishwa_Market_Report_2026.pdf',
-                                image: { type: 'jpeg', quality: 0.98 },
-                                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                                margin: 0,
+                                filename: 'Infinity_Report_${property.title?.replace(/\s+/g, '_')}.pdf',
+                                image: { type: 'jpeg', quality: 1 },
+                                html2canvas: { scale: 3, useCORS: true, letterRendering: true },
+                                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                             };
                             
                             setTimeout(() => {
-                                html2pdf().set(opt).from(element).save().then(() => {
-                                    // Optional: window.close() after download
-                                });
-                            }, 800);
+                                html2pdf().set(opt).from(element).save();
+                            }, 500);
                         }
                     </script>
                 </body>
@@ -308,7 +436,7 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
 
     return (
         <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-slate-900/90 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto">
-            <div className="bg-slate-50 w-full max-w-6xl rounded-2xl sm:rounded-3xl overflow-hidden relative shadow-2xl animate-scale-in max-h-[95vh] overflow-y-auto custom-scrollbar">
+            <div className="bg-slate-50 w-full max-w-6xl rounded-2xl sm:rounded-3xl overflow-hidden relative shadow-2xl animate-scale-in max-h-[95vh] overflow-y-auto custom-scrollbar font-sans">
 
                 {/* Close Button */}
                 <button
@@ -329,7 +457,7 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                 ) : (
                     <div className="pb-12">
                         {/* Top Notice */}
-                        <div className="bg-blue-600 py-3 text-center text-sm text-white font-medium sticky top-0 z-40 shadow-md">
+                        <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] py-3 text-center text-sm text-white font-medium sticky top-0 z-40 shadow-md">
                             One user can subscribe only once in one LLP.
                         </div>
 
@@ -349,10 +477,19 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                                         {property.location}
                                     </div>
                                 </div>
-                                <div className="flex gap-3">
-                                    <button className="p-3 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:shadow-md transition-all">
-                                        <Share2 size={20} />
-                                    </button>
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                    <div className="flex gap-3">
+                                        <button 
+                                            onClick={() => document.getElementById('investment-calculator')?.scrollIntoView({ behavior: 'smooth' })}
+                                            className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black text-xs uppercase tracking-widest hover:shadow-lg transition-all flex items-center gap-2 group"
+                                        >
+                                            <Calculator size={16} className="group-hover:rotate-12 transition-transform" />
+                                            View Calculations
+                                        </button>
+                                        <button className="p-3 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:shadow-md transition-all">
+                                            <Share2 size={20} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -448,6 +585,28 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                                 <PropertyInfographic property={property} />
                             </div>
 
+                            {/* Trust Badges Row */}
+                            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mb-6 py-4 bg-white/50 rounded-2xl border border-slate-100 shadow-sm">
+                                {[
+                                    "Clear Title",
+                                    "Litigation Free",
+                                    "RERA Registered",
+                                    "Sanctions Obtained"
+                                ].map((text, i) => (
+                                    <div key={i} className="flex items-center gap-2">
+                                        <div className="bg-green-100 p-1 rounded-full text-green-600">
+                                            <CheckCircle size={16} strokeWidth={3} />
+                                        </div>
+                                        <span className="text-sm font-extrabold text-[#1e293b] whitespace-nowrap">{text}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Investment Calculator Section */}
+                            <div className="lg:col-span-2 mb-4" id="investment-calculator">
+                                <InvestmentCalculator property={property} />
+                            </div>
+
                             {/* Details Grid */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                 <div>
@@ -470,20 +629,18 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
 
                                 <div>
                                     <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-brand-gradient">
-                                        <Layout size={20} className="text-blue-600" /> Amenities
+                                        <MapPin size={20} className="text-blue-600" /> Project Location
                                     </h3>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {[
-                                            { icon: Shield, text: '24/7 Security' },
-                                            { icon: Dumbbell, text: 'Gymnasium' },
-                                            { icon: Zap, text: 'Power Backup' },
-                                            { icon: Coffee, text: 'Cafeteria' }
-                                        ].map((item, i) => (
-                                            <div key={i} className="bg-white p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                                                <item.icon size={20} className="text-blue-600" />
-                                                <span className="text-sm font-bold text-slate-700">{item.text}</span>
-                                            </div>
-                                        ))}
+                                    <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm h-[300px]">
+                                        <iframe
+                                            src={property.map_url}
+                                            width="100%"
+                                            height="100%"
+                                            style={{ border: 0 }}
+                                            allowFullScreen
+                                            loading="lazy"
+                                            referrerPolicy="no-referrer-when-downgrade"
+                                        />
                                     </div>
                                     <button onClick={handleDownloadGuide} className="w-full mt-6 py-4 border-2 border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
                                         <Download size={20} /> Download Brochure

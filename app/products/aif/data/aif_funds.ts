@@ -99,7 +99,7 @@ export const aifStrategies = [
         manager: "Private Equity Team – Axis AMC",
         desc: "Dedicated PE investment professionals focusing on mid-market growth companies.",
         link: "#",
-        color: "#4F46E5",
+        color: "#2076C7",
         details: {
             category: "Category II AIF",
             structure: "Close-Ended",
@@ -196,7 +196,7 @@ export const aifStrategies = [
         manager: "Sunil Singhania",
         desc: "Veteran equity investor with decades of portfolio management experience.",
         link: "#",
-        color: "#4F46E5",
+        color: "#1CADA3",
         details: {
             category: "Category II AIF",
             structure: "Close-Ended",
@@ -338,7 +338,7 @@ export const aifStrategies = [
         manager: "Gopal Srinivasan",
         desc: "Renowned PE investor with focus on scalable mid-market businesses.",
         link: "#",
-        color: "#4F46E5",
+        color: "#1CADA3",
         details: {
             category: "Category II AIF",
             structure: "Close-Ended",
@@ -432,7 +432,7 @@ export const aifStrategies = [
         manager: "Edelweiss Alternatives Team",
         desc: "Focus: Stressed assets, turnaround opportunities",
         link: "#",
-        color: "#4F46E5",
+        color: "#2076C7",
         details: {
             category: "Category II AIF",
             structure: "Close-Ended",
@@ -591,7 +591,7 @@ export const aifStrategies = [
         manager: "ICICI Venture Team",
         desc: "Focus: Mid-market growth companies",
         link: "#",
-        color: "#4F46E5",
+        color: "#1CADA3",
         details: {
             category: "Category II AIF",
             structure: "Close-Ended",
@@ -732,7 +732,7 @@ export const aifStrategies = [
         manager: "Sanjiv Kaul – Managing Director",
         desc: "Focus: Growth & buyout investments",
         link: "#",
-        color: "#4F46E5",
+        color: "#2076C7",
         details: {
             category: "Category II AIF",
             structure: "Close-Ended",

@@ -22,21 +22,21 @@ const ResultCard: React.FC<ResultCardProps> = ({
     className = ''
 }) => {
     const colorClasses = {
-        blue: 'bg-blue-50 border-blue-200',
-        green: 'bg-green-50 border-green-200',
+        blue: 'bg-[#2076C7]/5 border-[#2076C7]/20',
+        green: 'bg-[#1CADA3]/5 border-[#1CADA3]/20',
         red: 'bg-red-50 border-red-200',
         yellow: 'bg-yellow-50 border-yellow-200',
         purple: 'bg-purple-50 border-purple-200',
-        teal: 'bg-teal-50 border-teal-200'
+        teal: 'bg-[#1CADA3]/5 border-[#1CADA3]/20'
     };
 
     const textColorClasses = {
         blue: 'text-primary',
-        green: 'text-green-600',
+        green: 'text-[#1CADA3]',
         red: 'text-red-600',
         yellow: 'text-yellow-600',
         purple: 'text-purple-600',
-        teal: 'text-accent-teal'
+        teal: 'text-[#1CADA3]'
     };
 
     const formatValue = (val: number | string) => {

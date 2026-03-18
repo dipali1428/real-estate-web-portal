@@ -78,7 +78,7 @@ export default function AbakkusEmergingDetail() {
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#123E66',
+                backgroundColor: '#0E8A82', // Deep Teal
                 padding: 12,
                 titleFont: { size: 14, weight: 700 },
                 bodyFont: { size: 13 },
@@ -117,7 +117,7 @@ export default function AbakkusEmergingDetail() {
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#123E66',
+                backgroundColor: '#0E8A82',
                 callbacks: {
                     label: (context: any) => `${context.dataset.label}: ${context.parsed.x}%`
                 }
@@ -137,7 +137,7 @@ export default function AbakkusEmergingDetail() {
         datasets: [
             {
                 data: [8.93, 36.06, 48.36, 6.65],
-                backgroundColor: ['#2076C7', '#1CADA3', '#4F46E5', '#94A3B8'],
+                backgroundColor: ['#2076C7', '#1CADA3', '#0E8A82', '#94A3B8'],
                 borderWidth: 0,
                 hoverOffset: 10,
             }
@@ -149,7 +149,7 @@ export default function AbakkusEmergingDetail() {
         maintainAspectRatio: false,
         plugins: {
             legend: { display: false },
-            tooltip: { backgroundColor: '#123E66' }
+            tooltip: { backgroundColor: '#0E8A82' }
         },
         cutout: '70%'
     };
@@ -171,17 +171,15 @@ export default function AbakkusEmergingDetail() {
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-left">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                        <Link href="/products/pms" className="inline-flex items-center text-slate-500 hover:text-primary transition-colors mb-6 group">
-                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
+                        <Link href="/products/pms" className="inline-flex items-center text-gray-500 hover:text-primary transition-colors mb-6 group">
+                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
                                 <ArrowLeft size={16} />
                             </div>
                             <span className="font-bold tracking-wider uppercase text-sm">Back to PMS Products</span>
                         </Link>
-                        <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight font-heading leading-[1.1] text-gray-700">
-                            Abakkus Emerging <br />
-                            <span className="text-[#2076C7]">
-                                Opportunities
-                            </span>
+                        <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tighter font-sans leading-[1.1] bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-clip-text text-transparent drop-shadow-sm">
+                            Abakkus <br />
+                            Emerging Opportunities
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-600 max-w-3xl leading-relaxed">
                             A fundamentally driven equity portfolio focused on emerging businesses across mid and small caps with long-term growth potential.
@@ -205,8 +203,8 @@ export default function AbakkusEmergingDetail() {
                             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                                 <item.icon className="text-primary w-6 h-6" />
                             </div>
-                            <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">{item.label}</div>
-                            <div className="font-bold text-gray-700 leading-tight">{item.value}</div>
+                            <div className="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">{item.label}</div>
+                            <div className="font-bold text-gray-900 leading-tight">{item.value}</div>
                         </div>
                     ))}
                 </div>
@@ -218,17 +216,17 @@ export default function AbakkusEmergingDetail() {
 
                         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-16 gap-8">
                             <div>
-                                <h2 className="text-4xl font-black text-gray-700 mb-4 font-heading">Performance Summary</h2>
-                                <p className="text-slate-500 font-medium">Strong long-term performance driven by disciplined stock selection.</p>
+                                <h2 className="text-3xl font-bold text-gray-900 mb-2 font-sans">Performance Snapshot</h2>
+                                <p className="text-gray-500 font-medium">Consistent portfolio growth through disciplined market cap diversification.</p>
                             </div>
                             <div className="flex gap-4">
-                                <div className="flex items-center gap-2 px-4 py-2 bg-neutral-50 rounded-full border border-gray-100">
-                                    <div className="w-3 h-3 rounded-full bg-accent-teal" />
-                                    <span className="text-xs font-bold text-slate-600">Abakkus Emerging</span>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-primary" />
+                                    <span className="text-xs font-bold text-gray-600">Abakkus Emerging</span>
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-neutral-50 rounded-full border border-gray-100">
-                                    <div className="w-3 h-3 rounded-full bg-slate-300" />
-                                    <span className="text-xs font-bold text-slate-600">BSE 500 TRI</span>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-gray-300" />
+                                    <span className="text-xs font-bold text-gray-600">BSE 500 TRI</span>
                                 </div>
                             </div>
                         </div>
@@ -236,22 +234,22 @@ export default function AbakkusEmergingDetail() {
                         <div className="grid lg:grid-cols-3 gap-8">
                             <div className="lg:col-span-2">
                                 <div className="mb-6 flex justify-between items-center">
-                                    <h3 className="text-xl font-bold text-gray-700 font-heading">Growth Since Inception</h3>
-                                    <div className="text-xs text-slate-400 font-bold italic">Data as on 31 Dec 2025</div>
+                                    <h3 className="text-xl font-bold text-gray-900 font-sans">Performance Since Inception</h3>
+                                    <div className="text-xs text-gray-400 font-bold italic">Data as on 31 Dec 2025</div>
                                 </div>
-                                <div className="h-[300px] w-full">
+                                <div className="h-[200px] md:h-[300px] w-full">
                                     <Line data={performanceData} options={lineOptions} />
                                 </div>
                             </div>
 
                             <div className="lg:col-span-1">
-                                <h3 className="text-xl font-bold text-gray-700 mb-8 font-heading">Returns Summary</h3>
-                                <div className="h-[300px] w-full">
+                                <h3 className="text-xl font-bold text-gray-900 mb-8 font-sans">Returns Summary</h3>
+                                <div className="h-[200px] md:h-[300px] w-full">
                                     <Bar data={returnsData} options={barOptions} />
                                 </div>
                                 <div className="mt-4 text-center">
-                                    <span className="bg-neutral-100 text-slate-400 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full">
-                                        Net TWRR Returns as on 31 Dec 2025
+                                    <span className="bg-neutral-100 text-gray-400 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full">
+                                        Indicative Split
                                     </span>
                                 </div>
                             </div>
@@ -259,37 +257,37 @@ export default function AbakkusEmergingDetail() {
                     </section>
 
                     {/* Asset Allocation */}
-                    <div className="grid lg:grid-cols-2 gap-12">
-                        <section className="bg-white rounded-[3rem] p-10 shadow-xl border border-gray-100 flex flex-col">
+                    <div className="grid lg:grid-cols-2 gap-12 items-start">
+                        <section className="bg-white rounded-[3rem] p-10 shadow-xl border border-gray-100">
                             <div className="flex items-center gap-4 mb-12">
                                 <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
                                     <PieChartIcon size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-black text-gray-700 font-heading">Market Cap Allocation</h3>
-                                    <p className="text-slate-400 text-sm font-bold tracking-tight">Tilt towards Mid & Small Caps</p>
+                                    <h3 className="text-2xl font-bold text-gray-900 font-sans">Market Cap Allocation</h3>
+                                    <p className="text-gray-400 text-sm font-bold tracking-tight">Tilt towards Mid & Small Caps</p>
                                 </div>
                             </div>
 
-                            <div className="flex-grow flex flex-col md:flex-row items-center gap-12">
-                                <div className="w-64 h-64 shrink-0 relative">
+                            <div className="flex flex-col md:flex-row items-center gap-12">
+                                <div className="w-full h-[200px] md:h-[250px] shrink-0 relative">
                                     <Pie data={marketCapData} options={pieOptions} />
                                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                                         <span className="text-3xl font-black text-gray-700 tracking-tight">100%</span>
-                                        <span className="text-[10px] text-slate-400 font-bold uppercase">Allocated</span>
+                                        <span className="text-[10px] text-gray-400 font-bold uppercase">Allocated</span>
                                     </div>
                                 </div>
-                                <div className="flex-grow space-y-4 w-full">
+                                <div className="space-y-4 w-full">
                                     {[
                                         { name: 'Large Cap', value: 8.93, color: '#2076C7' },
                                         { name: 'Mid Cap', value: 36.06, color: '#1CADA3' },
-                                        { name: 'Small Cap', value: 48.36, color: '#4F46E5' },
+                                        { name: 'Small Cap', value: 48.36, color: '#0E8A82' },
                                         { name: 'Cash', value: 6.65, color: '#94A3B8' },
                                     ].map((item, i) => (
                                         <div key={i} className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-gray-100 group hover:border-primary/30 transition-all">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }} />
-                                                <span className="font-bold text-slate-700">{item.name}</span>
+                                                <span className="font-bold text-gray-700">{item.name}</span>
                                             </div>
                                             <span className="text-xl font-black text-gray-700">{item.value}%</span>
                                         </div>
@@ -298,33 +296,34 @@ export default function AbakkusEmergingDetail() {
                             </div>
                         </section>
 
-                        <section className="bg-white rounded-[3rem] p-10 shadow-xl border border-gray-100 flex flex-col">
+                        <section className="bg-white rounded-[3rem] p-10 shadow-xl border border-gray-100">
                             <div className="flex items-center gap-4 mb-12">
-                                <div className="w-12 h-12 bg-accent-teal/10 text-accent-teal rounded-2xl flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#1CADA31A', color: '#1CADA3' }}>
                                     <Briefcase size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-black text-gray-700 font-heading">Sector Allocation</h3>
-                                    <p className="text-slate-400 text-sm font-bold tracking-tight">Top sector industry distribution</p>
+                                    <h3 className="text-2xl font-bold text-gray-900 font-sans">Sector Allocation</h3>
+                                    <p className="text-gray-400 text-sm font-bold tracking-tight">Top sector industry distribution</p>
                                 </div>
                             </div>
 
-                            <div className="flex-grow space-y-4">
+                            <div className="space-y-4">
                                 {sectorData.map((sector, i) => {
                                     const maxVal = Math.max(...sectorData.map(s => s.value));
                                     const percentage = (sector.value / maxVal) * 100;
                                     return (
                                         <div key={i} className="space-y-1">
                                             <div className="flex justify-between text-sm">
-                                                <span className="font-bold text-slate-600">{sector.name}</span>
-                                                <span className="font-black text-gray-700">{sector.value}%</span>
+                                                <span className="font-bold text-gray-600">{sector.name}</span>
+                                                <span className="font-bold text-gray-900">{sector.value}%</span>
                                             </div>
                                             <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                                                 <motion.div
                                                     initial={{ width: 0 }}
                                                     whileInView={{ width: `${percentage}%` }}
                                                     transition={{ duration: 1, delay: i * 0.05 }}
-                                                    className="h-full bg-accent-teal rounded-full"
+                                                    className="h-full rounded-full"
+                                                    style={{ backgroundColor: '#1CADA3' }}
                                                 />
                                             </div>
                                         </div>
@@ -341,8 +340,8 @@ export default function AbakkusEmergingDetail() {
                                 <Award size={28} />
                             </div>
                             <div>
-                                <h3 className="text-3xl font-black text-gray-700 font-heading">Top 10 Holdings</h3>
-                                <p className="text-slate-400 text-sm font-bold">High-conviction emerging opportunities</p>
+                                <h3 className="text-3xl font-bold text-gray-900 font-sans uppercase tracking-tighter">Market Highlights</h3>
+                                <p className="text-gray-400 text-sm font-bold">High-conviction emerging opportunities</p>
                             </div>
                         </div>
 
@@ -364,16 +363,28 @@ export default function AbakkusEmergingDetail() {
                                         <div className="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-black text-primary">
                                             {i + 1}
                                         </div>
-                                        <span className="font-black text-gray-700 text-lg">{stock.name}</span>
+                                        <span className="font-bold text-gray-700 text-lg">{stock.name}</span>
                                     </div>
                                     <div className="relative flex items-center gap-4">
-                                        <span className="font-black text-primary text-xl">{stock.weight}</span>
+                                        <span className="font-bold text-primary text-xl">{stock.weight}</span>
                                         <div className="w-2 h-2 rounded-full bg-primary" />
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </section>
+                </div>
+            </div>
+
+            {/* DISCLAIMER */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 mb-4">
+                <div className="bg-amber-50/50 border border-amber-200/50 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-4 text-center md:text-left shadow-sm">
+                    <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                        <AlertCircle className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <p className="text-amber-900 text-sm md:text-base font-medium leading-relaxed">
+                        <strong>Disclaimer:</strong> Past performance may or may not be sustained in the future. Returns are calculated on a TWRR basis and are not verified by SEBI. Investments are subject to market risks.
+                    </p>
                 </div>
             </div>
         </div>

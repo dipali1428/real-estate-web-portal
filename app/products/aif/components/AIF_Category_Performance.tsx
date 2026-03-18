@@ -68,7 +68,7 @@ const AIF_Category_Performance = () => {
             horizon: 70,
             diversification: 75,
             minInvestment: 95,
-            color: '#8b5cf6',
+            color: '#2076C7',
             targetIRR: '20-25%',
             typicalSize: '₹300-1500Cr',
             successRate: '70%'
@@ -82,7 +82,7 @@ const AIF_Category_Performance = () => {
             horizon: 80,
             diversification: 85,
             minInvestment: 95,
-            color: '#f59e0b',
+            color: '#1CADA3',
             targetIRR: '15-20%',
             typicalSize: '₹200-1000Cr',
             successRate: '75%'
@@ -96,7 +96,7 @@ const AIF_Category_Performance = () => {
             horizon: 30,
             diversification: 65,
             minInvestment: 95,
-            color: '#ef4444',
+            color: '#2076C7',
             targetIRR: '12-18%',
             typicalSize: '₹100-500Cr',
             successRate: '60%'
@@ -120,8 +120,8 @@ const AIF_Category_Performance = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                            <Zap className="text-primary" size={24} />
+                        <div className="p-2 bg-[#2076C7]/10 rounded-lg">
+                            <Zap className="text-[#2076C7]" size={24} />
                         </div>
                         <div>
                             <h3 className="text-2xl font-bold bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
@@ -133,7 +133,7 @@ const AIF_Category_Performance = () => {
                         </div>
                     </div>
                 </div>
-                <div className="text-xs font-bold text-primary bg-primary/5 px-3 py-1 rounded-full border border-primary/10">
+                <div className="text-xs font-bold text-[#2076C7] bg-[#2076C7]/5 px-3 py-1 rounded-full border border-[#2076C7]/10">
                     Updates Enabled
                 </div>
             </div>
@@ -183,13 +183,13 @@ const AIF_Category_Performance = () => {
                             key={category.id}
                             onClick={() => setSelectedCategory(category.name)}
                             className={`w-full p-4 rounded-xl text-left transition-all ${selectedCategory === category.name
-                                ? 'bg-primary/5 border-2 border-primary shadow-sm'
-                                : 'bg-white hover:bg-gray-50 border border-gray-100 hover:border-primary/20'
+                                ? 'bg-[#2076C7]/5 border-2 border-[#2076C7] shadow-sm'
+                                : 'bg-white hover:bg-gray-50 border border-gray-100 hover:border-[#2076C7]/20'
                                 }`}
                         >
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <div className={`font-bold transition-colors ${selectedCategory === category.name ? 'text-primary' : 'text-gray-700'}`}>{category.name}</div>
+                                    <div className={`font-bold transition-colors ${selectedCategory === category.name ? 'text-[#2076C7]' : 'text-gray-700'}`}>{category.name}</div>
                                     <div className="text-sm text-gray-500 mt-1">
                                         Target: {category.targetIRR}
                                     </div>
@@ -230,7 +230,7 @@ const AIF_Category_Performance = () => {
                 </div>
                 <div className="p-4 bg-neutral-50 rounded-xl border border-gray-100">
                     <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Performance Alpha</div>
-                    <div className="text-xl font-bold flex items-center gap-2 mt-1 text-primary">
+                    <div className="text-xl font-bold flex items-center gap-2 mt-1 text-[#2076C7]">
                         <Zap size={18} />
                         +{performanceAlpha}% vs public
                     </div>
@@ -253,9 +253,9 @@ const AIF_Category_Performance = () => {
             </div>
 
             {/* Disclaimer */}
-            <div className="mt-4 p-3 bg-primary/5 border border-primary/10 rounded-lg">
+            <div className="mt-4 p-3 bg-[#2076C7]/5 border border-[#2076C7]/10 rounded-lg">
                 <p className="text-[10px] text-gray-500 leading-relaxed text-center">
-                    <strong className="text-primary">Disclaimer:</strong> Investments in Alternative Investment Funds are subject to market risks and are available only to eligible investors through private placement. Please read the Private Placement Memorandum (PPM) carefully before investing.
+                    <strong className="text-[#2076C7]">Disclaimer:</strong> Investments in Alternative Investment Funds are subject to market risks and are available only to eligible investors through private placement. Please read the Private Placement Memorandum (PPM) carefully before investing.
                 </p>
             </div>
         </div>

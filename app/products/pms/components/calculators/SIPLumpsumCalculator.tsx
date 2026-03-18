@@ -43,9 +43,9 @@ export default function SIPLumpsumCalculator() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 {/* Lumpsum Section */}
-                <div className="space-y-6 p-8 bg-blue-50/50 rounded-[2rem] border border-blue-100">
+                <div className="space-y-6 p-8 bg-[#2076C7]/5 rounded-[2rem] border border-[#2076C7]/10">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center font-black">L</div>
+                        <div className="w-8 h-8 bg-[#2076C7]/10 text-[#2076C7] rounded-lg flex items-center justify-center font-black">L</div>
                         <h4 className="font-black text-gray-900 uppercase tracking-widest text-xs">Lumpsum Entry</h4>
                     </div>
                     <CalculatorSlider
@@ -60,9 +60,9 @@ export default function SIPLumpsumCalculator() {
                 </div>
 
                 {/* SIP Section */}
-                <div className="space-y-6 p-8 bg-teal-50/50 rounded-[2rem] border border-teal-100">
+                <div className="space-y-6 p-8 bg-[#1CADA3]/5 rounded-[2rem] border border-[#1CADA3]/10">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 bg-teal-500/10 text-teal-600 rounded-lg flex items-center justify-center font-black">S</div>
+                        <div className="w-8 h-8 bg-[#1CADA3]/10 text-[#1CADA3] rounded-lg flex items-center justify-center font-black">S</div>
                         <h4 className="font-black text-gray-900 uppercase tracking-widest text-xs">Systematic Flow</h4>
                     </div>
                     <CalculatorSlider
@@ -85,7 +85,7 @@ export default function SIPLumpsumCalculator() {
                                     key={months}
                                     onClick={() => setSipDuration(months)}
                                     className={`px-6 py-2 rounded-xl text-xs font-black transition-all ${sipDuration === months
-                                        ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-105'
+                                        ? 'bg-[#2076C7] text-white shadow-xl shadow-[#2076C7]/20 scale-105'
                                         : 'bg-white text-gray-400 hover:text-gray-600 border border-gray-100'
                                         }`}
                                 >
@@ -123,10 +123,10 @@ export default function SIPLumpsumCalculator() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <motion.div
                         layout
-                        className="p-8 bg-white rounded-[2rem] border-2 border-primary shadow-xl relative overflow-hidden group"
+                        className="p-8 bg-white rounded-[2rem] border-2 border-[#2076C7] shadow-xl relative overflow-hidden group"
                     >
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
-                        <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2">Lumpsum Strategy</div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#2076C7]/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
+                        <div className="text-[10px] font-black text-[#2076C7] uppercase tracking-[0.2em] mb-2">Lumpsum Strategy</div>
                         <div className="text-4xl font-black text-gray-900 mb-6">
                             ₹{new Intl.NumberFormat('en-IN').format(Math.round(lumpsumResult))}
                         </div>
@@ -137,7 +137,7 @@ export default function SIPLumpsumCalculator() {
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-400">Net Multiplier:</span>
-                                <span className="text-primary font-black">
+                                <span className="text-[#2076C7] font-black">
                                     {(lumpsumResult / lumpsumAmount).toFixed(2)}x
                                 </span>
                             </div>
@@ -146,10 +146,10 @@ export default function SIPLumpsumCalculator() {
 
                     <motion.div
                         layout
-                        className="p-8 bg-white rounded-[2rem] border-2 border-teal-500 shadow-xl relative overflow-hidden group"
+                        className="p-8 bg-white rounded-[2rem] border-2 border-[#1CADA3] shadow-xl relative overflow-hidden group"
                     >
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
-                        <div className="text-[10px] font-black text-teal-600 uppercase tracking-[0.2em] mb-2">SIP Strategy</div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#1CADA3]/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
+                        <div className="text-[10px] font-black text-[#1CADA3] uppercase tracking-[0.2em] mb-2">SIP Strategy</div>
                         <div className="text-4xl font-black text-gray-900 mb-6">
                             ₹{new Intl.NumberFormat('en-IN').format(Math.round(sipResult))}
                         </div>
@@ -160,7 +160,7 @@ export default function SIPLumpsumCalculator() {
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-400">Net Multiplier:</span>
-                                <span className="text-teal-600 font-black">
+                                <span className="text-[#1CADA3] font-black">
                                     {(sipResult / totalSIPInvested).toFixed(2)}x
                                 </span>
                             </div>
@@ -170,11 +170,11 @@ export default function SIPLumpsumCalculator() {
 
                 {/* Better Approach Badge */}
                 <div className="mt-8 p-8 bg-gray-900 rounded-3xl text-white text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-primary/20 to-teal-500/20 opacity-50" />
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 opacity-50" />
                     <div className="relative z-10 flex flex-col md:flex-row justify-center items-center gap-8">
                         <div>
                             <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 text-center md:text-left">Better approach for alpha</div>
-                            <div className={`text-2xl font-black ${lumpsumResult > sipResult ? 'text-primary' : 'text-teal-400'}`}>
+                            <div className={`text-2xl font-black ${lumpsumResult > sipResult ? 'text-[#2076C7]' : 'text-[#1CADA3]'}`}>
                                 {lumpsumResult > sipResult ? 'FULL LUMPSUM' : 'SYSTEMATIC SIP'}
                             </div>
                         </div>
@@ -189,8 +189,8 @@ export default function SIPLumpsumCalculator() {
                 </div>
 
                 {/* Insight */}
-                <div className="mt-8 p-8 bg-blue-50/30 rounded-3xl border border-blue-100/50">
-                    <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                <div className="mt-8 p-8 bg-[#2076C7]/5 rounded-3xl border border-[#2076C7]/10">
+                    <div className="text-[10px] font-black text-[#2076C7] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                         <Sparkles size={14} /> Strat Insight
                     </div>
                     <p className="text-gray-600 font-medium leading-relaxed italic">

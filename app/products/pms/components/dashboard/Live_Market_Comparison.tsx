@@ -101,14 +101,14 @@ export default function Live_Market_Comparison() {
         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg">
-                        <Activity className="text-green-600" size={24} />
+                    <div className="p-2 bg-[#1CADA3]/10 rounded-lg">
+                        <Activity className="text-[#1CADA3]" size={24} />
                     </div>
                     <div>
                         <div className="flex items-center gap-2">
                             <h3 className="text-xl font-bold text-gray-900">Live Market Pulse</h3>
                             {niftyTrend !== null && (
-                                <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${niftyTrend ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${niftyTrend ? 'bg-[#1CADA3]/10 text-[#1CADA3]' : 'bg-red-100 text-red-700'}`}>
                                     {niftyTrend ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
                                     {niftyTrend ? 'Up' : 'Down'}
                                 </span>
@@ -125,7 +125,7 @@ export default function Live_Market_Comparison() {
                                 key={tf.value}
                                 onClick={() => setTimeFrame(tf.value)}
                                 className={`px-3 py-1 text-xs rounded-md transition-all ${timeFrame === tf.value
-                                    ? 'bg-white shadow-md text-blue-600 font-bold'
+                                    ? 'bg-white shadow-md text-[#2076C7] font-bold'
                                     : 'text-gray-500 hover:text-gray-900'
                                     }`}
                             >

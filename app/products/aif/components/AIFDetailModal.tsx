@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck, TrendingUp, Briefcase, FileText, Phone, Download, PieChart as PieIcon, BarChart as BarIcon, Target, Users, Clock, IndianRupee } from 'lucide-react';
+import { useModal } from '../../../context/ModalContext';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 interface AIFDetailModalProps {
@@ -11,9 +12,10 @@ interface AIFDetailModalProps {
     fund: any; // Using any for flexibility with the strategy object structure
 }
 
-const COLORS = ['#2076C7', '#1CADA3', '#4F46E5', '#F59E0B'];
+const COLORS = ['#2076C7', '#1CADA3', '#2076C7', '#1CADA3'];
 
 export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModalProps) {
+    const { openLogin } = useModal();
     const [mounted, setMounted] = React.useState(false);
 
     React.useEffect(() => {
@@ -84,7 +86,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                         {/* Investment Strategy */}
                                         <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                                             <h3 className="flex items-center gap-2 text-xl font-bold text-gray-800 mb-4">
-                                                <Target className="w-5 h-5 text-primary" />
+                                                <Target className="w-5 h-5 text-[#2076C7]" />
                                                 Investment Strategy
                                             </h3>
                                             <p className="text-gray-600 leading-relaxed mb-6">
@@ -93,7 +95,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 {details.coreFocusAreas?.map((area: string, idx: number) => (
                                                     <div key={idx} className="flex items-center gap-3 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
-                                                        <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                                                        <div className="w-2 h-2 rounded-full bg-[#1CADA3] shrink-0" />
                                                         <span className="text-gray-700 font-medium">{area}</span>
                                                     </div>
                                                 ))}
@@ -106,7 +108,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                             {details.graphs?.sectorAllocation && (
                                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
                                                     <h4 className="font-bold text-gray-700 mb-6 flex items-center gap-2">
-                                                        <PieIcon className="w-4 h-4 text-teal-600" /> {details.graphs.sectorAllocationTitle || "Sector Allocation"}
+                                                        <PieIcon className="w-4 h-4 text-[#1CADA3]" /> {details.graphs.sectorAllocationTitle || "Sector Allocation"}
                                                     </h4>
                                                     <div className="h-80 w-full">
                                                         <ResponsiveContainer width="100%" height="100%">
@@ -140,7 +142,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                             {details.graphs?.stageAllocation && (
                                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
                                                     <h4 className="font-bold text-gray-700 mb-6 flex items-center gap-2">
-                                                        <BarIcon className="w-4 h-4 text-blue-600" /> {details.graphs.stageAllocationTitle || "Stage Allocation"}
+                                                        <BarIcon className="w-4 h-4 text-[#2076C7]" /> {details.graphs.stageAllocationTitle || "Stage Allocation"}
                                                     </h4>
                                                     <div className="h-64 w-full">
                                                         <ResponsiveContainer width="100%" height="100%">
@@ -168,7 +170,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                         {details.graphs?.longShortSplit && (
                                             <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                                                 <h4 className="font-bold text-gray-700 mb-6 flex items-center gap-2">
-                                                    <PieIcon className="w-4 h-4 text-purple-600" /> Long vs Short Split
+                                                    <PieIcon className="w-4 h-4 text-[#1CADA3]" /> Long vs Short Split
                                                 </h4>
                                                 <div className="h-64 w-full">
                                                     <ResponsiveContainer width="100%" height="100%">
@@ -202,7 +204,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                         {details.graphs?.portfolioConcentration && (
                                             <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                                                 <h4 className="font-bold text-gray-700 mb-6 flex items-center gap-2">
-                                                    <BarIcon className="w-4 h-4 text-purple-600" /> Portfolio Concentration
+                                                    <BarIcon className="w-4 h-4 text-[#2076C7]" /> Portfolio Concentration
                                                 </h4>
                                                 <div className="h-64 w-full">
                                                     <ResponsiveContainer width="100%" height="100%">
@@ -229,7 +231,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                         {details.graphs?.capitalProtection && (
                                             <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                                                 <h4 className="font-bold text-gray-700 mb-6 flex items-center gap-2">
-                                                    <ShieldCheck className="w-4 h-4 text-green-600" /> Capital Protection Structure
+                                                    <ShieldCheck className="w-4 h-4 text-[#1CADA3]" /> Capital Protection Structure
                                                 </h4>
                                                 <div className="h-64 w-full">
                                                     <ResponsiveContainer width="100%" height="100%">
@@ -256,7 +258,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                         {details.graphs?.recoveryStrategy && (
                                             <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                                                 <h4 className="font-bold text-gray-700 mb-6 flex items-center gap-2">
-                                                    <TrendingUp className="w-4 h-4 text-blue-600" /> Recovery Strategy Mix
+                                                    <TrendingUp className="w-4 h-4 text-[#2076C7]" /> Recovery Strategy Mix
                                                 </h4>
                                                 <div className="h-64 w-full">
                                                     <ResponsiveContainer width="100%" height="100%">
@@ -283,7 +285,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                         {details.graphs?.capitalStructure && (
                                             <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                                                 <h4 className="font-bold text-gray-700 mb-6 flex items-center gap-2">
-                                                    <BarIcon className="w-4 h-4 text-indigo-600" /> Capital Structure
+                                                    <BarIcon className="w-4 h-4 text-[#2076C7]" /> Capital Structure
                                                 </h4>
                                                 <div className="h-64 w-full">
                                                     <ResponsiveContainer width="100%" height="100%">
@@ -310,7 +312,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                         {details.graphs?.securityStructure && (
                                             <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                                                 <h4 className="font-bold text-gray-700 mb-6 flex items-center gap-2">
-                                                    <ShieldCheck className="w-4 h-4 text-green-600" /> Security Structure Breakdown
+                                                    <ShieldCheck className="w-4 h-4 text-[#1CADA3]" /> Security Structure Breakdown
                                                 </h4>
                                                 <div className="h-64 w-full">
                                                     <ResponsiveContainer width="100%" height="100%">
@@ -337,23 +339,23 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                         {details.graphs?.deployment && (
                                             <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                                                 <h4 className="font-bold text-gray-700 mb-4 flex items-center gap-2">
-                                                    <TrendingUp className="w-4 h-4 text-green-600" /> Capital Deployment
+                                                    <TrendingUp className="w-4 h-4 text-[#1CADA3]" /> Capital Deployment
                                                 </h4>
                                                 <div className="relative pt-1">
                                                     <div className="flex mb-2 items-center justify-between">
                                                         <div>
-                                                            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-green-600 bg-green-200">
+                                                            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-[#1CADA3] bg-[#1CADA3]/20">
                                                                 Deployed
                                                             </span>
                                                         </div>
                                                         <div className="text-right">
-                                                            <span className="text-xs font-semibold inline-block text-green-600">
+                                                            <span className="text-xs font-semibold inline-block text-[#1CADA3]">
                                                                 {details.graphs.deployment}%
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-green-100">
-                                                        <div style={{ width: `${details.graphs.deployment}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500 transition-all duration-1000 ease-out"></div>
+                                                    <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-[#1CADA3]/20">
+                                                        <div style={{ width: `${details.graphs.deployment}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-[#1CADA3] transition-all duration-1000 ease-out"></div>
                                                     </div>
                                                     <p className="text-xs text-gray-500 text-right">
                                                         {100 - details.graphs.deployment}% Available for Deployment
@@ -371,16 +373,22 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                                             <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Fund Overview</h4>
                                             <ul className="space-y-4">
-                                                <li className="flex justify-between items-center border-b border-gray-50 pb-2">
-                                                    <span className="text-gray-600 flex items-center gap-2"><IndianRupee className="w-4 h-4 text-gray-400" /> Min Investment</span>
-                                                    <span className="font-bold text-gray-800">{details.minCommitment}</span>
+                                                <li className="flex justify-between items-center border-b border-gray-100 pb-3">
+                                                    <span className="text-gray-500 font-medium flex items-center gap-2.5 text-sm">
+                                                        <IndianRupee className="w-4 h-4 text-[#1CADA3]" /> Min Investment
+                                                    </span>
+                                                    <span className="font-bold text-gray-900">{details.minCommitment}</span>
                                                 </li>
-                                                <li className="flex justify-between items-center border-b border-gray-50 pb-2">
-                                                    <span className="text-gray-600 flex items-center gap-2"><Clock className="w-4 h-4 text-gray-400" /> Tenure</span>
-                                                    <span className="font-bold text-gray-800">{details.tenure}</span>
+                                                <li className="flex justify-between items-center border-b border-gray-100 pb-3">
+                                                    <span className="text-gray-500 font-medium flex items-center gap-2.5 text-sm">
+                                                        <Clock className="w-4 h-4 text-[#1CADA3]" /> Tenure
+                                                    </span>
+                                                    <span className="font-bold text-gray-900">{details.tenure}</span>
                                                 </li>
-                                                <li className="flex justify-between items-center border-b border-gray-50 pb-2">
-                                                    <span className="text-gray-600 flex items-center gap-2"><Target className="w-4 h-4 text-gray-400" /> Target IRR</span>
+                                                <li className="flex justify-between items-center pb-1">
+                                                    <span className="text-gray-500 font-medium flex items-center gap-2.5 text-sm">
+                                                        <Target className="w-4 h-4 text-[#1CADA3]" /> Target IRR
+                                                    </span>
                                                     <span className="font-bold text-green-600">{details.targetIRR}</span>
                                                 </li>
                                             </ul>
@@ -403,31 +411,33 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                         {/* Fees */}
                                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                                             <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Fee Structure</h4>
-                                            <div className="space-y-3 text-sm">
-                                                <div className="flex justify-between">
-                                                    <span className="text-gray-600">Management Fee</span>
-                                                    <span className="font-medium text-gray-900">{details.fees?.management || "As per PPM"}</span>
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between items-center border-b border-gray-100 pb-3">
+                                                    <span className="text-gray-500 font-medium text-sm">Management Fee</span>
+                                                    <span className="font-bold text-gray-900 text-right">{details.fees?.management || "As per PPM"}</span>
                                                 </div>
-                                                <div className="flex justify-between">
-                                                    <span className="text-gray-600">Performance Fee</span>
-                                                    <span className="font-medium text-gray-900">{details.fees?.performance || "20%"}</span>
+                                                <div className="flex justify-between items-center border-b border-gray-100 pb-3">
+                                                    <span className="text-gray-500 font-medium text-sm">Performance Fee</span>
+                                                    <span className="font-bold text-gray-900 text-right">{details.fees?.performance || "20%"}</span>
                                                 </div>
-                                                <div className="flex justify-between">
-                                                    <span className="text-gray-600">Hurdle Rate</span>
-                                                    <span className="font-medium text-gray-900">{details.fees?.hurdle || "As per PPM"}</span>
+                                                <div className="flex justify-between items-center pb-1">
+                                                    <span className="text-gray-500 font-medium text-sm">Hurdle Rate</span>
+                                                    <span className="font-bold text-gray-900 text-right">{details.fees?.hurdle || "As per PPM"}</span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* CTA Buttons */}
                                         <div className="space-y-3">
-                                            <button className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 group">
+                                            <button 
+                                                onClick={() => {
+                                                    onClose();
+                                                    openLogin();
+                                                }}
+                                                className="w-full py-4 px-4 bg-[#2076C7] hover:bg-[#2076C7]/90 text-white rounded-xl font-bold shadow-lg shadow-[#2076C7]/20 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+                                            >
                                                 <FileText className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                                Request PPM
-                                            </button>
-                                            <button className="w-full py-3 px-4 bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-200 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
-                                                <Phone className="w-5 h-5 text-gray-500" />
-                                                Schedule Call
+                                                Apply Now
                                             </button>
                                         </div>
 

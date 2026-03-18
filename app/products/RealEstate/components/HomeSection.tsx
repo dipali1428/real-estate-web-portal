@@ -4,9 +4,9 @@ import { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, ChevronRight, Shield, TrendingUp, Wallet, Download, CheckCircle, MapPin } from 'lucide-react';
+import { ChevronRight, Shield, TrendingUp, CheckCircle, MapPin } from 'lucide-react';
 import { IconArrowLeft, IconBuildingSkyscraper, IconStar, IconCheck } from '@tabler/icons-react';
-import heroIllustration from '../../../../public/realestate/realestate.jpeg';
+import heroIllustration from '../assets/real_estate_hero.png';
 import { properties as staticProperties } from '../data/properties';
 
 interface RealEstateHomeSectionProps {
@@ -21,146 +21,6 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
     const featuredProperties = useMemo(() => {
         return staticProperties.filter((p: any) => p.status !== 'closed').slice(0, 3);
     }, []);
-
-    const handleDownloadGuide = () => {
-        const printWindow = window.open('', '_blank');
-        if (!printWindow) return;
-
-        const content = `
-            <!DOCTYPE html>
-            <html>
-                <head>
-                    <title>Infinity_Premium_Brochure_2026</title>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-                    <style>
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px 50px; color: #1e293b; line-height: 1.6; max-width: 950px; margin: 0 auto; font-size: 18px; background: white; }
-                        .header { text-align: center; border-bottom: 5px solid #2076C7; padding-bottom: 30px; margin-bottom: 40px; position: relative; }
-                        .header::after { content: ''; position: absolute; bottom: -5px; right: 0; width: 50%; height: 5px; background: #1CADA3; }
-                        h1 { background: linear-gradient(to right, #2076C7, #1CADA3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; font-size: 48px; text-transform: uppercase; letter-spacing: 3px; font-weight: 900; }
-                        .subtitle { color: #64748b; font-size: 26px; font-weight: 600; margin-top: 10px; letter-spacing: 1px; }
-                        .section { margin-bottom: 50px; }
-                        h2 { background: linear-gradient(to right, #2076C7, #1CADA3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-left: 8px solid #2076C7; padding-left: 20px; font-size: 30px; margin-bottom: 25px; display: inline-block; font-weight: 800; }
-                        .market-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 30px; margin-bottom: 30px; display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
-                        .market-stat { text-align: center; padding: 15px; background: white; border-radius: 15px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-                        .market-stat b { display: block; font-size: 28px; color: #2076C7; margin-bottom: 5px; }
-                        .market-stat p { margin: 0; font-size: 14px; text-transform: uppercase; font-weight: 700; color: #64748b; }
-                        .step { margin-bottom: 25px; display: flex; align-items: flex-start; }
-                        .step-num { background: linear-gradient(135deg, #2076C7, #1CADA3); color: white; min-width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; margin-right: 20px; font-size: 20px; flex-shrink: 0; }
-                        .step-content b { display: block; font-size: 22px; color: #1e293b; margin-bottom: 8px; }
-                        .step-content p { margin: 0; color: #475569; font-size: 17px; }
-                        ul { padding-left: 25px; margin: 0; }
-                        li { margin-bottom: 15px; font-size: 17px; color: #475569; }
-                        li b { color: #1e293b; }
-                        .why-us-grid { display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
-                        .why-us-item { background: #fff; border: 1px solid #e2e8f0; padding: 25px; border-radius: 15px; height: 100%; transition: all 0.3s; }
-                        .why-us-item b { color: #2076C7; display: block; margin-bottom: 10px; font-size: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
-                        .why-us-item p { margin: 0; font-size: 16px; color: #64748b; line-height: 1.6; }
-                        .footer { margin-top: 80px; text-align: center; font-size: 16px; color: #1e293b; border-top: 3px solid #f1f5f9; padding: 50px 0 100px 0; background: #fafafa; border-radius: 30px 30px 0 0; }
-                        .social-links { margin: 25px 0; font-weight: 700; }
-                        .social-links a { margin: 0 20px; text-decoration: none; color: #2076C7 !important; border-bottom: 2px solid #1CADA3; padding-bottom: 2px; }
-                        .page-break { page-break-before: always; }
-                    </style>
-                </head>
-                <body>
-                    <div id="brochure-content">
-                        <div class="header">
-                            <h1>INFINITY ARTHVISHWA</h1>
-                            <div class="subtitle">Real Estate Portfolio Insights • 2026 Edition</div>
-                        </div>
-
-                        <div class="section">
-                            <h2>2026 Market Analysis: Pune Growth Corridor</h2>
-                            <p style="margin-bottom: 25px; color: #475569;">The Pune real estate market has shown a resilient <b>11.5% YoY growth</b> in premium residential and commercial sectors. Our data-driven approach identifies micro-markets with high absorption rates.</p>
-                            <div class="market-box">
-                                <div class="market-stat"><b>12.8%</b><p>Avg. Capital Appreciation</p></div>
-                                <div class="market-stat"><b>8.4%</b><p>Commercial Rental Yield</p></div>
-                                <div class="market-stat"><b>₹2,500 Cr+</b><p>Managed Assets</p></div>
-                                <div class="market-stat"><b>98.5%</b><p>Occupancy Rate</p></div>
-                            </div>
-                        </div>
-
-                        <div class="section">
-                            <h2>1. Strategic Investment Roadmap</h2>
-                            <div class="step">
-                                <div class="step-num">1</div>
-                                <div class="step-content"><b>Institutional Grade Selection</b><p>We filter Grade-A properties from top-tier developers, ensuring only high-liquidity assets enter our portfolio.</p></div>
-                            </div>
-                            <div class="step">
-                                <div class="step-num">2</div>
-                                <div class="step-content"><b>Fractional Allocation</b><p>Invest in premium assets starting from ₹5 Lakh. Perfect for diversifying across multiple micro-markets.</p></div>
-                            </div>
-                            <div class="step">
-                                <div class="step-num">3</div>
-                                <div class="step-content"><b>SPV Governance</b><p>Secure ownership via a Special Purpose Vehicle (SPV), providing a bulletproof legal framework and tax efficiency.</p></div>
-                            </div>
-                            <div class="step">
-                                <div class="step-num">4</div>
-                                <div class="step-content"><b>Wealth Generation</b><p>Monthly rental credits directly to your bank account with long-term capital gains on asset disposal.</p></div>
-                            </div>
-                        </div>
-
-                        <div class="section page-break">
-                            <h2>2. Fractional Advantage & Eligibility</h2>
-                            <ul>
-                                <li><b>HNI & NRI Focus:</b> Custom structures for Resident Indians and NRI/OCI investors via NRE/NRO routes.</li>
-                                <li><b>Title Verification:</b> 100% cloud-accessible legal due diligence for every listed asset.</li>
-                                <li><b>Market Liquidity:</b> First-of-its-kind resale window and secondary market for fractional exits.</li>
-                                <li><b>Portfolio Diversification:</b> Spread capital across IT Parks, Luxury Retail, and Premium Residential.</li>
-                                <li><b>Tax Optimization:</b> Structured as LLPs for flow-through taxation benefits for investors.</li>
-                            </ul>
-                        </div>
-
-                        <div class="section">
-                            <h2>3. Why Choose Infinity Arthvishwa?</h2>
-                            <div class="why-us-grid">
-                                <div class="why-us-item"><b>Curated Selection</b><p>Only the top 1% of Pune's real estate deals pass our proprietary 50-point checklist.</p></div>
-                                <div class="why-us-item"><b>Digital First</b><p>Track performance, documents, and yields via our state-of-the-art investor dashboard.</p></div>
-                                <div class="why-us-item"><b>Full Stack Management</b><p>From facility management to legal compliance, we handle the dirty work.</p></div>
-                                <div class="why-us-item"><b>High Liquidity</b><p>Pre-planned exit strategies at the end of the holding period with professional resale support.</p></div>
-                            </div>
-                        </div>
-
-                        <div class="footer">
-                             <p style="font-weight: 800; font-size: 20px; color: #2076C7; margin-bottom: 15px;">INFINITY ARTHVISHWA PREMIUM REALTY</p>
-                            <div style="margin: 20px 0; color: #1e293b; font-weight: 800; font-size: 26px;">
-                                <span style="color: #64748b; font-size: 16px;">TOLL FREE:</span> 1800-532-7600
-                            </div>
-                            <div class="social-links">
-                                <a href="#">LinkedIn</a>
-                                <a href="#">Instagram</a>
-                                <a href="#">Facebook</a>
-                            </div>
-                            <p style="margin-top: 30px; font-weight: 700; color: #64748b; font-size: 14px;">
-                                Head Office: Prime Square, Baner, Pune - 411045<br>
-                                www.infinityarthvishwa.com | contact@infinity.com
-                            </p>
-                        </div>
-                    </div>
-                    <script>
-                        window.onload = function() {
-                            const element = document.getElementById('brochure-content');
-                            const opt = {
-                                margin: [10, 10, 20, 10],
-                                filename: 'Infinity_Arthvishwa_Market_Report_2026.pdf',
-                                image: { type: 'jpeg', quality: 0.98 },
-                                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                            };
-                            
-                            setTimeout(() => {
-                                html2pdf().set(opt).from(element).save().then(() => {
-                                    // Optional: window.close() after download
-                                });
-                            }, 800);
-                        }
-                    </script>
-                </body>
-            </html>
-        `;
-        printWindow.document.write(content);
-        printWindow.document.close();
-    };
 
     const handleSearch = (e: any) => {
         if (e && e.key && e.key !== 'Enter') return;
@@ -181,7 +41,7 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
     };
 
     return (
-        <div className="animate-fade-in">
+        <div className="animate-fade-in font-sans">
             {/* Hero Section - Redesigned to match Education Loan style */}
             <section className="relative min-h-[70vh] lg:min-h-[75vh] flex items-center bg-white overflow-hidden pt-12 md:pt-8 pb-16">
                 {/* Back Button (Non-sticky) */}
@@ -243,14 +103,6 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
                                     </span>
                                     <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
                                 </Link>
-                                <button
-                                    onClick={handleDownloadGuide}
-                                    className="group relative bg-white px-6 md:px-7 py-3.5 md:py-1.5 rounded-lg font-semibold text-base md:text-lg border-2 hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 transition-all"
-                                    style={{ color: '#2076C7', borderColor: '#2076C7' }}
-                                >
-                                    <Download size={18} className="group-hover:translate-y-1 transition-transform" />
-                                    How to Invest
-                                </button>
                             </div>
                         </motion.div>
 
@@ -319,7 +171,7 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
                         <div className="space-y-8">
                             {[
                                 { icon: Shield, title: 'Asset Backed Security', text: 'Your investments are secured by physical real estate assets.' },
-                                { icon: CheckCircle, title: 'Low Entry Barrier', text: 'Start investing with amounts as low as ₹1 Lakh.' },
+                                { icon: CheckCircle, title: 'Low Entry Barrier', text: 'Start investing with amounts as low as ₹5 Lakh.' },
                                 { icon: TrendingUp, title: 'Predictable Returns', text: 'Benefit from stable rental yields and long-term growth.' }
                             ].map((item, index) => (
                                 <div key={index} className="flex gap-6 items-start">
@@ -381,8 +233,8 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
                         <div key={property.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group">
                             <div className="relative h-56 overflow-hidden">
                                 <img src={property.image} alt={property.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                <div className="absolute top-4 right-4 px-3 py-1 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider rounded-full">
-                                    {property.type}
+                                <div className="absolute top-4 right-4 px-3 py-1 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg border border-white/20 backdrop-blur-sm">
+                                    {property.type.split(' ')[0]}
                                 </div>
                             </div>
                             <div className="p-6">
