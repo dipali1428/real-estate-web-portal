@@ -115,10 +115,9 @@ const AboutSection = () => {
                                 </p>
                             </div>
 
-                            {/* Row 1: 3 Leaders */}
-                            {/* Row 1: 4 Leaders - Rajesh, Rahul, Krishna, Sanjay */}
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
-                                {leaders.slice(0, 4).map((leader, index) => (
+                            {/* Row 1: 5 Leaders */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-[95rem] mx-auto mb-12">
+                                {leaders.slice(0, 5).map((leader, index) => (
                                     <div
                                         key={index}
                                         className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
@@ -140,9 +139,9 @@ const AboutSection = () => {
 
                             {/* Row 2: 3 Leaders */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-                                {leaders.slice(4, 7).map((leader, index) => (
+                                {leaders.slice(5, 8).map((leader, index) => (
                                     <div
-                                        key={index + 3}
+                                        key={index + 5}
                                         className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
                                         <div className="w-full aspect-square overflow-hidden">
                                             <img
@@ -169,10 +168,10 @@ const AboutSection = () => {
                             </div>
 
                             {/* Row 3: Remaining 5 Leaders */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-[95rem] mx-auto">
-                                {leaders.slice(7).map((leader, index) => (
+                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-[95rem] mx-auto">
+                                {leaders.slice(8).map((leader, index) => (
                                     <div
-                                        key={index + 6}
+                                        key={index + 8}
                                         className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
                                         <div className="w-full aspect-[4/5] overflow-hidden">
                                             <img
