@@ -66,10 +66,11 @@ export const RmService = {
     const response = await api.post(`/api/rm/detail-leads/${leadId}/reject`);
     return response.data;
   },
-  updateReferralStatus: async (leadId: number, newStatus: string) => {
-    const response = await api.put(`/api/rm/${leadId}/referral-status`,{
-      referral_lead_status: newStatus  
-    },);
+  updateReferralStatus: async (leadId: number, newStatus: string, note?: string) => {
+    const response = await api.put(`/api/rm/${leadId}/referral-status`, {
+      referral_lead_status: newStatus,
+      rejection_note: note  // Matches your backend expectation
+    });
     return response.data;
   },
  updateDetailLeadStatus: async (leadId: number, newStatus: string) => {
