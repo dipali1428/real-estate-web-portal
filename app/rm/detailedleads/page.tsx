@@ -119,13 +119,10 @@ export default function LeadDashboard() {
       let response;
       if (leadType === 'my_lead') {
         response = await RmService.getMyDetailLeads();
-        console.log("myleads leads response:", response);
       } else if (leadType === 'incoming') {
         response = await RmService.getIncomingDetailLeads();
-        console.log("imcoming leads response:", response);
       } else if (leadType === 'outgoing') {
         response = await RmService.getOutgoingDetailLeads();
-        console.log("outgoing leads response:", response);
       }
 
 
@@ -146,7 +143,6 @@ export default function LeadDashboard() {
       setProcessingId(leadId);
 
       const response = await RmService.updateDetailLeadStatus(leadId, status);
-      console.log("Status update response:", response);
       if (response.success) {
         fetchLeads();
         setOpenStatusDropdown(null);
