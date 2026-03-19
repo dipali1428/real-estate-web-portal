@@ -372,14 +372,7 @@ export default function TransactionsPage() {
               <History className="w-8 h-8 text-[#2076C7]" />
               Transaction History
             </h1>
-            <span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full border border-blue-200">
-              {filteredTransactions.length} of {transactions.length}
-            </span>
           </div>
-          <p className="text-gray-600 flex items-center gap-2">
-            <Clock size={14} className="text-gray-400" />
-            Last updated: {lastUpdated || 'Just now'}
-          </p>
         </div>
         
         <div className="flex items-center gap-3">

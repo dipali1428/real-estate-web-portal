@@ -251,6 +251,50 @@ const CustomerService = {
         return response.data;
     },
 
+    // ==================== GOAL PLANNER (FIXED PATHS) ====================
+    createGoal: async (goalData: any) => {
+        const response = await api.post("/api/customer/create-goal", goalData);
+        return response.data;
+    },
+
+    getMyGoals: async () => {
+        const response = await api.get("/api/customer/my-goals");
+        return response.data;
+    },
+
+    getGoalById: async (goalId: number) => {
+        const response = await api.get(`/api/customer/goal/${goalId}`);
+        return response.data;
+    },
+
+    updateGoal: async (goalId: number, goalData: any) => {
+        const response = await api.put(`/api/customer/update-goal/${goalId}`, goalData);
+        return response.data;
+    },
+
+    // In customerService.ts
+calculateGoal: async (calculationData: any) => {
+    // Change from GET to POST
+    const response = await api.post("/api/customer/calculate-goal", {
+        target_amount: calculationData.target_amount,
+        target_years: calculationData.target_years,
+        expected_return: calculationData.expected_return,
+        current_savings: calculationData.current_savings || 0
+        // Note: goal_name is NOT needed here based on your API
+    });
+    return response.data;
+},
+
+    getGoalProgress: async (goalId: number) => {
+        const response = await api.get(`/api/customer/goal-progress/${goalId}`);
+        return response.data;
+    },
+
+    deleteGoal: async (goalId: number) => {
+        const response = await api.delete(`/api/customer/delete-goal/${goalId}`);
+        return response.data;
+    },
+
     // ==================== LOGOUT ====================
     logout: async () => {
         const response = await api.post("/api/unlisted/user/logout");
