@@ -140,7 +140,7 @@ export default function FeeImpactCalculator() {
                 <h4 className="text-xl font-black text-gray-900 mb-10 text-center font-heading tracking-tight">Financial Summary</h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div className="p-8 bg-blue-50/50 rounded-3xl border border-blue-100 group hover:bg-blue-50 transition-colors">
+                    <div className="p-8 bg-[#2076C7]/5 rounded-3xl border border-[#2076C7]/10 group hover:bg-[#2076C7]/10 transition-colors">
                         <div className="text-[10px] font-black text-primary uppercase tracking-widest mb-4">Gross Asset Value</div>
                         <div className="text-2xl font-black text-gray-900 leading-tight">
                             ₹{new Intl.NumberFormat('en-IN').format(Math.round(results.grossAmount))}
@@ -148,8 +148,8 @@ export default function FeeImpactCalculator() {
                         <div className="mt-2 text-xs font-bold text-gray-400">Pre-fee terminal value</div>
                     </div>
 
-                    <div className="p-8 bg-teal-50/50 rounded-3xl border border-teal-100 group hover:bg-teal-50 transition-colors">
-                        <div className="text-[10px] font-black text-teal-600 uppercase tracking-widest mb-4">Net Asset Value</div>
+                    <div className="p-8 bg-[#1CADA3]/5 rounded-3xl border border-[#1CADA3]/10 group hover:bg-[#1CADA3]/10 transition-colors">
+                        <div className="text-[10px] font-black text-[#1CADA3] uppercase tracking-widest mb-4">Net Asset Value</div>
                         <div className="text-2xl font-black text-gray-900 leading-tight">
                             ₹{new Intl.NumberFormat('en-IN').format(Math.round(results.finalPortfolio))}
                         </div>

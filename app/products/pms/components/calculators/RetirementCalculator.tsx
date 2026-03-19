@@ -148,7 +148,7 @@ export default function RetirementCalculator() {
                             ₹{new Intl.NumberFormat('en-IN').format(Math.round(results.totalCorpus / 10000000))} <span className="text-2xl not-italic text-white/20">Cr</span>
                         </div>
                         <div className="mt-4 flex items-center justify-center lg:justify-start gap-3">
-                            <div className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${results.surplusDeficit >= 0 ? 'bg-teal-500/20 text-teal-400' : 'bg-red-500/20 text-red-400'}`}>
+                            <div className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${results.surplusDeficit >= 0 ? 'bg-[#1CADA3]/20 text-[#1CADA3]' : 'bg-red-500/20 text-red-400'}`}>
                                 {results.surplusDeficit >= 0 ? 'Surplus Achieved' : 'Capital Deficit'}
                             </div>
                             <div className="text-xs font-medium text-white/40 italic">Planning Horizon: {results.yearsToRetire} Years</div>
@@ -160,7 +160,7 @@ export default function RetirementCalculator() {
                             <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Required Base</div>
                             <div className="text-xl font-bold">₹{(results.requiredCorpus / 10000000).toFixed(1)} Cr</div>
                         </div>
-                        <div className={`p-6 bg-white/5 rounded-[2rem] border ${results.surplusDeficit >= 0 ? 'border-teal-500/30' : 'border-red-500/30'} backdrop-blur-sm`}>
+                        <div className={`p-6 bg-white/5 rounded-[2rem] border ${results.surplusDeficit >= 0 ? 'border-[#1CADA3]/30' : 'border-red-500/30'} backdrop-blur-sm`}>
                             <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">{results.surplusDeficit >= 0 ? 'Safety Margin' : 'Capital Gap'}</div>
                             <div className={`text-xl font-bold ${results.surplusDeficit >= 0 ? 'text-teal-400' : 'text-red-400'}`}>₹{(Math.abs(results.surplusDeficit) / 10000000).toFixed(1)} Cr</div>
                         </div>
@@ -170,7 +170,7 @@ export default function RetirementCalculator() {
 
             {/* Strategic Insights */}
             <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="p-8 bg-blue-50/50 rounded-[2.5rem] border border-blue-100 flex items-start gap-6">
+                <div className="p-8 bg-[#2076C7]/5 rounded-[2.5rem] border border-[#2076C7]/10 flex items-start gap-6">
                     <div className="w-12 h-12 bg-white rounded-2xl shadow-lg flex items-center justify-center text-primary shrink-0">
                         <ShieldCheck size={24} />
                     </div>

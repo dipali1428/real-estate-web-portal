@@ -48,7 +48,7 @@ const Header = () => {
 
   ];
 
- const loansOptions = [
+  const loansOptions = [
     { label: "Home Loan", href: "/products/home-loan" },
     { label: "Personal Loan", href: "/products/personal-loan" },
     { label: "Business Loan", href: "/products/business-loan" },
@@ -97,19 +97,19 @@ const Header = () => {
 
   return (
     <header className="bg-linear-to-br from-[#E8F6FA] via-[#F0FAFB] to-[#E9F8F6] backdrop-blur-md shadow-sm sticky top-0 z-50 transition-all duration-300 border-b border-[#1CADA3]/20">
-<nav className="relative max-w-[1600px] container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex items-center justify-start lg:justify-center">
-      <Link href="/" className="flex items-center shrink-0">
-  <Image
-    src="/logo.png"
-    alt="Infinity Arthvishva Logo"
-    width={200}
-    height={200}
-    className="h-10 sm:h-8 md:h-10 lg:h-12 xl:h-14 w-auto object-contain"
-    priority
-  />
-</Link>
+      <nav className="relative max-w-[1600px] container mx-auto px-3 sm:px-4 lg:px-6 py-3 flex items-center justify-start lg:justify-center">
+        <Link href="/" className="flex items-center shrink-0">
+          <Image
+            src="/logo.png"
+            alt="Infinity Arthvishva Logo"
+            width={200}
+            height={200}
+            className="h-10 sm:h-8 md:h-10 lg:h-12 xl:h-14 w-auto object-contain"
+            priority
+          />
+        </Link>
         {/* Desktop Menu */}
- <div className="hidden lg:flex items-center space-x-2 xl:space-x-3 font-sans ml-6">
+        <div className="hidden lg:flex items-center space-x-2 xl:space-x-3 font-sans ml-6">
 
           {/* Home & About Us */}
           {navLinks.slice(0, 2).map((link, i) => (
@@ -430,8 +430,9 @@ const Header = () => {
           {/* Calculator Dropdown */}
           <motion.div
             className="relative"
-            onMouseEnter={() => setIsCalculatorOpen(true)}
-            onMouseLeave={() => setIsCalculatorOpen(false)}>
+          // onMouseEnter={() => setIsCalculatorOpen(true)}
+          // onMouseLeave={() => setIsCalculatorOpen(false)}
+          >
             <motion.div
               whileHover={{ scale: 1.05, y: -2 }}
               transition={{ type: "spring", stiffness: 250, damping: 20 }}
@@ -443,13 +444,17 @@ const Header = () => {
                 whileHover={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.35 }}
               />
-              <button className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] flex items-center space-x-1 text-sm xl:text-base">
+              <a
+                href="/page/emi"
+                className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] flex items-center space-x-1 text-sm xl:text-base"
+              >
                 <span>Calculator</span>
-                <ChevronDown
+                {/* You can keep or remove the Chevron since the dropdown won't trigger on desktop anymore */}
+                {/* <ChevronDown
                   size={14}
                   className={`transition-transform duration-300 ${isCalculatorOpen ? "rotate-180" : ""}`}
-                />
-              </button>
+                /> */}
+              </a>
               <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
             </motion.div>
 
@@ -551,12 +556,12 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu Button */}
-<button
-  onClick={() => setIsOpen(!isOpen)}
-  className="lg:hidden absolute right-3 sm:right-4 p-3 text-[#2076C7]"
->
-  {isOpen ? <X size={30} /> : <Menu size={30} />}
-</button>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="lg:hidden absolute right-3 sm:right-4 p-3 text-[#2076C7]"
+        >
+          {isOpen ? <X size={30} /> : <Menu size={30} />}
+        </button>
       </nav>
 
       {/* Mobile Menu */}
@@ -569,7 +574,7 @@ const Header = () => {
             transition={{ duration: 0.3 }}
             className="lg:hidden bg-linear-to-br from-[#E8F6FA] via-[#F0FAFB] to-[#E9F8F6] backdrop-blur-md shadow-md">
             <div className="flex flex-col items-center space-y-3 py-4">
-              
+
               {/* Home & About */}
               {navLinks.slice(0, 2).map((link, i) => (
                 <a

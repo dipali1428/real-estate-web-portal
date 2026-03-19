@@ -6,11 +6,11 @@ import { Shield, Activity, PieChart, TrendingUp, AlertTriangle, CheckCircle } fr
 
 export default function PortfolioHealthCalculator() {
     const [currentAllocation, setCurrentAllocation] = useState([
-        { type: 'Equity Mutual Funds', value: 30000000, allocation: 60, color: 'bg-blue-500' },
-        { type: 'Fixed Deposits', value: 10000000, allocation: 20, color: 'bg-teal-500' },
-        { type: 'Real Estate', value: 5000000, allocation: 10, color: 'bg-indigo-500' },
-        { type: 'Gold', value: 3000000, allocation: 6, color: 'bg-amber-500' },
-        { type: 'Cash', value: 2000000, allocation: 4, color: 'bg-gray-400' }
+        { type: 'Equity Mutual Funds', value: 30000000, allocation: 60, color: 'bg-[#2076C7]' },
+        { type: 'Fixed Deposits', value: 10000000, allocation: 20, color: 'bg-[#1CADA3]' },
+        { type: 'Real Estate', value: 5000000, allocation: 10, color: 'bg-[#2076C7]/70' },
+        { type: 'Gold', value: 3000000, allocation: 6, color: 'bg-[#1CADA3]/70' },
+        { type: 'Cash', value: 2000000, allocation: 4, color: 'bg-[#2076C7]/30' }
     ]);
 
     const [riskProfile, setRiskProfile] = useState('moderate');

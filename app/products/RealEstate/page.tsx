@@ -54,7 +54,8 @@ export default function Home() {
         description="Whether you're looking for a luxury home or a high-yield commercial investment, our experts are here to guide you. Discover our exclusive portfolio and start your real estate journey today."
         buttonText="Browse Properties"
         buttonLink="#properties"
-   
+        // secondaryButtonText="Contact Us"
+        // secondaryButtonLink="/#contact"
       />
       <ScrollToTop />
     </main>

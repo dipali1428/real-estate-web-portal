@@ -137,7 +137,7 @@ export default function PGIMCoreEquityDetail() {
         datasets: [
             {
                 data: [62, 27, 7, 3],
-                backgroundColor: ['#0F172A', '#2076C7', '#1CADA3', '#94A3B8'],
+                backgroundColor: ['#0E8A82', '#2076C7', '#1CADA3', '#94A3B8'],
                 borderWidth: 0,
                 hoverOffset: 10,
             }
@@ -190,17 +190,15 @@ export default function PGIMCoreEquityDetail() {
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-left">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                        <Link href="/products/pms" className="inline-flex items-center text-slate-500 hover:text-primary transition-colors mb-6 group">
-                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
+                        <Link href="/products/pms" className="inline-flex items-center text-gray-500 hover:text-primary transition-colors mb-6 group">
+                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
                                 <ArrowLeft size={16} />
                             </div>
                             <span className="font-bold tracking-wider uppercase text-sm">Back to PMS Products</span>
                         </Link>
-                        <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight font-heading leading-[1.1] text-gray-700">
+                        <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tighter font-sans leading-[1.1] bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-clip-text text-transparent drop-shadow-sm">
                             PGIM India <br />
-                            <span className="text-[#2076C7]">
-                                Core Equity Portfolio
-                            </span>
+                            Core Equity Portfolio
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-600 max-w-3xl leading-relaxed">
                             A core equity strategy investing in high-quality Indian companies available at reasonable valuations, with the objective of long-term wealth creation.
@@ -224,8 +222,8 @@ export default function PGIMCoreEquityDetail() {
                             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                                 <item.icon className="text-primary w-6 h-6" />
                             </div>
-                            <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">{item.label}</div>
-                            <div className="font-bold text-gray-700 leading-tight text-sm">{item.value}</div>
+                            <div className="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">{item.label}</div>
+                            <div className="font-bold text-gray-900 leading-tight text-sm">{item.value}</div>
                         </div>
                     ))}
                 </div>
@@ -237,31 +235,31 @@ export default function PGIMCoreEquityDetail() {
 
                         <div className="flex items-center justify-between mb-8 relative z-10">
                             <div>
-                                <h3 className="text-2xl font-bold font-heading text-gray-700 flex items-center gap-3">
+                                <h3 className="text-2xl font-bold font-sans text-gray-900 flex items-center gap-3">
                                     <TrendingUp className="text-primary" />
                                     Performance Journey
                                 </h3>
-                                <p className="text-slate-500 mt-1">Portfolio Growth vs Benchmark</p>
+                                <p className="text-gray-500 mt-1">Portfolio Growth vs Benchmark</p>
                             </div>
                         </div>
 
-                        <div className="h-[350px] w-full">
+                        <div className="h-[250px] md:h-[350px] w-full">
                             <Line data={performanceData} options={lineOptions} />
                         </div>
 
                         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
-                                <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">FY 2023-24</div>
+                                <div className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">FY 2023-24</div>
                                 <div className="text-2xl font-black text-primary">29.91%</div>
-                                <div className="text-xs text-slate-400 mt-1">Strong Growth</div>
+                                <div className="text-xs text-gray-400 mt-1">Strong Growth</div>
                             </div>
                             <div className="bg-neutral-50 rounded-2xl p-4 border border-gray-100">
-                                <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">FY 2024-25</div>
-                                <div className="text-2xl font-black text-slate-700">6.18%</div>
-                                <div className="text-xs text-slate-400 mt-1">Steady</div>
+                                <div className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">FY 2024-25</div>
+                                <div className="text-2xl font-black text-gray-700">6.18%</div>
+                                <div className="text-xs text-gray-400 mt-1">Steady</div>
                             </div>
                             <div className="bg-neutral-50 rounded-2xl p-4 border border-gray-100 flex items-center justify-center text-center">
-                                <p className="text-sm text-slate-600 italic font-medium">
+                                <p className="text-sm text-gray-600 italic font-medium">
                                     "The portfolio has delivered steady performance with lower volatility compared to broader markets."
                                 </p>
                             </div>
@@ -269,43 +267,43 @@ export default function PGIMCoreEquityDetail() {
                     </div>
 
                     {/* Calendar Returns */}
-                    <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100 flex flex-col justify-between">
+                    <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100 justify-between">
                         <div>
-                            <h3 className="text-xl font-bold font-heading text-gray-700 mb-6 flex items-center gap-2">
-                                <BarChart3 className="text-accent-teal" />
+                            <h3 className="text-xl font-bold font-sans text-gray-900 mb-6 flex items-center gap-2">
+                                <BarChart3 className="text-[#1CADA3]" />
                                 Calendar Returns
                             </h3>
-                            <div className="h-[300px] w-full mb-6">
+                            <div className="h-[200px] md:h-[300px] w-full mb-6">
                                 <Bar data={calendarData} options={barOptions} />
                             </div>
                         </div>
-                        <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-                            <p className="text-xs text-slate-500 leading-relaxed text-center">
+                        <div className="bg-[#2076C7]/5 p-4 rounded-xl border border-[#2076C7]/10">
+                            <p className="text-xs text-gray-500 leading-relaxed text-center">
                                 Returns are net of fees and charges; calculated on TWRR basis.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-8 mb-16">
+                <div className="grid lg:grid-cols-3 gap-8 mb-16 items-start">
                     {/* Market Cap Split */}
-                    <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
-                        <h3 className="text-xl font-bold font-heading text-gray-700 mb-6 flex items-center gap-2">
+                    <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100 flex flex-col items-start">
+                        <h3 className="text-xl font-bold font-sans text-gray-900 mb-6 flex items-center gap-2">
                             <PieChart className="text-primary" />
                             Market Allocation
                         </h3>
-                        <div className="h-[250px] w-full relative">
+                        <div className="h-[200px] md:h-[250px] w-full relative mb-6">
                             <Pie data={allocationData} options={pieOptions} />
-                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <span className="text-3xl font-black text-gray-700">62%</span>
-                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Large Cap</span>
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Large Cap</span>
                             </div>
                         </div>
-                        <div className="flex flex-wrap justify-center gap-4 mt-6">
+                        <div className="flex flex-wrap justify-center gap-4 mt-auto w-full">
                             {allocationData.labels.map((label, index) => (
                                 <div key={index} className="flex items-center gap-2">
                                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: (allocationData.datasets[0].backgroundColor as string[])[index] }} />
-                                    <span className="text-xs font-bold text-slate-600">{label} {allocationData.datasets[0].data[index]}%</span>
+                                    <span className="text-xs font-bold text-gray-600">{label} {allocationData.datasets[0].data[index]}%</span>
                                 </div>
                             ))}
                         </div>
@@ -313,14 +311,14 @@ export default function PGIMCoreEquityDetail() {
 
                     {/* Sector Allocation */}
                     <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
-                        <h3 className="text-xl font-bold font-heading text-gray-700 mb-6 flex items-center gap-2">
+                        <h3 className="text-xl font-bold font-sans text-gray-900 mb-6 flex items-center gap-2">
                             <Layers className="text-primary" />
                             Sector Exposure
                         </h3>
                         <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
                             {sectorData.map((item, index) => (
                                 <div key={index} className="relative">
-                                    <div className="flex justify-between text-sm font-bold text-slate-700 mb-2">
+                                    <div className="flex justify-between text-sm font-bold text-gray-700 mb-2">
                                         <span>{item.name}</span>
                                         <span>{item.value}%</span>
                                     </div>
@@ -341,7 +339,7 @@ export default function PGIMCoreEquityDetail() {
 
                 {/* Top Holdings */}
                 <div className="mb-16">
-                    <h3 className="text-2xl font-bold font-heading text-gray-700 mb-8 flex items-center gap-2">
+                    <h3 className="text-2xl font-bold font-sans text-gray-900 mb-8 flex items-center gap-2">
                         <Briefcase className="text-primary" />
                         Top Portfolio Holdings
                     </h3>
@@ -356,14 +354,14 @@ export default function PGIMCoreEquityDetail() {
                             </div>
                         ))}
                     </div>
-                    <p className="text-xs text-slate-400 mt-4 italic">* Holdings are indicative and may vary across client portfolios.</p>
+                    <p className="text-xs text-gray-400 mt-4 italic">* Holdings are indicative and may vary across client portfolios.</p>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-12 mb-16">
+                <div className="grid lg:grid-cols-2 gap-12 mb-16 items-start">
                     {/* Investment Philosophy */}
-                    <div className="bg-white rounded-[2.5rem] p-8 lg:p-12 shadow-xl border border-gray-100 relative overflow-hidden">
+                    <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -mr-32 -mt-32" />
-                        <h3 className="text-2xl font-bold font-heading text-gray-700 mb-8 flex items-center gap-3 relative z-10">
+                        <h3 className="text-2xl font-bold font-sans text-gray-900 mb-8 flex items-center gap-3 relative z-10">
                             <Target className="text-primary" />
                             Investment Approach
                         </h3>
@@ -376,9 +374,9 @@ export default function PGIMCoreEquityDetail() {
                             ].map((point, i) => (
                                 <div key={i} className="flex gap-4">
                                     <div className="shrink-0 mt-1">
-                                        <CheckCircle className="text-accent-teal w-6 h-6" />
+                                        <CheckCircle className="text-[#1CADA3] w-6 h-6" />
                                     </div>
-                                    <p className="text-slate-700 font-medium leading-relaxed">{point}</p>
+                                    <p className="text-gray-700 font-medium leading-relaxed">{point}</p>
                                 </div>
                             ))}
                         </div>
@@ -386,7 +384,7 @@ export default function PGIMCoreEquityDetail() {
 
                     {/* Risk & Portfolio Attributes */}
                     <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
-                        <h3 className="text-xl font-bold font-heading text-gray-700 mb-6 flex items-center gap-2">
+                        <h3 className="text-xl font-bold font-sans text-gray-900 mb-6 flex items-center gap-2">
                             <Activity className="text-primary" />
                             Portfolio Statistics & Risk
                         </h3>
@@ -401,9 +399,9 @@ export default function PGIMCoreEquityDetail() {
                                 { l: "Top 10 Concentration", v: "49.24%", sub: "" },
                             ].map((attr, i) => (
                                 <div key={i} className={`bg-neutral-50 p-4 rounded-xl border border-gray-100 ${i === 6 ? 'col-span-2' : ''}`}>
-                                    <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">{attr.l}</div>
+                                    <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-1">{attr.l}</div>
                                     <div className="text-lg font-black text-gray-700">{attr.v}</div>
-                                    {attr.sub && <div className="text-[10px] text-slate-400">{attr.sub}</div>}
+                                    {attr.sub && <div className="text-[10px] text-gray-400">{attr.sub}</div>}
                                 </div>
                             ))}
                         </div>
@@ -412,42 +410,47 @@ export default function PGIMCoreEquityDetail() {
 
                 {/* Who Should Invest */}
                 <section>
-                    <div className="bg-white rounded-[4rem] p-10 lg:p-14 border border-gray-100 shadow-xl flex flex-col items-center text-center relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -mr-32 -mt-32" />
-
-                        <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mb-8 relative z-10">
-                            <Users className="text-primary" size={36} />
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center mb-12">
+                            <h3 className="text-3xl md:text-4xl font-bold font-sans text-gray-800 mb-4 tracking-tight">
+                                Is this right for you?
+                            </h3>
+                            <div className="w-20 h-1.5 bg-gradient-to-r from-primary to-[#1CADA3] mx-auto rounded-full"></div>
                         </div>
-                        <h3 className="text-3xl font-black text-gray-700 mb-10 uppercase tracking-tighter leading-none font-heading relative z-10">Is this right <br /> <span className="text-primary">for you?</span></h3>
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 w-full relative z-10">
+
+                        <div className="grid md:grid-cols-2 gap-6 w-full relative z-10">
                             {[
                                 "Investors seeking a core equity PMS",
                                 "Moderate risk appetite",
                                 "Minimum investment horizon of 3+ years",
                                 "Preference for stability with long-term growth"
                             ].map((point, i) => (
-                                <div key={i} className="bg-neutral-50 p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center gap-4 group hover:border-primary/20 hover:shadow-md transition-all duration-300">
-                                    <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:bg-primary transition-colors">
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                    className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md hover:border-primary/20 transition-all group"
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                                         <CheckCircle className="text-primary group-hover:text-white" size={16} />
                                     </div>
-                                    <span className="font-bold text-slate-700 group-hover:text-gray-700 transition-colors">{point}</span>
-                                </div>
+                                    <span className="font-bold text-gray-700 transition-colors">{point}</span>
+                                </motion.div>
                             ))}
                         </div>
                     </div>
                 </section>
 
-                {/* Disclaimer & CTA */}
-                <div className="mt-16 text-center">
-                    <div className="flex flex-col md:flex-row gap-6 justify-center">
-                        <a href="/assets/factsheets/PGIM India Core Equity - Factsheet.pdf" target="_blank" rel="noopener noreferrer" className="bg-[#2076C7] hover:bg-[#185ea0] text-white px-10 py-5 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3">
-                            <Download size={20} />
-                            Download Factsheet
-                        </a>
-                        <a href="tel:18005327600" className="bg-white hover:bg-gray-50 text-gray-700 px-10 py-5 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl border border-gray-100 transition-all flex items-center justify-center gap-3">
-                            <Phone size={20} className="text-primary" />
-                            Request Callback
-                        </a>
+                {/* DISCLAIMER */}
+                <div className="mt-16 mb-4">
+                    <div className="bg-amber-50/50 border border-amber-200/50 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-4 text-center md:text-left shadow-sm">
+                        <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                            <ShieldCheck className="w-6 h-6 text-amber-600" />
+                        </div>
+                        <p className="text-amber-900 text-sm md:text-base font-medium leading-relaxed">
+                            <strong>Disclaimer:</strong> Past performance may or may not be sustained in the future. Returns are calculated on a TWRR basis and are not verified by SEBI. Investments are subject to market risks.
+                        </p>
                     </div>
                 </div>
             </div>

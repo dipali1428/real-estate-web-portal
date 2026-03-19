@@ -136,7 +136,7 @@ export default function CarnelianContraDetail() {
         datasets: [
             {
                 data: [58.7, 9.8, 30.7, 0.8],
-                backgroundColor: ['#2076C7', '#1CADA3', '#0F172A', '#94A3B8'],
+                backgroundColor: ['#2076C7', '#1CADA3', '#0E8A82', '#94A3B8'],
                 borderWidth: 0,
                 hoverOffset: 10,
             }
@@ -190,17 +190,15 @@ export default function CarnelianContraDetail() {
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-left">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                        <Link href="/products/pms" className="inline-flex items-center text-slate-500 hover:text-primary transition-colors mb-6 group">
-                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
+                        <Link href="/products/pms" className="inline-flex items-center text-gray-500 hover:text-primary transition-colors mb-6 group">
+                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
                                 <ArrowLeft size={16} />
                             </div>
                             <span className="font-bold tracking-wider uppercase text-sm">Back to PMS Products</span>
                         </Link>
-                        <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight font-heading leading-[1.1] text-gray-700">
+                        <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tighter font-sans leading-[1.1] bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-clip-text text-transparent drop-shadow-sm">
                             Carnelian Contra <br />
-                            <span className="text-[#2076C7]">
-                                Portfolio Strategy
-                            </span>
+                            Portfolio Strategy
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-600 max-w-3xl leading-relaxed">
                             A large-cap-biased multi-cap equity strategy following a contrarian, absolute-return approach to generate superior risk-adjusted returns across market cycles.
@@ -224,8 +222,8 @@ export default function CarnelianContraDetail() {
                             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                                 <item.icon className="text-primary w-6 h-6" />
                             </div>
-                            <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">{item.label}</div>
-                            <div className="font-bold text-gray-700 leading-tight">{item.value}</div>
+                            <div className="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">{item.label}</div>
+                            <div className="font-bold text-gray-900 leading-tight">{item.value}</div>
                         </div>
                     ))}
                 </div>
@@ -237,35 +235,35 @@ export default function CarnelianContraDetail() {
 
                         <div className="flex items-center justify-between mb-8 relative z-10">
                             <div>
-                                <h3 className="text-2xl font-bold font-heading text-gray-700 flex items-center gap-3">
+                                <h3 className="text-2xl font-bold font-sans text-gray-900 flex items-center gap-3">
                                     <TrendingUp className="text-primary" />
                                     Performance Since Inception
                                 </h3>
-                                <p className="text-slate-500 mt-1">Growth of ₹100 Invested</p>
+                                <p className="text-gray-500 mt-1">Growth of ₹100 Invested</p>
                             </div>
                             <div className="text-right hidden md:block">
-                                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">Active CAGR</div>
+                                <div className="text-sm font-bold text-gray-400 uppercase tracking-widest">Active CAGR</div>
                                 <div className="text-4xl font-black text-primary animate-in slide-in-from-right duration-700">27.9%</div>
                             </div>
                         </div>
 
-                        <div className="h-[350px] w-full">
+                        <div className="h-[250px] md:h-[350px] w-full">
                             <Line data={performanceData} options={lineOptions} />
                         </div>
 
                         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
-                                <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Return</div>
+                                <div className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Total Return</div>
                                 <div className="text-2xl font-black text-primary">162.7%</div>
-                                <div className="text-xs text-slate-400 mt-1">Absolute</div>
+                                <div className="text-xs text-gray-400 mt-1">Absolute</div>
                             </div>
                             <div className="bg-neutral-50 rounded-2xl p-4 border border-gray-100">
-                                <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Benchmark CAGR</div>
-                                <div className="text-2xl font-black text-slate-700">13.9%</div>
-                                <div className="text-xs text-slate-400 mt-1">Annualized</div>
+                                <div className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Benchmark CAGR</div>
+                                <div className="text-2xl font-black text-gray-700">13.9%</div>
+                                <div className="text-xs text-gray-400 mt-1">Annualized</div>
                             </div>
                             <div className="bg-neutral-50 rounded-2xl p-4 border border-gray-100 flex items-center justify-center text-center">
-                                <p className="text-sm text-slate-600 italic font-medium">
+                                <p className="text-sm text-gray-600 italic font-medium">
                                     "₹100 invested in Jan 2022 has grown to <span className="text-primary font-bold">~₹263</span>."
                                 </p>
                             </div>
@@ -275,46 +273,46 @@ export default function CarnelianContraDetail() {
                     {/* Returns Profile */}
                     <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100 flex flex-col justify-between">
                         <div>
-                            <h3 className="text-xl font-bold font-heading text-gray-700 mb-6 flex items-center gap-2">
-                                <BarChart3 className="text-accent-teal" />
+                            <h3 className="text-xl font-bold font-sans text-gray-900 mb-6 flex items-center gap-2">
+                                <BarChart3 className="text-[#1CADA3]" />
                                 Returns Profile
                             </h3>
-                            <div className="h-[250px] w-full mb-6">
+                            <div className="h-[200px] md:h-[250px] w-full mb-6">
                                 <Bar data={returnsData} options={barOptions} />
                             </div>
                         </div>
-                        <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-                            <p className="text-xs text-slate-500 leading-relaxed text-center">
+                        <div className="bg-[#2076C7]/5 p-4 rounded-xl border border-[#2076C7]/10">
+                            <p className="text-xs text-gray-500 leading-relaxed text-center">
                                 Returns &gt; 1 year are annualized (CAGR) and calculated on TWRR basis.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-8 mb-16">
+                <div className="grid lg:grid-cols-3 gap-8 mb-16 items-start">
                     {/* Market Allocation */}
-                    <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
-                        <h3 className="text-xl font-bold font-heading text-gray-700 mb-6 flex items-center gap-2">
+                    <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100 flex flex-col items-start">
+                        <h3 className="text-xl font-bold font-sans text-gray-900 mb-6 flex items-center gap-2">
                             <PieChart className="text-primary" />
                             Market Allocation
                         </h3>
-                        <div className="h-[250px] w-full relative">
+                        <div className="h-[200px] md:h-[250px] w-full relative mb-6">
                             <Pie data={allocationData} options={pieOptions} />
                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                                 <span className="text-3xl font-black text-gray-700">Large</span>
-                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Bias</span>
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Bias</span>
                             </div>
                         </div>
-                        <div className="flex flex-wrap justify-center gap-4 mt-6">
+                        <div className="flex flex-wrap justify-center gap-4 mt-auto w-full">
                             {[
                                 { name: 'Large Cap', value: 58.7, color: '#2076C7' },
                                 { name: 'Mid Cap', value: 9.8, color: '#1CADA3' },
-                                { name: 'Small Cap', value: 30.7, color: '#0F172A' },
+                                { name: 'Small Cap', value: 30.7, color: '#0E8A82' },
                                 { name: 'Cash', value: 0.8, color: '#94A3B8' },
                             ].map((entry, index) => (
                                 <div key={index} className="flex items-center gap-2">
                                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                                    <span className="text-xs font-bold text-slate-600">{entry.name} {entry.value}%</span>
+                                    <span className="text-xs font-bold text-gray-600">{entry.name} {entry.value}%</span>
                                 </div>
                             ))}
                         </div>
@@ -322,11 +320,11 @@ export default function CarnelianContraDetail() {
 
                     {/* Sector Exposure */}
                     <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
-                        <h3 className="text-xl font-bold font-heading text-gray-700 mb-6 flex items-center gap-2">
+                        <h3 className="text-xl font-bold font-sans text-gray-900 mb-6 flex items-center gap-2">
                             <Layers className="text-primary" />
                             Sector Exposure
                         </h3>
-                        <div className="mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100 text-sm text-slate-600 italic">
+                        <div className="mb-6 bg-[#2076C7]/5 p-4 rounded-xl border border-[#2076C7]/10 text-sm text-gray-600 italic">
                             The portfolio maintains a strong large-cap bias while selectively investing in mid and small caps through a contrarian lens.
                         </div>
                         <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
@@ -335,7 +333,7 @@ export default function CarnelianContraDetail() {
                                 const percentage = (item.value / maxVal) * 100;
                                 return (
                                     <div key={index} className="relative">
-                                        <div className="flex justify-between text-sm font-bold text-slate-700 mb-2">
+                                        <div className="flex justify-between text-sm font-bold text-gray-700 mb-2">
                                             <span>{item.name}</span>
                                             <span>{item.value}%</span>
                                         </div>
@@ -357,7 +355,7 @@ export default function CarnelianContraDetail() {
 
                 {/* Top Holdings */}
                 <div className="mb-16">
-                    <h3 className="text-2xl font-bold font-heading text-gray-700 mb-8 flex items-center gap-2">
+                    <h3 className="text-2xl font-bold font-sans text-gray-900 mb-8 flex items-center gap-2">
                         <Briefcase className="text-primary" />
                         Top Holdings
                     </h3>
@@ -375,10 +373,10 @@ export default function CarnelianContraDetail() {
                 </div>
 
                 {/* Investment Approach */}
-                <div className="grid lg:grid-cols-2 gap-12 mb-16">
+                <div className="grid lg:grid-cols-2 gap-12 mb-16 items-start">
                     <div className="bg-white rounded-[2.5rem] p-8 lg:p-12 shadow-xl border border-gray-100 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -mr-32 -mt-32" />
-                        <h3 className="text-2xl font-bold font-heading text-gray-700 mb-8 flex items-center gap-3 relative z-10">
+                        <h3 className="text-2xl font-bold font-sans text-gray-900 mb-8 flex items-center gap-3 relative z-10">
                             <Target className="text-primary" />
                             Investment Approach
                         </h3>
@@ -392,16 +390,16 @@ export default function CarnelianContraDetail() {
                             ].map((point, i) => (
                                 <div key={i} className="flex gap-4">
                                     <div className="shrink-0 mt-1">
-                                        <CheckCircle className="text-accent-teal w-6 h-6" />
+                                        <CheckCircle className="text-[#1CADA3] w-6 h-6" />
                                     </div>
-                                    <p className="text-slate-700 font-medium leading-relaxed">{point}</p>
+                                    <p className="text-gray-700 font-medium leading-relaxed">{point}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
-                        <h3 className="text-xl font-bold font-heading text-gray-700 mb-6 flex items-center gap-2">
+                        <h3 className="text-xl font-bold font-sans text-gray-900 mb-6 flex items-center gap-2">
                             <Activity className="text-primary" />
                             Portfolio Attributes
                         </h3>
@@ -414,7 +412,7 @@ export default function CarnelianContraDetail() {
                                 { l: "Net Debt/Equity", v: "0.2" },
                             ].map((attr, i) => (
                                 <div key={i} className="bg-neutral-50 p-4 rounded-xl border border-gray-100">
-                                    <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider mb-1">{attr.l}</div>
+                                    <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-1">{attr.l}</div>
                                     <div className="text-lg font-black text-gray-700">{attr.v}</div>
                                 </div>
                             ))}
@@ -424,24 +422,49 @@ export default function CarnelianContraDetail() {
 
                 {/* Who should invest */}
                 <section>
-                    <div className="bg-white rounded-[4rem] p-10 lg:p-14 border border-gray-100 shadow-xl flex flex-col items-center text-center relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -mr-32 -mt-32" />
-                        <h3 className="text-3xl font-black text-gray-700 mb-10 uppercase tracking-tighter leading-none font-heading relative z-10">Is this right <br /> <span className="text-primary">for you?</span></h3>
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 w-full relative z-10">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center mb-12">
+                            <h3 className="text-3xl md:text-4xl font-bold font-sans text-gray-800 mb-4 tracking-tight">
+                                Is this right for you?
+                            </h3>
+                            <div className="w-20 h-1.5 bg-gradient-to-r from-primary to-[#1CADA3] mx-auto rounded-full"></div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-6 w-full relative z-10">
                             {[
                                 "Investors seeking a contrarian investing approach",
                                 "Moderate to high risk appetite",
                                 "Medium to long-term horizon (3+ years)",
                                 "Preference for large-cap stability with selective alpha"
                             ].map((point, i) => (
-                                <div key={i} className="bg-neutral-50 p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center gap-4 group transition-all duration-300">
-                                    <CheckCircle className="text-primary" size={16} />
-                                    <span className="font-bold text-slate-700">{point}</span>
-                                </div>
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                    className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md hover:border-primary/20 transition-all group"
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                        <CheckCircle size={16} />
+                                    </div>
+                                    <span className="font-bold text-gray-700">{point}</span>
+                                </motion.div>
                             ))}
                         </div>
                     </div>
                 </section>
+                
+                {/* DISCLAIMER */}
+                <div className="mt-16 mb-4">
+                    <div className="bg-amber-50/50 border border-amber-200/50 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-4 text-center md:text-left shadow-sm">
+                        <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                            <ShieldCheck className="w-6 h-6 text-amber-600" />
+                        </div>
+                        <p className="text-amber-900 text-sm md:text-base font-medium leading-relaxed">
+                            <strong>Disclaimer:</strong> Past performance may or may not be sustained in the future. Returns are calculated on a TWRR basis and are not verified by SEBI. Investments are subject to market risks.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     );

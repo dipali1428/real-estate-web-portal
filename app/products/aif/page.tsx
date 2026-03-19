@@ -1,17 +1,22 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
     TrendingUp, PieChart, ShieldCheck, ArrowRight,
-    Activity, BarChart, Zap, ArrowLeft, ChevronDown, Search, Filter
+    Activity, BarChart, Zap, ArrowLeft, ChevronDown, Plus, Minus, Search, Filter
 } from 'lucide-react';
 import { motion, Variants, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
 
 // Components
 import AIF_Category_Performance from './components/AIF_Category_Performance';
 import AIFDetailModal from './components/AIFDetailModal';
+import { useModal } from '../../context/ModalContext';
 import AIFComparisonGraph from './components/AIFComparisonGraph';
+import CTASection from '@/app/component/CTASection';
+import ChatBot from '@/app/component/chatbot/page';
+import ScrollToTop from '@/app/component/ScrollToTop';
 
 // Data
 import { aifStrategies, aifComparisonData, aifFaqs, aifFloatingTags } from './data/aif_funds';
@@ -29,7 +34,7 @@ const AIFHeaderRecommended = () => {
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between relative z-10">
                     <div className="lg:w-full">
                         <div className="flex items-center mb-4">
-                            <div className="w-10 h-10 bg-primary/10 text-gray-700 rounded-xl flex items-center justify-center mr-4 shadow-sm">
+                            <div className="w-10 h-10 bg-[#2076C7]/10 text-[#2076C7] rounded-xl flex items-center justify-center mr-4 shadow-sm">
                                 <BarChart className="w-6 h-6" />
                             </div>
                             <h1 className="text-xl md:text-3xl font-bold text-gray-900">
@@ -38,7 +43,7 @@ const AIFHeaderRecommended = () => {
                         </div>
                         <p className="text-gray-500 text-lg leading-relaxed max-w-3xl">
                             SEBI-registered private investment vehicles for sophisticated investors.
-                            <span className="text-primary font-bold"> Minimum investment ₹1 crore.</span> Diversified, strategy-driven funds with institutional-grade risk management.
+                            <span className="text-[#2076C7] font-bold"> Minimum investment ₹1 crore.</span> Diversified, strategy-driven funds with institutional-grade risk management.
                         </p>
                     </div>
                 </div>
@@ -105,7 +110,7 @@ const AIFHeroVisual = () => {
                                 <div
                                     className="w-20 h-20 bg-gradient-to-br from-white to-blue-50 rounded-2xl flex items-center justify-center shadow-lg border border-blue-100 mb-3"
                                 >
-                                    <ShieldCheck className="text-primary w-10 h-10 drop-shadow-sm" />
+                                    <ShieldCheck className="text-[#1CADA3] w-10 h-10 drop-shadow-sm" />
                                 </div>
                                 <div className="h-px w-16 bg-gradient-to-r from-transparent via-primary/50 to-transparent my-2" />
                                 <span className="text-teal-600 font-bold text-xs tracking-[0.3em]">
@@ -146,7 +151,20 @@ const AIFHeroVisual = () => {
 const AIFProductsContent = () => {
     const [openFaq, setOpenFaq] = useState<number | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const { openSignup, openLogin } = useModal();
     const [selectedFund, setSelectedFund] = useState<any>(null);
+
+    // Back Button State & Navigation
+    const router = useRouter();
+    const [showBackButton, setShowBackButton] = useState(true);
+
+    useEffect(() => {
+        const handleScroll = () => setShowBackButton(window.scrollY < 80);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const handleBackToOffers = () => router.push('/#services');
 
     // Filtering State
     const [searchQuery, setSearchQuery] = useState("");
@@ -192,6 +210,26 @@ const AIFProductsContent = () => {
 
     return (
         <div className="bg-neutral-100 min-h-screen">
+            {/* FIXED BACK BUTTON */}
+            <div className={`fixed z-50 top-20 left-4 md:top-24 md:left-8 transition-all duration-300 ${showBackButton ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                <button
+                    onClick={handleBackToOffers}
+                    aria-label="Back to Offers"
+                    className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+                >
+                    <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+                        <ArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+                    </div>
+                </button>
+                <button
+                    onClick={handleBackToOffers}
+                    className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group"
+                >
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+                    Back to Offers
+                </button>
+            </div>
+
             <motion.div
                 key="aif-content"
                 initial={{ opacity: 0 }}
@@ -199,57 +237,50 @@ const AIFProductsContent = () => {
                 transition={{ duration: 0.4 }}
             >
                 {/* AIF Hero Section */}
-                <section className="relative py-20 lg:py-28 overflow-hidden bg-gradient-to-r from-teal-50 to-white">
+                <section className="relative py-20 lg:py-28 overflow-hidden bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                         <div className="grid lg:grid-cols-2 gap-12 items-center">
-                            <motion.div
-                                variants={staggerContainer}
-                                initial="hidden"
-                                animate="visible"
-                                className="text-left"
-                            >
+                            <div className="text-left">
                                 <div className="mb-6 flex flex-wrap items-center gap-4">
-                                    <Link
-                                        href="/"
-                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-lg border border-gray-100 shadow-sm text-gray-700 font-bold text-sm hover:shadow-md transition-all active:scale-95"
-                                    >
-                                        <ArrowLeft size={16} />
-                                        Back
-                                    </Link>
-                                    <div className="bg-primary/10 text-gray-500 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">
+                                    <div className="bg-[#1CADA3]/10 text-[#1CADA3] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">
                                         Advanced Investments
                                     </div>
                                 </div>
 
-                                <div className="absolute top-0 right-0 z-30">
-                                    <motion.div>
-                                        <a
-                                            href="mailto:info@infinityarthvishva.com"
-                                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold text-white shadow-lg text-sm transition-all hover:opacity-90"
-                                            style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}
-                                        >
-                                            Apply Now
-                                            <Zap size={16} fill="currentColor" />
-                                        </a>
-                                    </motion.div>
-                                </div>
-
-                                <motion.h1 variants={slideUpFade} className="text-5xl md:text-7xl font-bold font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent leading-[1.1] mb-6 tracking-tight">
+                                <motion.h1 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.1 }}
+                                    className="text-5xl md:text-6xl lg:text-7xl font-bold font-sans bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent leading-[1.1] mb-6 tracking-tight"
+                                >
                                     Strategic Wealth <br />
                                     Creation via <br />
-                                    <span className="text-primary">Alternative Investment Funds</span>
+                                    <span className="text-[#2076C7]">Alternative Investment Funds</span>
                                 </motion.h1>
 
-                                <motion.p variants={slideUpFade} className="text-xl md:text-2xl text-gray-600 max-w-xl leading-relaxed mb-10">
+                                <motion.p 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.2 }}
+                                    className="text-xl md:text-2xl text-gray-600 max-w-xl leading-relaxed mb-10"
+                                >
                                     Exclusive alternative investment opportunities for sophisticated portfolios.
                                 </motion.p>
 
-                                <motion.div variants={slideUpFade} className="flex flex-wrap gap-5 pt-4">
-                                    <a href="mailto:info@infinityarthvishva.com" className="flex items-center gap-3 px-6 py-3 md:px-8 md:py-4 text-sm md:text-base font-bold text-white bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full shadow-lg hover:opacity-90 transition-all">
-                                        Consult an Advisor
-                                    </a>
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.3 }}
+                                >
+                                    <button
+                                        onClick={() => openLogin()}
+                                        className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-lg font-semibold text-white shadow-lg text-lg bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                                    >
+                                        Apply Now
+                                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    </button>
                                 </motion.div>
-                            </motion.div>
+                            </div>
 
                             <motion.div
                                 initial={{ opacity: 0 }}
@@ -307,7 +338,7 @@ const AIFProductsContent = () => {
                                         <div className="mb-2 bg-gray-50 w-12 h-12 rounded-lg flex items-center justify-center group-hover:bg-white group-hover:shadow-inner transition-all duration-300">
                                             {cat.icon}
                                         </div>
-                                        <h3 className="text-lg font-bold text-gray-800 mb-1 group-hover:text-primary transition-colors">{cat.title}</h3>
+                                        <h3 className="text-lg font-bold text-gray-800 mb-1 group-hover:text-[#2076C7] transition-colors">{cat.title}</h3>
                                         <p className="text-gray-600 leading-tight text-xs">
                                             {cat.desc}
                                         </p>
@@ -322,7 +353,7 @@ const AIFProductsContent = () => {
                 <section className="py-24 bg-neutral-50 text-gray-700">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} className="text-center mb-12">
-                            <motion.h2 variants={slideUpFade} className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
+                            <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                                 AIF Strategies & Approaches
                             </motion.h2>
                             <motion.p variants={slideUpFade} className="text-xl text-gray-500 max-w-3xl mx-auto font-light">
@@ -334,7 +365,7 @@ const AIFProductsContent = () => {
                         <div className="mb-12 flex flex-col md:flex-row items-center justify-between gap-6">
                             <div className="relative w-full md:max-w-md group">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <Search className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                                    <Search className="h-5 w-5 text-gray-400 group-focus-within:text-[#2076C7] transition-colors" />
                                 </div>
                                 <input
                                     type="text"
@@ -355,8 +386,8 @@ const AIFProductsContent = () => {
                                         key={cat}
                                         onClick={() => setSelectedCategory(cat)}
                                         className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${selectedCategory === cat
-                                            ? 'bg-[#2076C7] text-white shadow-lg shadow-primary/30'
-                                            : 'bg-white text-gray-600 border border-gray-100 hover:border-primary/30 hover:bg-gray-50'
+                                            ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg'
+                                            : 'bg-white text-gray-600 border border-gray-100 hover:border-[#1CADA3]/30 hover:bg-teal-50 hover:text-[#1CADA3]'
                                             }`}
                                     >
                                         {cat}
@@ -395,10 +426,10 @@ const AIFProductsContent = () => {
 
                                                     {/* Primary Info: Name & Tags */}
                                                     <div className="flex-1 min-w-0 md:max-w-xs lg:max-w-sm">
-                                                        <h3 className="text-xl font-bold text-gray-700 mb-2 group-hover:text-primary transition-colors truncate">{fund.name}</h3>
+                                                        <h3 className="text-xl font-bold text-gray-700 mb-2 group-hover:text-[#2076C7] transition-colors truncate">{fund.name}</h3>
                                                         <div className="flex flex-wrap gap-2">
-                                                            <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase tracking-wider">{fund.category}</span>
-                                                            <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-bold uppercase tracking-wider truncate">{fund.theme}</span>
+                                                            <span className="px-2 py-1 bg-[#1CADA3]/10 text-[#1CADA3] rounded text-[10px] font-bold uppercase tracking-wider">{fund.category}</span>
+                                                            <span className="px-2 py-1 bg-[#2076C7]/10 text-[#2076C7] rounded text-[10px] font-bold uppercase tracking-wider truncate">{fund.theme}</span>
                                                         </div>
                                                     </div>
 
@@ -413,7 +444,7 @@ const AIFProductsContent = () => {
                                                     {/* Action / Arrow */}
                                                     <div className="flex items-center gap-4 shrink-0">
                                                         <div className="hidden sm:block text-right">
-                                                            <div className="text-xs font-bold text-primary group-hover:translate-x-[-4px] transition-transform">VIEW DETAILS</div>
+                                                            <div className="text-xs font-bold text-[#2076C7] group-hover:translate-x-[-4px] transition-transform">VIEW DETAILS</div>
                                                         </div>
                                                         <div className="p-3 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-[#2076C7] group-hover:text-white transition-all shadow-sm">
                                                             <ArrowRight size={20} />
@@ -439,7 +470,7 @@ const AIFProductsContent = () => {
                                                 setSearchQuery("");
                                                 setSelectedCategory("All");
                                             }}
-                                            className="mt-6 font-bold text-primary hover:underline"
+                                            className="mt-6 font-bold text-[#2076C7] hover:underline"
                                         >
                                             Clear all filters
                                         </button>
@@ -454,7 +485,7 @@ const AIFProductsContent = () => {
                 <section className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
-                            <motion.h2 variants={slideUpFade} className="text-4xl font-bold bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
+                            <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                                 AIF Funds Comparison
                             </motion.h2>
                             <motion.p variants={slideUpFade} className="text-gray-500 text-lg lg:text-xl font-light">
@@ -467,7 +498,7 @@ const AIFProductsContent = () => {
                         <div className="overflow-x-auto rounded-3xl shadow-xl border border-gray-200">
                             <table className="w-full text-left border-collapse bg-white">
                                 <thead>
-                                    <tr className="bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white">
+                                    <tr className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white">
                                         <th className="p-5 font-bold text-sm uppercase tracking-wider text-white">Fund Name</th>
                                         <th className="p-5 font-bold text-sm uppercase tracking-wider text-white">Category</th>
                                         <th className="p-5 font-bold text-sm uppercase tracking-wider text-white">Strategy</th>
@@ -497,7 +528,7 @@ const AIFProductsContent = () => {
                 <section className="py-24 bg-neutral-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
-                            <motion.h2 variants={slideUpFade} className="text-3xl lg:text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
+                            <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                                 Why Choose AIF?
                             </motion.h2>
                             <motion.p variants={slideUpFade} className="text-gray-500 text-lg lg:text-xl font-light">
@@ -508,7 +539,7 @@ const AIFProductsContent = () => {
                         <div className="overflow-x-auto rounded-3xl shadow-xl border border-gray-200">
                             <table className="w-full text-left border-collapse bg-white">
                                 <thead>
-                                    <tr className="bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white">
+                                    <tr className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white">
                                         <th className="p-5 font-bold text-sm uppercase tracking-wider text-white w-1/4">Parameter</th>
                                         <th className="p-5 font-bold text-sm uppercase tracking-wider text-white w-1/3">AIF (Alternative Investment Fund)</th>
                                         <th className="p-5 font-bold text-sm uppercase tracking-wider text-white w-1/3">Mutual Fund</th>
@@ -540,7 +571,7 @@ const AIFProductsContent = () => {
                 <section className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
-                            <motion.h2 variants={slideUpFade} className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
+                            <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                                 AIF Category Intelligence
                             </motion.h2>
                             <motion.p variants={slideUpFade} className="text-xl text-gray-500 max-w-3xl mx-auto font-light">
@@ -551,7 +582,6 @@ const AIFProductsContent = () => {
                     </div>
                 </section>
 
-                {/* FAQ Section */}
                 <section className="py-24 bg-neutral-50">
                     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
                         <motion.div variants={slideUpFade} initial="hidden" whileInView="visible" viewport={{ once: true }} className="p-4 bg-yellow-50 border border-yellow-100 rounded-xl flex items-start gap-3 text-sm text-yellow-800">
@@ -563,32 +593,26 @@ const AIFProductsContent = () => {
                     </div>
                     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
-                            <motion.h2 variants={slideUpFade} className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">AIF FAQ & Investor Guidance</motion.h2>
-                            <motion.p variants={slideUpFade} className="text-xl text-gray-500 max-w-3xl mx-auto font-light">Common questions about starting your AIF journey.</motion.p>
+                            <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Frequently Asked Questions</motion.h2>
+                            <motion.p variants={slideUpFade} className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed font-light">Common questions about starting your AIF journey.</motion.p>
                         </motion.div>
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {aifFaqs.map((faq, idx) => (
                                 <motion.div key={idx} variants={slideUpFade} initial="hidden" whileInView="visible" viewport={{ once: true }} className="overflow-hidden bg-white shadow-sm border border-gray-100 rounded-2xl">
-                                    <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)} className="w-full px-8 py-6 text-left flex justify-between items-center hover:bg-neutral-50 transition-colors group">
-                                        <span className="font-bold text-lg text-gray-700 group-hover:text-primary transition-colors">{faq.q}</span>
-                                        <div className={`p-2 rounded-full transition-all ${openFaq === idx ? 'bg-primary text-white rotate-180' : 'bg-primary/10 text-primary'}`}><ChevronDown size={20} /></div>
+                                    <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)} className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left flex justify-between items-start gap-3 bg-white hover:bg-blue-50/50 transition-colors focus:outline-none cursor-pointer group">
+                                        <span className="font-bold text-gray-700 text-base sm:text-lg pr-2 group-hover:text-[#2076C7] transition-colors">{faq.q}</span>
+                                        <div className={`p-1.5 rounded-full bg-white border border-gray-300 text-gray-700 transition-transform duration-300 shrink-0 ${openFaq === idx ? 'rotate-180' : ''}`}>
+                                            {openFaq === idx ? <Minus size={18} strokeWidth={3} /> : <Plus size={18} strokeWidth={3} />}
+                                        </div>
                                     </button>
-                                    {openFaq === idx && <div className="px-8 pb-8 text-gray-500 bg-neutral-50/50 leading-relaxed"><div className="h-px bg-gray-100 mb-6" />{faq.a}</div>}
+                                    {openFaq === idx && <div className="px-6 py-6 bg-white text-gray-600 text-base leading-relaxed border-t border-gray-100 italic">{faq.a}</div>}
                                 </motion.div>
                             ))}
                         </div>
                     </div>
                 </section>
 
-                <section className="py-24">
-                    <div className="max-w-4xl mx-auto text-center px-4">
-                        <motion.div initial="hidden" whileInView="visible" variants={fadeIn} viewport={{ once: true }} className="p-16 shadow-2xl rounded-3xl relative overflow-hidden bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white">
-                            <motion.h2 variants={slideUpFade} className="text-4xl font-bold text-white mb-6">Ready to redefine your wealth?</motion.h2>
-                            <motion.p variants={slideUpFade} className="text-xl text-white/90 mb-10 leading-relaxed font-light">Join elite investors who choose professional management over passive indexing. Let's build a portfolio that reflects your ambitions.</motion.p>
-                            <a href="mailto:info@infinityarthvishva.com" className="bg-white text-primary hover:bg-white/90 px-12 py-4 rounded-xl text-[#2076C7] transition-all inline-flex items-center justify-center text-xl shadow-lg">Request a Strategy Call</a>
-                        </motion.div>
-                    </div>
-                </section>
+                <CTASection onClick={() => openLogin()} buttonText="Apply Now" />
             </motion.div>
 
             <AIFDetailModal
@@ -596,6 +620,8 @@ const AIFProductsContent = () => {
                 onClose={() => setIsDetailModalOpen(false)}
                 fund={selectedFund}
             />
+            <ChatBot />
+            <ScrollToTop />
         </div >
     );
 };

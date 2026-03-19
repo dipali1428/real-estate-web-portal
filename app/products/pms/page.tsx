@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
     CheckCircle, TrendingUp, PieChart, ShieldCheck, ArrowRight, Users, Settings,
@@ -13,6 +14,11 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 // Components
 import PMS_Live_Performance from './components/dashboard/PMS_Live_Performance';
 import PMSComparisonCalculator from './components/calculators/PMSComparisonCalculator';
+import CTASection from '@/app/component/CTASection';
+import ChatBot from '@/app/component/chatbot/page';
+import ScrollToTop from '@/app/component/ScrollToTop';
+import { useModal } from '@/app/context/ModalContext';
+import PMSFAQ from './components/PMSFAQ';
 
 const PMSHeaderRecommended = () => {
     return (
@@ -42,7 +48,7 @@ const PMSHeaderRecommended = () => {
 
 const PMSHeroVisual = () => {
     return (
-         <div className="relative w-full h-full flex items-center justify-center scale-75 md:scale-90 lg:scale-100">
+        <div className="relative w-full h-full flex items-center justify-center scale-75 md:scale-90 lg:scale-100">
             {/* Background Glow */}
             <motion.div
                 animate={{
@@ -88,10 +94,10 @@ const PMSHeroVisual = () => {
                 transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
                 className="absolute w-[450px] h-[450px] rounded-full border border-dashed border-slate-200 pointer-events-none">
                 <motion.div className="absolute top-0 left-1/2 -ml-4 mt-6 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-100">
-                    <PieChart className="text-blue-500 w-4 h-4" />
+                    <PieChart className="text-[#2076C7] w-4 h-4" />
                 </motion.div>
                 <motion.div className="absolute bottom-10 right-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-100">
-                    <IndianRupee className="text-teal-500 w-5 h-5" />
+                    <IndianRupee className="text-[#1CADA3] w-5 h-5" />
                 </motion.div>
             </motion.div>
         </div>
@@ -99,7 +105,18 @@ const PMSHeroVisual = () => {
 };
 
 function PMSProductsContent() {
-    const [openPmsFaq, setOpenPmsFaq] = useState<number | null>(null);
+    // Back Button State & Navigation
+    const router = useRouter();
+    const { openLogin } = useModal();
+    const [showBackButton, setShowBackButton] = useState(true);
+
+    useEffect(() => {
+        const handleScroll = () => setShowBackButton(window.scrollY < 80);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const handleBackToOffers = () => router.push('/#services');
 
     // Fixed Variants with "as const" to resolve TypeScript Easing error
     const fadeIn: Variants = {
@@ -109,15 +126,15 @@ function PMSProductsContent() {
 
     const slideUpFade: Variants = {
         hidden: { opacity: 0, y: 20 },
-        visible: { 
-            opacity: 1, 
-            y: 0, 
-            transition: { duration: 0.5, ease: "easeOut" } 
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5, ease: "easeOut" }
         }
     };
 
     const staggerContainer: Variants = {
-        hidden: { opacity: 0 },
+        hidden: { opacity: 1 },
         visible: {
             opacity: 1,
             transition: {
@@ -127,7 +144,27 @@ function PMSProductsContent() {
     };
 
     return (
-        <div className="bg-neutral-100 min-h-screen">
+        <div className="bg-white min-h-screen font-sans">
+            {/* FIXED BACK BUTTON */}
+            <div className={`fixed z-50 top-20 left-4 md:top-24 md:left-8 transition-all duration-300 ${showBackButton ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                <button
+                    onClick={handleBackToOffers}
+                    aria-label="Back to Offers"
+                    className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+                >
+                    <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+                        <ArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+                    </div>
+                </button>
+                <button
+                    onClick={handleBackToOffers}
+                    className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group"
+                >
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+                    Back to Offers
+                </button>
+            </div>
+
             <motion.div
                 key="pms-content"
                 initial={{ opacity: 0 }}
@@ -135,7 +172,7 @@ function PMSProductsContent() {
                 transition={{ duration: 0.4 }}
             >
                 {/* PMS Hero Section */}
-                <section className="relative py-20 lg:py-28 overflow-hidden bg-gradient-to-r from-blue-50 to-white">
+                <section className="relative py-20 lg:py-28 overflow-hidden bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                         <div className="grid lg:grid-cols-2 gap-12 items-center">
                             <motion.div
@@ -144,45 +181,44 @@ function PMSProductsContent() {
                                 animate="visible"
                                 className="text-left"
                             >
-                                <div className="mb-6">
-                                    <Link
-                                        href="/"
-                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-lg border border-gray-100 shadow-sm text-gray-700 font-bold text-sm hover:shadow-md transition-all active:scale-95"
-                                    >
-                                        <ArrowLeft size={16} />
-                                        Back to Home
-                                    </Link>
-                                </div>
+                                <motion.div
+                                    variants={slideUpFade}
+                                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 mb-6 shadow-sm"
+                                >
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                                    </span>
+                                    <span className="text-[10px] font-bold text-[#2076C7] uppercase tracking-widest">
+                                        Exclusive PMS Strategies
+                                    </span>
+                                </motion.div>
 
-                                <div className="absolute top-8 right-8 z-30">
-                                    <motion.div>
-                                        <a
-                                            href="mailto:info@infinityarthvishva.com"
-                                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold text-white shadow-lg text-sm transition-all hover:opacity-90"
-                                            style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}
-                                        >
-                                            Apply Now
-                                            <Zap size={16} fill="currentColor" />
-                                        </a>
-                                    </motion.div>
-                                </div>
-
-                                <motion.h1 variants={slideUpFade} className="text-5xl md:text-7xl font-bold font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent leading-[1.1] mb-6 tracking-tight">
+                                <motion.h1 variants={slideUpFade} className="text-5xl md:text-6xl lg:text-7xl font-sans font-bold bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-clip-text text-transparent leading-tight mb-6 tracking-tight">
                                     Get Closer to <br />
                                     Your Goals with <br />
-                                    <span className="text-primary">Instant PMS <br /> Investments</span>
+                                    <span className="text-[#2076C7]">Instant PMS <br /> Investments</span>
                                 </motion.h1>
 
-                                <motion.p variants={slideUpFade} className="text-xl md:text-2xl text-gray-600 max-w-xl leading-relaxed mb-10">
+                                <motion.p variants={slideUpFade} className="text-lg md:text-xl lg:text-2xl text-gray-700 max-w-xl leading-relaxed mb-10">
                                     Sophisticated investment vehicles for high-alpha wealth creation
                                 </motion.p>
 
-                                <motion.div variants={slideUpFade} className="flex flex-wrap gap-5 pt-4">
-                                    <a href="mailto:info@infinityarthvishva.com" className="flex items-center gap-3 px-6 py-3 md:px-8 md:py-4 text-sm md:text-base font-bold text-white bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full shadow-lg hover:opacity-90 transition-all">
-                                        Consult an Advisor
-                                    </a>
-                                </motion.div>
-                            </motion.div>
+                                <motion.div className="flex flex-col sm:flex-row gap-4 mb-2">
+                                    <button
+                                        onClick={openLogin}
+                                        className="group relative w-max px-8 py-3.5 md:px-12 md:py-4 rounded-xl font-bold text-base md:text-lg text-white transform hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden"
+                                        style={{ background: 'linear-gradient(135deg, #2076C7 0%, #1CADA3 100%)' }}
+                                    >
+                                        <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                        <span className="relative z-10 flex items-center justify-center gap-2">
+                                            Apply Now
+                                            <svg className="w-5 h-5 md:w-6 md:h-6 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </motion.div>                            </motion.div>
 
                             <motion.div
                                 initial={{ opacity: 0 }}
@@ -198,10 +234,10 @@ function PMSProductsContent() {
                 <PMSHeaderRecommended />
 
                 {/* PMS Strategies Section */}
-                <section className="py-24 bg-neutral-50 text-gray-700">
+                <section id="strategies" className="py-24 bg-white text-gray-700">
                     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} className="text-center mb-16">
-                            <motion.h2 variants={slideUpFade} className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">PMS Strategies & Approaches</motion.h2>
+                            <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">PMS Strategies & Approaches</motion.h2>
                             <motion.p variants={slideUpFade} className="text-xl text-gray-500 max-w-3xl mx-auto font-light">
                                 Our research-driven strategies are designed to capture alpha across diverse market cycles.
                             </motion.p>
@@ -210,14 +246,14 @@ function PMSProductsContent() {
                             {[
                                 { name: "Carnelian Capital Compounder Strategy", desc: "Multi-cap strategy focused on 'Magic' (Growth) and 'Compounder' (Quality) businesses.", link: "/products/pms/carnelian-compounder", risk: "High Risk", horizon: "5+ Years", color: "#2076C7" },
                                 { name: "Carnelian Shift Strategy", desc: "High-conviction mid & small-cap strategy focused on manufacturing and technology leaders.", link: "/products/pms/carnelian-shift", risk: "High Risk", horizon: "5+ Years", color: "#1CADA3" },
-                                { name: "Carnelian Contra Portfolio Strategy", desc: "Large-cap-biased multi-cap strategy following a contrarian, absolute-return approach.", link: "/products/pms/carnelian-contra", risk: "Moderate to High", horizon: "3+ Years", color: "#4F46E5" },
+                                { name: "Carnelian Contra Portfolio Strategy", desc: "Large-cap-biased multi-cap strategy following a contrarian, absolute-return approach.", link: "/products/pms/carnelian-contra", risk: "Moderate to High", horizon: "3+ Years", color: "#2076C7" },
                                 { name: "PGIM India Core Equity Portfolio", desc: "A core equity strategy investing in high-quality Indian companies available at reasonable valuations.", link: "/products/pms/pgim-india-core-equity", risk: "Moderate", horizon: "3+ Years", color: "#2076C7" },
                                 { name: "PGIM India Equity Portfolio", desc: "Diversified multi-cap equity portfolio aiming for long-term capital appreciation.", link: "/products/pms/pgim-india-equity", risk: "Moderate to High", horizon: "3+ Years", color: "#2076C7" },
                                 { name: "PGIM India Phoenix Portfolio", desc: "Quality-focused mid and small-cap equity portfolio aiming for long-term capital appreciation.", link: "/products/pms/pgim-india-phoenix", risk: "High Risk", horizon: "3+ Years", color: "#1CADA3" },
                                 { name: "MOTILAL OSWAL ETHICAL STRATEGY", desc: "A long-term equity strategy focused on ethical businesses with strong earnings growth and quality governance.", link: "/products/pms/motilal-oswal-ethical", risk: "High Risk", horizon: "3+ Years", color: "#1CADA3" },
                                 { name: "Invesco India Challengers Portfolio", desc: "Globally recognized investment approaches tailored for institutional-grade equity performance.", link: "/products/pms/invesco-challengers", risk: "Moderate to High", horizon: "3-5 Years", color: "#1CADA3" },
-                                { name: "Abakkus Emerging Opportunities – PMS", desc: "Focusing on mid and small-cap companies with high growth potential and strong fundamental backings.", link: "/products/pms/abakkus-emerging", risk: "High Risk", horizon: "5+ Years", color: "#4F46E5" },
-                                { name: "Abakkus All Cap Approach – PMS", desc: "A diversified approach across market capitalizations to capture growth opportunities in various cycles.", link: "/products/pms/abakkus-all-cap", risk: "Moderate Risk", horizon: "3-5 Years", color: "#0D9488" }
+                                { name: "Abakkus Emerging Opportunities – PMS", desc: "Focusing on mid and small-cap companies with high growth potential and strong fundamental backings.", link: "/products/pms/abakkus-emerging", risk: "High Risk", horizon: "5+ Years", color: "#1CADA3" },
+                                { name: "Abakkus All Cap Approach – PMS", desc: "A diversified approach across market capitalizations to capture growth opportunities in various cycles.", link: "/products/pms/abakkus-all-cap", risk: "Moderate Risk", horizon: "3-5 Years", color: "#2076C7" }
                             ].map((fund, idx) => (
                                 <motion.div
                                     key={idx}
@@ -260,14 +296,14 @@ function PMSProductsContent() {
                 <section className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
-                            <motion.h2 variants={slideUpFade} className="text-3xl lg:text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">PMS Strategies Comparison</motion.h2>
+                            <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">PMS Strategies Comparison</motion.h2>
                             <motion.p variants={slideUpFade} className="text-gray-500 text-lg lg:text-xl font-light">Find the right fit for your investment goals.</motion.p>
                         </motion.div>
 
                         <div className="overflow-x-auto rounded-3xl shadow-xl border border-gray-200">
                             <table className="w-full text-left border-collapse bg-white">
                                 <thead>
-                                    <tr className="bg-gradient-to-r from-primary to-accent-teal text-white">
+                                    <tr className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white">
                                         <th className="p-5 font-bold text-sm uppercase tracking-wider text-white">Fund Name</th>
                                         <th className="p-5 font-bold text-sm uppercase tracking-wider text-white">Strategy Type</th>
                                         <th className="p-5 font-bold text-sm uppercase tracking-wider text-white">Market Cap Bias</th>
@@ -288,12 +324,12 @@ function PMSProductsContent() {
                                         { name: "Abakkus All Cap", type: "Diversified Growth", cap: "Large + Mid + Small", risk: "Medium–High", horizon: "4–5+ yrs", suit: "Alpha seekers" },
                                         { name: "Invesco Challengers", type: "Challenger Theme", cap: "Multi-cap", risk: "Medium–High", horizon: "4+ yrs", suit: "Structural growth" },
                                     ].map((row, idx) => (
-                                        <tr key={idx} className={`hover:bg-blue-50/50 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-neutral-50/50'}`}>
+                                        <tr key={idx} className={`hover:bg-[#2076C7]/5 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-neutral-50/50'}`}>
                                             <td className="p-5 font-bold text-gray-700">{row.name}</td>
                                             <td className="p-5">{row.type}</td>
                                             <td className="p-5">{row.cap}</td>
                                             <td className="p-5">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${row.risk.includes('High') ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${row.risk.includes('High') ? 'bg-[#2076C7]/10 text-[#2076C7]' : 'bg-[#1CADA3]/10 text-[#1CADA3]'}`}>
                                                     {row.risk}
                                                 </span>
                                             </td>
@@ -308,10 +344,10 @@ function PMSProductsContent() {
                 </section>
 
                 {/* PMS Calculator Section */}
-                <section className="py-24 bg-neutral-100">
+                <section className="py-24 bg-white">
                     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
-                            <motion.h2 variants={slideUpFade} className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">Compare PMS with Other Investments</motion.h2>
+                            <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Compare PMS with Other Investments</motion.h2>
                             <motion.p variants={slideUpFade} className="text-xl text-gray-500 max-w-3xl mx-auto font-light">See how PMS returns stand out against traditional investment vehicles over time.</motion.p>
                         </motion.div>
                         <PMSComparisonCalculator />
@@ -322,50 +358,27 @@ function PMSProductsContent() {
                 <section className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
-                            <motion.h2 variants={slideUpFade} className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">Live Strategy Performance</motion.h2>
+                            <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Live Strategy Performance</motion.h2>
                             <motion.p variants={slideUpFade} className="text-xl text-gray-500 max-w-3xl mx-auto font-light">Real-time tracking of our aggregate PMS performance against benchmarks.</motion.p>
                         </motion.div>
                         <PMS_Live_Performance />
                     </div>
                 </section>
 
-                {/* PMS FAQ */}
-                <section className="py-24 bg-neutral-50">
-                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
-                            <motion.h2 variants={slideUpFade} className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">PMS FAQ & Investor Guidance</motion.h2>
-                            <motion.p variants={slideUpFade} className="text-gray-500 text-xl">Common questions about starting your PMS journey.</motion.p>
-                        </motion.div>
-                        <div className="space-y-6">
-                            {[
-                                { q: "What is Portfolio Management Services (PMS)?", a: "Portfolio Management Service (PMS) is a professional service where skilled portfolio managers and stock market experts manage your equity portfolio with the assistance of a research team. It offers a more customized and focused investment approach compared to mutual funds, specifically designed for high-net-worth individuals." },
-                                { q: "What is the tax treatment for PMS investments?", a: "Taxation is based on short-term and long-term capital gains, just like direct equity. We provide consolidated tax statements annually to make filing seamless for you." },
-                                { q: "How does the non-discretionary model work?", a: "In this model, our managers provide research-backed recommendations, but we only execute trades after receiving your explicit approval for each transaction." },
-                                { q: "Are there any lock-in periods for PMS?", a: "While there is no legal lock-in, we recommend a 3-5 year horizon. Most strategies have a marginal exit load (typically 1%) if redeemed within the first year." }
-                            ].map((faq, idx) => (
-                                <motion.div key={idx} variants={slideUpFade} initial="hidden" whileInView="visible" viewport={{ once: true }} className="overflow-hidden bg-white shadow-sm border border-gray-100 rounded-2xl">
-                                    <button onClick={() => setOpenPmsFaq(openPmsFaq === idx ? null : idx)} className="w-full px-8 py-6 text-left flex justify-between items-center hover:bg-neutral-50 transition-colors group">
-                                        <span className="font-bold text-lg text-gray-700 group-hover:text-primary transition-colors">{faq.q}</span>
-                                        <div className={`p-2 rounded-full transition-all ${openPmsFaq === idx ? 'bg-primary text-white rotate-180' : 'bg-primary/10 text-primary'}`}><ChevronDown size={20} /></div>
-                                    </button>
-                                    {openPmsFaq === idx && <div className="px-8 pb-8 text-gray-500 bg-neutral-50/50 leading-relaxed"><div className="h-px bg-gray-100 mb-6" />{faq.a}</div>}
-                                </motion.div>
-                            ))}
-                        </div>
+                <div className="bg-white py-10 px-4">
+                    <div className="max-w-4xl mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
+                        <p className="text-sm text-gray-700 text-center leading-relaxed">
+                            <strong className="text-black">Disclaimer:</strong> Portfolio Management Services (PMS) involve investment risks. Past performance is not indicative of future results. Investors are advised to read the Disclosure Document and Strategy brochure carefully before investing. Minimum investment required is ₹50 Lakhs as per SEBI regulations.
+                        </p>
                     </div>
-                </section>
+                </div>
 
-                {/* PMS CTA */}
-                <section className="py-24">
-                    <div className="max-w-4xl mx-auto text-center px-4">
-                        <motion.div initial="hidden" whileInView="visible" variants={fadeIn} viewport={{ once: true }} className="p-16 shadow-2xl rounded-3xl relative overflow-hidden bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white">
-                            <motion.h2 variants={slideUpFade} className="text-4xl font-bold text-white mb-6">Ready to redefine your wealth?</motion.h2>
-                            <motion.p variants={slideUpFade} className="text-xl text-white/90 mb-10 leading-relaxed font-light">Join elite investors who choose professional management over passive indexing. Let's build a portfolio that reflects your ambitions.</motion.p>
-                            <a href="mailto:info@infinityarthvishva.com" className="bg-white text-primary hover:bg-white/90 px-12 py-4 rounded-xl text-[#2076C7] transition-all inline-flex items-center justify-center text-xl shadow-lg">Request a Strategy Call</a>
-                        </motion.div>
-                    </div>
-                </section>
+                <PMSFAQ />
+
+                <CTASection />
             </motion.div>
+            <ChatBot />
+            <ScrollToTop />
         </div>
     );
 }
@@ -373,7 +386,7 @@ function PMSProductsContent() {
 export default function PMSListingPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-neutral-100 flex items-center justify-center">
+            <div className="min-h-screen bg-white flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
         }>

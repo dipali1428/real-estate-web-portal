@@ -144,7 +144,7 @@ export default function TaxImpactCalculator() {
                         </div>
                     </div>
 
-                    <div className="p-8 bg-blue-50/50 rounded-[2.5rem] border border-blue-100">
+                    <div className="p-8 bg-[#2076C7]/5 rounded-[2.5rem] border border-[#2076C7]/10">
                         <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2">
                             <Info size={14} /> Optimization Vector
                         </h4>
@@ -173,7 +173,7 @@ export default function TaxImpactCalculator() {
                 </div>
                 <div className="p-8 bg-gray-50 rounded-3xl border border-gray-100 text-center">
                     <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Capital Retention</div>
-                    <div className="text-3xl font-black text-teal-600 italic">
+                    <div className="text-3xl font-black text-[#1CADA3] italic">
                         {((results.netValue / results.finalValue) * 100).toFixed(1)}%
                     </div>
                 </div>
