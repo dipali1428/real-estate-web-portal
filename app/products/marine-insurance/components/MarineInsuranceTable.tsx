@@ -18,7 +18,7 @@ const comparisonData = {
 
 const MarineInsuranceTable = () => {
     return (
-        <section className="py-16 md:py-24 bg-neutral-50 border-t border-gray-100">
+        <section className="py-16 md:py-24 bg-white border-t border-gray-100">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="text-center mb-12 md:mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4 tracking-tight">
@@ -59,12 +59,12 @@ const MarineInsuranceTable = () => {
                                         <div key={featureIdx} className="flex items-center justify-between py-1 group">
                                             <span className="text-sm font-bold text-gray-600 group-hover:text-gray-900 transition-colors uppercase tracking-tight">{feature.name}</span>
                                             {hasFeature ? (
-                                                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100/50">
+                                                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#1CADA3]/10 text-[#1CADA3] border border-[#1CADA3]/20">
                                                     <CheckCircle2 size={12} strokeWidth={3} />
                                                     <span className="text-[10px] font-black uppercase tracking-widest">Yes</span>
                                                 </div>
                                             ) : (
-                                                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 text-rose-500 border border-rose-100/50">
+                                                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-gray-400 border border-gray-200">
                                                     <X size={12} strokeWidth={3} />
                                                     <span className="text-[10px] font-black uppercase tracking-widest">No</span>
                                                 </div>
@@ -83,58 +83,80 @@ const MarineInsuranceTable = () => {
                 </div>
 
                 {/* Desktop Table View (Visible on screens >= 1024px) */}
-                <div className="hidden lg:block overflow-hidden rounded-[2.5rem] border border-gray-100 shadow-2xl bg-white focus-within:ring-4 focus-within:ring-blue-500/5 transition-all">
+                <div className="hidden lg:block overflow-hidden rounded-[2.5rem] border border-gray-100 shadow-2xl bg-white focus-within:ring-4 focus-within:ring-[#1CADA3]/10 transition-all">
                     <div className="p-10 border-b border-gray-50 flex items-center justify-between bg-white relative overflow-hidden">
                         <div className="relative z-10 flex items-center gap-5">
-                            <div className="w-14 h-14 rounded-2xl bg-[#2076C7]/5 flex items-center justify-center text-[#2076C7] shadow-inner">
+                            <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white shadow-xl shadow-[#1CADA3]/20">
                                 <CheckCircle2 size={24} />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-[0.15em] leading-none mb-2">Technical Feature Matrix</h3>
-                                <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Comparing India's top 5 market leaders side-by-side</p>
+                                <h3 className="text-xl font-sans font-bold text-gray-900 tracking-[0.1em] leading-none mb-2">Technical Feature Matrix</h3>
+                                <p className="text-[11px] text-gray-500 font-bold tracking-widest uppercase">Comparing India's top 5 market leaders side-by-side</p>
                             </div>
                         </div>
                         <div className="relative z-10 flex items-center gap-3">
-                            <span className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-emerald-100/50">Verified Data</span>
+                            <span className="px-5 py-2.5 bg-neutral-50 text-gray-600 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-gray-200 shadow-sm flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-[#1CADA3] animate-pulse"></div>
+                                Verified Data
+                            </span>
                         </div>
                         {/* Subtle Background Accent */}
-                        <div className="absolute top-0 right-0 w-64 h-full bg-linear-to-l from-blue-50/50 to-transparent pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-64 h-full bg-linear-to-l from-[#f8fafd] to-transparent pointer-events-none" />
                     </div>
-                    <div className="overflow-x-auto custom-scrollbar">
+                    
+                    <div className="overflow-x-auto custom-scrollbar pb-2">
                         <table className="w-full text-left bg-white border-collapse">
                             <thead>
-                                <tr className="bg-neutral-50/80">
-                                    <th className="px-10 py-8 text-[11px] font-bold uppercase tracking-[0.25em] text-gray-400 border-b border-gray-100 bg-neutral-50/80 sticky left-0 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
-                                        Feature Set
+                                <tr className="bg-linear-to-r from-[#2076C7] to-[#1CADA3]">
+                                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-white border-b border-[#1CADA3]/20 sticky left-0 z-20 shadow-[2px_0_10px_rgba(0,0,0,0.1)] bg-[#2076C7] min-w-[200px]">
+                                        Provider
                                     </th>
-                                    {comparisonData.headers.slice(1).map((header, i) => (
-                                        <th key={i} className="px-10 py-8 text-[11px] font-bold uppercase tracking-[0.25em] text-gray-600 text-center border-b border-gray-100 min-w-[200px]">
-                                            {header}
+                                    {comparisonData.features.map((feature, i) => (
+                                        <th key={i} className="px-6 py-6 text-[10px] font-bold uppercase tracking-[0.1em] text-white/90 text-center border-b border-[#1CADA3]/20 min-w-[160px] max-w-[180px]">
+                                            {feature.name}
                                         </th>
                                     ))}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
-                                {comparisonData.features.map((feature, i) => (
-                                    <tr key={i} className="hover:bg-blue-50/30 transition-colors group">
-                                        <td className="px-10 py-8 border-r border-gray-50 bg-white sticky left-0 z-10 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.08)] group-hover:bg-blue-50/10 transition-colors">
-                                            <span className="font-bold text-gray-700 text-[13px] uppercase tracking-tight">{feature.name}</span>
-                                        </td>
-                                        {['icici', 'tata', 'hdfc', 'bajaj', 'sbi'].map((key) => (
-                                            <td key={key} className="px-10 py-8 text-center bg-white group-hover:bg-blue-50/10 transition-colors">
-                                                {feature[key as keyof typeof feature] ? (
-                                                    <div className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-500 shadow-sm ring-4 ring-emerald-50/50 group-hover:scale-110 transition-transform">
-                                                        <CheckCircle2 size={18} strokeWidth={2.5} />
-                                                    </div>
-                                                ) : (
-                                                    <div className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-rose-50 text-rose-400 shadow-sm ring-4 ring-rose-50/50 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all">
-                                                        <X size={18} strokeWidth={2.5} />
-                                                    </div>
-                                                )}
+                                {comparisonData.headers.slice(1).map((provider, providerIdx) => {
+                                    const providerKey = provider.toLowerCase().replace(' ', '');
+                                    const keyMap: { [key: string]: string } = {
+                                        'icicilombard': 'icici',
+                                        'tataaig': 'tata',
+                                        'hdfcergo': 'hdfc',
+                                        'bajajallianz': 'bajaj',
+                                        'sbigeneral': 'sbi'
+                                    };
+                                    const actualKey = keyMap[providerKey] || providerKey;
+
+                                    return (
+                                        <tr key={providerIdx} className="hover:bg-[#f8fafd] transition-colors group">
+                                            <td className="px-8 py-6 border-r border-gray-50 bg-white sticky left-0 z-10 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)] group-hover:bg-[#f8fafd] transition-colors">
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-gray-900 text-[13px] tracking-tight">{provider}</span>
+                                                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Marine Cover</span>
+                                                </div>
                                             </td>
-                                        ))}
-                                    </tr>
-                                ))}
+                                            {comparisonData.features.map((feature, featureIdx) => {
+                                                const hasFeature = feature[actualKey as keyof typeof feature];
+                                                return (
+                                                    <td key={featureIdx} className="px-6 py-6 text-center bg-transparent group-hover:bg-[#f8fafd] transition-colors">
+                                                        {hasFeature ? (
+                                                            <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#1CADA3]/10 text-[#1CADA3] ring-1 ring-[#1CADA3]/30 group-hover:scale-110 transition-transform">
+                                                                <CheckCircle2 size={16} strokeWidth={3} />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-300 ring-1 ring-gray-200 group-hover:bg-red-50 group-hover:text-red-300 group-hover:ring-red-100 transition-colors">
+                                                                <X size={16} strokeWidth={3} />
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                );
+                                            })}
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
@@ -143,11 +165,11 @@ const MarineInsuranceTable = () => {
                 {/* Legend Section */}
                 <div className="mt-12 flex flex-wrap justify-center gap-8 px-4 py-6 bg-white border border-gray-100 rounded-2xl shadow-sm lg:hidden md:flex">
                     <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                        <div className="w-3 h-3 rounded-full bg-[#1CADA3]" />
                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Feature Available</span>
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full bg-rose-400" />
+                        <div className="w-3 h-3 rounded-full bg-gray-300" />
                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Partial / Not Available</span>
                     </div>
                 </div>

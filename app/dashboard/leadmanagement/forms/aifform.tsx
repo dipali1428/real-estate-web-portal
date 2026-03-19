@@ -10,7 +10,7 @@ const STYLES = {
   err: "text-red-500 text-xs mt-1"
 };
 
-export default function PMSAIFForm({ onClose }: { onClose: () => void }) {
+export default function AIFForm({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState<any>({
     clientName: "", phone: "", email: "", dob: "", location: "",
     pincode: "", appointmentDate: "", appointmentTime: ""
@@ -117,8 +117,8 @@ export default function PMSAIFForm({ onClose }: { onClose: () => void }) {
     try {
       const payload = {
         department: "Investment",
-        product_type: "PMS",
-        sub_category: "PMS",
+        product_type: "AIF",
+        sub_category: "AIF",
         client: {
           name: form.clientName,
           mobile: form.phone,
@@ -150,7 +150,7 @@ export default function PMSAIFForm({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700 overflow-y-auto">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto my-auto flex flex-col relative max-h-[90vh]">
         <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white rounded-t-xl">
-          <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">PMS</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">AIF Form</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors"><X size={20} className="sm:w-6 sm:h-6" /></button>
         </div>
 

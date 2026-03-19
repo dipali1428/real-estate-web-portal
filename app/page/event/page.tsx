@@ -334,11 +334,11 @@ function GalleryImage({ src, alt }: { src: string, alt: string }) {
 const EventSection: React.FC = () => {
   const eventsByMonth = groupEventsByMonth(eventsByYear);
   
-  const [expanded, setExpanded] = useState({
+ const [expanded, setExpanded] = useState({
     contests: true, // Open by default
-    stories: false, // Closed by default
-    events: false,  // Closed by default
-    life: false     // Closed by default
+    stories: true, // Closed by default
+    events: true,  // Closed by default
+    life: true     // Closed by default
   });
 
   const toggle = (section: keyof typeof expanded) => {

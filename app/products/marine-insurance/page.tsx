@@ -1,24 +1,25 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
-    ShieldCheck,
-    Ship,
-    Anchor,
-    Box,
-    Truck,
-    Scale,
     ArrowRight,
     ArrowLeft,
     CheckCircle2,
     Search,
-    ChevronDown,
-    Zap,
-    AlertCircle,
     Info,
+    Plus,
+    Minus,
     HelpCircle,
-    IndianRupee
+    Zap,
+    ShieldCheck,
+    Scale,
+    Box,
+    Ship,
+    Anchor,
+    IndianRupee,
+    Truck
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -28,6 +29,10 @@ import MarineInsurancePlanCard from './components/MarineInsurancePlanCard';
 import MarineInsuranceCharts from './components/MarineInsuranceCharts';
 import MarineInsuranceTable from './components/MarineInsuranceTable';
 import MarineInsuranceApplyForm from './components/MarineInsuranceApplyForm';
+import CTASection from '@/app/component/CTASection';
+import Chatbot from '@/app/component/chatbot/page';
+import ScrollToTop from '@/app/component/ScrollToTop';
+import { useModal } from '@/app/context/ModalContext';
 
 const MarineHeroVisual = () => {
     return (
@@ -124,7 +129,7 @@ const marinePlansData = [
         coverageType: "Open Policy / Specific Transit",
         coverageScope: "Global Transit",
         sumInsured: "CIF Value + 10%",
-        color: "#2076C7",
+        color: "#1CADA3",
         keyBenefits: [
             "All Risk Coverage Option",
             "Loading & Unloading Risk Protection",
@@ -158,7 +163,7 @@ const marinePlansData = [
         coverageType: "Open Policy / Specific Transit",
         coverageScope: "Global Transit",
         sumInsured: "CIF Value + 10%",
-        color: "#2076C7",
+        color: "#1CADA3",
         keyBenefits: [
             "Institute Cargo Clauses (A/B/C)",
             "Optional War Risk Cover",
@@ -166,7 +171,6 @@ const marinePlansData = [
             "Customizable Coverage"
         ]
     },
-
     {
         name: "SBI General – Marine Cargo Insurance",
         carrier: "By SBI General Insurance",
@@ -192,7 +196,7 @@ const marinePlansData = [
         coverageType: "Open Policy / Specific Transit",
         coverageScope: "Global Transit",
         sumInsured: "CIF Value + 10%",
-        color: "#2076C7",
+        color: "#1CADA3",
         keyBenefits: [
             "All Risk Cargo Coverage",
             "Loading & Unloading Risk Protection",
@@ -226,7 +230,7 @@ const marinePlansData = [
         coverageType: "Open Policy / Specific Transit",
         coverageScope: "Global Transit",
         sumInsured: "CIF Value + 10%",
-        color: "#2076C7",
+        color: "#1CADA3",
         keyBenefits: [
             "Theft & Accident Coverage",
             "Damage During Handling Cover",
@@ -254,29 +258,27 @@ const marinePlansData = [
 ];
 
 const MarineInsurancePage = () => {
+    const router = useRouter();
     const [openFaq, setOpenFaq] = useState<number | null>(null);
+    const [showAllFaqs, setShowAllFaqs] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState<string | undefined>(undefined);
+    const [showBackButton, setShowBackButton] = useState(true);
+    const { openLogin, openSignup } = useModal();
+
+    useEffect(() => {
+        const handleScroll = () => setShowBackButton(window.scrollY < 80);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const handleBackToOffers = () => router.push('/offers');
 
     const handleApply = (planName: string) => {
         setSelectedPlan(planName);
         setIsApplyModalOpen(true);
-    };
-
-    const fadeIn: Variants = {
-        hidden: { opacity: 0 },
-        visible: { opacity: 1, transition: { duration: 0.6, ease: "easeOut" } }
-    };
-
-    const slideUpFade: Variants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.5, ease: "easeOut" }
-        }
     };
 
     const categories = ['All', 'Cargo', 'Hull', 'Transit', 'Freight'];
@@ -290,8 +292,39 @@ const MarineInsurancePage = () => {
         });
     }, [searchQuery, selectedCategory]);
 
+    const faqs = [
+        { q: "What is 'All Risks' coverage?", a: "It provides the broadest protection, covering all physical loss or damage from external causes, subject to certain standard exclusions." },
+        { q: "Does it cover war and strikes?", a: "Standard policies usually exclude these, but they can be added as optional 'War & Strike' clauses for specific routes." },
+        { q: "What is CIF vs FOB?", a: "CIF (Cost, Insurance, Freight) means the seller provides insurance. FOB (Free on Board) means the buyer is responsible for insurance once goods are loaded." },
+        { q: "Can I get a policy for a single shipment?", a: "Yes, 'Single Voyage' policies are available for one-off shipments. For regular trade, 'Open Cover' policies are more efficient." },
+        { q: "How are marine claims processed?", a: "A survey is usually required by an independent surveyor. You'll need the invoice, bill of lading, and damage report." },
+        { q: "What is General Average?", a: "It is a principle of maritime law where all stakeholders in a sea venture proportionally share any losses resulting from a voluntary sacrifice of part of the ship or cargo to save the whole in an emergency." },
+        { q: "Is Inland Transit covered?", a: "Yes, Marine Transit Insurance can cover goods moving domestically by road, rail, or air, as well as international shipments." }
+    ];
+
     return (
-        <div className="bg-[#f8fafd] min-h-screen font-sans">
+        <div className="bg-[#f8fafd] min-h-screen font-sans relative">
+
+            {/* FIXED BACK BUTTON */}
+            <div className={`fixed z-50 top-20 left-4 md:top-24 md:left-8 transition-all duration-300 ${showBackButton ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                <button
+                    onClick={handleBackToOffers}
+                    aria-label="Back to Offers"
+                    className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+                >
+                    <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+                        <ArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+                    </div>
+                </button>
+                <button
+                    onClick={handleBackToOffers}
+                    className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group cursor-pointer"
+                >
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+                    Back to Offers
+                </button>
+            </div>
+
             {/* Hero Content Section */}
             <section className="relative py-20 lg:py-28 overflow-hidden" style={{ background: 'linear-gradient(to bottom right, #f8fafd, #ffffff)' }}>
                 {/* Animated background shapes */}
@@ -304,31 +337,27 @@ const MarineInsurancePage = () => {
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div className="text-left">
                             <div className="mb-6">
-                                <Link
-                                    href="/"
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-lg border border-gray-100 shadow-sm text-gray-700 font-bold text-sm hover:shadow-md transition-all active:scale-95"
-                                >
-                                    <ArrowLeft size={16} />
-                                    Back
-                                </Link>
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 border border-gray-200 w-fit">
+                                    <Ship className="w-4 h-4 text-[#2076C7]" />
+                                    <span className="text-xs font-bold text-[#2076C7] tracking-wider uppercase">Global Transit Protection</span>
+                                </div>
                             </div>
-
 
                             <motion.h1
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="text-5xl md:text-7xl font-sans font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent leading-[1.1] mb-4 tracking-tight"
+                                className="text-5xl md:text-6xl lg:text-7xl font-sans font-bold bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-clip-text text-transparent leading-tight mb-6 tracking-tight"
                             >
                                 Get Closer to Your Goals <br />
                                 with an Instant <br />
-                                Marine Insurance
+                                <span className="text-[#2076C7]">Marine Insurance</span>
                             </motion.h1>
 
                             <motion.p
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.05 }}
-                                className="text-xl text-gray-500 font-bold mb-8 leading-relaxed"
+                                className="text-lg md:text-xl lg:text-2xl text-gray-700 max-w-2xl leading-relaxed mb-10"
                             >
                                 Protection for cargo and vessels during transit
                             </motion.p>
@@ -337,20 +366,23 @@ const MarineInsurancePage = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.2 }}
-                                className="flex flex-wrap gap-5 pt-4"
+                                className="flex flex-wrap gap-5 pt-2"
                             >
                                 <button
-                                    onClick={() => document.getElementById('calculator')?.scrollIntoView({ behavior: 'smooth' })}
-                                    className="group relative px-8 py-4 rounded-lg font-bold tracking-widest text-sm text-white shadow-xl hover:brightness-110 transform hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden uppercase"
+                                    onClick={openLogin}
+                                    className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
                                     style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}
                                 >
-                                    Consult an Advisor
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        Consult an Advisor <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    </span>
                                 </button>
                                 <button
-                                    onClick={() => document.getElementById('plans-grid')?.scrollIntoView({ behavior: 'smooth' })}
-                                    className="px-8 py-4 bg-white rounded-lg font-bold tracking-widest text-sm text-gray-500 border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all active:scale-95 uppercase"
+                                    onClick={openSignup}
+                                    className="group relative text-[#2076C7] bg-white px-8 py-4 rounded-lg font-semibold text-lg border-2 border-[#2076C7] shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
                                 >
-                                    View Plans
+                                    <span className="relative z-10 transition-colors duration-300 group-hover:text-white">Get Free Quote</span>
+                                    <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}></div>
                                 </button>
                             </motion.div>
                         </div>
@@ -367,26 +399,29 @@ const MarineInsurancePage = () => {
                 </div>
             </section>
 
-            {/* Types Section - Restored */}
+            {/* Types Section */}
             <section className="py-24 bg-[#f8fafd] border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="max-w-3xl mx-auto text-center mb-16">
-                        <h2 className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4 tracking-tight">
+                        <h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                             Types of Marine Insurance
                         </h2>
-                        <p className="text-xl text-gray-500 font-bold">Comprehensive solutions for every maritime risk</p>
+                        <p className="text-xl text-gray-500 max-w-3xl mx-auto font-light leading-relaxed">Comprehensive solutions for every maritime risk</p>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
-                            { id: 1, title: "Marine Cargo Insurance", desc: "Protects goods in transit by sea, air, road, or rail.", icon: Ship },
-                            { id: 2, title: "Hull Insurance", desc: "Covers physical damage to vessels / ships.", icon: Anchor },
-                            { id: 3, title: "Freight Insurance", desc: "Compensates shipping costs if goods are lost/damaged.", icon: IndianRupee },
-                            { id: 4, title: "Marine Transit Insurance", desc: "For goods moving internationally or domestically.", icon: Box }
+                            { id: 1, title: "Marine Cargo Insurance", desc: "Protects goods in transit by sea, air, road, or rail.", icon: Ship, color: "#2076C7" },
+                            { id: 2, title: "Hull Insurance", desc: "Covers physical damage to vessels / ships.", icon: Anchor, color: "#1CADA3" },
+                            { id: 3, title: "Freight Insurance", desc: "Compensates shipping costs if goods are lost/damaged.", icon: IndianRupee, color: "#2076C7" },
+                            { id: 4, title: "Marine Transit Insurance", desc: "For goods moving internationally or domestically.", icon: Box, color: "#1CADA3" }
                         ].map((type) => (
                             <div key={type.id} className="bg-white p-6 rounded-2xl border border-gray-50 shadow-sm hover:shadow-xl transition-all group">
-                                <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-[#2076C7] mb-4 group-hover:bg-[#2076C7] group-hover:text-white transition-all">
-                                    <type.icon size={24} />
+                                <div
+                                    className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-4 transition-all"
+                                    style={{ color: type.color }}
+                                >
+                                    <type.icon size={24} className="group-hover:scale-110 transition-transform" />
                                 </div>
                                 <h3 className="text-sm font-bold text-gray-900 uppercase tracking-tight mb-2">{type.id}. {type.title}</h3>
                                 <p className="text-[11px] text-gray-500 font-bold leading-relaxed">{type.desc}</p>
@@ -397,9 +432,9 @@ const MarineInsurancePage = () => {
             </section>
 
             {/* Plans Section */}
-            <section id="plans-grid" className="py-24 bg-[#f8fafd]">
+            <section id="plans-grid" className="py-24 bg-white">
                 <div className="max-w-7xl mx-auto px-4">
-                    {/* Filter Section - Redesigned to match image */}
+                    {/* Filter Section */}
                     <div className="flex flex-col lg:flex-row items-center gap-8 mb-16">
                         <div className="relative w-full max-w-sm">
                             <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -412,14 +447,14 @@ const MarineInsurancePage = () => {
                             />
                         </div>
 
-                        <div className="flex flex-wrap justify-start gap-3">
+                        <div className="flex flex-wrap justify-start gap-4">
                             {categories.map((cat) => (
                                 <button
                                     key={cat}
                                     onClick={() => setSelectedCategory(cat)}
-                                    className={`px-8 py-3.5 rounded-2xl font-bold text-[10px] tracking-widest transition-all cursor-pointer whitespace-nowrap border uppercase shadow-sm ${selectedCategory === cat
-                                        ? 'bg-blue-600 text-white border-transparent shadow-[0_8px_20px_rgba(37,99,235,0.3)]'
-                                        : 'bg-white text-gray-400 border-gray-100 hover:border-gray-200'
+                                    className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all cursor-pointer whitespace-nowrap shadow-sm border ${selectedCategory === cat
+                                        ? 'bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white border-transparent'
+                                        : 'bg-white text-gray-600 border-gray-200 hover:border-[#1CADA3] hover:text-[#1CADA3]'
                                         }`}
                                 >
                                     {cat}
@@ -429,21 +464,17 @@ const MarineInsurancePage = () => {
                     </div>
 
                     <div className="max-h-[850px] overflow-y-auto pr-2 custom-scrollbar">
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 pb-8">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
                             {filteredPlans.map((plan, idx) => (
-                                <MarineInsurancePlanCard key={idx} {...plan} onApply={handleApply} />
+                                <MarineInsurancePlanCard key={idx} {...plan} onApply={handleApply} onGetQuote={openSignup} onTalkToAdvisor={() => router.push('/contact')} />
                             ))}
                         </div>
                     </div>
                 </div>
             </section>
 
-
-
-
-
             {/* Calculator Section */}
-            <section id="calculator" className="py-24 bg-neutral-100 border-y border-gray-100">
+            <section id="calculator" className="py-24 bg-white border-y border-gray-100">
                 <div className="max-w-7xl mx-auto px-4 relative z-10">
                     <MarineInsuranceCalculator />
                 </div>
@@ -459,26 +490,26 @@ const MarineInsurancePage = () => {
                         <div className="order-2 lg:order-1">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 {[
-                                    { icon: <Zap className="text-amber-500" />, title: "Rapid Recovery", desc: "Minimize downtime after marine incidents with fast settlements." },
-                                    { icon: <ShieldCheck className="text-blue-500" />, title: "Risk Mitigation", desc: "Global protection against unpredictability on the high seas." },
-                                    { icon: <Scale className="text-indigo-500" />, title: "Legal Security", desc: "Compliance with international maritime laws and liabilities." },
-                                    { icon: <Box className="text-emerald-500" />, title: "Asset Protection", desc: "Full value coverage for high-stakes cargo and vessels." }
+                                    { icon: <Zap size={28} className="text-[#2076C7]" />, title: "Rapid Recovery", desc: "Minimize downtime after marine incidents with fast settlements.", bg: "from-[#2076C7]/10 to-[#2076C7]/20" },
+                                    { icon: <ShieldCheck size={28} className="text-[#1CADA3]" />, title: "Risk Mitigation", desc: "Global protection against unpredictability on the high seas.", bg: "from-[#1CADA3]/10 to-[#1CADA3]/20" },
+                                    { icon: <Scale size={28} className="text-[#2076C7]" />, title: "Legal Security", desc: "Compliance with international maritime laws and liabilities.", bg: "from-[#2076C7]/10 to-[#2076C7]/20" },
+                                    { icon: <Box size={28} className="text-[#1CADA3]" />, title: "Asset Protection", desc: "Full value coverage for high-stakes cargo and vessels.", bg: "from-[#1CADA3]/10 to-[#1CADA3]/20" }
                                 ].map((item, i) => (
-                                    <div key={i} className="bg-neutral-50 p-6 rounded-2xl border border-gray-100 shadow-sm group hover:border-[#1CADA3]/30 transition-all">
-                                        <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                    <div key={i} className="flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-all font-sans group">
+                                        <div className={`w-16 h-16 rounded-full bg-linear-to-r ${item.bg} flex items-center justify-center mb-5 shadow-sm group-hover:scale-110 transition-transform`}>
                                             {item.icon}
                                         </div>
-                                        <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-2">{item.title}</h4>
-                                        <p className="text-xs text-gray-500 font-bold leading-relaxed">{item.desc}</p>
+                                        <h4 className="text-lg font-bold text-gray-900 mb-2 tracking-tight">{item.title}</h4>
+                                        <p className="text-sm text-gray-600 leading-relaxed font-medium">{item.desc}</p>
                                     </div>
                                 ))}
                             </div>
                         </div>
                         <div className="order-1 lg:order-2">
-                            <h2 className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-6 tracking-tight">
+                            <h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                                 Why Marine Insurance <br /> is Crucial for Your Business
                             </h2>
-                            <p className="text-xl text-gray-500 font-bold mb-8 leading-relaxed">
+                            <p className="text-xl text-gray-500 max-w-3xl mx-auto font-light leading-relaxed mb-8">
                                 In the world of global logistics, the unexpected is the only constant. Marine insurance provides the financial bedrock to keep your operations afloat.
                             </p>
                             <div className="space-y-4">
@@ -501,138 +532,116 @@ const MarineInsurancePage = () => {
                 </div>
             </section>
 
-
-
             {/* How to Choose Section */}
             <section className="py-24 bg-white border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-4 text-center">
                     <div className="max-w-3xl mx-auto mb-16">
-                        <h2 className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4 tracking-tight">
+                        <h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                             How to Choose Marine Insurance
                         </h2>
-                        <p className="text-xl text-gray-500 font-bold">A guide for businesses and traders</p>
+                        <p className="text-xl text-gray-500 max-w-3xl mx-auto font-light leading-relaxed">A guide for businesses and traders</p>
                     </div>
 
-                    <div className="grid md:grid-cols-4 gap-8">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {[
-                            { step: "01", title: "Assess Cargo Value", desc: "Include cost of goods, freight, and a 10% buffer for contingencies." },
-                            { step: "02", title: "Define Transit Route", desc: "Different ports and routes carry varying risk levels (climate, piracy)." },
-                            { step: "03", title: "Select Coverage", desc: "Choose between 'All Risks' (Institute Cargo Clause A) or restricted covers." },
-                            { step: "04", title: "Review Deductibles", desc: "Balance your out-of-pocket costs with the premium amount." }
+                            { step: "1", title: "Assess Cargo Value", desc: "Include cost of goods, freight, and a 10% buffer for contingencies." },
+                            { step: "2", title: "Define Transit Route", desc: "Different ports and routes carry varying risk levels (climate, piracy)." },
+                            { step: "3", title: "Select Coverage", desc: "Choose between 'All Risks' (Institute Cargo Clause A) or restricted covers." },
+                            { step: "4", title: "Review Deductibles", desc: "Balance your out-of-pocket costs with the premium amount." }
                         ].map((item, idx) => (
-                            <div key={idx} className="relative p-8 bg-neutral-50 rounded-2xl border border-gray-100 shadow-sm group hover:-translate-y-2 transition-all overflow-hidden">
-                                <span className="absolute -top-2 -right-2 text-7xl font-bold text-gray-200/50 group-hover:text-[#1CADA3]/20 transition-colors pointer-events-none italic">
+                            <div key={idx} className="flex flex-col items-center text-center p-8 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-all font-sans group">
+                                <div className="w-16 h-16 rounded-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-2xl mb-6 shadow-md group-hover:scale-110 transition-transform">
                                     {item.step}
-                                </span>
-                                <div className="relative z-10 text-left">
-                                    <div className="w-10 h-10 rounded-lg bg-[#2076C7]/10 flex items-center justify-center text-[#2076C7] font-bold text-sm mb-6">
-                                        {item.step}
-                                    </div>
-                                    <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3 leading-tight">{item.title}</h4>
-                                    <p className="text-xs text-gray-500 font-bold leading-relaxed">{item.desc}</p>
                                 </div>
+                                <h4 className="text-lg font-bold text-gray-900 mb-3 tracking-tight">{item.title}</h4>
+                                <p className="text-sm text-gray-600 leading-relaxed font-medium">{item.desc}</p>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* FAQ Section */}
-            <section className="py-24 bg-neutral-100">
+            {/* Disclaimer Section Box */}
+            <section className="bg-white py-12 px-4">
+                <div className="max-w-4xl mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
+                    <p className="text-sm text-gray-700 text-center leading-relaxed font-sans">
+                        <strong className="text-black">Disclaimer:</strong> Marine Insurance coverage, premium rates, and policy terms are subject to the insurer's underwriting guidelines and the Maritime Laws of India. Final approval and claim settlements are at the sole discretion of the respective insurance providers.
+                    </p>
+                </div>
+            </section>
+
+            {/* Questions Section - Restored and Refactored */}
+            <section className="py-24 bg-white font-sans border-b border-gray-100">
                 <div className="max-w-4xl mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <div className="flex justify-center mb-4">
-                            <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-[#2076C7]">
-                                <HelpCircle size={32} />
-                            </div>
+                    <div className="text-center mb-16 relative">
+                        <div className="mb-4 flex justify-center">
+                            <HelpCircle className="w-12 h-12 text-[#1CADA3] opacity-20" strokeWidth={1.5} />
                         </div>
-                        <h2 className="text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4 tracking-tight">
+                        <h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                             Frequently Asked Questions
                         </h2>
                         <div className="w-24 h-1.5 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full"></div>
+                        <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed mt-4 font-light">Got questions about marine insurance? We&apos;ve got answers.</p>
                     </div>
 
                     <div className="space-y-4">
-                        {[
-                            { q: "What is 'All Risks' coverage?", a: "It provides the broadest protection, covering all physical loss or damage from external causes, subject to certain standard exclusions." },
-                            { q: "Does it cover war and strikes?", a: "Standard policies usually exclude these, but they can be added as optional 'War & Strike' clauses for specific routes." },
-                            { q: "What is CIF vs FOB?", a: "CIF (Cost, Insurance, Freight) means the seller provides insurance. FOB (Free on Board) means the buyer is responsible for insurance once goods are loaded." },
-                            { q: "Can I get a policy for a single shipment?", a: "Yes, 'Single Voyage' policies are available for one-off shipments. For regular trade, 'Open Cover' policies are more efficient." },
-                            { q: "How are marine claims processed?", a: "A survey is usually required by an independent surveyor. You'll need the invoice, bill of lading, and damage report." }
-                        ].map((faq, idx) => (
-                            <motion.div
+                        {(showAllFaqs ? faqs : faqs.slice(0, 5)).map((faq, idx) => (
+                            <div
                                 key={idx}
-                                className="overflow-hidden bg-white border border-gray-50 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+                                className="border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#2076C7]/30 hover:shadow-md"
                             >
                                 <button
                                     onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                                    className="w-full px-8 py-6 text-left flex justify-between items-center group"
+                                    className="w-full px-4 sm:px-6 py-4 sm:py-5 text-left flex justify-between items-start gap-3 bg-gray-50/50 hover:bg-blue-50/50 transition-colors focus:outline-none cursor-pointer group"
                                 >
-                                    <span className="font-bold text-gray-700 uppercase tracking-tight group-hover:text-[#2076C7] transition-colors">{faq.q}</span>
-                                    <div className={`p-2 rounded-lg transition-all ${openFaq === idx ? 'bg-[#2076C7] text-white rotate-180 shadow-lg shadow-[#2076C7]/30' : 'bg-neutral-50 text-gray-400'}`}>
-                                        <ChevronDown size={20} />
+                                    <span className="font-bold text-gray-700 text-base sm:text-lg pr-2 group-hover:text-[#2076C7] transition-colors">{faq.q}</span>
+                                    <div className={`p-1.5 rounded-full bg-white border border-gray-200 text-[#2076C7] transition-transform duration-300 ${openFaq === idx ? 'rotate-180' : ''}`}>
+                                        {openFaq === idx ? <Minus size={18} strokeWidth={3} /> : <Plus size={18} strokeWidth={3} />}
                                     </div>
                                 </button>
+
                                 <AnimatePresence>
                                     {openFaq === idx && (
                                         <motion.div
                                             initial={{ height: 0, opacity: 0 }}
                                             animate={{ height: "auto", opacity: 1 }}
                                             exit={{ height: 0, opacity: 0 }}
-                                            className="px-8 pb-8"
+                                            className="px-8 pb-8 bg-white"
                                         >
-                                            <div className="pt-4 border-t border-gray-50">
+                                            <div className="pt-4 border-t border-gray-100 mt-2">
                                                 <p className="text-sm text-gray-500 font-bold leading-relaxed">{faq.a}</p>
                                             </div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
-                            </motion.div>
+                            </div>
                         ))}
                     </div>
+
+                    {faqs.length > 5 && (
+                        <div className="text-center mt-12">
+                            <button
+                                onClick={() => setShowAllFaqs(!showAllFaqs)}
+                                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-blue-50 text-[#2076C7] font-bold tracking-tight hover:bg-blue-100 transition-all cursor-pointer shadow-sm active:scale-95"
+                            >
+                                {showAllFaqs ? 'View Less' : 'View More'}
+                                <Plus size={18} strokeWidth={3} className={`transition-transform duration-300 ${showAllFaqs ? 'rotate-45' : ''}`} />
+                            </button>
+                        </div>
+                    )}
                 </div>
             </section>
 
-            {/* Ready to Get Started Section */}
-            <section className="py-24">
-                <div className="max-w-4xl mx-auto text-center px-4">
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        variants={fadeIn}
-                        viewport={{ once: true }}
-                        className="p-16 shadow-2xl rounded-3xl relative overflow-hidden bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white"
-                    >
-                        <motion.h2 variants={slideUpFade} className="text-4xl font-bold text-white mb-6">
-                            Ready to Secure Your Maritime Business?
-                        </motion.h2>
-                        <motion.p variants={slideUpFade} className="text-xl text-white/90 mb-10 leading-relaxed font-light">
-                            Apply now for Marine Insurance and get expert guidance throughout the process. Our specialists are ready to help you navigate your coverage needs.
-                        </motion.p>
-
-                        <motion.div variants={slideUpFade} className="flex flex-wrap justify-center gap-6">
-                            <button
-                                onClick={() => setIsApplyModalOpen(true)}
-                                className="bg-white text-[#2076C7] hover:bg-white/90 px-12 py-4 rounded-xl transition-all inline-flex items-center justify-center text-xl font-bold shadow-xl active:scale-95"
-                            >
-                                Apply Now
-                            </button>
-                            <button
-                                onClick={() => document.getElementById('calculator')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="bg-transparent text-white border border-white/30 hover:bg-white/10 px-12 py-4 rounded-xl transition-all inline-flex items-center justify-center text-xl font-bold"
-                            >
-                                Contact Us
-                            </button>
-                        </motion.div>
-                    </motion.div>
-                </div>
-            </section>
+            <CTASection />
 
             <MarineInsuranceApplyForm
                 isOpen={isApplyModalOpen}
                 onClose={() => setIsApplyModalOpen(false)}
                 planName={selectedPlan}
             />
+
+            <Chatbot />
+            <ScrollToTop />
         </div>
     );
 };

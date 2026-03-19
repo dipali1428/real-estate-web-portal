@@ -59,7 +59,7 @@ const PMSComparisonCalculator = () => {
                                 key={years}
                                 onClick={() => setTimePeriod(years)}
                                 className={`px-6 py-2 rounded-lg font-medium transition-all ${timePeriod === years
-                                    ? 'bg-primary text-gray-700 shadow-md'
+                                    ? 'bg-[#2076C7] text-white shadow-md'
                                     : 'bg-gray-100 text-slate-main hover:bg-gray-200'
                                     }`}
                             >
@@ -116,39 +116,39 @@ const PMSComparisonCalculator = () => {
                     Investment Growth Comparison
                 </h4>
                 <div className="space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-2 border-gray-300 rounded-lg bg-blue-50 gap-2 sm:gap-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-2 border-[#2076C7]/20 rounded-lg bg-[#2076C7]/5 gap-2 sm:gap-0">
                         <div className="flex items-center">
-                            <div className="w-4 h-4 rounded-full bg-primary mr-3 flex-shrink-0" />
+                            <div className="w-4 h-4 rounded-full bg-[#2076C7] mr-3 flex-shrink-0" />
                             <span className="font-medium text-slate-main">PMS Strategy</span>
                         </div>
                         <div className="text-left sm:text-right pl-7 sm:pl-0">
-                            <div className="text-2xl font-bold text-primary">
+                            <div className="text-2xl font-bold text-[#2076C7]">
                                 ₹{new Intl.NumberFormat('en-IN').format(Math.round(results.pms))}
                             </div>
                             <div className="text-sm text-slate-muted">@{expectedReturn.pms}% p.a.</div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-300 rounded-lg bg-green-50 gap-2 sm:gap-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-300 rounded-lg bg-[#1CADA3]/5 gap-2 sm:gap-0">
                         <div className="flex items-center">
-                            <div className="w-4 h-4 rounded-full bg-green-500 mr-3 flex-shrink-0" />
+                            <div className="w-4 h-4 rounded-full bg-[#1CADA3] mr-3 flex-shrink-0" />
                             <span className="font-medium text-slate-main">Equity Mutual Fund</span>
                         </div>
                         <div className="text-left sm:text-right pl-7 sm:pl-0">
-                            <div className="text-xl font-bold text-green-600">
+                            <div className="text-xl font-bold text-[#1CADA3]">
                                 ₹{new Intl.NumberFormat('en-IN').format(Math.round(results.mutualFund))}
                             </div>
                             <div className="text-sm text-slate-muted">@{expectedReturn.mutualFund}% p.a.</div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-300 rounded-lg bg-yellow-50 gap-2 sm:gap-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-300 rounded-lg bg-[#2076C7]/5 gap-2 sm:gap-0">
                         <div className="flex items-center">
-                            <div className="w-4 h-4 rounded-full bg-yellow-500 mr-3 flex-shrink-0" />
+                            <div className="w-4 h-4 rounded-full bg-[#2076C7] mr-3 flex-shrink-0" />
                             <span className="font-medium text-slate-main">Fixed Deposit</span>
                         </div>
                         <div className="text-left sm:text-right pl-7 sm:pl-0">
-                            <div className="text-xl font-bold text-yellow-600">
+                            <div className="text-xl font-bold text-[#2076C7]">
                                 ₹{new Intl.NumberFormat('en-IN').format(Math.round(results.fd))}
                             </div>
                             <div className="text-sm text-slate-muted">@{expectedReturn.fd}% p.a.</div>
@@ -170,17 +170,17 @@ const PMSComparisonCalculator = () => {
                 </div>
 
                 {/* PMS Advantage */}
-                <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg border border-gray-300 border-primary">
+                <div className="mt-6 p-4 bg-gradient-to-r from-[#2076C7]/5 to-[#1CADA3]/5 rounded-lg border border-[#2076C7]/20">
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
                         <div className="w-full sm:w-auto text-center sm:text-left">
                             <div className="text-sm text-slate-muted">PMS Advantage over Mutual Funds</div>
-                            <div className="text-xl sm:text-2xl font-bold text-primary mt-1">
+                            <div className="text-xl sm:text-2xl font-bold text-[#2076C7] mt-1">
                                 +₹{new Intl.NumberFormat('en-IN').format(Math.round(results.pms - results.mutualFund))}
                             </div>
                         </div>
                         <div className="w-full sm:w-auto text-center sm:text-right border-t sm:border-t-0 border-gray-200 pt-3 sm:pt-0">
                             <div className="text-sm text-slate-muted">Additional Returns</div>
-                            <div className="text-lg sm:text-xl font-bold text-accent-teal mt-1">
+                            <div className="text-lg sm:text-xl font-bold text-[#1CADA3] mt-1">
                                 {(((results.pms - results.mutualFund) / investmentAmount) * 100).toFixed(1)}%
                             </div>
                         </div>
@@ -188,26 +188,26 @@ const PMSComparisonCalculator = () => {
                 </div>
 
                 {/* Real Returns After Inflation */}
-                <div className="mt-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                <div className="mt-4 p-4 bg-[#2076C7]/5 rounded-lg border border-[#2076C7]/10">
                     <div className="text-sm font-medium text-slate-main mb-2">
                         Real Returns (After Inflation)
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="p-3 bg-white/50 rounded-lg border border-purple-100">
+                        <div className="p-3 bg-white/50 rounded-lg border border-[#2076C7]/10">
                             <div className="text-xs text-slate-muted mb-1">PMS</div>
-                            <div className="text-lg font-bold text-purple-600 break-all">
+                            <div className="text-lg font-bold text-[#2076C7] break-all">
                                 ₹{new Intl.NumberFormat('en-IN').format(Math.round(results.pms - results.inflation + investmentAmount))}
                             </div>
                         </div>
-                        <div className="p-3 bg-white/50 rounded-lg border border-purple-100">
+                        <div className="p-3 bg-white/50 rounded-lg border border-[#2076C7]/10">
                             <div className="text-xs text-slate-muted mb-1">Mutual Fund</div>
-                            <div className="text-lg font-bold text-purple-600 break-all">
+                            <div className="text-lg font-bold text-[#2076C7] break-all">
                                 ₹{new Intl.NumberFormat('en-IN').format(Math.round(results.mutualFund - results.inflation + investmentAmount))}
                             </div>
                         </div>
-                        <div className="p-3 bg-white/50 rounded-lg border border-purple-100">
+                        <div className="p-3 bg-white/50 rounded-lg border border-[#2076C7]/10">
                             <div className="text-xs text-slate-muted mb-1">Fixed Deposit</div>
-                            <div className="text-lg font-bold text-purple-600 break-all">
+                            <div className="text-lg font-bold text-[#2076C7] break-all">
                                 ₹{new Intl.NumberFormat('en-IN').format(Math.round(results.fd - results.inflation + investmentAmount))}
                             </div>
                         </div>

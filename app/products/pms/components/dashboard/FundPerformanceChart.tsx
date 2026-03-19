@@ -130,7 +130,7 @@ export default function FundPerformanceChart({ fund }: { fund: Fund }) {
             {
                 label: 'Nifty 50',
                 data: chartData.map(d => d.benchmark),
-                borderColor: '#94a3b8',
+                borderColor: '#1CADA3',
                 backgroundColor: 'transparent',
                 fill: false,
                 borderDash: [5, 5],
@@ -151,7 +151,7 @@ export default function FundPerformanceChart({ fund }: { fund: Fund }) {
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#0F172A',
+                backgroundColor: '#2076C7',
                 padding: 12,
                 titleFont: { size: 14, weight: 700 },
                 bodyFont: { size: 13 },
@@ -189,7 +189,7 @@ export default function FundPerformanceChart({ fund }: { fund: Fund }) {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                        <div className="p-2 bg-[#2076C7]/10 rounded-lg text-[#2076C7]">
                             <Activity size={24} />
                         </div>
                         <h2 className="text-3xl font-bold text-gray-900">Live Performance</h2>
@@ -197,7 +197,7 @@ export default function FundPerformanceChart({ fund }: { fund: Fund }) {
                     <p className="text-gray-500 flex items-center gap-2">
                         Real-time tracking against <span className="font-bold text-gray-700">Nifty 50</span>
                         {benchmarkInfo && (
-                            <span className={`text-xs font-black ${benchmarkInfo.changePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            <span className={`text-xs font-black ${benchmarkInfo.changePercent >= 0 ? 'text-[#1CADA3]' : 'text-red-600'}`}>
                                 ({benchmarkInfo.changePercent >= 0 ? '+' : ''}{benchmarkInfo.changePercent.toFixed(2)}%)
                             </span>
                         )}
@@ -211,7 +211,7 @@ export default function FundPerformanceChart({ fund }: { fund: Fund }) {
                                 key={tf}
                                 onClick={() => setTimeFrame(tf)}
                                 className={`px-4 py-2 text-xs font-black rounded-lg transition-all ${timeFrame === tf
-                                    ? 'bg-white shadow-sm text-primary'
+                                    ? 'bg-white shadow-sm text-[#2076C7]'
                                     : 'text-slate-400 hover:text-slate-600'
                                     }`}
                             >
@@ -221,7 +221,7 @@ export default function FundPerformanceChart({ fund }: { fund: Fund }) {
                     </div>
                     <button
                         onClick={generateFundPerformance}
-                        className="p-2.5 bg-neutral-100 rounded-xl text-slate-400 hover:text-primary transition-colors hover:bg-primary/5"
+                        className="p-2.5 bg-neutral-100 rounded-xl text-slate-400 hover:text-[#2076C7] transition-colors hover:bg-[#2076C7]/5"
                     >
                         <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
                     </button>
@@ -232,7 +232,7 @@ export default function FundPerformanceChart({ fund }: { fund: Fund }) {
                 {loading && (
                     <div className="absolute inset-0 z-10 bg-white/50 backdrop-blur-[2px] flex items-center justify-center rounded-2xl">
                         <div className="flex flex-col items-center gap-4">
-                            <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+                            <div className="w-10 h-10 border-4 border-[#2076C7]/20 border-t-[#2076C7] rounded-full animate-spin" />
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Syncing Data...</p>
                         </div>
                     </div>
@@ -244,7 +244,7 @@ export default function FundPerformanceChart({ fund }: { fund: Fund }) {
             <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div className="space-y-1">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Alpha</p>
-                    <p className="text-2xl font-black text-primary">+{(parseFloat(fund.returns) - 14.5).toFixed(1)}%</p>
+                    <p className="text-2xl font-black text-[#2076C7]">+{(parseFloat(fund.returns) - 14.5).toFixed(1)}%</p>
                 </div>
                 <div className="space-y-1">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tracking Error</p>
@@ -256,12 +256,12 @@ export default function FundPerformanceChart({ fund }: { fund: Fund }) {
                 </div>
                 <div className="space-y-1">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sharpe Ratio</p>
-                    <p className="text-2xl font-black text-primary">2.14</p>
+                    <p className="text-2xl font-black text-[#1CADA3]">2.14</p>
                 </div>
             </div>
 
             <div className="mt-12 p-6 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-4">
-                <Info size={20} className="text-primary mt-1 flex-shrink-0" />
+                <Info size={20} className="text-[#2076C7] mt-1 flex-shrink-0" />
                 <p className="text-xs text-slate-500 leading-relaxed font-medium">
                     <span className="font-bold text-slate-700">Live Sync Enabled:</span> This chart is synchronized with real-time NSE market data. The fund line represents a back-tested high-conviction logic relative to the benchmark index. Past performance is not indicative of future results.
                 </p>

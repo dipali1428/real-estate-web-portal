@@ -19,10 +19,10 @@ ChartJS.register(
 const data = [
     { name: 'Financial Services', value: 35, color: '#2076C7' },
     { name: 'IT', value: 20, color: '#1CADA3' },
-    { name: 'Consumer Goods', value: 15, color: '#8b5cf6' },
-    { name: 'Healthcare', value: 12, color: '#f59e0b' },
-    { name: 'Automobile', value: 10, color: '#ef4444' },
-    { name: 'Others', value: 8, color: '#6b7280' },
+    { name: 'Consumer Goods', value: 15, color: '#3182ce' },
+    { name: 'Healthcare', value: 12, color: '#38b2ac' },
+    { name: 'Automobile', value: 10, color: '#4299e1' },
+    { name: 'Others', value: 8, color: '#4fd1c5' },
 ];
 
 export default function PMS_Sector_Heatmap() {
@@ -62,8 +62,8 @@ export default function PMS_Sector_Heatmap() {
     return (
         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
             <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                    <LayoutGrid className="text-purple-600" size={24} />
+                <div className="p-2 bg-[#2076C7]/10 rounded-lg">
+                    <LayoutGrid className="text-[#2076C7]" size={24} />
                 </div>
                 <div>
                     <h3 className="text-xl font-bold text-gray-900">Sectoral Allocation</h3>

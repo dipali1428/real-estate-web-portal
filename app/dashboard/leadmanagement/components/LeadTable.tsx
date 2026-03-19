@@ -30,6 +30,7 @@ export interface Lead {
   status?: string;
   referral_lead_status?: string;
   disbursement_amount?: string;
+  rejectionNote?: string;
 }
 
 interface LeadTableProps {
@@ -58,10 +59,10 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
   const [previewTitle, setPreviewTitle] = useState<string>("");
   // Added 'all' to counts and cache
   const [counts, setCounts] = useState({ all: 0, referral: 0, detailed: 0 });
-  const [cache, setCache] = useState<{ all: Lead[], referral: Lead[], detailed: Lead[] }>({ 
-    all: [], 
-    referral: [], 
-    detailed: [] 
+  const [cache, setCache] = useState<{ all: Lead[], referral: Lead[], detailed: Lead[] }>({
+    all: [],
+    referral: [],
+    detailed: []
   });
 
   const formatValue = (val: any) => {
@@ -78,7 +79,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
     const fetchLeads = async () => {
       try {
         if (cache[activeTab].length === 0) setLoading(true);
-        
+
         // Always fetch both if it's the initial load or if 'all' is selected and cache is empty
         const isInitialLoad = cache.referral.length === 0 && cache.detailed.length === 0;
         let referralRes, detailedRes;
@@ -88,7 +89,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
             DashboardService.getLeads(),
             DashboardService.getMyLeads()
           ]);
-          
+
         } else {
           if (activeTab === 'referral') {
             referralRes = await DashboardService.getLeads();
@@ -134,6 +135,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                 referral_lead_status: item.referral_lead_status || "PENDING",
                 createdDate: isNaN(dateObj.getTime()) ? "N/A" : dateObj.toLocaleDateString(),
                 createdTime: isNaN(dateObj.getTime()) ? "" : dateObj.toLocaleTimeString(),
+                rejectionNote: item.rejection_note || "-",
               };
             });
           }
@@ -149,10 +151,10 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
           newCache.detailed = processData(detailedRes, 'detailed');
           setCounts(prev => ({ ...prev, detailed: newCache.detailed.length }));
         }
-        
+
         // Merge both for 'all' leads and sort by date (newest first)
         newCache.all = [...newCache.referral, ...newCache.detailed].sort((a, b) => {
-           return new Date(b.createdDate + ' ' + b.createdTime).getTime() - new Date(a.createdDate + ' ' + a.createdTime).getTime();
+          return new Date(b.createdDate + ' ' + b.createdTime).getTime() - new Date(a.createdDate + ' ' + a.createdTime).getTime();
         });
         setCounts(prev => ({ ...prev, all: newCache.all.length }));
 
@@ -204,7 +206,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
     formData.append("metadata", JSON.stringify(metadata));
     try {
       const response = await DashboardService.uploadLeadDocument(refId, formData);
-    
+
       if (response.success) {
         alert("Document uploaded successfully!");
         loadDocuments(activeLead.id);
@@ -234,8 +236,8 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
   const endIndex = startIndex + itemsPerPage;
   const currentLeads = filteredLeads.slice(startIndex, endIndex);
 
-  const isLeadCompleted = 
-    activeLead?.status?.toLowerCase() === 'completed' || 
+  const isLeadCompleted =
+    activeLead?.status?.toLowerCase() === 'completed' ||
     activeLead?.referral_lead_status?.toLowerCase() === 'completed';
 
   const areAllDocsUploaded = documents.uploaded.length > 0 && documents.pending.length === 0;
@@ -302,6 +304,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Contact</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Dept</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Product</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Rejection Note</th>
                     {activeTab === 'all' && <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Amount</th>}
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Type</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
@@ -314,7 +317,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Dept</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Sub Category</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Amount</th>
-                    
+
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Self Login</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
                     <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Actions</th>
@@ -334,13 +337,17 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.clientName}</td>
                         <td className="px-4 py-4 text-sm text-gray-600">{lead.contactNumber}</td>
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.product}</td>
-                        
+
                         <td className="px-4 py-4 text-sm text-gray-700">{lead.subCategory}</td>
-                           <td className="px-4 py-4 text-sm text-gray-900">{formatValue(lead.disbursement_amount).replace(/\.0+$/, "")}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600 min-w-[100px] whitespace-pre">{lead.rejectionNote || '--'}</td>
+                        {/* <td className="px-4 py-4 text-sm text-gray-900">{formatValue(lead.disbursement_amount).replace(/\.0+$/, "")}</td> */}
+                        {activeTab === 'all' && (
+                          <td className="px-4 py-4 text-sm text-gray-900">{formatValue(lead.disbursement_amount).replace(/\.0+$/, "")}</td>
+                        )}
                         <td className="px-4 py-4 text-sm text-gray-700">
-                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${lead.clientType === 'Detailed' ? 'bg-purple-50 text-purple-600 border border-purple-100' : 'bg-orange-50 text-orange-600 border border-orange-100'}`}>
-                             {lead.clientType}
-                           </span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${lead.clientType === 'Detailed' ? 'bg-purple-50 text-purple-600 border border-purple-100' : 'bg-orange-50 text-orange-600 border border-orange-100'}`}>
+                            {lead.clientType}
+                          </span>
                         </td>
                         <td className="px-4 py-4 text-sm">
                           <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${statusStyles[(lead.status || lead.referral_lead_status)?.toLowerCase() || "pending"] || "bg-gray-50 text-gray-700 border-gray-100"}`}>
@@ -412,7 +419,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                 <div className="grid grid-cols-2 gap-y-6 gap-x-4 mb-10">
                   <div><p className="text-[11px] text-gray-400 uppercase font-bold tracking-wider">Lead ID</p><p className="text-sm font-semibold text-gray-700">{activeLead.refId}</p></div>
                   <div><p className="text-[11px] text-gray-400 uppercase font-bold tracking-wider">Applied Date</p><p className="text-sm font-semibold text-gray-700">{activeLead.createdDate}</p></div>
-                  
+
                   {activeLead.formData && Object.entries(activeLead.formData).map(([key, value]) => {
                     if (typeof value === 'object' || value === null) return null;
                     return (
@@ -441,8 +448,8 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                           <span className="text-[9px] bg-green-100 text-green-700 px-2 py-1 rounded font-bold uppercase border border-green-200">
                             {doc.status || "Uploaded"}
                           </span>
-                          <button 
-                            onClick={() => { setPreviewUrl(doc.file_url); setPreviewTitle(doc.document_label); }} 
+                          <button
+                            onClick={() => { setPreviewUrl(doc.file_url); setPreviewTitle(doc.document_label); }}
                             className="text-blue-600 text-xs font-bold hover:underline"
                           >
                             View
@@ -469,36 +476,35 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                 <div className="relative">
                   {[
                     { label: "Application Submitted", date: activeLead.createdDate, completed: true },
-                    { 
-                      label: "Document Verification", 
-                      date: (isLeadCompleted || areAllDocsUploaded) ? "Verified" : "Pending Verification", 
-                      completed: isLeadCompleted || areAllDocsUploaded 
+                    {
+                      label: "Document Verification",
+                      date: (isLeadCompleted || areAllDocsUploaded) ? "Verified" : "Pending Verification",
+                      completed: isLeadCompleted || areAllDocsUploaded
                     },
-                    { 
-                      label: "RM Review", 
-                      date: isLeadCompleted ? "Completed" : "In Progress", 
-                      completed: isLeadCompleted, 
-                      active: !isLeadCompleted && areAllDocsUploaded 
+                    {
+                      label: "RM Review",
+                      date: isLeadCompleted ? "Completed" : "In Progress",
+                      completed: isLeadCompleted,
+                      active: !isLeadCompleted && areAllDocsUploaded
                     },
-                    { 
-                      label: "Sanction / Approval", 
-                      date: isLeadCompleted ? "Sanctioned" : "-", 
-                      completed: isLeadCompleted 
+                    {
+                      label: "Sanction / Approval",
+                      date: isLeadCompleted ? "Sanctioned" : "-",
+                      completed: isLeadCompleted
                     },
-                    { 
-                      label: "Disbursement", 
-                      date: isLeadCompleted ? "Disbursed" : "-", 
-                      completed: isLeadCompleted 
+                    {
+                      label: "Disbursement",
+                      date: isLeadCompleted ? "Disbursed" : "-",
+                      completed: isLeadCompleted
                     },
                   ].map((step, idx, arr) => (
                     <div key={idx} className="flex gap-4 mb-8 last:mb-0 relative">
                       {idx !== arr.length - 1 && (
                         <div className={`absolute left-[11px] top-6 w-[2px] h-10 ${step.completed ? 'bg-emerald-500' : 'bg-gray-200'}`} />
                       )}
-                      <div className={`z-10 w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors duration-500 ${
-                        step.completed ? 'bg-emerald-500 text-white shadow-sm' : 
+                      <div className={`z-10 w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors duration-500 ${step.completed ? 'bg-emerald-500 text-white shadow-sm' :
                         step.active ? 'bg-blue-600 text-white shadow-lg animate-pulse' : 'bg-gray-200 text-white'
-                      }`}>
+                        }`}>
                         {step.completed ? <Check size={12} strokeWidth={4} /> : <Clock size={12} />}
                       </div>
                       <div>

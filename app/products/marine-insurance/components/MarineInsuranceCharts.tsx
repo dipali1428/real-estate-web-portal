@@ -19,7 +19,7 @@ const radarData = [
 const benchmarkData = [
     { name: 'Cargo Cover', features: 6, color: '#2076C7' },
     { name: 'Transit Cover', features: 4, color: '#1CADA3' },
-    { name: 'Hull Insurance', features: 4, color: '#4F46E5' },
+    { name: 'Hull Insurance', features: 4, color: '#2076C7' },
 ];
 
 const MarineInsuranceCharts = () => {
@@ -60,8 +60,8 @@ const MarineInsuranceCharts = () => {
                                             <stop offset="95%" stopColor="#1CADA3" stopOpacity={0} />
                                         </linearGradient>
                                         <linearGradient id="colorHull" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.8} />
-                                            <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
+                                            <stop offset="5%" stopColor="#2076C7" stopOpacity={0.8} />
+                                            <stop offset="95%" stopColor="#2076C7" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
@@ -79,7 +79,7 @@ const MarineInsuranceCharts = () => {
                                     <Legend verticalAlign="top" wrapperStyle={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', paddingBottom: '20px' }} />
                                     <Area type="monotone" dataKey="cargo" name="Cargo" stackId="1" stroke="#2076C7" fillOpacity={1} fill="url(#colorCargo)" />
                                     <Area type="monotone" dataKey="transit" name="Transit" stackId="1" stroke="#1CADA3" fillOpacity={1} fill="url(#colorTransit)" />
-                                    <Area type="monotone" dataKey="hull" name="Hull" stackId="1" stroke="#4F46E5" fillOpacity={1} fill="url(#colorHull)" />
+                                    <Area type="monotone" dataKey="hull" name="Hull" stackId="1" stroke="#2076C7" fillOpacity={1} fill="url(#colorHull)" />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>

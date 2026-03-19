@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Smartphone, LockKeyhole, ArrowRight, KeyRound, ChevronLeft } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
+import { PublicService } from "@/app/services/publicService";
 import { useRouter } from "next/navigation";
 import { useModal } from "../../context/ModalContext";
 
@@ -29,7 +30,6 @@ const itemVariants = {
 
 const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const [loginMethod, setLoginMethod] = useState<'OTP' | 'PASSWORD' | 'FORGOT'>('OTP');
-
     const [otpSent, setOtpSent] = useState(false);
     const [otpTimer, setOtpTimer] = useState(0);
     const [emailOrPhone, setEmailOrPhone] = useState("");
@@ -37,12 +37,12 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     const [password, setPassword] = useState("");
 
     // Forgot Password State
-    const [forgotStep, setForgotStep] = useState(1);
+    const [forgotStep, setForgotStep] = useState(1); // 1: Mobile, 2: OTP, 3: New Password
     const [newPassword, setNewPassword] = useState("");
 
     // UI State
     const [error, setError] = useState("");
-    const [isSuccess, setIsSuccess] = useState(false); // NEW STATE FOR GREEN COLOR
+    const [isSuccess, setIsSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -55,7 +55,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     const handleMethodSwitch = (method: 'OTP' | 'PASSWORD' | 'FORGOT') => {
         setLoginMethod(method);
         setError("");
-        setIsSuccess(false); // Reset color
+        setIsSuccess(false);
         setOtpSent(false);
         setOtp("");
         setPassword("");
@@ -66,7 +66,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
 
     // 1. WEB OTP API
     useEffect(() => {
-        if (otpSent && "OTPCredential" in window) {
+        if ((otpSent || (loginMethod === 'FORGOT' && forgotStep === 2)) && "OTPCredential" in window) {
             const ac = new AbortController();
             navigator.credentials
                 .get({
@@ -82,13 +82,56 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                 .catch((err) => console.log("Web OTP API not triggered", err));
             return () => ac.abort();
         }
-    }, [otpSent]);
+    }, [otpSent, loginMethod, forgotStep]);
 
-    const handleSuccessLogin = (data: any) => {
+    // 🔹 SUCCESS LOGIN WITH FCM INTEGRATION
+    const handleSuccessLogin = async (data: any) => {
         if (data?.token) {
             document.cookie = `authToken=${data.token}; path=/; SameSite=Lax`;
+
+            /* try {
+                const { getFirebaseMessaging } = await import("@/app/lib/firebase");
+                const { getToken } = await import("firebase/messaging");
+
+                const messaging = await getFirebaseMessaging();
+
+                if (messaging) {
+                    const permission = await Notification.requestPermission();
+                    if (permission === 'granted') {
+                        const token = await getToken(messaging, {
+                            vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY
+                        });
+
+                        if (token) {
+                            await AuthService.registerFcmToken(token, "web");
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("FCM Registration failed:", err);
+            } */
             redirectByRole(data.user.role);
             onClose();
+        }
+    };
+
+    const handleResendOtp = async () => {
+        if (otpTimer > 0 || loading) return;
+        setError("");
+        setLoading(true);
+        try {
+            if (loginMethod === 'FORGOT') {
+                await PublicService.sendOtp({ mobile: emailOrPhone });
+            } else {
+                await AuthService.sendLoginOtp({ identifier: emailOrPhone });
+            }
+            setOtpTimer(45);
+            setOtp("");
+            inputRefs.current[0]?.focus();
+        } catch (err: any) {
+            setError(err?.response?.data?.message || "Failed to resend OTP");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -96,19 +139,26 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-        setIsSuccess(false); // Default to error style
+        setIsSuccess(false);
         setLoading(true);
 
         try {
             if (loginMethod === 'FORGOT') {
                 if (forgotStep === 1) {
-                    await AuthService.forgotPasswordVerify(emailOrPhone);
+                    if (!phoneRegex.test(emailOrPhone)) throw new Error("Please enter a valid 10-digit phone number.");
+                    await PublicService.sendOtp({ mobile: emailOrPhone });
                     setForgotStep(2);
-                } else {
+                    setOtpTimer(45);
+                    setOtp("");
+                } else if (forgotStep === 2) {
+                    if (otp.length !== 6) throw new Error("Please enter the complete 6-digit OTP.");
+                    await PublicService.verifyOtp({ mobile: emailOrPhone, otp });
+                    setForgotStep(3);
+                } else if (forgotStep === 3) {
                     if (newPassword.length < 6) throw new Error("Password must be at least 6 characters");
                     await AuthService.updatePassword({ identifier: emailOrPhone, newPassword });
                     setLoginMethod('PASSWORD');
-                    setIsSuccess(true); // SET TO GREEN
+                    setIsSuccess(true);
                     setError("Password updated! Please login.");
                 }
                 setLoading(false);
@@ -161,7 +211,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
             handleSuccessLogin(data);
 
         } catch (err: any) {
-            setIsSuccess(false); // Ensure it's red on catch
+            setIsSuccess(false);
             setError(err?.response?.data?.message || err.message || "Action failed. Please try again.");
         } finally {
             setLoading(false);
@@ -229,7 +279,13 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                         <div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3]" />
 
                         {loginMethod === 'FORGOT' && (
-                            <button onClick={() => handleMethodSwitch('PASSWORD')} className="absolute top-4 left-4 p-2 text-gray-400 hover:text-[#2076C7] transition-colors z-10">
+                            <button 
+                                onClick={() => {
+                                    if (forgotStep > 1) setForgotStep(forgotStep - 1);
+                                    else handleMethodSwitch('PASSWORD');
+                                }} 
+                                className="absolute top-4 left-4 p-2 text-gray-400 hover:text-[#2076C7] transition-colors z-10"
+                            >
                                 <ChevronLeft size={20} />
                             </button>
                         )}
@@ -243,10 +299,14 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                     {loginMethod === 'FORGOT' ? <LockKeyhole size={28} /> : (loginMethod === 'PASSWORD' ? <KeyRound size={28} /> : <Smartphone size={28} />)}
                                 </div>
                                 <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">
-                                    {loginMethod === 'FORGOT' ? (forgotStep === 1 ? "Reset Password" : "Set New Password") : (otpSent ? "Verify Identity" : "Welcome Back")}
+                                    {loginMethod === 'FORGOT' 
+                                        ? (forgotStep === 1 ? "Reset Password" : forgotStep === 2 ? "Verify OTP" : "Set New Password") 
+                                        : (otpSent ? "Verify Identity" : "Welcome Back")}
                                 </h2>
                                 <p className="text-gray-500 text-xs sm:text-sm">
-                                    {loginMethod === 'FORGOT' ? "Securely update your account access." : (otpSent ? `Enter the code sent to ${emailOrPhone}` : "Select your preferred login method.")}
+                                    {loginMethod === 'FORGOT' 
+                                        ? (forgotStep === 2 ? `Enter code sent to ${emailOrPhone}` : "Securely update your account access.") 
+                                        : (otpSent ? `Enter the code sent to ${emailOrPhone}` : "Select your preferred login method.")}
                                 </p>
                             </motion.div>
 
@@ -262,18 +322,18 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                             )}
 
                             <form onSubmit={handleSubmit} className="space-y-6">
-                                {forgotStep === 1 && (
+                                {((loginMethod !== 'PASSWORD' && !otpSent && forgotStep === 1) || (loginMethod === 'PASSWORD')) && (
                                     <motion.div variants={itemVariants} className="relative group">
                                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5 ml-1">
-                                            {loginMethod === 'OTP' ? 'Phone Number' : 'Email, Phone or ADV ID'}
+                                            {loginMethod === 'OTP' || loginMethod === 'FORGOT' ? 'Phone Number' : 'Email, Phone or ADV ID'}
                                         </label>
                                         <input
                                             type="text"
                                             value={emailOrPhone}
-                                            disabled={otpSent}
-                                            onChange={(e) => loginMethod === 'OTP' ? setEmailOrPhone(e.target.value.replace(/\D/g, "").slice(0, 10)) : setEmailOrPhone(e.target.value)}
-                                            placeholder={loginMethod === 'OTP' ? "Enter 10-digit number" : "ADV_123 or Email or Phone"}
-                                            className="w-full h-11 sm:h-12 px-4 border font-sans text-gray-700 placeholder-gray-400 rounded-xl text-base transition-all duration-200 outline-none bg-white border-gray-300 focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/10"
+                                            disabled={otpSent || (loginMethod === 'FORGOT' && forgotStep > 1)}
+                                            onChange={(e) => (loginMethod === 'OTP' || loginMethod === 'FORGOT') ? setEmailOrPhone(e.target.value.replace(/\D/g, "").slice(0, 10)) : setEmailOrPhone(e.target.value)}
+                                            placeholder={(loginMethod === 'OTP' || loginMethod === 'FORGOT') ? "Enter 10-digit number" : "ADV_123 or Email or Phone"}
+                                            className="w-full h-11 sm:h-12 px-4 border font-sans text-gray-700 placeholder-gray-400 rounded-xl text-base transition-all duration-200 outline-none bg-white border-gray-300 focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/10 disabled:bg-gray-50"
                                         />
                                     </motion.div>
                                 )}
@@ -289,7 +349,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                     </motion.div>
                                 )}
 
-                                {loginMethod === 'FORGOT' && forgotStep === 2 && (
+                                {loginMethod === 'FORGOT' && forgotStep === 3 && (
                                     <motion.div variants={itemVariants} className="relative group">
                                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5 ml-1">New Password</label>
                                         <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Minimum 6 characters"
@@ -297,7 +357,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                     </motion.div>
                                 )}
 
-                                {otpSent && loginMethod === 'OTP' && (
+                                {((otpSent && loginMethod === 'OTP') || (loginMethod === 'FORGOT' && forgotStep === 2)) && (
                                     <motion.div variants={itemVariants} className="space-y-3">
                                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wide px-1">Enter OTP</label>
                                         <div className="flex justify-between gap-1" onPaste={handlePaste}>
@@ -305,6 +365,22 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                                 <input key={index} ref={(el) => { inputRefs.current[index] = el }} type="text" inputMode="numeric" maxLength={index === 0 ? 6 : 1} value={otp[index] || ""} onChange={(e) => handleOtpChange(index, e.target.value)} onKeyDown={(e) => handleOtpKeyDown(index, e)}
                                                     className="w-10 h-12 sm:w-12 sm:h-12 border border-gray-300 rounded-lg text-center text-lg sm:text-xl font-semibold bg-white focus:border-[#1CADA3] focus:ring-2 focus:ring-[#1CADA3]/20 transition-all duration-200 shadow-xs text-gray-800" />
                                             ))}
+                                        </div>
+                                        <div className="flex justify-center items-center mt-2">
+                                            <p className="text-xs text-gray-500">
+                                                Didn't receive the code?{" "}
+                                                {otpTimer > 0 ? (
+                                                    <span className="text-[#2076C7] font-semibold">Resend in {otpTimer}s</span>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleResendOtp}
+                                                        className="text-[#2076C7] font-bold hover:underline cursor-pointer"
+                                                    >
+                                                        Resend Now
+                                                    </button>
+                                                )}
+                                            </p>
                                         </div>
                                     </motion.div>
                                 )}
@@ -320,8 +396,8 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                     className={`w-full h-12 rounded-xl text-white font-semibold text-base shadow-lg bg-linear-to-r from-[#2076C7] to-[#1CADA3] hover:brightness-105 transition-all duration-300 flex items-center justify-center gap-2 ${loading ? "opacity-80 cursor-wait" : "cursor-pointer"}`}>
                                     {loading ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : (
                                         <>
-                                            {loginMethod === 'FORGOT' ? (forgotStep === 1 ? "Next" : "Update Password") : (loginMethod === 'PASSWORD' ? "Login" : (otpSent ? "Verify & Login" : "Get OTP"))}
-                                            {!loading && !otpSent && loginMethod !== 'PASSWORD' && <ArrowRight size={18} />}
+                                            {loginMethod === 'FORGOT' ? (forgotStep === 1 ? "Send OTP" : forgotStep === 2 ? "Verify OTP" : "Update Password") : (loginMethod === 'PASSWORD' ? "Login" : (otpSent ? "Verify & Login" : "Get OTP"))}
+                                            {!loading && !otpSent && loginMethod !== 'PASSWORD' && (loginMethod === 'FORGOT' ? forgotStep === 1 : true) && <ArrowRight size={18} />}
                                         </>
                                     )}
                                 </motion.button>

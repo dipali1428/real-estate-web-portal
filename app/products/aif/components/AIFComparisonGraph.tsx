@@ -12,10 +12,10 @@ const data = [
     { name: "India Discovery II", score: 91, cat: "I", color: "#1CADA3" },
     { name: "Equirus InnovateX", score: 89, cat: "I", color: "#1CADA3" },
     { name: "Getfive Opp Fund", score: 87, cat: "I", color: "#1CADA3" },
-    { name: "Edelweiss Alpha", score: 86, cat: "III", color: "#8b5cf6" },
-    { name: "Kotak Long-Short", score: 85, cat: "III", color: "#8b5cf6" },
-    { name: "ICICI Pru L/S", score: 84, cat: "III", color: "#8b5cf6" },
-    { name: "IIFL Long-Short", score: 85, cat: "III", color: "#8b5cf6" },
+    { name: "Edelweiss Alpha", score: 86, cat: "III", color: "#2076C7" },
+    { name: "Kotak Long-Short", score: 85, cat: "III", color: "#2076C7" },
+    { name: "ICICI Pru L/S", score: 84, cat: "III", color: "#1CADA3" },
+    { name: "IIFL Long-Short", score: 85, cat: "III", color: "#1CADA3" },
 ];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -57,11 +57,11 @@ const AIFComparisonGraph = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             whileHover={{ scale: 1.005 }}
             viewport={{ once: true }}
-            className="w-full bg-white p-4 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-gray-100 shadow-2xl mb-16 relative overflow-hidden group transition-shadow hover:shadow-primary/5"
+            className="w-full bg-white p-4 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-gray-100 shadow-2xl mb-16 relative overflow-hidden group transition-shadow hover:shadow-[#2076C7]/5"
         >
             {/* Background Decorative Element */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-50 sm:opacity-100 group-hover:bg-primary/10 transition-colors duration-700" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-400/5 rounded-full -ml-24 -mb-24 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#2076C7]/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-50 sm:opacity-100 group-hover:bg-[#2076C7]/10 transition-colors duration-700" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#1CADA3]/5 rounded-full -ml-24 -mb-24 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 relative z-10">
                 <div className="flex items-center gap-4">
@@ -75,12 +75,12 @@ const AIFComparisonGraph = () => {
                             repeat: Infinity,
                             ease: "easeInOut"
                         }}
-                        className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-primary/10 to-teal-400/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-primary shadow-inner border border-white group-hover:shadow-lg group-hover:scale-110 transition-all duration-500"
+                        className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-[#2076C7] shadow-inner border border-white group-hover:shadow-lg group-hover:scale-110 transition-all duration-500"
                     >
                         <BarChart3 size={isMobile ? 24 : 28} />
                     </motion.div>
                     <div>
-                        <h3 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight group-hover:text-primary transition-colors duration-300">AIF Funds Comparison</h3>
+                        <h3 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight group-hover:text-[#2076C7] transition-colors duration-300">AIF Funds Comparison</h3>
                         <p className="text-gray-400 sm:text-gray-500 text-xs sm:text-sm font-medium">Compare top-performing Alternative Investment Funds.</p>
                     </div>
                 </div>
@@ -109,8 +109,8 @@ const AIFComparisonGraph = () => {
                                 <stop offset="95%" stopColor="#2076C7" stopOpacity={0.4} />
                             </linearGradient>
                             <linearGradient id="colorCatIII" x1="0" y1="0" x2="1" y2="0">
-                                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.9} />
-                                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.4} />
+                                <stop offset="5%" stopColor="#1CADA3" stopOpacity={0.9} />
+                                <stop offset="95%" stopColor="#2076C7" stopOpacity={0.6} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f1f5f9" strokeWidth={1} />
@@ -181,7 +181,7 @@ const AIFComparisonGraph = () => {
                 {[
                     { label: "Cat I (VC/SME)", color: "#1CADA3" },
                     { label: "Cat II (Growth/PE)", color: "#2076C7" },
-                    { label: "Cat III (L/S)", color: "#8b5cf6" }
+                    { label: "Cat III (L/S)", color: "#2076C7" }
                 ].map((item, idx) => (
                     <div key={idx} className="flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl hover:bg-slate-50 transition-colors group">
                         <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-lg transition-transform group-hover:scale-125" style={{ background: item.color }} />

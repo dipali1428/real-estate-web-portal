@@ -495,7 +495,7 @@ export default function ProfileSection() {
     return (
         <main className="max-w-[1440px] mx-auto px-4 md:px-8 py-8 bg-[#F8FAFC] min-h-screen relative">
             {/* Popups */}
-            <div className="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none">
+            <div className="fixed top-5 right-5 z-9999 flex flex-col gap-3 pointer-events-none">
                 {popups.map((p) => (
                     <div key={p.id} className={`pointer-events-auto min-w-[280px] px-6 py-4 rounded-2xl shadow-2xl border transition-all duration-300 ${p.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : p.type === 'error' ? 'bg-rose-50 border-rose-100 text-rose-800' : 'bg-white border-slate-200 text-slate-800'}`}>
                         <div className="flex items-center justify-between gap-4">
@@ -518,7 +518,7 @@ export default function ProfileSection() {
                                 </div>
                                 <span className={`text-[10px] font-black uppercase tracking-widest ${currentStep >= step ? "text-[#1CADA3]" : "text-slate-400"}`}>Step {step}</span>
                             </div>
-                            {step < 3 && <div className={`w-12 sm:w-24 h-[2px] mx-2 -mt-6 transition-colors duration-500 ${currentStep > step ? "bg-[#1CADA3]" : "bg-slate-200"}`} />}
+                            {step < 3 && <div className={`w-12 sm:w-24 h-0.5 mx-2 -mt-6 transition-colors duration-500 ${currentStep > step ? "bg-[#1CADA3]" : "bg-slate-200"}`} />}
                         </div>
                     ))}
                 </div>
@@ -603,7 +603,7 @@ export default function ProfileSection() {
                                                     <button onClick={handleCheckPanAadhaarLink} disabled={verifyingLink} className="w-full py-3 bg-white border border-slate-200 hover:border-[#1CADA3] text-slate-600 hover:text-[#1CADA3] rounded-2xl text-[10px] font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm disabled:opacity-50">
                                                         {verifyingLink ? <Loader2 size={12} className="animate-spin" /> : <ShieldCheck size={12} />} Check Aadhaar PAN link status
                                                     </button>
-                                                    <div className="flex items-start gap-2 p-4 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 text-[10px] font-bold leading-relaxed">
+                                                    <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 text-[10px] font-bold leading-relaxed">
                                                         <AlertCircle size={14} className="mt-0.5 shrink-0 text-amber-500" />
                                                         <span>Note: You will be not eligible for the payout if pan-aadhaar is not linked</span>
                                                     </div>
@@ -620,7 +620,7 @@ export default function ProfileSection() {
                                         <span className={`ml-4 text-[8px] font-black uppercase px-2 py-1 rounded-lg ${gstVerified ? "text-emerald-500 bg-emerald-50 border border-emerald-100" : "text-amber-500 bg-amber-50 border border-amber-100"}`}>{gstVerified ? "Verified" : "Pending"}</span>
                                     </div>
                                 </div>
-                                <div className="flex items-start gap-2 p-4 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 text-[12px] font-bold leading-relaxed">
+                                <div className="flex items-start gap-2 p-3 mt-5 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 text-[12px] font-bold leading-relaxed">
                                     <AlertCircle size={14} className="mt-0.5 shrink-0 text-amber-500" />
                                     <span>Note: GST verification is mandatory if total payout exceeds ₹20 lakh in a financial year.</span>
                                 </div>
@@ -728,7 +728,7 @@ export default function ProfileSection() {
                                     {/* --- UPDATED: PROFILE SUMMARY LOCATION --- */}
                                     <div>
                                         <p className="text-[8px] font-black text-slate-400 uppercase">Location</p>
-                                        <p className="text-xs font-bold text-slate-700 whitespace-normal break-words leading-relaxed">
+                                        <p className="text-xs font-bold text-slate-700 whitespace-normal wrap-break-word leading-relaxed">
                                             {kyc?.aadhaar_kyc_data?.full_address || `${profile.city}, ${profile.state}`}
                                         </p>
                                     </div>
@@ -740,7 +740,7 @@ export default function ProfileSection() {
                                 <div className="pt-4 border-t border-slate-50">
                                     <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-2">Update Password</label>
                                     <div className="relative">
-                                        <input disabled={!isEditing} type={showPassword ? "text" : "password"} value={profile.password} onChange={(e) => setProfile({ ...profile, password: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none transition-colors ${isEditing ? "bg-white border-[#1CADA3]" : "bg-slate-50 border-slate-100 cursor-not-allowed"}`} placeholder="Enter new password" />
+                                        <input disabled={!isEditing} type={showPassword ? "text" : "password"} value={profile.password || ""} onChange={(e) => setProfile({ ...profile, password: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none transition-colors ${isEditing ? "bg-white border-[#1CADA3]" : "bg-slate-50 border-slate-100 cursor-not-allowed"}`} placeholder="Enter new password" />
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">{showPassword ? <EyeOff size={14} /> : <Eye size={14} />}</button>
                                     </div>
                                 </div>
@@ -759,7 +759,7 @@ export default function ProfileSection() {
                                             {/* --- UPDATED: DIGITAL VISITING CARD LOCATION --- */}
                                             <div className="flex items-start gap-2 max-w-[220px]">
                                                 <MapPin size={12} className="text-slate-400 mt-0.5 shrink-0" strokeWidth={2.5} />
-                                                <span className="text-[11px] font-bold text-slate-700 leading-tight whitespace-normal break-words">
+                                                <span className="text-[11px] font-bold text-slate-700 leading-tight whitespace-normal wrap-break-word">
                                                     {kyc?.aadhaar_kyc_data?.full_address || profile.city}
                                                 </span>
                                             </div>
@@ -783,7 +783,7 @@ export default function ProfileSection() {
                                             <p className="text-[11px] font-bold text-slate-700"><span className="text-slate-400">Contact:</span> +91 {profile.mobile}</p>
 
                                             {/* --- UPDATED: DSA IDENTITY CARD LOCATION --- */}
-                                            <p className="text-[10px] font-bold text-slate-700 px-2 leading-tight whitespace-normal break-words">
+                                            <p className="text-[10px] font-bold text-slate-700 px-2 leading-tight whitespace-normal wrap-break-word">
                                                 <span className="text-slate-400">Location:</span> {kyc?.aadhaar_kyc_data?.full_address || profile.city}
                                             </p>
                                         </div>

@@ -354,6 +354,11 @@ function FileSelectionCard({ label, docKey, allowMultiple, selectedFiles, onAdd,
     return (
       <div className="flex flex-col bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
         <label className="text-xs font-bold text-gray-500 uppercase mb-2 truncate">{label}</label>
+        {docKey === "RC_DOC" && (
+          <p className="text-[10px] text-orange-600 font-medium mb-2 leading-tight">
+            * Please ensure you upload both <b>Front</b> and <b>Back</b> sides of the RC.
+          </p>
+        )}
         <input type="file" ref={inputRef} multiple={allowMultiple} onChange={handleFileChange} className="hidden" accept="image/*,application/pdf" />
         <div className="space-y-2">
           <button type="button" onClick={() => inputRef.current?.click()} className="w-full border border-dashed rounded-md py-2 flex flex-col items-center justify-center bg-gray-50 hover:bg-[#1CADA3]/5 border-gray-300 hover:border-[#1CADA3] group transition-colors">

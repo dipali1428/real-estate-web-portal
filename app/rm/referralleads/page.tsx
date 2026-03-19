@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { RmService } from '@/app/services/rmService';
 import * as XLSX from 'xlsx';
-import { FileUp, ClipboardList, ChevronLeft, ChevronRight } from "lucide-react";
+import { FileUp, ClipboardList, ChevronLeft, ChevronRight, X } from "lucide-react";
 
 const statusStyles: Record<string, string> = {
   completed: "bg-green-50 text-green-700 border-green-100",
@@ -22,6 +22,8 @@ interface ReferralLead {
   department: string;
   sub_category: string;
   notes: string;
+  referral_lead_status?: string;
+  rejection_note?: string;
   status: 'pending' | 'contacted' | 'follow_up' | 'converted' | 'lost' | 'rejected' | 'new' | 'closed';
   created_at: string;
   dsa_id: number;
@@ -32,6 +34,10 @@ interface ReferralLead {
   ref_id: string;
   last_follow_up?: string;
   documents?: { name: string; url: string }[];
+  rm_name?: string;
+  rm_mobile?: string;
+  dsa_mobile?: string;
+  assigned_rm_sub_category?: string;
 }
 
 const formatDate = (dateString: string) => {
@@ -77,6 +83,10 @@ export default function ReferralLeadsDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
+  // Modal State
+  const [showNoteModal, setShowNoteModal] = useState(false);
+  const [pendingUpdate, setPendingUpdate] = useState<{ id: number; status: string } | null>(null);
+  const [rejectionNote, setRejectionNote] = useState('');
 
   useEffect(() => {
     setCurrentPage(1);
@@ -100,7 +110,6 @@ export default function ReferralLeadsDashboard() {
   const fetchLeads = async () => {
     try {
       const leadsRes = await RmService.getReferralLeads();
-      console.log('Leads Response:', leadsRes);
       if (leadsRes?.success && Array.isArray(leadsRes.leads)) {
         setLeads(leadsRes.leads);
       } else {
@@ -116,8 +125,6 @@ export default function ReferralLeadsDashboard() {
   const fetchIncomingLeads = async () => {
     try {
       const res = await RmService.getIncomingAssignedLeads();
-      console.log('Incoming Leads Response:', res);
-     
       if (res?.success && Array.isArray(res.leads)) {
         setIncomingLeads(res.leads);
       } else {
@@ -140,23 +147,49 @@ export default function ReferralLeadsDashboard() {
       setLoading(prev => ({ ...prev, outgoingLeads: false }));
     }
   };
- const handleStatusChange = async (leadId: number, newStatus: string) => {
+
+  const handleStatusChange = async (leadId: number, newStatus: string) => {
+    if (newStatus === "REJECTED") {
+      setPendingUpdate({ id: leadId, status: newStatus });
+      setRejectionNote("");
+      setShowNoteModal(true);
+      return; // Stop here, call API later from Modal
+    }
+
     try {
-      
       const res = await RmService.updateReferralStatus(leadId, newStatus);
       if (res.success) {
-        const updater = (prevLeads: ReferralLead[]) =>
-          prevLeads.map((lead) =>
-            lead.id === leadId ? { ...lead, referral_lead_status: newStatus } : lead
-          );
-        setLeads(updater);
-        setIncomingLeads(updater);
-        setOutgoingLeads(updater);
+        updateLocalLeads(leadId, newStatus);
       }
     } catch (err) {
       console.error('Failed to update status:', err);
     }
   };
+
+  const submitRejectionWithNote = async () => {
+    if (!pendingUpdate) return;
+    try {
+      const res = await RmService.updateReferralStatus(pendingUpdate.id, pendingUpdate.status, rejectionNote);
+      if (res.success) {
+        updateLocalLeads(pendingUpdate.id, pendingUpdate.status, rejectionNote);
+        setShowNoteModal(false);
+        setPendingUpdate(null);
+      }
+    } catch (err) {
+      console.error('Failed to update rejection status:', err);
+    }
+  };
+
+  const updateLocalLeads = (leadId: number, newStatus: string, note?: string) => {
+    const updater = (prevLeads: ReferralLead[]) =>
+      prevLeads.map((lead) =>
+        lead.id === leadId ? { ...lead, referral_lead_status: newStatus, rejection_note: note } : lead
+      );
+    setLeads(updater);
+    setIncomingLeads(updater);
+    setOutgoingLeads(updater);
+  };
+
   const normalize = (str: string) =>
     str?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
 
@@ -270,7 +303,6 @@ export default function ReferralLeadsDashboard() {
     }
 
     return (
-      
       <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6 mt-4">
         <div className="flex justify-between flex-1 sm:hidden">
           <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</button>
@@ -335,11 +367,11 @@ export default function ReferralLeadsDashboard() {
             </button>
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-x-thin">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {['ID','Ref_iD','DSA', 'Client Details', 'Department', 'Sub Category', 'Notes', 'Assignment Status','Lead Status', 'Created At'].map(h => (
+                {['ID', 'Ref_iD', 'DSA', 'Client Details', 'Department', 'Sub Category', 'Notes', 'Assignment Status', 'Lead Status', 'Rejection Note', 'Created At'].map(h => (
                   <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -347,7 +379,7 @@ export default function ReferralLeadsDashboard() {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedLeads.map(lead => (
                 <tr key={lead.id} className="hover:bg-gray-50">
-                 <td className="px-6 py-4 text-sm text-gray-700">{lead.id}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{lead.id}</td>
                   <td className="px-6 py-4 text-sm text-gray-700">{lead.ref_id}</td>
                   <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-medium text-gray-800">{lead.dsa_name}</span><span className="text-xs text-blue-500">{lead.dsa_mobile}</span><span className="text-xs text-gray-700">{lead.dsa_adv_id}</span></div></td>
                   <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-semibold text-gray-800">{lead.lead_name}</span><span className="text-blue-500">{lead.contact_number}</span><span className="text-gray-700">{lead.email}</span></div></td>
@@ -356,16 +388,16 @@ export default function ReferralLeadsDashboard() {
                   <td className="px-6 py-4 text-sm text-gray-800 max-w-xs truncate">{lead.notes || '--'} </td>
                   <td className="px-6 py-4 text-sm"><span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{lead.status}</span></td>
                   <td className="px-4 py-4 text-sm">
-                        <select
-                          value={lead.referral_lead_status?.toUpperCase() || ""}
-                          onChange={(e) => handleStatusChange(lead.id, e.target.value)}
-                          className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border cursor-pointer focus:outline-none ${
-                            statusStyles[lead.referral_lead_status?.toLowerCase() || "pending"] ||"bg-gray-50 text-gray-700 border-gray-100" }`}
-                        >
-                          <option value="" disabled>Select</option>
-                          {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
+                    <select
+                      value={lead.referral_lead_status?.toUpperCase() || ""}
+                      onChange={(e) => handleStatusChange(lead.id, e.target.value)}
+                      className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border cursor-pointer focus:outline-none ${statusStyles[lead.referral_lead_status?.toLowerCase() || "pending"] || "bg-gray-50 text-gray-700 border-gray-100"}`}
+                    >
+                      <option value="" disabled>Select</option>
+                      {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
                   </td>
+                  <td className="px-6 py-4 text-sm text-red-600 min-w-[100px] max-w-[260px] whitespace-pre overflow-x-auto scrollbar-x-thin">{lead.rejection_note || '--'}</td>
                   <td className="px-6 py-4 text-sm text-gray-700">{formatDate(lead.created_at)}<div className="text-xs text-gray-600">{formatTime(lead.created_at)}</div></td>
                 </tr>
               ))}
@@ -405,11 +437,11 @@ export default function ReferralLeadsDashboard() {
             </button>
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-x-thin">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {[ 'ID','Referral ID','Lead From', 'DSA', 'Client Details', 'Department', 'Sub Category', 'Notes', 'Assignment Status','Lead Status', 'Created At'].map(h => (
+                {['ID', 'Referral ID', 'Lead From', 'DSA', 'Client Details', 'Department', 'Sub Category', 'Notes', 'Assignment Status', 'Lead Status', 'Rejection Note', 'Created At'].map(h => (
                   <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -419,24 +451,25 @@ export default function ReferralLeadsDashboard() {
                 <tr key={lead.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-700">{lead.id}</td>
                   <td className="px-6 py-4 text-sm"><span className="font-bold text-gray-700">{lead.ref_id}</span></td>
-                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-600">{lead.rm_name}</span><span className="text-blue-600">{lead.rm_mobile}</span></div></td>
+                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-600">{lead.rm_name || 'NA'}</span><span className="text-blue-600">{lead.rm_mobile || '-'}</span></div></td>
                   <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-medium text-gray-900">{lead.dsa_name}</span><span className="text-xs text-gray-500">{lead.dsa_adv_id}</span></div></td>
-                 <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.lead_name}</span><span className="text-blue-600">{lead.contact_number}</span><span className="text-gray-600">{lead.email}</span></div></td>
+                  <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.lead_name}</span><span className="text-blue-600">{lead.contact_number}</span><span className="text-gray-600">{lead.email}</span></div></td>
                   <td className="px-6 py-4 text-sm text-gray-800">{lead.department}</td>
                   <td className="px-6 py-4 text-sm text-gray-800">{lead.sub_category}</td>
                   <td className="px-6 py-4 text-sm text-gray-800 max-w-xs truncate">{lead.notes || '-'}</td>
                   <td className="px-6 py-4 text-sm"><span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${lead.status === 'converted' ? 'bg-green-100 text-green-800' : lead.status === 'new' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>{lead.status}</span></td>
-                   <td className="px-4 py-4 text-sm">
-                        <select
-                          value={lead.referral_lead_status?.toUpperCase() || ""}
-                          onChange={(e) => handleStatusChange(lead.id, e.target.value)}
-                          className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border cursor-pointer focus:outline-none ${
-                            statusStyles[lead.referral_lead_status?.toLowerCase() || "pending"] ||"bg-gray-50 text-gray-700 border-gray-100" }`}
-                        >
-                          <option value="" disabled>Select</option>
-                          {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
+                  <td className="px-4 py-4 text-sm">
+                    <select
+                      value={lead.referral_lead_status?.toUpperCase() || ""}
+                      onChange={(e) => handleStatusChange(lead.id, e.target.value)}
+                      className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border cursor-pointer focus:outline-none ${statusStyles[lead.referral_lead_status?.toLowerCase() || "pending"] || "bg-gray-50 text-gray-700 border-gray-100"}`}
+                    >
+                      <option value="" disabled>Select</option>
+                      {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
                   </td>
+
+                  <td className="px-6 py-4 text-sm text-red-600 min-w-[100px] whitespace-pre">{lead.rejection_note || '--'}</td>
                   <td className="px-6 py-4 text-sm text-gray-700">{formatDate(lead.created_at)}<div className="text-xs text-gray-600">{formatTime(lead.created_at)}</div></td>
                 </tr>
               ))}
@@ -479,11 +512,11 @@ export default function ReferralLeadsDashboard() {
         <div className="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-md">
           <p className="text-sm text-blue-600 font-medium flex items-center"><ClipboardList className="w-4 h-4 mr-2" />Leads specifically assigned to you from the department team.</p>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-x-thin">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {['ID','Ref_ID','DSA Details', 'Client Details', 'Department', 'Sub-Category','Notes','Assignment Status','Assigned RM','Lead Status', 'Created At'].map(h => (
+                {['ID', 'Ref_ID', 'DSA Details', 'Client Details', 'Department', 'Sub-Category', 'Notes', 'Assignment Status', 'Assigned RM', 'Lead Status', 'Created At'].map(h => (
                   <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -491,7 +524,7 @@ export default function ReferralLeadsDashboard() {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedLeads.map(lead => (
                 <tr key={lead.id} className="hover:bg-gray-50">
-                 <td className="px-6 py-4 text-sm text-gray-600">{lead.id}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{lead.id}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{lead.ref_id}</td>
                   <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-medium text-gray-900">{lead.dsa_name}</span><span className="text-xs text-gray-500">{lead.dsa_adv_id}</span></div></td>
                   <td className="px-6 py-4 text-sm"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.lead_name}</span><span className="text-blue-600 font-medium">{lead.contact_number}</span><span className="text-gray-600 font-medium">{lead.email}</span></div></td>
@@ -500,16 +533,10 @@ export default function ReferralLeadsDashboard() {
                   <td className="px-6 py-4 text-sm text-gray-600">{lead.notes}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{lead.status}</td>
                   <td className="px-6 py-4 text-sm font-semibold text-blue-600"><div className="flex flex-col"><span className="font-bold text-gray-900">{lead.assigned_rm_name || 'Unassigned'}</span><span className="text-blue-500 font-medium">{lead.assigned_rm_sub_category}</span></div></td>
-                   <td className="px-4 py-4 text-sm">
-                        <select
-                          value={lead.referral_lead_status?.toUpperCase() || ""}
-                          onChange={(e) => handleStatusChange(lead.id, e.target.value)}
-                          className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border cursor-pointer focus:outline-none ${
-                            statusStyles[lead.referral_lead_status?.toLowerCase() || "pending"] ||"bg-gray-50 text-gray-700 border-gray-100" }`}
-                        >
-                          <option value="" disabled>Select</option>
-                          {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
+                  <td className="px-4 py-4 text-sm">
+                    <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border ${statusStyles[lead.referral_lead_status?.toLowerCase() || "pending"] || "bg-gray-50 text-gray-700 border-gray-100"}`}>
+                      {lead.referral_lead_status || "PENDING"}
+                    </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">{formatDate(lead.created_at)}</td>
                 </tr>
@@ -526,7 +553,7 @@ export default function ReferralLeadsDashboard() {
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-full mx-auto">
         <div className="mb-6 md:mb-8">
           <h1 className="text-xl md:text-2xl font-bold text-gray-900">Referral Leads</h1>
           <p className="text-sm md:text-base text-gray-600 mt-1">Manage your leads in one place</p>
@@ -561,6 +588,44 @@ export default function ReferralLeadsDashboard() {
           )}
         </div>
       </div>
+
+      {/* REJECTION NOTE MODAL */}
+      {showNoteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 overflow-hidden">
+            <div className="px-6 py-4 bg-gray-50 border-b flex justify-between items-center">
+              <h3 className="text-lg font-bold text-gray-900">Add Rejection Note</h3>
+              <button onClick={() => setShowNoteModal(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-sm text-gray-600 mb-4">Please provide a reason for rejecting this lead.</p>
+              <textarea
+                value={rejectionNote}
+                onChange={(e) => setRejectionNote(e.target.value)}
+                rows={4}
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-black-500 focus:border-red-500 text-gray-900 outline-none resize-none"
+                placeholder="Type your note here..."
+              />
+              <div className="mt-6 flex space-x-3 justify-end">
+                <button
+                  onClick={() => setShowNoteModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitRejectionWithNote}
+                  className="px-4 py-2 text-sm font-medium text-white bg-[#1CADA3] border border-transparent rounded-md hover:bg-[#25d6ca] shadow-sm"
+                >
+                  Submit Rejection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

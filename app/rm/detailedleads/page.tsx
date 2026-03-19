@@ -30,13 +30,15 @@ import {
 
 // --- Status Styles from Second Code ---
 const statusStyles: Record<string, string> = {
+  new: "bg-blue-50 text-blue-700 border-blue-200",
   completed: "bg-blue-50 text-blue-700 border-blue-200",
   submitted: "bg-green-50 text-green-700 border-green-200",
   in_progress: "bg-yellow-50 text-yellow-700 border-yellow-200",
   rejected: "bg-red-50 text-red-700 border-red-200",
   follow_up: "bg-orange-50 text-orange-700 border-orange-200",
+  sanctioned: "bg-purple-50 text-purple-700 border-purple-200",
 };
-const ALLOWED_STATUSES = ["SUBMITTED", "IN_PROGRESS", "FOLLOW_UP", "COMPLETED", "REJECTED"];
+const ALLOWED_STATUSES = ["NEW","SUBMITTED", "IN_PROGRESS", "FOLLOW_UP", "SANCTIONED", "COMPLETED", "REJECTED"];
 
 // --- Types ---
 interface Lead {
@@ -117,13 +119,10 @@ export default function LeadDashboard() {
       let response;
       if (leadType === 'my_lead') {
         response = await RmService.getMyDetailLeads();
-        console.log("myleads leads response:", response);
       } else if (leadType === 'incoming') {
         response = await RmService.getIncomingDetailLeads();
-        console.log("imcoming leads response:", response);
       } else if (leadType === 'outgoing') {
         response = await RmService.getOutgoingDetailLeads();
-        console.log("outgoing leads response:", response);
       }
 
 
@@ -144,7 +143,6 @@ export default function LeadDashboard() {
       setProcessingId(leadId);
 
       const response = await RmService.updateDetailLeadStatus(leadId, status);
-      console.log("Status update response:", response);
       if (response.success) {
         fetchLeads();
         setOpenStatusDropdown(null);

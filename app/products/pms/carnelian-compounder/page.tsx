@@ -150,7 +150,7 @@ export default function CarnelianCompounderDetail() {
         datasets: [
             {
                 data: [32.8, 44.9, 19.2, 3.2],
-                backgroundColor: ['#0F172A', '#2076C7', '#1CADA3', '#94A3B8'],
+                backgroundColor: ['#2076C7', '#1CADA3', '#0E8A82', '#94A3B8'],
                 borderWidth: 0,
                 hoverOffset: 15,
             }
@@ -210,7 +210,7 @@ export default function CarnelianCompounderDetail() {
 
                         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                             <div className="max-w-3xl">
-                                <h1 className="text-5xl md:text-7xl font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                                <h1 className="text-5xl md:text-7xl font-sans font-bold mb-3  bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                                     Carnelian Capital Compounder Strategy <br />
                                     
                                 </h1>
@@ -256,8 +256,8 @@ export default function CarnelianCompounderDetail() {
                 </div>
 
                 {/* 2. Performance Charts Section */}
-                <div className="grid lg:grid-cols-3 gap-8 mb-16">
-                    <div className="lg:col-span-2 bg-white rounded-[3rem] p-10 shadow-2xl border border-gray-100 relative overflow-hidden group">
+                <div className="grid lg:grid-cols-3 gap-8 mb-16 items-start">
+                    <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-8 shadow-2xl border border-gray-100 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-[100px] -mr-40 -mt-40 transition-all duration-1000 group-hover:bg-primary/10" />
 
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 relative z-10">
@@ -281,7 +281,7 @@ export default function CarnelianCompounderDetail() {
                             </div>
                         </div>
 
-                        <div className="h-[400px] w-full relative z-10">
+                        <div className="h-[250px] md:h-[400px] w-full relative z-10">
                             <Line data={performanceData} options={lineOptions} />
                         </div>
 
@@ -301,13 +301,13 @@ export default function CarnelianCompounderDetail() {
                     </div>
 
                     {/* Returns Summary Profile */}
-                    <div className="bg-white rounded-[3rem] p-10 shadow-2xl border border-gray-100 flex flex-col justify-between h-full group">
+                    <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border border-gray-100 group">
                         <div>
                             <h3 className="text-xl font-bold text-gray-800 mb-8 flex items-center gap-3">
-                                <BarChart3 className="text-accent-teal" />
+                                <BarChart3 className="text-[#1CADA3]" />
                                 Returns Summary
                             </h3>
-                            <div className="h-[300px] w-full mb-10">
+                            <div className="h-[200px] md:h-[300px] w-full mb-10">
                                 <Bar data={returnsSummaryData} options={barOptions} />
                             </div>
                         </div>
@@ -328,15 +328,15 @@ export default function CarnelianCompounderDetail() {
                     </div>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-8 mb-16">
+                <div className="grid lg:grid-cols-3 gap-8 mb-16 items-start">
                     {/* 3. Market Allocation */}
-                    <div className="bg-white rounded-[3rem] p-10 shadow-2xl border border-gray-100 flex flex-col justify-between">
+                    <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border border-gray-100">
                         <div>
                             <h3 className="text-xl font-bold text-gray-800 mb-8 flex items-center gap-3">
                                 <PieChart className="text-primary" />
                                 Market Cap Split
                             </h3>
-                            <div className="h-[280px] w-full relative">
+                            <div className="h-[200px] md:h-[280px] w-full relative">
                                 <Pie data={allocationData} options={pieOptions} />
                                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                                     <span className="text-4xl font-black text-gray-800">Mix</span>
@@ -346,9 +346,9 @@ export default function CarnelianCompounderDetail() {
                         </div>
                         <div className="space-y-3 mt-10">
                             {[
-                                { name: 'Large Cap', value: 32.8, color: '#0F172A' },
-                                { name: 'Mid Cap', value: 44.9, color: '#2076C7' },
-                                { name: 'Small Cap', value: 19.2, color: '#1CADA3' },
+                                { name: 'Large Cap', value: 32.8, color: '#2076C7' },
+                                { name: 'Mid Cap', value: 44.9, color: '#1CADA3' },
+                                { name: 'Small Cap', value: 19.2, color: '#0E8A82' },
                                 { name: 'Cash & Liquid', value: 3.2, color: '#94A3B8' },
                             ].map((entry, index) => (
                                 <div key={index} className="flex items-center justify-between p-3 bg-neutral-50 rounded-xl border border-gray-50 hover:bg-white hover:shadow-sm transition-all group">
@@ -372,135 +372,48 @@ export default function CarnelianCompounderDetail() {
                         </div>
                     </div>
 
-                    {/* 4. Sector Exposure */}
-                    <div className="lg:col-span-2 bg-white rounded-[3rem] p-10 shadow-2xl border border-gray-100">
-                        <div className="flex items-center justify-between mb-10">
-                            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-3">
-                                <Layers className="text-primary" />
-                                Sector Exposure
-                            </h3>
-                            <div className="px-4 py-1.5 bg-primary/5 rounded-full text-primary text-[10px] font-black uppercase tracking-widest border border-primary/10">
-                                Top Sector: BFSI
-                            </div>
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
-                            {sectorData.map((item, index) => {
-                                const maxVal = sectorData[0].value;
-                                const percentage = (item.value / maxVal) * 100;
-                                return (
-                                    <div key={index} className="relative group">
-                                        <div className="flex justify-between text-xs font-bold text-slate-700 mb-2 group-hover:text-primary transition-colors">
-                                            <span>{item.name}</span>
-                                            <span>{item.value}%</span>
-                                        </div>
-                                        <div className="h-2.5 w-full bg-slate-50 rounded-full overflow-hidden border border-gray-100">
-                                            <motion.div
-                                                initial={{ width: 0 }}
-                                                whileInView={{ width: `${percentage}%` }}
-                                                transition={{ duration: 1, delay: index * 0.1 }}
-                                                className="h-full rounded-full"
-                                                style={{
-                                                    background: `linear-gradient(to right, ${index < 3 ? '#2076C7, #1CADA3' : '#94A3B8, #64748b'})`,
-                                                    opacity: 1 - (index * 0.05)
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-
-                {/* 5. Top Holdings */}
-                <div className="mb-24">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-                        <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                            <Briefcase className="text-primary" />
-                            Major Portfolio Holdings
-                        </h3>
-                        <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-2xl border border-amber-100 text-amber-700 font-bold text-[10px] uppercase tracking-wider">
-                            <AlertCircle size={14} />
-                            Holdings are indicative and subject to change
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                        {holdings.map((stock, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: i * 0.05 }}
-                                className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden"
-                            >
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 transition-transform duration-500 group-hover:scale-150" />
-                                <div className="h-12 w-12 bg-neutral-50 rounded-2xl flex items-center justify-center text-primary font-black mb-4 group-hover:bg-primary group-hover:text-white transition-colors relative z-10 border border-gray-50 shadow-inner">
-                                    {i + 1}
+                    {/* 4. Sector Exposure & Drawdowns */}
+                    <div className="lg:col-span-2 flex flex-col gap-8">
+                        <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border border-gray-100">
+                            <div className="flex items-center justify-between mb-10">
+                                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                                    <Layers className="text-primary" />
+                                    Sector Exposure
+                                </h3>
+                                <div className="px-4 py-1.5 bg-primary/5 rounded-full text-primary text-[10px] font-black uppercase tracking-widest border border-primary/10">
+                                    Top Sector: BFSI
                                 </div>
-                                <div className="font-bold text-gray-800 text-sm mb-2 leading-tight h-10 group-hover:text-primary transition-colors relative z-10">{stock.name}</div>
-                                <div className="text-lg font-black text-primary relative z-10">{stock.weight}</div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* 6 & 7. Philosophy & Attributes */}
-                <div className="grid lg:grid-cols-2 gap-12 mb-24">
-                    {/* Philosophy */}
-                    <div className="bg-[#1CADA3] rounded-[4rem] p-12 shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
-                        <h3 className="text-3xl font-bold text-white mb-10 flex items-center gap-4 relative z-10">
-                            <Target className="text-primary" />
-                            Investment Approach
-                        </h3>
-                        <div className="space-y-6 text-white relative z-10">
-                            {[
-                                { t: "Structural Growth", d: "Focus on long-term structural growth themes across India" },
-                                { t: "Dual Growth Profile", d: "Blend of accelerated growth (“Magic”) and sustainable compounders" },
-                                { t: "Quality Bias", d: "Quality businesses with strong governance and management" },
-                                { t: "Valuation Discipline", d: "Valuation discipline through QGARP approach" },
-                                { t: "Secure Framework", d: "Risk managed via proprietary CLEAR forensic framework" }
-                            ].map((point, i) => (
-                                <motion.div key={i} className="flex gap-5" whileInView={{ x: [20, 0], opacity: [0, 1] }} transition={{ delay: i * 0.1 }}>
-                                    <div className="shrink-0 mt-1">
-                                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                                            <CheckCircle className="text-white w-5 h-5" />
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
+                                {sectorData.map((item, index) => {
+                                    const maxVal = sectorData[0].value;
+                                    const percentage = (item.value / maxVal) * 100;
+                                    return (
+                                        <div key={index} className="relative group">
+                                            <div className="flex justify-between text-xs font-bold text-slate-700 mb-2 group-hover:text-primary transition-colors">
+                                                <span>{item.name}</span>
+                                                <span>{item.value}%</span>
+                                            </div>
+                                            <div className="h-2.5 w-full bg-slate-50 rounded-full overflow-hidden border border-gray-100">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    whileInView={{ width: `${percentage}%` }}
+                                                    transition={{ duration: 1, delay: index * 0.1 }}
+                                                    className="h-full rounded-full"
+                                                    style={{
+                                                        background: 'linear-gradient(to right, #2076C7, #1CADA3)',
+                                                        opacity: 1 - (index * 0.08)
+                                                    }}
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <div className="text-primary font-black text-sm uppercase tracking-widest mb-1">{point.t}</div>
-                                        <p className="text-white/70 font-medium leading-relaxed">{point.d}</p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Risk Attributes */}
-                    <div className="flex flex-col gap-8">
-                        <div className="bg-white rounded-[3rem] p-10 shadow-xl border border-gray-100 flex-1 relative overflow-hidden">
-                            <h3 className="text-xl font-bold font-heading text-gray-800 mb-8 flex items-center gap-3">
-                                <Activity className="text-primary" />
-                                Portfolio Attributes
-                            </h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                {[
-                                    { l: "Portfolio Beta (SI)", v: "0.9" },
-                                    { l: "Sharpe Ratio (SI)", v: "0.9" },
-                                    { l: "Std Dev (SI)", v: "15.1" },
-                                    { l: "ROE (FY27)", v: "18.8%" },
-                                    { l: "Net Debt / Equity (FY25)", v: "0.0" },
-                                ].map((attr, i) => (
-                                    <div key={i} className="bg-neutral-50 p-5 rounded-2xl border border-gray-100 hover:bg-white hover:shadow-lg hover:border-primary/20 transition-all duration-300">
-                                        <div className="text-[10px] uppercase text-slate-400 font-extrabold tracking-widest mb-1">{attr.l}</div>
-                                        <div className="text-2xl font-black text-gray-800">{attr.v}</div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
 
                         {/* 8. Drawdowns & Recovery */}
-                        <div className="bg-gradient-to-br from-[#2076C7] to-[#1CADA3] rounded-[3rem] p-10 shadow-xl text-white">
+                        <div className="bg-gradient-to-br from-[#2076C7] to-[#1CADA3] rounded-[2.5rem] p-8 shadow-xl text-white">
                             <h3 className="text-xl font-bold font-heading mb-8 flex items-center gap-3">
                                 <Zap className="text-white" />
                                 Drawdowns & Recovery
@@ -539,56 +452,129 @@ export default function CarnelianCompounderDetail() {
                         </div>
                     </div>
                 </div>
- 
-                {/* 9. Who Should Invest */}
-                <section className="mb-24">
-                    <div className="bg-white rounded-[4rem] p-10 lg:p-20 border border-gray-100 shadow-2xl flex flex-col items-center text-center relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-[50rem] h-[50rem] bg-primary/5 rounded-full blur-[150px] -mr-64 -mt-64 group-hover:bg-primary/10 transition-colors duration-1000" />
-                        <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} className="relative z-10 w-full">
-                            <h3 className="text-4xl lg:text-5xl font-bold font-sans text-gray-700 mb-6 uppercase tracking-tight font-heading bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                                Who Should Invest?
-                            </h3>
-                            <div className="bg-primary/5 p-8 rounded-[3rem] border border-primary/10 max-w-4xl mx-auto">
-                                <div className="grid md:grid-cols-2 gap-6 w-full">
-                                    {[
-                                        "Long-term investors (5+ years)",
-                                        "Moderate to high risk appetite",
-                                        "Investors seeking consistent compounding",
-                                        "Exposure to India’s structural growth themes"
-                                    ].map((point, i) => (
-                                        <div key={i} className="flex items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-50">
-                                            <CheckCircle className="text-primary" size={20} />
-                                            <span className="font-bold text-slate-700 text-left">{point}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-                </section>
 
-                {/* 10. Compliance & CTA */}
-                <div className="flex flex-col lg:flex-row gap-8">
-                    <div className="bg-[#1CADA3] text-white rounded-[3rem] p-10 lg:w-3/5 flex flex-col justify-center">
-                        <h4 className="text-primary font-white font-sans font-bold uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
-                            <AlertCircle size={14} /> Disclaimer
-                        </h4>
-                        <p className="text-white leading-relaxed text-left opacity-80 font-medium font-sans">
-                            Past performance may or may not be sustained in the future. Returns are calculated on a TWRR basis and are not verified by SEBI. Investments are subject to market risks.
-                        </p>
+                {/* 5. Top Holdings */}
+                <div className="mb-24">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                        <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                            <Briefcase className="text-primary" />
+                            Major Portfolio Holdings
+                        </h3>
+                        <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-2xl border border-amber-100 text-amber-700 font-bold text-[10px] uppercase tracking-wider">
+                            <AlertCircle size={14} />
+                            Holdings are indicative and subject to change
+                        </div>
                     </div>
-                    <div className="lg:w-2/5 grid gap-4">
-                        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="btn-primary w-full py-5 rounded-3xl font-sans font-bold uppercase tracking-widest flex items-center  justify-center gap-3 shadow-xl bg-gradient-to-r from-primary to-accent-teal text-gray-600">
-                            <Download size={18} /> Download Latest Factsheet (PDF)
-                        </motion.button>
-                        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="bg-white border-2 border-primary/20 text-gray-700 w-full py-5 rounded-3xl font-bold font-sans uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg hover:border-primary transition-all">
-                            <Phone size={18} /> Request a Callback
-                        </motion.button>
-                        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="bg-neutral-100 text-slate-500 w-full py-5 rounded-3xl font-bold font-sans uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-slate-200 transition-all">
-                            <Users size={18} /> Speak to PMS Advisor
-                        </motion.button>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        {holdings.map((stock, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: i * 0.05 }}
+                                className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden"
+                            >
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 transition-transform duration-500 group-hover:scale-150" />
+                                <div className="h-12 w-12 bg-neutral-50 rounded-2xl flex items-center justify-center text-primary font-black mb-4 group-hover:bg-primary group-hover:text-white transition-colors relative z-10 border border-gray-50 shadow-inner">
+                                    {i + 1}
+                                </div>
+                                <div className="font-bold text-gray-800 text-sm mb-2 leading-tight h-10 group-hover:text-primary transition-colors relative z-10">{stock.name}</div>
+                                <div className="text-lg font-black text-primary relative z-10">{stock.weight}</div>
+                            </motion.div>
+                        ))}
                     </div>
                 </div>
+
+                {/* 6 & 7. Philosophy & Attributes */}
+                <div className="grid lg:grid-cols-2 gap-12 mb-24 items-start">
+                    {/* Philosophy */}
+                    <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -mr-32 -mt-32 transition-all duration-700 group-hover:bg-primary/10" />
+                        <h3 className="text-2xl font-bold text-gray-800 mb-10 flex items-center gap-3 relative z-10">
+                            <Target className="text-primary" />
+                            Investment Approach
+                        </h3>
+                        <div className="space-y-6 relative z-10">
+                            {[
+                                { t: "Structural Growth", d: "Focus on long-term structural growth themes across India" },
+                                { t: "Dual Growth Profile", d: "Blend of accelerated growth (“Magic”) and sustainable compounders" },
+                                { t: "Quality Bias", d: "Quality businesses with strong governance and management" },
+                                { t: "Valuation Discipline", d: "Valuation discipline through QGARP approach" },
+                                { t: "Secure Framework", d: "Risk managed via proprietary CLEAR forensic framework" }
+                            ].map((point, i) => (
+                                <motion.div key={i} className="flex gap-5" whileInView={{ x: [20, 0], opacity: [0, 1] }} transition={{ delay: i * 0.1 }}>
+                                    <div className="shrink-0 mt-1">
+                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
+                                            <CheckCircle className="text-primary w-5 h-5 group-hover:text-white transition-colors" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-primary font-black text-sm uppercase tracking-widest mb-1">{point.t}</div>
+                                        <p className="text-gray-600 font-medium leading-relaxed">{point.d}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Risk Attributes */}
+                    <div className="flex flex-col gap-8">
+                        <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100 relative overflow-hidden">
+                            <h3 className="text-xl font-bold font-heading text-gray-800 mb-8 flex items-center gap-3">
+                                <Activity className="text-primary" />
+                                Portfolio Attributes
+                            </h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                {[
+                                    { l: "Portfolio Beta (SI)", v: "0.9" },
+                                    { l: "Sharpe Ratio (SI)", v: "0.9" },
+                                    { l: "Std Dev (SI)", v: "15.1" },
+                                    { l: "ROE (FY27)", v: "18.8%" },
+                                    { l: "Net Debt / Equity (FY25)", v: "0.0" },
+                                ].map((attr, i) => (
+                                    <div key={i} className="bg-neutral-50 p-5 rounded-2xl border border-gray-100 hover:bg-white hover:shadow-lg hover:border-primary/20 transition-all duration-300">
+                                        <div className="text-[10px] uppercase text-slate-400 font-extrabold tracking-widest mb-1">{attr.l}</div>
+                                        <div className="text-2xl font-black text-gray-800">{attr.v}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 9. Who Should Invest */}
+                <section className="mb-24">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center mb-12">
+                            <h3 className="text-3xl md:text-4xl font-bold font-sans text-gray-800 mb-4 tracking-tight">
+                                Who Should Invest?
+                            </h3>
+                            <div className="w-20 h-1.5 bg-gradient-to-r from-primary to-[#1CADA3] mx-auto rounded-full"></div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {[
+                                "Long-term investors (5+ years)",
+                                "Moderate to high risk appetite",
+                                "Investors seeking consistent compounding",
+                                "Exposure to India’s structural growth themes"
+                            ].map((point, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                    className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md hover:border-primary/20 transition-all group"
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                        <CheckCircle size={20} />
+                                    </div>
+                                    <span className="font-bold text-gray-700">{point}</span>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     );
