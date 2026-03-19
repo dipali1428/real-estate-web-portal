@@ -93,7 +93,6 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
         } else {
           if (activeTab === 'referral') {
             referralRes = await DashboardService.getLeads();
-            console.log("Fetched referral leads:", referralRes);
           } else {
             detailedRes = await DashboardService.getMyLeads();
           }
