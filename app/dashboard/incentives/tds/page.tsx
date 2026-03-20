@@ -80,22 +80,22 @@ export default function TDSManagement() {
 
   const triggerUpload = () => fileInputRef.current?.click();
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      try {
-        setIsUploading(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        alert("File uploaded successfully (Simulated)");
-      } catch (error) {
-        console.error("Upload failed", error);
-        alert("Failed to upload TDS document.");
-      } finally {
-        setIsUploading(false);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-      }
-    }
-  };
+  // const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     try {
+  //       setIsUploading(true);
+  //       await new Promise(resolve => setTimeout(resolve, 1500));
+  //       alert("File uploaded successfully (Simulated)");
+  //     } catch (error) {
+  //       console.error("Upload failed", error);
+  //       alert("Failed to upload TDS document.");
+  //     } finally {
+  //       setIsUploading(false);
+  //       if (fileInputRef.current) fileInputRef.current.value = '';
+  //     }
+  //   }
+  // };
 
   const downloadCSV = async () => {
     try {
