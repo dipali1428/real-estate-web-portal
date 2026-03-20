@@ -53,7 +53,7 @@ export default function RolesManagementPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [activeRoleTab, setActiveRoleTab] = useState<
-    "ALL" | "ADMIN" | "RM" | "DEPARTMENTHEAD" | "ACCOUNTS" | "HR" | "Director"
+    "ALL" | "ADMIN" | "RM" | "DEPARTMENTHEAD" | "ACCOUNTS" | "HR" | "DIRECTOR" | "VP" | "BRANCH"
   >("ALL");
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -186,6 +186,8 @@ export default function RolesManagementPage() {
               { key: "ACCOUNTS", label: "Account" },
               { key: "HR", label: "HR" },
               { key: "DIRECTOR", label: "Director" },
+              { key: "VP", label: "VP" },
+              { key: "BRANCH", label: "Branch" },
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -298,6 +300,8 @@ export default function RolesManagementPage() {
                   <option value="ACCOUNTS">Account</option>
                  <option value="HR">HR</option>
                   <option value="DIRECTOR">Director</option>
+                  <option value="VP">VP</option>
+                  <option value="BRANCH">Branch</option>
                 </select>
               </div>
               <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Department</label><input type="text" className={inputClass} value={editingUser.department} onChange={(e) => setEditingUser({ ...editingUser, department: e.target.value })} /></div>
@@ -339,6 +343,8 @@ export default function RolesManagementPage() {
                   <option value="ACCOUNTS">Account</option>
                   <option value="HR">HR</option>
                   <option value="DIRECTOR">Director</option>
+                  <option value="VP">VP</option>
+                  <option value="BRANCH">Branch</option>
                 </select>
               </div>
               <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Department</label><input type="text" className={inputClass} value={newUser.department} onChange={(e) => setNewUser({ ...newUser, department: e.target.value })} /></div>

@@ -11,7 +11,6 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  uploadDate: string;
   category: 'insurance' | 'loan' | 'contest'; // Added contest
   subCategory: string;
   description: string;
@@ -97,7 +96,6 @@ export default function ImageTemplates() {
       id: '1',
       name: 'Life Insurance Plan',
       type: 'image',
-      uploadDate: '2024-01-15',
       category: 'insurance',
       subCategory: 'life',
       description: 'Comprehensive life insurance coverage for you and your family',
@@ -107,7 +105,6 @@ export default function ImageTemplates() {
       id: '2',
       name: 'Health Insurance',
       type: 'image',
-      uploadDate: '2024-01-10',
       category: 'insurance',
       subCategory: 'health',
       description: 'Complete health insurance protection for medical emergencies',
@@ -117,7 +114,6 @@ export default function ImageTemplates() {
       id: '3',
       name: 'Motor Insurance',
       type: 'image',
-      uploadDate: '2024-01-08',
       category: 'insurance',
       subCategory: 'motor',
       description: 'Best car insurance policies with great benefits',
@@ -127,7 +123,6 @@ export default function ImageTemplates() {
       id: '4',
       name: 'Home Loan Offer',
       type: 'image',
-      uploadDate: '2024-01-12',
       category: 'loan',
       subCategory: 'home',
       description: 'Affordable home loans with low interest rates',
@@ -137,7 +132,6 @@ export default function ImageTemplates() {
       id: '5',
       name: 'Personal Loan',
       type: 'image',
-      uploadDate: '2024-01-05',
       category: 'loan',
       subCategory: 'personal',
       description: 'Quick personal loans for all your needs',
@@ -147,7 +141,6 @@ export default function ImageTemplates() {
       id: '6',
       name: 'Business Loan',
       type: 'image',
-      uploadDate: '2024-01-03',
       category: 'loan',
       subCategory: 'business',
       description: 'Business loans to grow your enterprise',
@@ -157,7 +150,6 @@ export default function ImageTemplates() {
       id: '7',
       name: 'Educational Loan',
       type: 'image',
-      uploadDate: '2024-01-03',
       category: 'loan',
       subCategory: 'educational',
       description: 'Business loans to grow your enterprise',
@@ -168,7 +160,6 @@ export default function ImageTemplates() {
       id: '8',
       name: ' JFM DHAMAKA 2026 is ON! PHU QUOC ISLAND AWAITS YOU!',
       type: 'image',
-      uploadDate: '2024-02-01',
       category: 'contest',
       subCategory: 'current',
       description: 'Achieve ANY ONE target within the scheme period and qualify for an international getaway to PHU QUOC ISLAND, 1st January 2026 – 31st March 2026',
@@ -178,11 +169,19 @@ export default function ImageTemplates() {
       id: '9',
       name: ' JFM DHAMAKA 2026 is ON! PATTAYA (PHUKET ISLAND) AWAITS YOU!',
       type: 'image',
-      uploadDate: '2024-02-01',
       category: 'contest',
       subCategory: 'current',
       description: 'Achieve ANY ONE target within the scheme period and get a chance to fly to PATTAYA (PHUKET ISLAND) 5 Days / 4 Nights, 1st January 2026 – 31st March 2026',
       imageUrl: '/templateimg/contest2.jpeg'
+    },
+    {
+      id: '10',
+      name: 'Health Insurance',
+      type: 'image',
+      category: 'insurance',
+      subCategory: 'health',
+      description: 'Complete health insurance protection for medical emergencies',
+      imageUrl: '/templateimg/HealthInsurance2.jpeg'
     },
   ]);
 

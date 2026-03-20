@@ -6,7 +6,6 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  uploadDate: string;
   category: 'insurance' | 'loan' | 'contest'; // Added contest
   subCategory: string;
   description: string;
