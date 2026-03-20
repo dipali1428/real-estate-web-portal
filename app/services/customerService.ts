@@ -90,15 +90,6 @@ export interface KycStatusResponse {
     updated_at: string;
 }
 
-export interface ProfileData {
-    id?: number;
-    name: string;
-    mobile: string;
-    email?: string;
-    profile_image?: string;
-    // Add any other fields your API returns
-}
-
 export interface UpdateProfilePayload {
   name: string;
   mobile: string;
@@ -129,6 +120,31 @@ interface Company {
   price: string;
   min_lot_size: number | null; 
   depository_applicable: string | null;
+}
+
+// ==================== WISHLIST TYPES ====================
+
+export interface AddToWishlistParams {
+    product_type: string;
+    product_id: number;
+    product_name: string;
+}
+
+export interface WishlistItem {
+    id: number;
+    user_id: number;
+    product_type: string;
+    product_id: number;
+    product_name: string;
+    created_at: string;
+}
+
+export interface WishlistResponse {
+    success: boolean;
+    message?: string;
+    data?: WishlistItem | WishlistItem[];
+    total?: number;
+    count?: number;
 }
 
 // ==================== CUSTOMER SERVICE ====================
@@ -272,18 +288,15 @@ const CustomerService = {
         return response.data;
     },
 
-    // In customerService.ts
-calculateGoal: async (calculationData: any) => {
-    // Change from GET to POST
-    const response = await api.post("/api/customer/calculate-goal", {
-        target_amount: calculationData.target_amount,
-        target_years: calculationData.target_years,
-        expected_return: calculationData.expected_return,
-        current_savings: calculationData.current_savings || 0
-        // Note: goal_name is NOT needed here based on your API
-    });
-    return response.data;
-},
+    calculateGoal: async (calculationData: any) => {
+        const response = await api.post("/api/customer/calculate-goal", {
+            target_amount: calculationData.target_amount,
+            target_years: calculationData.target_years,
+            expected_return: calculationData.expected_return,
+            current_savings: calculationData.current_savings || 0
+        });
+        return response.data;
+    },
 
     getGoalProgress: async (goalId: number) => {
         const response = await api.get(`/api/customer/goal-progress/${goalId}`);
@@ -292,6 +305,57 @@ calculateGoal: async (calculationData: any) => {
 
     deleteGoal: async (goalId: number) => {
         const response = await api.delete(`/api/customer/delete-goal/${goalId}`);
+        return response.data;
+    },
+
+    // ==================== WISHLIST API METHODS ====================
+
+    /**
+     * Add item to wishlist
+     * POST → /api/customer/add-wishlist
+     */
+    addToWishlist: async (wishlistData: AddToWishlistParams): Promise<WishlistResponse> => {
+        const response = await api.post("/api/customer/add-wishlist", {
+            product_type: wishlistData.product_type,
+            product_id: wishlistData.product_id,
+            product_name: wishlistData.product_name
+        });
+        return response.data;
+    },
+
+    /**
+     * Get all wishlist items for current user
+     * GET → /api/customer/my-wishlist
+     */
+    getMyWishlist: async (): Promise<WishlistResponse> => {
+        const response = await api.get("/api/customer/my-wishlist");
+        return response.data;
+    },
+
+    /**
+     * Get specific wishlist item by ID
+     * GET → /api/customer/wishlist/:id
+     */
+    getWishlistItem: async (wishlistId: number): Promise<WishlistResponse> => {
+        const response = await api.get(`/api/customer/wishlist/${wishlistId}`);
+        return response.data;
+    },
+
+    /**
+     * Get total count of wishlist items for current user
+     * GET → /api/customer/wishlist-count
+     */
+    getWishlistCount: async (): Promise<{ success: boolean; count: number }> => {
+        const response = await api.get("/api/customer/wishlist-count");
+        return response.data;
+    },
+
+    /**
+     * Remove item from wishlist by ID
+     * DELETE → /api/customer/remove-wishlist/:id
+     */
+    removeFromWishlist: async (wishlistId: number): Promise<{ success: boolean; message: string }> => {
+        const response = await api.delete(`/api/customer/remove-wishlist/${wishlistId}`);
         return response.data;
     },
 

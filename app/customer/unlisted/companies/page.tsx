@@ -1,21 +1,23 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  Search,
-  Filter,
-  Building2,
-  IndianRupee,
-  TrendingUp,
-  AlertCircle,
-  RefreshCw,
-  Database,
-  Clock,
-  Shield,
-  X
+import { 
+  Search, 
+  Filter, 
+  Building2, 
+  IndianRupee, 
+  TrendingUp, 
+  AlertCircle, 
+  RefreshCw, 
+  Database, 
+  Clock, 
+  Shield, 
+  X,
+  Bookmark, 
+  BookmarkCheck 
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import customerService from '../../../services/customerService';
+import customerService, { WishlistItem } from '../../../services/customerService';
 
 // ==================== TYPES ====================
 
@@ -34,11 +36,28 @@ interface DepositoryBadge {
   label: string;
 }
 
-interface ApiResponse {
-  success: boolean;
-  data: Company[];
-  message?: string;
-}
+// ==================== CONSTANTS ====================
+
+const PRICE_RANGES = [
+  { label: 'All Prices', value: 'ALL' },
+  { label: 'Under ₹100', value: '0-100' },
+  { label: '₹100 - ₹500', value: '100-500' },
+  { label: '₹500 - ₹1000', value: '500-1000' },
+  { label: '₹1000 - ₹5000', value: '1000-5000' },
+  { label: 'Above ₹5000', value: '5000-1000000' },
+] as const;
+
+const SORT_OPTIONS = [
+  { label: 'Name: A to Z', value: 'name-asc' },
+  { label: 'Name: Z to A', value: 'name-desc' },
+  { label: 'Price: Low to High', value: 'price-asc' },
+  { label: 'Price: High to Low', value: 'price-desc' },
+  { label: 'Lot Size: Low to High', value: 'lot-asc' },
+  { label: 'Lot Size: High to Low', value: 'lot-desc' },
+] as const;
+
+type SortOption = typeof SORT_OPTIONS[number]['value'];
+type PriceRangeOption = typeof PRICE_RANGES[number]['value'];
 
 // ==================== HELPER FUNCTIONS ====================
 
@@ -62,9 +81,7 @@ const formatCurrency = (amount: string): string => {
 };
 
 const formatMinLotSize = (minLotSize: number | null): string => {
-  if (minLotSize === null || minLotSize === undefined) {
-    return 'N/A';
-  }
+  if (minLotSize === null || minLotSize === undefined) return 'N/A';
   return minLotSize.toLocaleString();
 };
 
@@ -101,48 +118,52 @@ const calculateMinInvestment = (price: string, minLotSize: number | null): numbe
   return priceNum * lotSize;
 };
 
-// ==================== PRICE RANGES ====================
-
-const PRICE_RANGES = [
-  { label: 'All Prices', value: 'ALL' },
-  { label: 'Under ₹100', value: '0-100' },
-  { label: '₹100 - ₹500', value: '100-500' },
-  { label: '₹500 - ₹1000', value: '500-1000' },
-  { label: '₹1000 - ₹5000', value: '1000-5000' },
-  { label: 'Above ₹5000', value: '5000-1000000' },
-] as const;
-
-// ==================== SORT OPTIONS ====================
-
-const SORT_OPTIONS = [
-  { label: 'Name: A to Z', value: 'name-asc' },
-  { label: 'Name: Z to A', value: 'name-desc' },
-  { label: 'Price: Low to High', value: 'price-asc' },
-  { label: 'Price: High to Low', value: 'price-desc' },
-  { label: 'Lot Size: Low to High', value: 'lot-asc' },
-  { label: 'Lot Size: High to Low', value: 'lot-desc' },
-] as const;
-
-type SortOption = typeof SORT_OPTIONS[number]['value'];
-type PriceRangeOption = typeof PRICE_RANGES[number]['value'];
-
 // ==================== MAIN COMPONENT ====================
 
 export default function CompaniesPage() {
   const router = useRouter();
   
-  // State
+  // Company State
   const [companies, setCompanies] = useState<Company[]>([]);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [retryCount, setRetryCount] = useState(0);
+  
+  // Filter State
   const [searchTerm, setSearchTerm] = useState('');
   const [priceRange, setPriceRange] = useState<PriceRangeOption>('ALL');
   const [sortBy, setSortBy] = useState<SortOption>('name-asc');
   const [showFilters, setShowFilters] = useState(false);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
-  const [retryCount, setRetryCount] = useState(0);
+  
+  // Wishlist State
+  const [wishlistItems, setWishlistItems] = useState<Map<number, number>>(new Map()); // product_id -> wishlist_id
+  const [processingWishlist, setProcessingWishlist] = useState<Set<number>>(new Set());
+  const [notification, setNotification] = useState<{ show: boolean; message: string; type: 'success' | 'error' }>({
+    show: false,
+    message: '',
+    type: 'success'
+  });
+
+  // ========== FETCH WISHLIST ==========
+  const fetchWishlist = async () => {
+    try {
+      const response = await customerService.getMyWishlist();
+      if (response.success && response.data && Array.isArray(response.data)) {
+        const wishlistMap = new Map();
+        response.data.forEach((item: WishlistItem) => {
+          if (item.product_type === 'unlisted_share') {
+            wishlistMap.set(item.product_id, item.id);
+          }
+        });
+        setWishlistItems(wishlistMap);
+      }
+    } catch (error) {
+      console.error('Failed to fetch wishlist:', error);
+    }
+  };
 
   // ========== FETCH COMPANIES ==========
   const fetchCompanies = async (showLoading = true) => {
@@ -150,71 +171,40 @@ export default function CompaniesPage() {
     setError(null);
     
     try {
-      // Get token from cookie
       const token = getTokenFromCookie();
-      
       if (!token) {
-        console.log('No authentication token found');
         router.push('/');
         return;
       }
 
-      // Set token in localStorage for API service
       localStorage.setItem('token', token);
       
-      console.log('Fetching companies...');
-      
-      // Call the API
       const response = await customerService.getAllCompanies();
-      console.log('API Response:', response);
       
-      // Handle different response structures
       let companiesData: Company[] = [];
-      
       if (response?.data && Array.isArray(response.data)) {
-        // Response format: { success: true, data: [...] }
         companiesData = response.data;
       } else if (Array.isArray(response)) {
-        // Response format: direct array
         companiesData = response;
       } else if (response?.success && response?.data) {
-        // Alternative format
         companiesData = response.data;
       } else {
-        console.error('Unexpected response format:', response);
         throw new Error('Invalid data format received from server');
       }
       
-      if (companiesData.length > 0) {
-        setCompanies(companiesData);
-        setFilteredCompanies(companiesData);
-        setLastUpdated(new Date().toLocaleTimeString('en-IN', {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        }));
-        setError(null);
-      } else {
-        setCompanies([]);
-        setFilteredCompanies([]);
-        setLastUpdated(new Date().toLocaleTimeString('en-IN', {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        }));
-      }
+      setCompanies(companiesData);
+      setFilteredCompanies(companiesData);
+      setLastUpdated(new Date().toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }));
+      
+      // Fetch wishlist after companies are loaded
+      await fetchWishlist();
       
     } catch (err: any) {
-      console.error('Companies fetch error:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
-        stack: err.stack
-      });
-      
-      // Handle specific error cases
       if (err.response?.status === 401) {
-        console.log('Unauthorized access - clearing token');
         removeTokenCookie();
         localStorage.removeItem('token');
         router.push('/');
@@ -237,19 +227,75 @@ export default function CompaniesPage() {
     }
   };
 
-  // Initial fetch
-  useEffect(() => {
-    fetchCompanies();
-    
-    // Auto refresh every 60 seconds
-    const interval = setInterval(() => {
-      fetchCompanies(false);
-    }, 60000);
-    
-    return () => clearInterval(interval);
-  }, [router, retryCount]); // Add retryCount to dependencies
+  // ========== WISHLIST HANDLERS ==========
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => {
+      setNotification({ show: false, message: '', type: 'success' });
+    }, 3000);
+  };
 
-  // ========== APPLY FILTERS AND SEARCH ==========
+  const handleAddToWishlist = async (company: Company) => {
+    setProcessingWishlist(prev => new Set(prev).add(company.id));
+    
+    try {
+      const response = await customerService.addToWishlist({
+        product_type: 'unlisted_share',
+        product_id: company.id,
+        product_name: company.shares_name
+      });
+      
+      if (response.success && response.data) {
+        const wishlistItem = response.data as WishlistItem;
+        setWishlistItems(prev => new Map(prev).set(company.id, wishlistItem.id));
+        showNotification(`${company.shares_name} saved to wishlist`, 'success');
+      }
+    } catch (error: any) {
+      showNotification(
+        error.response?.data?.message || 'Failed to save company',
+        'error'
+      );
+    } finally {
+      setProcessingWishlist(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(company.id);
+        return newSet;
+      });
+    }
+  };
+
+  const handleRemoveFromWishlist = async (company: Company) => {
+    const wishlistId = wishlistItems.get(company.id);
+    if (!wishlistId) return;
+    
+    setProcessingWishlist(prev => new Set(prev).add(company.id));
+    
+    try {
+      const response = await customerService.removeFromWishlist(wishlistId);
+      
+      if (response.success) {
+        setWishlistItems(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(company.id);
+          return newMap;
+        });
+        showNotification(`${company.shares_name} removed from wishlist`, 'success');
+      }
+    } catch (error: any) {
+      showNotification(
+        error.response?.data?.message || 'Failed to remove from wishlist',
+        'error'
+      );
+    } finally {
+      setProcessingWishlist(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(company.id);
+        return newSet;
+      });
+    }
+  };
+
+  // ========== FILTERS AND SEARCH ==========
   useEffect(() => {
     if (!companies.length) {
       setFilteredCompanies([]);
@@ -258,14 +304,12 @@ export default function CompaniesPage() {
     
     let filtered = [...companies];
     
-    // Apply search
     if (searchTerm.trim()) {
       filtered = filtered.filter(company =>
         company.shares_name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     
-    // Apply price range filter
     if (priceRange !== 'ALL') {
       const [min, max] = priceRange.split('-').map(Number);
       filtered = filtered.filter(company => {
@@ -277,7 +321,6 @@ export default function CompaniesPage() {
       });
     }
     
-    // Apply sorting
     filtered.sort((a, b) => {
       const priceA = parseFloat(a.price);
       const priceB = parseFloat(b.price);
@@ -305,12 +348,34 @@ export default function CompaniesPage() {
     setFilteredCompanies(filtered);
   }, [companies, searchTerm, priceRange, sortBy]);
 
-  // ========== HANDLE IMAGE ERRORS ==========
+  // ========== INITIAL FETCH ==========
+  useEffect(() => {
+    fetchCompanies();
+    
+    const interval = setInterval(() => {
+      fetchCompanies(false);
+    }, 60000);
+    
+    return () => clearInterval(interval);
+  }, [router, retryCount]);
+
+  // ========== HANDLERS ==========
   const handleImageError = (companyId: number): void => {
     setImageErrors(prev => new Set(prev).add(companyId));
   };
 
-  // ========== RENDER COMPANY LOGO ==========
+  const clearFilters = (): void => {
+    setSearchTerm('');
+    setPriceRange('ALL');
+    setSortBy('name-asc');
+  };
+
+  const handleRetry = (): void => {
+    setRetryCount(prev => prev + 1);
+    fetchCompanies();
+  };
+
+  // ========== RENDER FUNCTIONS ==========
   const renderCompanyLogo = (company: Company) => {
     if (company.logo_url && !imageErrors.has(company.id)) {
       return (
@@ -333,39 +398,23 @@ export default function CompaniesPage() {
     );
   };
 
-  // ========== CLEAR FILTERS ==========
-  const clearFilters = (): void => {
-    setSearchTerm('');
-    setPriceRange('ALL');
-    setSortBy('name-asc');
-  };
-
-  // ========== HANDLE RETRY ==========
-  const handleRetry = (): void => {
-    setRetryCount(prev => prev + 1);
-    fetchCompanies();
-  };
-
-  // ========== CALCULATE STATS ==========
+  // ========== COMPUTED VALUES ==========
   const totalCompanies = companies.length;
-  
   const avgPrice = companies.length > 0
     ? companies.reduce((sum, c) => sum + parseFloat(c.price), 0) / companies.length
     : 0;
-  
   const minPrice = companies.length > 0
     ? Math.min(...companies.map(c => parseFloat(c.price)))
     : 0;
-  
   const maxPrice = companies.length > 0
     ? Math.max(...companies.map(c => parseFloat(c.price)))
     : 0;
-
   const activeFilterCount = [
     searchTerm ? 1 : 0,
     priceRange !== 'ALL' ? 1 : 0,
     sortBy !== 'name-asc' ? 1 : 0
   ].reduce((a, b) => a + b, 0);
+  const wishlistCount = wishlistItems.size;
 
   // ========== LOADING STATE ==========
   if (loading) {
@@ -414,6 +463,17 @@ export default function CompaniesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       
+      {/* Notification Toast */}
+      {notification.show && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg border animate-fadeIn ${
+          notification.type === 'success' 
+            ? 'bg-green-50 border-green-200 text-green-800' 
+            : 'bg-red-50 border-red-200 text-red-800'
+        }`}>
+          {notification.message}
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -439,6 +499,20 @@ export default function CompaniesPage() {
             </div>
             
             <div className="flex items-center gap-3">
+              {/* Wishlist Badge */}
+              <button
+                onClick={() => router.push('/customer/wishlist')}
+                className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all"
+              >
+                <Bookmark size={16} className={wishlistCount > 0 ? 'fill-[#2076C7] text-[#2076C7]' : ''} />
+                <span>Saved</span>
+                {wishlistCount > 0 && (
+                  <span className="px-1.5 py-0.5 bg-[#2076C7] text-white text-xs rounded-full">
+                    {wishlistCount}
+                  </span>
+                )}
+              </button>
+
               {/* Search Bar */}
               <div className="relative flex-1 md:flex-none md:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -483,9 +557,7 @@ export default function CompaniesPage() {
               <Building2 size={16} className="text-[#2076C7]" />
               Total Companies
             </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {totalCompanies}
-            </p>
+            <p className="text-2xl font-bold text-gray-900">{totalCompanies}</p>
           </div>
           
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
@@ -513,9 +585,7 @@ export default function CompaniesPage() {
               <Clock size={16} className="text-purple-600" />
               Last Updated
             </div>
-            <p className="text-lg font-bold text-gray-900">
-              {lastUpdated || 'Just now'}
-            </p>
+            <p className="text-lg font-bold text-gray-900">{lastUpdated || 'Just now'}</p>
           </div>
         </div>
 
@@ -537,7 +607,6 @@ export default function CompaniesPage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Price Range Filter */}
               <div>
                 <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
                   Price Range
@@ -548,14 +617,11 @@ export default function CompaniesPage() {
                   onChange={(e) => setPriceRange(e.target.value as PriceRangeOption)}
                 >
                   {PRICE_RANGES.map(range => (
-                    <option key={range.value} value={range.value}>
-                      {range.label}
-                    </option>
+                    <option key={range.value} value={range.value}>{range.label}</option>
                   ))}
                 </select>
               </div>
               
-              {/* Sort By */}
               <div>
                 <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
                   Sort By
@@ -566,23 +632,16 @@ export default function CompaniesPage() {
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
                 >
                   {SORT_OPTIONS.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
+                    <option key={option.value} value={option.value}>{option.label}</option>
                   ))}
                 </select>
               </div>
               
-              {/* Results Summary */}
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 flex items-center justify-between">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Showing</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {filteredCompanies.length}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    of {totalCompanies} companies
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">{filteredCompanies.length}</p>
+                  <p className="text-xs text-gray-500">of {totalCompanies} companies</p>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
                   <Database className="w-6 h-6 text-[#2076C7]" />
@@ -596,12 +655,13 @@ export default function CompaniesPage() {
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           {/* Table Header */}
           <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-            <div className="grid grid-cols-12 gap-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
+            <div className="grid grid-cols-13 gap-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
               <div className="col-span-5">Company</div>
               <div className="col-span-2 text-right">Price</div>
               <div className="col-span-2 text-right">Min. Lot</div>
               <div className="col-span-2 text-right">Min Investment</div>
               <div className="col-span-1 text-center">Depository</div>
+              <div className="col-span-1 text-center">Save</div>
             </div>
           </div>
 
@@ -609,18 +669,14 @@ export default function CompaniesPage() {
           <div className="divide-y divide-gray-200">
             {filteredCompanies.length > 0 ? (
               filteredCompanies.map((company) => {
-                const minInvestment = calculateMinInvestment(
-                  company.price, 
-                  company.min_lot_size
-                );
+                const minInvestment = calculateMinInvestment(company.price, company.min_lot_size);
                 const depository = getDepositoryBadge(company.depository_applicable);
+                const isSaved = wishlistItems.has(company.id);
+                const isProcessing = processingWishlist.has(company.id);
                 
                 return (
-                  <div 
-                    key={company.id} 
-                    className="px-6 py-4 hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="grid grid-cols-12 gap-4 items-center">
+                  <div key={company.id} className="px-6 py-4 hover:bg-gray-50 transition-colors group">
+                    <div className="grid grid-cols-13 gap-4 items-center">
                       {/* Company Column */}
                       <div className="col-span-5">
                         <div className="flex items-center gap-3">
@@ -654,10 +710,7 @@ export default function CompaniesPage() {
                       {/* Min Investment */}
                       <div className="col-span-2 text-right">
                         <span className="font-medium text-gray-900">
-                          {minInvestment > 0 
-                            ? formatCurrency(minInvestment.toFixed(2))
-                            : 'N/A'
-                          }
+                          {minInvestment > 0 ? formatCurrency(minInvestment.toFixed(2)) : 'N/A'}
                         </span>
                       </div>
                       
@@ -667,6 +720,28 @@ export default function CompaniesPage() {
                           <Shield size={10} />
                           {depository.label === 'NSDL & CDSL' ? 'Both' : depository.label}
                         </span>
+                      </div>
+                      
+                      {/* Save Button */}
+                      <div className="col-span-1 text-center">
+                        <button
+                          onClick={() => isSaved ? handleRemoveFromWishlist(company) : handleAddToWishlist(company)}
+                          disabled={isProcessing}
+                          className={`p-2 rounded-lg transition-all ${
+                            isSaved
+                              ? 'bg-[#2076C7] text-white hover:bg-[#1a5fa0]'
+                              : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 group-hover:bg-gray-200'
+                          }`}
+                          title={isSaved ? 'Remove from saved' : 'Save company'}
+                        >
+                          {isProcessing ? (
+                            <RefreshCw size={18} className="animate-spin" />
+                          ) : isSaved ? (
+                            <BookmarkCheck size={18} className="fill-white" />
+                          ) : (
+                            <Bookmark size={18} />
+                          )}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -678,18 +753,12 @@ export default function CompaniesPage() {
                 <Database className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-600 mb-2">No companies found</p>
                 {companies.length === 0 ? (
-                  <button
-                    onClick={handleRetry}
-                    className="text-[#2076C7] text-sm font-semibold hover:underline flex items-center gap-1 mx-auto"
-                  >
+                  <button onClick={handleRetry} className="text-[#2076C7] text-sm font-semibold hover:underline flex items-center gap-1 mx-auto">
                     <RefreshCw size={14} />
                     Refresh data
                   </button>
                 ) : (
-                  <button
-                    onClick={clearFilters}
-                    className="text-[#2076C7] text-sm font-semibold hover:underline"
-                  >
+                  <button onClick={clearFilters} className="text-[#2076C7] text-sm font-semibold hover:underline">
                     Clear filters
                   </button>
                 )}
@@ -705,15 +774,11 @@ export default function CompaniesPage() {
           from { opacity: 0; transform: translateY(-10px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-out;
         }
-        .animate-spin-slow {
-          animation: spin-slow 3s linear infinite;
+        .grid-cols-13 {
+          grid-template-columns: repeat(13, minmax(0, 1fr));
         }
       `}</style>
     </div>
