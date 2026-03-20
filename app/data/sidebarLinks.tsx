@@ -32,6 +32,7 @@ import {
     Ticket,
     Wallet,
     Receipt,
+    BookUp,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -67,7 +68,7 @@ export const sidebarLinks = {
                 {
                     label: "TDS",
                     href: "/dashboard/incentives/tds",
-                    icon: <Receipt className="h-4 w-4 text-neutral-700" />,
+                    icon: <BookUp className="h-4 w-4 text-neutral-700" />,
                 },
             ],
         },
@@ -93,6 +94,7 @@ export const sidebarLinks = {
         { label: "User Management", href: "/admin/allusers", icon: <Users className="h-5 w-5 text-neutral-700" /> },
         { label: "Detailed Leads", href: "/admin/detailleads", icon: <FileText className="h-5 w-5 text-neutral-700" /> },
         { label: "Referral Leads", href: "/admin/referralleads", icon: <Share2 className="h-5 w-5 text-neutral-700" /> },
+         { label: "TDS Management", href: "/admin/tdsmanagement", icon: <BookUp className="h-5 w-5 text-neutral-700" /> },
         { label: "Career Applications", href: "/admin/careermanagement", icon: <Briefcase className="h-5 w-5 text-neutral-700" /> },
     ],
 

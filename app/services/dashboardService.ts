@@ -182,4 +182,10 @@ export const DashboardService = {
         const response = await api.post("/api/dashboard/verify-pan-aadhaar-link");
         return response.data;
     },
+    
+    // 🔹 NEW: Get TDS Details
+    getTdsDetails: async () => {
+        const response = await api.get("/api/dashboard/tds");
+        return response.data;
+    },
 };

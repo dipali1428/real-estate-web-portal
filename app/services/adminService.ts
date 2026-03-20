@@ -294,6 +294,28 @@ export const AdminService = {
     return response.data;
   },
 
- 
+// 🔹 TDS Management APIs
+   getTDSData: async (params?: { page?: number; limit?: number; search?: string }) => {
+    const response = await api.get("/api/admin/tds/data", { params });
+    return response.data;
+  },
+
+ // Add this inside the AdminService object in adminService.ts
+  exportTDS: async () => {
+    return await api.get("/api/admin/tds/download");
+  },
+
+   uploadTDS: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file); // Backend expects the file in the 'file' field
+    
+    const res = await api.post("/api/admin/tds/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  },
+
 };
 
