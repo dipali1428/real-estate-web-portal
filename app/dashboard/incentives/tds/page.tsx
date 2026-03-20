@@ -41,7 +41,6 @@ export default function TDSManagement() {
       try {
         setIsLoading(true);
         const res = await DashboardService.getTdsDetails();
-        console.log("Raw TDS API Response:", res);
         const safeData = Array.isArray(res?.tds)
           ? res.tds
           : res?.tds
@@ -114,7 +113,6 @@ export default function TDSManagement() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Export failed", error);
-      alert("Failed to export TDS data.");
     } finally {
       setIsExporting(false);
     }

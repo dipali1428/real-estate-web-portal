@@ -67,11 +67,9 @@ export default function TDSManagement() {
       try {
         setIsUploading(true);
         await AdminService.uploadTDS(file);
-        alert("File uploaded successfully");
         fetchTDSData(); // Refresh list
       } catch (error) {
         console.error("Upload failed", error);
-        alert("Failed to upload TDS document.");
       } finally {
         setIsUploading(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
@@ -94,7 +92,6 @@ export default function TDSManagement() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Export failed", error);
-      alert("Failed to export TDS data.");
     } finally {
       setIsExporting(false);
     }
