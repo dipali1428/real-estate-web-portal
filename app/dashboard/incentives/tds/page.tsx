@@ -1,201 +1,297 @@
-import React from 'react';
-import {
-  FileText,
-  Download,
-  CheckCircle2,
-  ArrowRight,
-  Info,
-  Calendar,    // Added for stats
-  Building2,   // Added for stats
-  Clock        // Added for stats
-} from 'lucide-react';
+"use client";
 
-const TDSPortal = () => {
-  const quarterlyData = [
-    {
-      quarter: "Quarter 1",
-      period: "Apr - Jun 2025",
-      status: "AVAILABLE",
-      generatedOn: "July 15, 2025",
-      fileSize: "1.2 MB",
-      verified: true,
-      processing: false,
-    },
-    {
-      quarter: "Quarter 2",
-      period: "Jul - Sep 2025",
-      status: "AVAILABLE",
-      generatedOn: "Oct 18, 2025",
-      fileSize: "1.4 MB",
-      verified: true,
-      processing: false,
-    },
-    {
-      quarter: "Quarter 3",
-      period: "Oct - Dec 2025",
-      status: "PROCESSING",
-      generatedOn: "Expected Jan 20, 2026",
-      fileSize: "--",
-      verified: false,
-      processing: true,
-    },
-  ];
+import React, { useState, useRef, useMemo, useEffect } from 'react';
+import { Search, Upload, Download, FileText, Trash2, Plus, Loader2, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { DashboardService } from '@/app/services/dashboardService';
+
+// Updated data structure
+interface TDS {
+  id: number;
+  user_id: number;
+  adv_id: string;
+  name: string;
+  pan: string;
+  q1: number;
+  q2: number;
+  q3: number;
+  q_total: number;
+  q1_pdf_url: string | null;
+  q2_pdf_url: string | null;
+  q3_pdf_url: string | null;
+  updated_at: string;
+}
+
+export default function TDSManagement() {
+  const [records, setRecords] = useState<TDS[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // --- NEW STATE FOR MODAL ---
+  const [selectedPdf, setSelectedPdf] = useState<string | null>(null);
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // ✅ FETCH API (SAFE HANDLING)
+  useEffect(() => {
+    const fetchTds = async () => {
+      try {
+        setIsLoading(true);
+        const res = await DashboardService.getTdsDetails();
+        console.log("Raw TDS API Response:", res);
+        const safeData = Array.isArray(res?.tds)
+          ? res.tds
+          : res?.tds
+          ? [res.tds]
+          : [];
+        setRecords(safeData);
+      } catch (error) {
+        console.error("Failed to fetch TDS data", error);
+        setRecords([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTds();
+  }, []);
+
+  // Local Filtering Logic
+  const filteredRecords = useMemo(() => {
+    return records.filter(record =>
+      record.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.adv_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.pan?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, records]);
+
+  const totalPages = Math.ceil(filteredRecords.length / itemsPerPage) || 1;
+  const totalRecords = filteredRecords.length;
+
+  // Paginated View
+  const paginatedRecords = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredRecords.slice(start, start + itemsPerPage);
+  }, [filteredRecords, currentPage]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const triggerUpload = () => fileInputRef.current?.click();
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        setIsUploading(true);
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        alert("File uploaded successfully (Simulated)");
+      } catch (error) {
+        console.error("Upload failed", error);
+        alert("Failed to upload TDS document.");
+      } finally {
+        setIsUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const downloadCSV = async () => {
+    try {
+      setIsExporting(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const headers = "DSA ID,Name,PAN,Q1,Q2,Q3\n";
+      const rows = records.map(r => `${r.adv_id},${r.name},${r.pan},${r.q1},${r.q2},${r.q3}`).join("\n");
+      const blob = new Blob([headers + rows], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `TDS_Report_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Export failed", error);
+      alert("Failed to export TDS data.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // --- NEW DOWNLOAD HANDLER FOR INDIVIDUAL PDF ---
+  const handleDownloadPdf = async (url: string, fileName: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      window.open(url, '_blank'); // Fallback if fetch is blocked
+    }
+  };
+
+  const deleteRecord = (id: number) => {
+    if (confirm("Are you sure you want to delete this record?")) {
+      setRecords(records.filter(r => r.id !== id));
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50/30 font-sans text-gray-900 selection:bg-[#1CADA3]/20">
-      <main className="max-w-7xl mx-auto px-6 py-16">
-
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
-          <div className="max-w-3xl"> 
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">Tax Deducted at Source (TDS)</h1>
-            <p className="text-slate-500 mt-1 sm:mt-2 text-sm sm:text-base">
-              Access and download your TDS certificates for the current financial year.
-              Ensure your records are up to date for tax compliance.
-            </p>
-          </div>
-          <div className="hidden md:flex items-center gap-2 text-gray-400 text-xs font-semibold italic">
-            <Info className="w-4 h-4 text-[#2076C7]" />
-            <span>Certificates are usually available 15 days after quarter end.</span>
+    <div className="min-h-screen bg-gray-50 p-6 lg:p-12 text-slate-900">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">TDS Download</h1>
+            <p className="text-slate-500 mt-1 sm:mt-2 text-sm sm:text-base">You can easily download your quarterly TDS documents and certificates.</p>
           </div>
         </div>
 
-        {/* --- ADDED STATS CARDS START --- */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {/* Financial Year Card */}
-          <div className="bg-white p-7 rounded-3xl border border-gray-100 flex items-center gap-5 shadow-[0_2px_15px_rgba(0,0,0,0.02)]">
-            <div className="bg-[#1CADA3]/10 p-3.5 rounded-2xl">
-              <Calendar className="w-6 h-6 text-[#1CADA3]" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-0.5">Financial Year</p>
-              <p className="text-xl font-bold text-slate-700">2025-26</p>
-            </div>
-          </div>
-
-          {/* Total Deductions Card */}
-          <div className="bg-white p-7 rounded-3xl border border-gray-100 flex items-center gap-5 shadow-[0_2px_15px_rgba(0,0,0,0.02)]">
-            <div className="bg-[#1CADA3]/10 p-3.5 rounded-2xl">
-              <Building2 className="w-6 h-6 text-[#1CADA3]" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-0.5">Total Deductions</p>
-              <p className="text-xl font-bold text-slate-700">₹4,52,000</p>
-            </div>
-          </div>
-
-          {/* Last Updated Card */}
-          <div className="bg-white p-7 rounded-3xl border border-gray-100 flex items-center gap-5 shadow-[0_2px_15px_rgba(0,0,0,0.02)]">
-            <div className="bg-[#1CADA3]/10 p-3.5 rounded-2xl">
-              <Clock className="w-6 h-6 text-[#1CADA3]" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-0.5">Last Updated</p>
-              <p className="text-xl font-bold text-slate-700">2 hours ago</p>
-            </div>
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
+          <div className="relative w-full max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search by DSA ID, Name or PAN..."
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-slate-700 mb-8">Quarterly Certificates</h2>
-        {/* --- ADDED STATS CARDS END --- */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  <th className="px-6 py-4 text-sm font-semibold text-slate-600">DSA Details</th>
+                  <th className="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Quarter 1</th>
+                  <th className="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Quarter 2</th>
+                  <th className="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Quarter 3</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center">
+                      <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
+                    </td>
+                  </tr>
+                ) : paginatedRecords.length > 0 ? (
+                  paginatedRecords.map((record) => (
+                    <tr key={record.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col">
+                          <span className="font-mono text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded w-fit mb-1">
+                            {record.adv_id}
+                          </span>
+                          <p className="font-medium text-slate-800">{record.name}</p>
+                          <p className="text-xs text-slate-400">PAN: {record.pan}</p>
+                        </div>
+                      </td>
 
-        {/* Quarterly Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-          {quarterlyData.map((item, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-[2.5rem] p-10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col transition-transform hover:scale-[1.02] duration-300"
-            >
-              {/* Card Header: Icon & Status */}
-              <div className="flex justify-between items-start mb-10">
-                <div className={`${item.processing ? 'bg-orange-50' : 'bg-[#1CADA3]/10'} p-4 rounded-2xl`}>
-                  <FileText className={`w-8 h-8 ${item.processing ? 'text-orange-400' : 'text-[#1CADA3]'}`} />
-                </div>
-                <span className={`text-[10px] font-black px-3 py-1.5 rounded-full tracking-[0.1em] ${item.processing
-                    ? 'bg-orange-100/50 text-orange-600'
-                    : 'bg-[#1CADA3]/10 text-[#1CADA3]'
-                  }`}>
-                  {item.status}
-                </span>
-              </div>
-
-              {/* Title Area */}
-              <div className="mb-10">
-                <h3 className="text-3xl font-bold text-gray-900 mb-1">{item.quarter}</h3>
-                <p className="text-gray-400 font-bold text-sm tracking-wide">{item.period}</p>
-              </div>
-
-              {/* Data Table */}
-              <div className="space-y-5 mb-12 text-[13px]">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400 font-medium">Generated on</span>
-                  <span className="text-gray-900 font-bold">{item.generatedOn}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400 font-medium">File size</span>
-                  <span className="text-gray-900 font-bold">{item.fileSize}</span>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <div className="mt-auto">
-                <button
-                  disabled={item.processing}
-                  className={`w-full flex items-center justify-center gap-3 py-3 rounded-md font-bold text-sm transition-all duration-300 shadow-lg ${item.processing
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
-                      : 'bg-gradient-to-t from-[#2076C7] to-[#1CADA3] text-white hover:opacity-90 transform hover:scale-105'
-                    }`}
-                >
-                  <Download className="w-5 h-5" />
-                  Download Form 16A
-                </button>
-
-                {/* Verification Footer */}
-                {item.verified && (
-                  <div className="flex items-center justify-center gap-2 mt-6 text-[10px] font-black text-[#1CADA3] tracking-[0.15em] uppercase">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Verified by IT Department</span>
-                  </div>
+                      {[1, 2, 3].map((q) => {
+                        const url = record[`q${q}_pdf_url` as keyof TDS] as string;
+                        return (
+                          <td key={q} className="px-6 py-4 text-center">
+                            {url ? (
+                              <div className="flex flex-col items-center gap-2">
+                                {/* Modified View Button to open Modal */}
+                                <button
+                                  onClick={() => setSelectedPdf(url)}
+                                  className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-50 px-2.5 py-1 rounded transition-colors"
+                                >
+                                  <FileText className="w-3.5 h-3.5" />
+                                  View Q{q}
+                                </button>
+                                
+                                {/* New Download Button */}
+                                <button
+                                  onClick={() => handleDownloadPdf(url, `TDS_${record.name}_Q${q}.pdf`)}
+                                  className="inline-flex items-center gap-1.5 text-slate-600 hover:text-slate-900 font-medium text-[10px] bg-slate-100 px-2 py-0.5 rounded transition-colors"
+                                >
+                                  <Download className="w-3 h-3" />
+                                  Download
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-gray-500 text-xs italic">Not Available</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic">
+                      No TDS records found.
+                    </td>
+                  </tr>
                 )}
-              </div>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+            <p className="text-xs text-slate-500">
+              Showing {totalRecords === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalRecords)} of {totalRecords} records
+            </p>
+            <div className="flex gap-2">
+              <button
+                disabled={currentPage === 1 || isLoading}
+                onClick={() => setCurrentPage(p => p - 1)}
+                className="p-1 rounded border bg-white disabled:opacity-50"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-sm font-medium px-2 py-1">Page {currentPage} of {totalPages}</span>
+              <button
+                disabled={currentPage === totalPages || isLoading}
+                onClick={() => setCurrentPage(p => p + 1)}
+                className="p-1 rounded border bg-white disabled:opacity-50"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
-          ))}
-        </div>
-
-        {/* Bottom Section: Assistance & Important Note */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center pt-16 border-t border-gray-100">
-
-          {/* Need Assistance Text */}
-          <div className="max-w-md px-2">
-            <h4 className="text-xl font-bold text-gray-900 mb-4">Need Assistance?</h4>
-            <p className="text-gray-400 text-sm leading-relaxed mb-8 font-medium">
-              If you find any discrepancies in your TDS certificates or have trouble downloading, please contact our finance department or reach out to the helpdesk.
-            </p>
-            <a href="#" className="inline-flex items-center gap-2 text-sm font-bold text-[#2076C7] group">
-              Contact Support
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </a>
-          </div>
-
-          {/* Important Note Box */}
-          <div className="bg-gradient-to-t from-[#2076C7] to-[#1CADA3] text-white p-12 rounded-[3rem] shadow-2xl shadow-[#2076C7]/20">
-            <h4 className="text-xl font-bold mb-4 text-white">Important Note</h4>
-            <p className="text-blue-100 text-sm leading-relaxed max-w-sm font-medium">
-              TDS certificates are generated based on the quarterly returns filed. Please ensure your PAN is correctly mapped to avoid any credit issues.
-            </p>
           </div>
         </div>
+      </div>
 
-        {/* Legal Footer */}
-        {/* <footer className="mt-24 pb-12 text-center">
-          <p className="text-[10px] font-bold text-gray-300 tracking-[0.25em] uppercase">
-            © 2026 TDS PORTAL • SECURE TAX MANAGEMENT SYSTEM
-          </p>
-        </footer> */}
-
-      </main>
+      {/* --- PDF VIEW MODAL --- */}
+      {selectedPdf && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="relative bg-white w-full max-w-5xl h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+            <div className="p-4 border-b flex justify-between items-center bg-white">
+              <h3 className="font-bold text-slate-700">TDS Document Preview</h3>
+              <button 
+                onClick={() => setSelectedPdf(null)}
+                className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6 text-slate-500" />
+              </button>
+            </div>
+            <div className="flex-1 bg-slate-100">
+              <iframe 
+                src={`${selectedPdf}#toolbar=0`} 
+                className="w-full h-full border-none"
+                title="TDS Preview"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
-export default TDSPortal;
+}
