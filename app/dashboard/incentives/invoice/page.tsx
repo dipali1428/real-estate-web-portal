@@ -66,7 +66,6 @@ export default function PayoutHistory() {
 
         // 2. Fetch Payouts Data
         const response = await DashboardService.getCompletedDetailLeads();
-        console.log("Raw API Response for Payouts:", response);
         
         const rawList = Array.isArray(response) 
           ? response 
