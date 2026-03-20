@@ -34,6 +34,7 @@ interface PayoutRecord {
 export default function PayoutHistory() {
   const [isLoading, setIsLoading] = useState(true);
   const [payoutData, setPayoutData] = useState<PayoutRecord[]>([]);
+  const [userProfile, setUserProfile] = useState<any>(null); // State for Profile Info
 
   // Format helper used by both Table and Invoice
   const formatValue = (val: any, stripDecimals = false) => {
@@ -46,11 +47,25 @@ export default function PayoutHistory() {
   };
 
   useEffect(() => {
-    const loadPayouts = async () => {
+    const loadData = async () => {
       try {
         setIsLoading(true);
+        
+        // 1. Fetch Profile Data
+        try {
+          const profileRes = await DashboardService.getProfile();
+          setUserProfile({
+            name: profileRes?.user?.name || 'Authorized Partner',
+            address: profileRes?.kycDetails?.aadhaar_kyc_data?.full_address || profileRes?.user?.city || '',
+            pan: profileRes?.user?.pan || '',
+            gst: profileRes?.kycDetails?.gst_number || profileRes?.user?.gst_number || ''
+          });
+        } catch (err) {
+          console.error("Failed to fetch profile", err);
+        }
+
+        // 2. Fetch Payouts Data
         const response = await DashboardService.getCompletedDetailLeads();
-        console.log("Raw API Response for Payouts:", response);
         
         const rawList = Array.isArray(response) 
           ? response 
@@ -90,7 +105,7 @@ export default function PayoutHistory() {
       }
     };
 
-    loadPayouts();
+    loadData();
   }, []);
 
   const stats = useMemo(() => {
@@ -105,136 +120,227 @@ export default function PayoutHistory() {
   }, [payoutData]);
 
 /* ===============================
-   INVOICE DOWNLOAD FUNCTION
+   UPDATED INVOICE DOWNLOAD FUNCTION
    =============================== */
-const downloadInvoice = (data: PayoutRecord) => {
+const downloadInvoice = (payoutId: string) => {
+  const groupedRecords = payoutData.filter(item => item.payoutId === payoutId);
+  if (groupedRecords.length === 0) return;
 
-const invoiceHtml = `
+  // VARIABLE FOR THE STAMP IMAGE URL
+  const stampUrl = "https://infinity-client-documents.s3.ap-south-1.amazonaws.com/Infinity-Arthvishva-Stamp.png";
+
+  const baseRecord = groupedRecords[0];
+
+  const parseAmount = (val: any) => parseFloat(val?.toString().replace(/,/g, '') || '0');
+  const totalGross = groupedRecords.reduce((acc, item) => acc + parseAmount(item.grossAmount), 0);
+  const totalGst = groupedRecords.reduce((acc, item) => acc + parseAmount(item.gstAmount), 0);
+  const totalTds = groupedRecords.reduce((acc, item) => acc + parseAmount(item.tdsAmount), 0);
+  const totalNet = groupedRecords.reduce((acc, item) => acc + parseAmount(item.netPayout), 0);
+
+  const rowsHtml = groupedRecords.map((data, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${data.leadId}</td>
+      <td>${data.clientName}</td>
+      <td>${data.product}</td>
+      <td>${formatValue(data.loanNumber)}</td>
+      <td>${data.paymentMode}</td>
+      <td>₹ ${formatValue(data.amount, true)}</td>
+      <td>₹ ${formatValue(data.grossAmount, true)}</td>
+      <td>₹ ${formatValue(data.tdsAmount, true)}</td>
+      <td>₹ ${formatValue(data.gstAmount)}</td>
+      <td>₹ ${formatValue(data.netPayout, true)}</td>
+    </tr>
+  `).join('');
+
+  const invoiceHtml = `
 <html>
 <head>
 <title>Tax Invoice</title>
 <style>
-body{font-family: Arial, Helvetica, sans-serif;padding:40px;color:#333;}
-.invoice-container{width:900px;margin:auto;}
-.header{text-align:center;margin-bottom:20px;}
-.header h1{margin:0;font-size:26px;}
-.top-table{width:100%;font-size:13px;line-height:20px;}
-.meta{margin-top:15px;font-size:13px;}
-.main-table{width:100%;border-collapse:collapse;margin-top:20px;font-size:12px;}
-.main-table th{background:#f2f2f2;border:1px solid #ccc;padding:8px;text-align:left;}
-.main-table td{border:1px solid #ccc;padding:8px;}
-.bottom-table{width:100%;margin-top:40px;font-size:13px;}
-.bottom-table td{vertical-align:top;}
-.summary-table{width:100%;}
-.summary-table td{padding:4px 0;}
-.total{font-weight:bold;border-top:2px solid #000;padding-top:6px;font-size:14px;}
-.footer{margin-top:60px;display:flex;justify-content:space-between;font-size:13px;}
-.signature{text-align:right;margin-top:50px;}
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap');
+
+body{font-family: Arial, Helvetica, sans-serif; padding:20px; color:#333; background-color:#f5f5f5;}
+.invoice-container{
+  width:900px; margin:auto; border: 1px solid #ddd; padding: 40px; background: #fff;
+  box-sizing: border-box; min-height: 1100px; position: relative; display: flex; flex-direction: column;
+}
+.header-top {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+}
+
+.company-logo {
+  height: 60px; 
+  width: auto;
+  object-fit: contain;
+}
+
+.header h1{margin:0; font-size:22px; text-transform: uppercase; color: #1e3a8a; letter-spacing: 1px;}
+.top-table{width:100%; font-size:12px; line-height:1.6; margin-bottom: 20px;}
+.meta{margin-bottom:20px; font-size:12px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+.main-table{width:100%; border-collapse:collapse; margin-top:10px; font-size:11px;}
+.main-table th{background:#f8fafc; border:1px solid #e2e8f0; padding:10px; text-align:left; color: #64748b;}
+.main-table td{border:1px solid #e2e8f0; padding:10px;}
+
+/* CLEAN SUMMARY TABLE STYLE */
+.bottom-table{width:100%; margin-top:30px;}
+.summary-table {
+  width: 320px; 
+  border-collapse: collapse; 
+  font-size: 13px;
+  border: 1px solid #e2e8f0;
+}
+.summary-table td {
+  padding: 10px 15px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.summary-table .total-row {
+  background-color: #f8fafc;
+  font-weight: bold;
+  font-size: 15px;
+  color: #1e3a8a;
+  border-top: 2px solid #1e3a8a;
+}
+.tds-color { color: #ef4444; }
+
+.footer-section {
+  margin-top: auto; padding-top: 40px; border-top: 1px solid #eee;
+}
+
+.auth-container {
+  display: flex; justify-content: flex-end; position: relative; height: 150px;
+}
+
+.signature-box {
+  text-align: center; width: 250px; z-index: 2;
+}
+
+.signature-name {
+  font-family: 'Dancing Script', cursive; font-size: 26px; color: #1e3a8a; margin-bottom: 5px;
+}
+
+/* LARGE OVERLAPPING STAMP */
+.stamp-image {
+  position: absolute;
+  right: 120px; 
+  bottom: 10px;
+  width: 180px; 
+  height: auto;
+  opacity: 0.85; 
+  transform: rotate(-12deg); 
+  z-index: 1; 
+  mix-blend-mode: multiply; 
+  pointer-events: none;
+}
+
+.footer-note {
+  text-align: center; margin-top: 30px; font-size: 11px; color: #94a3b8;
+}
+
+@media print {
+  body { background: none; padding: 0; }
+  .invoice-container { border: none; margin: 0; width: 100%; }
+}
 </style>
 </head>
 <body>
 <div class="invoice-container">
-<div class="header"><h1>Tax Invoice</h1></div>
+<div class="header-top">
+    <div class="logo-container">
+      <img src="/logo.png" alt="Company Logo" class="company-logo" />
+    </div>
+    <div class="header"><h1>Tax Invoice</h1></div>
+</div>
+
 <table class="top-table">
 <tr>
-<td width="50%">
-<b>From</b><br/>
-Infinity Arthvishva Advisory Private Limited<br/>
-12th Floor,1201,7 Business Square,Plot No 487,CTS 1108/7,<br/>
-Ganeshkhind Road,Pune Central,Shivaji Nagar,<br/>
-Pune,Maharashtra,411005<br/>
-GSTIN : 27AAICI0723K1ZJ PAN: AAICI0723K
+<td width="50%" style="vertical-align: top;">
+<span style="color: #64748b; font-weight: bold;">FROM:</span><br/>
+<strong style="font-size: 14px;">${userProfile?.name || 'Authorized Partner'}</strong><br/>
+${userProfile?.address || ''}<br/>
+${userProfile?.pan ? `PAN: ${userProfile.pan}` : ''}<br/>
+${userProfile?.gst ? `GSTIN: ${userProfile.gst}` : ''}
 </td>
-<td width="50%">
-<b>To</b><br/>
-${data.clientName}<br/>
-Lead ID : ${data.leadId}<br/>
-Product : ${data.product}<br/>
-Payout ID: ${data.payoutId}
+<td width="50%" style="vertical-align: top; text-align: right;">
+<span style="color: #64748b; font-weight: bold;">BILL TO:</span><br/>
+<strong style="font-size: 14px;">Infinity Arthvishva Advisory Private Limited</strong><br/>
+12th Floor, 1201, 7 Business Square, Shivaji Nagar, Pune, 411005<br/>
+GSTIN: 27AAICI0723K1ZJ | PAN: AAICI0723K
 </td>
 </tr>
 </table>
 
 <div class="meta">
-<b>Invoice Number:</b> ${data.invoiceNumber} <br/>
-<b>Invoice Date:</b> ${data.invoiceDate}
+  <div style="display: flex; justify-content: space-between;">
+    <span><b>Invoice:</b> ${baseRecord.invoiceNumber}</span>
+    <span><b>Date:</b> ${baseRecord.invoiceDate}</span>
+    <span><b>Payout ID:</b> ${baseRecord.payoutId}</span>
+  </div>
 </div>
 
 <table class="main-table">
 <thead>
 <tr>
-<th>#</th>
-<th>Lead ID</th>
-<th>Client Name</th>
-<th>Product</th>
-<th>Reference No</th>
-<th>Payment Mode</th>
-<th>Amount</th>
-<th>Gross</th>
-<th>TDS</th>
-<th>GST</th>
-<th>Net</th>
+<th>#</th><th>Lead ID</th><th>Client Name</th><th>Product</th><th>Ref No</th><th>Mode</th><th>Amount</th><th>Gross</th><th>TDS</th><th>GST</th><th>Net</th>
 </tr>
 </thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>${data.leadId}</td>
-<td>${data.clientName}</td>
-<td>${data.product}</td>
-<td>${formatValue(data.loanNumber)}</td>
-<td>${data.paymentMode}</td>
-<td>₹ ${formatValue(data.amount, true)}</td>
-<td>₹ ${formatValue(data.grossAmount, true)}</td>
-<td>₹ ${formatValue(data.tdsAmount, true)}</td>
-<td>₹ ${formatValue(data.gstAmount)}</td>
-<td>₹ ${formatValue(data.netPayout, true)}</td>
-</tr>
-</tbody>
+<tbody>${rowsHtml}</tbody>
 </table>
 
-<table class="bottom-table">
-<tr>
-<td width="50%">
-<b>Payment Information</b><br/><br/>
-Beneficiary Name : Infinity Arthvishva Advisory Pvt Ltd<br/>
-Bank Name : IndusInd Bank Ltd<br/>
-Account Number : 251-026-041988<br/>
-IFSC Code : INDB0000380
-</td>
-<td width="50%">
-<table class="summary-table">
-<tr><td>Taxable Amount</td><td align="right">₹ ${formatValue(data.grossAmount, true)}</td></tr>
-<tr><td>GST</td><td align="right">₹ ${formatValue(data.gstAmount)}</td></tr>
-<tr><td>TDS</td><td align="right">- ₹ ${formatValue(data.tdsAmount, true)}</td></tr>
-<tr class="total"><td>Payable Amount</td><td align="right">₹ ${formatValue(data.netPayout, true)}</td></tr>
-</table>
-</td>
-</tr>
-</table>
+<!-- CLEAN SUMMARY TABLE ON LEFT -->
+<div class="bottom-table">
+  <table class="summary-table">
+    <tr>
+      <td>Subtotal</td>
+      <td align="right">₹ ${totalGross.toLocaleString('en-IN')}</td>
+    </tr>
+    <tr>
+      <td>GST</td>
+      <td align="right">₹ ${totalGst.toLocaleString('en-IN')}</td>
+    </tr>
+    <tr>
+      <td>TDS (deducted)</td>
+      <td align="right" class="tds-color">- ₹ ${totalTds.toLocaleString('en-IN')}</td>
+    </tr>
+    <tr class="total-row">
+      <td>TOTAL PAYABLE</td>
+      <td align="right">₹ ${totalNet.toLocaleString('en-IN')}</td>
+    </tr>
+  </table>
+</div>
 
-<div class="footer">
-<div><b>Note</b><br/>This is a system generated invoice.</div>
-<div class="signature">Authorized Signatory<br/><br/>Infinity Arthvishva Advisory Pvt Ltd</div>
+<div class="footer-section">
+  <div class="auth-container">
+    <!-- USING THE stampUrl VARIABLE HERE -->
+    <img src="${stampUrl}" alt="Stamp" class="stamp-image" />
+    
+    <div class="signature-box">
+      <div class="signature-name">Rajesh Parkhi</div>
+      <div style="border-top: 1px solid #333; padding-top: 5px;">
+        <small><b>Authorized Signatory</b></small><br/>
+        <small>Infinity Arthvishva Advisory Pvt Ltd</small>
+      </div>
+    </div>
+  </div>
+  <div class="footer-note">This is a computer-generated document and is valid without a physical signature.</div>
 </div>
+
 </div>
-<script>window.onload = function(){ window.print(); }</script>
+<script>window.onload = function(){ window.print(); window.onafterprint = function(){ window.close(); } }</script>
 </body>
 </html>
 `;
 
-const win = window.open("", "", "width=1000,height=800");
-win?.document.write(invoiceHtml);
-win?.document.close();
-};
-
-
+  const win = window.open("", "", "width=1000,height=800");
+  win?.document.write(invoiceHtml);
+  win?.document.close();
+}
   return (
     <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-6">
         
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">Invoice download</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">Invoice Download</h1>
           <p className="text-slate-500 mt-1 sm:mt-2 text-sm sm:text-base">Track your payment status and download your invoices specifically.</p>
         </div>
 
@@ -332,7 +438,7 @@ win?.document.close();
                         <div className="text-xs text-slate-400">{row.invoiceNumber}</div>
                         <div className="text-xs text-slate-400">{row.invoiceDate}</div>
                         <button
-                          onClick={() => downloadInvoice(row)}
+                          onClick={() => downloadInvoice(row.payoutId)}
                           className="mt-2 text-xs px-3 py-1 bg-[#10b981] text-white rounded"
                         >
                           Download

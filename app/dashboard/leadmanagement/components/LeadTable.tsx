@@ -39,7 +39,6 @@ interface LeadTableProps {
 }
 
 const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
-  // Added 'all' to the activeTab type
   const [activeTab, setActiveTab] = useState<'all' | 'referral' | 'detailed'>('all');
   const [data, setData] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +56,6 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewTitle, setPreviewTitle] = useState<string>("");
-  // Added 'all' to counts and cache
   const [counts, setCounts] = useState({ all: 0, referral: 0, detailed: 0 });
   const [cache, setCache] = useState<{ all: Lead[], referral: Lead[], detailed: Lead[] }>({
     all: [],
@@ -244,11 +242,9 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
 
   return (
     <div className="w-full mt-8">
-      {/* Tabs and Search Section */}
       <div className="mb-6 border-b border-gray-200">
         <div className="flex flex-col lg:flex-row justify-between items-end lg:items-center gap-4">
           <div className="flex space-x-8">
-            {/* Added 'all' to the tabs array */}
             {['all', 'referral', 'detailed'].map((tab) => (
               <button
                 key={tab}
@@ -296,7 +292,6 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">ID</th>
-                {/* Changed condition to handle 'all' tab using referral layout for uniformity */}
                 {activeTab !== 'detailed' ? (
                   <>
                     <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Ref ID</th>
@@ -395,7 +390,6 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
         )}
       </div>
 
-      {/* DETAIL MODAL (Kept Exactly Same) */}
       {viewingDetails && activeLead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -474,7 +468,10 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
               <div className="flex-1 bg-gray-50/50 p-8">
                 <h5 className="font-bold text-gray-800 mb-8 uppercase text-xs tracking-widest">Application Progress</h5>
                 <div className="relative">
-                  {[
+                  {(() => {
+                    const isLoan = activeLead.product?.toLowerCase().includes('loan');
+                    
+                    const steps = [
                     { label: "Application Submitted", date: activeLead.createdDate, completed: true },
                     {
                       label: "Document Verification",
@@ -486,23 +483,29 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                       date: isLeadCompleted ? "Completed" : "In Progress",
                       completed: isLeadCompleted,
                       active: !isLeadCompleted && areAllDocsUploaded
-                    },
-                    {
-                      label: "Sanction / Approval",
-                      date: isLeadCompleted ? "Sanctioned" : "-",
-                      completed: isLeadCompleted
-                    },
-                    {
-                      label: "Disbursement",
-                      date: isLeadCompleted ? "Disbursed" : "-",
-                      completed: isLeadCompleted
-                    },
-                  ].map((step, idx, arr) => (
+                      }
+                    ];
+
+                    if (isLoan) {
+                      steps.push(
+                        { label: "Sanction", date: isLeadCompleted ? "Sanctioned" : "-", completed: isLeadCompleted },
+                        { label: "Disbursement", date: isLeadCompleted ? "Disbursed" : "-", completed: isLeadCompleted }
+                      );
+                    } else {
+                      steps.push(
+                        { label: "Quotation", date: isLeadCompleted ? "Approved" : "-", completed: isLeadCompleted },
+                        { label: "Payment Link", date: isLeadCompleted ? "Processed" : "-", completed: isLeadCompleted },
+                        { label: "Policy Issuance", date: isLeadCompleted ? "Issued" : "-", completed: isLeadCompleted }
+                      );
+                    }
+
+                    return steps.map((step, idx, arr) => (
                     <div key={idx} className="flex gap-4 mb-8 last:mb-0 relative">
                       {idx !== arr.length - 1 && (
                         <div className={`absolute left-[11px] top-6 w-[2px] h-10 ${step.completed ? 'bg-emerald-500' : 'bg-gray-200'}`} />
                       )}
-                      <div className={`z-10 w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors duration-500 ${step.completed ? 'bg-emerald-500 text-white shadow-sm' :
+                        <div className={`z-10 w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors duration-500 ${
+                          step.completed ? 'bg-emerald-500 text-white shadow-sm' : 
                         step.active ? 'bg-blue-600 text-white shadow-lg animate-pulse' : 'bg-gray-200 text-white'
                         }`}>
                         {step.completed ? <Check size={12} strokeWidth={4} /> : <Clock size={12} />}
@@ -516,7 +519,8 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                         </p>
                       </div>
                     </div>
-                  ))}
+                    ));
+                  })()}
                 </div>
               </div>
             </div>
@@ -527,7 +531,6 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
         </div>
       )}
 
-      {/* PREVIEW MODAL (Kept Exactly Same) */}
       {previewUrl && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
