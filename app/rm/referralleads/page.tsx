@@ -397,7 +397,15 @@ export default function ReferralLeadsDashboard() {
                       {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </td>
-                  <td className="px-6 py-4 text-sm text-red-600 min-w-[100px] max-w-[260px] whitespace-pre overflow-x-auto scrollbar-x-thin">{lead.rejection_note || '--'}</td>
+                  <td className="px-6 py-4 text-sm min-w-[100px] max-w-[260px] whitespace-pre overflow-x-auto scrollbar-x-thin">
+                    {lead.rejection_note ? (
+                      <span className="bg-red-100 text-red-700 px-1.5 py-0.5 rounded">
+                        {lead.rejection_note}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">--</span>
+                    )}
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-700">{formatDate(lead.created_at)}<div className="text-xs text-gray-600">{formatTime(lead.created_at)}</div></td>
                 </tr>
               ))}
@@ -469,7 +477,15 @@ export default function ReferralLeadsDashboard() {
                     </select>
                   </td>
 
-                  <td className="px-6 py-4 text-sm text-red-600 min-w-[100px] whitespace-pre">{lead.rejection_note || '--'}</td>
+                  <td className="px-6 py-4 text-sm min-w-[100px] max-w-[260px] whitespace-pre overflow-x-auto scrollbar-x-thin">
+                    {lead.rejection_note ? (
+                      <span className="bg-red-100 text-red-700 px-1.5 py-0.5 rounded">
+                        {lead.rejection_note}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">--</span>
+                    )}
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-700">{formatDate(lead.created_at)}<div className="text-xs text-gray-600">{formatTime(lead.created_at)}</div></td>
                 </tr>
               ))}
