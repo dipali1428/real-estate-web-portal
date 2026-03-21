@@ -133,7 +133,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                 referral_lead_status: item.referral_lead_status || "PENDING",
                 createdDate: isNaN(dateObj.getTime()) ? "N/A" : dateObj.toLocaleDateString(),
                 createdTime: isNaN(dateObj.getTime()) ? "" : dateObj.toLocaleTimeString(),
-                rejectionNote: item.rejection_note || "-",
+                rejectionNote: item.rejection_note,
               };
             });
           }
@@ -334,7 +334,15 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.product}</td>
 
                         <td className="px-4 py-4 text-sm text-gray-700">{lead.subCategory}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600 min-w-[100px] whitespace-pre">{lead.rejectionNote || '--'}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600 min-w-[100px] whitespace-pre">
+                          {lead.rejectionNote ? (
+                            <span className="bg-red-100 text-red-700 px-2 py-1 rounded">
+                              {lead.rejectionNote}
+                            </span>
+                          ) : (
+                            '--'
+                          )}
+                        </td>
                         {/* <td className="px-4 py-4 text-sm text-gray-900">{formatValue(lead.disbursement_amount).replace(/\.0+$/, "")}</td> */}
                         {activeTab === 'all' && (
                           <td className="px-4 py-4 text-sm text-gray-900">{formatValue(lead.disbursement_amount).replace(/\.0+$/, "")}</td>
@@ -472,17 +480,17 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                     const isLoan = activeLead.product?.toLowerCase().includes('loan');
                     
                     const steps = [
-                    { label: "Application Submitted", date: activeLead.createdDate, completed: true },
-                    {
-                      label: "Document Verification",
-                      date: (isLeadCompleted || areAllDocsUploaded) ? "Verified" : "Pending Verification",
-                      completed: isLeadCompleted || areAllDocsUploaded
-                    },
-                    {
-                      label: "RM Review",
-                      date: isLeadCompleted ? "Completed" : "In Progress",
-                      completed: isLeadCompleted,
-                      active: !isLeadCompleted && areAllDocsUploaded
+                      { label: "Application Submitted", date: activeLead.createdDate, completed: true },
+                      {
+                        label: "Document Verification",
+                        date: (isLeadCompleted || areAllDocsUploaded) ? "Verified" : "Pending Verification",
+                        completed: isLeadCompleted || areAllDocsUploaded
+                      },
+                      {
+                        label: "RM Review",
+                        date: isLeadCompleted ? "Completed" : "In Progress",
+                        completed: isLeadCompleted,
+                        active: !isLeadCompleted && areAllDocsUploaded
                       }
                     ];
 
@@ -500,25 +508,24 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                     }
 
                     return steps.map((step, idx, arr) => (
-                    <div key={idx} className="flex gap-4 mb-8 last:mb-0 relative">
-                      {idx !== arr.length - 1 && (
-                        <div className={`absolute left-[11px] top-6 w-[2px] h-10 ${step.completed ? 'bg-emerald-500' : 'bg-gray-200'}`} />
-                      )}
-                        <div className={`z-10 w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors duration-500 ${
-                          step.completed ? 'bg-emerald-500 text-white shadow-sm' : 
-                        step.active ? 'bg-blue-600 text-white shadow-lg animate-pulse' : 'bg-gray-200 text-white'
-                        }`}>
-                        {step.completed ? <Check size={12} strokeWidth={4} /> : <Clock size={12} />}
+                      <div key={idx} className="flex gap-4 mb-8 last:mb-0 relative">
+                        {idx !== arr.length - 1 && (
+                          <div className={`absolute left-[11px] top-6 w-[2px] h-10 ${step.completed ? 'bg-emerald-500' : 'bg-gray-200'}`} />
+                        )}
+                        <div className={`z-10 w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors duration-500 ${step.completed ? 'bg-emerald-500 text-white shadow-sm' :
+                            step.active ? 'bg-blue-600 text-white shadow-lg animate-pulse' : 'bg-gray-200 text-white'
+                          }`}>
+                          {step.completed ? <Check size={12} strokeWidth={4} /> : <Clock size={12} />}
+                        </div>
+                        <div>
+                          <p className={`text-sm font-bold tracking-tight ${step.completed || step.active ? 'text-gray-800' : 'text-gray-400'}`}>
+                            {step.label}
+                          </p>
+                          <p className={`text-[10px] font-medium ${!step.completed && idx === 1 ? 'text-orange-500' : 'text-gray-500'}`}>
+                            {step.date}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className={`text-sm font-bold tracking-tight ${step.completed || step.active ? 'text-gray-800' : 'text-gray-400'}`}>
-                          {step.label}
-                        </p>
-                        <p className={`text-[10px] font-medium ${!step.completed && idx === 1 ? 'text-orange-500' : 'text-gray-500'}`}>
-                          {step.date}
-                        </p>
-                      </div>
-                    </div>
                     ));
                   })()}
                 </div>
