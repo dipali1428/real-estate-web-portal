@@ -499,19 +499,16 @@ export default function CompaniesPage() {
             </div>
             
             <div className="flex items-center gap-3">
-              {/* Wishlist Badge */}
-              <button
-                onClick={() => router.push('/customer/wishlist')}
-                className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all"
-              >
-                <Bookmark size={16} className={wishlistCount > 0 ? 'fill-[#2076C7] text-[#2076C7]' : ''} />
-                <span>Saved</span>
-                {wishlistCount > 0 && (
-                  <span className="px-1.5 py-0.5 bg-[#2076C7] text-white text-xs rounded-full">
-                    {wishlistCount}
-                  </span>
-                )}
-              </button>
+             {/* Wishlist Badge */}
+<div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700">
+  <Bookmark size={16} className={wishlistCount > 0 ? 'fill-[#2076C7] text-[#2076C7]' : ''} />
+  <span>Saved</span>
+  {wishlistCount > 0 && (
+    <span className="px-1.5 py-0.5 bg-[#2076C7] text-white text-xs rounded-full">
+      {wishlistCount}
+    </span>
+  )}
+</div>
 
               {/* Search Bar */}
               <div className="relative flex-1 md:flex-none md:w-64">

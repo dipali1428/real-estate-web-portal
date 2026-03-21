@@ -228,17 +228,6 @@ export default function CalculatorPage({ type = 'emi', onNavigate }: any) {
       <div className="calculator-container">
         {renderCalculator()}
       </div>
-
-      {/* FAQ Section */}
-      <section className="mt-16">
-        <SectionHeader 
-          title="Frequently Asked Questions" 
-          subtitle="Got questions about our calculators? We've got answers."
-        />
-        <div className="max-w-3xl mx-auto">
-          <FAQ items={FAQS} />
-        </div>
-      </section>
     </div>
   );
 }
