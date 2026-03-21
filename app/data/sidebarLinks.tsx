@@ -134,6 +134,16 @@ export const sidebarLinks = {
         { label: "Career Applications", href: "/hr/careermanagement", icon: < Briefcase className="h-5 w-5 text-neutral-700" /> },
     ],
 
+    BRANCHHEAD: [
+        { label: "HR Dashboard", href: "/branchhead", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
+        { label: "My Profile", href: "/branchhead/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
+    ],
+
+    DIRECTOR: [
+        { label: "HR Dashboard", href: "/director", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
+        { label: "My Profile", href: "/director/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
+    ],
+
     CUSTOMER: [
         { label: "Dashboard", href: "/customer", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/customer/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
@@ -149,11 +159,6 @@ export const sidebarLinks = {
                             label: "Unlisted Dashboard",
                             href: "/customer/unlisted/dashboard",
                             icon: <BarChart3 className="h-4 w-4 text-neutral-700" />,
-                        },
-                        {
-                            label: "Portfolio",
-                            href: "/customer/unlisted/portfolio",
-                            icon: <Briefcase className="h-4 w-4 text-neutral-700" />,
                         },
                         {
                             label: "Companies",

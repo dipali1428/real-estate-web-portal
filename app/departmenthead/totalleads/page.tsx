@@ -293,7 +293,7 @@ const LeadTable: FC = () => {
       department: item.department || "N/A",
       subCategory: item.sub_category || "N/A",
       notes: item.notes || "No notes available",
-      status: (item.status || 'new').toLowerCase(),
+      status: (item.lead_status || 'new').toLowerCase(),
       assignedTo: item.assigned_rm_name || "Unassigned",
       rmId: (item.assigned_rm_id || "N/A").toString(),
       assignedRMDepartment: item.assigned_rm_department || "N/A",
