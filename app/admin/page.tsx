@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import StatsCard from "./components/DashboardStatsCard";
 import DashboardSectionHeader from "./components/DashboardSectionHeader"
+import { getToken, isTokenExpired } from "../lib/auth-token";
 
 import { Users, Mail, Clock, CheckCircle, LineChart, FolderOpen } from "lucide-react";
 
@@ -32,8 +33,11 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
-      if (!token) return router.push("/");
+
+      const token = getToken();
+      if (!token || isTokenExpired(token)) {
+        router.push("/");
+      }
 
       // Fetch Admin Profile
       const profile = await AdminService.getAdminProfile();
