@@ -6,6 +6,7 @@ import { DashboardService } from "../services/dashboardService";
 import { useRouter } from "next/navigation";
 import PortfolioChart from './components/PortfolioChart';
 import toast from "react-hot-toast";
+import { getToken, isTokenExpired } from "../lib/auth-token";
 
 interface UserProfile {
     id: number;
@@ -70,8 +71,11 @@ export default function Dashboard() {
 
         const fetchProfile = async () => {
             try {
-                const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
-                if (!token) return router.push("/");
+
+                const token = getToken();
+                if (!token || isTokenExpired(token)) {
+                    router.push("/");
+                }
                 setLoading(true);
 
                 const data = await DashboardService.getProfile();
@@ -162,8 +166,10 @@ export default function Dashboard() {
 
     // Token check
     useEffect(() => {
-        const cookie = document.cookie.includes("authToken=");
-        if (!cookie) router.push("/");
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            router.push("/");
+        }
     }, [router]);
 
     // ✅ KPI Card Component
@@ -191,8 +197,7 @@ export default function Dashboard() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white"
-                >
+                    className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white">
                     <div className="absolute bottom-4 right-6 text-xs sm:text-sm font-mono text-white/90 bg-black/20 px-2 py-1 rounded-md border border-white/10">
                         ID: <span className="text-white-400 font-bold ml-1">
                             {loading ? "..." : (user?.adv_id || "N/A")}
