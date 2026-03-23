@@ -44,14 +44,14 @@ const frequencyMap: Record<PaymentFrequency, number> = {
 const frequencyOptions: { value: PaymentFrequency; label: string }[] = [
   { value: 'daily', label: 'Daily' },
   { value: 'weekly', label: 'Weekly' },
-  { value: 'biweekly', label: 'Bi-Weekly (Every 2 weeks)' },
-  { value: 'semimonthly', label: 'Semi-Monthly (Twice a month)' },
-  { value: 'monthly', label: 'Monthly (APR)' },
-  { value: 'bimonthly', label: 'Bi-Monthly (Every 2 months)' },
+  { value: 'biweekly', label: 'Bi-Weekly' },
+  { value: 'semimonthly', label: 'Semi-Monthly' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'bimonthly', label: 'Bi-Monthly' },
   { value: 'quarterly', label: 'Quarterly' },
   { value: 'semiannually', label: 'Semi-Annually' },
-  { value: 'annually', label: 'Annually (APY)' },
-  { value: 'continuous', label: 'Continuously' },
+  { value: 'annually', label: 'Annually' },
+  { value: 'continuous', label: 'Continuous' },
 ];
 
 // Calculator options for dropdown
@@ -590,7 +590,7 @@ export const HomeLoanCalculatorContent: React.FC = () => {
                   Months
                 </span>
               </div>
-              <div className="mt-2 text-sm text-gray-600">
+              <div className="mt-2 text-xs text-gray-600">
                 Current: {formatLoanTerm(loanTermMonths)}
               </div>
             </div>
@@ -600,48 +600,19 @@ export const HomeLoanCalculatorContent: React.FC = () => {
               <label className="block text-[#2076C7] font-semibold mb-3">
                 Payment Frequency
               </label>
-              <div className="grid grid-cols-3 gap-3">
-                {frequencyOptions.slice(0, 3).map((option) => (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {frequencyOptions.map((option) => (
                   <button
                     key={option.value}
                     type="button"
                     onClick={() => setPaymentFrequency(option.value)}
-                    className={`py-3 px-4 rounded-lg border transition-all ${paymentFrequency === option.value ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
+                    className={`py-2 px-3 rounded-lg border text-sm transition-all ${
+                      paymentFrequency === option.value 
+                        ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium' 
+                        : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                    }`}
                   >
-                    <div className="font-medium">{option.label.split('(')[0]}</div>
-                    <div className="text-xs mt-1 opacity-75">
-                      {option.label.includes('(') ? option.label.split('(')[1].replace(')', '') : ''}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-3 gap-3 mt-3">
-                {frequencyOptions.slice(3, 6).map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setPaymentFrequency(option.value)}
-                    className={`py-3 px-4 rounded-lg border transition-all ${paymentFrequency === option.value ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
-                  >
-                    <div className="font-medium">{option.label.split('(')[0]}</div>
-                    <div className="text-xs mt-1 opacity-75">
-                      {option.label.includes('(') ? option.label.split('(')[1].replace(')', '') : ''}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-3 gap-3 mt-3">
-                {frequencyOptions.slice(6).map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setPaymentFrequency(option.value)}
-                    className={`py-3 px-4 rounded-lg border transition-all ${paymentFrequency === option.value ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
-                  >
-                    <div className="font-medium">{option.label.split('(')[0]}</div>
-                    <div className="text-xs mt-1 opacity-75">
-                      {option.label.includes('(') ? option.label.split('(')[1].replace(')', '') : ''}
-                    </div>
+                    {option.label}
                   </button>
                 ))}
               </div>
@@ -650,7 +621,7 @@ export const HomeLoanCalculatorContent: React.FC = () => {
             {/* Results Section */}
             <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
               <div className="text-center mb-6">
-                <div className="text-sm text-[#2076C7] font-medium mb-1">Monthly Payment (EMI)</div>
+                <div className="text-sm text-[#2076C7] font-medium mb-1">Payment Amount</div>
                 <div className="text-3xl font-bold text-[#1CADA3] font-sans">
                   {paymentAmount > 0 ? formatCurrency(paymentAmount) : '₹0'}
                 </div>
@@ -678,7 +649,7 @@ export const HomeLoanCalculatorContent: React.FC = () => {
               <canvas ref={canvasRef}></canvas>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
+            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-6">
               <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Loan Summary</h5>
               <div className="space-y-4">
                 <div className="flex justify-between pb-3 border-b border-gray-200">
@@ -725,190 +696,88 @@ export const HomeLoanCalculatorContent: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-        {/* Key Insights Section */}
-        <div className="max-w-6xl mx-auto mt-8">
-          <div className="bg-white rounded-xl border shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <i className="fas fa-lightbulb text-yellow-500"></i>
-              Key Insights
-            </h2>
 
-            <div className="text-gray-700 leading-relaxed">
-              <ul className="list-disc pl-5 mb-4 space-y-2">
-                <li>
-                  Your monthly EMI of{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {formatCurrency(paymentAmount)}
-                  </span>{' '}
-                  will continue for {formatLoanTerm(loanTermMonths)}
-                </li>
-                
-                <li>
-                  You'll pay{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {formatCurrency(totalInterest)}
-                  </span>{' '}
-                  in interest, which is{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {((totalInterest / loanAmount) * 100).toFixed(1)}%
-                  </span>{' '}
-                  of your loan amount
-                </li>
-                
-                <li>
-                  For every ₹100 you repay,{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    ₹{((totalInterest / totalPayment) * 100).toFixed(0)}
-                  </span>{' '}
-                  goes towards interest and only{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    ₹{((loanAmount / totalPayment) * 100).toFixed(0)}
-                  </span>{' '}
-                  reduces your principal
-                </li>
-                
-                {(() => {
-                  // Calculate if tenure extension reduces EMI significantly
-                  const extendedTenure = loanTermMonths + 12;
-                  const extendedPayments = Math.ceil(extendedTenure / 12 * frequencyMap[paymentFrequency]);
-                  const periodicInterestRate = (annualInterestRate / 100) / frequencyMap[paymentFrequency];
-                  const rateFactor = Math.pow(1 + periodicInterestRate, extendedPayments);
-                  const extendedEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
-                  const emiReduction = paymentAmount - extendedEMI;
+            {/* Key Insights Section - Inside right column, below Loan Summary */}
+            <div className="bg-white rounded-xl border shadow-md p-5">
+              <h2 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                Key Insights
+              </h2>
+
+              <div className="text-gray-700 leading-relaxed text-xs">
+                <ul className="list-disc pl-4 space-y-1.5">
+                  <li>
+                    Your payment amount of{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {formatCurrency(paymentAmount)}
+                    </span>{' '}
+                    will continue for {formatLoanTerm(loanTermMonths)}
+                  </li>
                   
-                  if (emiReduction > 0) {
-                    return (
-                      <li>
-                        Extending tenure by 1 year reduces your EMI by{' '}
-                        <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                          {formatCurrency(emiReduction)}
-                        </span>{' '}
-                        ({((emiReduction / paymentAmount) * 100).toFixed(1)}% reduction)
-                      </li>
-                    );
-                  }
-                  return null;
-                })()}
+                  <li>
+                    You'll pay{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {formatCurrency(totalInterest)}
+                    </span>{' '}
+                    in interest, which is{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {((totalInterest / loanAmount) * 100).toFixed(1)}%
+                    </span>{' '}
+                    of your loan amount
+                  </li>
+                  
+                  <li>
+                    For every ₹100 you repay,{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      ₹{((totalInterest / totalPayment) * 100).toFixed(0)}
+                    </span>{' '}
+                    goes towards interest and only{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      ₹{((loanAmount / totalPayment) * 100).toFixed(0)}
+                    </span>{' '}
+                    reduces your principal
+                  </li>
+                  
+                  <li>
+                    A 1% lower interest rate would save you{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {formatCurrency(totalInterest * 0.15)}
+                    </span>{' '}
+                    over the loan term
+                  </li>
+                  
+                  <li>
+                    Making one extra payment early could save approximately{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {formatCurrency(totalInterest * 0.2)}
+                    </span>{' '}
+                    in interest
+                  </li>
+                  
+                  <li>
+                    Your effective annual rate is{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {effectiveAnnualRate.toFixed(2)}%
+                    </span>{' '}
+                    (higher than the nominal rate due to {paymentFrequency} compounding)
+                  </li>
+                </ul>
                 
-                {(() => {
-                  // Calculate impact of 1% lower interest rate
-                  const lowerRate = annualInterestRate - 1;
-                  if (lowerRate > 0) {
-                    const periodicInterestRate = (lowerRate / 100) / frequencyMap[paymentFrequency];
-                    const totalPayments = calculateTotalPayments();
-                    const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
-                    const lowerEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
-                    const totalSavings = (paymentAmount - lowerEMI) * totalPayments;
-                    
-                    return (
-                      <li>
-                        A 1% lower interest rate would save you{' '}
-                        <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                          {formatCurrency(totalSavings)}
-                        </span>{' '}
-                        over the loan term
-                      </li>
-                    );
-                  }
-                  return null;
-                })()}
+                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-xs text-yellow-800">
+                    <strong>Pro Tip:</strong> Consider making at least one extra payment each year. 
+                    This can reduce your loan tenure by several months and save significant interest costs.
+                  </p>
+                </div>
                 
-                {(() => {
-                  // Early repayment insight
-                  const earlyRepaymentSavings = totalInterest * 0.2; // Estimate 20% savings with one early payment
-                  return (
-                    <li>
-                      Making one extra payment early could save approximately{' '}
-                      <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                        {formatCurrency(earlyRepaymentSavings)}
-                      </span>{' '}
-                      in interest
-                    </li>
-                  );
-                })()}
-                
-                {(() => {
-                  // 30-year loan specific insight
-                  if (loanTermMonths >= 360) {
-                    const tenYearEMI = calculateEMIForTerm(120);
-                    const thirtyYearEMI = paymentAmount;
-                    const emiDifference = thirtyYearEMI - tenYearEMI;
-                    const totalInterest10Year = (tenYearEMI * 120) - loanAmount;
-                    const interestDifference = totalInterest - totalInterest10Year;
-                    
-                    if (emiDifference < 0) {
-                      return (
-                        <li>
-                          Choosing a 30-year loan instead of 10-year reduces your monthly EMI by{' '}
-                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                            {formatCurrency(Math.abs(emiDifference))}
-                          </span>{' '}
-                          but increases total interest by{' '}
-                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                            {formatCurrency(interestDifference)}
-                          </span>
-                        </li>
-                      );
-                    }
-                  }
-                  return null;
-                })()}
-                
-                {(() => {
-                  // 15-year vs 30-year comparison
-                  if (loanTermMonths >= 360) {
-                    const fifteenYearEMI = calculateEMIForTerm(180);
-                    const thirtyYearEMI = paymentAmount;
-                    const emiDifference = thirtyYearEMI - fifteenYearEMI;
-                    const totalInterest15Year = (fifteenYearEMI * 180) - loanAmount;
-                    const interestDifference = totalInterest - totalInterest15Year;
-                    
-                    if (emiDifference < 0) {
-                      return (
-                        <li>
-                          Compared to a 15-year loan, your 30-year loan saves{' '}
-                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                            {formatCurrency(Math.abs(emiDifference))}
-                          </span>{' '}
-                          per month but costs{' '}
-                          <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                            {formatCurrency(interestDifference)}
-                          </span>{' '}
-                          more in total interest
-                        </li>
-                      );
-                    }
-                  }
-                  return null;
-                })()}
-                
-                <li>
-                  Your effective annual rate is{' '}
-                  <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                    {effectiveAnnualRate.toFixed(2)}%
-                  </span>{' '}
-                  (higher than the nominal rate due to {paymentFrequency} compounding)
-                </li>
-              </ul>
-              
-              <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm text-yellow-800">
-                  <strong>💡 Pro Tip:</strong> Consider making at least one extra payment each year. 
-                  This can reduce your loan tenure by several months and save significant interest costs.
-                  Even a single extra EMI payment can make a noticeable difference.
+                <p className="text-[11px] text-gray-500 mt-2">
+                  <strong>Note:</strong> This calculation doesn't account for processing fees, prepayment charges, or insurance costs. 
+                  Actual terms may vary based on lender policies and your credit profile.
                 </p>
               </div>
-              
-              <p className="text-sm text-gray-600 mt-4">
-                <strong>Note:</strong> This calculation doesn't account for processing fees, prepayment charges, or insurance costs. 
-                Actual terms may vary based on lender policies and your credit profile.
-              </p>
             </div>
           </div>
         </div>
+      </div>
     </div>
   );
 };
@@ -928,79 +797,81 @@ const HomeLoanCalculatorStandalone: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Loan Calculator */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-          <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
-            <h1 className="text-3xl font-bold mb-2">Home Loan Calculator</h1>
-            <p className="text-blue-100">Calculate your Loan EMI and Payment Schedule</p>
-          </div>
+      {/* Header */}
+      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <i className="fas fa-home text-white text-2xl"></i>
+          <h1 className="text-3xl font-bold">Home Loan Calculator</h1>
+        </div>
+        <p className="text-blue-100">Estimate your home loan EMI and total interest payable</p>
+      </div>
 
-          {/* Dropdown */}
-          <div className="px-8 pt-4 pb-2 max-w-md mx-auto">
-            <div className="relative">
-              <button 
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
-                    <activeData.icon className="w-5 h-5 text-teal-600" />
-                  </div>
-                  <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
-                </div>
-                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {isDropdownOpen && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto"
-                  >
-                    {CALCULATOR_OPTIONS.map((calc) => (
-                      <button
-                        key={calc.id}
-                        onClick={() => {
-                          handleCalculatorChange(calc.path);
-                          setIsDropdownOpen(false);
-                        }}
-                        className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
-                          calc.id === 'homeloan' ? 'bg-teal-500/5' : ''
-                        }`}
-                      >
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          calc.id === 'homeloan' 
-                            ? 'bg-teal-500 text-white' 
-                            : 'bg-gray-100 text-gray-500'
-                        }`}>
-                          <calc.icon className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1">
-                          <span className={`font-medium ${
-                            calc.id === 'homeloan' ? 'text-teal-600' : 'text-gray-700'
-                          }`}>
-                            {calc.label}
-                          </span>
-                          <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
-                        </div>
-                        {calc.id === 'homeloan' && (
-                          <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
-                        )}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+      {/* Dropdown */}
+      <div className="container mx-auto px-4 py-4 max-w-md">
+        <div className="relative">
+          <button 
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
+                <activeData.icon className="w-5 h-5 text-teal-600" />
+              </div>
+              <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
             </div>
-          </div>
+            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
 
-          {/* Calculator Content */}
-          <HomeLoanCalculatorContent />
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto"
+              >
+                {CALCULATOR_OPTIONS.map((calc) => (
+                  <button
+                    key={calc.id}
+                    onClick={() => {
+                      handleCalculatorChange(calc.path);
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                      calc.id === 'homeloan' ? 'bg-teal-500/5' : ''
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      calc.id === 'homeloan' 
+                        ? 'bg-teal-500 text-white' 
+                        : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      <calc.icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <span className={`font-medium ${
+                        calc.id === 'homeloan' ? 'text-teal-600' : 'text-gray-700'
+                      }`}>
+                        {calc.label}
+                      </span>
+                      <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
+                    </div>
+                    {calc.id === 'homeloan' && (
+                      <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
+                    )}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
+
+      {/* Calculator Content */}
+      <HomeLoanCalculatorContent />
+      
+      {/* Font Awesome */}
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     </div>
   );
 };

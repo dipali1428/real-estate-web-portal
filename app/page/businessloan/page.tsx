@@ -44,14 +44,14 @@ const frequencyMap: Record<PaymentFrequency, number> = {
 const frequencyOptions: { value: PaymentFrequency; label: string }[] = [
   { value: 'daily', label: 'Daily' },
   { value: 'weekly', label: 'Weekly' },
-  { value: 'biweekly', label: 'Bi-Weekly (Every 2 weeks)' },
-  { value: 'semimonthly', label: 'Semi-Monthly (Twice a month)' },
-  { value: 'monthly', label: 'Monthly (APR)' },
-  { value: 'bimonthly', label: 'Bi-Monthly (Every 2 months)' },
+  { value: 'biweekly', label: 'Bi-Weekly' },
+  { value: 'semimonthly', label: 'Semi-Monthly' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'bimonthly', label: 'Bi-Monthly' },
   { value: 'quarterly', label: 'Quarterly' },
   { value: 'semiannually', label: 'Semi-Annually' },
-  { value: 'annually', label: 'Annually (APY)' },
-  { value: 'continuous', label: 'Continuously' },
+  { value: 'annually', label: 'Annually' },
+  { value: 'continuous', label: 'Continuous' },
 ];
 
 // Calculator options for dropdown
@@ -91,12 +91,6 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
   // Chart reference
   const chartRef = useRef<Chart<'doughnut'> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  // Calculate slider background gradient
-  const getSliderBackground = (value: number, min: number, max: number) => {
-    const percentage = ((value - min) / (max - min)) * 100;
-    return `linear-gradient(to right, #1CADA3 0%, #1CADA3 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
-  };
 
   // Format currency for display
   const formatCurrency = (value: number): string => {
@@ -284,21 +278,20 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
             labels: ['Loan Amount', 'Total Interest'],
             datasets: [{
               data: [loanAmount, totalInterest],
-              backgroundColor: ['#009B91', '#E5E7EB'],
+              backgroundColor: ['#1CADA3', '#2076C7'],
               borderWidth: 0
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '80%',
             plugins: {
               legend: {
-                display: false
+                position: 'bottom' as const
               },
               tooltip: {
                 callbacks: {
-                  label: function (context) {
+                  label: function(context) {
                     let label = context.label || '';
                     if (label) {
                       label += ': ';
@@ -350,7 +343,7 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
   const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newItemsPerPage = parseInt(e.target.value);
     setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); // Reset to first page when changing items per page
+    setCurrentPage(1);
   };
 
   // Handle slider changes
@@ -440,15 +433,15 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 md:py-10">
+    <div className="container mx-auto px-4 py-8">
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row p-4 lg:p-5 font-sans">
+        <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
           {/* Input Section */}
           <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
 
             {/* Loan Amount */}
-            <div className="mb-2">
-              <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-1">
+            <div className="mb-6">
+              <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-2">
                 Loan Amount (₹)
               </label>
               <div className="slider-container mb-2">
@@ -460,10 +453,7 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
                   step="10000"
                   value={loanAmount}
                   onChange={handleLoanAmountChange}
-                  className="w-full h-2 rounded-lg cursor-pointer slider accent-teal-600"
-                  style={{
-                    background: getSliderBackground(loanAmount, 10000, 10000000)
-                  }}
+                  className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
                 <div className="flex justify-between text-sm text-gray-600 mt-1">
                   <span>₹10,000</span>
@@ -477,7 +467,7 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
                   value={getLoanAmountDisplayValue()}
                   onChange={handleLoanAmountInputChange}
                   onWheel={handleWheel}
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
                   placeholder="Enter loan amount"
                 />
                 <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
@@ -485,8 +475,8 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
             </div>
 
             {/* Interest Rate */}
-            <div className="mb-2">
-              <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-1">
+            <div className="mb-6">
+              <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2">
                 Annual Interest Rate (%)
               </label>
               <div className="slider-container mb-2">
@@ -498,10 +488,7 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
                   step="0.1"
                   value={annualInterestRate}
                   onChange={handleInterestRateChange}
-                  className="w-full h-2 rounded-lg cursor-pointer slider accent-teal-600"
-                  style={{
-                    background: getSliderBackground(annualInterestRate, 0.1, 30)
-                  }}
+                  className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
                 <div className="flex justify-between text-sm text-gray-600 mt-1">
                   <span>0.1%</span>
@@ -518,15 +505,15 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
                   value={getInterestRateDisplayValue()}
                   onChange={handleInterestRateInputChange}
                   onWheel={handleNumberInputWheel}
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
                 />
                 <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
               </div>
             </div>
 
             {/* Loan Tenure */}
-            <div className="mb-2">
-              <label htmlFor="loanTerm" className="block text-[#2076C7] font-semibold mb-1">
+            <div className="mb-6">
+              <label htmlFor="loanTerm" className="block text-[#2076C7] font-semibold mb-2">
                 Loan Tenure (Months)
               </label>
               <div className="slider-container mb-2">
@@ -538,10 +525,7 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
                   step="1"
                   value={loanTermMonths}
                   onChange={handleTenureChange}
-                  className="w-full h-2 rounded-lg cursor-pointer slider accent-teal-600"
-                  style={{
-                    background: getSliderBackground(loanTermMonths, 1, 120)
-                  }}
+                  className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
                 <div className="flex justify-between text-sm text-gray-600 mt-1">
                   <span>1 Month</span>
@@ -564,122 +548,99 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
                   Months
                 </span>
               </div>
+              <div className="mt-2 text-xs text-gray-600">
+                Current: {formatLoanTerm(loanTermMonths)}
+              </div>
             </div>
 
             {/* Payment Frequency */}
-            <div className="mb-4">
-              <label className="block text-[#2076C7] font-semibold mb-1">
+            <div className="mb-8">
+              <label className="block text-[#2076C7] font-semibold mb-3">
                 Payment Frequency
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                {frequencyOptions.slice(0, 3).map((option) => (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {frequencyOptions.map((option) => (
                   <button
                     key={option.value}
                     type="button"
                     onClick={() => setPaymentFrequency(option.value)}
-                    className={`py-1 px-4 rounded-lg border transition-all ${paymentFrequency === option.value ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
+                    className={`py-2 px-3 rounded-lg border text-sm transition-all ${
+                      paymentFrequency === option.value 
+                        ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium' 
+                        : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                    }`}
                   >
-                    <div className="text-[13px] font-semibold">{option.label.split('(')[0]}</div>
-                    <div className="text-[10px] mt-0.5 opacity-75">
-                      {option.label.includes('(') ? option.label.split('(')[1].replace(')', '') : ''}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-2">
-                {frequencyOptions.slice(3, 6).map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setPaymentFrequency(option.value)}
-                    className={`py-1 px-4 rounded-lg border transition-all ${paymentFrequency === option.value ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
-                  >
-                    <div className="text-[13px] font-semibold">{option.label.split('(')[0]}</div>
-                    <div className="text-[10px] mt-0.5 opacity-75">
-                      {option.label.includes('(') ? option.label.split('(')[1].replace(')', '') : ''}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-2">
-                {frequencyOptions.slice(6).map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setPaymentFrequency(option.value)}
-                    className={`py-1 px-4 rounded-lg border transition-all ${paymentFrequency === option.value ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3]' : 'border-gray-300 hover:border-gray-400 text-gray-700'}`}
-                  >
-                    <div className="text-[13px] font-semibold">{option.label.split('(')[0]}</div>
-                    <div className="text-[10px] mt-0.5 opacity-75">
-                      {option.label.includes('(') ? option.label.split('(')[1].replace(')', '') : ''}
-                    </div>
+                    {option.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Results Section REMOVED - UI now uses center-aligned text in Donut */}
+            {/* Results Section */}
+            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
+              <div className="text-center mb-6">
+                <div className="text-sm text-[#2076C7] font-medium mb-1">Payment Amount</div>
+                <div className="text-3xl font-bold text-[#1CADA3] font-sans">
+                  {paymentAmount > 0 ? formatCurrency(paymentAmount) : '₹0'}
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <div className="text-center flex-1 px-4">
+                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                    {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                  </div>
+                  <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
+                </div>
+                <div className="text-center flex-1 px-4">
+                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                    {totalPayment > 0 ? formatCurrency(totalPayment) : '₹0'}
+                  </div>
+                  <div className="text-sm text-[#1CADA3] mt-1">Total Payment</div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Visualization Section */}
           <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0">
-            <div className="chart-container h-44 sm:h-56 mb-4 sm:mb-6 relative flex items-center justify-center">
+            <div className="chart-container h-64 mb-6">
               <canvas ref={canvasRef}></canvas>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <div className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">
-                  MONTHLY PAYMENT (EMI)
-                </div>
-                <div className="text-xl sm:text-3xl font-extrabold text-[#009B91] font-sans">
-                  {paymentAmount > 0 ? formatCurrency(paymentAmount) : '₹0'}
-                </div>
-              </div>
             </div>
 
-            <div className="flex justify-center gap-8 mb-6">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-[#009B91]"></div>
-                <span className="text-sm font-bold text-gray-700">Loan Amount</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-[#E5E7EB]"></div>
-                <span className="text-sm font-bold text-gray-700">Total Interest</span>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
-              <h5 className="font-semibold mb-4 text-lg bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">Loan Summary</h5>
-              <div className="space-y-1.5">
-                <div className="flex justify-between pb-1 border-b border-gray-200">
+            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-6">
+              <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Loan Summary</h5>
+              <div className="space-y-4">
+                <div className="flex justify-between pb-3 border-b border-gray-200">
                   <span className="text-gray-600">Loan Amount</span>
                   <span className="font-medium font-sans text-[#1CADA3]">
                     {loanAmount > 0 ? formatCurrency(loanAmount) : '₹0'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-1 border-b border-gray-200">
+                <div className="flex justify-between pb-3 border-b border-gray-200">
                   <span className="text-gray-600">Interest Rate</span>
                   <span className="font-medium font-sans text-[#1CADA3]">
                     {annualInterestRate > 0 ? `${annualInterestRate}%` : '0%'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-1 border-b border-gray-200">
+                <div className="flex justify-between pb-3 border-b border-gray-200">
                   <span className="text-gray-600">Loan Tenure</span>
                   <span className="font-medium font-sans text-[#1CADA3]">
                     {loanTermMonths > 0 ? formatLoanTerm(loanTermMonths) : '0'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-1 border-b border-gray-200">
+                <div className="flex justify-between pb-3 border-b border-gray-200">
                   <span className="text-gray-600">Payment Frequency</span>
                   <span className="font-medium font-sans text-[#1CADA3] capitalize">
                     {paymentFrequency}
                   </span>
                 </div>
-                <div className="flex justify-between pb-1 border-b border-gray-200">
+                <div className="flex justify-between pb-3 border-b border-gray-200">
                   <span className="text-gray-600">Total Payments</span>
                   <span className="font-medium font-sans text-[#1CADA3]">
                     {calculateTotalPayments()}
                   </span>
                 </div>
-                <div className="flex justify-between pb-1 border-b border-gray-200">
+                <div className="flex justify-between pb-3 border-b border-gray-200">
                   <span className="text-gray-600">Effective Annual Rate</span>
                   <span className="font-medium font-sans text-[#1CADA3]">
                     {effectiveAnnualRate > 0 ? `${effectiveAnnualRate.toFixed(2)}%` : '0%'}
@@ -693,164 +654,153 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* KEY INSIGHTS SECTION - Business Loan */}
-        <div className="border-t border-gray-100 p-5 lg:p-6 bg-gray-50/30">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
-            <i className="fas fa-lightbulb text-yellow-500"></i>
-            Key Insights
-          </h2>
+            {/* Key Insights Section - Inside right column */}
+            <div className="bg-white rounded-xl border shadow-md p-5">
+              <h2 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                Key Insights
+              </h2>
 
-          <div className="text-sm text-gray-700 leading-relaxed">
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 list-disc pl-5 mb-2">
-              <li>
-                Your business will pay{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  {paymentAmount > 0 ? formatCurrency(paymentAmount) : '₹0'}
-                </span>{' '}
-                monthly for {loanTermMonths > 0 ? formatLoanTerm(loanTermMonths) : '0 months'}
-              </li>
+              <div className="text-gray-700 leading-relaxed text-xs">
+                <ul className="list-disc pl-4 space-y-1.5">
+                  <li>
+                    Your business will pay{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {paymentAmount > 0 ? formatCurrency(paymentAmount) : '₹0'}
+                    </span>{' '}
+                    monthly for {loanTermMonths > 0 ? formatLoanTerm(loanTermMonths) : '0 months'}
+                  </li>
 
-              <li>
-                Total interest cost for your business will be{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
-                </span>{' '}
-                which is{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  {loanAmount > 0 ? ((totalInterest / loanAmount) * 100).toFixed(1) : '0'}%
-                </span>{' '}
-                of the loan amount
-              </li>
+                  <li>
+                    Total interest cost for your business will be{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                    </span>{' '}
+                    which is{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {loanAmount > 0 ? ((totalInterest / loanAmount) * 100).toFixed(1) : '0'}%
+                    </span>{' '}
+                    of the loan amount
+                  </li>
 
-              <li>
-                For every ₹100 repaid,{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  ₹{totalPayment > 0 ? ((totalInterest / totalPayment) * 100).toFixed(0) : '0'}
-                </span>{' '}
-                goes towards interest and{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  ₹{totalPayment > 0 ? ((loanAmount / totalPayment) * 100).toFixed(0) : '0'}
-                </span>{' '}
-                reduces principal
-              </li>
+                  <li>
+                    For every ₹100 repaid,{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      ₹{totalPayment > 0 ? ((totalInterest / totalPayment) * 100).toFixed(0) : '0'}
+                    </span>{' '}
+                    goes towards interest and{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      ₹{totalPayment > 0 ? ((loanAmount / totalPayment) * 100).toFixed(0) : '0'}
+                    </span>{' '}
+                    reduces principal
+                  </li>
 
-              {(() => {
-                // Calculate if shorter tenure saves interest
-                if (loanTermMonths > 12 && loanAmount > 0 && annualInterestRate > 0) {
-                  const shorterTenure = Math.max(6, loanTermMonths - 12);
-                  const shorterPayments = Math.ceil(shorterTenure / 12 * frequencyMap[paymentFrequency]);
-                  const periodicInterestRate = (annualInterestRate / 100) / frequencyMap[paymentFrequency];
-                  const rateFactor = Math.pow(1 + periodicInterestRate, shorterPayments);
-                  const higherEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
-                  const interestSaved = totalInterest - (higherEMI * shorterPayments - loanAmount);
+                  {(() => {
+                    if (loanTermMonths > 12 && loanAmount > 0 && annualInterestRate > 0) {
+                      const shorterTenure = Math.max(6, loanTermMonths - 12);
+                      const shorterPayments = Math.ceil(shorterTenure / 12 * frequencyMap[paymentFrequency]);
+                      const periodicInterestRate = (annualInterestRate / 100) / frequencyMap[paymentFrequency];
+                      const rateFactor = Math.pow(1 + periodicInterestRate, shorterPayments);
+                      const higherEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+                      const interestSaved = totalInterest - (higherEMI * shorterPayments - loanAmount);
 
-                  if (interestSaved > 0) {
-                    return (
-                      <li>
-                        Reducing tenure by 1 year could save your business{' '}
-                        <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                          {formatCurrency(interestSaved)}
-                        </span>{' '}
-                        in interest
-                      </li>
-                    );
-                  }
-                }
-                return null;
-              })()}
+                      if (interestSaved > 0) {
+                        return (
+                          <li>
+                            Reducing tenure by 1 year could save your business{' '}
+                            <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                              {formatCurrency(interestSaved)}
+                            </span>{' '}
+                            in interest
+                          </li>
+                        );
+                      }
+                    }
+                    return null;
+                  })()}
 
-              {(() => {
-                // Calculate tax benefit insight for businesses
-                if (totalInterest > 0) {
-                  const taxBenefit = totalInterest * 0.30; // Assuming 30% tax rate for businesses
-                  return (
-                    <li>
-                      Interest payments may be tax deductible, potentially saving your business{' '}
-                      <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                        {formatCurrency(taxBenefit)}
-                      </span>{' '}
-                      in taxes
-                    </li>
-                  );
-                }
-                return null;
-              })()}
+                  {(() => {
+                    if (totalInterest > 0) {
+                      const taxBenefit = totalInterest * 0.30;
+                      return (
+                        <li>
+                          Interest payments may be tax deductible, potentially saving your business{' '}
+                          <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                            {formatCurrency(taxBenefit)}
+                          </span>{' '}
+                          in taxes
+                        </li>
+                      );
+                    }
+                    return null;
+                  })()}
 
-              {(() => {
-                // Calculate impact of better credit score/rate
-                if (annualInterestRate > 1 && loanAmount > 0 && loanTermMonths > 0) {
-                  const betterRate = annualInterestRate - 2; // 2% better rate for good credit
-                  if (betterRate > 0) {
-                    const periodicInterestRate = (betterRate / 100) / frequencyMap[paymentFrequency];
-                    const totalPayments = calculateTotalPayments();
-                    const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
-                    const betterEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
-                    const totalSavings = (paymentAmount - betterEMI) * totalPayments;
+                  {(() => {
+                    if (annualInterestRate > 1 && loanAmount > 0 && loanTermMonths > 0) {
+                      const betterRate = annualInterestRate - 2;
+                      if (betterRate > 0) {
+                        const periodicInterestRate = (betterRate / 100) / frequencyMap[paymentFrequency];
+                        const totalPayments = calculateTotalPayments();
+                        const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
+                        const betterEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+                        const totalSavings = (paymentAmount - betterEMI) * totalPayments;
 
-                    return (
-                      <li>
-                        A 2% lower interest rate could save{' '}
-                        <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                          {formatCurrency(totalSavings)}
-                        </span>{' '}
-                        in financing costs
-                      </li>
-                    );
-                  }
-                }
-                return null;
-              })()}
+                        return (
+                          <li>
+                            A 2% lower interest rate could save{' '}
+                            <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                              {formatCurrency(totalSavings)}
+                            </span>{' '}
+                            in financing costs
+                          </li>
+                        );
+                      }
+                    }
+                    return null;
+                  })()}
 
-              {(() => {
-                // Early repayment insight for business cash flow
-                if (totalInterest > 0) {
-                  const quarterlyRepaymentSavings = totalInterest * 0.15; // 15% savings with quarterly extra payments
-                  return (
-                    <li>
-                      Making quarterly extra payments could reduce interest by{' '}
-                      <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                        {formatCurrency(quarterlyRepaymentSavings)}
-                      </span>
-                    </li>
-                  );
-                }
-                return null;
-              })()}
+                  {(() => {
+                    if (totalInterest > 0) {
+                      const quarterlyRepaymentSavings = totalInterest * 0.15;
+                      return (
+                        <li>
+                          Making quarterly extra payments could reduce interest by{' '}
+                          <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                            {formatCurrency(quarterlyRepaymentSavings)}
+                          </span>
+                        </li>
+                      );
+                    }
+                    return null;
+                  })()}
 
-              <li>
-                Effective annual borrowing cost is{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  {effectiveAnnualRate > 0 ? effectiveAnnualRate.toFixed(2) : '0.00'}%
-                </span>{' '}
-                (considers {paymentFrequency} compounding)
-              </li>
+                  <li>
+                    Effective annual borrowing cost is{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {effectiveAnnualRate > 0 ? effectiveAnnualRate.toFixed(2) : '0.00'}%
+                    </span>{' '}
+                    (considers {paymentFrequency} compounding)
+                  </li>
 
-              {/* Business Loan Specific Insight */}
-              <li>
-                Business loans often have{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  flexible repayment options
-                </span>{' '}
-                like EMI holidays during lean seasons
-              </li>
-            </ul>
+                  <li>
+                    Business loans often have{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      flexible repayment options
+                    </span>{' '}
+                    like EMI holidays during lean seasons
+                  </li>
+                </ul>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-                <p className="text-sm text-yellow-800">
-                  <strong className="block mb-1 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">💡 Business Strategy Tip:</strong>
-                  Match your loan repayment schedule with your business cash flow cycles.
-                  Interest is often tax deductible - consult your accountant.
-                </p>
-              </div>
+                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-xs text-yellow-800">
+                    <strong>Business Strategy Tip:</strong> Match your loan repayment schedule with your business cash flow cycles.
+                    Interest is often tax deductible - consult your accountant.
+                  </p>
+                </div>
 
-              <div className="p-4 bg-blue-50/50 border border-blue-100 rounded-xl">
-                <p className="text-sm text-gray-600">
-                  <strong className="block mb-1 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">Note for Businesses:</strong>
-                  Business loans typically require collateral, business plans, and financial statements. Rates vary based on vintage and creditworthiness.
+                <p className="text-[11px] text-gray-500 mt-2">
+                  <strong>Note for Businesses:</strong> Business loans typically require collateral, business plans, and financial statements. 
+                  Rates vary based on vintage and creditworthiness.
                 </p>
               </div>
             </div>
@@ -865,7 +815,6 @@ export const BusinessLoanCalculatorContent: React.FC = () => {
 // STANDALONE VERSION (with header and dropdown)
 // =============================================
 const BusinessLoanCalculatorStandalone: React.FC = () => {
-  // Dropdown state
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'businessloan') || CALCULATOR_OPTIONS[0];
@@ -876,79 +825,81 @@ const BusinessLoanCalculatorStandalone: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Loan Calculator */}
-      <div className="container mx-auto px-4 py-6 md:py-10">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-          <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 px-4 sm:px-8 text-center">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">Business Loan Calculator</h1>
-            <p className="text-blue-100 text-sm sm:text-base">Calculate your Loan EMI and Payment Schedule</p>
-          </div>
+      {/* Header */}
+      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <i className="fas fa-building text-white text-2xl"></i>
+          <h1 className="text-3xl font-bold">Business Loan Calculator</h1>
+        </div>
+        <p className="text-blue-100">Plan your business expansion with our business loan calculator</p>
+      </div>
 
-          {/* Dropdown */}
-          <div className="px-4 sm:px-8 pt-4 pb-2 max-w-md mx-auto">
-            <div className="relative">
-              <button 
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
-                    <activeData.icon className="w-5 h-5 text-teal-600" />
-                  </div>
-                  <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
-                </div>
-                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {isDropdownOpen && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto"
-                  >
-                    {CALCULATOR_OPTIONS.map((calc) => (
-                      <button
-                        key={calc.id}
-                        onClick={() => {
-                          handleCalculatorChange(calc.path);
-                          setIsDropdownOpen(false);
-                        }}
-                        className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
-                          calc.id === 'businessloan' ? 'bg-teal-500/5' : ''
-                        }`}
-                      >
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          calc.id === 'businessloan' 
-                            ? 'bg-teal-500 text-white' 
-                            : 'bg-gray-100 text-gray-500'
-                        }`}>
-                          <calc.icon className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1">
-                          <span className={`font-medium ${
-                            calc.id === 'businessloan' ? 'text-teal-600' : 'text-gray-700'
-                          }`}>
-                            {calc.label}
-                          </span>
-                          <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
-                        </div>
-                        {calc.id === 'businessloan' && (
-                          <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
-                        )}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+      {/* Dropdown */}
+      <div className="container mx-auto px-4 py-4 max-w-md">
+        <div className="relative">
+          <button 
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
+                <activeData.icon className="w-5 h-5 text-teal-600" />
+              </div>
+              <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
             </div>
-          </div>
+            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
 
-          {/* Calculator Content */}
-          <BusinessLoanCalculatorContent />
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto"
+              >
+                {CALCULATOR_OPTIONS.map((calc) => (
+                  <button
+                    key={calc.id}
+                    onClick={() => {
+                      handleCalculatorChange(calc.path);
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                      calc.id === 'businessloan' ? 'bg-teal-500/5' : ''
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      calc.id === 'businessloan' 
+                        ? 'bg-teal-500 text-white' 
+                        : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      <calc.icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <span className={`font-medium ${
+                        calc.id === 'businessloan' ? 'text-teal-600' : 'text-gray-700'
+                      }`}>
+                        {calc.label}
+                      </span>
+                      <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
+                    </div>
+                    {calc.id === 'businessloan' && (
+                      <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
+                    )}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
+
+      {/* Calculator Content */}
+      <BusinessLoanCalculatorContent />
+      
+      {/* Font Awesome */}
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     </div>
   );
 };

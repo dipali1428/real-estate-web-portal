@@ -12,12 +12,12 @@ Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 const CALCULATOR_OPTIONS = [
   { id: 'emi', label: 'EMI Calculator', icon: Calculator, desc: 'Calculate your Equated Monthly Installment with precision.', path: '/page/emi' },
   { id: 'sip', label: 'SIP Calculator', icon: TrendingUp, desc: 'Plan your mutual fund investments and estimate future wealth.', path: '/page/sip' },
-  { id: 'sip-vs-emi', label: 'EMI VS SIP', icon: Timer, desc: 'Compare how different loan tenures affect your finances.', path: '/page/sip-vs-emi' },
-  { id: 'home-loan', label: 'Home Loan', icon: Home, desc: 'Estimate your home loan EMI and total interest payable.', path: '/page/home-loan' },
-  { id: 'personal-loan', label: 'Personal Loan', icon: User, desc: 'Calculate your personal loan EMI and repayment schedule.', path: '/page/personal-loan' },
-  { id: 'business-loan', label: 'Business Loan', icon: Building2, desc: 'Plan your business expansion with our business loan calculator.', path: '/page/business-loan' },
+  { id: 'sipVsEmi', label: 'EMI VS SIP', icon: Timer, desc: 'Compare how different loan tenures affect your finances.', path: '/page/sipVsEmi' },
+  { id: 'homeloan', label: 'Home Loan', icon: Home, desc: 'Estimate your home loan EMI and total interest payable.', path: '/page/homeloan' },
+  { id: 'personalloan', label: 'Personal Loan', icon: User, desc: 'Calculate your personal loan EMI and repayment schedule.', path: '/page/personalloan' },
+  { id: 'businessloan', label: 'Business Loan', icon: Building2, desc: 'Plan your business expansion with our business loan calculator.', path: '/page/businessloan' },
   { id: 'fd', label: 'FD Calculator', icon: PieChart, desc: 'Calculate the maturity amount of your fixed deposits.', path: '/page/fd' },
-  { id: 'compound-interest', label: 'Compound Interest', icon: LineChart, desc: 'See how your money grows over time with compound interest.', path: '/page/compound-interest' },
+  { id: 'CompoundInterest', label: 'Compound Interest', icon: LineChart, desc: 'See how your money grows over time with compound interest.', path: '/page/CompoundInterest' },
 ];
 
 // Main Calculator Component (without any header/dropdown)
@@ -316,7 +316,7 @@ const EMICalculatorContent: React.FC = () => {
               <canvas ref={canvasRef}></canvas>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7]">
+            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-6">
               <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Loan Summary</h5>
               <div className="space-y-4">
                 <div className="flex justify-between pb-3 border-b border-gray-200">
@@ -339,114 +339,112 @@ const EMICalculatorContent: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    
-      {/* Insights Section */}
-      <div className="max-w-6xl mx-auto mt-8">
-        <div className="bg-white rounded-xl border shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <i className="fas fa-lightbulb text-yellow-500"></i>
-            Key Insights
-          </h2>
 
-          <div className="text-gray-700 leading-relaxed">
-            <ul className="list-disc pl-5 mb-4 space-y-3">
-              <li>
-                <span className="font-medium">💡 Your monthly commitment</span> - You need to pay{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  {formatCurrency(emi)}
-                </span>{' '}
-                every month for {loanTenure} years
-              </li>
-              
-              <li>
-                <span className="font-medium">✅ Interest adds significant cost</span> - You pay{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  {formatCurrency(totalInterest)}
-                </span>{' '}
-                in interest, which is{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  {((totalInterest / loanAmount) * 100).toFixed(1)}%
-                </span>{' '}
-                of your loan amount
-              </li>
-              
-              <li>
-                <span className="font-medium">✅ Shorter tenure saves interest</span> - Reducing tenure by 5 years would increase your EMI by{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  {(() => {
-                    if (loanTenure > 5) {
-                      const shorterTenure = loanTenure - 5;
-                      const monthlyRate = interestRate / 12 / 100;
-                      const shorterMonths = shorterTenure * 12;
-                      const shorterEMI = loanAmount * monthlyRate *
-                        Math.pow(1 + monthlyRate, shorterMonths) /
-                        (Math.pow(1 + monthlyRate, shorterMonths) - 1);
-                      return formatCurrency(shorterEMI - emi);
-                    }
-                    return '₹0';
-                  })()}
-                </span>{' '}
-                but save significant interest
-              </li>
-              
-              <li>
-                <span className="font-medium">✅ Even 0.5% rate reduction matters</span> - At{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  {(interestRate - 0.5).toFixed(1)}%
-                </span>{' '}
-                instead of {interestRate}%, you would save{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  {(() => {
-                    const lowerRate = interestRate - 0.5;
-                    const monthlyRate = lowerRate / 12 / 100;
-                    const months = loanTenure * 12;
-                    const lowerEMI = loanAmount * monthlyRate *
-                      Math.pow(1 + monthlyRate, months) /
-                      (Math.pow(1 + monthlyRate, months) - 1);
-                    const lowerTotal = lowerEMI * months;
-                    return formatCurrency(totalPayment - lowerTotal);
-                  })()}
-                </span>
-              </li>
-              
-              <li>
-                <span className="font-medium">✅ Consider prepayments</span> - A single{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  ₹50,000
-                </span>{' '}
-                prepayment in year 1 can reduce total interest by{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  {formatCurrency(totalInterest * 0.015)}
-                </span>
-              </li>
-              
-              <li>
-                For every ₹100 you repay,{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  ₹{((totalInterest / totalPayment) * 100).toFixed(0)}
-                </span>{' '}
-                goes towards interest and only{' '}
-                <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
-                  ₹{((loanAmount / totalPayment) * 100).toFixed(0)}
-                </span>{' '}
-                reduces your principal
-              </li>
-            </ul>
-            
-            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
-                <strong>💡 Pro Tip:</strong> Aim to make at least one extra EMI payment each year. 
-                This can reduce your loan tenure by several years and save lakhs in interest payments.
-              </p>
+            {/* Insights Section - Smaller font and reduced spacing */}
+            <div className="bg-white rounded-xl border shadow-md p-5">
+              <h2 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                
+                Key Insights
+              </h2>
+
+              <div className="text-gray-700 leading-relaxed text-xs">
+                <ul className="list-disc pl-4 space-y-1.5">
+                  <li>
+                    <span className="font-medium">Your monthly commitment</span> - You need to pay{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {formatCurrency(emi)}
+                    </span>{' '}
+                    every month for {loanTenure} years
+                  </li>
+                  
+                  <li>
+                    <span className="font-medium">Interest adds significant cost</span> - You pay{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {formatCurrency(totalInterest)}
+                    </span>{' '}
+                    in interest, which is{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {((totalInterest / loanAmount) * 100).toFixed(1)}%
+                    </span>{' '}
+                    of your loan amount
+                  </li>
+                  
+                  <li>
+                    <span className="font-medium">Shorter tenure saves interest</span> - Reducing tenure by 5 years would increase your EMI by{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {(() => {
+                        if (loanTenure > 5) {
+                          const shorterTenure = loanTenure - 5;
+                          const monthlyRate = interestRate / 12 / 100;
+                          const shorterMonths = shorterTenure * 12;
+                          const shorterEMI = loanAmount * monthlyRate *
+                            Math.pow(1 + monthlyRate, shorterMonths) /
+                            (Math.pow(1 + monthlyRate, shorterMonths) - 1);
+                          return formatCurrency(shorterEMI - emi);
+                        }
+                        return '₹0';
+                      })()}
+                    </span>{' '}
+                    but save significant interest
+                  </li>
+                  
+                  <li>
+                    <span className="font-medium">Even 0.5% rate reduction matters</span> - At{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {(interestRate - 0.5).toFixed(1)}%
+                    </span>{' '}
+                    instead of {interestRate}%, you would save{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {(() => {
+                        const lowerRate = interestRate - 0.5;
+                        const monthlyRate = lowerRate / 12 / 100;
+                        const months = loanTenure * 12;
+                        const lowerEMI = loanAmount * monthlyRate *
+                          Math.pow(1 + monthlyRate, months) /
+                          (Math.pow(1 + monthlyRate, months) - 1);
+                        const lowerTotal = lowerEMI * months;
+                        return formatCurrency(totalPayment - lowerTotal);
+                      })()}
+                    </span>
+                  </li>
+                  
+                  <li>
+                    <span className="font-medium">Consider prepayments</span> - A single{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      ₹50,000
+                    </span>{' '}
+                    prepayment in year 1 can reduce total interest by{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      {formatCurrency(totalInterest * 0.015)}
+                    </span>
+                  </li>
+                  
+                  <li>
+                    For every ₹100 you repay,{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      ₹{((totalInterest / totalPayment) * 100).toFixed(0)}
+                    </span>{' '}
+                    goes towards interest and only{' '}
+                    <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
+                      ₹{((loanAmount / totalPayment) * 100).toFixed(0)}
+                    </span>{' '}
+                    reduces your principal
+                  </li>
+                </ul>
+                
+                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-xs text-yellow-800">
+                    <strong>Pro Tip:</strong> Aim to make at least one extra EMI payment each year. 
+                    This can reduce your loan tenure by several years and save lakhs in interest payments.
+                  </p>
+                </div>
+                
+                <p className="text-[11px] text-gray-500 mt-2">
+                  <strong>Note:</strong> This calculation doesn't account for processing fees, insurance, or any other charges. 
+                  Actual EMI may vary based on lender policies.
+                </p>
+              </div>
             </div>
-            
-            <p className="text-sm text-gray-600 mt-4">
-              <strong>Note:</strong> This calculation doesn't account for processing fees, insurance, or any other charges. 
-              Actual EMI may vary based on lender policies.
-            </p>
           </div>
         </div>
       </div>
