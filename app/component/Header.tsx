@@ -57,6 +57,7 @@ const Header = () => {
     { label: "Education Loan", href: "/products/education-loan" },
     { label: "Vehicle Loan", href: "/products/vehicle-loan" },
     { label: "Loan Against Securities", href: "/products/loan-against-securities" },
+      { label: "Credit cards", href: "/products/credit-card" },
   ];
 
   const insuranceOptions = [

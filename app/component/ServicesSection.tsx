@@ -38,7 +38,7 @@ const ServicesSection = () => {
         { name: "Mortgage Loan", slug: "../../products/mortgage-loan" },
         { name: "Education Loan", slug: "../../products/educationloan" },
         { name: "Vehicle Loan", slug: "../../products/vehicle-loan" },
-        { name: "Credit Card", slug: "credit-card" },
+        { name: "Credit Card", slug: "../../products/credit-card" },
         { name: "Loan Against Securities", slug: "../../products/loan-against-securities" },
       ],
     },
