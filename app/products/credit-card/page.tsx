@@ -8,7 +8,7 @@ import EligibilityAndProcess from './components/EligibilityAndProcess';
 import BenefitsSection from './components/BenefitsSection';
 import CTASection from '../../component/CTASection';
 import ScrollToTop from '@/app/component/ScrollToTop';
-import ContactModal from '@/app/component/ContactModal';
+import ContactModal from '../../component/ContactModal';
 import { useState } from 'react';
 
 export default function CreditCardPage() {
