@@ -1,10 +1,24 @@
 "use client";
-
-import React, { useState, useRef, useMemo, useEffect } from 'react';
-import { Search, Upload, Download, FileText, Trash2, Plus, Loader2, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { 
+  Search, 
+  Download, 
+  FileText, 
+  Loader2, 
+  ChevronLeft, 
+  ChevronRight, 
+  X, 
+  User, 
+  Calendar, 
+  Building2, 
+  Clock,
+  CheckCircle2,
+  ExternalLink,
+  Wallet
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { DashboardService } from '@/app/services/dashboardService';
 
-// Updated data structure
 interface TDS {
   id: number;
   user_id: number;
@@ -24,40 +38,41 @@ interface TDS {
 export default function TDSManagement() {
   const [records, setRecords] = useState<TDS[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isExporting, setIsExporting] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // --- NEW STATE FOR MODAL ---
   const [selectedPdf, setSelectedPdf] = useState<string | null>(null);
-
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [totalDeductions, setTotalDeductions] = useState<string>("0"); 
+  const itemsPerPage = 6; 
 
-  // ✅ FETCH API (SAFE HANDLING)
   useEffect(() => {
-    const fetchTds = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true);
+        
+        // Fetch TDS Records and Totals from the same API
         const res = await DashboardService.getTdsDetails();
-        const safeData = Array.isArray(res?.tds)
-          ? res.tds
-          : res?.tds
-          ? [res.tds]
-          : [];
+        console.log("Fetched TDS Data:", res);
+        
+        // 1. Set Records
+        const safeData = Array.isArray(res?.tds) ? res.tds : res?.tds ? [res.tds] : [];
         setRecords(safeData);
+
+        // 2. Set Total Deductions dynamically from response (tdsTotal.sum)
+        if (res?.tdsTotal?.sum) {
+          const total = parseFloat(res.tdsTotal.sum);
+          setTotalDeductions(total.toLocaleString('en-IN'));
+        }
+
       } catch (error) {
-        console.error("Failed to fetch TDS data", error);
+        console.error("Failed to fetch dashboard data", error);
         setRecords([]);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchTds();
+    fetchData();
   }, []);
 
-  // Local Filtering Logic
   const filteredRecords = useMemo(() => {
     return records.filter(record =>
       record.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -69,56 +84,11 @@ export default function TDSManagement() {
   const totalPages = Math.ceil(filteredRecords.length / itemsPerPage) || 1;
   const totalRecords = filteredRecords.length;
 
-  // Paginated View
   const paginatedRecords = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredRecords.slice(start, start + itemsPerPage);
   }, [filteredRecords, currentPage]);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const triggerUpload = () => fileInputRef.current?.click();
-
-  // const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     try {
-  //       setIsUploading(true);
-  //       await new Promise(resolve => setTimeout(resolve, 1500));
-  //       alert("File uploaded successfully (Simulated)");
-  //     } catch (error) {
-  //       console.error("Upload failed", error);
-  //       alert("Failed to upload TDS document.");
-  //     } finally {
-  //       setIsUploading(false);
-  //       if (fileInputRef.current) fileInputRef.current.value = '';
-  //     }
-  //   }
-  // };
-
-  const downloadCSV = async () => {
-    try {
-      setIsExporting(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const headers = "DSA ID,Name,PAN,Q1,Q2,Q3\n";
-      const rows = records.map(r => `${r.adv_id},${r.name},${r.pan},${r.q1},${r.q2},${r.q3}`).join("\n");
-      const blob = new Blob([headers + rows], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `TDS_Report_${new Date().toISOString().split('T')[0]}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode?.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Export failed", error);
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  // --- NEW DOWNLOAD HANDLER FOR INDIVIDUAL PDF ---
   const handleDownloadPdf = async (url: string, fileName: string) => {
     try {
       const response = await fetch(url);
@@ -132,164 +102,184 @@ export default function TDSManagement() {
       link.parentNode?.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      window.open(url, '_blank'); // Fallback if fetch is blocked
-    }
-  };
-
-  const deleteRecord = (id: number) => {
-    if (confirm("Are you sure you want to delete this record?")) {
-      setRecords(records.filter(r => r.id !== id));
+      window.open(url, '_blank');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 lg:p-12 text-slate-900">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">TDS Download</h1>
-            <p className="text-slate-500 mt-1 sm:mt-2 text-sm sm:text-base">You can easily download your quarterly TDS documents and certificates.</p>
-          </div>
+    <div className="min-h-screen bg-[#F8F9FA] text-[#333] font-sans">
+      <main className="max-w-7xl mx-auto px-6 py-10">
+        <header className="mb-8">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <h1 className="text-2xl font-semibold text-slate-800 mb-1">Tax Deducted at Source (TDS)</h1>
+            <p className="text-sm text-slate-500 max-w-2xl">
+              Manage and download your quarterly certificates.
+            </p>
+          </motion.div>
+        </header>
+
+        {/* Stats Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+          {[
+            { label: 'Active Partners', value: records.length, icon: Building2, color: 'text-[#2076C7]', bg: 'bg-blue-50' },
+            { label: 'Total Deductions', value: `₹ ${totalDeductions}`, icon: Wallet, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          ].map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm"
+            >
+              <div className="flex items-center gap-4">
+                <div className={`p-2.5 ${stat.bg} ${stat.color} rounded-xl`}>
+                  <stat.icon size={20} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{stat.label}</p>
+                  <p className="text-lg font-semibold text-slate-800">{stat.value}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
-          <div className="relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search by DSA ID, Name or PAN..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-            />
-          </div>
-        </div>
+       
+        {/* Full-Width Records */}
+        <div className="space-y-6">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-slate-100">
+              <Loader2 className="w-8 h-8 animate-spin text-[#2076C7] mb-2" />
+              <p className="text-xs font-medium text-slate-400">Loading records...</p>
+            </div>
+          ) : paginatedRecords.length > 0 ? (
+            paginatedRecords.map((record, index) => (
+              <motion.div
+                key={record.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm group"
+              >
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8 pb-6 border-b border-slate-50">
+                  <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-[#2076C7]/5 group-hover:text-[#2076C7] transition-colors">
+                      <User size={28} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded bg-slate-100 text-[9px] font-bold text-slate-500 uppercase tracking-tight">
+                          DSA ID: {record.adv_id}
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[9px] font-bold uppercase tracking-tight">
+                          Active
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-800 leading-tight">{record.name}</h3>
+                      <p className="text-xs text-slate-400 font-medium tracking-tight">PAN: {record.pan}</p>
+                    </div>
+                  </div>
+                </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="px-6 py-4 text-sm font-semibold text-slate-600">DSA Details</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Quarter 1</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Quarter 2</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Quarter 3</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center">
-                      <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
-                    </td>
-                  </tr>
-                ) : paginatedRecords.length > 0 ? (
-                  paginatedRecords.map((record) => (
-                    <tr key={record.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <span className="font-mono text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded w-fit mb-1">
-                            {record.adv_id}
-                          </span>
-                          <p className="font-medium text-slate-800">{record.name}</p>
-                          <p className="text-xs text-slate-400">PAN: {record.pan}</p>
-                        </div>
-                      </td>
-
-                      {[1, 2, 3].map((q) => {
-                        const url = record[`q${q}_pdf_url` as keyof TDS] as string;
-                        return (
-                          <td key={q} className="px-6 py-4 text-center">
-                            {url ? (
-                              <div className="flex flex-col items-center gap-2">
-                                {/* Modified View Button to open Modal */}
-                                <button
-                                  onClick={() => setSelectedPdf(url)}
-                                  className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-50 px-2.5 py-1 rounded transition-colors"
-                                >
-                                  <FileText className="w-3.5 h-3.5" />
-                                  View Q{q}
-                                </button>
-                                
-                                {/* New Download Button */}
-                                <button
-                                  onClick={() => handleDownloadPdf(url, `TDS_${record.name}_Q${q}.pdf`)}
-                                  className="inline-flex items-center gap-1.5 text-slate-600 hover:text-slate-900 font-medium text-[10px] bg-slate-100 px-2 py-0.5 rounded transition-colors"
-                                >
-                                  <Download className="w-3 h-3" />
-                                  Download
-                                </button>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[1, 2, 3].map((q) => {
+                    const url = record[`q${q}_pdf_url` as keyof TDS] as string;
+                    const isAvailable = !!url;
+                    
+                    return (
+                      <div 
+                        key={q} 
+                        className={`p-6 rounded-[1.5rem] border transition-all flex flex-col justify-between min-h-[220px] ${
+                          isAvailable 
+                          ? 'bg-white border-slate-100 hover:border-[#2076C7]/20 shadow-sm' 
+                          : 'bg-slate-50 border-dashed border-slate-200 opacity-60'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex justify-between items-start mb-4">
+                            <div className={`p-3 rounded-xl ${isAvailable ? 'bg-blue-50 text-[#2076C7]' : 'bg-slate-100 text-slate-400'}`}>
+                              <FileText size={20} />
+                            </div>
+                            {isAvailable ? (
+                              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-bold uppercase tracking-tight">
+                                <CheckCircle2 size={10} /> AVAILABLE
                               </div>
                             ) : (
-                              <span className="text-gray-500 text-xs italic">Not Available</span>
+                              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 text-[9px] font-bold uppercase tracking-tight">
+                                <Clock size={10} /> NOT AVAILABLE
+                              </div>
                             )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic">
-                      No TDS records found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
-            <p className="text-xs text-slate-500">
-              Showing {totalRecords === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalRecords)} of {totalRecords} records
-            </p>
-            <div className="flex gap-2">
-              <button
-                disabled={currentPage === 1 || isLoading}
-                onClick={() => setCurrentPage(p => p - 1)}
-                className="p-1 rounded border bg-white disabled:opacity-50"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="text-sm font-medium px-2 py-1">Page {currentPage} of {totalPages}</span>
-              <button
-                disabled={currentPage === totalPages || isLoading}
-                onClick={() => setCurrentPage(p => p + 1)}
-                className="p-1 rounded border bg-white disabled:opacity-50"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
+                          </div>
+                          <h4 className="text-base font-semibold text-slate-800">Quarter 0{q}</h4>
+                          <p className="text-[11px] text-gray-500 font-medium">TDS Certificate Form 16A</p>
+                        </div>
+                        
+                        {isAvailable ? (
+                          <div className="grid grid-cols-2 gap-2 mt-6">
+                            <button
+                              onClick={() => setSelectedPdf(url)}
+                              className="py-2.5 rounded-xl bg-slate-100 text-slate-600 text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-slate-200 transition-all uppercase tracking-tight"
+                            >
+                              <ExternalLink size={13} /> Preview
+                            </button>
+                            <button
+                              onClick={() => handleDownloadPdf(url, `TDS_${record.name}_Q${q}.pdf`)}
+                              className="py-2.5 rounded-xl bg-[#2076C7] text-white text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-[#1a62a5] transition-all uppercase tracking-tight shadow-sm"
+                            >
+                              <Download size={13} /> Download
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="mt-6 py-2.5 text-center border-t border-slate-100">
+                            <span className="text-[15px] font-medium text-gray-500 italic">No Document uploaded</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="text-center py-32 bg-white rounded-3xl border border-dashed border-slate-200">
+              <p className="text-sm text-slate-400">No matching records found.</p>
             </div>
-          </div>
+          )}
         </div>
-      </div>
 
-      {/* --- PDF VIEW MODAL --- */}
-      {selectedPdf && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="relative bg-white w-full max-w-5xl h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-            <div className="p-4 border-b flex justify-between items-center bg-white">
-              <h3 className="font-bold text-slate-700">TDS Document Preview</h3>
-              <button 
-                onClick={() => setSelectedPdf(null)}
-                className="p-2 hover:bg-slate-100 rounded-full transition-colors"
-              >
-                <X className="w-6 h-6 text-slate-500" />
-              </button>
-            </div>
-            <div className="flex-1 bg-slate-100">
-              <iframe 
-                src={`${selectedPdf}#toolbar=0`} 
-                className="w-full h-full border-none"
-                title="TDS Preview"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      </main>
+
+      {/* PDF Modal */}
+      <AnimatePresence>
+        {selectedPdf && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative bg-white w-full max-w-5xl h-[85vh] rounded-[2rem] shadow-2xl flex flex-col overflow-hidden">
+              <div className="px-6 py-4 border-b flex justify-between items-center bg-white">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-50 text-[#2076C7] rounded-lg">
+                    <FileText size={18} />
+                  </div>
+                  <h3 className="font-semibold text-base text-slate-800 tracking-tight">Document Preview</h3>
+                </div>
+                <button onClick={() => setSelectedPdf(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                  <X size={20} className="text-slate-400" />
+                </button>
+              </div>
+              <div className="flex-1 bg-slate-50 p-6">
+                <iframe src={`${selectedPdf}#toolbar=0`} className="w-full h-full rounded-xl border border-slate-200 bg-white" title="TDS Preview" />
+              </div>
+              <div className="px-6 py-4 bg-white border-t flex justify-end gap-3">
+                <button 
+                   onClick={() => handleDownloadPdf(selectedPdf, 'TDS_Document.pdf')}
+                   className="px-6 py-2.5 bg-[#2076C7] text-white rounded-xl font-bold text-[11px] uppercase tracking-tight hover:bg-[#1a62a5] transition-all shadow-md shadow-blue-500/10"
+                >
+                  Download Certificate
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
