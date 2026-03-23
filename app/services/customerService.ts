@@ -147,6 +147,26 @@ export interface WishlistResponse {
     count?: number;
 }
 
+export interface SupportTicket {
+    id: string;
+    ticket_id: string;
+    category: string;
+    product_type: string;
+    reference_id?: string;
+    issue_type: string;
+    severity: string;
+    subject: string;
+    description: string;
+    status: 'Open' | 'Closed' | 'In Progress' | 'Resolved';
+    created_at: string;
+    updated_at: string;
+}
+
+export interface SupportCategory {
+    id: number;
+    category_name: string;
+}
+
 // ==================== CUSTOMER SERVICE ====================
 
 const CustomerService = {
@@ -359,12 +379,46 @@ const CustomerService = {
         return response.data;
     },
 
-    // ==================== LOGOUT ====================
-    logout: async () => {
-        const response = await api.post("/api/unlisted/user/logout");
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('token');
-        }
+      createTicket: async (ticketData: {
+        category: string;
+        product_type: string;
+        reference_id: string;
+        issue_type: string;
+        severity: string;
+        subject: string;
+        description: string;
+    }) => {
+        const response = await api.post("/api/customer/create", ticketData);
+        return response.data;
+    },
+
+    // 2) GET: /api/customer/list
+    getTicketList: async () => {
+        const response = await api.get("/api/customer/list");
+        return response.data;
+    },
+
+    // 3) GET: /api/customer/categories
+    getSupportCategories: async () => {
+        const response = await api.get("/api/customer/categories");
+        return response.data;
+    },
+
+    // 4) POST : /api/customer/reply
+    replyToTicket: async (replyData: { ticket_id: string; message: string }) => {
+        const response = await api.post("/api/customer/reply", replyData);
+        return response.data;
+    },
+
+    // 5) POST : /api/customer/close
+    closeTicket: async (ticket_id: string) => {
+        const response = await api.post("/api/customer/close", { ticket_id });
+        return response.data;
+    },
+
+    // 6) GET : /api/customer/:ticket_id
+    getTicketDetails: async (ticket_id: string) => {
+        const response = await api.get(`/api/customer/${ticket_id}`);
         return response.data;
     },
 

@@ -1,583 +1,604 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import customerService from '../../services/customerService';
+import { 
+    Plus, MessageSquare, Clock, ChevronRight, Send, X, 
+    AlertCircle, User, Headset, Search, Eye, CheckCircle2,
+    ArrowLeft, MoreVertical, ShieldCheck, Paperclip, Smile
+} from 'lucide-react';
 
-// Ticket Categories
-const ticketCategories = [
-    { id: 'mutual-funds', name: 'Mutual Funds', icon: '📈', color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'pms', name: 'PMS', icon: '🏦', color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'aif', name: 'AIF', icon: '🏛️', color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'fixed-income', name: 'Fixed Income', icon: '💰', color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'nps', name: 'NPS', icon: '👴', color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'real-estate', name: 'Real Estate', icon: '🏠', color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'unlisted', name: 'Unlisted Shares', icon: '📄', color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'reports', name: 'Reports & Tax', icon: '📊', color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'kyc', name: 'KYC & Account', icon: '🔐', color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'technical', name: 'Technical', icon: '⚙️', color: 'from-[#2076C7] to-[#1CADA3]' },
+/* ---------------- CATEGORY MAPPING ---------------- */
+const PRODUCT_OPTIONS = [
+    "Unlisted Shares", "Mutual Funds", "Bonds & Fixed Income", 
+    "Investment Issue", "Insurance", "Technical Support"
 ];
 
-// FAQ Data - Keeping as reference content since FAQs are static content
-const faqCategories = [
-    {
-        category: 'Mutual Funds',
-        icon: '📈',
-        questions: [
-            { q: 'How do I start a SIP?', a: 'You can start a SIP by visiting the Mutual Funds section, selecting a fund, and clicking on "Start SIP". Minimum SIP amount is ₹500.' },
-            { q: 'How to redeem mutual funds?', a: 'Go to Portfolio → Mutual Funds → Select Fund → Redeem. Redemption typically takes 2-3 business days.' },
-            { q: 'What is exit load?', a: 'Exit load is a fee charged if you redeem before a certain period. Usually 1% if redeemed within 1 year for equity funds.' },
-            { q: 'Tax on capital gains?', a: 'LTCG above ₹1 lakh is taxed at 10%. STCG is taxed at 15%. Debt funds are taxed as per income slab.' },
-        ]
-    },
-    {
-        category: 'PMS/AIF',
-        icon: '🏦',
-        questions: [
-            { q: 'Minimum investment in PMS?', a: 'Minimum investment for PMS is typically ₹50 lakhs. AIF requires minimum ₹1 crore.' },
-            { q: 'What is the lock-in period?', a: 'PMS usually has no lock-in, but AIF typically has 3-5 years lock-in period.' },
-            { q: 'How are PMS returns taxed?', a: 'PMS is treated as business income or capital gains depending on structure. Consult your RM for details.' },
-        ]
-    },
-    {
-        category: 'Bonds/NCD',
-        icon: '💰',
-        questions: [
-            { q: 'What is coupon rate?', a: 'Coupon rate is the annual interest rate paid by the bond issuer to the bondholder.' },
-            { q: 'What is YTM?', a: 'Yield to Maturity (YTM) is the total return anticipated on a bond if held until it matures.' },
-            { q: 'What if issuer defaults?', a: 'In case of default, you may lose principal. Always check credit rating before investing.' },
-        ]
-    },
-    {
-        category: 'NPS',
-        icon: '👴',
-        questions: [
-            { q: 'Tax benefits in NPS?', a: 'Additional deduction of ₹50,000 under Section 80CCD(1B) over and above ₹1.5L 80C limit.' },
-            { q: 'Partial withdrawal rules?', a: 'Partial withdrawal allowed after 3 years, up to 25% of contributions, for specific purposes.' },
-        ]
-    },
-    {
-        category: 'Real Estate',
-        icon: '🏠',
-        questions: [
-            { q: 'What is rental yield?', a: 'Rental yield is annual rental income divided by property value. Typically 2-4% in India.' },
-            { q: 'Stamp duty charges?', a: 'Stamp duty varies by state, typically 5-7% of property value.' },
-        ]
-    },
-    {
-        category: 'Unlisted Shares',
-        icon: '📄',
-        questions: [
-            { q: 'What is lock-in period?', a: 'Lock-in period varies by company, typically 1-3 years post investment or IPO.' },
-            { q: 'How is valuation done?', a: 'Valuation based on last funding round, financial performance, and market conditions.' },
-            { q: 'Liquidity risk?', a: 'Unlisted shares are illiquid. Exit may take 12-36 months. High risk - invest only if long-term horizon.' },
-        ]
-    }
+const initialFilters = [
+    { id: 'all', name: 'All Tickets', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'Open', name: 'Open Issues', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'Closed', name: 'Resolved', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
 ];
-
-// Empty tickets array - No dummy data
-const recentTickets: any[] = [];
 
 export default function HelpSupport() {
-    const [activeTab, setActiveTab] = useState('dashboard');
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [showTicketForm, setShowTicketForm] = useState(false);
+    const [view, setView] = useState<'list' | 'create' | 'detail'>('list');
+    const [tickets, setTickets] = useState<any[]>([]);
+    const [apiCategories, setApiCategories] = useState<any[]>([]);
+    const [selectedTicket, setSelectedTicket] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
+    
+    const [selectedFilter, setSelectedFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
-    const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
-    const [ticketForm, setTicketForm] = useState({
-        category: '',
-        subject: '',
-        description: '',
-        priority: 'Medium',
-        attachment: null
+    const [filterTabs, setFilterTabs] = useState(initialFilters);
+
+    const [replyMessage, setReplyMessage] = useState('');
+    const chatEndRef = useRef<HTMLDivElement>(null);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const [formData, setFormData] = useState({
+        category: '', product_type: '', reference_id: '',
+        issue_type: 'General', severity: 'Medium', subject: '', description: ''
     });
 
-    // Filter FAQs based on search
-    const filteredFaqs = faqCategories.map(cat => ({
-        ...cat,
-        questions: cat.questions.filter(q => 
-            q.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            q.a.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-    })).filter(cat => cat.questions.length > 0);
+    useEffect(() => {
+        loadInitialData();
+    }, []);
 
-    const getStatusColor = (status: string) => {
-        switch(status) {
-            case 'Resolved': return 'bg-green-100 text-green-600';
-            case 'In Progress': return 'bg-blue-100 text-blue-600';
-            case 'Open': return 'bg-yellow-100 text-yellow-600';
-            default: return 'bg-gray-100 text-gray-600';
+    useEffect(() => {
+        if (view === 'detail') {
+            scrollToBottom();
+        }
+    }, [selectedTicket, view]);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const loadInitialData = async () => {
+        setLoading(true);
+        try {
+            const [ticketRes, catRes] = await Promise.all([
+                customerService.getTicketList(),
+                customerService.getSupportCategories()
+            ]);
+            const ticketData = ticketRes.data || [];
+            setTickets(ticketData);
+            setApiCategories(catRes.data || []);
+            updateTabCounts(ticketData);
+        } catch (error) {
+            console.error('Fetch error:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const getPriorityColor = (priority: string) => {
-        switch(priority) {
-            case 'High': return 'bg-red-100 text-red-600';
-            case 'Medium': return 'bg-yellow-100 text-yellow-600';
-            case 'Low': return 'bg-green-100 text-green-600';
-            default: return 'bg-gray-100 text-gray-600';
-        }
+    const updateTabCounts = (items: any[]) => {
+        setFilterTabs(prev => prev.map(tab => ({
+            ...tab,
+            count: tab.id === 'all' ? items.length : items.filter(t => t.status === tab.id).length
+        })));
     };
+
+    const handleViewDetails = async (tid: string) => {
+        setLoading(true);
+        try {
+            const res = await customerService.getTicketDetails(tid);
+            if (res.status) {
+                setSelectedTicket(res);
+                setView('detail');
+            }
+        } catch (err) { alert("Error loading ticket details"); }
+        finally { setLoading(false); }
+    };
+
+    const handleCreateTicket = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setActionLoading(true);
+        try {
+            const res = await customerService.createTicket({
+                ...formData,
+                product_type: formData.product_type || formData.category,
+                reference_id: formData.reference_id || "N/A"
+            });
+            if (res.status) {
+                setView('list');
+                loadInitialData();
+                setFormData({ category: '', product_type: '', reference_id: '', issue_type: 'General', severity: 'Medium', subject: '', description: '' });
+            }
+        } catch (err) { alert("Failed to create ticket"); }
+        finally { setActionLoading(false); }
+    };
+
+    const handleSendReply = async () => {
+        if (!replyMessage.trim()) return;
+        setActionLoading(true);
+        try {
+            const res = await customerService.replyToTicket({
+                ticket_id: selectedTicket.ticket.ticket_id,
+                message: replyMessage
+            });
+            if (res.success) {
+                setReplyMessage('');
+                handleViewDetails(selectedTicket.ticket.ticket_id);
+            }
+        } catch (err) { alert("Failed to send message"); }
+        finally { setActionLoading(false); }
+    };
+
+    const handleResolveTicket = async (tid: string) => {
+        const confirmResolve = window.confirm("Is your issue fully resolved? Clicking OK will finalize and close this support ticket.");
+        if (!confirmResolve) return;
+        
+        try {
+            await customerService.closeTicket(tid);
+            setView('list');
+            loadInitialData();
+        } catch (err) { alert("Error resolving ticket"); }
+    };
+
+    const filteredTickets = tickets.filter(t => {
+        const matchesFilter = selectedFilter === 'all' || t.status === selectedFilter;
+        const matchesSearch = t.subject.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                              t.ticket_id.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesFilter && matchesSearch;
+    });
+
+    if (loading && view === 'list') {
+        return (
+            <div className="flex-1 p-4 sm:p-6 bg-[#f8fafc] min-h-screen flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-[#2076C7] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex-1 p-4 sm:p-6 bg-[#f8fafc] min-h-screen">
-            {/* Header Section */}
+            
+            {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white"
+                className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white shadow-lg"
             >
-                <div className="flex items-center justify-between">
+                <div className="flex justify-between items-center mb-4">
                     <div>
-                        <h2 className="text-xl sm:text-2xl font-bold mb-2">
-                            🆘 Help & Support
+                        <h2 className="text-2xl font-bold flex items-center gap-2">
+                            <ShieldCheck className="opacity-80" /> Help & Support
                         </h2>
-                        <p className="text-sm sm:text-base opacity-90">
-                            We're here to help 24/7. Get support for all your investment needs.
-                        </p>
+                        <p className="text-sm opacity-80">Track your requests or get expert assistance</p>
                     </div>
-                    
-                    {/* Live Chat Status */}
-                    <div className="bg-white/20 px-4 py-2 rounded-xl flex items-center space-x-2">
-                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                        <span className="text-sm">Live Chat Online</span>
-                    </div>
+                    {view === 'list' && (
+                        <button 
+                            onClick={() => setView('create')}
+                            className="bg-white text-[#2076C7] hover:bg-gray-100 px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-md active:scale-95"
+                        >
+                            <Plus size={18} strokeWidth={3} /> Raise Ticket
+                        </button>
+                    )}
                 </div>
 
-                {/* Quick Action Buttons */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-                    <button 
-                        onClick={() => { setActiveTab('ticket'); setShowTicketForm(true); }}
-                        className="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center transition-colors"
-                    >
-                        <div className="text-xl mb-1">📩</div>
-                        <div className="text-xs font-medium">Raise Ticket</div>
-                    </button>
-                    <button className="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center transition-colors">
-                        <div className="text-xl mb-1">💬</div>
-                        <div className="text-xs font-medium">Live Chat</div>
-                    </button>
-                    <button className="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center transition-colors">
-                        <div className="text-xl mb-1">📞</div>
-                        <div className="text-xs font-medium">Request Callback</div>
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('faq')}
-                        className="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center transition-colors"
-                    >
-                        <div className="text-xl mb-1">📄</div>
-                        <div className="text-xs font-medium">FAQs</div>
-                    </button>
-                </div>
-
-                {/* Search Bar */}
-                <div className="mt-4 relative">
-                    <input
-                        type="text"
-                        placeholder="Search help articles, FAQs, or ticket ID..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full px-4 py-2 pl-10 rounded-xl bg-white/20 text-white placeholder-white/70 border border-white/30 focus:outline-none focus:border-white"
-                    />
-                    <svg className="w-4 h-4 absolute left-3 top-3 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
+                {view === 'list' && (
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Search by Ticket ID or Subject..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full px-4 py-2 pl-10 rounded-xl bg-white/20 text-white placeholder-white/60 border border-white/20 focus:outline-none focus:bg-white/30 transition-all"
+                        />
+                    </div>
+                )}
             </motion.div>
 
-            {/* Navigation Tabs */}
-            <div className="mb-6 overflow-x-auto scrollbar-hide">
-                <div className="flex space-x-2 pb-2">
-                    {['dashboard', 'my-tickets', 'faq', 'documents', 'kyc-help'].map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all capitalize ${
-                                activeTab === tab
-                                    ? 'bg-[#2076C7] text-white shadow-md'
-                                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
-                            }`}
-                        >
-                            {tab.replace('-', ' ')}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Main Content Area */}
             <AnimatePresence mode="wait">
-                {/* Dashboard View */}
-                {activeTab === 'dashboard' && (
-                    <motion.div
-                        key="dashboard"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="space-y-6"
-                    >
-                        {/* Category Grid */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                            {ticketCategories.map((cat) => (
-                                <motion.button
-                                    key={cat.id}
-                                    whileHover={{ scale: 1.02 }}
-                                    className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center hover:shadow-md transition-all"
-                                    onClick={() => {
-                                        setActiveTab('ticket');
-                                        setTicketForm({...ticketForm, category: cat.id});
-                                        setShowTicketForm(true);
-                                    }}
+                {/* VIEW 1: DASHBOARD TABLE */}
+                {view === 'list' && (
+                    <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                        {/* Tabs */}
+                        <div className="flex space-x-2 overflow-x-auto pb-6 scrollbar-hide">
+                            {filterTabs.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setSelectedFilter(tab.id)}
+                                    className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center space-x-2 transition-all ${
+                                        selectedFilter === tab.id
+                                            ? `bg-gradient-to-r ${tab.color} text-white`
+                                            : 'bg-white text-gray-600 border border-gray-100'
+                                    }`}
                                 >
-                                    <div className={`w-12 h-12 mx-auto mb-2 rounded-xl bg-linear-to-r ${cat.color} flex items-center justify-center text-white text-xl`}>
-                                        {cat.icon}
-                                    </div>
-                                    <div className="text-sm font-medium text-gray-800">{cat.name}</div>
-                                </motion.button>
+                                    <span>{tab.name}</span>
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/20">
+                                        {tab.count}
+                                    </span>
+                                </button>
                             ))}
                         </div>
 
-                        {/* Recent Tickets - Empty State */}
-                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-800">Recent Tickets</h3>
+                        {/* Table */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b border-gray-100 bg-gray-50/50">
+                                            <th className="px-6 py-4 text-left text-[11px] text-gray-400 uppercase tracking-widest font-black">Conversation</th>
+                                            <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase tracking-widest font-black">Product</th>
+                                            <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase tracking-widest font-black">Status</th>
+                                            <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase tracking-widest font-black">Last Update</th>
+                                            <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase tracking-widest font-black">Action</th>
+                                          </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        <AnimatePresence>
+                                            {filteredTickets.map(ticket => (
+                                                <motion.tr 
+                                                    key={ticket.id} 
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    exit={{ opacity: 0 }}
+                                                    className="hover:bg-gray-50 transition-colors group"
+                                                >
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex items-center space-x-4">
+                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold transition-transform group-hover:scale-110 ${ticket.status === 'Open' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-400'}`}>
+                                                                <MessageSquare size={18} />
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-gray-800">{ticket.subject}</div>
+                                                                <div className="text-[11px] text-gray-400">ID: {ticket.ticket_id}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center">
+                                                        <span className="text-[11px] font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-lg">
+                                                            {ticket.category}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center">
+                                                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                                            ticket.status === 'Open' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'
+                                                        }`}>
+                                                            {ticket.status}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center text-xs text-gray-400">
+                                                        {new Date(ticket.updated_at).toLocaleDateString()}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center">
+                                                        <button 
+                                                            onClick={() => handleViewDetails(ticket.ticket_id)}
+                                                            className="px-4 py-2 bg-[#2076C7] text-white rounded-xl text-xs font-bold hover:shadow-lg transition-all active:scale-95 flex items-center gap-2 mx-auto"
+                                                        >
+                                                            View Chat <Eye size={14} />
+                                                        </button>
+                                                    </td>
+                                                </motion.tr>
+                                            ))}
+                                        </AnimatePresence>
+                                    </tbody>
+                                </table>
+
+                                {filteredTickets.length === 0 && (
+                                    <div className="text-center py-16 text-gray-400">
+                                        No support tickets found
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* VIEW 2: CREATE TICKET MODAL */}
+                {view === 'create' && (
+                    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                        <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                            <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-6 text-white rounded-t-3xl flex justify-between items-center sticky top-0">
+                                <div className="flex items-center gap-3">
+                                    <MessageSquare size={24} />
+                                    <h3 className="text-xl font-bold">Raise Support Ticket</h3>
+                                </div>
                                 <button 
-                                    onClick={() => setActiveTab('my-tickets')}
-                                    className="text-sm text-[#2076C7] hover:underline"
+                                    onClick={() => setView('list')} 
+                                    className="p-2 hover:bg-white/20 rounded-xl transition-colors"
                                 >
-                                    View All
+                                    <X size={20} />
                                 </button>
                             </div>
                             
-                            {/* Empty State */}
-                            <div className="text-center py-8">
-                                <div className="w-16 h-16 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <span className="text-2xl">🎫</span>
-                                </div>
-                                <h4 className="text-sm font-medium text-gray-800 mb-1">No tickets yet</h4>
-                                <p className="text-xs text-gray-400 mb-3">Your support tickets will appear here</p>
-                                <button 
-                                    onClick={() => { setActiveTab('ticket'); setShowTicketForm(true); }}
-                                    className="px-4 py-2 bg-[#2076C7] text-white rounded-xl text-xs font-medium hover:bg-[#1a5e9e]"
-                                >
-                                    Raise a Ticket
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
+                            <div className="p-8 space-y-6">
+                                <form onSubmit={handleCreateTicket} className="space-y-6">
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700 mb-2 block">
+                                                Investment Area
+                                            </label>
+                                            <select 
+                                                required 
+                                                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all appearance-none"
+                                                value={formData.category} 
+                                                onChange={(e) => setFormData({...formData, category: e.target.value, product_type: e.target.value})}
+                                                style={{
+                                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                                                    backgroundRepeat: 'no-repeat',
+                                                    backgroundPosition: 'right 1rem center',
+                                                    backgroundSize: '1rem'
+                                                }}
+                                            >
+                                                <option value="">Select Category</option>
+                                                {PRODUCT_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700 mb-2 block">
+                                                Priority
+                                            </label>
+                                            <select 
+                                                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all appearance-none"
+                                                value={formData.severity} 
+                                                onChange={(e) => setFormData({...formData, severity: e.target.value})}
+                                                style={{
+                                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                                                    backgroundRepeat: 'no-repeat',
+                                                    backgroundPosition: 'right 1rem center',
+                                                    backgroundSize: '1rem'
+                                                }}
+                                            >
+                                                <option value="Low">Low</option>
+                                                <option value="Medium">Medium</option>
+                                                <option value="High">High</option>
+                                            </select>
+                                        </div>
+                                    </div>
 
-                {/* Raise Ticket Form */}
-                {activeTab === 'ticket' && showTicketForm && (
-                    <motion.div
-                        key="ticket-form"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
-                    >
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-semibold text-gray-800">📩 Raise a Support Ticket</h3>
-                            <button 
-                                onClick={() => setShowTicketForm(false)}
-                                className="text-gray-400 hover:text-gray-600"
-                            >
-                                ✕
-                            </button>
-                        </div>
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-700 mb-2 block">
+                                            Reference ID <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g., Investment ID, Policy Number"
+                                            className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                                            value={formData.reference_id}
+                                            onChange={(e) => setFormData({...formData, reference_id: e.target.value})}
+                                        />
+                                    </div>
 
-                        <div className="space-y-4">
-                            {/* Category Selection */}
-                            <div>
-                                <label className="text-sm font-medium text-gray-700 mb-2 block">Category *</label>
-                                <select 
-                                    className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-[#2076C7] focus:ring-1 focus:ring-[#2076C7] outline-none"
-                                    value={ticketForm.category}
-                                    onChange={(e) => setTicketForm({...ticketForm, category: e.target.value})}
-                                >
-                                    <option value="">Select Category</option>
-                                    {ticketCategories.map(cat => (
-                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                    ))}
-                                </select>
-                            </div>
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-700 mb-2 block">
+                                            Subject
+                                        </label>
+                                        <input
+                                            required
+                                            type="text"
+                                            placeholder="What is the issue?"
+                                            className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                                            value={formData.subject}
+                                            onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                                        />
+                                    </div>
 
-                            {/* Subject */}
-                            <div>
-                                <label className="text-sm font-medium text-gray-700 mb-2 block">Subject *</label>
-                                <input 
-                                    type="text"
-                                    className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-[#2076C7] focus:ring-1 focus:ring-[#2076C7] outline-none"
-                                    placeholder="Brief summary of your issue"
-                                    value={ticketForm.subject}
-                                    onChange={(e) => setTicketForm({...ticketForm, subject: e.target.value})}
-                                />
-                            </div>
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-700 mb-2 block">
+                                            Detailed Description
+                                        </label>
+                                        <textarea
+                                            required
+                                            rows={4}
+                                            placeholder="Describe your concern in detail..."
+                                            className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all resize-none"
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                        />
+                                    </div>
 
-                            {/* Description */}
-                            <div>
-                                <label className="text-sm font-medium text-gray-700 mb-2 block">Description *</label>
-                                <textarea 
-                                    rows={4}
-                                    className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-[#2076C7] focus:ring-1 focus:ring-[#2076C7] outline-none"
-                                    placeholder="Describe your issue in detail"
-                                    value={ticketForm.description}
-                                    onChange={(e) => setTicketForm({...ticketForm, description: e.target.value})}
-                                />
-                            </div>
+                                    <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
+                                        <div className="flex items-start gap-3">
+                                            <AlertCircle size={18} className="text-[#2076C7] mt-0.5 shrink-0" />
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-800">Support Response Time</p>
+                                                <p className="text-xs text-gray-600 mt-1">Our support team typically responds within 24 hours. Please provide as much detail as possible to help us resolve your issue faster.</p>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                            {/* Priority */}
-                            <div>
-                                <label className="text-sm font-medium text-gray-700 mb-2 block">Priority</label>
-                                <div className="flex space-x-3">
-                                    {['Low', 'Medium', 'High'].map(priority => (
+                                    <div className="flex gap-4 pt-4">
                                         <button
-                                            key={priority}
-                                            onClick={() => setTicketForm({...ticketForm, priority})}
-                                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                                                ticketForm.priority === priority
-                                                    ? priority === 'High' ? 'bg-red-500 text-white' :
-                                                      priority === 'Medium' ? 'bg-yellow-500 text-white' :
-                                                      'bg-green-500 text-white'
-                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                            }`}
+                                            type="button"
+                                            onClick={() => setView('list')}
+                                            className="flex-1 py-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
                                         >
-                                            {priority}
+                                            Cancel
                                         </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Attachment */}
-                            <div>
-                                <label className="text-sm font-medium text-gray-700 mb-2 block">Attachment (Optional)</label>
-                                <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center">
-                                    <input type="file" className="hidden" id="file-upload" />
-                                    <label htmlFor="file-upload" className="cursor-pointer">
-                                        <svg className="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                        </svg>
-                                        <span className="text-sm text-gray-500">Click to upload or drag and drop</span>
-                                        <span className="text-xs text-gray-400 block mt-1">PDF, JPG, PNG up to 10MB</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            {/* Submit Button */}
-                            <div className="pt-4">
-                                <button className="w-full bg-[#2076C7] text-white py-3 rounded-xl font-medium hover:bg-[#1a5e9e] transition-colors">
-                                    Submit Ticket
-                                </button>
-                                <p className="text-xs text-gray-400 text-center mt-2">
-                                    Our team will respond within 24-48 hours
-                                </p>
+                                        <button
+                                            type="submit"
+                                            disabled={actionLoading || !formData.category || !formData.subject || !formData.description}
+                                            className="flex-1 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
+                                        >
+                                            {actionLoading ? (
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <Send size={18} />
+                                            )}
+                                            Submit Support Request
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 )}
 
-                {/* My Tickets View - Empty State */}
-                {activeTab === 'my-tickets' && (
-                    <motion.div
-                        key="my-tickets"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+                {/* VIEW 3: IMPROVED CHAT VIEW */}
+                {view === 'detail' && selectedTicket && (
+                    <motion.div 
+                        key="detail" 
+                        initial={{ opacity: 0, y: 20 }} 
+                        animate={{ opacity: 1, y: 0 }} 
+                        className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden flex flex-col h-[calc(100vh-200px)]"
                     >
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">My Support Tickets</h3>
-                        
-                        {/* Empty State */}
-                        <div className="text-center py-12">
-                            <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                                <span className="text-3xl">🎫</span>
-                            </div>
-                            <h4 className="text-base font-medium text-gray-800 mb-2">No tickets found</h4>
-                            <p className="text-sm text-gray-400 mb-4 max-w-sm mx-auto">
-                                You haven't raised any support tickets yet. Create your first ticket and we'll get back to you shortly.
-                            </p>
-                            <button 
-                                onClick={() => { setActiveTab('ticket'); setShowTicketForm(true); }}
-                                className="px-6 py-2 bg-[#2076C7] text-white rounded-xl text-sm font-medium hover:bg-[#1a5e9e]"
-                            >
-                                Raise a Ticket
-                            </button>
-                        </div>
-
-                        {/* SLA Info */}
-                        <div className="mt-6 bg-blue-50 rounded-xl p-4">
-                            <div className="flex items-start space-x-3">
-                                <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                        {/* Enhanced Chat Header */}
+                        <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] px-6 py-4 flex justify-between items-center">
+                            <div className="flex items-center gap-4">
+                                <button 
+                                    onClick={() => setView('list')}
+                                    className="p-2 hover:bg-white/20 rounded-xl transition-all text-white"
+                                    title="Back to tickets"
+                                >
+                                    <ArrowLeft size={20} />
+                                </button>
                                 <div>
-                                    <h4 className="text-sm font-semibold text-blue-800">SLA Commitment</h4>
-                                    <p className="text-xs text-blue-600 mt-1">
-                                        High priority: 24 hrs | Medium: 48 hrs | Low: 72 hrs
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-[10px] font-black text-white/80 uppercase tracking-[0.2em]">
+                                            Ticket #{selectedTicket.ticket.ticket_id}
+                                        </span>
+                                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                            selectedTicket.ticket.status === 'Open' 
+                                                ? 'bg-amber-400/20 text-amber-100 border border-amber-400/30' 
+                                                : 'bg-emerald-400/20 text-emerald-100 border border-emerald-400/30'
+                                        }`}>
+                                            {selectedTicket.ticket.status}
+                                        </span>
+                                    </div>
+                                    <h3 className="text-white font-bold text-lg">{selectedTicket.ticket.subject}</h3>
+                                    <p className="text-white/70 text-xs mt-1">
+                                        Category: {selectedTicket.ticket.category} • Created: {new Date(selectedTicket.ticket.created_at).toLocaleDateString()}
                                     </p>
                                 </div>
                             </div>
+                            
+                            {selectedTicket.ticket.status === 'Open' && (
+                                <button 
+                                    onClick={() => handleResolveTicket(selectedTicket.ticket.ticket_id)}
+                                    className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all backdrop-blur-sm border border-white/30"
+                                >
+                                    Mark as Resolved
+                                </button>
+                            )}
                         </div>
-                    </motion.div>
-                )}
 
-                {/* FAQs View - Keeping static content */}
-                {activeTab === 'faq' && (
-                    <motion.div
-                        key="faq"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="space-y-6"
-                    >
-                        {filteredFaqs.map((category) => (
-                            <div key={category.category} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                                <div className="flex items-center space-x-2 mb-4">
-                                    <span className="text-2xl">{category.icon}</span>
-                                    <h3 className="text-lg font-semibold text-gray-800">{category.category}</h3>
-                                </div>
-                                <div className="space-y-3">
-                                    {category.questions.map((item, idx) => (
-                                        <div key={idx} className="border border-gray-100 rounded-xl overflow-hidden">
-                                            <button
-                                                onClick={() => setExpandedFaq(expandedFaq === `${category.category}-${idx}` ? null : `${category.category}-${idx}`)}
-                                                className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50"
-                                            >
-                                                <span className="text-sm font-medium text-gray-800">{item.q}</span>
-                                                <svg className={`w-5 h-5 text-gray-400 transition-transform ${expandedFaq === `${category.category}-${idx}` ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </button>
-                                            <AnimatePresence>
-                                                {expandedFaq === `${category.category}-${idx}` && (
-                                                    <motion.div
-                                                        initial={{ height: 0 }}
-                                                        animate={{ height: 'auto' }}
-                                                        exit={{ height: 0 }}
-                                                        className="overflow-hidden"
-                                                    >
-                                                        <div className="px-4 pb-3 text-sm text-gray-600 bg-gray-50 pt-2">
-                                                            {item.a}
-                                                        </div>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
+                        {/* Messages Area - Improved Design */}
+                        <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50 to-white">
+                            <div className="space-y-4 max-w-4xl mx-auto">
+                                {/* Initial Issue Message */}
+                                <div className="flex gap-3 animate-in slide-in-from-bottom-2 duration-300">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center shadow-md flex-shrink-0">
+                                        <User size={18} className="text-white" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="bg-white rounded-2xl rounded-tl-none shadow-sm border border-gray-100 p-4 max-w-[80%]">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className="text-xs font-bold text-gray-900">You</span>
+                                                <span className="text-[10px] text-gray-400">
+                                                    {new Date(selectedTicket.ticket.created_at).toLocaleString()}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-gray-700 leading-relaxed">
+                                                {selectedTicket.ticket.description}
+                                            </p>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </motion.div>
-                )}
-
-                {/* Documents Section - Static content */}
-                {activeTab === 'documents' && (
-                    <motion.div
-                        key="documents"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
-                    >
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">📥 Download Documents</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {[
-                                'Portfolio Statement',
-                                'Capital Gains Statement',
-                                'Transaction History',
-                                'NPS Statement',
-                                'PMS Statement',
-                                'Tax Report',
-                                'Investment Certificate',
-                                'Annual Account Statement'
-                            ].map((doc) => (
-                                <button key={doc} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                    <div className="flex items-center space-x-3">
-                                        <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                        </svg>
-                                        <span className="text-sm font-medium text-gray-800">{doc}</span>
                                     </div>
-                                    <svg className="w-5 h-5 text-[#2076C7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                    </svg>
-                                </button>
-                            ))}
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* KYC Help - Static content */}
-                {activeTab === 'kyc-help' && (
-                    <motion.div
-                        key="kyc-help"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
-                    >
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">🔐 KYC & Account Help</h3>
-                        
-                        <div className="space-y-4">
-                            {/* KYC Status */}
-                            <div className="bg-gray-50 rounded-xl p-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <div className="text-sm font-medium text-gray-800">KYC Status</div>
-                                        <div className="text-xs text-gray-400">Not available</div>
-                                    </div>
-                                    <span className="px-3 py-1 bg-gray-300 text-white text-xs font-medium rounded-full">--</span>
                                 </div>
-                            </div>
 
-                            {/* Action Grid */}
-                            <div className="grid grid-cols-2 gap-3">
-                                {[
-                                    { name: 'Update PAN', icon: '🆔' },
-                                    { name: 'Update Bank', icon: '🏦' },
-                                    { name: 'Update Nominee', icon: '👥' },
-                                    { name: 'Update Address', icon: '📍' },
-                                    { name: 'Change Password', icon: '🔑' },
-                                    { name: 'Reset 2FA', icon: '📱' },
-                                ].map((action) => (
-                                    <button key={action.name} className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <span className="text-lg">{action.icon}</span>
-                                        <span className="text-sm font-medium text-gray-800">{action.name}</span>
-                                    </button>
+                                {/* Support Messages */}
+                                {selectedTicket.messages.map((msg: any, index: number) => (
+                                    <div 
+                                        key={msg.id} 
+                                        className={`flex gap-3 ${msg.sender_type === 'customer' ? '' : 'flex-row-reverse'} animate-in slide-in-from-bottom-2 duration-300`}
+                                        style={{ animationDelay: `${index * 100}ms` }}
+                                    >
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md flex-shrink-0 ${
+                                            msg.sender_type === 'customer' 
+                                                ? 'bg-gradient-to-br from-[#2076C7] to-[#1CADA3]' 
+                                                : 'bg-gradient-to-br from-emerald-500 to-teal-600'
+                                        }`}>
+                                            {msg.sender_type === 'customer' ? (
+                                                <User size={18} className="text-white" />
+                                            ) : (
+                                                <Headset size={18} className="text-white" />
+                                            )}
+                                        </div>
+                                        <div className={`flex-1 ${msg.sender_type === 'customer' ? '' : 'flex justify-end'}`}>
+                                            <div className={`rounded-2xl shadow-sm p-4 max-w-[80%] ${
+                                                msg.sender_type === 'customer' 
+                                                    ? 'bg-white border border-gray-100 rounded-tl-none' 
+                                                    : 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-tr-none'
+                                            }`}>
+                                                <div className={`flex items-center gap-2 mb-2 ${msg.sender_type === 'customer' ? '' : 'justify-end'}`}>
+                                                    <span className={`text-xs font-bold ${
+                                                        msg.sender_type === 'customer' ? 'text-gray-900' : 'text-white'
+                                                    }`}>
+                                                        {msg.sender_type === 'customer' ? 'You' : 'Support Team'}
+                                                    </span>
+                                                    <span className={`text-[10px] ${
+                                                        msg.sender_type === 'customer' ? 'text-gray-400' : 'text-white/70'
+                                                    }`}>
+                                                        {new Date(msg.created_at).toLocaleString()}
+                                                    </span>
+                                                </div>
+                                                <p className={`text-sm leading-relaxed ${
+                                                    msg.sender_type === 'customer' ? 'text-gray-700' : 'text-white'
+                                                }`}>
+                                                    {msg.message}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 ))}
+                                <div ref={messagesEndRef} />
                             </div>
+                        </div>
 
-                            {/* Document Upload */}
-                            <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
-                                <svg className="w-10 h-10 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                </svg>
-                                <p className="text-sm text-gray-600 mb-1">Upload KYC Document</p>
-                                <p className="text-xs text-gray-400">PAN Card, Aadhaar, Passport</p>
-                                <button className="mt-3 px-4 py-2 bg-[#2076C7] text-white rounded-xl text-xs font-medium hover:bg-[#1a5e9e]">
-                                    Choose File
-                                </button>
-                            </div>
+                        {/* Enhanced Reply Input */}
+                        <div className="border-t border-gray-200 bg-white p-4">
+                            {selectedTicket.ticket.status === 'Open' ? (
+                                <div className="max-w-4xl mx-auto">
+                                    <div className="flex gap-3 items-end">
+                                        <div className="flex-1 relative">
+                                            <textarea
+                                                rows={2}
+                                                placeholder="Type your message here..."
+                                                className="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-2xl outline-none text-gray-700 text-sm font-medium focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all resize-none"
+                                                value={replyMessage}
+                                                onChange={(e) => setReplyMessage(e.target.value)}
+                                                onKeyPress={(e) => {
+                                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                                        e.preventDefault();
+                                                        handleSendReply();
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                        <button
+                                            disabled={actionLoading || !replyMessage.trim()}
+                                            onClick={handleSendReply}
+                                            className="px-6 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-medium hover:opacity-90 disabled:opacity-50 transition-all flex items-center gap-2 shadow-md"
+                                        >
+                                            {actionLoading ? (
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <>
+                                                    <Send size={18} />
+                                                    <span className="hidden sm:inline">Send</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 mt-2 ml-1">
+                                        Press Enter to send, Shift + Enter for new line
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="text-center py-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200">
+                                    <CheckCircle2 size={20} className="text-emerald-500 mx-auto mb-2" />
+                                    <p className="text-sm text-gray-600 font-medium">This ticket has been resolved</p>
+                                    <p className="text-xs text-gray-400 mt-1">The conversation is now closed</p>
+                                </div>
+                            )}
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            {/* Request Callback Floating Button */}
-            <motion.button
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="fixed bottom-6 right-6 bg-[#2076C7] text-white p-4 rounded-full shadow-lg hover:bg-[#1a5e9e] transition-colors z-10"
-            >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-            </motion.button>
-
-            {/* Compliance Disclaimer */}
-            <div className="mt-2 text-center">
-                <p className="text-xs text-gray-400">
-                    By raising a ticket, you agree to our <span className="text-[#2076C7] cursor-pointer hover:underline">Terms of Service</span> and <span className="text-[#2076C7] cursor-pointer hover:underline">Privacy Policy</span>
-                </p>
-            </div>
         </div>
     );
 }
