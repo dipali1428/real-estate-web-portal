@@ -178,7 +178,7 @@ const CustomerService = {
 
     // ==================== PORTFOLIO ====================
     getPortfolio: async () => {
-        const response = await api.get("/api/unlisted/user/portfolio");
+        const response = await api.get("/api/customer/portfolio");
         return response.data;
     },
 
