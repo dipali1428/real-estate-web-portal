@@ -126,10 +126,19 @@ const downloadInvoice = (payoutId: string) => {
   const groupedRecords = payoutData.filter(item => item.payoutId === payoutId);
   if (groupedRecords.length === 0) return;
 
-  // VARIABLE FOR THE STAMP IMAGE URL
-  const stampUrl = "https://infinity-client-documents.s3.ap-south-1.amazonaws.com/Infinity-Arthvishva-Stamp.png";
-
   const baseRecord = groupedRecords[0];
+
+  // 1. CONSTRUCT THE FULL ADDRESS
+  const addressParts = [
+    userProfile?.address, 
+    userProfile?.city, 
+    userProfile?.state, 
+    userProfile?.pincode || userProfile?.zipCode
+  ];
+  
+  const fullAddress = addressParts
+    .filter(part => part && part.toString().trim() !== "")
+    .join(", ");
 
   const parseAmount = (val: any) => parseFloat(val?.toString().replace(/,/g, '') || '0');
   const totalGross = groupedRecords.reduce((acc, item) => acc + parseAmount(item.grossAmount), 0);
@@ -158,173 +167,89 @@ const downloadInvoice = (payoutId: string) => {
 <head>
 <title>Tax Invoice</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap');
-
 body{font-family: Arial, Helvetica, sans-serif; padding:20px; color:#333; background-color:#f5f5f5;}
 .invoice-container{
   width:900px; margin:auto; border: 1px solid #ddd; padding: 40px; background: #fff;
-  box-sizing: border-box; min-height: 1100px; position: relative; display: flex; flex-direction: column;
+  box-sizing: border-box; min-height: 1100px; display: flex; flex-direction: column;
 }
-.header-top {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
-}
-
-.company-logo {
-  height: 60px; 
-  width: auto;
-  object-fit: contain;
-}
-
-.header h1{margin:0; font-size:22px; text-transform: uppercase; color: #1e3a8a; letter-spacing: 1px;}
-.top-table{width:100%; font-size:12px; line-height:1.6; margin-bottom: 20px;}
-.meta{margin-bottom:20px; font-size:12px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+.header { text-align: center; margin-bottom: 20px; }
+.header h1{ margin:0; font-size:24px; text-transform: uppercase; color: #1e3a8a; letter-spacing: 2px; border-bottom: 2px solid #1e3a8a; display: inline-block; padding-bottom: 5px; }
+.meta-header { display: flex; justify-content: space-between; margin-bottom: 20px; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+.top-table{width:100%; font-size:12px; line-height:1.6; margin-bottom: 30px;}
 .main-table{width:100%; border-collapse:collapse; margin-top:10px; font-size:11px;}
 .main-table th{background:#f8fafc; border:1px solid #e2e8f0; padding:10px; text-align:left; color: #64748b;}
 .main-table td{border:1px solid #e2e8f0; padding:10px;}
-
-/* CLEAN SUMMARY TABLE STYLE */
 .bottom-table{width:100%; margin-top:30px;}
-.summary-table {
-  width: 320px; 
-  border-collapse: collapse; 
-  font-size: 13px;
-  border: 1px solid #e2e8f0;
-}
-.summary-table td {
-  padding: 10px 15px;
-  border-bottom: 1px solid #f1f5f9;
-}
-.summary-table .total-row {
-  background-color: #f8fafc;
-  font-weight: bold;
-  font-size: 15px;
-  color: #1e3a8a;
-  border-top: 2px solid #1e3a8a;
-}
+.summary-table { width: 320px; border-collapse: collapse; font-size: 13px; border: 1px solid #e2e8f0; }
+.summary-table td { padding: 10px 15px; border-bottom: 1px solid #f1f5f9; }
+.summary-table .total-row { background-color: #f8fafc; font-weight: bold; font-size: 15px; color: #1e3a8a; border-top: 2px solid #1e3a8a; }
 .tds-color { color: #ef4444; }
-
-.footer-section {
-  margin-top: auto; padding-top: 40px; border-top: 1px solid #eee;
-}
-
-.auth-container {
-  display: flex; justify-content: flex-end; position: relative; height: 150px;
-}
-
-.signature-box {
-  text-align: center; width: 250px; z-index: 2;
-}
-
-.signature-name {
-  font-family: 'Dancing Script', cursive; font-size: 26px; color: #1e3a8a; margin-bottom: 5px;
-}
-
-/* LARGE OVERLAPPING STAMP */
-.stamp-image {
-  position: absolute;
-  right: 120px; 
-  bottom: 10px;
-  width: 180px; 
-  height: auto;
-  opacity: 0.85; 
-  transform: rotate(-12deg); 
-  z-index: 1; 
-  mix-blend-mode: multiply; 
-  pointer-events: none;
-}
-
-.footer-note {
-  text-align: center; margin-top: 30px; font-size: 11px; color: #94a3b8;
-}
-
-@media print {
-  body { background: none; padding: 0; }
-  .invoice-container { border: none; margin: 0; width: 100%; }
-}
+.footer-section { margin-top: auto; padding-top: 40px; }
+.footer-note { text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #eee; padding-top: 20px; }
+@media print { body { background: none; padding: 0; } .invoice-container { border: none; margin: 0; width: 100%; } }
 </style>
 </head>
 <body>
 <div class="invoice-container">
-<div class="header-top">
-    <div class="logo-container">
-      <img src="/logo.png" alt="Company Logo" class="company-logo" />
-    </div>
     <div class="header"><h1>Tax Invoice</h1></div>
-</div>
-
-<table class="top-table">
-<tr>
-<td width="50%" style="vertical-align: top;">
-<span style="color: #64748b; font-weight: bold;">FROM:</span><br/>
-<strong style="font-size: 14px;">${userProfile?.name || 'Authorized Partner'}</strong><br/>
-${userProfile?.address || ''}<br/>
-${userProfile?.pan ? `PAN: ${userProfile.pan}` : ''}<br/>
-${userProfile?.gst ? `GSTIN: ${userProfile.gst}` : ''}
-</td>
-<td width="50%" style="vertical-align: top; text-align: right;">
-<span style="color: #64748b; font-weight: bold;">BILL TO:</span><br/>
-<strong style="font-size: 14px;">Infinity Arthvishva Advisory Private Limited</strong><br/>
-12th Floor, 1201, 7 Business Square, Shivaji Nagar, Pune, 411005<br/>
-GSTIN: 27AAICI0723K1ZJ | PAN: AAICI0723K
-</td>
-</tr>
-</table>
-
-<div class="meta">
-  <div style="display: flex; justify-content: space-between;">
-    <span><b>Invoice:</b> ${baseRecord.invoiceNumber}</span>
-    <span><b>Date:</b> ${baseRecord.invoiceDate}</span>
-    <span><b>Payout ID:</b> ${baseRecord.payoutId}</span>
-  </div>
-</div>
-
-<table class="main-table">
-<thead>
-<tr>
-<th>#</th><th>Lead ID</th><th>Client Name</th><th>Product</th><th>Ref No</th><th>Mode</th><th>Amount</th><th>Gross</th><th>TDS</th><th>GST</th><th>Net</th>
-</tr>
-</thead>
-<tbody>${rowsHtml}</tbody>
-</table>
-
-<!-- CLEAN SUMMARY TABLE ON LEFT -->
-<div class="bottom-table">
-  <table class="summary-table">
-    <tr>
-      <td>Subtotal</td>
-      <td align="right">₹ ${totalGross.toLocaleString('en-IN')}</td>
-    </tr>
-    <tr>
-      <td>GST</td>
-      <td align="right">₹ ${totalGst.toLocaleString('en-IN')}</td>
-    </tr>
-    <tr>
-      <td>TDS (deducted)</td>
-      <td align="right" class="tds-color">- ₹ ${totalTds.toLocaleString('en-IN')}</td>
-    </tr>
-    <tr class="total-row">
-      <td>TOTAL PAYABLE</td>
-      <td align="right">₹ ${totalNet.toLocaleString('en-IN')}</td>
-    </tr>
-  </table>
-</div>
-
-<div class="footer-section">
-  <div class="auth-container">
-    <!-- USING THE stampUrl VARIABLE HERE -->
-    <img src="${stampUrl}" alt="Stamp" class="stamp-image" />
-    
-    <div class="signature-box">
-      <div class="signature-name">Rajesh Parkhi</div>
-      <div style="border-top: 1px solid #333; padding-top: 5px;">
-        <small><b>Authorized Signatory</b></small><br/>
-        <small>Infinity Arthvishva Advisory Pvt Ltd</small>
-      </div>
+    <div class="meta-header">
+        <span><b>Invoice No:</b> ${baseRecord.invoiceNumber}</span>
+     <span><b>Invoice Date:</b> ${baseRecord.invoiceDate ? new Date(baseRecord.invoiceDate).toLocaleDateString('en-IN') : ''}</span>
     </div>
-  </div>
-  <div class="footer-note">This is a computer-generated document and is valid without a physical signature.</div>
-</div>
+    <table class="top-table">
+        <tr>
+            <td width="50%" style="vertical-align: top;">
+                <span style="color: #64748b; font-weight: bold;">FROM:</span><br/>
+                <strong style="font-size: 14px;">Infinity Arthvishva Advisory Private Limited</strong><br/>
+                12th Floor, 1201, 7 Business Square, Shivaji Nagar, Pune, 411005<br/>
+              <strong>GSTIN:</strong> 27AAICI0723K1ZJ<br/>
+              <strong>PAN:</strong> AAICI0723K
+            </td>
+            <td width="50%" style="vertical-align: top; text-align: right;">
+                <span style="color: #64748b; font-weight: bold;">BILL TO:</span><br/>
+                <strong style="font-size: 14px;">${userProfile?.name || 'Authorized Partner'}</strong><br/>
+                <div style="max-width: 300px; margin-left: auto;">
+                   ${fullAddress || 'No Address Provided'}
+                </div>
+               ${userProfile?.pan ? `<div><strong>PAN:</strong> ${userProfile.pan}</div>` : ''}
+               ${userProfile?.gst ? `<div><strong>GSTIN:</strong> ${userProfile.gst}</div>` : ''}
+            </td>
+        </tr>
+    </table>
 
+    <table class="main-table">
+        <thead>
+            <tr>
+                <th>#</th><th>Lead ID</th><th>Client Name</th><th>Product</th><th>Ref No</th><th>Mode</th><th>Amount</th><th>Gross</th><th>TDS</th><th>GST</th><th>Net</th>
+            </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+    </table>
+
+    <div class="bottom-table">
+        <table class="summary-table">
+            <tr>
+                <td>Subtotal</td>
+                <td align="right">₹ ${totalGross.toLocaleString('en-IN')}</td>
+            </tr>
+            <tr>
+                <td>GST</td>
+                <td align="right">₹ ${totalGst.toLocaleString('en-IN')}</td>
+            </tr>
+            <tr>
+                <td>TDS (deducted)</td>
+                <td align="right" class="tds-color">- ₹ ${totalTds.toLocaleString('en-IN')}</td>
+            </tr>
+            <tr class="total-row">
+                <td>TOTAL PAYABLE</td>
+                <td align="right">₹ ${totalNet.toLocaleString('en-IN')}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer-section">
+        <div class="footer-note">This is a computer-generated document and is valid without a physical signature.</div>
+    </div>
 </div>
 <script>window.onload = function(){ window.print(); window.onafterprint = function(){ window.close(); } }</script>
 </body>
@@ -435,8 +360,7 @@ GSTIN: 27AAICI0723K1ZJ | PAN: AAICI0723K
                       <td className="px-6 py-5 text-gray-600">₹{formatValue(row.gstAmount)}</td>
                       <td className="px-6 py-5 font-bold text-gray-600">₹{formatValue(row.netPayout, true)}</td>
                       <td className="px-6 py-5">
-                        <div className="text-xs text-slate-400">{row.invoiceNumber}</div>
-                        <div className="text-xs text-slate-400">{row.invoiceDate}</div>
+                        <div className="text-xs text-slate-400 font-medium">{row.invoiceNumber}</div>
                         <button
                           onClick={() => downloadInvoice(row.payoutId)}
                           className="mt-2 text-xs px-3 py-1 bg-[#10b981] text-white rounded"
