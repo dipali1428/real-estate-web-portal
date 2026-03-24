@@ -1,88 +1,88 @@
 import { title } from "process";
 
 const AboutSection = () => {
-   const leaders = [
-{
-    name: "Mr. Rajesh Parkhi",
-    title: "Executive Director",
-    description: "25+ years of experience in retail finance, MBA in Marketing, with strong expertise in retail loan structuring and driving sustainable business growth.",
-    image: "/leader/Image 8.jpeg"
-},
-{
-    name: "Mr. Rahul Kangane",
-    title: "Chairman and Managing Director",
-    description: "15 years of experience in broking and wealth management, specializing in portfolio strategy and delivering strong market insights that drive company growth.",
-    image: "/leader/rahulsir4.jpeg"
-},
-{
-    name: "Mr. K Krishna",
-    title: "Telangana State Director, Hyderabad ",
-    description: "K Krishna brings 18+ years of banking experience, driving strategic growth, operational excellence, and revenue expansion through high-performing teams and strong client-focused strategies.",
-    image: "/leader/K-Krishna.jpeg"
-},
-{
-    name: "Dr. Sanjay Shaha",
-    title: "Director – Infinity Arthvishva",
-    description: "Dr. Sanjay Shaha, Director at Infinity Arthvishva, is a senior physician with 40+ years of experience. National Merit Winner, Gold Medalist & Vijay Ratna Awardee, bringing strategic vision and ethical leadership.",
-    image: "/leader/sanjay-shaha.jpeg"
-},
+    const leaders = [
+        {
+            name: "Mr. Rajesh Parkhi",
+            title: "Executive Director",
+            description: "25+ years of experience in retail finance, MBA in Marketing, with strong expertise in retail loan structuring and driving sustainable business growth.",
+            image: "/leader/Image 8.jpeg"
+        },
+        {
+            name: "Mr. Rahul Kangane",
+            title: "Chairman and Managing Director",
+            description: "15 years of experience in broking and wealth management, specializing in portfolio strategy and delivering strong market insights that drive company growth.",
+            image: "/leader/rahulsir4.jpeg"
+        },
+        {
+            name: "Mr. K Krishna",
+            title: "Telangana State Director, Hyderabad ",
+            description: "K Krishna brings 18+ years of banking experience, driving strategic growth, operational excellence, and revenue expansion through high-performing teams and strong client-focused strategies.",
+            image: "/leader/K-Krishna.jpeg"
+        },
+        {
+            name: "Dr. Sanjay Shaha",
+            title: "Director – Infinity Arthvishva",
+            description: "Dr. Sanjay Shaha, Director at Infinity Arthvishva, is a senior physician with 40+ years of experience. National Merit Winner, Gold Medalist & Vijay Ratna Awardee, bringing strategic vision and ethical leadership.",
+            image: "/leader/sanjay-shaha.jpeg"
+        },
 
-{
-    name: "Mr. Arun Job",
-    title: "Regional Director (Hyderabad)",
-    description: "With over 20 years of leadership across telecommunications, manufacturing, pharma packaging and banking sectors, Arun Job drives transformative growth and operational excellence. An IIMA alumnus known for building high-performing teams, strategic partnerships, and revenue expansion.",
-    image: "/leader/arun-job.png"
-},
+        {
+            name: "Mr. Arun Job",
+            title: "Regional Director (Hyderabad)",
+            description: "With over 20 years of leadership across telecommunications, manufacturing, pharma packaging and banking sectors, Arun Job drives transformative growth and operational excellence. An IIMA alumnus known for building high-performing teams, strategic partnerships, and revenue expansion.",
+            image: "/leader/arun-job.png"
+        },
 
-{
-    name: "Mr. Pravin Marathe",
-    title: "Chief Financial Officer ",
-    description: "Mr. Pravin Marathe, CFO at Infinity Arthvishva, has 18+ years of experience in financial markets with expertise in mutual funds, PMS, and AIFs.",
-    image: "/leader/Img3.jpeg"
-},
-{
-    name: "Mr. Sandip Powar",
-    title: "Vice President",
-    description: "Mr. Sandip Powar, Vice President, brings 11+ years of expertise in Home Loans and Insurance, leading Pan-India expansion, branch development, and strategic growth with a strong customer-focused approach.",
-    image: "/leader/Sandip-Powar.jpeg"
-},
-{
-    name: "Mr. Satyen Mehta",
-    title: "General Manager",
-    description: "Mr. Satyen Mehta brings 25+ years of banking experience in Home Loans, LAP, Insurance, and Real Estate, leading overall strategy, revenue growth, operational excellence, and sustainable business expansion.",
-    image: "/leader/Satyen-Mehta (2).jpeg"
-},
-{
-    name: "Mr. Sharad Kulkarni",
-    title: "Regional Business Head (Sangli Branch)",
-    description: "Mr. Sharad Kulkarni, Regional Business Head – Sangli, brings over 9 years of lending and 5 years of insurance experience, driving regional growth, high-performing teams, and strong client-focused business expansion.",
-    image: "/leader/Sharad-Kulkarni.jpeg"
-},
-{
-    name: "Mr. Anant Chachad",
-    title: "Regional Business Head – Kolhapur",
-    description: "Mr. Anant Madhusudan Chachad, Regional Business Head – Kolhapur, brings over 14 years of experience in financial services, leading Mortgage Loans for the West region with expertise in Home Loans, LAP, distribution network development, and strategic portfolio growth.",
-    image: "/leader/Anant-Chachad.jpeg"
-},
-{
-    name: "Mr. Kailas Patil",
-    title: "Assistant Vice President (AVP) – Nashik",
-    description: "Mr. Kailas Eknath Patil is a finance professional with 15+ years of experience in Home Loans, LAP, and Business Loans, driving regional growth through strong sales leadership, channel partnerships, and operational excellence.",
-    image: "/leader/Kailas-Patil.jpeg"
-},
-{
-    name: "Mr. Neeraj Mohata",
-    title: "Regional Business Head – Nagpur",
-    description: "Mr. Neeraj Mohata brings 11+ years of experience in lending and financial services, driving regional sales growth, channel expansion, and profitable business performance with strong leadership and market expertise.",
-    image: "/leader/Neeraj-Mohata1.jpeg"
-},
-{
-    name: "Mr. Pravin Rautray",
-    title: "Business Head (Moshi Branch )",
-    description: "Mr. Pravin Rautray drives growth across Loans and Insurance with a strong track record in building high-performing teams, expanding market reach, and delivering strategic, customer-focused revenue growth.",
-    image: "/leader/Pravin-Rautray.jpeg"
-}
-];
+        {
+            name: "Mr. Pravin Marathe",
+            title: "Chief Financial Officer ",
+            description: "Mr. Pravin Marathe, CFO at Infinity Arthvishva, has 18+ years of experience in financial markets with expertise in mutual funds, PMS, and AIFs.",
+            image: "/leader/Img3.jpeg"
+        },
+        {
+            name: "Mr. Sandip Powar",
+            title: "Vice President",
+            description: "Mr. Sandip Powar, Vice President, brings 11+ years of expertise in Home Loans and Insurance, leading Pan-India expansion, branch development, and strategic growth with a strong customer-focused approach.",
+            image: "/leader/Sandip-Powar.jpeg"
+        },
+        {
+            name: "Mr. Satyen Mehta",
+            title: "General Manager",
+            description: "Mr. Satyen Mehta brings 25+ years of banking experience in Home Loans, LAP, Insurance, and Real Estate, leading overall strategy, revenue growth, operational excellence, and sustainable business expansion.",
+            image: "/leader/Satyen-Mehta (2).jpeg"
+        },
+        {
+            name: "Mr. Sharad Kulkarni",
+            title: "Regional Business Head (Sangli Branch)",
+            description: "Mr. Sharad Kulkarni, Regional Business Head – Sangli, brings over 9 years of lending and 5 years of insurance experience, driving regional growth, high-performing teams, and strong client-focused business expansion.",
+            image: "/leader/Sharad-Kulkarni.jpeg"
+        },
+        {
+            name: "Mr. Anant Chachad",
+            title: "Regional Business Head – Kolhapur",
+            description: "Mr. Anant Madhusudan Chachad, Regional Business Head – Kolhapur, brings over 14 years of experience in financial services, leading Mortgage Loans for the West region with expertise in Home Loans, LAP, distribution network development, and strategic portfolio growth.",
+            image: "/leader/Anant-Chachad.jpeg"
+        },
+        {
+            name: "Mr. Kailas Patil",
+            title: "Assistant Vice President (AVP) – Nashik",
+            description: "Mr. Kailas Eknath Patil is a finance professional with 15+ years of experience in Home Loans, LAP, and Business Loans, driving regional growth through strong sales leadership, channel partnerships, and operational excellence.",
+            image: "/leader/Kailas-Patil.jpeg"
+        },
+        {
+            name: "Mr. Neeraj Mohata",
+            title: "Regional Business Head – Nagpur",
+            description: "Mr. Neeraj Mohata brings 11+ years of experience in lending and financial services, driving regional sales growth, channel expansion, and profitable business performance with strong leadership and market expertise.",
+            image: "/leader/Neeraj-Mohata1.jpeg"
+        },
+        {
+            name: "Mr. Pravin Rautray",
+            title: "Business Head (Moshi Branch )",
+            description: "Mr. Pravin Rautray drives growth across Loans and Insurance with a strong track record in building high-performing teams, expanding market reach, and delivering strategic, customer-focused revenue growth.",
+            image: "/leader/Pravin-Rautray.jpeg"
+        }
+    ];
 
     return (
         <div>
@@ -270,139 +270,150 @@ const AboutSection = () => {
                         </p>
                     </div>
 
-                    {/* All branches in grid - MODIFIED: removed Moshi and Hyderabad from here */}
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {/* Kanpur Branch */}
-                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="bg-white rounded-xl p-5 h-full">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Kanpur Branch</h3>
-                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
-                                    <p className="font-medium text-gray-700">Office No. 01, Kamlist Tower</p>
-                                    <p>Behind Mishra Jewellers, Near Joga Bhogha Chauraha</p>
-                                    <p>Nehru Nagar, Shuklaganj</p>
-                                    <p>Kanpur, Unnao, Uttar Pradesh - 209861</p>
-                                </div>
-                            </div>
-                        </div>
+                    {/* All branches in grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
 
-                        {/* Nagpur Branch */}
-                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="bg-white rounded-xl p-5 h-full">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Nagpur Branch</h3>
-                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
-                                    <p className="font-medium text-gray-700">Apartment No. 202, 2nd Floor</p>
-                                    <p>Sharda Enclave, Nagji Bhai Town</p>
-                                    <p>Besides Platina Heart Institute, Sitabuldi</p>
-                                    <p>Nagpur, Maharashtra - 440012</p>
-                                </div>
-                            </div>
-                        </div>
+                        {/* Branch Card Common Pattern */}
+                        {[
+                            {
+                                title: "Kanpur Branch",
+                                lines: [
+                                    "Office No. 01, Kamlist Tower",
+                                    "Behind Mishra Jewellers, Near Joga Bhogha Chauraha",
+                                    "Nehru Nagar, Shuklaganj",
+                                    "Kanpur, Unnao, Uttar Pradesh - 209861"
+                                ]
+                            },
+                            {
+                                title: "Nagpur Branch",
+                                lines: [
+                                    "Apartment No. 202, 2nd Floor",
+                                    "Sharda Enclave, Nagji Bhai Town",
+                                    "Besides Platina Heart Institute, Sitabuldi",
+                                    "Nagpur, Maharashtra - 440012"
+                                ]
+                            },
+                            {
+                                title: "Kolkata Branch",
+                                lines: [
+                                    "PS Qube, Room No. 620, 6th Floor",
+                                    "Plot No. IID/31/1, NewTown",
+                                    "Kolkata, West Bengal - 700135"
+                                ]
+                            },
+                            {
+                                title: "Nashik Branch",
+                                lines: [
+                                    "2064, 2nd Floor",
+                                    "Roongta Shopping Hub",
+                                    "Near Hotel Surya, Mumbai Agra Road, Indira Nagar",
+                                    "Nashik, Maharashtra - 422009"
+                                ]
+                            },
+                            {
+                                title: "Kolhapur Branch",
+                                lines: [
+                                    "Yashonandan Plaza, 1st Floor",
+                                    "Shahupuri 3rd Lane",
+                                    "Near Shubhash Photo",
+                                    "Kolhapur, Maharashtra - 416001"
+                                ]
+                            },
+                            {
+                                title: "Chiplun Branch",
+                                lines: [
+                                    "United Classic, 203/204, 2nd Floor",
+                                    "Near Old S.T. Stand",
+                                    "Chiplun Bazarpeth",
+                                    "Chiplun, Maharashtra - 415605"
+                                ]
+                            },
+                            {
+                                title: "Ratnagiri Branch",
+                                lines: [
+                                    "S. No. A-4",
+                                    "Soham Samarth Apartment, S.V. Road",
+                                    "Maruti Mandir",
+                                    "Ratnagiri, Maharashtra - 415612"
+                                ]
+                            },
+                            {
+                                title: "Sangli Branch",
+                                lines: [
+                                    "1st Floor, Plot No. 103",
+                                    "Adity Sai Landmark Near Bhoi Clinic",
+                                    "Ram Mandir Chowk",
+                                    "Sangli, Maharashtra - 416416"
+                                ]
+                            }
+                        ].map((branch, index) => (
+                            <div
+                                key={index}
+                                className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-[1px] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 h-full"
+                            >
+                                <div className="bg-white rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
 
-                        {/* Kolkata Branch */}
-                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="bg-white rounded-xl p-5 h-full">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Kolkata Branch</h3>
-                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
-                                    <p className="font-medium text-gray-700">PS Qube, Room No. 620, 6th Floor</p>
-                                    <p>Plot No. IID/31/1, NewTown</p>
-                                    <p>Kolkata, West Bengal - 700135</p>
-                                </div>
-                            </div>
-                        </div>
+                                    <div>
+                                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
+                                            {branch.title}
+                                        </h3>
 
-                        {/* Nashik Branch */}
-                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="bg-white rounded-xl p-5 h-full">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Nashik Branch</h3>
-                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
-                                    <p className="font-medium text-gray-700">2064, 2nd Floor</p>
-                                    <p>Roongta Shopping Hub</p>
-                                    <p>Near Hotel Surya, Mumbai Agra Road, Indira Nagar</p>
-                                    <p>Nashik, Maharashtra - 422009</p>
-                                </div>
-                            </div>
-                        </div>
+                                        <div className="text-sm text-gray-600 leading-relaxed space-y-2">
+                                            {branch.lines.map((line, i) => (
+                                                <p
+                                                    key={i}
+                                                    className={i === 0 ? "font-medium text-gray-800" : ""}
+                                                >
+                                                    {line}
+                                                </p>
+                                            ))}
+                                        </div>
+                                    </div>
 
-                        {/* Kolhapur Branch */}
-                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="bg-white rounded-xl p-5 h-full">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Kolhapur Branch</h3>
-                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
-                                    <p className="font-medium text-gray-700">Yashonandan Plaza, 1st Floor</p>
-                                    <p>Shahupuri 3rd Lane</p>
-                                    <p>Near Shubhash Photo</p>
-                                    <p>Kolhapur, Maharashtra - 416001</p>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Chiplun Branch */}
-                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="bg-white rounded-xl p-5 h-full">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Chiplun Branch</h3>
-                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
-                                    <p className="font-medium text-gray-700">United Classic, 203/204, 2nd Floor</p>
-                                    <p>Near Old S.T. Stand</p>
-                                    <p>Chiplun Bazarpeth</p>
-                                    <p>Chiplun, Maharashtra - 415605</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Ratnagiri Branch */}
-                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="bg-white rounded-xl p-5 h-full">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Ratnagiri Branch</h3>
-                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
-                                    <p className="font-medium text-gray-700">S. No. A-4</p>
-                                    <p>Soham Samarth Apartment, S.V. Road</p>
-                                    <p>Maruti Mandir</p>
-                                    <p>Ratnagiri, Maharashtra - 415612</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Sangli Branch */}
-                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="bg-white rounded-xl p-5 h-full">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Sangli Branch</h3>
-                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
-                                    <p className="font-medium text-gray-700">1st Floor, Plot No. 103</p>
-                                    <p>Adity Sai Landmark Near Bhoi Clinic</p>
-                                    <p>Ram Mandir Chowk</p>
-                                    <p>Sangli, Maharashtra - 416416 </p>
-                                </div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
 
                     {/* NEW - Centered container for Moshi and Hyderabad branches */}
-                    <div className="flex justify-center gap-6 mt-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-6">
+
                         {/* Moshi Branch */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="bg-white rounded-xl p-5 h-full">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Moshi Branch</h3>
-                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
-                                    <p className="font-medium text-gray-700">1st Floor, Office No 104</p>
-                                    <p>Destination Ostiya</p>
-                                    <p>F Building, Alandi Moshi Road</p>
-                                    <p>Pune, Maharashtra - 412105</p>
+                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-[1px] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 h-full">
+                            <div className="bg-white rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+                                <div>
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
+                                        Moshi Branch
+                                    </h3>
+
+                                    <div className="text-sm text-gray-600 leading-relaxed space-y-2">
+                                        <p className="font-medium text-gray-800">1st Floor, Office No 104</p>
+                                        <p>Destination Ostiya</p>
+                                        <p>F Building, Alandi Moshi Road</p>
+                                        <p>Pune, Maharashtra - 412105</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Hyderabad Branch */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-0.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="bg-white rounded-xl p-5 h-full">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Hyderabad Branch</h3>
-                                <div className="text-gray-600 text-sm leading-relaxed space-y-2">
-                                    <p className="font-medium text-gray-700">Office No: 5B, 5th Floor</p>
-                                    <p>Vishwa Heritage Arcade</p>
-                                    <p>Near ESI Metro Station, Pillar No. 1010, SR Nagar,</p>
-                                    <p>Hyderabad, Telangana - 500038</p>
+                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-[1px] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 h-full">
+                            <div className="bg-white rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+                                <div>
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
+                                        Hyderabad Branch
+                                    </h3>
+
+                                    <div className="text-sm text-gray-600 leading-relaxed space-y-2">
+                                        <p className="font-medium text-gray-800">Office No: 5B, 5th Floor</p>
+                                        <p>Vishwa Heritage Arcade</p>
+                                        <p>Near ESI Metro Station, Pillar No. 1010, SR Nagar</p>
+                                        <p>Hyderabad, Telangana - 500038</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </section>
