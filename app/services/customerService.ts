@@ -422,6 +422,46 @@ const CustomerService = {
         return response.data;
     },
 
+    // Add these methods to your customerService object
+
+    // ==================== REPORT API METHODS ====================
+
+    /**
+     * Get report overview
+     * GET → /api/customer/reports/overview
+     */
+    getReportOverview: async () => {
+        const response = await api.get("/api/customer/reports/overview");
+        return response.data;
+    },
+
+    /**
+     * Get product summary
+     * GET → /api/customer/reports/product-summary
+     */
+    getProductSummary: async () => {
+        const response = await api.get("/api/customer/reports/product-summary");
+        return response.data;
+    },
+
+    /**
+     * Get recent investments
+     * GET → /api/customer/reports/recent-investments
+     */
+    getRecentInvestments: async () => {
+        const response = await api.get("/api/customer/reports/recent-investments");
+        return response.data;
+    },
+
+    /**
+     * Get portfolio distribution
+     * GET → /api/customer/reports/portfolio-distribution
+     */
+    getPortfolioDistribution: async () => {
+        const response = await api.get("/api/customer/reports/portfolio-distribution");
+        return response.data;
+    },
+
     // ==================== AUTH HELPERS ====================
     isAuthenticated: () => typeof window !== 'undefined' && !!localStorage.getItem('token'),
     getToken: () => typeof window !== 'undefined' ? localStorage.getItem('token') : null,
