@@ -217,7 +217,6 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                       type="tel"
                       value={profile?.mobile || ""}
                       onChange={(e) => {
-                        console.log("Mobile Number:", e.target.value);
                         onProfileChange("mobile", e.target.value);
                       }}
                       className={`w-full px-4 py-3 bg-white border-2 ${

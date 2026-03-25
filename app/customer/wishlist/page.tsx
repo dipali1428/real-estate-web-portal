@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import customerService from '../../services/customerService';
 import { Bookmark } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 /* ---------------- TYPES ---------------- */
 
@@ -35,14 +36,20 @@ interface WishlistItem extends ApiWishlistItem {
 const productTypeToCategoryId: Record<string, string> = {
     unlisted_share: 'unlisted',
     mutual_fund: 'mutual-funds',
-    pms: 'pms',
+    loans: 'loans',
+    insurance: 'insurance',
+    investments: 'investments',
+    'real-estate': 'real-estate'
 };
 
 const initialCategories = [
     { id: 'all', name: 'All Items', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'unlisted', name: 'Unlisted Shares', icon: '📄', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'mutual-funds', name: 'Mutual Funds', icon: '📈', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
-    { id: 'pms', name: 'PMS', icon: '🏦', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'unlisted', name: 'Unlisted Shares', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'mutual-funds', name: 'Mutual Funds', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'loans', name: 'Loans', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'insurance', name: 'Insurance', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'investments', name: 'Investments', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
+    { id: 'real-estate', name: 'Real Estate', count: 0, color: 'from-[#2076C7] to-[#1CADA3]' },
 ];
 
 /* ---------------- COMPONENT ---------------- */
@@ -82,9 +89,12 @@ export default function Wishlist() {
 
                 setWishlistItems(transformed);
                 updateCategoryCounts(transformed);
+                toast.success(`Loaded ${transformed.length} wishlist items`);
+            } else {
+                toast.error('Failed to load wishlist');
             }
         } catch (error) {
-            console.error('Wishlist fetch error:', error);
+            toast.error('Failed to load wishlist');
         } finally {
             setLoading(false);
         }
@@ -100,9 +110,12 @@ export default function Wishlist() {
                 const updated = wishlistItems.filter(item => item.id !== id);
                 setWishlistItems(updated);
                 updateCategoryCounts(updated);
+                toast.success('Item removed from wishlist');
+            } else {
+                toast.error(response.message || 'Failed to remove item');
             }
         } catch (error) {
-            console.error('Remove failed:', error);
+            toast.error('Failed to remove item');
         }
     };
 
@@ -175,7 +188,6 @@ export default function Wishlist() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full px-4 py-2 pl-10 rounded-xl bg-white/20 text-white placeholder-white/60 border border-white/20 focus:outline-none"
                     />
-                    <span className="absolute left-3 top-2.5">🔍</span>
                 </div>
             </motion.div>
 
@@ -191,7 +203,6 @@ export default function Wishlist() {
                                 : 'bg-white text-gray-600 border border-gray-100'
                         }`}
                     >
-                        {cat.icon && <span>{cat.icon}</span>}
                         <span>{cat.name}</span>
                         <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/20">
                             {cat.count}

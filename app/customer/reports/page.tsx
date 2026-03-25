@@ -176,7 +176,6 @@ export default function ReportsPage() {
         second: '2-digit'
       }));
     } catch (error) {
-      console.error("Report fetch error:", error);
       toast.error("Failed to load reports");
     }
   };

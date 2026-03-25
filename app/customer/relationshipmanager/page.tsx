@@ -29,27 +29,31 @@ const RelationshipManager: React.FC = () => {
   });
 
   // Fetch API Data
-  useEffect(() => {
+    useEffect(() => {
     const fetchRM = async () => {
-      try {
+        try {
         const response = await CustomerService.getrmcustomer();
-        
-        // Handle the API response structure: { success: true, data: { id, name, email, mobile } }
+
         if (response.success && response.data) {
-          const rmData = response.data;
-          setRelationshipManager({
+            const rmData = response.data;
+
+            setRelationshipManager({
             id: rmData.id?.toString() || 'assigned-rm',
             name: rmData.name || 'Your RM will be assigned soon',
             email: rmData.email || 'info@infinityarthvishva.com',
-            phone: (rmData.mobile && rmData.mobile !== 'null') ? rmData.mobile : '1800-532-7600'
-          });
+            phone:
+                rmData.mobile && rmData.mobile !== 'null'
+                ? rmData.mobile
+                : '1800-532-7600'
+            });
         }
-      } catch (error) {
-        console.error("Error fetching RM data:", error);
-      }
+        } catch (error) {
+        // silent fail
+        }
     };
+
     fetchRM();
-  }, []);
+    }, []);
 
   // Contact Cards Data
   const contactCards: ContactCard[] = [
@@ -125,23 +129,11 @@ const RelationshipManager: React.FC = () => {
     },
   ];
 
-  // Event handlers
-  const handleScheduleMeeting = () => {
-    console.log('Schedule meeting with RM');
-    alert('Scheduling meeting with your Relationship Manager');
-  };
-
-  const handleSendMessage = () => {
-    console.log('Send message to RM');
-    alert('Opening chat with your Relationship Manager');
-  };
-
   // Function to handle phone call
   const handlePhoneCall = (phoneNumber: string) => {
     const cleanPhoneNumber = phoneNumber.replace(/[^\d+]/g, '');
     const telLink = `tel:${cleanPhoneNumber}`;
     window.location.href = telLink;
-    console.log('Initiating call to:', cleanPhoneNumber);
   };
 
   return (

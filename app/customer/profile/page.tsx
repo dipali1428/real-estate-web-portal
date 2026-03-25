@@ -11,6 +11,7 @@ import customerService from '../../services/customerService';
 import { ProfileSection } from './profilesection';
 import { KYCSection } from './kycsection';
 import { Modals } from './modal';
+import toast from 'react-hot-toast';
 
 // ==================== TYPES ====================
 export interface ProfileData {
@@ -168,8 +169,7 @@ export default function ProfilePage() {
         const userData = response.user || {};
         const kycData = response.kycDetails || {};
 
-        // Get profile image from various possible fields
-        const profileImage = 
+        const profileImage =
           userData.profile_image ||
           userData.profile_photo ||
           userData.avatar ||
@@ -208,14 +208,14 @@ export default function ProfilePage() {
         setAadhaarVerified(!!userData.aadhaar_verified || !!kycData.aadhaar_verified);
         setBankVerified(!!userData.bank_verified || !!kycData.bank_verified);
         setDematAdded(!!userData.demat_added);
-        
-        // Update timestamp to refresh image
+
         setImageTimestamp(Date.now());
       }
     } catch (error) {
-      console.error('Failed to refresh profile:', error);
+      toast.error("Failed to refresh profile data");
     }
   }, []);
+
 
   // ========== INITIAL FETCH PROFILE DATA ==========
   useEffect(() => {
@@ -307,7 +307,6 @@ export default function ProfilePage() {
       }
 
     } catch (err) {
-      console.error(err);
       showNotification("Mobile number already exists", "error");
     } finally {
       setUpdating(false);

@@ -256,8 +256,6 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
             setBankDetails(prev => ({ ...prev, bank_name: data.BANK }));
           }
         } catch (error) {
-          console.error('Failed to fetch bank details');
-        } finally {
           setFetchingBankDetails(false);
         }
       }
@@ -450,11 +448,9 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
         
         triggerPopup('Demat account added successfully!', 'success');
       }
-    } catch (error: any) {
-      console.error('Error adding demat:', error);
-      triggerPopup(error.response?.data?.message || 'Failed to add demat account', 'error');
-    } finally {
+    } catch (error) {
       setSavingDemat(false);
+      triggerPopup('Failed to add demat account', 'error');
     }
   };
 

@@ -80,7 +80,6 @@ export default function CustomerDashboard() {
                 // ✅ Fetch customer profile using the correct API
                 try {
                     const profileResponse = await customerService.getProfile();
-                    console.log('Profile response:', profileResponse);
                     
                     // Extract user data from response
                     const userData = profileResponse.user || profileResponse;
@@ -102,13 +101,11 @@ export default function CustomerDashboard() {
                     
                     // You can also store KYC details if needed
                     if (profileResponse.kycDetails) {
-                        console.log('KYC Details:', profileResponse.kycDetails);
                         // You can set these in state if you want to display KYC status on dashboard
                         // setKycDetails(profileResponse.kycDetails);
                     }
                     
                 } catch (profileErr: any) {
-                    console.error("Profile fetch error:", profileErr);
                     
                     if (profileErr?.response?.status === 401) {
                         toast.error("Session expired! Please login again.");
@@ -131,7 +128,6 @@ export default function CustomerDashboard() {
                 setShares(sharesList);
                 
             } catch (error) {
-                console.error("Dashboard Load Error:", error);
                 toast.error("Failed to load dashboard data");
             } finally {
                 setLoading(false);

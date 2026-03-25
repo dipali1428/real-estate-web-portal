@@ -169,7 +169,6 @@ export default function PortfolioPage() {
       }
       
       const response = await customerService.getPortfolio();
-      console.log('API Response:', response);
       
       if (response.success && response.data) {
         setPortfolioData(response);
@@ -182,7 +181,6 @@ export default function PortfolioPage() {
         toast.error("Failed to load portfolio data");
       }
     } catch (error) {
-      console.error("Portfolio fetch error:", error);
       toast.error("Failed to load portfolio");
     }
   };

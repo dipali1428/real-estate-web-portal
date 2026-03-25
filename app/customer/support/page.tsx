@@ -7,6 +7,7 @@ import {
     Plus, Send, X, AlertCircle, User, Headset, Eye, CheckCircle2,
     ArrowLeft, ShieldCheck
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 /* ---------------- CATEGORY MAPPING ---------------- */
 const PRODUCT_OPTIONS = [
@@ -66,8 +67,9 @@ export default function HelpSupport() {
             setTickets(ticketData);
             setApiCategories(catRes.data || []);
             updateTabCounts(ticketData);
+            toast.success(`Loaded ${ticketData.length} tickets`);
         } catch (error) {
-            console.error('Fetch error:', error);
+            toast.error('Failed to load support tickets');
         } finally {
             setLoading(false);
         }
@@ -87,9 +89,14 @@ export default function HelpSupport() {
             if (res.status) {
                 setSelectedTicket(res);
                 setView('detail');
+            } else {
+                toast.error('Failed to load ticket details');
             }
-        } catch (err) { alert("Error loading ticket details"); }
-        finally { setLoading(false); }
+        } catch (err) {
+            toast.error('Error loading ticket details');
+        } finally { 
+            setLoading(false); 
+        }
     };
 
     const handleCreateTicket = async (e: React.FormEvent) => {
@@ -102,12 +109,18 @@ export default function HelpSupport() {
                 reference_id: formData.reference_id || "N/A"
             });
             if (res.status) {
+                toast.success('Ticket created successfully');
                 setView('list');
                 loadInitialData();
                 setFormData({ category: '', product_type: '', reference_id: '', issue_type: 'General', severity: 'Medium', subject: '', description: '' });
+            } else {
+                toast.error(res.message || 'Failed to create ticket');
             }
-        } catch (err) { alert("Failed to create ticket"); }
-        finally { setActionLoading(false); }
+        } catch (err) {
+            toast.error('Failed to create ticket');
+        } finally { 
+            setActionLoading(false); 
+        }
     };
 
     const handleSendReply = async () => {
@@ -119,22 +132,34 @@ export default function HelpSupport() {
                 message: replyMessage
             });
             if (res.success) {
+                toast.success('Message sent successfully');
                 setReplyMessage('');
                 handleViewDetails(selectedTicket.ticket.ticket_id);
+            } else {
+                toast.error(res.message || 'Failed to send message');
             }
-        } catch (err) { alert("Failed to send message"); }
-        finally { setActionLoading(false); }
+        } catch (err) {
+            toast.error('Failed to send message');
+        } finally { 
+            setActionLoading(false); 
+        }
     };
 
     const handleResolveTicket = async (tid: string) => {
         const confirmResolve = window.confirm("Is your issue fully resolved? Clicking OK will finalize and close this support ticket.");
         if (!confirmResolve) return;
         
+        setActionLoading(true);
         try {
             await customerService.closeTicket(tid);
+            toast.success('Ticket resolved successfully');
             setView('list');
             loadInitialData();
-        } catch (err) { alert("Error resolving ticket"); }
+        } catch (err) {
+            toast.error('Error resolving ticket');
+        } finally {
+            setActionLoading(false);
+        }
     };
 
     const filteredTickets = tickets.filter(t => {
@@ -147,7 +172,10 @@ export default function HelpSupport() {
     if (loading && view === 'list') {
         return (
             <div className="flex-1 p-4 sm:p-6 bg-[#f8fafc] min-h-screen flex items-center justify-center">
-                <div className="w-10 h-10 border-4 border-[#2076C7] border-t-transparent rounded-full animate-spin"></div>
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-[#2076C7] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading your tickets...</p>
+                </div>
             </div>
         );
     }
@@ -187,6 +215,14 @@ export default function HelpSupport() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full px-4 py-2 pl-10 rounded-xl bg-white/20 text-white placeholder-white/60 border border-white/20 focus:outline-none focus:bg-white/30 transition-all"
                         />
+                        <svg
+                            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
                     </div>
                 )}
             </motion.div>
@@ -201,7 +237,7 @@ export default function HelpSupport() {
                                 <button
                                     key={tab.id}
                                     onClick={() => setSelectedFilter(tab.id)}
-                                    className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center space-x-2 transition-all ${
+                                    className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center space-x-2 transition-all whitespace-nowrap ${
                                         selectedFilter === tab.id
                                             ? `bg-gradient-to-r ${tab.color} text-white`
                                             : 'bg-white text-gray-600 border border-gray-100'
@@ -226,60 +262,68 @@ export default function HelpSupport() {
                                             <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase tracking-widest font-black">Status</th>
                                             <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase tracking-widest font-black">Last Update</th>
                                             <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase tracking-widest font-black">Action</th>
-                                          </tr>
+                                           </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         <AnimatePresence>
-                                            {filteredTickets.map(ticket => (
-                                                <motion.tr 
-                                                    key={ticket.id} 
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                    exit={{ opacity: 0 }}
-                                                    className="hover:bg-gray-50 transition-colors group"
-                                                >
-                                                    <td className="px-6 py-5">
-                                                        <div className="flex items-center space-x-4">
-                                                            <div>
-                                                                <div className="text-sm font-semibold text-gray-800">{ticket.subject}</div>
-                                                                <div className="text-[11px] text-gray-400">ID: {ticket.ticket_id}</div>
+                                            {filteredTickets.length > 0 ? (
+                                                filteredTickets.map(ticket => (
+                                                    <motion.tr 
+                                                        key={ticket.id} 
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        exit={{ opacity: 0 }}
+                                                        className="hover:bg-gray-50 transition-colors group"
+                                                    >
+                                                        <td className="px-6 py-5">
+                                                            <div className="flex items-center space-x-4">
+                                                                <div>
+                                                                    <div className="text-sm font-semibold text-gray-800">{ticket.subject}</div>
+                                                                    <div className="text-[11px] text-gray-400">ID: {ticket.ticket_id}</div>
+                                                                </div>
                                                             </div>
+                                                         </td>
+                                                        <td className="px-6 py-4 text-center">
+                                                            <span className="text-[11px] font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-lg">
+                                                                {ticket.category}
+                                                            </span>
+                                                         </td>
+                                                        <td className="px-6 py-4 text-center">
+                                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                                                ticket.status === 'Open' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'
+                                                            }`}>
+                                                                {ticket.status}
+                                                            </span>
+                                                         </td>
+                                                        <td className="px-6 py-4 text-center text-xs text-gray-400">
+                                                            {new Date(ticket.updated_at).toLocaleDateString()}
+                                                         </td>
+                                                        <td className="px-6 py-4 text-center">
+                                                            <button 
+                                                                onClick={() => handleViewDetails(ticket.ticket_id)}
+                                                                className="px-4 py-2 bg-[#2076C7] text-white rounded-xl text-xs font-bold hover:shadow-lg transition-all active:scale-95 flex items-center gap-2 mx-auto"
+                                                            >
+                                                                View Chat <Eye size={14} />
+                                                            </button>
+                                                         </td>
+                                                    </motion.tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan={5} className="px-6 py-16 text-center">
+                                                        <div className="flex flex-col items-center justify-center">
+                                                            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                                <ShieldCheck className="w-10 h-10 text-gray-400" />
+                                                            </div>
+                                                            <p className="text-gray-500 font-medium mb-2">No support tickets found</p>
+                                                            <p className="text-sm text-gray-400">Raise a new ticket to get help from our support team</p>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 text-center">
-                                                        <span className="text-[11px] font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-lg">
-                                                            {ticket.category}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center">
-                                                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                                            ticket.status === 'Open' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'
-                                                        }`}>
-                                                            {ticket.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center text-xs text-gray-400">
-                                                        {new Date(ticket.updated_at).toLocaleDateString()}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center">
-                                                        <button 
-                                                            onClick={() => handleViewDetails(ticket.ticket_id)}
-                                                            className="px-4 py-2 bg-[#2076C7] text-white rounded-xl text-xs font-bold hover:shadow-lg transition-all active:scale-95 flex items-center gap-2 mx-auto"
-                                                        >
-                                                            View Chat <Eye size={14} />
-                                                        </button>
-                                                    </td>
-                                                </motion.tr>
-                                            ))}
+                                                </tr>
+                                            )}
                                         </AnimatePresence>
                                     </tbody>
                                 </table>
-
-                                {filteredTickets.length === 0 && (
-                                    <div className="text-center py-16 text-gray-400">
-                                        No support tickets found
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </motion.div>
@@ -387,16 +431,6 @@ export default function HelpSupport() {
                                         />
                                     </div>
 
-                                    <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
-                                        <div className="flex items-start gap-3">
-                                            <AlertCircle size={18} className="text-[#2076C7] mt-0.5 shrink-0" />
-                                            <div>
-                                                <p className="text-sm font-medium text-gray-800">Support Response Time</p>
-                                                <p className="text-xs text-gray-600 mt-1">Our support team typically responds within 24 hours. Please provide as much detail as possible to help us resolve your issue faster.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     <div className="flex gap-4 pt-4">
                                         <button
                                             type="button"
@@ -465,9 +499,14 @@ export default function HelpSupport() {
                             {selectedTicket.ticket.status === 'Open' && (
                                 <button 
                                     onClick={() => handleResolveTicket(selectedTicket.ticket.ticket_id)}
-                                    className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all backdrop-blur-sm border border-white/30"
+                                    disabled={actionLoading}
+                                    className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all backdrop-blur-sm border border-white/30 disabled:opacity-50"
                                 >
-                                    Mark as Resolved
+                                    {actionLoading ? (
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        'Mark as Resolved'
+                                    )}
                                 </button>
                             )}
                         </div>
@@ -496,7 +535,7 @@ export default function HelpSupport() {
                                 </div>
 
                                 {/* Support Messages */}
-                                {selectedTicket.messages.map((msg: any, index: number) => (
+                                {selectedTicket.messages && selectedTicket.messages.map((msg: any, index: number) => (
                                     <div 
                                         key={msg.id} 
                                         className={`flex gap-3 ${msg.sender_type === 'customer' ? '' : 'flex-row-reverse'} animate-in slide-in-from-bottom-2 duration-300`}
@@ -579,9 +618,6 @@ export default function HelpSupport() {
                                             )}
                                         </button>
                                     </div>
-                                    <p className="text-[10px] text-gray-400 mt-2 ml-1">
-                                        Press Enter to send, Shift + Enter for new line
-                                    </p>
                                 </div>
                             ) : (
                                 <div className="text-center py-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200">
