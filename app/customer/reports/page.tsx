@@ -3,9 +3,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  TrendingUp, Wallet, PieChart as PieChartIcon,
-  RefreshCw, Building, ArrowUpRight, Clock, Database, FolderOpen, Banknote,
-  BarChart3, Download, Inbox, FileText, Package, Activity,
+  TrendingUp, Wallet, PieChart as PieChartIcon, Building, ArrowUpRight, Clock, FolderOpen, Banknote,
+  BarChart3, Inbox, FileText, Package, Activity,
   CheckCircle, Clock as ClockIcon, IndianRupee, Table
 } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
@@ -264,28 +263,6 @@ export default function ReportsPage() {
               <p className="text-sm sm:text-base text-white/80">
                 Comprehensive analysis of your investment portfolio
               </p>
-              <p className="text-xs text-white/60 mt-2 flex items-center gap-1">
-                <Clock size={12} />
-                Last updated: {lastUpdated || 'Just now'}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setRefreshing(true);
-                  fetchReportData().finally(() => setRefreshing(false));
-                }}
-                disabled={refreshing}
-                className="p-2 bg-white/20 rounded-xl hover:bg-white/30 transition-all disabled:opacity-50"
-              >
-                <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
-              </button>
-              <button
-                onClick={exportJSON}
-                className="p-2 bg-white/20 rounded-xl hover:bg-white/30 transition-all"
-              >
-                <Download className="w-5 h-5" />
-              </button>
             </div>
           </div>
         </motion.div>

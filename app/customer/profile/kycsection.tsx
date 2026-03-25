@@ -626,7 +626,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                     Full Name as per PAN <span className="text-rose-500">*</span>
                   </label>
                   <input
-                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-700 bg-white border border-slate-200"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
                     value={panDetails.name_as_per_pan}
                     onChange={(e) => setPanDetails({...panDetails, name_as_per_pan: e.target.value})}
                   />
@@ -640,7 +640,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                     <input
                       type="text"
                       placeholder="DD/MM/YYYY"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-700 bg-white border border-slate-200"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
                       value={panDetails.date_of_birth}
                       onChange={(e) =>
                         setPanDetails({...panDetails, date_of_birth: e.target.value})

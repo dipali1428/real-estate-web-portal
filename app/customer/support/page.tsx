@@ -4,9 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import customerService from '../../services/customerService';
 import { 
-    Plus, MessageSquare, Clock, ChevronRight, Send, X, 
-    AlertCircle, User, Headset, Search, Eye, CheckCircle2,
-    ArrowLeft, MoreVertical, ShieldCheck, Paperclip, Smile
+    Plus, Send, X, AlertCircle, User, Headset, Eye, CheckCircle2,
+    ArrowLeft, ShieldCheck
 } from 'lucide-react';
 
 /* ---------------- CATEGORY MAPPING ---------------- */
@@ -241,9 +240,6 @@ export default function HelpSupport() {
                                                 >
                                                     <td className="px-6 py-5">
                                                         <div className="flex items-center space-x-4">
-                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold transition-transform group-hover:scale-110 ${ticket.status === 'Open' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-400'}`}>
-                                                                <MessageSquare size={18} />
-                                                            </div>
                                                             <div>
                                                                 <div className="text-sm font-semibold text-gray-800">{ticket.subject}</div>
                                                                 <div className="text-[11px] text-gray-400">ID: {ticket.ticket_id}</div>
@@ -295,7 +291,6 @@ export default function HelpSupport() {
                         <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                             <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-6 text-white rounded-t-3xl flex justify-between items-center sticky top-0">
                                 <div className="flex items-center gap-3">
-                                    <MessageSquare size={24} />
                                     <h3 className="text-xl font-bold">Raise Support Ticket</h3>
                                 </div>
                                 <button 

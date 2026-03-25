@@ -1,20 +1,14 @@
 'use client';
 
-import React, { RefObject } from 'react';
+import React, { RefObject, useState, useEffect } from 'react';
 import {
   User,
-  Award,
-  Shield,
-  CheckCircle,
   Loader2,
   Edit2,
   Save,
   X,
   Key,
-  Trash2,
-  ChevronRight,
-  Camera,
-  Lock
+  Camera
 } from 'lucide-react';
 import { ProfileData } from './page';
 
@@ -26,7 +20,7 @@ interface ProfileSectionProps {
   mobileError: string | null;
   hasChanges: boolean;
   fileInputRef: RefObject<HTMLInputElement>;
-  getImageUrl: (path: string | undefined) => string | null;
+  getProfileImageUrl: (path: string | undefined) => string | null;
   onEdit: () => void;
   onDiscard: () => void;
   onProfileChange: (field: keyof ProfileData, value: string) => void;
@@ -44,7 +38,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   mobileError,
   hasChanges,
   fileInputRef,
-  getImageUrl,
+  getProfileImageUrl,
   onEdit,
   onDiscard,
   onProfileChange,
@@ -53,6 +47,26 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   onShowPasswordModal,
   onShowDeleteModal
 }) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageKey, setImageKey] = useState(Date.now());
+
+  // Get the profile image URL with cache buster
+  const imageUrl = getProfileImageUrl(profile?.profile_image || profile?.profile_photo || profile?.avatar || profile?.profile_pic);
+  
+  // Force image refresh when profile updates
+  useEffect(() => {
+    setImageKey(Date.now());
+    setImageError(false);
+  }, [profile?.profile_image, profile?.profile_photo, profile?.avatar, profile?.profile_pic]);
+
+  // Handle image load error
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  // Get the current image source with cache buster
+  const currentImageSrc = imageUrl && !imageError ? `${imageUrl}&imgKey=${imageKey}` : null;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
       {/* Left Column - Profile Image */}
@@ -68,11 +82,12 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                       <Loader2 className="w-6 h-6 animate-spin text-[#1CADA3]" />
                       <span className="text-[8px] font-bold text-slate-400">UPDATING</span>
                     </div>
-                  ) : profile?.profile_image ? (
+                  ) : currentImageSrc ? (
                     <img 
-                      src={getImageUrl(profile.profile_image)!} 
+                      src={currentImageSrc}
                       alt="Profile" 
                       className="w-full h-full object-cover"
+                      onError={handleImageError}
                     />
                   ) : (
                     <User className="w-12 h-12 text-slate-300" />
@@ -96,6 +111,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             <p className="text-slate-400 text-[10px] font-bold tracking-widest uppercase mt-1">Upload your photo</p>
             <div className="mt-6 text-left">
               <p className="text-xs text-slate-500 font-medium">Upload a clear passport size photo (max 5MB)</p>
+              <p className="text-[10px] text-slate-400 mt-2">Supported formats: JPG, PNG, GIF</p>
             </div>
           </div>
         </div>

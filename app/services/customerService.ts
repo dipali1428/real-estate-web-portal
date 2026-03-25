@@ -462,6 +462,16 @@ const CustomerService = {
         return response.data;
     },
 
+    /**
+     * Get assigned relationship manager
+     * GET → /api/customer/assigned-rm
+     */
+
+    getrmcustomer: async () => {
+        const response = await api.get("/api/customer/rm/assigned-rm");
+        return response.data;
+    },
+
     // ==================== AUTH HELPERS ====================
     isAuthenticated: () => typeof window !== 'undefined' && !!localStorage.getItem('token'),
     getToken: () => typeof window !== 'undefined' ? localStorage.getItem('token') : null,
