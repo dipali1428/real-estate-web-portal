@@ -1,9 +1,12 @@
+import investmentService from "@/app/products/mutual-funds/services/investmentService";
+
 interface CategoryDropdownProps {
-  type: 'insurance' | 'loan' | 'contest'; // Added contest
+  type: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest';
   isOpen: boolean;
-  activeCategory: 'insurance' | 'loan' | 'contest'; // Added contest
+  activeCategory: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest';
   activeSubCategory: string;
-  onToggle: (type: 'insurance' | 'loan' | 'contest', event: React.MouseEvent) => void;
+  subCategories?: string[]; // Added this to match page.tsx usage
+  onToggle: (type: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest', event: React.MouseEvent) => void;
   onSubCategorySelect: (subCategory: string, event: React.MouseEvent) => void;
 }
 
@@ -12,14 +15,20 @@ const subCategoryLabels: Record<string, string> = {
   life: 'Life Insurance',
   health: 'Health Insurance',
   motor: 'Motor Insurance',
+  marine: 'Marine Insurance',
+  general: 'General Insurance',
   home: 'Home Loan',
   business: 'Business Loan',
   lap: 'LAP Loan',
   personal: 'Personal Loan',
   educational: 'Educational Loan',
-  current: 'Current Contests', // Added
-  upcoming: 'Upcoming Contests', // Added
-  closed: 'Closed Contests' // Added
+  vehicle: 'Vehicle Loan',
+  investments: 'Investments',
+  mutualfunds: 'Mutual Funds',
+  realestate: 'Real Estate',
+  current: 'Current Contests',
+  upcoming: 'Upcoming Contests',
+  closed: 'Closed Contests'
 };
 
 export default function CategoryDropdown({
@@ -27,28 +36,41 @@ export default function CategoryDropdown({
   isOpen,
   activeCategory,
   activeSubCategory,
+  subCategories, // Destructure the new prop
   onToggle,
   onSubCategorySelect
 }: CategoryDropdownProps) {
   const isActive = activeCategory === type;
   
-  // Define colors based on type
   const colorConfig = {
     insurance: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-300' },
     loan: { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-300' },
+    investments: { bg: 'bg-yellow-100', text: 'text-yellow-700', border: 'border-yellow-300' },
+    mutualfunds: { bg: 'bg-pink-100', text: 'text-pink-700', border: 'border-pink-300' },
+    realestate: { bg: 'bg-teal-100', text: 'text-teal-700', border: 'border-teal-300' },
     contest: { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-300' }
   };
 
   const currentColors = colorConfig[type];
 
   const getSubCategories = () => {
+    // Use the passed props if available, otherwise fallback to internal logic
+    if (subCategories) return subCategories;
+
     if (type === 'insurance') {
-      return ['all', 'life', 'health', 'motor'];
+      return ['all', 'life', 'health', 'motor', 'marine', 'general'];
     } else if (type === 'loan') {
-      return ['all', 'home', 'business', 'lap', 'personal', 'educational'];
-    } else {
-      return ['all', 'current', 'upcoming',]; // Contest subcategories
+      return ['all', 'home', 'business', 'lap', 'personal', 'educational', 'vehicle'];
+    } else if (type === 'investments') {
+      return ['all', 'investments'];
+    } else if (type === 'mutualfunds') {
+      return ['all', 'mutualfunds'];
+    } else if (type === 'realestate') {
+      return ['all', 'realestate'];
+    } else if (type === 'contest') {
+      return ['all', 'current', 'upcoming'];
     }
+    return ['all'];
   };
 
   return (
@@ -61,7 +83,9 @@ export default function CategoryDropdown({
             : 'text-slate-700 hover:text-[#2076C7] hover:bg-slate-50 border-2 border-transparent'
         }`}
       >
-        <span className="text-base sm:text-lg capitalize">{type}</span>
+        <span className="text-base sm:text-lg capitalize">
+          {type === 'mutualfunds' ? 'Mutual Funds' : type === 'realestate' ? 'Real Estate' : type}
+        </span>
         <svg 
           className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           fill="none" 
@@ -75,7 +99,7 @@ export default function CategoryDropdown({
       {isOpen && (
         <div className="absolute top-full left-0 right-0 sm:left-auto sm:right-auto sm:w-64 mt-2 bg-white rounded-xl shadow-xl border border-slate-200 py-3 z-20">
           <div className="px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide border-b border-slate-100">
-            {type} Types
+            {type === 'mutualfunds' ? 'Mutual Funds' : type === 'realestate' ? 'Real Estate' : type} Types
           </div>
           {getSubCategories().map((subCategory) => (
             <button
