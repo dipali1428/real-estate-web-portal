@@ -1,18 +1,13 @@
 'use client';
 
-import React, { RefObject } from 'react';
+import React, { RefObject, useState, useEffect } from 'react';
 import {
   User,
-  Award,
-  Shield,
-  CheckCircle,
   Loader2,
   Edit2,
   Save,
   X,
   Key,
-  Trash2,
-  ChevronRight,
   Camera
 } from 'lucide-react';
 import { ProfileData } from './page';
@@ -25,7 +20,7 @@ interface ProfileSectionProps {
   mobileError: string | null;
   hasChanges: boolean;
   fileInputRef: RefObject<HTMLInputElement>;
-  getImageUrl: (path: string | undefined) => string | null;
+  getProfileImageUrl: (path: string | undefined) => string | null;
   onEdit: () => void;
   onDiscard: () => void;
   onProfileChange: (field: keyof ProfileData, value: string) => void;
@@ -43,7 +38,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   mobileError,
   hasChanges,
   fileInputRef,
-  getImageUrl,
+  getProfileImageUrl,
   onEdit,
   onDiscard,
   onProfileChange,
@@ -52,13 +47,33 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   onShowPasswordModal,
   onShowDeleteModal
 }) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageKey, setImageKey] = useState(Date.now());
+
+  // Get the profile image URL with cache buster
+  const imageUrl = getProfileImageUrl(profile?.profile_image || profile?.profile_photo || profile?.avatar || profile?.profile_pic);
+  
+  // Force image refresh when profile updates
+  useEffect(() => {
+    setImageKey(Date.now());
+    setImageError(false);
+  }, [profile?.profile_image, profile?.profile_photo, profile?.avatar, profile?.profile_pic]);
+
+  // Handle image load error
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  // Get the current image source with cache buster
+  const currentImageSrc = imageUrl && !imageError ? `${imageUrl}&imgKey=${imageKey}` : null;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
       {/* Left Column - Profile Image */}
       <div className="lg:col-span-4 space-y-6">
         {/* Profile Image Card */}
         <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 pb-8">
-          <div className="h-28 bg-[#1CADA3] relative mb-14">
+          <div className="h-28 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] relative mb-14">
             <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
               <div className="relative group">
                 <div className="w-24 h-24 rounded-2xl bg-slate-100 border-4 border-white overflow-hidden shadow-md flex items-center justify-center">
@@ -67,11 +82,12 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                       <Loader2 className="w-6 h-6 animate-spin text-[#1CADA3]" />
                       <span className="text-[8px] font-bold text-slate-400">UPDATING</span>
                     </div>
-                  ) : profile?.profile_image ? (
+                  ) : currentImageSrc ? (
                     <img 
-                      src={getImageUrl(profile.profile_image)!} 
+                      src={currentImageSrc}
                       alt="Profile" 
                       className="w-full h-full object-cover"
+                      onError={handleImageError}
                     />
                   ) : (
                     <User className="w-12 h-12 text-slate-300" />
@@ -95,29 +111,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             <p className="text-slate-400 text-[10px] font-bold tracking-widest uppercase mt-1">Upload your photo</p>
             <div className="mt-6 text-left">
               <p className="text-xs text-slate-500 font-medium">Upload a clear passport size photo (max 5MB)</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Account Summary Card */}
-        <div className="bg-gradient-to-br from-[#2076C7] to-[#1CADA3] rounded-3xl p-6 text-white shadow-sm">
-          <h3 className="font-bold mb-6 flex items-center gap-2 text-lg">
-            <Award size={20} />
-            Account Summary
-          </h3>
-          
-          <div className="space-y-4">
-            <div className="flex justify-between py-3 border-b border-white/20">
-              <span className="text-sm opacity-90 font-medium">Investor ID</span>
-              <span className="font-bold">#{profile?.id || 'N/A'}</span>
-            </div>
-            
-            <div className="flex justify-between py-3">
-              <span className="text-sm opacity-90 font-medium">Account Status</span>
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-500/20 text-emerald-100 rounded-lg text-xs font-bold">
-                <CheckCircle className="w-3 h-3" />
-                Active
-              </span>
+              <p className="text-[10px] text-slate-400 mt-2">Supported formats: JPG, PNG, GIF</p>
             </div>
           </div>
         </div>
@@ -127,8 +121,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
       <div className="lg:col-span-8 space-y-6">
         {/* Personal Information Card */}
         <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          {/* Header with Edit Profile and Change Password buttons */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-emerald-50 text-emerald-500 rounded-2xl">
                 <User size={24} />
@@ -139,38 +133,51 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
               </div>
             </div>
 
-            {!isEditing ? (
+            <div className="flex items-center gap-2">
+              {/* Change Password Button - Always visible */}
               <button
                 type="button"
-                onClick={onEdit}
-                className="px-6 py-3 bg-[#2076C7] text-white rounded-xl hover:opacity-90 flex items-center gap-2 text-xs font-black uppercase tracking-widest shadow-sm"
+                onClick={onShowPasswordModal}
+                className="px-4 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors flex items-center gap-2 text-xs font-black uppercase tracking-widest"
+                title="Change Password"
               >
-                <Edit2 size={14} />
-                Edit Profile
+                <Key size={14} />
+                <span className="hidden sm:inline">Password</span>
               </button>
-            ) : (
-              <div className="flex items-center gap-2">
+
+              {!isEditing ? (
                 <button
                   type="button"
-                  onClick={onDiscard}
-                  className="px-6 py-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 text-xs font-black uppercase tracking-widest flex items-center gap-2"
+                  onClick={onEdit}
+                  className="px-4 py-3 bg-[#2076C7] text-white rounded-xl hover:bg-[#1a5a9e] transition-colors flex items-center gap-2 text-xs font-black uppercase tracking-widest shadow-sm"
                 >
-                  <X size={14} />
-                  Discard
+                  <Edit2 size={14} />
+                  <span className="hidden sm:inline">Edit Profile</span>
                 </button>
-                <button
-                  type="submit"
-                  form="profile-form"
-                  disabled={updating || !hasChanges || !!mobileError}
-                  className={`px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 disabled:opacity-50 flex items-center gap-2 text-xs font-black uppercase tracking-widest shadow-sm ${
-                    !hasChanges || mobileError ? 'cursor-not-allowed' : ''
-                  }`}
-                >
-                  {updating ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                  {updating ? "Saving..." : "Save"}
-                </button>
-              </div>
-            )}
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={onDiscard}
+                    className="px-4 py-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors text-xs font-black uppercase tracking-widest flex items-center gap-2"
+                  >
+                    <X size={14} />
+                    <span className="hidden sm:inline">Discard</span>
+                  </button>
+                  <button
+                    type="submit"
+                    form="profile-form"
+                    disabled={updating || !hasChanges || !!mobileError}
+                    className={`px-4 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-xs font-black uppercase tracking-widest shadow-sm ${
+                      !hasChanges || mobileError ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    {updating ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                    <span className="hidden sm:inline">{updating ? "Saving..." : "Save"}</span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Form */}
@@ -179,7 +186,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
               {/* Name Field */}
               <div className="space-y-2">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Full Name
+                  Full Name <span className="text-rose-500">*</span>
                 </label>
 
                 {isEditing ? (
@@ -187,12 +194,12 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                     type="text"
                     value={profile?.name || ""}
                     onChange={(e) => onProfileChange("name", e.target.value)}
-                    className="w-full px-4 py-3 bg-white border-2 border-[#1CADA3] rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#158f87] transition-all"
+                    className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm font-medium text-slate-700 outline-none focus:border-[#1CADA3] focus:ring-2 focus:ring-emerald-100 transition-all"
                     placeholder="Enter your full name"
                     required
                   />
                 ) : (
-                  <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-bold text-slate-700">
+                  <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-medium text-slate-700 border border-slate-200">
                     {profile?.name || "Not provided"}
                   </div>
                 )}
@@ -201,7 +208,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
               {/* Mobile Field */}
               <div className="space-y-2">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Mobile Number
+                  Mobile Number <span className="text-rose-500">*</span>
                 </label>
 
                 {isEditing ? (
@@ -209,71 +216,39 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                     <input
                       type="tel"
                       value={profile?.mobile || ""}
-                      onChange={(e) => onProfileChange("mobile", e.target.value)}
+                      onChange={(e) => {
+                        onProfileChange("mobile", e.target.value);
+                      }}
                       className={`w-full px-4 py-3 bg-white border-2 ${
-                        mobileError ? 'border-rose-500' : 'border-[#1CADA3]'
-                      } rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-[#158f87] transition-all`}
+                        mobileError ? "border-rose-500" : "border-slate-200 focus:border-[#1CADA3]"
+                      } rounded-xl text-sm font-medium text-slate-700 outline-none focus:ring-2 focus:ring-emerald-100 transition-all`}
                       placeholder="Enter your mobile number"
                       required
                       maxLength={10}
                     />
+
                     {mobileError && (
-                      <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
+                      <p className="text-xs text-rose-500 mt-2 flex items-center gap-1 font-medium">
                         <X size={12} />
                         {mobileError}
                       </p>
                     )}
                   </div>
                 ) : (
-                  <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-bold text-slate-700">
-                    {profile?.mobile || "Not provided"}
-                  
+                  <div className="w-full px-4 py-3 bg-slate-50 rounded-xl text-sm font-medium text-slate-700 border border-slate-200">
+                    {profile?.mobile ? profile.mobile : "Not provided"}
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Helper Text */}
+            {isEditing && (
+              <p className="text-xs text-slate-400 mt-4">
+                Fields marked with <span className="text-rose-500">*</span> are required
+              </p>
+            )}
           </form>
-        </div>
-
-        {/* Security Card */}
-        <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="p-3 bg-emerald-50 text-emerald-500 rounded-2xl">
-              <Shield size={24} />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-slate-900">Security Settings</h3>
-              <p className="text-sm text-slate-500">Manage your account security</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Change Password Card */}
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 hover:border-[#1CADA3] transition-all cursor-pointer group"
-                 onClick={onShowPasswordModal}>
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-2 bg-white rounded-xl shadow-sm">
-                  <Key size={20} className="text-[#2076C7]" />
-                </div>
-                <ChevronRight size={20} className="text-slate-400 group-hover:text-[#1CADA3] transition-colors" />
-              </div>
-              <h4 className="font-bold text-slate-900 mb-1">Change Password</h4>
-              <p className="text-xs text-slate-500">Update your password regularly</p>
-            </div>
-
-            {/* Delete Account Card */}
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 hover:border-rose-500 transition-all cursor-pointer group"
-                 onClick={onShowDeleteModal}>
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-2 bg-white rounded-xl shadow-sm">
-                  <Trash2 size={20} className="text-rose-500" />
-                </div>
-                <ChevronRight size={20} className="text-slate-400 group-hover:text-rose-500 transition-colors" />
-              </div>
-              <h4 className="font-bold text-slate-900 mb-1">Delete Account</h4>
-              <p className="text-xs text-slate-500">Permanently remove your account</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

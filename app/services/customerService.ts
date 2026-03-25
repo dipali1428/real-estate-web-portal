@@ -90,15 +90,6 @@ export interface KycStatusResponse {
     updated_at: string;
 }
 
-export interface ProfileData {
-    id?: number;
-    name: string;
-    mobile: string;
-    email?: string;
-    profile_image?: string;
-    // Add any other fields your API returns
-}
-
 export interface UpdateProfilePayload {
   name: string;
   mobile: string;
@@ -131,6 +122,51 @@ interface Company {
   depository_applicable: string | null;
 }
 
+// ==================== WISHLIST TYPES ====================
+
+export interface AddToWishlistParams {
+    product_type: string;
+    product_id: number;
+    product_name: string;
+}
+
+export interface WishlistItem {
+    id: number;
+    user_id: number;
+    product_type: string;
+    product_id: number;
+    product_name: string;
+    created_at: string;
+}
+
+export interface WishlistResponse {
+    success: boolean;
+    message?: string;
+    data?: WishlistItem | WishlistItem[];
+    total?: number;
+    count?: number;
+}
+
+export interface SupportTicket {
+    id: string;
+    ticket_id: string;
+    category: string;
+    product_type: string;
+    reference_id?: string;
+    issue_type: string;
+    severity: string;
+    subject: string;
+    description: string;
+    status: 'Open' | 'Closed' | 'In Progress' | 'Resolved';
+    created_at: string;
+    updated_at: string;
+}
+
+export interface SupportCategory {
+    id: number;
+    category_name: string;
+}
+
 // ==================== CUSTOMER SERVICE ====================
 
 const CustomerService = {
@@ -142,7 +178,7 @@ const CustomerService = {
 
     // ==================== PORTFOLIO ====================
     getPortfolio: async () => {
-        const response = await api.get("/api/unlisted/user/portfolio");
+        const response = await api.get("/api/customer/portfolio");
         return response.data;
     },
 
@@ -165,7 +201,7 @@ const CustomerService = {
 
     // ==================== PROFILE ====================
     getProfile: async () => {
-        const response = await api.get("/api/unlisted/user/profile");
+        const response = await api.get("/api/dashboard/profile");
         return response.data;
     },
 
@@ -251,12 +287,188 @@ const CustomerService = {
         return response.data;
     },
 
-    // ==================== LOGOUT ====================
-    logout: async () => {
-        const response = await api.post("/api/unlisted/user/logout");
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('token');
-        }
+    // ==================== GOAL PLANNER (FIXED PATHS) ====================
+    createGoal: async (goalData: any) => {
+        const response = await api.post("/api/customer/create-goal", goalData);
+        return response.data;
+    },
+
+    getMyGoals: async () => {
+        const response = await api.get("/api/customer/my-goals");
+        return response.data;
+    },
+
+    getGoalById: async (goalId: number) => {
+        const response = await api.get(`/api/customer/goal/${goalId}`);
+        return response.data;
+    },
+
+    updateGoal: async (goalId: number, goalData: any) => {
+        const response = await api.put(`/api/customer/update-goal/${goalId}`, goalData);
+        return response.data;
+    },
+
+    calculateGoal: async (calculationData: any) => {
+        const response = await api.post("/api/customer/calculate-goal", {
+            target_amount: calculationData.target_amount,
+            target_years: calculationData.target_years,
+            expected_return: calculationData.expected_return,
+            current_savings: calculationData.current_savings || 0
+        });
+        return response.data;
+    },
+
+    getGoalProgress: async (goalId: number) => {
+        const response = await api.get(`/api/customer/goal-progress/${goalId}`);
+        return response.data;
+    },
+
+    deleteGoal: async (goalId: number) => {
+        const response = await api.delete(`/api/customer/delete-goal/${goalId}`);
+        return response.data;
+    },
+
+    // ==================== WISHLIST API METHODS ====================
+
+    /**
+     * Add item to wishlist
+     * POST → /api/customer/add-wishlist
+     */
+    addToWishlist: async (wishlistData: AddToWishlistParams): Promise<WishlistResponse> => {
+        const response = await api.post("/api/customer/add-wishlist", {
+            product_type: wishlistData.product_type,
+            product_id: wishlistData.product_id,
+            product_name: wishlistData.product_name
+        });
+        return response.data;
+    },
+
+    /**
+     * Get all wishlist items for current user
+     * GET → /api/customer/my-wishlist
+     */
+    getMyWishlist: async (): Promise<WishlistResponse> => {
+        const response = await api.get("/api/customer/my-wishlist");
+        return response.data;
+    },
+
+    /**
+     * Get specific wishlist item by ID
+     * GET → /api/customer/wishlist/:id
+     */
+    getWishlistItem: async (wishlistId: number): Promise<WishlistResponse> => {
+        const response = await api.get(`/api/customer/wishlist/${wishlistId}`);
+        return response.data;
+    },
+
+    /**
+     * Get total count of wishlist items for current user
+     * GET → /api/customer/wishlist-count
+     */
+    getWishlistCount: async (): Promise<{ success: boolean; count: number }> => {
+        const response = await api.get("/api/customer/wishlist-count");
+        return response.data;
+    },
+
+    /**
+     * Remove item from wishlist by ID
+     * DELETE → /api/customer/remove-wishlist/:id
+     */
+    removeFromWishlist: async (wishlistId: number): Promise<{ success: boolean; message: string }> => {
+        const response = await api.delete(`/api/customer/remove-wishlist/${wishlistId}`);
+        return response.data;
+    },
+
+      createTicket: async (ticketData: {
+        category: string;
+        product_type: string;
+        reference_id: string;
+        issue_type: string;
+        severity: string;
+        subject: string;
+        description: string;
+    }) => {
+        const response = await api.post("/api/customer/create", ticketData);
+        return response.data;
+    },
+
+    // 2) GET: /api/customer/list
+    getTicketList: async () => {
+        const response = await api.get("/api/customer/list");
+        return response.data;
+    },
+
+    // 3) GET: /api/customer/categories
+    getSupportCategories: async () => {
+        const response = await api.get("/api/customer/categories");
+        return response.data;
+    },
+
+    // 4) POST : /api/customer/reply
+    replyToTicket: async (replyData: { ticket_id: string; message: string }) => {
+        const response = await api.post("/api/customer/reply", replyData);
+        return response.data;
+    },
+
+    // 5) POST : /api/customer/close
+    closeTicket: async (ticket_id: string) => {
+        const response = await api.post("/api/customer/close", { ticket_id });
+        return response.data;
+    },
+
+    // 6) GET : /api/customer/:ticket_id
+    getTicketDetails: async (ticket_id: string) => {
+        const response = await api.get(`/api/customer/${ticket_id}`);
+        return response.data;
+    },
+
+    // Add these methods to your customerService object
+
+    // ==================== REPORT API METHODS ====================
+
+    /**
+     * Get report overview
+     * GET → /api/customer/reports/overview
+     */
+    getReportOverview: async () => {
+        const response = await api.get("/api/customer/reports/overview");
+        return response.data;
+    },
+
+    /**
+     * Get product summary
+     * GET → /api/customer/reports/product-summary
+     */
+    getProductSummary: async () => {
+        const response = await api.get("/api/customer/reports/product-summary");
+        return response.data;
+    },
+
+    /**
+     * Get recent investments
+     * GET → /api/customer/reports/recent-investments
+     */
+    getRecentInvestments: async () => {
+        const response = await api.get("/api/customer/reports/recent-investments");
+        return response.data;
+    },
+
+    /**
+     * Get portfolio distribution
+     * GET → /api/customer/reports/portfolio-distribution
+     */
+    getPortfolioDistribution: async () => {
+        const response = await api.get("/api/customer/reports/portfolio-distribution");
+        return response.data;
+    },
+
+    /**
+     * Get assigned relationship manager
+     * GET → /api/customer/assigned-rm
+     */
+
+    getrmcustomer: async () => {
+        const response = await api.get("/api/customer/rm/assigned-rm");
         return response.data;
     },
 

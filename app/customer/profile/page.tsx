@@ -4,15 +4,14 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation';
 import {
   AlertCircle,
-  ArrowLeft,
   Bell,
-  CheckCircle,
-  Loader2
+  CheckCircle
 } from 'lucide-react';
 import customerService from '../../services/customerService';
 import { ProfileSection } from './profilesection';
 import { KYCSection } from './kycsection';
 import { Modals } from './modal';
+import toast from 'react-hot-toast';
 
 // ==================== TYPES ====================
 export interface ProfileData {
@@ -21,7 +20,7 @@ export interface ProfileData {
   mobile: string;
   email?: string;
   profile_image?: string;
-  // KYC fields (optional, for refresh)
+  // KYC fields
   pan_verified?: boolean;
   aadhaar_verified?: boolean;
   bank_verified?: boolean;
@@ -31,9 +30,13 @@ export interface ProfileData {
   bank_name?: string;
   bank_account?: string;
   ifsc?: string;
-  gst_number?: string;
   name_as_per_pan?: string;
   date_of_birth?: string;
+  // Add kycDetails as an optional property
+  kycDetails?: any;
+  profile_photo?: string;
+  avatar?: string;
+  profile_pic?: string;
 }
 
 export interface PasswordData {
@@ -80,6 +83,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [originalProfile, setOriginalProfile] = useState<ProfileData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [imageTimestamp, setImageTimestamp] = useState(Date.now());
 
   // KYC Verification States
   const [panVerified, setPanVerified] = useState(false);
@@ -128,13 +132,24 @@ export default function ProfilePage() {
     return profile.name !== originalProfile.name || profile.mobile !== originalProfile.mobile;
   }, [profile, originalProfile]);
 
-  // ========== IMAGE URL HELPER ==========
-  const getImageUrl = useCallback((path: string | undefined) => {
+  // ========== GET PROFILE IMAGE WITH CACHE BUSTER ==========
+  const getProfileImageUrl = useCallback((path: string | undefined) => {
     if (!path) return null;
-    if (path.startsWith('http')) return path;
-    if (path.startsWith('/')) return `${baseURL}${path}`;
-    return `${baseURL}/uploads/${path}`;
-  }, [baseURL]);
+
+    // If it's already a full URL
+    if (path.startsWith('http')) {
+      // Add timestamp to bust cache
+      return `${path}${path.includes('?') ? '&' : '?'}t=${imageTimestamp}`;
+    }
+
+    // If it's a local path
+    if (path.startsWith('/uploads')) {
+      return `${baseURL}${path}${path.includes('?') ? '&' : '?'}t=${imageTimestamp}`;
+    }
+
+    // Default path
+    return `${baseURL}/uploads/${path}${path.includes('?') ? '&' : '?'}t=${imageTimestamp}`;
+  }, [baseURL, imageTimestamp]);
 
   // ========== SHOW NOTIFICATION ==========
   const showNotification = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -149,51 +164,58 @@ export default function ProfilePage() {
   const refreshProfileData = useCallback(async () => {
     try {
       const response = await customerService.getProfile();
-      
+
       if (response) {
-        let profileData = response;
-        if (response.data) profileData = response.data;
-        if (response.user) profileData = response.user;
-        
-        const storedImageUrl = localStorage.getItem('profile_image_url');
-        
-        // Create updated profile object with ALL fields from backend
+        const userData = response.user || {};
+        const kycData = response.kycDetails || {};
+
+        const profileImage =
+          userData.profile_image ||
+          userData.profile_photo ||
+          userData.avatar ||
+          userData.profile_pic ||
+          kycData.profile_image_url ||
+          '';
+
         const updatedProfile: ProfileData = {
-          id: profileData.id || profileData.user_id,
-          name: profileData.name || profileData.full_name || '',
-          mobile: profileData.mobile || profileData.phone || profileData.mobile_number || '',
-          email: profileData.email || '',
-          profile_image: storedImageUrl || profileData.profile_image || profileData.avatar || profileData.profile_pic,
-          
-          // Add KYC/verification fields
-          pan_verified: profileData.pan_verified,
-          aadhaar_verified: profileData.aadhaar_verified,
-          bank_verified: profileData.bank_verified,
-          demat_added: profileData.demat_added,
-          pan: profileData.pan,
-          aadhaar: profileData.aadhaar,
-          bank_name: profileData.bank_name,
-          bank_account: profileData.bank_account,
-          ifsc: profileData.ifsc,
-          gst_number: profileData.gst_number,
-          name_as_per_pan: profileData.name_as_per_pan,
-          date_of_birth: profileData.date_of_birth
+          id: userData.id || userData.user_id,
+          name: userData.name || userData.full_name || '',
+          mobile: userData.mobile || userData.phone || userData.mobile_number || '',
+          email: userData.email || '',
+          profile_image: profileImage,
+          profile_photo: profileImage,
+          avatar: profileImage,
+          profile_pic: profileImage,
+
+          pan_verified: userData.pan_verified,
+          aadhaar_verified: userData.aadhaar_verified,
+          bank_verified: userData.bank_verified,
+          demat_added: userData.demat_added,
+          pan: userData.pan,
+          aadhaar: userData.aadhaar,
+          bank_name: userData.bank_name,
+          bank_account: userData.bank_account,
+          ifsc: userData.ifsc,
+          name_as_per_pan: userData.name_as_per_pan,
+          date_of_birth: userData.date_of_birth,
+          kycDetails: kycData
         };
-        
-        // Update ALL state variables with fresh data
+
         setProfile(updatedProfile);
         setOriginalProfile(updatedProfile);
-        
-        // Update verification statuses
-        setPanVerified(!!profileData.pan_verified);
-        setAadhaarVerified(!!profileData.aadhaar_verified);
-        setBankVerified(!!profileData.bank_verified);
-        setDematAdded(!!profileData.demat_added);
+
+        setPanVerified(!!userData.pan_verified);
+        setAadhaarVerified(!!userData.aadhaar_verified || !!kycData.aadhaar_verified);
+        setBankVerified(!!userData.bank_verified || !!kycData.bank_verified);
+        setDematAdded(!!userData.demat_added);
+
+        setImageTimestamp(Date.now());
       }
     } catch (error) {
-      console.error('Failed to refresh profile:', error);
+      toast.error("Failed to refresh profile data");
     }
   }, []);
+
 
   // ========== INITIAL FETCH PROFILE DATA ==========
   useEffect(() => {
@@ -220,7 +242,6 @@ export default function ProfilePage() {
         if (err.response?.status === 401) {
           removeTokenCookie();
           localStorage.removeItem('token');
-          localStorage.removeItem('profile_image_url');
           router.push('/');
         } else {
           setError(err.message || 'Failed to load profile');
@@ -255,73 +276,40 @@ export default function ProfilePage() {
   const handleProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!profile) {
-        showNotification('Profile data not found', 'error');
-        return;
-    }
-
-    if (!profile.name?.trim()) {
-        showNotification('Name is required', 'error');
-        return;
-    }
-
-    const mobileValidationError = validateMobile(profile.mobile);
-    if (mobileValidationError) {
-        setMobileError(mobileValidationError);
-        showNotification(mobileValidationError, 'error');
-        return;
-    }
-
-    if (!hasChanges) {
-        showNotification('No changes detected', 'info');
-        setIsEditing(false);
-        return;
-    }
+    if (!profile) return;
 
     try {
-        setUpdating(true);
-        
-        const response = await customerService.updateProfile({
-          name: profile.name,
+      setUpdating(true);
+
+      const response = await customerService.updateProfile({
+        name: profile.name,
+        mobile: profile.mobile,
+      });
+
+      if (response?.success) {
+
+        const updatedProfile = {
+          ...profile,
           mobile: profile.mobile,
-        });
+          name: profile.name
+        };
 
-        if (response?.success || response?.message?.includes('success')) {
-          setIsEditing(false);
-          setOriginalProfile(profile);
-          showNotification(response.message || 'Profile updated successfully!', 'success');
-          setMobileError(null);
-          
-          await refreshProfileData();
-        } else {
-          showNotification('Failed to update profile', 'error');
-        }
+        setProfile(updatedProfile);
+        setOriginalProfile(updatedProfile);
 
-    } catch (error: any) {
-        if (error.response?.status === 401) {
-          showNotification('Session expired. Please login again.', 'error');
-          removeTokenCookie();
-          localStorage.removeItem('token');
-          localStorage.removeItem('profile_image_url');
-          router.push('/');
-        } else if (error.response?.status === 400) {
-          const errorMessage = error.response.data?.message;
-          
-          if (errorMessage?.includes('Mobile number already exists')) {
-              const attemptedNumber = profile.mobile;
-              const lastFourDigits = attemptedNumber.slice(-4);
-              const maskedNumber = `XXXXXX${lastFourDigits}`;
-              
-              setMobileError(`Mobile number ${maskedNumber} is already registered with another account`);
-              showNotification(`Mobile number ${maskedNumber} is already registered`, 'error');
-          } else {
-              showNotification(errorMessage || 'Invalid data provided', 'error');
-          }
-        } else {
-          showNotification('Failed to update profile', 'error');
-        }
+        setIsEditing(false);
+        setMobileError(null);
+
+        showNotification("Profile updated successfully", "success");
+
+      } else {
+        showNotification("Failed to update profile", "error");
+      }
+
+    } catch (err) {
+      showNotification("Mobile number already exists", "error");
     } finally {
-        setUpdating(false);
+      setUpdating(false);
     }
   };
 
@@ -344,30 +332,28 @@ export default function ProfilePage() {
     formData.append('profile_photo', file);
 
     setUploadingImage(true);
+
     try {
       const response = await customerService.updateProfileImage(formData);
+
+      // Force refresh profile data and update timestamp
+      await refreshProfileData();
       
-      let imageUrl = response.profile_image_url || response.data?.profile_image_url || response.image_url || response.url;
-      
-      if (imageUrl) {
-        localStorage.setItem('profile_image_url', imageUrl);
-        
-        setProfile(prev => prev ? { ...prev, profile_image: imageUrl } : null);
-        
-        if (!isEditing) {
-          setOriginalProfile(prev => prev ? { ...prev, profile_image: imageUrl } : null);
-        }
-        
-        showNotification(response.message || 'Profile picture updated!', 'success');
-      } else {
-        await refreshProfileData();
-        showNotification('Profile picture updated!', 'success');
-      }
+      // Force image refresh by updating timestamp
+      setImageTimestamp(Date.now());
+
+      showNotification(response.message || 'Profile picture updated!', 'success');
     } catch (err: any) {
-      showNotification(err.response?.data?.message || 'Failed to upload image', 'error');
-    } finally { 
+      showNotification(
+        err.response?.data?.message || 'Failed to upload image',
+        'error'
+      );
+    } finally {
       setUploadingImage(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -430,7 +416,6 @@ export default function ProfilePage() {
       if (response) {
         removeTokenCookie();
         localStorage.removeItem('token');
-        localStorage.removeItem('profile_image_url');
         showNotification('Account deleted successfully', 'success');
         setTimeout(() => router.push('/'), 2000);
       }
@@ -450,17 +435,22 @@ export default function ProfilePage() {
   const handleProfileChange = (field: keyof ProfileData, value: string) => {
     if (!profile) return;
 
-    if (field === 'mobile') {
-      const cleanValue = value.replace(/\D/g, '').slice(0, 10);
-      setProfile({ ...profile, [field]: cleanValue });
-      
+    if (field === "mobile") {
+      const cleanValue = value.replace(/\D/g, "").slice(0, 10);
+
+      setProfile(prev =>
+        prev ? { ...prev, mobile: cleanValue } : prev
+      );
+
       if (cleanValue && !/^\d{10}$/.test(cleanValue)) {
-        setMobileError('Please enter a valid 10-digit mobile number');
+        setMobileError("Please enter a valid 10-digit mobile number");
       } else {
         setMobileError(null);
       }
     } else {
-      setProfile({ ...profile, [field]: value });
+      setProfile(prev =>
+        prev ? { ...prev, [field]: value } : prev
+      );
     }
   };
 
@@ -586,7 +576,7 @@ export default function ProfilePage() {
         mobileError={mobileError}
         hasChanges={hasChanges}
         fileInputRef={fileInputRef}
-        getImageUrl={getImageUrl}
+        getProfileImageUrl={getProfileImageUrl}
         onEdit={() => setIsEditing(true)}
         onDiscard={discardChanges}
         onProfileChange={handleProfileChange}
@@ -598,6 +588,7 @@ export default function ProfilePage() {
 
       {/* KYC Section - With refresh and verification props */}
       <KYCSection 
+        profile={profile}
         onRefresh={refreshProfileData}
         externalPanVerified={panVerified}
         externalAadhaarVerified={aadhaarVerified}

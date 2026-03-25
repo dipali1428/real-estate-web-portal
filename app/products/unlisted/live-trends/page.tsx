@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
     fetchDashboardData,
     fetchTopGainers,
@@ -227,8 +227,8 @@ const LiveTrends: React.FC = () => {
     }, [chartRef.current]);
 
     // ========== CHART INITIALIZATION ==========
-    useEffect(() => {
-        if (!isChartReady || !chartRef.current || graphData.length === 0) {
+  const initializeChart = useCallback(() => {
+        if (!chartRef.current || graphData.length === 0) {
             return;
         }
 
@@ -333,16 +333,116 @@ const LiveTrends: React.FC = () => {
         try {
             chartInstance.current = new Chart(ctx, config);
         } catch (error) {
-            // Silently handle chart creation error
+            console.error('Chart creation error:', error);
         }
+    }, [graphData, period]);
 
+    // Initialize chart when data is loaded and canvas is ready
+    useEffect(() => {
+        if (!isGraphLoading && graphData.length > 0 && chartRef.current) {
+            // Small timeout to ensure DOM is ready
+            const timer = setTimeout(() => {
+                initializeChart();
+            }, 100);
+            
+            return () => clearTimeout(timer);
+        }
+    }, [isGraphLoading, graphData.length, chartRef.current, initializeChart]);
+
+    // Handle period changes
+    useEffect(() => {
+        if (!isGraphLoading && graphData.length > 0 && chartInstance.current) {
+            initializeChart();
+        }
+    }, [period, initializeChart, isGraphLoading, graphData.length]);
+
+    // Cleanup on unmount
+    useEffect(() => {
         return () => {
             if (chartInstance.current) {
                 chartInstance.current.destroy();
                 chartInstance.current = null;
             }
         };
-    }, [graphData, period, isChartReady]);
+    }, []);
+
+    // ========== FETCH ALL DATA ==========
+    useEffect(() => {
+        const loadAllData = async () => {
+            setIsGraphLoading(true);
+            setIsMoversLoading(true);
+            setIsSharesLoading(true);
+            
+            try {
+                // Fetch graph data - now it returns {success, summary, graph}
+                const graphResponse = await fetchDashboardData();
+                
+                // Check if the response has the expected structure
+                if (graphResponse && graphResponse.success && graphResponse.graph) {
+                    // Set the graph data from the graph property
+                    setGraphData(graphResponse.graph);
+                    
+                    // Set summary from the response
+                    if (graphResponse.summary) {
+                        setSummary(graphResponse.summary);
+                    }
+                } else {
+                    setGraphError("Invalid graph data format");
+                }
+
+                // Fetch top gainers
+                try {
+                    const gainersData = await fetchTopGainers(5);
+                    if (gainersData.success) {
+                        setGainers(gainersData.data);
+                    }
+                } catch (error) {
+                    // Silently handle error
+                }
+
+                // Fetch top losers
+                try {
+                    const losersData = await fetchTopLosers(5);
+                    if (losersData.success) {
+                        setLosers(losersData.data);
+                    }
+                } catch (error) {
+                    // Silently handle error
+                }
+
+                // Fetch shares data
+                try {
+                    const sharesData = await fetchAllShares();
+                    if (Array.isArray(sharesData)) {
+                        setShares(sharesData);
+                        
+                        // Update total companies count from shares data if summary exists
+                        setSummary(prev => prev ? {
+                            ...prev,
+                            totalCompanies: sharesData.length,
+                            totalSharesListed: sharesData.length
+                        } : null);
+                    }
+                } catch (error) {
+                    // Silently handle error
+                }
+
+                setGraphError(null);
+                setMoversError(null);
+            } catch (error: any) {
+                setGraphError("Unable to connect to live API");
+            } finally {
+                setIsGraphLoading(false);
+                setIsMoversLoading(false);
+                setIsSharesLoading(false);
+            }
+        };
+
+        loadAllData();
+        
+        const now = new Date();
+        setLastUpdatedTime(now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }));
+    }, []);
 
     // ========== RENDER ==========
     return (
