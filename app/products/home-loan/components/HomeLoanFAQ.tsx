@@ -22,9 +22,9 @@ export default function HomeLoanFAQ() {
     const [showAllFaqs, setShowAllFaqs] = useState(false);
 
     return (
-        <section className="py-12 md:py-16 bg-white font-sans">
+        <section className="py-8 md:py-12 bg-white font-sans">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <motion.div initial="hidden" whileInView="visible" className="text-center mb-16">
+                <motion.div initial="hidden" whileInView="visible" className="text-center mb-10">
                     <section className="mb-10">
                         <div className="max-w-4xl mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
                             <p className="text-sm text-gray-700 text-center leading-relaxed">
@@ -77,7 +77,7 @@ export default function HomeLoanFAQ() {
                 </div>
 
                 {HOME_LOAN_FAQS.length > 5 && (
-                    <div className="text-center mt-12">
+                    <div className="text-center mt-8">
                         <button
                             onClick={() => setShowAllFaqs(!showAllFaqs)}
                             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-blue-50 text-[#2076C7] font-bold hover:bg-blue-100 transition-all cursor-pointer shadow-sm active:scale-95"

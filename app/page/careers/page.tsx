@@ -425,8 +425,8 @@ export default function CareersContent() {
           
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 font-sans text-center mb-16">
             <StatItem value="20+" label="Branches Across India" />
-            <StatItem value="127+" label="Cities Covered" />
-            <StatItem value="2,700+" label="Active DSA & Partners" />
+            <StatItem value="134+" label="Cities Covered" />
+            <StatItem value="3000+" label="Active DSA & Partners" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

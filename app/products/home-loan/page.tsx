@@ -139,9 +139,9 @@ export default function HomeLoanPage() {
                     />
 
                     {/* EMI Calculator */}
-                    <section className="py-12 md:py-16 bg-white border-y border-gray-100">
+                    <section className="py-8 md:py-12 bg-white border-y border-gray-100">
                         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <motion.div initial="hidden" whileInView="visible" className="text-center mb-16">
+                            <motion.div initial="hidden" whileInView="visible" className="text-center mb-10">
                                 <motion.h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                                     Calculate Your EMI
                                 </motion.h2>

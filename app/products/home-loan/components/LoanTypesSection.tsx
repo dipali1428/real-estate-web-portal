@@ -43,13 +43,13 @@ export default function LoanTypesSection({ onApply }: LoanTypesSectionProps) {
     const [showMoreLoans, setShowMoreLoans] = useState(false);
 
     return (
-        <section className="py-12 md:py-16 bg-white relative overflow-hidden">
+        <section className="py-8 md:py-12 bg-white relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
-                    className="text-center mb-16"
+                    className="text-center mb-10"
                 >
                     <motion.h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Choose Your Home Loan
@@ -195,7 +195,7 @@ export default function LoanTypesSection({ onApply }: LoanTypesSectionProps) {
                     </AnimatePresence>
 
                     {/* View More Toggle Button */}
-                    <div className="flex justify-center mt-12">
+                    <div className="flex justify-center mt-8">
                         <button
                             onClick={() => setShowMoreLoans(!showMoreLoans)}
                             className="group relative flex items-center gap-3 px-10 py-4 bg-white border-2 border-[#2076C7]/20 hover:border-[#1CADA3] rounded-2xl transition-all duration-300 text-[#2076C7] hover:text-[#1CADA3] font-bold shadow-sm hover:shadow-xl hover:-translate-y-1 cursor-pointer overflow-hidden"
