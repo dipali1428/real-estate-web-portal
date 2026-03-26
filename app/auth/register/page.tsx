@@ -102,6 +102,15 @@ export default function BecomePartnerForm() {
     return () => clearInterval(interval);
   }, [otpTimer]);
 
+  // Referral Code Handler
+  useEffect(() => {
+    const ref = localStorage.getItem("referral_code");
+
+    if (ref) {
+      setField("rm_referral", ref);
+    }
+  }, []);
+
   const setField = (key: keyof typeof form, value: any) => {
     let newValue = value;
 
@@ -267,6 +276,9 @@ export default function BecomePartnerForm() {
       refresh();
       setAnswer("");
 
+      localStorage.removeItem("referral_code");
+      localStorage.removeItem("ref_handled");
+
     } catch (err: any) {
       setServerError(err?.response?.data?.message || "Something went wrong. Try again.");
       refresh();
@@ -380,10 +392,10 @@ export default function BecomePartnerForm() {
                       {errors.mobile && <p className={errorClass}>{errors.mobile}</p>}
                     </div>
 
-                    {/* RM Referral */}
+                    {/* Referral */}
                     <div>
                       <label className={labelClass}>
-                        RM Referral Code <span className="text-gray-400 font-normal">(Optional)</span>
+                        Referral Code <span className="text-gray-400 font-normal">(Optional)</span>
                       </label>
                       <input
                         type="text"
