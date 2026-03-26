@@ -221,7 +221,8 @@ export default function ProfileSection() {
                 setReferralCode(`${res.user.referral_code}`);
             }
             setKyc(res.kycDetails);
-            setMobileVerified(!!res.user?.mobile_verified || !!res.kycDetails?.phone_verified);
+            // || !!res.kycDetails?.phone_verified
+            setMobileVerified(true);
             setEmailVerified(!!res.user?.email_verified || !!res.kycDetails?.email_verified);
             setBankVerified(!!res.kycDetails?.bank_verified);
             setAadhaarVerified(!!res.kycDetails?.aadhaar_verified);
