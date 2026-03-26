@@ -317,5 +317,9 @@ export const AdminService = {
     return res.data;
   },
 
+getDSAKycStatus: async (params?: { page?: number; limit?: number; search?: string }) => {
+  const response = await api.get("/api/admin/get-dsa-kyc-status", { params });
+  return response.data;
+},
 };
 
