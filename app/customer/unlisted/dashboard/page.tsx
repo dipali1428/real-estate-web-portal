@@ -66,7 +66,7 @@ const UserDashboard: React.FC = () => {
   useEffect(() => {
     // Check if user is logged in by looking for authToken cookie
     const token = getTokenFromCookie();
-    
+
     // If no token, redirect to home page which will open login modal
     if (!token) {
       router.push('/');
@@ -82,14 +82,14 @@ const UserDashboard: React.FC = () => {
     const loadDashboardData = async () => {
       setIsLoading(true);
       setError(null);
-      
+
       try {
         // Store token in localStorage for the API service
         localStorage.setItem('token', token);
-        
+
         // Fetch dashboard data using customerService
         const dashboardResponse = await customerService.getDashboard();
-        
+
         if (dashboardResponse?.success) {
           setDashboard(dashboardResponse.data);
           setLastUpdated(new Date().toLocaleTimeString('en-IN', {
@@ -115,7 +115,7 @@ const UserDashboard: React.FC = () => {
 
       } catch (err: any) {
         console.error('Dashboard error:', err);
-        
+
         // Check for 401 Unauthorized
         if (err.response?.status === 401 || err.message?.includes('401')) {
           removeTokenCookie();
@@ -130,7 +130,7 @@ const UserDashboard: React.FC = () => {
     };
 
     loadDashboardData();
-    
+
     // Auto refresh every 60 seconds
     const interval = setInterval(loadDashboardData, 60000);
     return () => clearInterval(interval);
@@ -138,12 +138,6 @@ const UserDashboard: React.FC = () => {
 
   // ========== HANDLE LOGOUT ==========
   const handleLogout = async () => {
-    try {
-      await customerService.logout();
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
-    // Clear everything and redirect
     removeTokenCookie();
     localStorage.removeItem('token');
     router.push('/');
@@ -184,14 +178,14 @@ const UserDashboard: React.FC = () => {
           <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">Unable to Load Dashboard</h3>
           <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">{error}</p>
           <div className="space-y-3">
-            <button 
+            <button
               onClick={() => window.location.reload()}
               className="w-full py-3 px-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-semibold rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
             >
               <RefreshCw size={18} />
               Retry Connection
             </button>
-            <button 
+            <button
               onClick={handleLogout}
               className="w-full py-3 px-4 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all text-sm sm:text-base"
             >
@@ -208,7 +202,7 @@ const UserDashboard: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        
+
         {/* Welcome Section */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -229,7 +223,7 @@ const UserDashboard: React.FC = () => {
 
         {/* Stats Grid - Stack on mobile */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          
+
           {/* Total Invested Card */}
           <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-16 sm:w-20 h-16 sm:h-20 bg-blue-50 rounded-bl-full -mr-5 -mt-5 opacity-50 group-hover:opacity-70 transition-opacity"></div>
@@ -237,7 +231,7 @@ const UserDashboard: React.FC = () => {
               <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <IndianRupee className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
               </div>
-              <button 
+              <button
                 onClick={() => setBalanceVisible(!balanceVisible)}
                 className="text-gray-400 hover:text-gray-600 transition-colors bg-white/80 backdrop-blur-sm p-1.5 rounded-lg"
               >
@@ -280,14 +274,14 @@ const UserDashboard: React.FC = () => {
 
         {/* Quick Stats - Only showing from API data */}
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          
+
           {/* Quick Stats */}
           <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100">
             <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-1 sm:gap-2">
               <BarChart3 size={16} className="sm:w-[20px] sm:h-[20px] text-[#2076C7]" />
               Quick Stats
             </h3>
-            
+
             <div className="space-y-2 sm:space-y-3">
               <div className="flex items-center justify-between p-2 sm:p-3 hover:bg-gray-50 rounded-lg sm:rounded-xl transition-colors">
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -298,7 +292,7 @@ const UserDashboard: React.FC = () => {
                 </div>
                 <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">--</span>
               </div>
-              
+
               <div className="flex items-center justify-between p-2 sm:p-3 hover:bg-gray-50 rounded-lg sm:rounded-xl transition-colors">
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                   <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
@@ -308,7 +302,7 @@ const UserDashboard: React.FC = () => {
                 </div>
                 <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">--</span>
               </div>
-              
+
               <div className="flex items-center justify-between p-2 sm:p-3 hover:bg-gray-50 rounded-lg sm:rounded-xl transition-colors">
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                   <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
@@ -322,7 +316,7 @@ const UserDashboard: React.FC = () => {
           </div>
         </div>
       </main>
-      
+
       {/* Add custom animation */}
       <style jsx>{`
         @keyframes spin-slow {

@@ -221,7 +221,6 @@ export default function OrdersPage() {
   // ========== HANDLE LOGOUT ==========
   const handleLogout = async () => {
     try {
-      await customerService.logout();
       removeTokenCookie();
       localStorage.removeItem('token');
       showNotification('Logged out successfully', 'success');
