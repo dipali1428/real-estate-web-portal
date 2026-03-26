@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import Header from "./component/Header";
 import Footer from "./component/Footer";
 import { ModalProvider, useModal } from "./context/ModalContext";
@@ -44,7 +44,9 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
     <ModalProvider>
 
       {/* ✅ Referral handler runs globally */}
-      <ReferralHandler />
+      <Suspense fallback={null}>
+        <ReferralHandler />
+      </Suspense>
 
       {!isDashboard &&
         !isContactList &&
