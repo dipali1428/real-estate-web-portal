@@ -44,15 +44,33 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
   const [viewingDetails, setViewingDetails] = useState<boolean>(false);
   const [fetchingDocs, setFetchingDocs] = useState<boolean>(false);
   const [uploadingKey, setUploadingKey] = useState<string | null>(null);
+  const [subCategoryFilter, setSubCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+// Add this useEffect to make the popup disappear after 3 seconds
+useEffect(() => {
+  if (toast) {
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
+  }
+}, [toast]);
   const [documents, setDocuments] = useState<{ uploaded: any[], pending: any[] }>({
     uploaded: [],
     pending: []
   });
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewTitle, setPreviewTitle] = useState<string>("");
@@ -70,6 +88,8 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
 
   useEffect(() => {
     setSearchTerm("");
+    setSubCategoryFilter("all");
+    setStatusFilter("all"); // Add this line
     setCurrentPage(1);
   }, [activeTab]);
 
@@ -192,21 +212,27 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
     loadDocuments(lead.id);
   };
 
+  // UPLOAD PENDING DOC FRON ACTION
   const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>, doc: any) => {
+
     const file = e.target.files?.[0];
     if (!file || !activeLead) return;
+
     const refId = activeLead.refId;
+
     setUploadingKey(doc.document_key);
+
     const formData = new FormData();
     formData.append("leadDbId", refId);
     formData.append("documents", file);
+
     const metadata = [{ key: doc.document_key, label: doc.document_label }];
     formData.append("metadata", JSON.stringify(metadata));
     try {
       const response = await DashboardService.uploadLeadDocument(refId, formData);
 
       if (response.success) {
-        alert("Document uploaded successfully!");
+        setToast({ message: "Document uploaded successfully!", type: "success" }); 
         loadDocuments(activeLead.id);
       }
     } catch (error) {
@@ -218,16 +244,35 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
 
   const isImage = (url: string) => /\.(jpg|jpeg|png|webp|gif)$/i.test(url);
 
+  // Get unique subcategories
+  const uniqueSubCategories = useMemo(() => {
+    const subs = data.map(lead => lead.subCategory).filter(s => s && s !== "-");
+    return Array.from(new Set(subs)).sort();
+  }, [data]);
+
+  // Get unique statuses (normalized to lowercase for consistency)
+  const uniqueStatuses = useMemo(() => {
+    const statuses = data.map(lead => (lead.status || lead.referral_lead_status || "PENDING").toLowerCase());
+    return Array.from(new Set(statuses)).sort();
+  }, [data]);
+
   const filteredLeads = useMemo(() => {
     return data.filter(lead => {
       const search = searchTerm.toLowerCase();
-      return (
+      const leadStatus = (lead.status || lead.referral_lead_status || "PENDING").toLowerCase();
+
+      const matchesSearch = (
         lead.clientName.toLowerCase().includes(search) ||
         lead.refId.toLowerCase().includes(search) ||
         lead.contactNumber.includes(searchTerm)
       );
+
+      const matchesSubCategory = subCategoryFilter === "all" || lead.subCategory === subCategoryFilter;
+      const matchesStatus = statusFilter === "all" || leadStatus === statusFilter;
+
+      return matchesSearch && matchesSubCategory && matchesStatus;
     });
-  }, [data, searchTerm]);
+  }, [data, searchTerm, subCategoryFilter, statusFilter]);
 
   const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -270,6 +315,34 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                 <option value={5}>5</option><option value={10}>10</option><option value={25}>25</option>
               </select>
             </div>
+            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-3 py-1.5">
+              <span className="text-[10px] font-bold text-gray-500 uppercase">Subcategory</span>
+              <select
+                value={subCategoryFilter}
+                onChange={(e) => setSubCategoryFilter(e.target.value)}
+                className="text-xs text-gray-700 focus:outline-none bg-transparent font-semibold max-w-[120px]"
+              >
+                <option value="all">All</option>
+                {uniqueSubCategories.map(sub => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Status Filter */}
+            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-3 py-1.5">
+              <span className="text-[10px] font-bold text-gray-500 uppercase">Status</span>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="text-xs text-gray-700 focus:outline-none bg-transparent font-semibold max-w-[100px] capitalize"
+              >
+                <option value="all">All</option>
+                {uniqueStatuses.map(status => (
+                  <option key={status} value={status}>{status.replace('_', ' ')}</option>
+                ))}
+              </select>
+            </div>
             <div className="relative">
               <input
                 type="text"
@@ -296,11 +369,11 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                   <>
                     <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Ref ID</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Client</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Contact</th>
+                    {/* <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Contact</th> */}
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Dept</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Product</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Rejection Note</th>
-                    {activeTab === 'all' && <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Amount</th>}
+                    {activeTab === 'all' && <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Amount</th>}
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Type</th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
                     {activeTab === 'all' && <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Actions</th>}
@@ -330,9 +403,8 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                       <>
                         <td className="px-4 py-4 text-center text-sm text-gray-600">{lead.refId}</td>
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.clientName}</td>
-                        <td className="px-4 py-4 text-sm text-gray-600">{lead.contactNumber}</td>
+                        {/* <td className="px-4 py-4 text-sm text-gray-600">{lead.contactNumber}</td> */}
                         <td className="px-4 py-4 text-sm text-gray-900">{lead.product}</td>
-
                         <td className="px-4 py-4 text-sm text-gray-700">{lead.subCategory}</td>
                         <td className="px-6 py-4 text-sm text-gray-600 min-w-[100px] whitespace-pre">
                           {lead.rejectionNote ? (
@@ -465,7 +537,8 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                         {uploadingKey === doc.document_key ? (
                           <span className="text-[10px] text-blue-600 font-bold animate-pulse">Uploading...</span>
                         ) : (
-                          <label className="cursor-pointer text-blue-600 text-[10px] font-bold uppercase hover:text-blue-800">Upload <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, doc)} /></label>
+                          <label className="cursor-pointer text-blue-600 text-[10px] font-bold hover:text-blue-800">UPLOAD<input type="file" className="hidden" onChange={(e) => handleFileUpload(e, doc)} />
+                          </label>
                         )}
                       </div>
                     ))}
@@ -478,7 +551,7 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                 <div className="relative">
                   {(() => {
                     const isLoan = activeLead.product?.toLowerCase().includes('loan');
-                    
+
                     const steps = [
                       { label: "Application Submitted", date: activeLead.createdDate, completed: true },
                       {
@@ -510,10 +583,10 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
                     return steps.map((step, idx, arr) => (
                       <div key={idx} className="flex gap-4 mb-8 last:mb-0 relative">
                         {idx !== arr.length - 1 && (
-                          <div className={`absolute left-[11px] top-6 w-[2px] h-10 ${step.completed ? 'bg-emerald-500' : 'bg-gray-200'}`} />
+                          <div className={`absolute left-[11px] top-6 w-0.5 h-10 ${step.completed ? 'bg-emerald-500' : 'bg-gray-200'}`} />
                         )}
                         <div className={`z-10 w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors duration-500 ${step.completed ? 'bg-emerald-500 text-white shadow-sm' :
-                            step.active ? 'bg-blue-600 text-white shadow-lg animate-pulse' : 'bg-gray-200 text-white'
+                          step.active ? 'bg-blue-600 text-white shadow-lg animate-pulse' : 'bg-gray-200 text-white'
                           }`}>
                           {step.completed ? <Check size={12} strokeWidth={4} /> : <Clock size={12} />}
                         </div>
@@ -539,19 +612,33 @@ const LeadTable: FC<LeadTableProps> = ({ onEdit, onDelete }) => {
       )}
 
       {previewUrl && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
               <h3 className="text-lg font-bold text-gray-800">{previewTitle}</h3>
               <button onClick={() => setPreviewUrl(null)} className="text-gray-500 hover:text-black font-bold text-xl">Close ✕</button>
             </div>
-            <div className="flex-grow bg-gray-100 flex items-center justify-center overflow-hidden">
+            <div className="grow bg-gray-100 flex items-center justify-center overflow-hidden">
               {isImage(previewUrl) ? (
                 <img src={previewUrl} alt="Preview" className="max-w-full max-h-full object-contain" />
               ) : (
                 <iframe src={`${previewUrl}#toolbar=0`} className="w-full h-full border-none" title="PDF Preview" />
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+{toast && (
+        <div className="fixed top-5 right-5 z-[100] animate-in slide-in-from-right-5">
+          <div className={`flex items-center gap-3 px-6 py-3 rounded-xl shadow-2xl border ${
+            toast.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-red-50 border-red-100 text-red-800'
+          }`}>
+            {toast.type === 'success' ? <Check size={18} /> : <X size={18} />}
+            <p className="text-sm font-bold uppercase tracking-wide">{toast.message}</p>
+            <button onClick={() => setToast(null)} className="ml-4 opacity-50 hover:opacity-100">
+              <X size={14} />
+            </button>
           </div>
         </div>
       )}

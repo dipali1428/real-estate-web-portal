@@ -144,7 +144,7 @@ export default function LeadManagementPage() {
   return (
     <>
       <section id="lead-management" className="min-h-screen bg-slate-50 p-4 sm:p-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-full mx-auto">
 
           {/* Header */}
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-2 gap-4">
