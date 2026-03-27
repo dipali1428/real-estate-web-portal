@@ -11,6 +11,8 @@ import { useModal } from "../context/ModalContext";
 import Link from "next/link";
 // import { useRouter } from "next/navigation";
 // import { useClientCookie } from "../hooks/useClientCookie";
+import { useRef } from "react";
+
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +26,7 @@ const Header = () => {
   const [isRealEstateOpen, setIsRealEstateOpen] = useState(false);
   const [isUnlistedOpen, setIsUnlistedOpen] = useState(false);
   const { openLogin, openPartner, openSignup } = useModal();
+  const productTimeout = useRef(null);
 
   // const router = useRouter();
   // const token = useClientCookie("authToken");
