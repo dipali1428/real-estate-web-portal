@@ -25,6 +25,7 @@ export default function KycStatusPage() {
         limit, 
         search 
       });
+      
       if (response.success) {
         setData(response.data || []);
         setTotalPages(response.totalPages || 1);
@@ -82,7 +83,7 @@ export default function KycStatusPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input 
                 type="text" 
-                placeholder="Search Name or ID..." 
+                placeholder="Search By Name or ADV_ID..." 
                 className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg outline-none text-gray-600 focus:ring-2 focus:ring-gray-100 w-64 text-sm bg-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -108,13 +109,16 @@ export default function KycStatusPage() {
               <thead>
                 <tr className="bg-gray-50/50 border-b border-gray-200">
                   <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">DSA Name</th>
+                  <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">DSA Details</th>
                   <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">PAN Verified</th>
-                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Email Verified</th>
-                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Bank Verified</th>
                   <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Aadhaar Verified</th>
+                    <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">PAN-Aadhaar Link</th>
+                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Email Verified</th>
+                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Phone Verified</th>
+                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Bank Verified</th>
+                  
                   <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">GST Verified</th>
-                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">PAN-Aadhaar Link</th>
+                
                   <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center bg-blue-50/30">KYC Completed</th>
                 </tr>
               </thead>
@@ -129,16 +133,20 @@ export default function KycStatusPage() {
                 ) : data.length > 0 ? (
                   data.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50/80 transition-colors">
-                      <td className="px-4 py-4 text-xs font-mono text-gray-400">{item.id}</td>
+                      <td className="px-4 py-4 text-xs font-sans text-gray-700">{item.id}</td>
                       <td className="px-4 py-4">
                         <div className="text-sm font-bold text-gray-900 leading-tight">{item.name}</div>
+                        <div className="text-xs text-gray-500 leading-tight">{item.adv_id}</div>
                       </td>
                       <td className="px-2 py-4"><StatusIndicator verified={item.pan_verified} /></td>
-                      <td className="px-2 py-4"><StatusIndicator verified={item.email_verified} /></td>
-                      <td className="px-2 py-4"><StatusIndicator verified={item.bank_verified} /></td>
                       <td className="px-2 py-4"><StatusIndicator verified={item.aadhaar_verified} /></td>
+                        <td className="px-2 py-4"><StatusIndicator verified={item.pan_aadhaar_linked} /></td>
+                      <td className="px-2 py-4"><StatusIndicator verified={item.email_verified} /></td>
+                        <td className="px-2 py-4"><StatusIndicator verified={item.phone_verified} /></td>
+                      <td className="px-2 py-4"><StatusIndicator verified={item.bank_verified} /></td>
+                      
                       <td className="px-2 py-4"><StatusIndicator verified={item.gst_verified} /></td>
-                      <td className="px-2 py-4"><StatusIndicator verified={item.pan_aadhaar_linked} /></td>
+                    
                       <td className="px-4 py-4 bg-blue-50/10">
                         <div className="flex justify-center">
                           {item.kyc_completed ? (

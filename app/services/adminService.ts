@@ -127,19 +127,11 @@ export const AdminService = {
   },
 
   // Fetch DSA List 
-  dsaList: async (formData: DSAListPayload = {}) => {
-    const response = await api.get("/api/admin/dsalist", { params: formData });
-    return response.data;
-  },
+  dsaList: async (params?: { page?: number; limit?: number; search?: string }) => {
+  const response = await api.get("/api/admin/dsalist", { params });
+  return response.data;
+},
 
-  // Fetch DSA List with Search
-  searchDSA: async (params = {}, options = {}) => {
-    const response = await api.get("/api/admin/dsalist/search", {
-      params,
-      ...options
-    });
-    return response.data;
-  },
 
   contactusData: async (formData: EnquiryPayload = {}) => {
     const response = await api.get("/api/admin/contactus", { params: formData });
@@ -274,7 +266,7 @@ export const AdminService = {
   },
 
 
-  // Updated to accept pagination and search params
+ // Updated to accept pagination and search params
   getAllDetailLeads: async (params?: { page?: number; limit?: number; search?: string }) => {
     const response = await api.get("/api/admin/get-all-detail-leads", { params });
     return response.data;
