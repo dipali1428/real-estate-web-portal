@@ -671,6 +671,23 @@ export default function ProfileSection() {
                                             </div>
                                         ))}
                                     </div>
+                                    {/* <div className="mt-3 space-y-2">
+                                        <label className="text-[14px] font-bold text-slate-600 uppercase tracking-wider block">
+                                            Current Address
+                                        </label>
+                                        <textarea
+                                            disabled={!isEditing}
+                                            value={profile.address || ""}
+                                            onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                                            rows={1}
+                                            className={`w-full border rounded-xl px-4 py-2.5 text-[14px] font-bold outline-none transition-all resize-none 
+                                                ${!isEditing
+                                                    ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed'
+                                                    : 'bg-white border-slate-300 text-slate-700 focus:border-[#2076C7] shadow-sm'
+                                                }`}
+                                            placeholder="Enter your full current address"
+                                        />
+                                    </div> */}
                                     <div className="pt-3 border-t border-slate-100">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
                                             {/* Password Input Field */}
@@ -819,58 +836,7 @@ export default function ProfileSection() {
 
                     <div className="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 space-y-4">
 
-                        {/* PAN Block */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-white rounded-xl border border-slate-100">
-                            <div className="md:col-span-3 flex justify-between items-center">
-                                <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Permanent Account Number (PAN)</h4>
-                                {profile.pan_verified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
-                            </div>
-
-                            <input
-                                disabled={profile.pan_verified}
-                                value={profile.pan_verified ? maskPAN(profile.pan || "") : profile.pan || ""}
-                                onChange={(e) => setProfile({ ...profile, pan: e.target.value.toUpperCase() })}
-                                className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50"
-                                placeholder="PAN Number"
-                            />
-
-                            <input
-                                disabled={profile.pan_verified}
-                                value={
-                                    profile.pan_verified
-                                        ? (profile.name?.toUpperCase() || "")
-                                        : (profile.name_as_per_pan || "")
-                                }
-                                onChange={(e) => setProfile({ ...profile, name_as_per_pan: e.target.value.toUpperCase() })}
-
-                                className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50 disabled:text-slate-600"
-                                placeholder="Name as per PAN"
-                            />
-
-                            <div className="flex gap-2">
-                                <input
-                                    type="date"
-                                    disabled={profile.pan_verified}
-                                    value={
-                                        profile.pan_verified
-                                            ? (profile.date_of_birth || "")
-                                            : ("")
-                                    }
-                                    onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
-                                    className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none disabled:bg-slate-50"
-                                />
-                                {!profile.pan_verified && (
-                                    <button
-                                        onClick={handlePanVerification}
-                                        className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-[#158f87]"
-                                    >
-                                        Verify
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Aadhaar Block */}
+                    {/* Aadhaar Block */}
                         <div className="p-4 bg-white rounded-xl border border-slate-100">
                             <div className="flex justify-between items-center mb-3">
                                 <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Aadhaar Verification</h4>
@@ -904,6 +870,54 @@ export default function ProfileSection() {
                                             Verify OTP
                                         </button>
                                     </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* PAN Block */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-white rounded-xl border border-slate-100">
+                            <div className="md:col-span-3 flex justify-between items-center">
+                                <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Permanent Account Number (PAN)</h4>
+                                {profile.pan_verified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
+                            </div>
+
+                            <input
+                                disabled={profile.pan_verified}
+                                value={profile.pan_verified ? maskPAN(profile.pan || "") : profile.pan || ""}
+                                onChange={(e) => setProfile({ ...profile, pan: e.target.value.toUpperCase() })}
+                                className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50"
+                                placeholder="PAN Number"
+                            />
+
+                            <input
+                                disabled={profile.pan_verified}
+                                value={
+                                    profile.pan_verified
+                                        ? (profile.name?.toUpperCase() || "")
+                                        : (profile.name_as_per_pan || "")
+                                }
+                                onChange={(e) => setProfile({ ...profile, name_as_per_pan: e.target.value.toUpperCase() })}
+
+                                className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50 disabled:text-slate-600"
+                                placeholder="Name as per PAN"
+                            />
+
+                            <div className="flex gap-2">
+                                <input
+                                    type="date"
+                                    disabled={profile.pan_verified}
+                                    // Changed: Always show the state value so the user can see what they are typing
+                                    value={profile.date_of_birth || ""}
+                                    onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
+                                    className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none disabled:bg-slate-50"
+                                />
+                                {!profile.pan_verified && (
+                                    <button
+                                        onClick={handlePanVerification}
+                                        className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-[#158f87]"
+                                    >
+                                        Verify
+                                    </button>
                                 )}
                             </div>
                         </div>
@@ -1051,7 +1065,7 @@ export default function ProfileSection() {
                                 </div>
                             </div>
 
-                            <div className="space-y-3 ml-20">
+                            <div className="space-y-3 sm:ml-20">
                                 <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1 text-left">DSA Identity Card</h4>
                                 <div className="max-w-[260px] sm:max-w-[280px] aspect-[1/1.58] lg:ml-0 mx-auto rounded-2xl bg-white border border-slate-200 shadow-xl relative overflow-hidden group flex flex-col">
                                     <div className="h-2 w-full bg-[#1CADA3]"></div>
