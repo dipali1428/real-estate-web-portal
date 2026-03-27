@@ -33,6 +33,7 @@ import {
     Wallet,
     Receipt,
     BookUp,
+    WalletCards,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -70,6 +71,11 @@ export const sidebarLinks = {
                     href: "/dashboard/incentives/tds",
                     icon: <BookUp className="h-4 w-4 text-neutral-700" />,
                 },
+                // {
+                //     label: "Credit Note",
+                //     href: "/dashboard/incentives/creditnote",
+                //     icon: <WalletCards className="h-4 w-4 text-neutral-700" />,
+                // },
             ],
         },
 
@@ -84,6 +90,7 @@ export const sidebarLinks = {
     ADMIN: [
         { label: "Dashboard", href: "/admin", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/admin/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
+         { label: "KYC Management", href: "/admin/kycmanagement", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "Role Management", href: "/admin/roles", icon: <ShieldCheck className="h-5 w-5 text-neutral-700" /> },
         { label: "DSA Management", href: "/admin/dsalist", icon: <Handshake className="h-5 w-5 text-neutral-700" /> },
         { label: "Support Tickets", href: "/admin/ticket", icon: <Ticket className="h-5 w-5 text-neutral-700" /> },
@@ -152,14 +159,10 @@ export const sidebarLinks = {
             icon: <Package className="h-5 w-5 text-neutral-700" />,
             children: [
                 {
-                    label: "Unlisted Shares Panel",
+                    label: "Unlisted Shares",
                     icon: <BarChart3 className="h-4 w-4 text-neutral-700" />,
                     children: [
-                        {
-                            label: "Unlisted Dashboard",
-                            href: "/customer/unlisted/dashboard",
-                            icon: <BarChart3 className="h-4 w-4 text-neutral-700" />,
-                        },
+                        
                         {
                             label: "Companies",
                             href: "/customer/unlisted/companies",
