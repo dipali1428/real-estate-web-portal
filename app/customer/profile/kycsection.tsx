@@ -12,20 +12,8 @@ import {
   Info,
   Database,
   Save,
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  Hash,
-  Building2,
-  FileText,
-  IdCard,
-  Globe,
-  Home,
-  Map,
-  Briefcase,
-  Asterisk
+  Asterisk,
+  X
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import customerService from '../../services/customerService';
@@ -39,10 +27,10 @@ interface DematDetails {
   demat_name: string;
 }
 
-interface PopupMessage {
+interface Toast {
   id: string;
   message: string;
-  type: "success" | "error" | "loading";
+  type: 'success' | 'error' | 'info' | 'warning';
 }
 
 interface KYCSectionProps {
@@ -54,57 +42,34 @@ interface KYCSectionProps {
   externalDematAdded?: boolean;
 }
 
-// Helper to mask values: shows only last 4 characters
-const maskValue = (value: string) => {
-  if (!value) return '';
-  // If value is shorter than 4 characters, mask all. Otherwise show last 4.
-  return value.length > 4 
-    ? value.replace(/.(?=.{4})/g, '•') 
-    : value.replace(/./g, '•');
-};
+// Toast Component
+const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error' | 'info' | 'warning'; onClose: () => void }) => {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 4000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
 
-// Verified Details Component
-const VerifiedDetailsCard: React.FC<{ 
-  title: string;
-  icon: React.ReactNode;
-  color: string;
-  children: React.ReactNode;
-}> = ({ title, icon, color, children }) => (
-  <div className="bg-white rounded-xl border border-slate-100 overflow-hidden shadow-sm">
-    <div className={`px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r ${color} border-b border-white/10`}>
-      <div className="flex items-center gap-2">
-        <div className="p-1 sm:p-1.5 bg-white/20 rounded-lg">
-          {icon}
-        </div>
-        <h3 className="text-xs sm:text-sm font-bold text-white">{title}</h3>
-      </div>
-    </div>
-    <div className="p-3 sm:p-4">
-      {children}
-    </div>
-  </div>
-);
+  const bgColor = {
+    success: 'bg-green-50 border-green-200 text-green-800',
+    error: 'bg-red-50 border-red-200 text-red-800',
+    warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    info: 'bg-blue-50 border-blue-200 text-blue-800'
+  }[type];
 
-// Detail Row Component
-const DetailRow: React.FC<{
-  icon: React.ReactNode;
-  label: string;
-  value: string | number;
-  masked?: boolean;
-}> = ({ icon, label, value, masked = false }) => {
-  if (!value) return null;
-  
-  const displayValue = masked && typeof value === 'string' 
-    ? `•••• ${value.slice(-4)}` 
-    : value;
-    
+  const icon = {
+    success: <CheckCircle2 className="w-5 h-5 text-green-500" />,
+    error: <AlertCircle className="w-5 h-5 text-red-500" />,
+    warning: <AlertCircle className="w-5 h-5 text-yellow-500" />,
+    info: <Info className="w-5 h-5 text-blue-500" />
+  }[type];
+
   return (
-    <div className="flex items-start gap-2 sm:gap-3 py-1.5 sm:py-2 border-b border-slate-50 last:border-0">
-      <div className="text-slate-400 mt-0.5 shrink-0">{icon}</div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
-        <p className="text-xs sm:text-sm font-medium text-slate-700 truncate">{displayValue}</p>
-      </div>
+    <div className={`fixed top-20 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg ${bgColor} animate-in slide-in-from-right-5 max-w-sm cursor-pointer`} onClick={onClose}>
+      {icon}
+      <p className="text-sm font-medium">{message}</p>
+      <button onClick={onClose} className="ml-2 hover:opacity-70">
+        <X className="w-4 h-4" />
+      </button>
     </div>
   );
 };
@@ -119,6 +84,9 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
 }) => {
   const [loading, setLoading] = useState(true);
   const [loadingSection, setLoadingSection] = useState<string | null>(null);
+  
+  // Toast state
+  const [toasts, setToasts] = useState<Toast[]>([]);
   
   // PAN States
   const [panDetails, setPanDetails] = useState({
@@ -168,27 +136,17 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
   // IFSC Lookup
   const [fetchingBankDetails, setFetchingBankDetails] = useState(false);
 
-  // Popup States
-  const [popups, setPopups] = useState<PopupMessage[]>([]);
-
-  // ========== POPUP FUNCTIONS ==========
-  const removePopup = (id: string) => {
-    setPopups(prev => prev.filter(p => p.id !== id));
+  // ========== TOAST FUNCTIONS ==========
+  const showToast = (message: string, type: Toast['type'] = 'info') => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(toast => toast.id !== id));
+    }, 4000);
   };
 
-  const triggerPopup = (message: string, type: "success" | "error" | "loading" = "success", manualId?: string) => {
-    const id = manualId || Math.random().toString(36).substring(2, 9);
-    setPopups(prev => {
-      const exists = prev.find(p => p.id === id);
-      if (exists) {
-        return prev.map(p => p.id === id ? { ...p, message, type } : p);
-      }
-      return [...prev, { id, message, type }];
-    });
-    if (type !== "loading") {
-      setTimeout(() => removePopup(id), 4000);
-    }
-    return id;
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
   };
 
   useEffect(() => {
@@ -197,16 +155,13 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
       return;
     }
     
-    // Extract kycDetails from profile
     if (profile.kycDetails) {
       setKycDetails(profile.kycDetails);
       
-      // Set aadhaar number from kycDetails
       if (profile.kycDetails.aadhaar_number) {
         setAadhaarNumber(profile.kycDetails.aadhaar_number);
       }
       
-      // Set bank details from kycDetails
       if (profile.kycDetails.bank_name) {
         setBankDetails({
           bank_name: profile.kycDetails.bank_name || '',
@@ -222,7 +177,6 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
       date_of_birth: profile.date_of_birth || profile.user?.date_of_birth || ''
     });
 
-    // Update verification statuses
     setPanStatus(profile.pan_verified || profile.user?.pan_verified ? 'VERIFIED' : 'NOT_STARTED');
     setAadhaarStatus(profile.aadhaar_verified || profile.kycDetails?.aadhaar_verified ? 'VERIFIED' : 'NOT_STARTED');
     setBankStatus(profile.bank_verified || profile.kycDetails?.bank_verified ? 'VERIFIED' : 'NOT_STARTED');
@@ -238,7 +192,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
         setOtpExpiry(null);
         setOtpSent(false);
         setOtp(['', '', '', '', '', '']);
-        triggerPopup('OTP expired. Please generate again.', 'error');
+        showToast('OTP expired. Please generate again.', 'warning');
       }, otpExpiry - Date.now());
       return () => clearTimeout(timer);
     }
@@ -266,29 +220,29 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
   // ========== PAN VERIFICATION ==========
   const handleVerifyPan = async () => {
     if (!panDetails.pan || panDetails.pan.length !== 10) {
-      triggerPopup('Please enter a valid 10-digit PAN number', 'error');
+      showToast('Please enter a valid 10-digit PAN number', 'error');
       return;
     }
 
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     if (!panRegex.test(panDetails.pan)) {
-      triggerPopup('Invalid PAN format. It should be 5 letters, 4 numbers, and 1 letter', 'error');
+      showToast('Invalid PAN format. It should be 5 letters, 4 numbers, and 1 letter', 'error');
       return;
     }
 
     if (!panDetails.name_as_per_pan) {
-      triggerPopup('Please enter your name as per PAN card', 'error');
+      showToast('Please enter your name as per PAN card', 'error');
       return;
     }
 
     if (!panDetails.date_of_birth) {
-      triggerPopup('Please enter your date of birth', 'error');
+      showToast('Please enter your date of birth', 'error');
       return;
     }
     
     const dobRegex = /^\d{2}\/\d{2}\/\d{4}$/;
     if (!dobRegex.test(panDetails.date_of_birth)) {
-      triggerPopup('Date must be in DD/MM/YYYY format', 'error');
+      showToast('Date must be in DD/MM/YYYY format', 'error');
       return;
     }
 
@@ -305,10 +259,10 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
       if (onRefresh) await onRefresh();
       setPanStatus('VERIFIED');
     
-      triggerPopup(response.message || 'PAN verified successfully!', 'success');
+      showToast(response.message || 'PAN verified successfully!', 'success');
     } catch (error: any) {
       setPanStatus('FAILED');
-      triggerPopup(error.response?.data?.message || 'PAN verification failed', 'error');
+      showToast(error.response?.data?.message || 'PAN verification failed', 'error');
     } finally {
       setLoadingSection(null);
     }
@@ -317,7 +271,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
   // ========== AADHAAR OTP GENERATION ==========
   const handleGenerateAadhaarOtp = async () => {
     if (!aadhaarNumber || aadhaarNumber.length !== 12) {
-      triggerPopup('Please enter a valid 12-digit Aadhaar number', 'error');
+      showToast('Please enter a valid 12-digit Aadhaar number', 'error');
       return;
     }
 
@@ -328,11 +282,11 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
         setReferenceId(response.reference_id || response["Reference ID"]);
       }
       setOtpSent(true);
-      setOtpExpiry(Date.now() + 180000); // 3 minutes
-      triggerPopup('OTP sent to your registered mobile number', 'success');
+      setOtpExpiry(Date.now() + 180000);
+      showToast('OTP sent to your registered mobile number', 'success');
     } catch (error: any) {
       setAadhaarStatus('FAILED');
-      triggerPopup(error.response?.data?.message || 'Failed to generate OTP', 'error');
+      showToast(error.response?.data?.message || 'Failed to generate OTP', 'error');
     } finally {
       setLoadingSection(null);
     }
@@ -342,12 +296,12 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
   const handleVerifyAadhaarOtp = async () => {
     const otpString = otp.join('');
     if (otpString.length !== 6) {
-      triggerPopup('Please enter a valid 6-digit OTP', 'error');
+      showToast('Please enter a valid 6-digit OTP', 'error');
       return;
     }
 
     if (!referenceId) {
-      triggerPopup('Reference ID not found. Please generate OTP again.', 'error');
+      showToast('Reference ID not found. Please generate OTP again.', 'error');
       return;
     }
 
@@ -364,13 +318,12 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
       setOtpExpiry(null);
       setOtp(['', '', '', '', '', '']);
       
-      // Refresh data from backend
       if (onRefresh) await onRefresh();
       
-      triggerPopup('Aadhaar verified successfully', 'success');
+      showToast('Aadhaar verified successfully', 'success');
     } catch (error: any) {
       setAadhaarStatus('FAILED');
-      triggerPopup(error.response?.data?.message || 'OTP verification failed', 'error');
+      showToast(error.response?.data?.message || 'OTP verification failed', 'error');
     } finally {
       setLoadingSection(null);
     }
@@ -379,17 +332,17 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
   // ========== BANK VERIFICATION ==========
   const handleVerifyBank = async () => {
     if (!bankDetails.bank_name || !bankDetails.bank_account_number || !bankDetails.ifsc_code) {
-      triggerPopup('Please fill all bank details', 'error');
+      showToast('Please fill all bank details', 'error');
       return;
     }
 
     if (bankDetails.bank_account_number.length < 9 || bankDetails.bank_account_number.length > 18) {
-      triggerPopup('Account number should be between 9 and 18 digits', 'error');
+      showToast('Account number should be between 9 and 18 digits', 'error');
       return;
     }
 
     if (bankDetails.ifsc_code.length !== 11) {
-      triggerPopup('IFSC code should be 11 characters', 'error');
+      showToast('IFSC code should be 11 characters', 'error');
       return;
     }
 
@@ -399,16 +352,15 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
       
       setBankStatus('VERIFIED');
       
-      // Refresh data from backend
       if (onRefresh) await onRefresh();
       
-      triggerPopup(response.message, 'success');
+      showToast(response.message, 'success');
       if (response.data?.utr) {
-        triggerPopup(`₹${response.data.amount_deposited} deposited. UTR: ${response.data.utr}`, 'success');
+        showToast(`₹${response.data.amount_deposited} deposited. UTR: ${response.data.utr}`, 'info');
       }
     } catch (error: any) {
       setBankStatus('FAILED');
-      triggerPopup(error.response?.data?.message || 'Bank verification failed', 'error');
+      showToast(error.response?.data?.message || 'Bank verification failed', 'error');
     } finally {
       setLoadingSection(null);
     }
@@ -417,17 +369,17 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
   // ========== ADD DEMAT ==========
   const handleAddDemat = async () => {
     if (!dematDetails.dp_id || !dematDetails.client_id || !dematDetails.demat_name) {
-      triggerPopup('Please fill all required fields (DP ID, Client ID, and Name on Demat)', 'error');
+      showToast('Please fill all required fields (DP ID, Client ID, and Name on Demat)', 'error');
       return;
     }
 
     if (!dematDetails.dp_id.match(/^[A-Z0-9]{6,}$/)) {
-      triggerPopup('Invalid DP ID format', 'error');
+      showToast('Invalid DP ID format', 'error');
       return;
     }
 
     if (!dematDetails.client_id.match(/^[0-9]{8,}$/)) {
-      triggerPopup('Client ID should be at least 8 digits', 'error');
+      showToast('Client ID should be at least 8 digits', 'error');
       return;
     }
 
@@ -442,15 +394,13 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
       
       if (response) {
         setDematAdded(true);
-        
-        // Refresh data from backend
         if (onRefresh) await onRefresh();
-        
-        triggerPopup('Demat account added successfully!', 'success');
+        showToast('Demat account added successfully!', 'success');
       }
     } catch (error) {
+      showToast('Failed to add demat account', 'error');
+    } finally {
       setSavingDemat(false);
-      triggerPopup('Failed to add demat account', 'error');
     }
   };
 
@@ -466,7 +416,6 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
     if (panStatus === 'VERIFIED') count++;
     if (aadhaarStatus === 'VERIFIED') count++;
     if (bankStatus === 'VERIFIED') count++;
-    // Demat is optional, so don't include in mandatory count
     return count;
   };
 
@@ -474,7 +423,6 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
   const mandatoryProgressPercentage = (mandatoryStepsCompleted / 3) * 100;
   const allMandatoryCompleted = mandatoryStepsCompleted === 3;
 
-  // Update status when external props change
   useEffect(() => {
     if (externalPanVerified !== undefined) {
       setPanStatus(externalPanVerified ? 'VERIFIED' : 'NOT_STARTED');
@@ -500,28 +448,15 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
 
   return (
     <div className="mt-6 sm:mt-12 px-4 sm:px-0">
-      {/* KYC Custom Notification Popups */}
-      <div className="fixed top-3 sm:top-5 right-3 sm:right-5 z-[9999] flex flex-col gap-2 sm:gap-3 pointer-events-none">
-        {popups.map((p) => (
-          <div
-            key={p.id}
-            className={`pointer-events-auto min-w-[250px] sm:min-w-[280px] px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-2xl border transition-all duration-300
-              ${p.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' :
-                p.type === 'error' ? 'bg-rose-50 border-rose-100 text-rose-800' :
-                'bg-white border-slate-200 text-slate-800'}`}
-          >
-            <div className="flex items-center justify-between gap-3 sm:gap-4">
-              <span className="text-xs sm:text-sm font-bold tracking-wide">
-                {p.type === 'loading' ? `Please wait: ${p.message}` : p.message}
-              </span>
-              <button
-                onClick={() => removePopup(p.id)}
-                className="text-[10px] sm:text-xs font-black uppercase opacity-50 hover:opacity-100 transition-opacity"
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
+      {/* Toast Container */}
+      <div className="fixed top-20 right-4 z-[9999] flex flex-col gap-3">
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            type={toast.type}
+            onClose={() => removeToast(toast.id)}
+          />
         ))}
       </div>
 
@@ -534,7 +469,6 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
             </div>
           </div>
           
-          {/* Step Counter */}
           <div className="flex items-center gap-2 sm:gap-3 self-start sm:self-auto">
             <span className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[9px] sm:text-xs font-black uppercase tracking-widest whitespace-nowrap ${
               allMandatoryCompleted 
@@ -552,7 +486,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
         </div>
       </header>
 
-      {/* KYC Progress Bar - Now shows only mandatory steps */}
+      {/* KYC Progress Bar */}
       <div className="mb-4 sm:mb-8 bg-white rounded-xl p-3 sm:p-5 border border-slate-100 shadow-sm">
         <div className="flex justify-between items-center mb-2">
           <span className="text-[9px] sm:text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
@@ -571,7 +505,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
       </div>
   
       <div className="w-full max-w-7xl mx-auto px-0 py-4 sm:py-6 space-y-4 sm:space-y-6">
-        {/* PAN Verification Card - Step 1 - Mandatory */}
+        {/* PAN Verification Card */}
         <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="flex items-center gap-3 sm:gap-4">
@@ -601,7 +535,6 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
           </div>
 
           <div className="space-y-3 sm:space-y-4">
-
             {panStatus !== 'VERIFIED' && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
                 <div>
@@ -644,9 +577,10 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
                     />
                     <button
                       onClick={handleVerifyPan}
-                      className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[#1CADA3] text-white text-xs font-bold rounded-lg sm:rounded-xl"
+                      disabled={loadingSection === 'pan'}
+                      className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[#1CADA3] text-white text-xs font-bold rounded-lg sm:rounded-xl hover:bg-[#158f87] transition-colors disabled:opacity-50"
                     >
-                      Verify PAN
+                      {loadingSection === 'pan' ? "Verifying..." : "Verify PAN"}
                     </button>
                   </div>
                 </div>
@@ -657,20 +591,15 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
               <div className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-emerald-50 rounded-lg sm:rounded-xl border border-emerald-100">
                 <CheckCircle2 className="text-emerald-500 w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 <div>
-                  <p className="text-xs sm:text-sm font-bold text-emerald-800">
-                    PAN Verified Successfully
-                  </p>
-                  <p className="text-[10px] sm:text-xs text-emerald-600">
-                    PAN: ••••••{panDetails.pan?.slice(-4)}
-                  </p>
+                  <p className="text-xs sm:text-sm font-bold text-emerald-800">PAN Verified Successfully</p>
+                  <p className="text-[10px] sm:text-xs text-emerald-600">PAN: ••••••{panDetails.pan?.slice(-4)}</p>
                 </div>
               </div>
             )}
-
           </div>
         </div>
 
-        {/* Aadhaar Verification Card - Step 2 - Mandatory */}
+        {/* Aadhaar Verification Card */}
         <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="flex items-center gap-3 sm:gap-4">
@@ -782,7 +711,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
           </div>
         </div>
 
-        {/* Bank Verification Card - Step 3 - Mandatory */}
+        {/* Bank Verification Card */}
         <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="flex items-center gap-3 sm:gap-4">
@@ -853,14 +782,11 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
             </div>
           )}
 
-          {/* Bank Verified Status */}
           {bankStatus === 'VERIFIED' && (
             <div className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-emerald-50 rounded-lg sm:rounded-xl border border-emerald-100">
               <CheckCircle2 className="text-emerald-500 w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
               <div>
-                <p className="text-xs sm:text-sm font-bold text-emerald-800">
-                  Bank Account Verified Successfully
-                </p>
+                <p className="text-xs sm:text-sm font-bold text-emerald-800">Bank Account Verified Successfully</p>
                 <p className="text-[10px] sm:text-xs text-emerald-600">
                   {bankDetails.bank_name && `Bank: ${bankDetails.bank_name} | `}
                   A/C: ••••••{bankDetails.bank_account_number?.slice(-4)} | IFSC: •••••••{bankDetails.ifsc_code?.slice(-4)}
@@ -869,7 +795,6 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
             </div>
           )}
 
-          {/* Verify Button */}
           {bankStatus !== 'VERIFIED' && bankDetails.bank_account_number && bankDetails.ifsc_code && (
             <div className="mt-3 sm:mt-4 flex justify-end">
               <button 
@@ -887,7 +812,7 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
           )}
         </div>
 
-        {/* Demat Account Card - Step 4 - Optional */}
+        {/* Demat Account Card - Optional */}
         <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="flex items-center gap-3 sm:gap-4">
@@ -1000,7 +925,6 @@ export const KYCSection: React.FC<KYCSectionProps> = ({
           )}
         </div>
 
-        {/* Note */}
         <div className="flex justify-end pt-2 sm:pt-4">
           <p className="text-[8px] sm:text-xs text-slate-400">
             <span className="text-rose-500">*</span> Mandatory fields • Demat account is optional

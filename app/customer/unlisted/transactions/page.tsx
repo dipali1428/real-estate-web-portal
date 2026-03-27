@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import customerService from '../../../services/customerService';
 
 // ==================== TYPES ====================
@@ -85,18 +86,22 @@ export default function TransactionsPage() {
             minute: '2-digit',
             second: '2-digit'
           }));
+          toast.success('Transactions loaded successfully');
         } else {
           setError('Failed to load transactions');
+          toast.error('Failed to load transactions');
         }
       } catch (err: any) {
         console.error('Transactions fetch error:', err);
         
         if (err.response?.status === 401) {
+          toast.error('Session expired. Please login again.');
           removeTokenCookie();
           localStorage.removeItem('token');
           router.push('/');
         } else {
           setError(err.response?.data?.message || 'Failed to load transactions');
+          toast.error('Failed to load transactions');
         }
       } finally {
         setLoading(false);
@@ -141,9 +146,11 @@ export default function TransactionsPage() {
           minute: '2-digit',
           second: '2-digit'
         }));
+        toast.success(`Found ${response.data.length} transactions`);
       }
     } catch (err: any) {
       console.error('Filter error:', err);
+      toast.error('Failed to apply filters');
       // Fallback to client-side filtering if API fails
       applyClientSideFilters();
     } finally {
@@ -185,6 +192,7 @@ export default function TransactionsPage() {
     filtered.sort((a, b) => new Date(b.createdat).getTime() - new Date(a.createdat).getTime());
     
     setFilteredTransactions(filtered);
+    toast.success(`Showing ${filtered.length} transactions`);
   };
 
   // ========== CLEAR ALL FILTERS ==========
@@ -195,10 +203,16 @@ export default function TransactionsPage() {
     setDateTo('');
     setCompanySearch('');
     setFilteredTransactions(transactions);
+    toast.success('Filters cleared');
   };
 
   // ========== EXPORT TRANSACTIONS ==========
   const exportTransactions = () => {
+    if (filteredTransactions.length === 0) {
+      toast.error('No transactions to export');
+      return;
+    }
+    
     const csvContent = [
       ['Date', 'Type', 'Company', 'Quantity', 'Price (₹)', 'Total (₹)', 'Status', 'Transaction ID'].join(','),
       ...filteredTransactions.map(tx => [
@@ -219,6 +233,8 @@ export default function TransactionsPage() {
     a.href = url;
     a.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
+    
+    toast.success('Transactions exported successfully');
   };
 
   // ========== TOGGLE ROW EXPAND ==========
@@ -426,85 +442,85 @@ export default function TransactionsPage() {
             </button>
           </div>
           
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Status Filter */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-                  Status
-                </label>
-                <select 
-                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="ALL" className="text-gray-900">All Status</option>
-                  <option value="APPROVED" className="text-gray-900">Approved</option>
-                  <option value="PENDING" className="text-gray-900">Pending</option>
-                  <option value="REJECTED" className="text-gray-900">Rejected</option>
-                  <option value="FAILED" className="text-gray-900">Failed</option>
-                  <option value="CANCELLED" className="text-gray-900">Cancelled</option>
-                </select>
-              </div>
-              
-              {/* Type Filter */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-                  Transaction Type
-                </label>
-                <select 
-                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                >
-                  <option value="ALL" className="text-gray-900">All Types</option>
-                  <option value="BUY" className="text-gray-900">Buy</option>
-                  <option value="SELL" className="text-gray-900">Sell</option>
-                </select>
-              </div>
-              
-              {/* Company Search */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-                  Company Name
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                  <input
-                    type="text"
-                    placeholder="Search company..."
-                    value={companySearch}
-                    onChange={(e) => setCompanySearch(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 placeholder:text-gray-500 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                  />
-                </div>
-              </div>
-              
-              {/* Date Range */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-                    From
-                  </label>
-                  <input
-                    type="date"
-                    value={dateFrom}
-                    onChange={(e) => setDateFrom(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-                    To
-                  </label>
-                  <input
-                    type="date"
-                    value={dateTo}
-                    onChange={(e) => setDateTo(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                  />
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Status Filter */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+                Status
+              </label>
+              <select 
+                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="ALL" className="text-gray-900">All Status</option>
+                <option value="APPROVED" className="text-gray-900">Approved</option>
+                <option value="PENDING" className="text-gray-900">Pending</option>
+                <option value="REJECTED" className="text-gray-900">Rejected</option>
+                <option value="FAILED" className="text-gray-900">Failed</option>
+                <option value="CANCELLED" className="text-gray-900">Cancelled</option>
+              </select>
+            </div>
+            
+            {/* Type Filter */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+                Transaction Type
+              </label>
+              <select 
+                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+              >
+                <option value="ALL" className="text-gray-900">All Types</option>
+                <option value="BUY" className="text-gray-900">Buy</option>
+                <option value="SELL" className="text-gray-900">Sell</option>
+              </select>
+            </div>
+            
+            {/* Company Search */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+                Company Name
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Search company..."
+                  value={companySearch}
+                  onChange={(e) => setCompanySearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 placeholder:text-gray-500 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                />
               </div>
             </div>
+            
+            {/* Date Range */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+                  From
+                </label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+                  To
+                </label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                />
+              </div>
+            </div>
+          </div>
 
           <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
             <button

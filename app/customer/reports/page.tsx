@@ -456,36 +456,36 @@ export default function ReportsPage() {
 
             {/* Bar Chart Visualization - ONLY API DATA */}
             {productSummaryData.length > 0 && chartReady && (
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-[#2076C7]" />
-                  Investment by Product Type
-                </h3>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={productSummaryData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                      <YAxis tickFormatter={(value) => formatLargeNumber(value)} />
-                      <Tooltip 
-                        formatter={(value: number | undefined) => {
-                          if (value === undefined) return '₹0';
-                          return formatCurrency(value);
-                        }}
-                        contentStyle={{ 
-                          borderRadius: '12px', 
-                          border: 'none', 
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                          fontSize: '12px',
-                          padding: '8px 12px'
-                        }}
-                      />
-                      <Legend />
-                      <Bar dataKey="amount" name="Total Amount" fill="#2076C7" radius={[8, 8, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5 text-[#2076C7]" />
+                        Investment by Product Type
+                    </h3>
+                    <div className="h-80 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={productSummaryData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                                <YAxis tickFormatter={(value) => formatLargeNumber(value)} />
+                                <Tooltip 
+                                    formatter={(value: number | undefined) => {
+                                        if (value === undefined) return '₹0';
+                                        return formatCurrency(value);
+                                    }}
+                                    contentStyle={{ 
+                                        borderRadius: '12px', 
+                                        border: 'none', 
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                        fontSize: '12px',
+                                        padding: '8px 12px'
+                                    }}
+                                />
+                                <Legend />
+                                <Bar dataKey="amount" name="Total Amount" fill="#2076C7" radius={[8, 8, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
-              </div>
             )}
           </motion.div>
         )}
@@ -499,68 +499,68 @@ export default function ReportsPage() {
           >
             {/* Portfolio Distribution - Only show if API has data */}
             {reportData.portfolioDistribution && reportData.portfolioDistribution.length > 0 ? (
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <PieChartIcon className="w-5 h-5 text-[#2076C7]" />
-                  Portfolio Distribution
-                </h3>
-                <p className="text-xs text-gray-500 mb-6">
-                  Visual representation of your investment allocation across different asset classes
-                </p>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <PieChartIcon className="w-5 h-5 text-[#2076C7]" />
+                        Portfolio Distribution
+                    </h3>
+                    <p className="text-xs text-gray-500 mb-6">
+                        Visual representation of your investment allocation across different asset classes
+                    </p>
 
-                <div className="h-80">
-                  {chartReady && (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={reportData.portfolioDistribution}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={100}
-                          paddingAngle={5}
-                          dataKey="value"
-                          label={renderPieLabel}
-                          labelLine={true}
-                        >
-                          {reportData.portfolioDistribution.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color || `#${Math.floor(Math.random()*16777215).toString(16)}`} stroke="white" strokeWidth={2} />
-                          ))}
-                        </Pie>
-                        <Tooltip 
-                          formatter={(value: number | undefined) => {
-                            if (value === undefined) return '₹0';
-                            return formatCurrency(value);
-                          }}
-                          contentStyle={{ 
-                            borderRadius: '12px', 
-                            border: 'none', 
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            fontSize: '12px',
-                            padding: '8px 12px'
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  )}
-                </div>
+                    <div className="h-80 w-full">
+                        {chartReady && (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={reportData.portfolioDistribution}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={100}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                        label={renderPieLabel}
+                                        labelLine={true}
+                                    >
+                                        {reportData.portfolioDistribution.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color || `#${Math.floor(Math.random()*16777215).toString(16)}`} stroke="white" strokeWidth={2} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip 
+                                        formatter={(value: number | undefined) => {
+                                            if (value === undefined) return '₹0';
+                                            return formatCurrency(value);
+                                        }}
+                                        contentStyle={{ 
+                                            borderRadius: '12px', 
+                                            border: 'none', 
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                            fontSize: '12px',
+                                            padding: '8px 12px'
+                                        }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        )}
+                    </div>
 
-                {/* Legend */}
-                <div className="mt-6 pt-4 border-t border-gray-100">
-                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Asset Classes</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                    {reportData.portfolioDistribution.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color || `#${Math.floor(Math.random()*16777215).toString(16)}` }}></div>
-                        <span className="text-xs text-gray-600 truncate">{item.name}</span>
-                        <span className="text-xs font-semibold text-gray-800 ml-auto">
-                          {formatLargeNumber(item.value)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                    {/* Legend */}
+                    <div className="mt-6 pt-4 border-t border-gray-100">
+                        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Asset Classes</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                            {reportData.portfolioDistribution.map((item, idx) => (
+                                <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color || `#${Math.floor(Math.random()*16777215).toString(16)}` }}></div>
+                                    <span className="text-xs text-gray-600 truncate">{item.name}</span>
+                                    <span className="text-xs font-semibold text-gray-800 ml-auto">
+                                        {formatLargeNumber(item.value)}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
-              </div>
             ) : (
               <div className="bg-white rounded-2xl p-12 text-center border border-gray-100">
                 <Inbox className="w-16 h-16 text-gray-300 mx-auto mb-4" />

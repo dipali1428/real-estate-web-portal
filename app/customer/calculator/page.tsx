@@ -7,7 +7,6 @@ import {
   TrendingUp, 
   CheckCircle2, 
   ChevronDown, 
-  ArrowRight,
   Zap,
   Plus,
   Minus,
@@ -15,7 +14,6 @@ import {
   User,
   Building2,
   LineChart,
-  Timer,
   Loader2
 } from 'lucide-react';
 

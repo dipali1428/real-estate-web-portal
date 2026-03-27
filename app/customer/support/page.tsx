@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import customerService from '../../services/customerService';
 import { 
     Plus, Send, X, AlertCircle, User, Headset, Eye, CheckCircle2,
-    ArrowLeft, ShieldCheck
+    ArrowLeft, ShieldCheck, Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -41,6 +41,10 @@ export default function HelpSupport() {
         category: '', product_type: '', reference_id: '',
         issue_type: 'General', severity: 'Medium', subject: '', description: ''
     });
+
+    // Resolve confirmation modal state
+    const [showResolveModal, setShowResolveModal] = useState(false);
+    const [ticketToResolve, setTicketToResolve] = useState<string | null>(null);
 
     useEffect(() => {
         loadInitialData();
@@ -145,14 +149,21 @@ export default function HelpSupport() {
         }
     };
 
-    const handleResolveTicket = async (tid: string) => {
-        const confirmResolve = window.confirm("Is your issue fully resolved? Clicking OK will finalize and close this support ticket.");
-        if (!confirmResolve) return;
+    // Updated resolve handler - opens modal instead of confirm
+    const handleResolveClick = (tid: string) => {
+        setTicketToResolve(tid);
+        setShowResolveModal(true);
+    };
+
+    const handleConfirmResolve = async () => {
+        if (!ticketToResolve) return;
         
         setActionLoading(true);
         try {
-            await customerService.closeTicket(tid);
+            await customerService.closeTicket(ticketToResolve);
             toast.success('Ticket resolved successfully');
+            setShowResolveModal(false);
+            setTicketToResolve(null);
             setView('list');
             loadInitialData();
         } catch (err) {
@@ -183,6 +194,50 @@ export default function HelpSupport() {
     return (
         <div className="flex-1 p-4 sm:p-6 bg-[#f8fafc] min-h-screen">
             
+            {/* Resolve Confirmation Modal */}
+            {showResolveModal && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="p-6">
+                            <div className="flex justify-center mb-4">
+                                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
+                                    <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+                                </div>
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+                                Resolve Ticket
+                            </h3>
+                            <p className="text-gray-500 text-center mb-6">
+                                Is your issue fully resolved? Clicking Confirm will finalize and close this support ticket.
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        setShowResolveModal(false);
+                                        setTicketToResolve(null);
+                                    }}
+                                    className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleConfirmResolve}
+                                    disabled={actionLoading}
+                                    className="flex-1 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-medium hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {actionLoading ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <CheckCircle2 className="w-4 h-4" />
+                                    )}
+                                    Confirm Resolve
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -262,7 +317,7 @@ export default function HelpSupport() {
                                             <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase tracking-widest font-black">Status</th>
                                             <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase tracking-widest font-black">Last Update</th>
                                             <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase tracking-widest font-black">Action</th>
-                                           </tr>
+                                        </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         <AnimatePresence>
@@ -282,22 +337,22 @@ export default function HelpSupport() {
                                                                     <div className="text-[11px] text-gray-400">ID: {ticket.ticket_id}</div>
                                                                 </div>
                                                             </div>
-                                                         </td>
+                                                        </td>
                                                         <td className="px-6 py-4 text-center">
                                                             <span className="text-[11px] font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-lg">
                                                                 {ticket.category}
                                                             </span>
-                                                         </td>
+                                                        </td>
                                                         <td className="px-6 py-4 text-center">
                                                             <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                                                                 ticket.status === 'Open' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'
                                                             }`}>
                                                                 {ticket.status}
                                                             </span>
-                                                         </td>
+                                                        </td>
                                                         <td className="px-6 py-4 text-center text-xs text-gray-400">
                                                             {new Date(ticket.updated_at).toLocaleDateString()}
-                                                         </td>
+                                                        </td>
                                                         <td className="px-6 py-4 text-center">
                                                             <button 
                                                                 onClick={() => handleViewDetails(ticket.ticket_id)}
@@ -305,7 +360,7 @@ export default function HelpSupport() {
                                                             >
                                                                 View Chat <Eye size={14} />
                                                             </button>
-                                                         </td>
+                                                        </td>
                                                     </motion.tr>
                                                 ))
                                             ) : (
@@ -458,7 +513,7 @@ export default function HelpSupport() {
                     </div>
                 )}
 
-                {/* VIEW 3: IMPROVED CHAT VIEW */}
+                {/* VIEW 3: CHAT VIEW */}
                 {view === 'detail' && selectedTicket && (
                     <motion.div 
                         key="detail" 
@@ -466,7 +521,7 @@ export default function HelpSupport() {
                         animate={{ opacity: 1, y: 0 }} 
                         className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden flex flex-col h-[calc(100vh-200px)]"
                     >
-                        {/* Enhanced Chat Header */}
+                        {/* Chat Header */}
                         <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] px-6 py-4 flex justify-between items-center">
                             <div className="flex items-center gap-4">
                                 <button 
@@ -498,7 +553,7 @@ export default function HelpSupport() {
                             
                             {selectedTicket.ticket.status === 'Open' && (
                                 <button 
-                                    onClick={() => handleResolveTicket(selectedTicket.ticket.ticket_id)}
+                                    onClick={() => handleResolveClick(selectedTicket.ticket.ticket_id)}
                                     disabled={actionLoading}
                                     className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all backdrop-blur-sm border border-white/30 disabled:opacity-50"
                                 >
@@ -511,7 +566,7 @@ export default function HelpSupport() {
                             )}
                         </div>
 
-                        {/* Messages Area - Improved Design */}
+                        {/* Messages Area */}
                         <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50 to-white">
                             <div className="space-y-4 max-w-4xl mx-auto">
                                 {/* Initial Issue Message */}
@@ -583,7 +638,7 @@ export default function HelpSupport() {
                             </div>
                         </div>
 
-                        {/* Enhanced Reply Input */}
+                        {/* Reply Input */}
                         <div className="border-t border-gray-200 bg-white p-4">
                             {selectedTicket.ticket.status === 'Open' ? (
                                 <div className="max-w-4xl mx-auto">

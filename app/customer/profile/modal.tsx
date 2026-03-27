@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Key,
   X,
@@ -10,9 +10,49 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
-  Trash2
+  Trash2,
+  AlertCircle,
+  Info
 } from 'lucide-react';
 import { PasswordData } from './page';
+
+interface Toast {
+  id: string;
+  message: string;
+  type: 'success' | 'error' | 'info' | 'warning';
+}
+
+// Toast Component
+const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error' | 'info' | 'warning'; onClose: () => void }) => {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 4000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  const bgColor = {
+    success: 'bg-green-50 border-green-200 text-green-800',
+    error: 'bg-red-50 border-red-200 text-red-800',
+    warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    info: 'bg-blue-50 border-blue-200 text-blue-800'
+  }[type];
+
+  const icon = {
+    success: <CheckCircle className="w-5 h-5 text-green-500" />,
+    error: <AlertCircle className="w-5 h-5 text-red-500" />,
+    warning: <AlertCircle className="w-5 h-5 text-yellow-500" />,
+    info: <Info className="w-5 h-5 text-blue-500" />
+  }[type];
+
+  return (
+    <div className={`fixed top-20 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg ${bgColor} animate-in slide-in-from-right-5 max-w-sm cursor-pointer`} onClick={onClose}>
+      {icon}
+      <p className="text-sm font-medium">{message}</p>
+      <button onClick={onClose} className="ml-2 hover:opacity-70">
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  );
+};
 
 interface ModalsProps {
   showPasswordModal: boolean;
@@ -34,6 +74,8 @@ interface ModalsProps {
   onToggleConfirmPassword: () => void;
   getPasswordStrengthColor: () => string;
   getPasswordStrengthText: () => string;
+  // Add these props for toast notifications
+  showToast?: (message: string, type: 'success' | 'error' | 'info' | 'warning') => void;
 }
 
 export const Modals: React.FC<ModalsProps> = ({
@@ -55,12 +97,65 @@ export const Modals: React.FC<ModalsProps> = ({
   onToggleNewPassword,
   onToggleConfirmPassword,
   getPasswordStrengthColor,
-  getPasswordStrengthText
+  getPasswordStrengthText,
+  showToast
 }) => {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  // Toast helper
+  const handleShowToast = (message: string, type: 'success' | 'error' | 'info' | 'warning') => {
+    if (showToast) {
+      showToast(message, type);
+    } else {
+      const id = Math.random().toString(36).substring(2, 9);
+      setToasts(prev => [...prev, { id, message, type }]);
+      setTimeout(() => {
+        setToasts(prev => prev.filter(toast => toast.id !== id));
+      }, 4000);
+    }
+  };
+
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
+
+  // Wrap the original handlers to add toast notifications
+  const handlePasswordUpdateWithToast = async (e: React.FormEvent) => {
+    try {
+      await onPasswordUpdate(e);
+      // Success will be shown by parent component
+    } catch (error: any) {
+      handleShowToast(error.message || 'Failed to update password', 'error');
+    }
+  };
+
+  const handleDeleteAccountWithToast = async () => {
+    try {
+      await onDeleteAccount();
+      // Success will be shown by parent component
+    } catch (error: any) {
+      handleShowToast(error.message || 'Failed to delete account', 'error');
+    }
+  };
+
   if (!showPasswordModal && !showDeleteModal) return null;
 
   return (
     <>
+      {/* Toast Container */}
+      {toasts.length > 0 && (
+        <div className="fixed top-20 right-4 z-[10000] flex flex-col gap-3">
+          {toasts.map((toast) => (
+            <Toast
+              key={toast.id}
+              message={toast.message}
+              type={toast.type}
+              onClose={() => removeToast(toast.id)}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Password Change Modal */}
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -75,7 +170,7 @@ export const Modals: React.FC<ModalsProps> = ({
               </button>
             </div>
             
-            <form onSubmit={onPasswordUpdate} className="p-8 space-y-6">
+            <form onSubmit={handlePasswordUpdateWithToast} className="p-8 space-y-6">
               {/* Current Password */}
               <div className="space-y-2">
                 <label className="text-xs font-black text-slate-700 uppercase tracking-widest">Current Password</label>
@@ -190,30 +285,6 @@ export const Modals: React.FC<ModalsProps> = ({
           </div>
         </div>
       )}
-
-      {/* Delete Account Modal */}
-      {/* {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-md w-full p-8 shadow-xl">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-rose-100">
-                <Trash2 size={40} className="text-rose-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">Delete Account?</h3>
-              <p className="text-sm text-slate-500 mb-8">This action cannot be undone. This will permanently delete your account and remove all associated data.</p>
-              
-              <div className="flex gap-4">
-                <button onClick={onCloseDeleteModal} className="flex-1 py-3 border-2 border-slate-400 rounded-xl hover:bg-slate-50 text-gray-700 text-sm font-black uppercase tracking-widest transition-colors">
-                  Cancel
-                </button>
-                <button onClick={onDeleteAccount} disabled={deleting} className="flex-1 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest shadow-sm">
-                  {deleting ? 'Deleting...' : 'Delete'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
     </>
   );
 };

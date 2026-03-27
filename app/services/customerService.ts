@@ -472,6 +472,16 @@ const CustomerService = {
         return response.data;
     },
 
+      /**
+     * Get assigned relationship manager
+     * POST → /api/unlisted/user/logout
+     */
+
+    logout: async () => {
+        const response = await api.post("/api/unlisted/user/logout");
+        return response.data;
+    },
+
     // ==================== AUTH HELPERS ====================
     isAuthenticated: () => typeof window !== 'undefined' && !!localStorage.getItem('token'),
     getToken: () => typeof window !== 'undefined' ? localStorage.getItem('token') : null,

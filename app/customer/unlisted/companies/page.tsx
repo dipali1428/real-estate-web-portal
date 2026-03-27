@@ -17,6 +17,7 @@ import {
   BookmarkCheck 
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import customerService, { WishlistItem } from '../../../services/customerService';
 
 // ==================== TYPES ====================
@@ -139,13 +140,8 @@ export default function CompaniesPage() {
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
   
   // Wishlist State
-  const [wishlistItems, setWishlistItems] = useState<Map<number, number>>(new Map()); // product_id -> wishlist_id
+  const [wishlistItems, setWishlistItems] = useState<Map<number, number>>(new Map());
   const [processingWishlist, setProcessingWishlist] = useState<Set<number>>(new Set());
-  const [notification, setNotification] = useState<{ show: boolean; message: string; type: 'success' | 'error' }>({
-    show: false,
-    message: '',
-    type: 'success'
-  });
 
   // ========== FETCH WISHLIST ==========
   const fetchWishlist = async () => {
@@ -200,7 +196,6 @@ export default function CompaniesPage() {
         second: '2-digit'
       }));
       
-      // Fetch wishlist after companies are loaded
       await fetchWishlist();
       
     } catch (err: any) {
@@ -227,14 +222,7 @@ export default function CompaniesPage() {
     }
   };
 
-  // ========== WISHLIST HANDLERS ==========
-  const showNotification = (message: string, type: 'success' | 'error') => {
-    setNotification({ show: true, message, type });
-    setTimeout(() => {
-      setNotification({ show: false, message: '', type: 'success' });
-    }, 3000);
-  };
-
+  // ========== WISHLIST HANDLERS - Using Toast ==========
   const handleAddToWishlist = async (company: Company) => {
     setProcessingWishlist(prev => new Set(prev).add(company.id));
     
@@ -248,13 +236,10 @@ export default function CompaniesPage() {
       if (response.success && response.data) {
         const wishlistItem = response.data as WishlistItem;
         setWishlistItems(prev => new Map(prev).set(company.id, wishlistItem.id));
-        showNotification(`${company.shares_name} saved to wishlist`, 'success');
+        toast.success(`${company.shares_name} saved to wishlist`);
       }
     } catch (error: any) {
-      showNotification(
-        error.response?.data?.message || 'Failed to save company',
-        'error'
-      );
+      toast.error(error.response?.data?.message || 'Failed to save company');
     } finally {
       setProcessingWishlist(prev => {
         const newSet = new Set(prev);
@@ -279,13 +264,10 @@ export default function CompaniesPage() {
           newMap.delete(company.id);
           return newMap;
         });
-        showNotification(`${company.shares_name} removed from wishlist`, 'success');
+        toast.success(`${company.shares_name} removed from wishlist`);
       }
     } catch (error: any) {
-      showNotification(
-        error.response?.data?.message || 'Failed to remove from wishlist',
-        'error'
-      );
+      toast.error(error.response?.data?.message || 'Failed to remove from wishlist');
     } finally {
       setProcessingWishlist(prev => {
         const newSet = new Set(prev);
@@ -368,11 +350,13 @@ export default function CompaniesPage() {
     setSearchTerm('');
     setPriceRange('ALL');
     setSortBy('name-asc');
+    toast.success('Filters cleared');
   };
 
   const handleRetry = (): void => {
     setRetryCount(prev => prev + 1);
     fetchCompanies();
+    toast.loading('Retrying...');
   };
 
   // ========== RENDER FUNCTIONS ==========
@@ -462,18 +446,6 @@ export default function CompaniesPage() {
   // ========== MAIN RENDER ==========
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
-      
-      {/* Notification Toast */}
-      {notification.show && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg border animate-fadeIn ${
-          notification.type === 'success' 
-            ? 'bg-green-50 border-green-200 text-green-800' 
-            : 'bg-red-50 border-red-200 text-red-800'
-        }`}>
-          {notification.message}
-        </div>
-      )}
-
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -499,16 +471,16 @@ export default function CompaniesPage() {
             </div>
             
             <div className="flex items-center gap-3">
-             {/* Wishlist Badge */}
-<div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700">
-  <Bookmark size={16} className={wishlistCount > 0 ? 'fill-[#2076C7] text-[#2076C7]' : ''} />
-  <span>Saved</span>
-  {wishlistCount > 0 && (
-    <span className="px-1.5 py-0.5 bg-[#2076C7] text-white text-xs rounded-full">
-      {wishlistCount}
-    </span>
-  )}
-</div>
+              {/* Wishlist Badge */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700">
+                <Bookmark size={16} className={wishlistCount > 0 ? 'fill-[#2076C7] text-[#2076C7]' : ''} />
+                <span>Saved</span>
+                {wishlistCount > 0 && (
+                  <span className="px-1.5 py-0.5 bg-[#2076C7] text-white text-xs rounded-full">
+                    {wishlistCount}
+                  </span>
+                )}
+              </div>
 
               {/* Search Bar */}
               <div className="relative flex-1 md:flex-none md:w-64">

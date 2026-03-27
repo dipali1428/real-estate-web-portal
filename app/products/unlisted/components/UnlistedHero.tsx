@@ -18,16 +18,15 @@ import {
     User,
     Loader2,
     Building,
-    Calculator,
-    MessageSquare
+    Calculator
 } from 'lucide-react';
 import { createEnquiry } from '../../../services/unlistedservices';
-import { useModal } from '../../../context/ModalContext'; // Add this import
+import { useModal } from '../../../context/ModalContext';
 
-// Define Enquiry type for API calls
+// Define Enquiry type matching the service
 interface EnquiryPayload {
     company_id?: number;
-    enquiry_type: 'buy' | 'sell';
+    enquiry_type: 'buy' | 'sell' | 'other';
     full_name: string;
     email: string;
     phone: string;
@@ -42,33 +41,29 @@ interface UnlistedHeroProps {
 
 export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHeroProps) {
     const router = useRouter();
-    const { openLogin } = useModal(); // Get openLogin from modal context
+    const { openLogin } = useModal();
     const handleBackHome = () => router.push('/');
     
-    // Handle Apply Now button click - open login modal (same as reference)
     const handleApplyNow = () => {
-        openLogin(); // Open login modal instead of redirecting
+        openLogin();
     };
 
-    // State for tab animation
     const [showTabs, setShowTabs] = useState(false);
-
-    // Enquiry Modal States
     const [showEnquiryModal, setShowEnquiryModal] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [enquiryError, setEnquiryError] = useState<string | null>(null);
     const [notifications, setNotifications] = useState<{ id: number; message: string; type?: 'success' | 'error' }[]>([]);
 
-    // Form Data
+    // Form Data - All required fields
     const [formData, setFormData] = useState({
+        companyId: '',
         fullName: '',
         email: '',
         phone: '',
-        message: ''
+        quantity: ''
     });
 
-    // Effect for tab animation (similar to typing animation in HeroSection)
     useEffect(() => {
         const hasVisitedUnlisted = localStorage.getItem("unlistedHeroVisited");
         
@@ -77,16 +72,14 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
             return;
         }
 
-        // Simulate typing completion delay before showing tabs
         const timer = setTimeout(() => {
             setShowTabs(true);
             localStorage.setItem("unlistedHeroVisited", "true");
-        }, 2000); // Matches the typing animation duration from HeroSection
+        }, 2000);
 
         return () => clearTimeout(timer);
     }, []);
 
-    // NOTIFICATION HANDLER
     const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
         const id = Date.now();
         setNotifications(prev => [...prev, { id, message, type }]);
@@ -101,8 +94,49 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim()) {
-            setEnquiryError('Please fill in all required fields');
+        // Validate all required fields
+        if (!formData.companyId.trim()) {
+            setEnquiryError('Company ID is required');
+            return;
+        }
+        if (!formData.fullName.trim()) {
+            setEnquiryError('Full name is required');
+            return;
+        }
+        if (!formData.email.trim()) {
+            setEnquiryError('Email is required');
+            return;
+        }
+        if (!formData.phone.trim()) {
+            setEnquiryError('Phone number is required');
+            return;
+        }
+        if (!formData.quantity.trim()) {
+            setEnquiryError('Quantity is required');
+            return;
+        }
+        
+        const companyIdNum = parseInt(formData.companyId);
+        if (isNaN(companyIdNum) || companyIdNum <= 0) {
+            setEnquiryError('Please enter a valid company ID');
+            return;
+        }
+        
+        const quantityNum = parseInt(formData.quantity);
+        if (isNaN(quantityNum) || quantityNum <= 0) {
+            setEnquiryError('Please enter a valid quantity');
+            return;
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email.trim())) {
+            setEnquiryError('Please enter a valid email address');
+            return;
+        }
+        
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(formData.phone.trim())) {
+            setEnquiryError('Please enter a valid 10-digit phone number');
             return;
         }
 
@@ -110,30 +144,38 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
         setEnquiryError(null);
         
         try {
+            // Create payload matching the service's expected type
             const payload: EnquiryPayload = {
-                enquiry_type: 'buy',
+                company_id: companyIdNum,
+                enquiry_type: 'buy',  // Changed to lowercase to match service
                 full_name: formData.fullName.trim(),
                 email: formData.email.trim(),
                 phone: formData.phone.trim(),
-                message: formData.message.trim() || 'General enquiry from Unlisted Hero section'
+                quantity: quantityNum,
+                message: `Enquiry for company ID ${companyIdNum} - ${quantityNum} shares`
             };
 
+            console.log('Sending enquiry payload:', payload);
+            
             await createEnquiry(payload);
             
             setShowEnquiryModal(false);
             setShowSuccess(true);
             setFormData({
+                companyId: '',
                 fullName: '',
                 email: '',
                 phone: '',
-                message: ''
+                quantity: ''
             });
             
             showNotification('Enquiry submitted successfully!', 'success');
             
         } catch (err: any) {
-            setEnquiryError(err.response?.data?.message || 'Failed to submit enquiry. Please try again.');
-            showNotification('Failed to submit enquiry', 'error');
+            console.error('Enquiry error:', err);
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to submit enquiry. Please try again.';
+            setEnquiryError(errorMessage);
+            showNotification(errorMessage, 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -163,7 +205,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                 ))}
             </div>
 
-            {/* --- Back to Home Button --- */}
+            {/* Back to Home Button */}
             <div className="absolute z-50 top-8 left-4 md:top-12 md:left-12">
                 <button
                     onClick={handleBackHome}
@@ -174,7 +216,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                 </button>
             </div>
 
-            {/* --- Main Hero Content (Top/Middle) --- */}
+            {/* Main Hero Content */}
             <div className="max-w-[1440px] mx-auto px-6 w-full flex-grow flex items-center">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
                 
@@ -194,13 +236,10 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                         </h1>
 
                         <p className="text-xl text-gray-600 leading-relaxed max-w-xl font-medium">
-                            Access exclusive unlisted shares and Pre-IPO opportunities before they hit the stock exchange. Secure, transparent, and research-backed.
+                            Access exclusive unlisted shares and Pre-IPO opportunities before they hit the stock exchange.
                         </p>
 
-                        {/* --- PRIMARY ACTION BUTTONS ONLY --- */}
                         <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4 items-center">
-                            
-                            {/* Apply Now Button - Opens Login Modal (same as reference) */}
                             <button
                                 onClick={handleApplyNow}
                                 className="group relative text-white px-10 py-5 rounded-lg font-bold text-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer" 
@@ -212,7 +251,6 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                 <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
                             </button>
 
-                            {/* Enquire Now Button (Grouped with Apply) */}
                             <button
                                 onClick={() => setShowEnquiryModal(true)}
                                 className="group relative bg-white px-10 py-5 rounded-2xl font-black text-base border-2 hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 cursor-pointer overflow-hidden"
@@ -223,11 +261,10 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                     Enquire Now
                                 </span>
                             </button>
-                            
                         </div>
                     </motion.div>
 
-                    {/* Right Side: Circular Hero Image */}
+                    {/* Right Side Image */}
                     <div className="relative flex justify-center">
                         <div className="relative w-full max-w-[500px] aspect-square flex items-center justify-center">
                             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#2076C7]/15 to-[#1CADA3]/15 blur-3xl" />
@@ -254,87 +291,162 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                 </div>
             </div>
 
-            {/* --- BOTTOM NAVIGATION TAB BAR WITH ANIMATION (Like HeroSection Buttons) --- */}
+            {/* Bottom Navigation */}
             <div className="w-full pb-16 pt-10 border-b border-gray-50">
                 <div className="max-w-[1440px] mx-auto px-6">
-                    <div 
-                        className={`flex flex-wrap justify-center items-center gap-4 lg:gap-8 transition-opacity duration-1000 delay-300 ${
-                            showTabs ? 'opacity-100' : 'opacity-0'
-                        }`}
-                    >
+                    <div className={`flex flex-wrap justify-center items-center gap-4 lg:gap-8 transition-opacity duration-1000 delay-300 ${showTabs ? 'opacity-100' : 'opacity-0'}`}>
                         {[
                             { href: '/products/unlisted/buy-shares', icon: ShoppingCart, label: 'Buy Shares' },
                             { href: '/products/unlisted/sell-shares', icon: HandCoins, label: 'Sell Shares' },
                             { href: '/products/unlisted/live-trends', icon: Activity, label: 'Live Trends' },
                             { href: '/products/unlisted/presspage', icon: Newspaper, label: 'Press & Media' },
                         ].map(({ href, icon: Icon, label }) => (
-                            <Link 
-                                key={href} 
-                                href={href} 
-                                className="min-w-[160px] sm:min-w-[220px] px-6 py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black rounded-2xl shadow-xl hover:scale-105 hover:shadow-2xl transition-all flex items-center justify-center gap-3 text-sm sm:text-base cursor-pointer"
-                            >
-                                <Icon size={20} strokeWidth={2.5} /> 
-                                {label}
+                            <Link key={href} href={href} className="min-w-[160px] sm:min-w-[220px] px-6 py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black rounded-2xl shadow-xl hover:scale-105 hover:shadow-2xl transition-all flex items-center justify-center gap-3 text-sm sm:text-base cursor-pointer">
+                                <Icon size={20} strokeWidth={2.5} /> {label}
                             </Link>
                         ))}
                     </div>
                 </div>
             </div>
 
-            {/* --- MODALS (Unchanged Logic) --- */}
+            {/* Enquiry Modal - Compact Size */}
             {showEnquiryModal && (
                 <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-6 text-white flex justify-between items-center">
+                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-4 text-white flex justify-between items-center">
                             <div>
-                                <h3 className="text-xl font-black uppercase tracking-tight">General Enquiry</h3>
-                                <p className="text-xs text-white/80">We'll get back to you within 24 hours</p>
+                                <h3 className="text-lg font-black uppercase tracking-tight">Investor Enquiry</h3>
+                                <p className="text-xs text-white/80">Fill details to get started</p>
                             </div>
-                            <button onClick={() => setShowEnquiryModal(false)} className="hover:bg-white/20 p-2 rounded-full transition-all">
-                                <X className="w-6 h-6" />
+                            <button onClick={() => setShowEnquiryModal(false)} className="hover:bg-white/20 p-1 rounded-full transition-all">
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <form className="p-8 space-y-5" onSubmit={handleFormSubmit}>
-                            {enquiryError && <div className="bg-rose-50 text-rose-600 text-xs p-3 rounded-lg border border-rose-200 flex items-start gap-2"><X className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" /><span>{enquiryError}</span></div>}
+                        
+                        <form className="p-5 space-y-4" onSubmit={handleFormSubmit}>
+                            {enquiryError && (
+                                <div className="bg-rose-50 text-rose-600 text-xs p-2 rounded-lg border border-rose-200 flex items-start gap-2">
+                                    <X className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                                    <span>{enquiryError}</span>
+                                </div>
+                            )}
+                            
+                            {/* Company ID */}
                             <div>
-                                <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">Full Name <span className="text-rose-500">*</span></label>
+                                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                    Company ID <span className="text-rose-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                    <input 
+                                        type="number"
+                                        value={formData.companyId} 
+                                        onChange={(e) => handleInputChange('companyId', e.target.value)} 
+                                        required 
+                                        className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
+                                        placeholder="Enter company ID" 
+                                        min="1"
+                                    />
+                                </div>
+                            </div>
+                            
+                            {/* Full Name */}
+                            <div>
+                                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                    Full Name <span className="text-rose-500">*</span>
+                                </label>
                                 <div className="relative">
                                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                    <input name="fullName" value={formData.fullName} onChange={(e) => handleInputChange('fullName', e.target.value)} required className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-[#2076C7] text-sm text-black" placeholder="John Doe" />
+                                    <input 
+                                        value={formData.fullName} 
+                                        onChange={(e) => handleInputChange('fullName', e.target.value)} 
+                                        required 
+                                        className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
+                                        placeholder="John Doe" 
+                                    />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            
+                            {/* Email and Phone - Side by side */}
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">Email *</label>
-                                    <input name="email" type="email" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} required className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-[#2076C7] text-sm text-black" placeholder="john@email.com" />
+                                    <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                        Email <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input 
+                                        type="email" 
+                                        value={formData.email} 
+                                        onChange={(e) => handleInputChange('email', e.target.value)} 
+                                        required 
+                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
+                                        placeholder="john@email.com" 
+                                    />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">Phone *</label>
-                                    <input name="phone" type="tel" value={formData.phone} onChange={(e) => handleInputChange('phone', e.target.value)} required className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-[#2076C7] text-sm text-black" placeholder="+91..." />
+                                    <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                        Phone <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input 
+                                        type="tel" 
+                                        value={formData.phone} 
+                                        onChange={(e) => handleInputChange('phone', e.target.value)} 
+                                        required 
+                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
+                                        placeholder="9876543210" 
+                                    />
                                 </div>
                             </div>
+                            
+                            {/* Quantity */}
                             <div>
-                                <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">Message (optional)</label>
+                                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                    Quantity (Shares) <span className="text-rose-500">*</span>
+                                </label>
                                 <div className="relative">
-                                    <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-gray-300" />
-                                    <textarea name="message" value={formData.message} onChange={(e) => handleInputChange('message', e.target.value)} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-[#2076C7] text-sm h-24 resize-none text-black" placeholder="Your requirements..." />
+                                    <Calculator className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                    <input 
+                                        type="number" 
+                                        value={formData.quantity} 
+                                        onChange={(e) => handleInputChange('quantity', e.target.value)} 
+                                        required 
+                                        className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
+                                        placeholder="Number of shares" 
+                                        min="1"
+                                    />
                                 </div>
                             </div>
-                            <button type="submit" disabled={isSubmitting} className="w-full py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-black text-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-                                {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin" />Processing...</> : <><Send className="w-5 h-5" />Submit Enquiry</>}
+                            
+                            <button 
+                                type="submit" 
+                                disabled={isSubmitting} 
+                                className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold text-base hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                {isSubmitting ? (
+                                    <><Loader2 className="w-4 h-4 animate-spin" />Processing...</>
+                                ) : (
+                                    <><Send className="w-4 h-4" />Submit Enquiry</>
+                                )}
                             </button>
                         </form>
                     </div>
                 </div>
             )}
 
+            {/* Success Modal */}
             {showSuccess && (
                 <div className="fixed inset-0 z-[7000] bg-black/60 flex items-center justify-center p-4">
-                    <div className="bg-white p-10 rounded-3xl max-w-sm w-full text-center shadow-2xl">
-                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"><CheckCircle className="w-10 h-10 text-green-600" /></div>
-                        <h3 className="text-2xl font-black text-gray-900 mb-2">Enquiry Sent!</h3>
-                        <p className="text-gray-500 text-sm mb-8">Our manager will contact you within 24 hours.</p>
-                        <button onClick={() => setShowSuccess(false)} className="w-full py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-black">Back to Home</button>
+                    <div className="bg-white p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <CheckCircle className="w-8 h-8 text-green-600" />
+                        </div>
+                        <h3 className="text-xl font-black text-gray-900 mb-2">Enquiry Sent!</h3>
+                        <p className="text-gray-500 text-sm mb-4">Our manager will contact you within 24 hours.</p>
+                        <button 
+                            onClick={() => setShowSuccess(false)} 
+                            className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold hover:opacity-90 transition-all"
+                        >
+                            Back to Home
+                        </button>
                     </div>
                 </div>
             )}

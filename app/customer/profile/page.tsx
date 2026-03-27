@@ -45,11 +45,16 @@ export interface PasswordData {
   confirmPassword: string;
 }
 
-export interface Notification {
-  id: number;
-  message: string;
-  type: 'success' | 'error' | 'info';
-}
+// Helper for info toast
+const showInfoToast = (message: string) => {
+  toast(message, {
+    icon: 'ℹ️',
+    style: {
+      background: '#3b82f6',
+      color: '#fff',
+    },
+  });
+};
 
 // ==================== HELPER FUNCTIONS ====================
 const getTokenFromCookie = (): string | null => {
@@ -109,7 +114,6 @@ export default function ProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [updatingPassword, setUpdatingPassword] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [mobileError, setMobileError] = useState<string | null>(null);
 
   // Track if initial fetch has been done
@@ -136,29 +140,16 @@ export default function ProfilePage() {
   const getProfileImageUrl = useCallback((path: string | undefined) => {
     if (!path) return null;
 
-    // If it's already a full URL
     if (path.startsWith('http')) {
-      // Add timestamp to bust cache
       return `${path}${path.includes('?') ? '&' : '?'}t=${imageTimestamp}`;
     }
 
-    // If it's a local path
     if (path.startsWith('/uploads')) {
       return `${baseURL}${path}${path.includes('?') ? '&' : '?'}t=${imageTimestamp}`;
     }
 
-    // Default path
     return `${baseURL}/uploads/${path}${path.includes('?') ? '&' : '?'}t=${imageTimestamp}`;
   }, [baseURL, imageTimestamp]);
-
-  // ========== SHOW NOTIFICATION ==========
-  const showNotification = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
-    const id = Date.now();
-    setNotifications(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-    }, 4000);
-  }, []);
 
   // ========== REFRESH PROFILE DATA FROM BACKEND ==========
   const refreshProfileData = useCallback(async () => {
@@ -215,7 +206,6 @@ export default function ProfilePage() {
       toast.error("Failed to refresh profile data");
     }
   }, []);
-
 
   // ========== INITIAL FETCH PROFILE DATA ==========
   useEffect(() => {
@@ -300,14 +290,14 @@ export default function ProfilePage() {
         setIsEditing(false);
         setMobileError(null);
 
-        showNotification("Profile updated successfully", "success");
+        toast.success("Profile updated successfully");
 
       } else {
-        showNotification("Failed to update profile", "error");
+        toast.error("Failed to update profile");
       }
 
     } catch (err) {
-      showNotification("Mobile number already exists", "error");
+      toast.error("Mobile number already exists");
     } finally {
       setUpdating(false);
     }
@@ -319,12 +309,12 @@ export default function ProfilePage() {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      showNotification('File size should be less than 5MB', 'error');
+      toast.error('File size should be less than 5MB');
       return;
     }
 
     if (!file.type.startsWith('image/')) {
-      showNotification('Please upload a valid image file', 'error');
+      toast.error('Please upload a valid image file');
       return;
     }
 
@@ -336,18 +326,12 @@ export default function ProfilePage() {
     try {
       const response = await customerService.updateProfileImage(formData);
 
-      // Force refresh profile data and update timestamp
       await refreshProfileData();
-      
-      // Force image refresh by updating timestamp
       setImageTimestamp(Date.now());
 
-      showNotification(response.message || 'Profile picture updated!', 'success');
+      toast.success(response.message || 'Profile picture updated!');
     } catch (err: any) {
-      showNotification(
-        err.response?.data?.message || 'Failed to upload image',
-        'error'
-      );
+      toast.error(err.response?.data?.message || 'Failed to upload image');
     } finally {
       setUploadingImage(false);
 
@@ -362,17 +346,17 @@ export default function ProfilePage() {
     e.preventDefault();
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      showNotification('New passwords do not match', 'error');
+      toast.error('New passwords do not match');
       return;
     }
 
     if (passwordData.newPassword.length < 8) {
-      showNotification('Password must be at least 8 characters', 'error');
+      toast.error('Password must be at least 8 characters');
       return;
     }
 
     if (passwordStrength < 75) {
-      showNotification('Please choose a stronger password', 'error');
+      toast.error('Please choose a stronger password');
       return;
     }
 
@@ -391,15 +375,15 @@ export default function ProfilePage() {
           newPassword: '',
           confirmPassword: ''
         });
-        showNotification('Password updated successfully!', 'success');
+        toast.success('Password updated successfully!');
       }
     } catch (err: any) {
       if (err.response?.status === 401) {
-        showNotification('Incorrect current password', 'error');
+        toast.error('Incorrect current password');
       } else if (err.response?.status === 400) {
-        showNotification(err.response.data?.message || 'Invalid password data', 'error');
+        toast.error(err.response.data?.message || 'Invalid password data');
       } else {
-        showNotification('Failed to update password', 'error');
+        toast.error('Failed to update password');
       }
     } finally {
       setUpdatingPassword(false);
@@ -416,14 +400,14 @@ export default function ProfilePage() {
       if (response) {
         removeTokenCookie();
         localStorage.removeItem('token');
-        showNotification('Account deleted successfully', 'success');
+        toast.success('Account deleted successfully');
         setTimeout(() => router.push('/'), 2000);
       }
     } catch (err: any) {
       if (err.response?.status === 401) {
-        showNotification('Session expired', 'error');
+        toast.error('Session expired');
       } else {
-        showNotification('Failed to delete account', 'error');
+        toast.error('Failed to delete account');
       }
       setShowDeleteModal(false);
     } finally {
@@ -459,8 +443,8 @@ export default function ProfilePage() {
     setProfile(originalProfile);
     setIsEditing(false);
     setMobileError(null);
-    showNotification('Changes discarded', 'info');
-  }, [originalProfile, showNotification]);
+    showInfoToast('Changes discarded');
+  }, [originalProfile]);
 
   // ========== PASSWORD STRENGTH HELPERS ==========
   const getPasswordStrengthColor = useCallback(() => {
@@ -512,26 +496,6 @@ export default function ProfilePage() {
 
   return (
     <main className="max-w-[1440px] mx-auto px-4 md:px-8 py-8 bg-[#F8FAFC] min-h-screen relative">
-      
-      {/* Notifications */}
-      <div className="fixed top-20 right-5 z-50 flex flex-col gap-3">
-        {notifications.map(n => (
-          <div
-            key={n.id}
-            className={`px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 border ${
-              n.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
-              n.type === 'error' ? 'bg-rose-50 text-rose-800 border-rose-200' :
-              'bg-blue-50 text-blue-800 border-blue-200'
-            }`}
-          >
-            {n.type === 'success' && <CheckCircle className="w-5 h-5" />}
-            {n.type === 'error' && <AlertCircle className="w-5 h-5" />}
-            {n.type === 'info' && <Bell className="w-5 h-5" />}
-            <span className="text-sm font-bold">{n.message}</span>
-          </div>
-        ))}
-      </div>
-
       {/* Header */}
       <header className="mb-10">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -586,7 +550,7 @@ export default function ProfilePage() {
         onShowDeleteModal={() => setShowDeleteModal(true)}
       />
 
-      {/* KYC Section - With refresh and verification props */}
+      {/* KYC Section */}
       <KYCSection 
         profile={profile}
         onRefresh={refreshProfileData}
