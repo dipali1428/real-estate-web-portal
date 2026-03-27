@@ -328,6 +328,21 @@ const CustomerService = {
         return response.data;
     },
 
+     sendEmailOTP: async (email: string) => {
+    const response = await api.post("/api/dashboard/send-email-otp", { email });
+    return response.data;
+  },
+
+  verifyEmailOtp: async (data: { otp: string }) => {
+    const response = await api.post("/api/dashboard/verify-email-otp", data);
+    return response.data;
+  },
+
+  verifyPanAadhaarLink: async () => {
+    const response = await api.post("/api/dashboard/verify-pan-aadhaar-link");
+    return response.data;
+  },
+
     // ==================== WISHLIST API METHODS ====================
 
     /**
@@ -464,12 +479,12 @@ const CustomerService = {
 
     /**
      * Get assigned relationship manager
-     * GET → /api/customer/assigned-rm
+     * GET → /api/customer/rm/assigned-rm
      */
 
     getrmcustomer: async () => {
-        const response = await api.get("/api/customer/rm/assigned-rm");
-        return response.data;
+    const response = await api.get('/api/customer/rm/assigned-rm');
+    return response.data;
     },
 
       /**

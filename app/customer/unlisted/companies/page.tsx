@@ -14,7 +14,9 @@ import {
   Shield, 
   X,
   Bookmark, 
-  BookmarkCheck 
+  BookmarkCheck,
+  ShoppingCart,
+  CheckCircle
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -35,6 +37,16 @@ interface DepositoryBadge {
   bg: string;
   text: string;
   label: string;
+}
+
+interface CartItem {
+  id: number;
+  name: string;
+  type: string;
+  amount: number;
+  image?: string | null;
+  min_lot_size?: number | null;
+  price?: string;
 }
 
 // ==================== CONSTANTS ====================
@@ -119,6 +131,26 @@ const calculateMinInvestment = (price: string, minLotSize: number | null): numbe
   return priceNum * lotSize;
 };
 
+// ==================== CART STORAGE FUNCTIONS ====================
+
+const CART_STORAGE_KEY = 'unlisted_shares_cart';
+
+const getCartFromStorage = (): CartItem[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = localStorage.getItem(CART_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveCartToStorage = (cart: CartItem[]): void => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  }
+};
+
 // ==================== MAIN COMPONENT ====================
 
 export default function CompaniesPage() {
@@ -142,6 +174,66 @@ export default function CompaniesPage() {
   // Wishlist State
   const [wishlistItems, setWishlistItems] = useState<Map<number, number>>(new Map());
   const [processingWishlist, setProcessingWishlist] = useState<Set<number>>(new Set());
+  
+  // Cart State
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [processingCart, setProcessingCart] = useState<Set<number>>(new Set());
+
+  // ========== CART FUNCTIONS ==========
+  
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    setCartItems(getCartFromStorage());
+  }, []);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    saveCartToStorage(cartItems);
+  }, [cartItems]);
+
+  const isInCart = (companyId: number): boolean => {
+    return cartItems.some(item => item.id === companyId);
+  };
+
+  const addToCart = (company: Company) => {
+    setProcessingCart(prev => new Set(prev).add(company.id));
+    
+    const minInvestment = calculateMinInvestment(company.price, company.min_lot_size);
+    
+    const newCartItem: CartItem = {
+      id: company.id,
+      name: company.shares_name,
+      type: 'unlisted_share',
+      amount: minInvestment,
+      image: company.logo_url,
+      min_lot_size: company.min_lot_size,
+      price: company.price
+    };
+    
+    setCartItems(prev => {
+      // Check if already exists
+      if (prev.some(item => item.id === company.id)) {
+        return prev;
+      }
+      return [...prev, newCartItem];
+    });
+    
+    toast.success(`${company.shares_name} added to cart`);
+    
+    setProcessingCart(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(company.id);
+      return newSet;
+    });
+  };
+
+  const removeFromCart = (companyId: number) => {
+    setCartItems(prev => prev.filter(item => item.id !== companyId));
+    const company = companies.find(c => c.id === companyId);
+    if (company) {
+      toast.success(`${company.shares_name} removed from cart`);
+    }
+  };
 
   // ========== FETCH WISHLIST ==========
   const fetchWishlist = async () => {
@@ -222,7 +314,7 @@ export default function CompaniesPage() {
     }
   };
 
-  // ========== WISHLIST HANDLERS - Using Toast ==========
+  // ========== WISHLIST HANDLERS ==========
   const handleAddToWishlist = async (company: Company) => {
     setProcessingWishlist(prev => new Set(prev).add(company.id));
     
@@ -274,6 +366,15 @@ export default function CompaniesPage() {
         newSet.delete(company.id);
         return newSet;
       });
+    }
+  };
+
+  // ========== CART HANDLER ==========
+  const handleCartAction = (company: Company) => {
+    if (isInCart(company.id)) {
+      removeFromCart(company.id);
+    } else {
+      addToCart(company);
     }
   };
 
@@ -399,6 +500,7 @@ export default function CompaniesPage() {
     sortBy !== 'name-asc' ? 1 : 0
   ].reduce((a, b) => a + b, 0);
   const wishlistCount = wishlistItems.size;
+  const cartCount = cartItems.length;
 
   // ========== LOADING STATE ==========
   if (loading) {
@@ -472,7 +574,7 @@ export default function CompaniesPage() {
             
             <div className="flex items-center gap-3">
               {/* Wishlist Badge */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700">
                 <Bookmark size={16} className={wishlistCount > 0 ? 'fill-[#2076C7] text-[#2076C7]' : ''} />
                 <span>Saved</span>
                 {wishlistCount > 0 && (
@@ -520,7 +622,7 @@ export default function CompaniesPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Market Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
               <Building2 size={16} className="text-[#2076C7]" />
@@ -551,10 +653,10 @@ export default function CompaniesPage() {
           
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-              <Clock size={16} className="text-purple-600" />
-              Last Updated
+              <ShoppingCart size={16} className="text-blue-500" />
+              Cart Items
             </div>
-            <p className="text-lg font-bold text-gray-900">{lastUpdated || 'Just now'}</p>
+            <p className="text-2xl font-bold text-gray-900">{cartCount}</p>
           </div>
         </div>
 
@@ -575,7 +677,7 @@ export default function CompaniesPage() {
               </button>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
                   Price Range
@@ -622,15 +724,15 @@ export default function CompaniesPage() {
 
         {/* Companies List */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          {/* Table Header */}
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-            <div className="grid grid-cols-13 gap-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
-              <div className="col-span-5">Company</div>
+          {/* Table Header - Hidden on mobile */}
+          <div className="hidden md:block bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+            <div className="grid grid-cols-12 gap-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
+              <div className="col-span-4">Company</div>
               <div className="col-span-2 text-right">Price</div>
               <div className="col-span-2 text-right">Min. Lot</div>
               <div className="col-span-2 text-right">Min Investment</div>
               <div className="col-span-1 text-center">Depository</div>
-              <div className="col-span-1 text-center">Save</div>
+              <div className="col-span-1 text-center">Actions</div>
             </div>
           </div>
 
@@ -642,12 +744,15 @@ export default function CompaniesPage() {
                 const depository = getDepositoryBadge(company.depository_applicable);
                 const isSaved = wishlistItems.has(company.id);
                 const isProcessing = processingWishlist.has(company.id);
+                const inCart = isInCart(company.id);
+                const isAddingToCart = processingCart.has(company.id);
                 
                 return (
-                  <div key={company.id} className="px-6 py-4 hover:bg-gray-50 transition-colors group">
-                    <div className="grid grid-cols-13 gap-4 items-center">
+                  <div key={company.id} className="px-4 sm:px-6 py-4 hover:bg-gray-50 transition-colors group">
+                    {/* Desktop View */}
+                    <div className="hidden md:grid grid-cols-12 gap-4 items-center">
                       {/* Company Column */}
-                      <div className="col-span-5">
+                      <div className="col-span-4">
                         <div className="flex items-center gap-3">
                           {renderCompanyLogo(company)}
                           <div>
@@ -691,26 +796,126 @@ export default function CompaniesPage() {
                         </span>
                       </div>
                       
-                      {/* Save Button */}
-                      <div className="col-span-1 text-center">
-                        <button
-                          onClick={() => isSaved ? handleRemoveFromWishlist(company) : handleAddToWishlist(company)}
-                          disabled={isProcessing}
-                          className={`p-2 rounded-lg transition-all ${
-                            isSaved
-                              ? 'bg-[#2076C7] text-white hover:bg-[#1a5fa0]'
-                              : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 group-hover:bg-gray-200'
-                          }`}
-                          title={isSaved ? 'Remove from saved' : 'Save company'}
-                        >
-                          {isProcessing ? (
-                            <RefreshCw size={18} className="animate-spin" />
-                          ) : isSaved ? (
-                            <BookmarkCheck size={18} className="fill-white" />
-                          ) : (
-                            <Bookmark size={18} />
-                          )}
-                        </button>
+                      {/* Actions */}
+                      <div className="col-span-1">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => isSaved ? handleRemoveFromWishlist(company) : handleAddToWishlist(company)}
+                            disabled={isProcessing}
+                            className={`p-2 rounded-lg transition-all ${
+                              isSaved
+                                ? 'bg-[#2076C7] text-white hover:bg-[#1a5fa0]'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-600 group-hover:bg-gray-200'
+                            }`}
+                            title={isSaved ? 'Remove from saved' : 'Save company'}
+                          >
+                            {isProcessing ? (
+                              <RefreshCw size={18} className="animate-spin" />
+                            ) : isSaved ? (
+                              <BookmarkCheck size={18} className="fill-white" />
+                            ) : (
+                              <Bookmark size={18} />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleCartAction(company)}
+                            disabled={isAddingToCart}
+                            className={`p-2 rounded-lg transition-all ${
+                              inCart
+                                ? 'bg-[#2076C7] text-white cursor-default'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-600'
+                            }`}
+                            title={inCart ? 'Remove from cart' : 'Add to cart'}
+                          >
+                            {isAddingToCart ? (
+                              <RefreshCw size={18} className="animate-spin" />
+                            ) : inCart ? (
+                              <CheckCircle size={18} />
+                            ) : (
+                              <ShoppingCart size={18} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mobile View */}
+                    <div className="md:hidden">
+                      <div className="flex items-start gap-3">
+                        {renderCompanyLogo(company)}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <h3 className="font-semibold text-gray-900 text-sm">
+                                {company.shares_name}
+                              </h3>
+                              <p className="text-xs text-gray-500 mt-0.5">ID: {company.id}</p>
+                            </div>
+                            <div className="flex gap-1 flex-shrink-0">
+                              <button
+                                onClick={() => isSaved ? handleRemoveFromWishlist(company) : handleAddToWishlist(company)}
+                                disabled={isProcessing}
+                                className={`p-2 rounded-lg transition-all ${
+                                  isSaved
+                                    ? 'bg-[#2076C7] text-white'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
+                                {isProcessing ? (
+                                  <RefreshCw size={16} className="animate-spin" />
+                                ) : isSaved ? (
+                                  <BookmarkCheck size={16} className="fill-white" />
+                                ) : (
+                                  <Bookmark size={16} />
+                                )}
+                              </button>
+                              <button
+                                onClick={() => handleCartAction(company)}
+                                disabled={isAddingToCart}
+                                className={`p-2 rounded-lg transition-all ${
+                                  inCart
+                                    ? 'bg-green-500 text-white'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
+                                {isAddingToCart ? (
+                                  <RefreshCw size={16} className="animate-spin" />
+                                ) : inCart ? (
+                                  <CheckCircle size={16} />
+                                ) : (
+                                  <ShoppingCart size={16} />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-gray-100">
+                            <div>
+                              <p className="text-xs text-gray-500">Price</p>
+                              <p className="text-base font-bold text-[#2076C7] mt-0.5">
+                                {formatCurrency(company.price)}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500">Min. Lot</p>
+                              <p className="text-sm font-medium text-gray-900 mt-0.5">
+                                {formatMinLotSize(company.min_lot_size)}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500">Min. Investment</p>
+                              <p className="text-sm font-medium text-gray-900 mt-0.5">
+                                {minInvestment > 0 ? formatCurrency(minInvestment.toFixed(2)) : 'N/A'}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500">Depository</p>
+                              <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium mt-1 ${depository.bg} ${depository.text}`}>
+                                <Shield size={10} />
+                                {depository.label === 'NSDL & CDSL' ? 'Both' : depository.label}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -746,8 +951,12 @@ export default function CompaniesPage() {
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-out;
         }
-        .grid-cols-13 {
-          grid-template-columns: repeat(13, minmax(0, 1fr));
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 640px) {
+          .grid-cols-1.sm\:grid-cols-2 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+          }
         }
       `}</style>
     </div>
