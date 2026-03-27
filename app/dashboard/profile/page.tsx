@@ -836,6 +836,44 @@ export default function ProfileSection() {
 
                     <div className="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 space-y-4">
 
+                    {/* Aadhaar Block */}
+                        <div className="p-4 bg-white rounded-xl border border-slate-100">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Aadhaar Verification</h4>
+                                {aadhaarVerified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <div className="flex flex-col sm:flex-row gap-2">
+                                    <input
+                                        disabled={aadhaarVerified}
+                                        value={aadhaarVerified ? maskAadhaar(profile.aadhaar || "") : profile.aadhaar}
+                                        onChange={(e) => setProfile({ ...profile, aadhaar: e.target.value })}
+                                        className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
+                                        placeholder="12 Digit Aadhaar Number"
+                                        maxLength={12}
+                                    />
+                                    {!aadhaarVerified && (
+                                        <button onClick={handleRequestAadhaarOtp} className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs">
+                                            Get OTP
+                                        </button>
+                                    )}
+                                </div>
+                                {aadhaarOtpSent && !aadhaarVerified && (
+                                    <div className="flex flex-col sm:flex-row gap-2 animate-in slide-in-from-top-2">
+                                        <input
+                                            placeholder="Enter Aadhaar OTP"
+                                            value={aadhaarOtpInput}
+                                            onChange={(e) => setAadhaarOtpInput(e.target.value)}
+                                            className="flex-1 px-3 py-2 border border-[#1CADA3] text-slate-700 rounded-lg font-bold text-sm outline-none"
+                                        />
+                                        <button onClick={handleVerifyAadhaarOtp} className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-xs">
+                                            Verify OTP
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
                         {/* PAN Block */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-white rounded-xl border border-slate-100">
                             <div className="md:col-span-3 flex justify-between items-center">
@@ -880,44 +918,6 @@ export default function ProfileSection() {
                                     >
                                         Verify
                                     </button>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Aadhaar Block */}
-                        <div className="p-4 bg-white rounded-xl border border-slate-100">
-                            <div className="flex justify-between items-center mb-3">
-                                <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Aadhaar Verification</h4>
-                                {aadhaarVerified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <div className="flex flex-col sm:flex-row gap-2">
-                                    <input
-                                        disabled={aadhaarVerified}
-                                        value={aadhaarVerified ? maskAadhaar(profile.aadhaar || "") : profile.aadhaar}
-                                        onChange={(e) => setProfile({ ...profile, aadhaar: e.target.value })}
-                                        className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
-                                        placeholder="12 Digit Aadhaar Number"
-                                        maxLength={12}
-                                    />
-                                    {!aadhaarVerified && (
-                                        <button onClick={handleRequestAadhaarOtp} className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs">
-                                            Get OTP
-                                        </button>
-                                    )}
-                                </div>
-                                {aadhaarOtpSent && !aadhaarVerified && (
-                                    <div className="flex flex-col sm:flex-row gap-2 animate-in slide-in-from-top-2">
-                                        <input
-                                            placeholder="Enter Aadhaar OTP"
-                                            value={aadhaarOtpInput}
-                                            onChange={(e) => setAadhaarOtpInput(e.target.value)}
-                                            className="flex-1 px-3 py-2 border border-[#1CADA3] text-slate-700 rounded-lg font-bold text-sm outline-none"
-                                        />
-                                        <button onClick={handleVerifyAadhaarOtp} className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-xs">
-                                            Verify OTP
-                                        </button>
-                                    </div>
                                 )}
                             </div>
                         </div>
