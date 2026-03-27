@@ -12,7 +12,7 @@ interface HeroSectionProps {
 
 export default function HeroSection({ onApply, isMobile }: HeroSectionProps) {
     return (
-        <header className="relative w-full overflow-hidden pt-24 md:pt-32 pb-16 bg-white">
+        <header className="relative w-full overflow-hidden pt-20 md:pt-24 pb-12 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="flex flex-col lg:flex-row items-center gap-12">
                     {/* Left Column: Text & CTA */}
@@ -30,7 +30,7 @@ export default function HeroSection({ onApply, isMobile }: HeroSectionProps) {
                             <>
                                 Unlock Your <br />
                                 <span className="text-[#2076C7]">Dream Home</span> <br />
-                                with Rates as Low as <span className="text-[#1CADA3]">7.10%</span>
+                                with Rates as Low as <span className="text-[#1CADA3]">7.10%*</span>
                             </>
                         </h1>
 
