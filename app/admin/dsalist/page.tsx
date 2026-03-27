@@ -65,16 +65,15 @@ const inputClass =
 
 export default function DSAManagementPage() {
   const [dsas, setDsas] = useState<DSA[]>([]);
+  const [totalCount, setTotalCount] = useState(0); // Added to store the 'count' from API
   const [editingDSA, setEditingDSA] = useState<DSA | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(50);
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Matches your API default limit
 
-  const hasFetched = useRef(false);
-  const isSearching = useRef(false);
   const tabs = ["All", "Active", "Inactive", "Pending"];
 
   const [cities, setCities] = useState<string[]>([]);
@@ -83,61 +82,50 @@ export default function DSAManagementPage() {
   const fetchDSAs = useCallback(async () => {
     try {
       setLoading(true);
-      const apiResponse = await AdminService.dsaList();
-      const apiData = apiResponse?.dsalist || apiResponse?.dsas || apiResponse || [];
+      // Passing pagination and search params to the API
+      const apiResponse = await AdminService.dsaList({
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchQuery
+      });
+      
+      console.log("Raw API Response for DSA List:", apiResponse);
+      
+      const apiData = apiResponse?.dsalist || apiResponse?.dsas || [];
+      const count = apiResponse?.count || 0;
+      
       const mappedDSAs = mapApiDataToDSA(apiData);
       setDsas(mappedDSAs);
-      setCities(Array.from(new Set(mappedDSAs.map((d) => d.city).filter(Boolean))));
-      setRoles(Array.from(new Set(mappedDSAs.map((d) => d.role).filter(Boolean))));
+      setTotalCount(count); // Setting the proper 2690 count here
+      
+      if (cities.length === 0) {
+        setCities(Array.from(new Set(mappedDSAs.map((d) => d.city).filter(Boolean))));
+      }
+      if (roles.length === 0) {
+        setRoles(Array.from(new Set(mappedDSAs.map((d) => d.role).filter(Boolean))));
+      }
     } catch (err) {
       toast.error("Failed to load DSAs");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [currentPage, itemsPerPage, searchQuery]); // Re-fetch when these change
 
   useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
     fetchDSAs();
   }, [fetchDSAs]);
 
-  useEffect(() => {
-    const query = searchQuery.trim();
-    if (!query) {
-      if (isSearching.current) {
-        isSearching.current = false;
-        fetchDSAs();
-      }
-      return;
-    }
-    isSearching.current = true;
-    const abortController = new AbortController();
-    const delayDebounce = setTimeout(async () => {
-      try {
-        const res = await AdminService.searchDSA({ search: query }, { signal: abortController.signal });
-        const apiData = res?.dsalist || res || [];
-        if (Array.isArray(apiData)) setDsas(mapApiDataToDSA(apiData));
-      } catch (err: any) {
-        if (err?.name === "CanceledError" || err?.name === "AbortError") return;
-      }
-    }, 500);
-    return () => {
-      abortController.abort();
-      clearTimeout(delayDebounce);
-    };
-  }, [searchQuery, fetchDSAs]);
-
+  // Handle Tab Filtering locally (since the current API might not support status filtering)
   const filteredDSAs = useMemo(() => {
-    if (activeTab === "All") return dsas;
-    return dsas.filter((dsa) => dsa.status === activeTab);
+    let result = dsas;
+    if (activeTab !== "All") {
+      result = result.filter((dsa) => dsa.status === activeTab);
+    }
+    return result;
   }, [dsas, activeTab]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredDSAs.length / itemsPerPage));
-  const paginatedDSAs = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredDSAs.slice(start, start + itemsPerPage);
-  }, [filteredDSAs, currentPage, itemsPerPage]);
+  // Pagination logic using server totalCount
+  const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
 
   const getPaginationGroup = useMemo(() => {
     const pages: (number | string)[] = [];
@@ -185,8 +173,8 @@ export default function DSAManagementPage() {
   };
 
   const stats = {
-    total: dsas.length,
-    active: dsas.filter((d) => d.status === "Active").length,
+    total: totalCount, // Properly using the API count
+    active: totalCount,
     inactive: dsas.filter((d) => d.status === "Inactive").length,
     pending: dsas.filter((d) => d.status === "Pending").length,
   };
@@ -203,7 +191,7 @@ export default function DSAManagementPage() {
             <p className="text-sm text-slate-600">View and manage all Direct Selling Agents.</p>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => { hasFetched.current = false; fetchDSAs(); }} className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
+            <button onClick={() => fetchDSAs()} className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
               <RefreshCw className={classNames("h-4 w-4", loading ? "animate-spin" : "")} /> Refresh
             </button>
             <button onClick={downloadExcel} className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 shadow-sm transition-colors">
@@ -243,7 +231,13 @@ export default function DSAManagementPage() {
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div className="relative w-full md:w-96">
-                <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by ID, Name, or Email..." className="w-full pl-10 pr-4 py-2 rounded-lg shadow-md focus:outline-none text-gray-700 focus:ring-2 focus:ring-blue-500 bg-white" />
+                <input 
+                  type="text" 
+                  value={searchQuery} 
+                  onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }} 
+                  placeholder="Search by ID, Name, Mobile, or Adv ID..." 
+                  className="w-full pl-10 pr-4 py-2 rounded-lg shadow-md focus:outline-none text-gray-700 focus:ring-2 focus:ring-blue-500 bg-white" 
+                />
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <Search className="w-5 h-5 text-gray-400" />
                 </div>
@@ -251,7 +245,7 @@ export default function DSAManagementPage() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs sm:text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <span>Show</span>
-                  <select value={itemsPerPage} onChange={(e) => setItemsPerPage(Number(e.target.value))} className="border border-gray-300 rounded-md px-2 py-1 bg-white">
+                  <select value={itemsPerPage} onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }} className="border border-gray-300 rounded-md px-2 py-1 bg-white">
                     <option value={10}>10</option>
                     <option value={25}>25</option>
                     <option value={50}>50</option>
@@ -259,7 +253,7 @@ export default function DSAManagementPage() {
                   </select>
                   <span>per page</span>
                 </div>
-                <p>Showing <span className="font-semibold">{filteredDSAs.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}</span> - <span className="font-semibold">{Math.min(currentPage * itemsPerPage, filteredDSAs.length)}</span> of <span className="font-semibold">{filteredDSAs.length}</span> DSAs</p>
+                <p>Showing <span className="font-semibold">{totalCount === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}</span> - <span className="font-semibold">{Math.min(currentPage * itemsPerPage, totalCount)}</span> of <span className="font-semibold">{totalCount}</span> DSAs</p>
               </div>
             </div>
           </div>
@@ -291,7 +285,7 @@ export default function DSAManagementPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {paginatedDSAs.map((dsa) => (
+                    {filteredDSAs.map((dsa) => (
                       <tr key={dsa.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3">
                           <button onClick={() => handleEdit(dsa)} className="p-1.5 text-gray-400 hover:text-[#2076C7] hover:bg-blue-50 rounded-md transition-colors"><Pencil size={16} /></button>
@@ -320,7 +314,7 @@ export default function DSAManagementPage() {
           </div>
         </Tab.Group>
 
-        {!loading && filteredDSAs.length > 0 && (
+        {!loading && totalCount > 0 && (
           <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-gray-600">
             <div>Page <span className="font-semibold">{currentPage}</span> of <span className="font-semibold">{totalPages}</span></div>
             <div className="flex items-center gap-1 sm:gap-2">
