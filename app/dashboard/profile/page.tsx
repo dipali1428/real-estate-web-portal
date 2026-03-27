@@ -193,7 +193,7 @@ export default function ProfileSection() {
     const refreshProfileData = async () => {
         try {
             const res = await DashboardService.getProfile();
-            
+
             setPanAadhaarLinked(!!res.kycDetails?.pan_aadhaar_linked);
             // 1. Extract DOB from Aadhaar KYC data if available
             const aadhaarDob = res.kycDetails?.aadhaar_kyc_data?.date_of_birth; // "13-11-2001"
@@ -687,7 +687,7 @@ export default function ProfileSection() {
                                                                 ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed select-none' // Clearly locked
                                                                 : 'bg-white border-slate-300 text-slate-700 focus:border-[#2076C7] shadow-sm'
                                                             }`}
-                                                        placeholder={`${!isEditing? '••••••••': ''}`}
+                                                        placeholder={`${!isEditing ? '••••••••' : ''}`}
                                                     />
                                                     <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                                                 </div>
@@ -836,9 +836,14 @@ export default function ProfileSection() {
 
                             <input
                                 disabled={profile.pan_verified}
-                                value={profile.name || ""}
+                                value={
+                                    profile.pan_verified
+                                        ? (profile.name?.toUpperCase() || "")
+                                        : (profile.name_as_per_pan || "")
+                                }
                                 onChange={(e) => setProfile({ ...profile, name_as_per_pan: e.target.value.toUpperCase() })}
-                                className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50"
+
+                                className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50 disabled:text-slate-600"
                                 placeholder="Name as per PAN"
                             />
 
@@ -846,12 +851,19 @@ export default function ProfileSection() {
                                 <input
                                     type="date"
                                     disabled={profile.pan_verified}
-                                    value={profile.date_of_birth || ""}
+                                    value={
+                                        profile.pan_verified
+                                            ? (profile.date_of_birth || "")
+                                            : ("")
+                                    }
                                     onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
                                     className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none disabled:bg-slate-50"
                                 />
                                 {!profile.pan_verified && (
-                                    <button onClick={handlePanVerification} className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-[#158f87]">
+                                    <button
+                                        onClick={handlePanVerification}
+                                        className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-[#158f87]"
+                                    >
                                         Verify
                                     </button>
                                 )}
@@ -960,6 +972,15 @@ export default function ProfileSection() {
                     </div>
 
                     <div className="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
+                        <div className="flex justify-between items-center mb-2 px-1">
+                            <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Bank Account Details</h4>
+                            {bankVerified && (
+                                <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 text-emerald-600 px-2.5 py-1 rounded-full">
+                                    <CheckCircle2 size={12} className="shrink-0" />
+                                    <span className="text-[10px] font-black uppercase tracking-tight">Verified</span>
+                                </div>
+                            )}
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Bank Name</label>
@@ -1012,7 +1033,7 @@ export default function ProfileSection() {
                             </div>
                             <h2 className="text-xl sm:text-2xl font-bold text-slate-800 text-center">Identity Assets</h2>
                         </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4"> 
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div className="space-y-4">
                                 <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Digital Visiting Card</h4>
                                 <div className="aspect-[1.75/1] rounded-[24px] sm:rounded-[32px] shadow-2xl overflow-hidden relative border border-slate-200 bg-slate-900 group">
@@ -1031,8 +1052,8 @@ export default function ProfileSection() {
                             </div>
 
                             <div className="space-y-3 ml-20">
-                            <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1 text-left">DSA Identity Card</h4>
-                            <div className="max-w-[260px] sm:max-w-[280px] aspect-[1/1.58] lg:ml-0 mx-auto rounded-2xl bg-white border border-slate-200 shadow-xl relative overflow-hidden group flex flex-col">
+                                <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1 text-left">DSA Identity Card</h4>
+                                <div className="max-w-[260px] sm:max-w-[280px] aspect-[1/1.58] lg:ml-0 mx-auto rounded-2xl bg-white border border-slate-200 shadow-xl relative overflow-hidden group flex flex-col">
                                     <div className="h-2 w-full bg-[#1CADA3]"></div>
                                     <div className="p-5 sm:p-6 flex flex-col items-center h-full">
                                         <div className="h-10 sm:h-12 w-28 sm:w-32 mb-4 sm:mb-6"><img src={LogoImage.src} className="w-full h-full object-contain" /></div>
