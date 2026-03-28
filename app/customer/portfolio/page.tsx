@@ -305,19 +305,19 @@ export default function PortfolioPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <KpiCard 
               icon={<Wallet className="w-6 h-6" />}
-              color="from-blue-500 to-blue-600"
+              color="from-[#2076C7] to-[#1CADA3]"
               value={formatLargeNumber(summary.totalInvestment)}
               label="Total Investment"
             />
             <KpiCard 
               icon={<TrendingUp className="w-6 h-6" />}
-              color="from-green-500 to-green-600"
+              color="from-[#2076C7] to-[#1CADA3]"
               value={formatLargeNumber(summary.currentValue)}
               label="Current Value"
             />
             <KpiCard 
               icon={<ArrowUpRight className="w-6 h-6" />}
-              color="from-purple-500 to-purple-600"
+              color="from-[#2076C7] to-[#1CADA3]"
               value={formatLargeNumber(Math.abs(summary.totalReturns))}
               label={`Total Returns (${absoluteReturn >= 0 ? '+' : ''}${absoluteReturn.toFixed(2)}%)`}
             />

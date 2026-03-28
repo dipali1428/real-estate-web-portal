@@ -10,7 +10,8 @@ import {
     X, 
     User, 
     Loader2, 
-    MessageSquare,
+    Building,
+    Calculator,
     CheckCircle 
 } from 'lucide-react';
 
@@ -26,7 +27,7 @@ interface EnquiryPayload {
 }
 
 export default function UnlistedCTA() {
-    const { openPartner } = useModal(); // Get openPartner from context
+    const { openPartner } = useModal();
     
     // Enquiry Modal States
     const [showEnquiryModal, setShowEnquiryModal] = useState(false);
@@ -35,12 +36,13 @@ export default function UnlistedCTA() {
     const [enquiryError, setEnquiryError] = useState<string | null>(null);
     const [notifications, setNotifications] = useState<{ id: number; message: string; type?: 'success' | 'error' }[]>([]);
 
-    // Form Data
+    // Form Data - All required fields
     const [formData, setFormData] = useState({
+        companyId: '',
         fullName: '',
         email: '',
         phone: '',
-        message: ''
+        quantity: ''
     });
 
     // NOTIFICATION HANDLER
@@ -58,8 +60,53 @@ export default function UnlistedCTA() {
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim()) {
-            setEnquiryError('Please fill in all required fields');
+        // Validate all required fields
+        if (!formData.companyId.trim()) {
+            setEnquiryError('Company ID is required');
+            return;
+        }
+        if (!formData.fullName.trim()) {
+            setEnquiryError('Full name is required');
+            return;
+        }
+        if (!formData.email.trim()) {
+            setEnquiryError('Email is required');
+            return;
+        }
+        if (!formData.phone.trim()) {
+            setEnquiryError('Phone number is required');
+            return;
+        }
+        if (!formData.quantity.trim()) {
+            setEnquiryError('Quantity is required');
+            return;
+        }
+        
+        // Validate company ID
+        const companyIdNum = parseInt(formData.companyId);
+        if (isNaN(companyIdNum) || companyIdNum <= 0) {
+            setEnquiryError('Please enter a valid company ID');
+            return;
+        }
+        
+        // Validate quantity
+        const quantityNum = parseInt(formData.quantity);
+        if (isNaN(quantityNum) || quantityNum <= 0) {
+            setEnquiryError('Please enter a valid quantity');
+            return;
+        }
+        
+        // Validate email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email.trim())) {
+            setEnquiryError('Please enter a valid email address');
+            return;
+        }
+        
+        // Validate phone (10 digits)
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(formData.phone.trim())) {
+            setEnquiryError('Please enter a valid 10-digit phone number');
             return;
         }
 
@@ -68,11 +115,13 @@ export default function UnlistedCTA() {
         
         try {
             const payload: EnquiryPayload = {
+                company_id: companyIdNum,
                 enquiry_type: 'buy',
                 full_name: formData.fullName.trim(),
                 email: formData.email.trim(),
                 phone: formData.phone.trim(),
-                message: formData.message.trim() || 'General enquiry from CTA section'
+                quantity: quantityNum,
+                message: `Enquiry for company ID ${companyIdNum} - ${quantityNum} shares`
             };
 
             await createEnquiry(payload);
@@ -80,17 +129,19 @@ export default function UnlistedCTA() {
             setShowEnquiryModal(false);
             setShowSuccess(true);
             setFormData({
+                companyId: '',
                 fullName: '',
                 email: '',
                 phone: '',
-                message: ''
+                quantity: ''
             });
             
             showNotification('Enquiry submitted successfully!', 'success');
             
         } catch (err: any) {
-            setEnquiryError(err.response?.data?.message || 'Failed to submit enquiry. Please try again.');
-            showNotification('Failed to submit enquiry', 'error');
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to submit enquiry. Please try again.';
+            setEnquiryError(errorMessage);
+            showNotification(errorMessage, 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -156,94 +207,112 @@ export default function UnlistedCTA() {
                 </div>
             </section>
 
-            {/* ENQUIRY MODAL */}
+            {/* ENQUIRY MODAL - Compact with all required fields */}
             {showEnquiryModal && (
                 <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="bg-gradient-to-r from-teal-600 to-teal-500 p-6 text-white flex justify-between items-center">
+                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="bg-gradient-to-r from-teal-600 to-teal-500 p-4 text-white flex justify-between items-center">
                             <div>
-                                <h3 className="text-xl font-black uppercase tracking-tight">General Enquiry</h3>
-                                <p className="text-xs text-white/80">We'll get back to you within 24 hours</p>
+                                <h3 className="text-lg font-black uppercase tracking-tight">Investor Enquiry</h3>
+                                <p className="text-xs text-white/80">Fill details to get started</p>
                             </div>
                             <button 
                                 onClick={() => setShowEnquiryModal(false)} 
-                                className="hover:bg-white/20 p-2 rounded-full transition-all"
+                                className="hover:bg-white/20 p-1 rounded-full transition-all"
                             >
-                                <X className="w-6 h-6" />
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
                         
-                        <form className="p-8 space-y-5" onSubmit={handleFormSubmit}>
+                        <form className="p-5 space-y-4" onSubmit={handleFormSubmit}>
                             {enquiryError && (
-                                <div className="bg-rose-50 text-rose-600 text-xs p-3 rounded-lg border border-rose-200 flex items-start gap-2">
+                                <div className="bg-rose-50 text-rose-600 text-xs p-2 rounded-lg border border-rose-200 flex items-start gap-2">
                                     <X className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
                                     <span>{enquiryError}</span>
                                 </div>
                             )}
                             
+                            {/* Company ID */}
+                            <div>
+                                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                    Company ID <span className="text-rose-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                    <input 
+                                        type="number"
+                                        value={formData.companyId}
+                                        onChange={(e) => handleInputChange('companyId', e.target.value)}
+                                        required 
+                                        className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
+                                        placeholder="Enter company ID" 
+                                        min="1"
+                                    />
+                                </div>
+                            </div>
+                            
                             {/* Full Name */}
                             <div>
-                                <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">
+                                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
                                     Full Name <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                                     <input 
-                                        name="fullName"
                                         value={formData.fullName}
                                         onChange={(e) => handleInputChange('fullName', e.target.value)}
                                         required 
-                                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-teal-500 text-sm text-black" 
+                                        className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
                                         placeholder="John Doe" 
                                     />
                                 </div>
                             </div>
                             
-                            {/* Email & Phone */}
-                            <div className="grid grid-cols-2 gap-4">
+                            {/* Email and Phone - Side by side */}
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">
+                                    <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
                                         Email <span className="text-rose-500">*</span>
                                     </label>
                                     <input 
-                                        name="email"
                                         type="email"
                                         value={formData.email}
                                         onChange={(e) => handleInputChange('email', e.target.value)}
                                         required 
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-teal-500 text-sm text-black" 
+                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
                                         placeholder="john@email.com" 
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">
+                                    <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
                                         Phone <span className="text-rose-500">*</span>
                                     </label>
                                     <input 
-                                        name="phone"
                                         type="tel"
                                         value={formData.phone}
                                         onChange={(e) => handleInputChange('phone', e.target.value)}
                                         required 
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-teal-500 text-sm text-black" 
-                                        placeholder="+91..." 
+                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
+                                        placeholder="9876543210" 
                                     />
                                 </div>
                             </div>
                             
-                            {/* Message */}
+                            {/* Quantity */}
                             <div>
-                                <label className="block text-xs font-black text-gray-400 uppercase mb-2 tracking-widest">
-                                    Message <span className="text-gray-300">(optional)</span>
+                                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                    Quantity (Shares) <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative">
-                                    <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-gray-300" />
-                                    <textarea 
-                                        name="message"
-                                        value={formData.message}
-                                        onChange={(e) => handleInputChange('message', e.target.value)}
-                                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-teal-500 text-sm h-24 resize-none text-black" 
-                                        placeholder="Tell us about your investment requirements..."
+                                    <Calculator className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                    <input 
+                                        type="number"
+                                        value={formData.quantity}
+                                        onChange={(e) => handleInputChange('quantity', e.target.value)}
+                                        required 
+                                        className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
+                                        placeholder="Number of shares" 
+                                        min="1"
                                     />
                                 </div>
                             </div>
@@ -252,16 +321,16 @@ export default function UnlistedCTA() {
                             <button 
                                 type="submit" 
                                 disabled={isSubmitting} 
-                                className="w-full py-4 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-xl font-black text-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                className="w-full py-3 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-lg font-bold text-base hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                         Processing...
                                     </>
                                 ) : (
                                     <>
-                                        <Send className="w-5 h-5" />
+                                        <Send className="w-4 h-4" />
                                         Submit Enquiry
                                     </>
                                 )}
@@ -279,17 +348,17 @@ export default function UnlistedCTA() {
             {/* SUCCESS MODAL */}
             {showSuccess && (
                 <div className="fixed inset-0 z-[7000] bg-black/60 flex items-center justify-center p-4">
-                    <div className="bg-white p-10 rounded-3xl max-w-sm w-full text-center shadow-2xl">
-                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <CheckCircle className="w-10 h-10 text-green-600" />
+                    <div className="bg-white p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <CheckCircle className="w-8 h-8 text-green-600" />
                         </div>
-                        <h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">Enquiry Sent!</h3>
-                        <p className="text-gray-500 text-sm mb-8 leading-relaxed">
+                        <h3 className="text-xl font-black text-gray-900 mb-2 tracking-tight">Enquiry Sent!</h3>
+                        <p className="text-gray-500 text-sm mb-4 leading-relaxed">
                             Our relationship manager will contact you within 24 hours with more information.
                         </p>
                         <button 
                             onClick={() => setShowSuccess(false)} 
-                            className="w-full py-4 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-xl font-black hover:opacity-90 transition-all"
+                            className="w-full py-3 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-lg font-bold hover:opacity-90 transition-all"
                         >
                             Back to Home
                         </button>

@@ -104,10 +104,15 @@ export default function GoalPlanner() {
     const [progress, setProgress] = useState<Record<number, number>>({});
     const [calculationPreview, setCalculationPreview] = useState<GoalCalculation | null>(null);
     
-    // New state for goal details
+    // Goal details state
     const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
     const [showGoalDetails, setShowGoalDetails] = useState(false);
     const [loadingGoalDetails, setLoadingGoalDetails] = useState(false);
+    
+    // Delete confirmation modal state
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [goalToDelete, setGoalToDelete] = useState<number | null>(null);
+    const [deleting, setDeleting] = useState(false);
 
     // ========== TOAST HELPER ==========
     const showToast = (message: string, type: 'success' | 'error' | 'info') => {
@@ -282,12 +287,18 @@ export default function GoalPlanner() {
         }
     };
 
-    // ========== DELETE GOAL ==========
-    const handleDeleteGoal = async (goalId: number) => {
-        if (!confirm('Are you sure you want to delete this goal?')) return;
+    // ========== DELETE GOAL - Updated with custom modal ==========
+    const handleDeleteClick = (goalId: number) => {
+        setGoalToDelete(goalId);
+        setShowDeleteModal(true);
+    };
 
+    const handleConfirmDelete = async () => {
+        if (!goalToDelete) return;
+        
+        setDeleting(true);
         try {
-            const response = await CustomerService.deleteGoal(goalId);
+            const response = await CustomerService.deleteGoal(goalToDelete);
             if (response.success) {
                 showToast('Goal deleted successfully', 'success');
                 await fetchGoals();
@@ -296,6 +307,10 @@ export default function GoalPlanner() {
             }
         } catch (error: any) {
             showToast(error.response?.data?.message || 'Failed to delete goal', 'error');
+        } finally {
+            setDeleting(false);
+            setShowDeleteModal(false);
+            setGoalToDelete(null);
         }
     };
 
@@ -664,10 +679,11 @@ export default function GoalPlanner() {
                                                                 <Edit2 size={16} className="text-gray-500" />
                                                             </button>
                                                             <button
-                                                                onClick={() => handleDeleteGoal(goal.id)}
-                                                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                                                onClick={() => handleDeleteClick(goal.id)}
+                                                                className="p-2 hover:bg-red-100 rounded-lg transition-colors group"
+                                                                title="Delete Goal"
                                                             >
-                                                                <Trash2 size={16} className="text-gray-500" />
+                                                                <Trash2 size={16} className="text-gray-500 group-hover:text-red-600" />
                                                             </button>
                                                         </div>
                                                     </td>
@@ -974,123 +990,123 @@ export default function GoalPlanner() {
                                     <Loader2 className="w-8 h-8 text-[#2076C7] animate-spin" />
                                 </div>
                             ) : (
-                                <div className="p-8 space-y-6">
-                                    {/* Quick Stats */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-blue-50 p-4 rounded-xl">
-                                            <div className="flex items-center gap-2 text-blue-600 mb-2">
-                                                <Target size={16} />
-                                                <span className="text-xs font-medium">GOAL ID</span>
-                                            </div>
-                                            <p className="text-2xl font-bold text-gray-900">#{selectedGoal.id}</p>
+                            <div className="p-5 space-y-4">
+                                {/* Quick Stats - Compact */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-blue-50 p-3 rounded-lg">
+                                        <div className="flex items-center gap-1.5 text-blue-600 mb-1">
+                                            <Target size={12} />
+                                            <span className="text-[10px] font-medium">GOAL ID</span>
                                         </div>
-                                        <div className="bg-emerald-50 p-4 rounded-xl">
-                                            <div className="flex items-center gap-2 text-emerald-600 mb-2">
-                                                <PiggyBank size={16} />
-                                                <span className="text-xs font-medium">USER ID</span>
-                                            </div>
-                                            <p className="text-2xl font-bold text-gray-900">#{selectedGoal.user_id}</p>
-                                        </div>
+                                        <p className="text-lg font-bold text-gray-900">#{selectedGoal.id}</p>
                                     </div>
-
-                                    {/* Main Details */}
-                                    <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
-                                        <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                                            <Info size={18} className="text-[#2076C7]" />
-                                            Goal Information
-                                        </h4>
-                                        
-                                        <div className="grid grid-cols-2 gap-6">
-                                            <div>
-                                                <p className="text-xs text-gray-500 mb-1">Target Amount</p>
-                                                <p className="text-xl font-bold text-gray-900">
-                                                    {formatCurrency(selectedGoal.target_amount)}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-gray-500 mb-1">Current Savings</p>
-                                                <p className="text-xl font-bold text-blue-600">
-                                                    {formatCurrency(selectedGoal.current_savings)}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-gray-500 mb-1">Time Horizon</p>
-                                                <div className="flex items-center gap-2">
-                                                    <CalendarDays size={16} className="text-gray-400" />
-                                                    <p className="text-lg font-bold text-gray-900">{selectedGoal.target_years} years</p>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-gray-500 mb-1">Expected Return</p>
-                                                <div className="flex items-center gap-2">
-                                                    <Percent size={16} className="text-gray-400" />
-                                                    <p className="text-lg font-bold text-emerald-600">{selectedGoal.expected_return}% p.a.</p>
-                                                </div>
-                                            </div>
+                                    <div className="bg-emerald-50 p-3 rounded-lg">
+                                        <div className="flex items-center gap-1.5 text-emerald-600 mb-1">
+                                            <PiggyBank size={12} />
+                                            <span className="text-[10px] font-medium">USER ID</span>
                                         </div>
-                                    </div>
-
-                                    {/* Progress Section */}
-                                    <div className="bg-gradient-to-r from-blue-50 to-emerald-50 rounded-2xl p-6">
-                                        <h4 className="font-semibold text-gray-900 mb-4">Progress Tracking</h4>
-                                        <div className="mb-3">
-                                            <div className="flex justify-between text-sm mb-1">
-                                                <span className="text-gray-600">Completion</span>
-                                                <span className="font-bold text-gray-900">
-                                                    {progress[selectedGoal.id]?.toFixed(1) || 0}%
-                                                </span>
-                                            </div>
-                                            <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                                                <div 
-                                                    style={{ width: `${progress[selectedGoal.id] || 0}%` }}
-                                                    className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3]"
-                                                />
-                                            </div>
-                                        </div>
-                                        
-                                        {calculations[selectedGoal.id] && (
-                                            <div className="mt-4 pt-4 border-t border-blue-200">
-                                                <p className="text-sm font-medium text-gray-700 mb-3">Monthly Investment Required</p>
-                                                <p className="text-3xl font-bold text-emerald-600">
-                                                    {formatCurrency(calculations[selectedGoal.id].monthly_investment_required)}
-                                                    <span className="text-sm font-normal text-gray-500 ml-2">per month</span>
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Timestamps */}
-                                    <div className="border-t border-gray-200 pt-4">
-                                        <div className="flex justify-between text-xs text-gray-500">
-                                            <div>
-                                                <span className="font-medium">Created:</span> {formatDateTime(selectedGoal.created_at)}
-                                            </div>
-                                            <div>
-                                                <span className="font-medium">Last Updated:</span> {formatDateTime(selectedGoal.updated_at)}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Action Buttons */}
-                                    <div className="flex gap-3 pt-2">
-                                        <button
-                                            onClick={() => {
-                                                setShowGoalDetails(false);
-                                                handleEditGoal(selectedGoal);
-                                            }}
-                                            className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
-                                        >
-                                            <Edit2 size={16} />
-                                            Edit Goal
-                                        </button>
-                                        <button
-                                            onClick={() => setShowGoalDetails(false)}
-                                            className="flex-1 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-medium hover:opacity-90 transition-all"
-                                        >
-                                            Close
-                                        </button>
+                                        <p className="text-lg font-bold text-gray-900">#{selectedGoal.user_id}</p>
                                     </div>
                                 </div>
+
+                                {/* Main Details - Compact */}
+                                <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+                                    <h4 className="font-semibold text-sm text-gray-900 flex items-center gap-1.5">
+                                        <Info size={14} className="text-[#2076C7]" />
+                                        Goal Information
+                                    </h4>
+                                    
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <p className="text-[10px] text-gray-500 mb-0.5">Target Amount</p>
+                                            <p className="text-sm font-bold text-gray-900">
+                                                {formatCurrency(selectedGoal.target_amount)}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-gray-500 mb-0.5">Current Savings</p>
+                                            <p className="text-sm font-bold text-blue-600">
+                                                {formatCurrency(selectedGoal.current_savings)}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-gray-500 mb-0.5">Time Horizon</p>
+                                            <div className="flex items-center gap-1">
+                                                <CalendarDays size={12} className="text-gray-400" />
+                                                <p className="text-sm font-bold text-gray-900">{selectedGoal.target_years} years</p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-gray-500 mb-0.5">Expected Return</p>
+                                            <div className="flex items-center gap-1">
+                                                <Percent size={12} className="text-gray-400" />
+                                                <p className="text-sm font-bold text-emerald-600">{selectedGoal.expected_return}% p.a.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Progress Section - Compact */}
+                                <div className="bg-gradient-to-r from-blue-50 to-emerald-50 rounded-xl p-4">
+                                    <h4 className="font-semibold text-sm text-gray-900 mb-2">Progress Tracking</h4>
+                                    <div className="mb-2">
+                                        <div className="flex justify-between text-xs mb-1">
+                                            <span className="text-gray-600">Completion</span>
+                                            <span className="font-bold text-gray-900 text-xs">
+                                                {progress[selectedGoal.id]?.toFixed(1) || 0}%
+                                            </span>
+                                        </div>
+                                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                            <div 
+                                                style={{ width: `${progress[selectedGoal.id] || 0}%` }}
+                                                className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3]"
+                                            />
+                                        </div>
+                                    </div>
+                                    
+                                    {calculations[selectedGoal.id] && (
+                                        <div className="mt-3 pt-3 border-t border-blue-200">
+                                            <p className="text-[11px] font-medium text-gray-700 mb-1">Monthly Investment Required</p>
+                                            <p className="text-xl font-bold text-emerald-600">
+                                                {formatCurrency(calculations[selectedGoal.id].monthly_investment_required)}
+                                                <span className="text-[10px] font-normal text-gray-500 ml-1">/month</span>
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Timestamps - Compact */}
+                                <div className="border-t border-gray-200 pt-3">
+                                    <div className="flex justify-between text-[10px] text-gray-500">
+                                        <div>
+                                            <span className="font-medium">Created:</span> {formatDateTime(selectedGoal.created_at)}
+                                        </div>
+                                        <div>
+                                            <span className="font-medium">Updated:</span> {formatDateTime(selectedGoal.updated_at)}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons - Compact */}
+                                <div className="flex gap-2 pt-2">
+                                    <button
+                                        onClick={() => {
+                                            setShowGoalDetails(false);
+                                            handleEditGoal(selectedGoal);
+                                        }}
+                                        className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-all flex items-center justify-center gap-1.5"
+                                    >
+                                        <Edit2 size={14} />
+                                        Edit Goal
+                                    </button>
+                                    <button
+                                        onClick={() => setShowGoalDetails(false)}
+                                        className="flex-1 py-2.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-all"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
                             )}
                         </div>
                     </div>
@@ -1240,6 +1256,63 @@ export default function GoalPlanner() {
                                     >
                                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : editingGoal ? <Save size={18} /> : <Plus size={18} />}
                                         {editingGoal ? 'Update Goal' : 'Create Goal'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Delete Confirmation Modal */}
+                {showDeleteModal && (
+                    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                        <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
+                            <div className="p-6">
+                                {/* Icon */}
+                                <div className="flex justify-center mb-4">
+                                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                                        <AlertCircle className="w-8 h-8 text-red-600" />
+                                    </div>
+                                </div>
+                                
+                                {/* Title */}
+                                <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+                                    Delete Goal
+                                </h3>
+                                
+                                {/* Message */}
+                                <p className="text-gray-500 text-center mb-6">
+                                    Are you sure you want to delete this goal? This action cannot be undone.
+                                </p>
+                                
+                                {/* Buttons */}
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => {
+                                            setShowDeleteModal(false);
+                                            setGoalToDelete(null);
+                                        }}
+                                        className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all"
+                                        disabled={deleting}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleConfirmDelete}
+                                        disabled={deleting}
+                                        className="flex-1 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        {deleting ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                Deleting...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Trash2 className="w-4 h-4" />
+                                                Delete
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                             </div>

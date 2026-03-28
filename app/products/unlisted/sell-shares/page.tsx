@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   Search,
@@ -19,12 +20,12 @@ import {
   Send,
   TrendingUp,
   Package,
-  User,
   Filter,
   Loader2,
   AlertCircle
 } from 'lucide-react';
 import { fetchAllShares } from '../../../services/unlistedservices';
+import { useModal } from '../../../context/ModalContext';
 
 // Define the Company type based on your API response
 interface ApiCompany {
@@ -63,6 +64,9 @@ const FAQ_ITEMS = [
 ];
 
 const SellShares: React.FC = () => {
+  const router = useRouter();
+  const { openLogin } = useModal(); // Get openLogin from modal context
+  
   // STATE MANAGEMENT
   const [companies, setCompanies] = useState<ApiCompany[]>([]);
   const [companyStats, setCompanyStats] = useState<Map<number, CompanyStats>>(new Map());
@@ -82,7 +86,7 @@ const SellShares: React.FC = () => {
   const [sortBy, setSortBy] = useState('name-asc');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Modal States - Removed enquiry modal state, kept only success notification
+  // Modal States
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Fetch companies on mount
@@ -251,7 +255,30 @@ const SellShares: React.FC = () => {
     setTimeout(() => document.getElementById('resultsSection')?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
-  // Removed handleSubmitEnquiry function
+  // Handle Sell Now button click - Open login modal
+  const handleSellNow = () => {
+    if (calcResult && selectedCompany && qtyToSell) {
+      // Store sell details in session storage for after login
+      sessionStorage.setItem('pendingSellDetails', JSON.stringify({
+        company: {
+          id: selectedCompany.id,
+          name: selectedCompany.shares_name,
+          price: Number(selectedCompany.price),
+          lotSize: selectedCompany.min_lot_size,
+          logo_url: selectedCompany.logo_url,
+          depository: selectedCompany.depository_applicable
+        },
+        quantity: parseInt(qtyToSell),
+        estimatedValue: calcResult,
+        timestamp: new Date().toISOString()
+      }));
+      
+      // Open login modal
+      openLogin();
+    } else {
+      showNotification('Please calculate the estimated value first', 'error');
+    }
+  };
 
   const toggleFaq = (idx: number) => {
     setActiveFaqs(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
@@ -272,14 +299,6 @@ const SellShares: React.FC = () => {
       case 'Medium': return 'bg-yellow-100 text-yellow-600';
       case 'Low': return 'bg-red-100 text-red-600';
       default: return 'bg-gray-100 text-gray-600';
-    }
-  };
-
-  // Handle Sell Now button click - placeholder for future functionality
-  const handleSellNow = () => {
-    if (calcResult) {
-      showNotification('Sell functionality coming soon!', 'success');
-      // You can add your sell logic here later
     }
   };
 
@@ -496,7 +515,7 @@ const SellShares: React.FC = () => {
                           >
                             <div className="p-6">
                               <div className="flex items-start gap-4 mb-4">
-                                <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                                <div className="w-12 h-12 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-blue-600 shadow-sm">
                                   {company.logo_url ? (
                                     <img src={company.logo_url} className="w-8 h-8 object-contain" alt={company.shares_name} />
                                   ) : (
