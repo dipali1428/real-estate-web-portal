@@ -2,27 +2,22 @@
 import { useRef } from 'react';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-// Import services - removed createEnquiry
+import { useRouter } from 'next/navigation';
 import { fetchAllShares, fetchIdGraphData, GraphPoint } from '../../../services/unlistedservices';
 import { 
   ArrowLeft, Search, Filter, CheckCircle, Package, Info,  
-  Database, TrendingUp, X, User, FileText, ChevronDown, ChevronUp,
-  ShoppingCart, IndianRupee, ChevronLeft, ChevronRight, LineChart, Loader2,
-  Building, Calendar, MapPin, Award, BarChart3, TrendingDown, Activity,
-  HandCoins, FileSignature, Calculator, ChartLine, Paperclip, Mail, Phone, HelpCircle, FileCheck, Clock, Send, MessageSquare, History
+  TrendingUp, X,  FileText, ChevronDown, ChevronUp,
+  ShoppingCart, IndianRupee, MapPin, Activity, Clock,
+  FileSignature, Calculator, HelpCircle, Loader2,
+  HandCoins, AlertTriangle
 } from 'lucide-react';
+import { useModal } from '../../../context/ModalContext';
 
-// Define Company interface based on your API response
-interface Company {
+// Toast Component
+interface Toast {
   id: number;
-  shares_name: string;
-  logo_url: string;
-  price: string;
-  depository_applicable: string;
-  min_lot_size: number;
-  created_at?: string;
-  updated_at?: string;
-  clean_name?: string | null;
+  message: string;
+  type: 'success' | 'error' | 'info' | 'warning';
 }
 
 // Extended Company interface for UI
@@ -41,7 +36,6 @@ interface ExtendedCompany {
   clean_name?: string | null;
   created_at?: string;
   updated_at?: string;
-  // Additional UI fields
   isin: string;
   founded_year: string;
   headquarters: string;
@@ -54,7 +48,7 @@ interface ExtendedCompany {
   volume: string;
 }
 
-// PROCESS STEPS DATA - Matching SellShares
+// PROCESS STEPS DATA
 const PROCESS_STEPS = [
   { icon: FileSignature, num: 1, title: 'Select Company', desc: 'Browse and select from our verified unlisted companies with live pricing.' },
   { icon: Calculator, num: 2, title: 'Calculate Investment', desc: 'Determine your investment amount based on current market price and lot size.' },
@@ -62,7 +56,7 @@ const PROCESS_STEPS = [
   { icon: Clock, num: 4, title: 'Complete Transaction', desc: 'Get shares transferred to your Demat account within 7-10 business days.' }
 ];
 
-// FAQ DATA - Matching SellShares
+// FAQ DATA
 const FAQ_ITEMS = [
   { q: 'How long does the buying process take?', a: 'Typically, the buying process takes 7-10 business days from enquiry to shares credited to your Demat account. This includes verification, matching with sellers, and transaction settlement.' },
   { q: 'What documents are required to buy unlisted shares?', a: "You'll need your PAN card, Demat account details, and KYC documents. Our team will guide you through the specific documentation requirements." },
@@ -70,6 +64,9 @@ const FAQ_ITEMS = [
 ];
 
 const BuyShares: React.FC = () => {
+  const router = useRouter();
+  const { openLogin } = useModal();
+  
   // --- DATA STATES ---
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstance = useRef<any>(null);
@@ -89,21 +86,28 @@ const BuyShares: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
 
-  // --- MODAL STATES - Kept only detail modal, removed enquiry related states ---
+  // --- MODAL STATES ---
   const [detailCompany, setDetailCompany] = useState<ExtendedCompany | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'company'>('overview');
   
-  // --- NOTIFICATION STATE ---
-  const [notifications, setNotifications] = useState<{ id: number; message: string }[]>([]);
+  // --- TOAST STATE ---
+  const [toasts, setToasts] = useState<Toast[]>([]);
   
   // --- FAQ STATE ---
   const [activeFaqs, setActiveFaqs] = useState<number[]>([]);
 
-  // NOTIFICATION HANDLER - Matching SellShares
-  const showNotification = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  // TOAST HANDLER - Replaces notification system
+  const showToast = useCallback((message: string, type: Toast['type'] = 'info', duration: number = 4000) => {
     const id = Date.now();
-    setNotifications(prev => [...prev, { id, message }]);
-    setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== id)), 4000);
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(toast => toast.id !== id));
+    }, duration);
+  }, []);
+
+  // Remove toast manually
+  const removeToast = useCallback((id: number) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
   }, []);
 
   // FETCH SHARES DATA
@@ -113,12 +117,9 @@ const BuyShares: React.FC = () => {
         setIsLoading(true);
         const result = await fetchAllShares();
         
-        // Handle API response - your backend returns array directly
         const rawData = Array.isArray(result) ? result : [];
         
-        // Map API data to ExtendedCompany format
         const mappedData: ExtendedCompany[] = rawData.map((item: any) => {
-          // Extract category from company name or set default
           let category = 'Unlisted Shares';
           const name = item.shares_name || '';
           
@@ -152,7 +153,6 @@ const BuyShares: React.FC = () => {
             clean_name: item.clean_name,
             created_at: item.created_at,
             updated_at: item.updated_at,
-            // Add mock data for additional UI fields
             isin: `INE${id}${Math.floor(10000000 + Math.random() * 90000000)}`,
             founded_year: `${2010 + (id % 13)}`,
             headquarters: 'Mumbai, India',
@@ -170,14 +170,15 @@ const BuyShares: React.FC = () => {
         setError(null);
       } catch {
         setError("Failed to load market data. Please try again.");
+        showToast("Failed to load market data. Please try again.", 'error');
       } finally {
         setIsLoading(false);
       }
     };
     loadShares();
-  }, []);
+  }, [showToast]);
 
-  // FETCH GRAPH DATA WHEN DETAIL MODAL OPENS - FIXED
+  // FETCH GRAPH DATA WHEN DETAIL MODAL OPENS
   useEffect(() => {
     const loadGraphData = async () => {
       if (!detailCompany) return;
@@ -188,9 +189,7 @@ const BuyShares: React.FC = () => {
       try {
         const response = await fetchIdGraphData(detailCompany.id);
         
-        // Check if response exists and has the graph array
         if (response && response.success && response.graph && Array.isArray(response.graph)) {
-          // Map the graph array - using market_price from API response
           const formattedData: GraphPoint[] = response.graph
             .filter(item => item && item.price_date && item.market_price !== null && item.market_price !== undefined)
             .map((item) => ({
@@ -200,20 +199,22 @@ const BuyShares: React.FC = () => {
           
           if (formattedData.length > 0) {
             setGraphData(formattedData);
+          } else {
+            showToast('No historical price data available for this company', 'info');
           }
         }
       } catch {
-        // Silently handle error
         setGraphData([]);
+        showToast('Unable to load price chart data', 'warning');
       } finally {
         setIsGraphLoading(false);
       }
     };
 
     loadGraphData();
-  }, [detailCompany]);
+  }, [detailCompany, showToast]);
 
-  // PREVENT SCROLL ON MODAL OPEN - Updated to only check detailCompany
+  // PREVENT SCROLL ON MODAL OPEN
   useEffect(() => {
     document.body.style.overflow = detailCompany ? 'hidden' : 'unset';
     return () => { document.body.style.overflow = 'unset'; };
@@ -225,12 +226,11 @@ const BuyShares: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // ✅ CHART INITIALIZATION - Minimal like LiveTrends
+  // CHART INITIALIZATION
   useEffect(() => {
     if (!chartRef.current || !detailCompany) return;
     if (graphData.length === 0) return;
 
-    // Destroy existing chart
     if (chartInstance.current) {
       chartInstance.current.destroy();
     }
@@ -238,7 +238,6 @@ const BuyShares: React.FC = () => {
     const ctx = chartRef.current.getContext('2d');
     if (!ctx) return;
 
-    // Filter data based on selected time range
     let filteredData = [...graphData];
     const now = new Date();
 
@@ -255,7 +254,7 @@ const BuyShares: React.FC = () => {
       cutoffDate.setMonth(now.getMonth() - 3);
       filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
     }
-    // Sort data by date (oldest to newest for proper line chart)
+    
     filteredData.sort((a, b) => new Date(a.price_date).getTime() - new Date(b.price_date).getTime());
 
     const labels = filteredData.map(item => {
@@ -350,7 +349,6 @@ const BuyShares: React.FC = () => {
     return result;
   }, [companies, debouncedSearch, selectedCategory, sortBy]);
 
-  // Handle Apply Filters
   const handleApplyFilters = () => {
     setDebouncedSearch(searchTerm);
   };
@@ -360,9 +358,16 @@ const BuyShares: React.FC = () => {
     Array.from(new Set(companies.map(c => c.category))).sort()
   , [companies]);
 
-  // FAQ TOGGLE - Matching SellShares
+  // FAQ TOGGLE
   const toggleFaq = (idx: number) => {
     setActiveFaqs(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
+  };
+
+  // HANDLE BUY NOW CLICK
+  const handleBuyNowClick = (company: ExtendedCompany) => {
+    sessionStorage.setItem('pendingBuyCompany', JSON.stringify(company));
+    openLogin();
+    showToast('Please login to proceed with purchase', 'info', 3000);
   };
 
   const calculateMinInvestment = (price: number, lotSize: number): string => {
@@ -454,7 +459,7 @@ const BuyShares: React.FC = () => {
     }).replace(',', '');
   };
 
-  // LOADING STATE UI - Simplified to match SellShares
+  // LOADING STATE UI
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -466,7 +471,7 @@ const BuyShares: React.FC = () => {
     );
   }
 
-  // ERROR STATE UI - Simplified to match SellShares
+  // ERROR STATE UI
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white p-4">
@@ -488,14 +493,38 @@ const BuyShares: React.FC = () => {
     );
   }
 
+  // Toast Icon Helper
+  const getToastIcon = (type: Toast['type']) => {
+    switch (type) {
+      case 'success': return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case 'error': return <X className="w-4 h-4 text-red-600" />;
+      case 'warning': return <AlertTriangle className="w-4 h-4 text-yellow-600" />;
+      default: return <Info className="w-4 h-4 text-blue-600" />;
+    }
+  };
+
+  // Toast Background Helper
+  const getToastBg = (type: Toast['type']) => {
+    switch (type) {
+      case 'success': return 'bg-green-100 border-green-200 text-green-800';
+      case 'error': return 'bg-red-100 border-red-200 text-red-800';
+      case 'warning': return 'bg-yellow-100 border-yellow-200 text-yellow-800';
+      default: return 'bg-blue-100 border-blue-200 text-blue-800';
+    }
+  };
+
   return (
     <div className="min-h-screen font-sans bg-gradient-to-br from-gray-50 to-white">
-      {/* NOTIFICATIONS - Matching SellShares */}
+      {/* TOAST CONTAINER - Replaces notification system */}
       <div className="fixed top-20 right-5 z-[5000] flex flex-col gap-3">
-        {notifications.map(n => (
-          <div key={n.id} className="px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 bg-blue-100 text-blue-800 border border-blue-200 animate-in slide-in-from-right-5">
-            <CheckCircle className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-medium">{n.message}</span>
+        {toasts.map(toast => (
+          <div 
+            key={toast.id} 
+            className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 border ${getToastBg(toast.type)} animate-in slide-in-from-right-5 max-w-sm`}
+            onClick={() => removeToast(toast.id)}
+          >
+            {getToastIcon(toast.type)}
+            <span className="text-sm font-medium">{toast.message}</span>
           </div>
         ))}
       </div>
@@ -514,7 +543,7 @@ const BuyShares: React.FC = () => {
           </div>
         </div>
 
-        {/* HEADER - Updated to match SellShares */}
+        {/* HEADER */}
         <header className="mb-12 text-center">
           <div className="inline-flex items-center justify-center p-4 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 mb-6">
             <div className="p-4 rounded-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg">
@@ -530,9 +559,9 @@ const BuyShares: React.FC = () => {
           </p>
         </header>
 
-        {/* SEARCH & FILTERS - With Search Tab at Top */}
+        {/* SEARCH & FILTERS */}
         <section className="mb-8">
-          {/* Search Bar - Prominently at the top */}
+          {/* Search Bar */}
           <div className="mb-6">
             <div className="relative max-w-2xl mx-auto">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -560,10 +589,9 @@ const BuyShares: React.FC = () => {
             </p>
           </div>
 
-          {/* Filter Row - Below Search */}
+          {/* Filter Row */}
           <div className="flex flex-wrap gap-4 items-center justify-between">
             <div className="flex flex-wrap gap-3 flex-1">
-              {/* Category Filter */}
               <select 
                 className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-gray-900 min-w-[180px]" 
                 value={selectedCategory} 
@@ -573,7 +601,6 @@ const BuyShares: React.FC = () => {
                 {categories.map(cat => <option key={cat} value={cat} className="text-gray-900">{cat}</option>)}
               </select>
               
-              {/* Sort By Filter */}
               <select 
                 className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-gray-900 min-w-[180px]" 
                 value={sortBy} 
@@ -585,7 +612,6 @@ const BuyShares: React.FC = () => {
                 <option value="price-low" className="text-gray-900">Price: Low to High</option>
               </select>
 
-              {/* Results Count Badge */}
               <div className="flex items-center px-4 py-2 bg-blue-50 rounded-lg">
                 <span className="text-sm text-[#2076C7] font-semibold">
                   {filteredCompanies.length} companies
@@ -593,7 +619,6 @@ const BuyShares: React.FC = () => {
               </div>
             </div>
 
-            {/* Apply Filters Button */}
             <button 
               onClick={handleApplyFilters} 
               className="px-6 py-2.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold hover:opacity-90 transition-all flex items-center gap-2 shadow-md whitespace-nowrap"
@@ -603,16 +628,15 @@ const BuyShares: React.FC = () => {
           </div>
         </section>
 
-        {/* RESULTS INFO - Without pagination */}
+        {/* RESULTS INFO */}
         <div className="flex justify-between items-center mb-4">
           <p className="text-sm text-gray-600 bg-white/60 px-4 py-2 rounded-full">
             Showing <span className="font-bold text-[#2076C7]">{filteredCompanies.length}</span> companies
           </p>
         </div>
 
-        {/* COMPANIES GRID - 4 columns with internal scrolling */}
+        {/* COMPANIES GRID */}
         <div className="relative">
-          {/* Scrollable Container */}
           <div className="overflow-y-auto max-h-[800px] pr-2 custom-scrollbar">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
               {filteredCompanies.map(company => (
@@ -620,8 +644,7 @@ const BuyShares: React.FC = () => {
                   key={company.id}
                   className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-6 flex flex-col items-center text-center h-full"
                 >
-                  {/* Company Logo - Centered */}
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center mb-4 border-2 border-white shadow-sm">
+                  <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 border-2 border-gray-100 shadow-sm">
                     {company.logo ? (
                       <img 
                         src={company.logo} 
@@ -643,11 +666,9 @@ const BuyShares: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Company Name & Category - Centered */}
                   <h3 className="text-xl font-bold text-gray-900 mb-1">{company.name}</h3>
                   <div className="text-sm text-gray-500 mb-4">{company.category}</div>
 
-                  {/* Stats Grid - 2x2 Centered */}
                   <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
                     <div className="text-center">
                       <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
@@ -675,10 +696,9 @@ const BuyShares: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Action Buttons - Side by Side - Buy Now button restored */}
                   <div className="flex gap-3 w-full mt-auto">
                     <button
-                      onClick={() => {/* This would open enquiry modal */}}
+                      onClick={() => handleBuyNowClick(company)}
                       className="flex-1 py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
                     >
                       Buy Now
@@ -719,7 +739,7 @@ const BuyShares: React.FC = () => {
           </div>
         )}
 
-        {/* FAQ SECTION - New section matching SellShares */}
+        {/* FAQ SECTION */}
         <section className="mb-12 mt-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
             <HelpCircle className="w-6 h-6 text-[#2076C7]" /> 
@@ -748,15 +768,15 @@ const BuyShares: React.FC = () => {
         </section>
       </main>
 
-      {/* DETAIL MODAL - Only modal remaining */}
+      {/* DETAIL MODAL */}
       {detailCompany && (
         <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
           <div className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 animate-fadeIn overflow-hidden flex flex-col border border-gray-100">
             
-            {/* HEADER: Simplified Clean Design */}
+            {/* HEADER */}
             <div className="bg-white border-b border-gray-100 p-6 flex items-start justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 rounded-xl bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm">
                   {detailCompany.logo ? (
                     <img src={detailCompany.logo} className="w-10 h-10 object-contain" alt={detailCompany.name} />
                   ) : (
@@ -792,10 +812,10 @@ const BuyShares: React.FC = () => {
               </div>
             </div>
 
-            {/* BODY: Clean Grid Layout */}
+            {/* BODY */}
             <div className="p-6 md:p-8 bg-gray-50/30 overflow-y-auto max-h-[calc(90vh-120px)]">
               
-              {/* Metric Cards Row - Clean & Simple */}
+              {/* Metric Cards Row */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {[
                   { label: 'Minimum Lot', value: `${detailCompany.lotSize.toLocaleString()} Shares`, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -818,9 +838,8 @@ const BuyShares: React.FC = () => {
                 {/* LEFT: Graph & Description */}
                 <div className="lg:col-span-2 space-y-6">
                   
-                  {/* Chart Section - Minimal like LiveTrends */}
+                  {/* Chart Section */}
                   <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                    {/* Header with Index Value and Change */}
                     <div className="flex items-center justify-between mb-6">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -844,7 +863,6 @@ const BuyShares: React.FC = () => {
                         <p className="text-xs text-gray-400 mt-1">Current Price</p>
                       </div>
                       
-                      {/* Time Range Filters */}
                       <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80">
                         {['All', '3M', '1M', '1W'].map(r => (
                           <button 
@@ -862,7 +880,6 @@ const BuyShares: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Graph Container */}
                     <div className="h-64 w-full relative mb-8">
                       {isGraphLoading ? (
                         <div className="h-full flex items-center justify-center">
@@ -877,7 +894,6 @@ const BuyShares: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Market Stats Cards */}
                     <div className="grid grid-cols-3 gap-4 mt-2">
                       <div className="bg-gray-50/50 rounded-lg p-3">
                         <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">
@@ -925,7 +941,7 @@ const BuyShares: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Description Card - Clean Typography */}
+                  {/* Description Card */}
                   <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
                     <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
                       <Info className="text-[#1CADA3]" size={20} />
@@ -935,7 +951,6 @@ const BuyShares: React.FC = () => {
                       {detailCompany.description || `${detailCompany.name} is a leading player in the ${detailCompany.category} sector with strong growth potential and a proven track record of innovation. The company has shown consistent performance and is poised for significant expansion in the coming years.`}
                     </p>
                     
-                    {/* Key Highlights */}
                     <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">ISIN</p>
@@ -957,7 +972,7 @@ const BuyShares: React.FC = () => {
                   </div>
                 </div>
                 
-                {/* RIGHT: Sidebar - Clean Cards */}
+                {/* RIGHT: Sidebar */}
                 <div className="space-y-6">
                   
                   {/* Key Statistics Card */}
@@ -982,19 +997,29 @@ const BuyShares: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Action Card - Updated to keep investment info */}
+                  {/* Action Card */}
                   <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm">
                     <h4 className="text-sm font-bold text-gray-900 mb-3">Ready to Invest?</h4>
                     <p className="text-xs text-gray-500 mb-6">
                       Minimum investment: {calculateMinInvestment(detailCompany.price, detailCompany.lotSize)}
                     </p>
                     
+                    <button
+                      onClick={() => {
+                        setDetailCompany(null);
+                        handleBuyNowClick(detailCompany);
+                      }}
+                      className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                    >
+                      Buy Now
+                    </button>
+                    
                     <p className="text-[10px] text-gray-400 text-center mt-4">
                       Our team will contact you within 24 hours
                     </p>
                   </div>
 
-                  {/* Valuation Progress Bars - Simplified */}
+                  {/* Valuation Progress Bars */}
                   <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
                     <h4 className="text-sm font-bold text-gray-900 mb-4">Valuation Metrics</h4>
                     <div className="space-y-5">
@@ -1041,7 +1066,21 @@ const BuyShares: React.FC = () => {
           animation: fadeIn 0.2s ease-out;
         }
         
-        /* Custom scrollbar styling */
+        @keyframes slideInFromRight {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        .slide-in-from-right-5 {
+          animation: slideInFromRight 0.3s ease-out;
+        }
+        
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }

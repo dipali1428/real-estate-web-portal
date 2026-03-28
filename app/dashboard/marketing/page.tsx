@@ -55,7 +55,7 @@ export default function ImageTemplates() {
         setLoading(true);
         const response = await DashboardService.getProfile();
         const profileData: ApiProfile = response.user;
-    
+
         const capitalizeFullName = (name: string): string => {
           if (!name || name.trim() === '') return 'User';
           return name
@@ -73,7 +73,7 @@ export default function ImageTemplates() {
             })
             .join(' ');
         };
-    
+
         setUserProfile({
           name: capitalizeFullName(profileData.name),
           contactNumber: profileData.mobile || 'Not provided'
@@ -273,6 +273,15 @@ export default function ImageTemplates() {
       description: '',
       imageUrl: '/templateimg/VehicalLoan1.jpeg'
     },
+    {
+      id: '21',
+      name: 'Personal Loan',
+      type: 'image',
+      category: 'loan',
+      subCategory: 'personal',
+      description: 'Quick personal loans for all your needs',
+      imageUrl: '/templateimg/PersonalLoan1.jpg'
+    },
   ]);
 
   const filteredTemplates = allTemplates.filter(template => {
@@ -309,12 +318,12 @@ export default function ImageTemplates() {
 
   const handleDropdownToggle = (type: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest', event: React.MouseEvent) => {
     event.stopPropagation();
-    const currentState = 
+    const currentState =
       type === 'insurance' ? isInsuranceOpen :
-      type === 'loan' ? isLoanOpen :
-      type === 'investments' ? isInvestmentsOpen :
-      type === 'mutualfunds' ? isMutualFundsOpen :
-      type === 'realestate' ? isRealEstateOpen : isContestOpen;
+        type === 'loan' ? isLoanOpen :
+          type === 'investments' ? isInvestmentsOpen :
+            type === 'mutualfunds' ? isMutualFundsOpen :
+              type === 'realestate' ? isRealEstateOpen : isContestOpen;
 
     closeAllDropdowns();
     if (type === 'insurance') setIsInsuranceOpen(!currentState);
@@ -339,60 +348,60 @@ export default function ImageTemplates() {
             img.src = url;
           });
         };
-  
+
         const dimensions = await getImageDimensions(template.imageUrl);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         if (!ctx) { reject(new Error('Error creating canvas context')); return; }
-  
+
         const minWidth = 400, maxWidth = 2400, minFont = 24, maxFont = 64;
         let fontSize;
         if (dimensions.width <= minWidth) fontSize = minFont;
         else if (dimensions.width >= maxWidth) fontSize = maxFont;
         else fontSize = minFont + (maxFont - minFont) * ((dimensions.width - minWidth) / (maxWidth - minWidth));
-        
+
         fontSize = Math.round(fontSize / 2) * 2;
         const iconSize = fontSize * 1.3, spacing = fontSize * 0.6, lineSpacing = fontSize, lineWidth = Math.max(2, fontSize * 0.03);
         const textAreaHeight = fontSize * 3.5;
         canvas.width = dimensions.width;
         canvas.height = dimensions.height + textAreaHeight;
-  
+
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
+
         const img = new Image();
         img.crossOrigin = 'anonymous';
         await new Promise((resolve, reject) => {
           img.onload = resolve; img.onerror = reject; img.src = template.imageUrl;
         });
         ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
-  
+
         const userIconSVG = `data:image/svg+xml;base64,${btoa(`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="#1d283a"/><path d="M12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="#1d283a"/></svg>`)}`;
         const phoneIconSVG = `data:image/svg+xml;base64,${btoa(`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 15.5C18.75 15.5 17.55 15.3 16.43 14.93C16.08 14.82 15.69 14.9 15.41 15.17L13.21 17.37C10.38 15.93 8.06 13.62 6.62 10.79L8.82 8.59C9.1 8.31 9.18 7.92 9.07 7.57C8.7 6.45 8.5 5.25 8.5 4C8.5 3.45 8.05 3 7.5 3H4C3.45 3 3 3.45 3 4C3 13.39 10.61 21 20 21C20.55 21 21 20.55 21 20V16.5C21 15.95 20.55 15.5 20 15.5Z" fill="#1d283a"/></svg>`)}`;
-  
+
         const loadIcon = (svgData: string): Promise<HTMLImageElement> => new Promise((resolve, reject) => {
           const iconImg = new Image(); iconImg.onload = () => resolve(iconImg); iconImg.onerror = reject; iconImg.src = svgData;
         });
-  
+
         const [userIcon, phoneIcon] = await Promise.all([loadIcon(userIconSVG), loadIcon(phoneIconSVG)]);
         ctx.fillStyle = '#1e293b'; ctx.font = `bold ${fontSize}px Arial`;
         const userName = userProfile.name, contactNumber = userProfile.contactNumber;
         const userNameWidth = ctx.measureText(userName).width, contactNumberWidth = ctx.measureText(contactNumber).width;
         const totalWidthWithIcons = userNameWidth + contactNumberWidth + (iconSize * 2) + (spacing * 3) + lineSpacing;
         const startX = Math.max(0, (canvas.width - totalWidthWithIcons) / 2), detailsY = dimensions.height + (textAreaHeight / 2);
-  
+
         const drawScaledIcon = (icon: HTMLImageElement, x: number, y: number) => {
-          ctx.save(); ctx.translate(x, y - iconSize / 2); ctx.scale(iconSize/24, iconSize/24); ctx.drawImage(icon, 0, 0); ctx.restore();
+          ctx.save(); ctx.translate(x, y - iconSize / 2); ctx.scale(iconSize / 24, iconSize / 24); ctx.drawImage(icon, 0, 0); ctx.restore();
         };
-  
+
         drawScaledIcon(userIcon, startX, detailsY);
         ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(userName, startX + iconSize + spacing, detailsY);
         const lineX = startX + iconSize + spacing + userNameWidth + (lineSpacing / 2);
         ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = lineWidth; ctx.beginPath();
         ctx.moveTo(lineX, detailsY - (fontSize * 0.7)); ctx.lineTo(lineX, detailsY + (fontSize * 0.7)); ctx.stroke();
-        drawScaledIcon(phoneIcon, lineX + (lineSpacing/2), detailsY);
-        ctx.fillText(contactNumber, lineX + (lineSpacing/2) + iconSize + spacing, detailsY);
-  
+        drawScaledIcon(phoneIcon, lineX + (lineSpacing / 2), detailsY);
+        ctx.fillText(contactNumber, lineX + (lineSpacing / 2) + iconSize + spacing, detailsY);
+
         canvas.toBlob((blob) => { blob ? resolve(blob) : reject(new Error('Error creating blob')); }, 'image/png');
       } catch (error) { reject(error); }
     });
@@ -502,11 +511,10 @@ export default function ImageTemplates() {
 
           <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
             <span className="text-sm font-medium text-slate-600">Showing:</span>
-            <span className={`px-3 py-1 rounded-full text-sm font-semibold capitalize ${
-                activeCategory === 'insurance' ? 'bg-blue-100 text-[#2076C7]' : 
-                activeCategory === 'loan' ? 'bg-green-100 text-green-700' :
+            <span className={`px-3 py-1 rounded-full text-sm font-semibold capitalize ${activeCategory === 'insurance' ? 'bg-blue-100 text-[#2076C7]' :
+              activeCategory === 'loan' ? 'bg-green-100 text-green-700' :
                 activeCategory === 'contest' ? 'bg-purple-100 text-purple-700' :
-                'bg-slate-100 text-slate-700'
+                  'bg-slate-100 text-slate-700'
               }`}>
               {activeCategory.replace('mutualfunds', 'Mutual Funds').replace('realestate', 'Real Estate')} - {activeSubCategory === 'all' ? 'All Templates' : activeSubCategory}
             </span>

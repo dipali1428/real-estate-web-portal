@@ -57,23 +57,20 @@ export default function PersonalLoanPage() {
     }
 
     return (
-        <div className="font-sans text-gray-900" style={{ fontFamily: 'var(--font-geist-sans)' }}>
+        <div className="font-sans text-gray-900 bg-white">
             {/* Back to Home Button */}
             <div className="fixed z-50 top-20 left-4 md:top-24 md:left-8">
                 <button
                     onClick={handleBackHome}
                     aria-label="Back to Home"
-                    className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
-                >
+                    className="md:hidden group flex items-center gap-2 p-2 text-gray-500">
                     <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
                         <IconArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
                     </div>
                 </button>
                 <button
                     onClick={handleBackHome}
-                    className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group font-sans"
-                    style={{ fontFamily: 'var(--font-geist-sans)' }}
-                >
+                    className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group font-sans">
                     <IconArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
                     Back to Home
                 </button>

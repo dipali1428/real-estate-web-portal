@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Loader2, ArrowRight } from 'lucide-react';
+import { useModal } from '../../../context/ModalContext'; // Import useModal
 
 interface Company {
     id: number;
@@ -31,6 +32,7 @@ const getLotSize = (price: number) => {
 };
 
 export default function FeaturedCompanies({ companies, loading, onEnquire }: any) {
+    const { openLogin } = useModal(); // Get openLogin from modal context
     const sectionRef = useRef<HTMLElement>(null);
     const [isVisible, setIsVisible] = useState(false);
     const [animatedItems, setAnimatedItems] = useState<number[]>([]);
@@ -39,6 +41,22 @@ export default function FeaturedCompanies({ companies, loading, onEnquire }: any
     const featured = companies
         .sort((a: any, b: any) => safeNumber(a.id) - safeNumber(b.id))
         .slice(0, 5);
+
+    // Handle Buy Now click - opens login modal and stores company in session storage
+    const handleBuyNow = (company: Company) => {
+        // Store company data in session storage for after login
+        sessionStorage.setItem('pendingBuyCompany', JSON.stringify({
+            id: company.id,
+            name: company.name,
+            price: company.price,
+            lotSize: company.min_lot_size || getLotSize(company.price),
+            logo_url: company.logo_url,
+            sector: company.sector
+        }));
+        
+        // Open login modal
+        openLogin();
+    };
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -176,9 +194,9 @@ export default function FeaturedCompanies({ companies, loading, onEnquire }: any
                                                 </span>
                                             </div>
 
-                                            {/* Enquire Button - Responsive with slide animation */}
+                                            {/* Buy Now Button - Opens login modal */}
                                             <button
-                                                onClick={() => onEnquire(c)}
+                                                onClick={() => handleBuyNow(c)}
                                                 className="mt-auto w-full py-3 sm:py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95 transition-all duration-300 uppercase tracking-widest text-[10px] sm:text-xs cursor-pointer relative overflow-hidden group/btn"
                                             >
                                                 <span className="relative z-10 block group-hover:scale-105 transition-transform duration-300">Buy Now</span>
