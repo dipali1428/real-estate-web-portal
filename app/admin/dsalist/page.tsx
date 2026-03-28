@@ -51,7 +51,7 @@ const mapApiDataToDSA = (apiData: any[]): DSA[] => {
     date_joined: item.date_joined || "",
     updated_at: item.updated_at || "",
     role: item.role || "",
-    status: "Active", 
+    status: "Active",
     password: item.password || "",
   }));
 };
@@ -88,16 +88,14 @@ export default function DSAManagementPage() {
         limit: itemsPerPage,
         search: searchQuery
       });
-      
-      console.log("Raw API Response for DSA List:", apiResponse);
-      
+
       const apiData = apiResponse?.dsalist || apiResponse?.dsas || [];
       const count = apiResponse?.count || 0;
-      
+
       const mappedDSAs = mapApiDataToDSA(apiData);
       setDsas(mappedDSAs);
       setTotalCount(count); // Setting the proper 2690 count here
-      
+
       if (cities.length === 0) {
         setCities(Array.from(new Set(mappedDSAs.map((d) => d.city).filter(Boolean))));
       }
@@ -221,31 +219,52 @@ export default function DSAManagementPage() {
 
         <Tab.Group onChange={(index) => { setActiveTab(tabs[index]); setCurrentPage(1); }}>
           <div className="flex flex-col gap-4 mb-4">
-            <Tab.List className="flex p-1 bg-gray-200/50 rounded-xl w-fit">
-              {tabs.map((tab) => (
-                <Tab key={tab} className={({ selected }) => classNames("px-6 py-2 text-sm font-medium rounded-lg transition-all outline-none", selected ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-600 hover:text-gray-800")}>
-                  {tab}
-                </Tab>
-              ))}
-            </Tab.List>
+            <div className="flex flex-col md:flex-row md:items-center gap-3">
 
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div className="relative w-full md:w-96">
-                <input 
-                  type="text" 
-                  value={searchQuery} 
-                  onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }} 
-                  placeholder="Search by ID, Name, Mobile, or Adv ID..." 
-                  className="w-full pl-10 pr-4 py-2 rounded-lg shadow-md focus:outline-none text-gray-700 focus:ring-2 focus:ring-blue-500 bg-white" 
-                />
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <Search className="w-5 h-5 text-gray-400" />
+              {/* LEFT SECTION (Search + Tabs) */}
+              <div className="flex flex-col md:flex-row md:items-center gap-3">
+
+                <div className="relative w-full md:w-96">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                    placeholder="Search by Name, Mobile, Adv Id"
+                    className="w-full pl-10 pr-4 py-2 rounded-lg shadow-md focus:outline-none text-gray-700 focus:ring-2 focus:ring-blue-500 bg-white"
+                  />
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Search className="w-5 h-5 text-gray-400" />
+                  </div>
                 </div>
+
+                <Tab.List className="flex p-1 bg-gray-200/50 rounded-xl w-fit">
+                  {tabs.map((tab) => (
+                    <Tab
+                      key={tab}
+                      className={({ selected }) =>
+                        classNames(
+                          "px-6 py-2 text-sm font-medium rounded-lg transition-all outline-none",
+                          selected
+                            ? "bg-white text-[#2076C7] shadow-sm"
+                            : "text-gray-600 hover:text-gray-800"
+                        )}>
+                      {tab}
+                    </Tab>
+                  ))}
+                </Tab.List>
               </div>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs sm:text-sm text-gray-600">
+
+              {/* RIGHT SECTION (Pagination Info) */}
+              <div className="ml-auto flex flex-col sm:flex-row sm:items-center gap-3 text-xs sm:text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <span>Show</span>
-                  <select value={itemsPerPage} onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }} className="border border-gray-300 rounded-md px-2 py-1 bg-white">
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="border border-gray-300 rounded-md px-2 py-1 bg-white">
                     <option value={10}>10</option>
                     <option value={25}>25</option>
                     <option value={50}>50</option>
@@ -253,9 +272,20 @@ export default function DSAManagementPage() {
                   </select>
                   <span>per page</span>
                 </div>
-                <p>Showing <span className="font-semibold">{totalCount === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}</span> - <span className="font-semibold">{Math.min(currentPage * itemsPerPage, totalCount)}</span> of <span className="font-semibold">{totalCount}</span> DSAs</p>
+
+                <p>
+                  Showing{" "}
+                  <span className="font-semibold">
+                    {totalCount === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}
+                  </span>{" "}-{" "}
+                  <span className="font-semibold">
+                    {Math.min(currentPage * itemsPerPage, totalCount)}
+                  </span>{" "}
+                  of <span className="font-semibold">{totalCount}</span> DSAs
+                </p>
               </div>
             </div>
+
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

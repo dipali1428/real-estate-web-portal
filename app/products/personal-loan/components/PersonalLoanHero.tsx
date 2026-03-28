@@ -11,12 +11,7 @@ export default function PersonalLoanHero({ }: PersonalLoanHeroProps) {
     const { openLogin } = useModal();
 
     return (
-        <section className="relative bg-[#ffffff] pt-20 pb-12 lg:pt-28 lg:pb-20 font-sans overflow-hidden" style={{ fontFamily: 'var(--font-geist-sans)' }}>
-
-            {/* Minimalist Background Elements */}
-            <div className="absolute top-0 right-0 w-full h-[300px] md:h-[500px] bg-gradient-to-b from-blue-50/80 to-transparent pointer-events-none"></div>
-            <div className="absolute -top-40 -right-40 w-[300px] h-[300px] md:w-[600px] md:h-[600px] rounded-full bg-gradient-to-br from-[#2076C7]/5 to-[#1CADA3]/5 blur-3xl"></div>
-            <div className="absolute top-40 -left-20 w-[200px] h-[200px] md:w-[400px] md:h-[400px] rounded-full bg-gradient-to-tr from-[#1CADA3]/10 to-transparent blur-3xl"></div>
+        <section className="relative bg-white pt-20 pb-12 lg:pt-28 lg:pb-20 font-sans overflow-hidden">
 
             <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-center">
@@ -40,8 +35,7 @@ export default function PersonalLoanHero({ }: PersonalLoanHeroProps) {
                             <button
                                 onClick={(e) => { e.preventDefault(); openLogin(); }}
                                 className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer inline-block text-center"
-                                style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
-                            >
+                                style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}>
                                 <span className="relative z-10 flex items-center justify-center gap-2">
                                     Apply Now
                                     <ArrowRight size={18} className="transform group-hover:translate-x-1 transition-transform" />
@@ -104,6 +98,6 @@ export default function PersonalLoanHero({ }: PersonalLoanHeroProps) {
                     </div>
                 </div>
             </div>
-        </section>
+        </section >
     );
 }

@@ -42,7 +42,7 @@ export default function EligibilityCriteria({ openForm }: EligibilityCriteriaPro
     ];
 
     return (
-        <section className="py-12 md:py-20 bg-white font-sans" style={{ fontFamily: 'var(--font-geist-sans)' }}>
+        <section className="md:py-20 bg-white font-sans">
             <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                 <div className="text-center max-w-2xl mx-auto mb-10 md:mb-16">
                     <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 tracking-tight font-sans text-transparent bg-clip-text bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">

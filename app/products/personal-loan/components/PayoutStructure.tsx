@@ -74,8 +74,7 @@ export default function PayoutStructure({ openBankModal }: PayoutStructureProps)
                         <button
                             onClick={() => setIsExpanded(!isExpanded)}
                             suppressHydrationWarning
-                            className="bg-[#f0f7ff] text-[#2076C7] px-5 md:px-7 py-2.5 md:py-3 rounded-full font-bold text-[10px] md:text-xs flex items-center gap-2 hover:bg-[#2076C7] hover:text-white transition-all shadow-sm shrink-0 uppercase tracking-wider"
-                        >
+                            className="hidden md:flex bg-[#f0f7ff] text-[#2076C7] px-5 md:px-7 py-2.5 md:py-3 rounded-full font-bold text-[10px] md:text-xs items-center gap-2 hover:bg-[#2076C7] hover:text-white transition-all shadow-sm shrink-0 uppercase tracking-wider">
                             {isExpanded ? 'Show Less' : `View All ${partnerBanks.length} Partners`}
                             {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                         </button>
@@ -87,8 +86,7 @@ export default function PayoutStructure({ openBankModal }: PayoutStructureProps)
                             <div
                                 key={idx}
                                 onClick={() => openLogin()}
-                                className="group bg-white rounded-2xl md:rounded-3xl border border-gray-50 p-4 md:p-5 flex items-center gap-4 hover:shadow-xl hover:border-blue-100 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
-                            >
+                                className={`group bg-white rounded-2xl md:rounded-3xl border border-gray-50 p-4 md:p-5 flex items-center gap-4 hover:shadow-xl hover:border-blue-100 hover:-translate-y-1 transition-all duration-300 cursor-pointer ${!isExpanded && idx >= 3 ? 'hidden md:flex' : 'flex'}`}>
                                 <div className={`w-11 h-11 md:w-14 md:h-14 rounded-2xl ${bank.color} flex items-center justify-center shrink-0 shadow-sm transition-transform duration-500 group-hover:scale-110`}>
                                     <Landmark className="w-5 h-5 md:w-7 md:h-7" strokeWidth={1.5} />
                                 </div>
@@ -97,6 +95,16 @@ export default function PayoutStructure({ openBankModal }: PayoutStructureProps)
                                 </span>
                             </div>
                         ))}
+                    </div>
+
+                    {/* View More Button for Mobile only */}
+                    <div className="mt-8 flex justify-center md:hidden">
+                        <button
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="bg-[#f0f7ff] text-[#2076C7] px-8 py-3 rounded-full font-bold text-xs flex items-center gap-2 hover:bg-[#2076C7] hover:text-white transition-all shadow-md uppercase tracking-wider transition-colors duration-300">
+                            {isExpanded ? 'View Less' : 'View More'}
+                            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </button>
                     </div>
 
                     {/* Footer Info */}
