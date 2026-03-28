@@ -412,17 +412,17 @@ const EventSection: React.FC = () => {
           )}
         </div>
 
-        {/* ===== Events Section ===== */}
-<div className="mb-20 font-sans">
-  {/* Main Container - Removed inner padding to let content breathe */}
-  <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-8 md:p-12 transition-all duration-500">
+{/* ===== Events Section ===== */}
+<div className="mb-10 sm:mb-14 md:mb-20 font-sans">
+  {/* Main Container */}
+  <div className="bg-white rounded-2xl sm:rounded-3xl md:rounded-[2.5rem] border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8 lg:p-12 transition-all duration-500">
     
     <SectionHeader
       title="Business Events"
       isOpen={expanded.events}
       onToggle={() => toggle("events")}
       description={
-        <span className="text-gray-500">
+        <span className="text-gray-500 text-sm sm:text-base">
           Join <span className="font-semibold text-teal-600">Infinity Arthvishva</span> across 
           India for networking, workshops, and business growth opportunities.
         </span>
@@ -430,17 +430,17 @@ const EventSection: React.FC = () => {
     />
 
     {/* Elegant Divider */}
-    <div className="mt-8 mb-12 h-px w-full bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100" />
+    <div className="mt-6 sm:mt-8 mb-8 sm:mb-10 md:mb-12 h-px w-full bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100" />
 
     {expanded.events && (
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-5 sm:space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
         {Object.keys(eventsByMonth).map((month) => (
           <div
             key={month}
-            className="group relative bg-white border border-gray-100 rounded-3xl p-8 transition-all duration-500 hover:border-teal-100 hover:shadow-lg hover:shadow-teal-500/5"
+            className="group relative bg-white border border-gray-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 transition-all duration-500 hover:border-teal-100 hover:shadow-lg hover:shadow-teal-500/5 overflow-hidden"
           >
             {/* Subtle Month Header Accent */}
-            <div className="absolute left-0 top-0 w-1.5 h-full bg-teal-500 rounded-l-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute left-0 top-0 w-1 sm:w-1.5 h-full bg-teal-500 rounded-l-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             <EventMonthSection
               month={month}

@@ -1,6 +1,7 @@
 "use client";
 
-import { Landmark as Bank } from 'lucide-react';
+import { Landmark as Bank, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { CATEGORIES } from '../loanConstants';
@@ -17,13 +18,22 @@ interface PartnerBanksSectionProps {
 }
 
 export default function PartnerBanksSection({ activeCategory, setActiveCategory, filteredPartners }: PartnerBanksSectionProps) {
+    const [showAll, setShowAll] = useState(false);
+
+    // Reset showAll when category changes
+    useEffect(() => {
+        setShowAll(false);
+    }, [activeCategory]);
+
+    const visiblePartners = showAll ? filteredPartners : filteredPartners.slice(0, 4);
+
     return (
-        <section id="products-section" className="py-12 md:py-16 bg-white">
+        <section id="products-section" className="py-8 md:py-12 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-inner border border-gray-100 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-[#2076C7]/5 to-transparent rounded-full blur-3xl -mr-32 -mt-32" />
 
-                    <div className="relative z-10 flex flex-col items-center justify-center text-center gap-6 mb-12">
+                    <div className="relative z-10 flex flex-col items-center justify-center text-center gap-6 mb-8">
                         <div className="text-center">
                             <h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Our Partner Banks</h2>
                             <p className="text-gray-500 font-medium">Top-rated financial institutions supporting your {activeCategory.toLowerCase()} needs</p>
@@ -50,8 +60,8 @@ export default function PartnerBanksSection({ activeCategory, setActiveCategory,
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 relative z-10">
                         <AnimatePresence mode="popLayout">
-                            {filteredPartners.length > 0 ? (
-                                filteredPartners.map((bank, index) => (
+                            {visiblePartners.length > 0 ? (
+                                visiblePartners.map((bank, index) => (
                                     <div key={bank.name}>
                                         <motion.div
                                             layout
@@ -80,6 +90,22 @@ export default function PartnerBanksSection({ activeCategory, setActiveCategory,
                             )}
                         </AnimatePresence>
                     </div>
+
+                    {/* View More / View Less Button */}
+                    {filteredPartners.length > 4 && (
+                        <div className="flex justify-center mt-6 relative z-10">
+                            <button
+                                onClick={() => setShowAll(prev => !prev)}
+                                className="px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-white shadow-lg hover:shadow-[#2076C7]/20 active:scale-95 transition-all flex items-center gap-2"
+                            >
+                                {showAll ? "View Less Partners" : `View All Partners (${filteredPartners.length - 4} more)`}
+                                <ArrowRight
+                                    size={16}
+                                    className={`transition-transform duration-300 ${showAll ? "rotate-[270deg]" : "rotate-90"}`}
+                                />
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </section>

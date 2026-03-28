@@ -666,18 +666,18 @@ export default function LoanCalculator() {
                                         {paymentAmount > 0 ? formatCurrency(paymentAmount) : '₹0'}
                                     </div>
                                 </div>
-                                <div className="flex justify-between">
-                                    <div className="text-center flex-1 px-4">
-                                        <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                                <div className="flex flex-col sm:flex-row justify-between gap-6 sm:gap-4">
+                                    <div className="text-center flex-1 px-2 sm:px-4">
+                                        <div className="text-lg sm:text-xl font-bold font-sans text-[#1CADA3]">
                                             {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                                         </div>
-                                        <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
+                                        <div className="text-xs sm:text-sm text-[#1CADA3] mt-1 font-medium">Total Interest</div>
                                     </div>
-                                    <div className="text-center flex-1 px-4">
-                                        <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                                    <div className="text-center flex-1 px-2 sm:px-4">
+                                        <div className="text-lg sm:text-xl font-bold font-sans text-[#1CADA3]">
                                             {totalPayment > 0 ? formatCurrency(totalPayment) : '₹0'}
                                         </div>
-                                        <div className="text-sm text-[#1CADA3] mt-1">Total Payment</div>
+                                        <div className="text-xs sm:text-sm text-[#1CADA3] mt-1 font-medium">Total Payment</div>
                                     </div>
                                 </div>
                             </div>

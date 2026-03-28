@@ -1,9 +1,30 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, Suspense } from "react";
 import Header from "./component/Header";
 import Footer from "./component/Footer";
-import { ModalProvider } from "./context/ModalContext";
+import { ModalProvider, useModal } from "./context/ModalContext";
+
+function ReferralHandler() {
+  const searchParams = useSearchParams();
+  const { openPartner } = useModal();
+
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+
+    if (ref && !localStorage.getItem("ref_handled")) {
+      // Save referral
+      localStorage.setItem("referral_code", ref);
+      localStorage.setItem("ref_handled", "true");
+
+      // Open signup modal
+      openPartner();
+    }
+  }, [searchParams, openPartner]);
+
+  return null;
+}
 
 export default function RootClientWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -17,13 +38,43 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
   const isHRProfile = pathname?.startsWith("/hr");
   const isDirector = pathname?.startsWith("/director");
   const isBranchHead = pathname?.startsWith("/branchhead");
-
   const isContactList = pathname?.startsWith("/page/contactlist");
+
   return (
     <ModalProvider>
-      {!isDashboard && !isContactList && !isAdminDashboard && !isRM && !isdepartmenthead && !isaccountProfile && !iscustomerProfile && !isUnlistedAdmin && !isHRProfile && !isDirector && !isBranchHead &&<Header />}
+
+      {/* ✅ Referral handler runs globally */}
+      <Suspense fallback={null}>
+        <ReferralHandler />
+      </Suspense>
+
+      {!isDashboard &&
+        !isContactList &&
+        !isAdminDashboard &&
+        !isRM &&
+        !isdepartmenthead &&
+        !isaccountProfile &&
+        !iscustomerProfile &&
+        !isUnlistedAdmin &&
+        !isHRProfile &&
+        !isDirector &&
+        !isBranchHead && <Header />}
+
+
       {children}
-      {!isDashboard && !isContactList && !isAdminDashboard && !isRM && !isdepartmenthead && !isaccountProfile && !iscustomerProfile && !isUnlistedAdmin && !isHRProfile && !isDirector && !isBranchHead &&<Footer />}
+
+      {!isDashboard &&
+        !isContactList &&
+        !isAdminDashboard &&
+        !isRM &&
+        !isdepartmenthead &&
+        !isaccountProfile &&
+        !iscustomerProfile &&
+        !isUnlistedAdmin &&
+        !isHRProfile &&
+        !isDirector &&
+        !isBranchHead && <Footer />}
+
     </ModalProvider>
   );
 }

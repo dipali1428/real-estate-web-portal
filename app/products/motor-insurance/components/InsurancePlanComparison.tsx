@@ -105,7 +105,7 @@ export default function InsurancePlanComparison({
     };
 
     return (
-        <section id="plans" className="py-12 md:py-16 bg-white font-sans">
+        <section id="plans" className="py-12 md:py-16 pt-32 sm:pt-16 bg-white font-sans">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="text-center max-w-3xl mx-auto mb-10">
                     <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
@@ -119,7 +119,7 @@ export default function InsurancePlanComparison({
                 <div className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto">
                     {/* Left Sidebar - Filters */}
                     <div className="w-full lg:w-1/4 xl:w-[280px] shrink-0">
-                        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm sticky top-28">
+                        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm lg:sticky lg:top-28">
                             <div className="flex items-center gap-2 mb-6 text-gray-800">
                                 <Filter size={18} strokeWidth={2.5} />
                                 <h3 className="font-bold text-base tracking-tight">Filters</h3>
@@ -129,7 +129,7 @@ export default function InsurancePlanComparison({
                             {showVehicleSelection && (
                                 <div className="mb-8">
                                     <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Vehicle Type</h4>
-                                    <div className="flex flex-col gap-2">
+                                    <div className="grid grid-cols-2 lg:flex lg:flex-col gap-2">
                                         {vehicleTypes.map((type) => {
                                             const Icon = type.icon;
                                             const isActive = activeVehicleType === type.id;
@@ -140,14 +140,14 @@ export default function InsurancePlanComparison({
                                                         setActiveVehicleType(type.id);
                                                         setShowAll(false);
                                                     }}
-                                                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
+                                                    className={`flex items-center gap-3 px-3 sm:px-4 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all ${isActive
                                                         ? "bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-500/20"
                                                         : "bg-gray-50 text-gray-600 hover:bg-gray-100/80"
                                                         }`}
                                                 >
                                                     <Icon size={18} className={isActive ? "text-white" : "text-gray-500"} />
-                                                    {type.label}
-                                                    {isActive && <Check size={16} className="ml-auto" strokeWidth={3} />}
+                                                    <span className="truncate">{type.label}</span>
+                                                    {isActive && <Check size={16} className="ml-auto hidden sm:block" strokeWidth={3} />}
                                                 </button>
                                             );
                                         })}
@@ -189,7 +189,7 @@ export default function InsurancePlanComparison({
                         <div className="bg-white rounded-2xl border border-gray-100 px-4 py-3 shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
 
                             {/* Plan Types */}
-                            <div className="flex flex-wrap gap-1 bg-gray-50 p-1 rounded-xl">
+                            <div className="flex flex-wrap gap-1 bg-gray-50 p-1 rounded-xl w-full md:w-auto">
                                 {planTypes
                                     .filter(plan => {
                                         if ((activeVehicleType === 'commercial' || activeVehicleType === 'misc') && plan.id === 'ownDamage') return false;
@@ -199,7 +199,7 @@ export default function InsurancePlanComparison({
                                         <button
                                             key={plan.id}
                                             onClick={() => setActivePlanType(plan.id)}
-                                            className={`px-4 py-2 rounded-lg text-[13px] font-bold transition-all ${activePlanType === plan.id
+                                            className={`flex-1 md:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-[13px] font-bold transition-all ${activePlanType === plan.id
                                                 ? "bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-500/20"
                                                 : "text-gray-500 hover:text-gray-700 hover:bg-white"
                                                 }`}
@@ -210,15 +210,15 @@ export default function InsurancePlanComparison({
                             </div>
 
                             {/* CC & IDV Drops */}
-                            <div className="flex items-center gap-6 px-2 w-full md:w-auto overflow-hidden">
+                            <div className="flex items-center gap-4 sm:gap-6 px-2 w-full md:w-auto overflow-hidden">
                                 {/* Engine Capacity */}
                                 {(activeVehicleType === "bike" || activeVehicleType === "car" || activeVehicleType === "commercial" || activeVehicleType === "misc") && (
-                                    <div className="flex flex-col">
+                                    <div className="flex flex-col flex-1 md:flex-none">
                                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{activeVehicleType === "commercial" ? "GVW" : "Engine Capacity"}</span>
                                         <select
                                             value={activeCC}
                                             onChange={(e) => handleCCChange(e.target.value)}
-                                            className="text-sm font-bold text-[#1C2024] bg-transparent border-none p-0 focus:ring-0 cursor-pointer outline-none w-full"
+                                            className="text-xs sm:text-sm font-bold text-[#1C2024] bg-transparent border-none p-0 focus:ring-0 cursor-pointer outline-none w-full"
                                         >
                                             {(() => {
                                                 if (activeVehicleType === "bike") return bikeCCSegments;
@@ -233,12 +233,12 @@ export default function InsurancePlanComparison({
 
                                 {/* Selected IDV */}
                                 {(activeVehicleType === "car" || activeVehicleType === "commercial" || activeVehicleType === "misc") && (activePlanType === "comprehensive" || activePlanType === "ownDamage") && (
-                                    <div className="flex flex-col border-l border-gray-100 pl-6 shrink-0">
+                                    <div className="flex flex-col border-l border-gray-100 pl-4 sm:pl-6 shrink-0 flex-1 md:flex-none">
                                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Selected IDV</span>
                                         <select
                                             value={activeIDV}
                                             onChange={(e) => setActiveIDV(Number(e.target.value))}
-                                            className="text-sm font-bold text-[#2076C7] bg-transparent border-none p-0 focus:ring-0 cursor-pointer outline-none w-full"
+                                            className="text-xs sm:text-sm font-bold text-[#2076C7] bg-transparent border-none p-0 focus:ring-0 cursor-pointer outline-none w-full"
                                         >
                                             {(() => {
                                                 if (activeVehicleType === "car") return [
@@ -338,14 +338,14 @@ export default function InsurancePlanComparison({
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.98 }}
                                             transition={{ duration: 0.3 }}
-                                            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4 overflow-hidden relative group hover:shadow-md transition-all"
+                                            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 overflow-hidden relative group hover:shadow-md transition-all"
                                         >
                                             {/* Left Blue Accent Line */}
                                             <div className="absolute left-0 top-6 bottom-6 w-1 bg-linear-to-b from-[#2076C7] to-[#1CADA3] rounded-r-full" />
 
                                             {/* Left: Logo and Name */}
-                                            <div className="flex items-center gap-4 pl-4 w-full md:w-auto">
-                                                <div className="w-16 h-16 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center shrink-0 p-2 overflow-hidden">
+                                            <div className="flex items-center gap-4 pl-4 w-full sm:w-auto">
+                                                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center shrink-0 p-2 overflow-hidden">
                                                     {company.logo ? (
                                                         <img
                                                             src={company.logo}
@@ -356,29 +356,29 @@ export default function InsurancePlanComparison({
                                                             }}
                                                         />
                                                     ) : (
-                                                        <span className="font-bold text-[#2076C7] text-xl">{company.name.substring(0, 2).toUpperCase()}</span>
+                                                        <span className="font-bold text-[#2076C7] text-lg sm:text-xl">{company.name.substring(0, 2).toUpperCase()}</span>
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <h3 className="text-base font-bold text-[#1C2024] mb-1">{company.name}</h3>
+                                                    <h3 className="text-sm sm:text-base font-bold text-[#1C2024] mb-1">{company.name}</h3>
                                                 </div>
                                             </div>
 
                                             {/* Middle/Right Container */}
-                                            <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-gray-100 pt-4 md:pt-0 pb-1 pr-1">
+                                            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-gray-100 pt-4 sm:pt-0 pb-1 pr-1">
                                                 {/* Price */}
-                                                <div className="text-right">
-                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 mr-1">Starting From</p>
-                                                    <p className="text-[#1C2024] font-bold text-gray-700 text-2xl flex items-end gap-1 leading-none">
+                                                <div className="text-center sm:text-right w-full sm:w-auto">
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 sm:mr-1">Starting From</p>
+                                                    <p className="text-[#1C2024] font-bold text-gray-700 text-xl sm:text-2xl flex items-end justify-center sm:justify-end gap-1 leading-none">
                                                         ₹ {price.toLocaleString("en-IN")}
-                                                        <span className="text-xs font-semibold text-gray-400 mb-0.5">/year</span>
+                                                        <span className="text-[10px] sm:text-xs font-semibold text-gray-400 mb-0.5">/year</span>
                                                     </p>
                                                 </div>
 
                                                 {/* Button */}
                                                 <button
                                                     type="button"
-                                                    className="px-5 py-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] hover:opacity-90 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 whitespace-nowrap text-sm cursor-pointer ml-2"
+                                                    className="w-full sm:w-auto px-5 py-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] hover:opacity-90 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 whitespace-nowrap text-sm cursor-pointer sm:ml-2"
                                                 >
                                                     View Details
                                                     <span className="text-lg leading-none">→</span>

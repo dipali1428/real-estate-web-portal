@@ -188,4 +188,19 @@ export const DashboardService = {
         const response = await api.get("/api/dashboard/tds");
         return response.data;
     },
+
+    getRefLink: async () => {
+        const response = await api.get("/api/dashboard/profile/share-referral");
+        return response.data;
+    },
+
+    createAgreement: async (payload: { signed_name: string }) => {
+        const response = await api.post("/api/dashboard/profile/create-agreement", payload);
+        return response.data;
+    },
+
+    checkKycStatus: async () => {
+        const response = await api.get("/api/dashboard/profile/kyc-status");
+        return response.data;
+    },
 };

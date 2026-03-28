@@ -6,7 +6,7 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  category: 'insurance' | 'loan' | 'contest'; // Added contest
+  category: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest'; // Added contest
   subCategory: string;
   description: string;
   imageUrl: string;

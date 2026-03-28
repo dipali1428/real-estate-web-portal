@@ -11,7 +11,7 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  category: 'insurance' | 'loan' | 'contest'; // Added contest
+  category: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest';
   subCategory: string;
   description: string;
   imageUrl: string;
@@ -35,18 +35,20 @@ interface ApiProfile {
 }
 
 export default function ImageTemplates() {
-  const [activeCategory, setActiveCategory] = useState<'insurance' | 'loan' | 'contest'>('insurance');
+  const [activeCategory, setActiveCategory] = useState<'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest'>('insurance');
   const [activeSubCategory, setActiveSubCategory] = useState<string>('all');
   const [isInsuranceOpen, setIsInsuranceOpen] = useState(false);
   const [isLoanOpen, setIsLoanOpen] = useState(false);
-  const [isContestOpen, setIsContestOpen] = useState(false); // Added state
+  const [isInvestmentsOpen, setIsInvestmentsOpen] = useState(false);
+  const [isMutualFundsOpen, setIsMutualFundsOpen] = useState(false);
+  const [isRealEstateOpen, setIsRealEstateOpen] = useState(false);
+  const [isContestOpen, setIsContestOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile>({
     name: '',
     contactNumber: ''
   });
   const [loading, setLoading] = useState(true);
 
-  // Fetch user profile data from API
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -90,7 +92,6 @@ export default function ImageTemplates() {
     fetchUserProfile();
   }, []);
 
-  // All Templates - Added contest example
   const [allTemplates] = useState<TemplateItem[]>([
     {
       id: '1',
@@ -155,7 +156,6 @@ export default function ImageTemplates() {
       description: 'Business loans to grow your enterprise',
       imageUrl: '/templateimg/EducationLoan.jpg'
     },
-    // Example Contest Template
     {
       id: '8',
       name: ' JFM DHAMAKA 2026 is ON! PHU QUOC ISLAND AWAITS YOU!',
@@ -183,6 +183,96 @@ export default function ImageTemplates() {
       description: 'Complete health insurance protection for medical emergencies',
       imageUrl: '/templateimg/HealthInsurance2.jpeg'
     },
+    {
+      id: '11',
+      name: 'Motor Insurance',
+      type: 'image',
+      category: 'insurance',
+      subCategory: 'motor',
+      description: '',
+      imageUrl: '/templateimg/MotorInsurance1.jpeg'
+    },
+    {
+      id: '12',
+      name: 'Business Loan',
+      type: 'image',
+      category: 'loan',
+      subCategory: 'business',
+      description: '',
+      imageUrl: '/templateimg/BussinessLoan1.jpeg'
+    },
+    {
+      id: '13',
+      name: 'Insurance',
+      type: 'image',
+      category: 'insurance',
+      subCategory: 'general',
+      description: '',
+      imageUrl: '/templateimg/Insurance.jpeg'
+    },
+    {
+      id: '14',
+      name: 'investments',
+      type: 'image',
+      category: 'investments',
+      subCategory: 'investments',
+      description: '',
+      imageUrl: '/templateimg/Investments1.jpeg'
+    },
+    {
+      id: '15',
+      name: 'investments',
+      type: 'image',
+      category: 'investments',
+      subCategory: 'investments',
+      description: '',
+      imageUrl: '/templateimg/Investments2.jpeg'
+    },
+    {
+      id: '16',
+      name: 'Marine Insurance',
+      type: 'image',
+      category: 'insurance',
+      subCategory: 'marine',
+      description: '',
+      imageUrl: '/templateimg/MarineInsurance1.jpeg'
+    },
+    {
+      id: '17',
+      name: 'Mutual Funds',
+      type: 'image',
+      category: 'mutualfunds',
+      subCategory: 'mutualfunds',
+      description: '',
+      imageUrl: '/templateimg/MutualFund1.jpeg'
+    },
+    {
+      id: '18',
+      name: 'Mutual Funds',
+      type: 'image',
+      category: 'mutualfunds',
+      subCategory: 'mutualfunds',
+      description: '',
+      imageUrl: '/templateimg/MutualFund2.jpeg'
+    },
+    {
+      id: '19',
+      name: 'Real Estate',
+      type: 'image',
+      category: 'realestate',
+      subCategory: 'realestate',
+      description: '',
+      imageUrl: '/templateimg/RealEstate1.jpeg'
+    },
+    {
+      id: '20',
+      name: 'Vehicle Loan',
+      type: 'image',
+      category: 'loan',
+      subCategory: 'vehicle',
+      description: '',
+      imageUrl: '/templateimg/VehicalLoan1.jpeg'
+    },
   ]);
 
   const filteredTemplates = allTemplates.filter(template => {
@@ -191,16 +281,22 @@ export default function ImageTemplates() {
     return categoryMatch && subCategoryMatch;
   });
 
+  const closeAllDropdowns = () => {
+    setIsInsuranceOpen(false);
+    setIsLoanOpen(false);
+    setIsInvestmentsOpen(false);
+    setIsMutualFundsOpen(false);
+    setIsRealEstateOpen(false);
+    setIsContestOpen(false);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (!target.closest('.dropdown-container')) {
-        setIsInsuranceOpen(false);
-        setIsLoanOpen(false);
-        setIsContestOpen(false); // Added
+        closeAllDropdowns();
       }
     };
-
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
@@ -208,29 +304,28 @@ export default function ImageTemplates() {
   const handleSubCategorySelect = (subCategory: string, event: React.MouseEvent) => {
     event.stopPropagation();
     setActiveSubCategory(subCategory);
-    setIsInsuranceOpen(false);
-    setIsLoanOpen(false);
-    setIsContestOpen(false); // Added
+    closeAllDropdowns();
   };
 
-  const handleDropdownToggle = (type: 'insurance' | 'loan' | 'contest', event: React.MouseEvent) => {
+  const handleDropdownToggle = (type: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest', event: React.MouseEvent) => {
     event.stopPropagation();
-    if (type === 'insurance') {
-      setIsInsuranceOpen(!isInsuranceOpen);
-      setIsLoanOpen(false);
-      setIsContestOpen(false);
-      setActiveCategory('insurance');
-    } else if (type === 'loan') {
-      setIsLoanOpen(!isLoanOpen);
-      setIsInsuranceOpen(false);
-      setIsContestOpen(false);
-      setActiveCategory('loan');
-    } else {
-      setIsContestOpen(!isContestOpen);
-      setIsInsuranceOpen(false);
-      setIsLoanOpen(false);
-      setActiveCategory('contest');
-    }
+    const currentState = 
+      type === 'insurance' ? isInsuranceOpen :
+      type === 'loan' ? isLoanOpen :
+      type === 'investments' ? isInvestmentsOpen :
+      type === 'mutualfunds' ? isMutualFundsOpen :
+      type === 'realestate' ? isRealEstateOpen : isContestOpen;
+
+    closeAllDropdowns();
+    if (type === 'insurance') setIsInsuranceOpen(!currentState);
+    else if (type === 'loan') setIsLoanOpen(!currentState);
+    else if (type === 'investments') setIsInvestmentsOpen(!currentState);
+    else if (type === 'mutualfunds') setIsMutualFundsOpen(!currentState);
+    else if (type === 'realestate') setIsRealEstateOpen(!currentState);
+    else if (type === 'contest') setIsContestOpen(!currentState);
+
+    setActiveCategory(type);
+    setActiveSubCategory('all');
   };
 
   const generatePersonalizedImage = async (template: TemplateItem): Promise<Blob> => {
@@ -347,12 +442,13 @@ export default function ImageTemplates() {
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 space-y-4 sm:space-y-0">
+            <div className="flex flex-wrap items-center gap-4">
               <CategoryDropdown
                 type="insurance"
                 isOpen={isInsuranceOpen}
                 activeCategory={activeCategory}
                 activeSubCategory={activeSubCategory}
+                subCategories={['all', 'life', 'health', 'motor', 'marine', 'general']}
                 onToggle={handleDropdownToggle}
                 onSubCategorySelect={handleSubCategorySelect}
               />
@@ -361,6 +457,34 @@ export default function ImageTemplates() {
                 isOpen={isLoanOpen}
                 activeCategory={activeCategory}
                 activeSubCategory={activeSubCategory}
+                subCategories={['all', 'home', 'personal', 'business', 'educational', 'vehicle']}
+                onToggle={handleDropdownToggle}
+                onSubCategorySelect={handleSubCategorySelect}
+              />
+              <CategoryDropdown
+                type="investments"
+                isOpen={isInvestmentsOpen}
+                activeCategory={activeCategory}
+                activeSubCategory={activeSubCategory}
+                subCategories={['all', 'investments']}
+                onToggle={handleDropdownToggle}
+                onSubCategorySelect={handleSubCategorySelect}
+              />
+              <CategoryDropdown
+                type="mutualfunds"
+                isOpen={isMutualFundsOpen}
+                activeCategory={activeCategory}
+                activeSubCategory={activeSubCategory}
+                subCategories={['all', 'mutualfunds']}
+                onToggle={handleDropdownToggle}
+                onSubCategorySelect={handleSubCategorySelect}
+              />
+              <CategoryDropdown
+                type="realestate"
+                isOpen={isRealEstateOpen}
+                activeCategory={activeCategory}
+                activeSubCategory={activeSubCategory}
+                subCategories={['all', 'realestate']}
                 onToggle={handleDropdownToggle}
                 onSubCategorySelect={handleSubCategorySelect}
               />
@@ -369,6 +493,7 @@ export default function ImageTemplates() {
                 isOpen={isContestOpen}
                 activeCategory={activeCategory}
                 activeSubCategory={activeSubCategory}
+                subCategories={['all', 'current']}
                 onToggle={handleDropdownToggle}
                 onSubCategorySelect={handleSubCategorySelect}
               />
@@ -377,12 +502,13 @@ export default function ImageTemplates() {
 
           <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
             <span className="text-sm font-medium text-slate-600">Showing:</span>
-            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+            <span className={`px-3 py-1 rounded-full text-sm font-semibold capitalize ${
                 activeCategory === 'insurance' ? 'bg-blue-100 text-[#2076C7]' : 
                 activeCategory === 'loan' ? 'bg-green-100 text-green-700' :
-                'bg-purple-100 text-purple-700'
+                activeCategory === 'contest' ? 'bg-purple-100 text-purple-700' :
+                'bg-slate-100 text-slate-700'
               }`}>
-              {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} - {activeSubCategory === 'all' ? 'All Templates' : activeSubCategory}
+              {activeCategory.replace('mutualfunds', 'Mutual Funds').replace('realestate', 'Real Estate')} - {activeSubCategory === 'all' ? 'All Templates' : activeSubCategory}
             </span>
           </div>
         </div>

@@ -13,9 +13,9 @@ export default function EligibilitySection({ eligibility }: EligibilitySectionPr
     const [isChecklistOpen, setIsChecklistOpen] = useState(false);
 
     return (
-        <section className="py-12 md:py-16 bg-white">
+        <section className="py-8 md:py-12 bg-white">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                <motion.div initial="hidden" whileInView="visible" className="text-center mb-16">
+                <motion.div initial="hidden" whileInView="visible" className="text-center mb-10">
                     <motion.h2 className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Eligibility Criteria
                     </motion.h2>
@@ -30,7 +30,7 @@ export default function EligibilitySection({ eligibility }: EligibilitySectionPr
                     viewport={{ once: true }}
                 >
                     <section className="bg-white rounded-[40px] shadow-inner border border-gray-100 p-8 md:p-12">
-                        <ul className="space-y-4 mb-10">
+                        <ul className="space-y-4 mb-6">
                             {eligibility.map((item, index) => (
                                 <li key={index} className="flex items-center gap-3 p-3 rounded-lg bg-white shadow-sm border border-gray-50">
                                     <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-[#2076C7] font-bold text-sm shrink-0">{index + 1}</div>
@@ -59,7 +59,7 @@ export default function EligibilitySection({ eligibility }: EligibilitySectionPr
                                     transition={{ duration: 0.5, ease: "easeInOut" }}
                                     className="overflow-hidden"
                                 >
-                                    <div className="pt-12 mt-8 border-t border-gray-100">
+                                    <div className="pt-8 mt-6 border-t border-gray-100">
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                                             {/* Salaried Applicants */}
                                             {/* Salaried Applicants */}

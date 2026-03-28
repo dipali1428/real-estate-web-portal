@@ -23,7 +23,7 @@ export const bikeCCSegments = [
 export const carCCSegments = [
     { id: "upto-1000", label: "Up to 1000cc", factor: 0.613 },
     { id: "1001-1500", label: "1001cc - 1500cc", factor: 1.0 },
-    { id: "above-1500", label: "Above 1500cc", factor: 2.312 },
+    { id: "above-1500", label: "Above 1500cc", factor: 2.3118 },
 ];
 
 export const commercialCCSegments = [
