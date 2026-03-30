@@ -2,14 +2,14 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { DashboardService } from "@/app/services/dashboardService";
-import CardTemplateImage from "@/app/assets/Bussiness_Card2.png";
+import CardTemplateImage from "@/app/assets/visiting_card.png";
 import { Phone, Mail, MapPin, Globe, Landmark, Pencil, CheckCircle2, User, AlertCircle, Loader2, Camera, Eye, EyeOff, X, ShieldCheck, Download, Lock, Copy, Share2 } from "lucide-react";
 import LogoImage from "@/public/logo.png";
 
 // --- Types & Constants ---
 interface PopupMessage { id: string; message: string; type: "success" | "error" | "loading"; }
-interface Profile { referral_code?: string; mobile_verified: boolean; adv_id: string; name: string; email: string; mobile: string; pan: string; aadhaar?: string; gst_number?: string; city: string; state: string; head: string; category: string; password: string; bank_name?: string; branch_name?: string; bank_account?: string; ifsc?: string; pan_verified: boolean; profile_photo?: any; name_as_per_pan?: string; date_of_birth?: string; }
-interface KycDetails { bank_name?: string; bank_account_number?: string; ifsc_code?: string; bank_verified: boolean; aadhaar_number?: string; aadhaar_verified: boolean; gst_number?: string; gst_verified: boolean; kyc_completed: boolean; profile_image_url?: string; phone_verified?: boolean; email_verified?: boolean; aadhaar_kyc_data?: { full_address?: string;[key: string]: any }; }
+interface Profile { address: string; current_address?: string; referral_code?: string; mobile_verified: boolean; adv_id: string; name: string; email: string; mobile: string; pan: string; aadhaar?: string; gst_number?: string; city: string; state: string; head: string; category: string; password: string; bank_name?: string; branch_name?: string; bank_account?: string; ifsc?: string; pan_verified: boolean; profile_photo?: any; name_as_per_pan?: string; date_of_birth?: string; }
+interface KycDetails { current_address?: string; bank_name?: string; bank_account_number?: string; ifsc_code?: string; bank_verified: boolean; aadhaar_number?: string; aadhaar_verified: boolean; gst_number?: string; gst_verified: boolean; kyc_completed: boolean; profile_image_url?: string; phone_verified?: boolean; email_verified?: boolean; aadhaar_kyc_data?: { full_address?: string;[key: string]: any }; }
 
 const CATEGORY_MAP: Record<string, string[]> = {
     Investment: ["Mutual Funds", "Wealth Management", "Pension Funds", "Stocks and Securities", "Portfolio Management Services", "Real Estate Investments", "Unlisted Shares"],
@@ -207,12 +207,13 @@ export default function ProfileSection() {
 
             setProfile({
                 ...res.user,
+                address: res.kycDetails?.current_address || "", 
                 date_of_birth: finalDob,
-                aadhaar: res.kycDetails?.aadhaar_number || res.user.aadhaar || "",
-                gst_number: res.kycDetails?.gst_number || res.user.gst_number || "",
-                bank_name: res.kycDetails?.bank_name || res.user.bank_name || "",
-                bank_account: res.kycDetails?.bank_account_number || res.user.bank_account || "",
-                ifsc: res.kycDetails?.ifsc_code || res.user.ifsc || ""
+                aadhaar: res.kycDetails?.aadhaar_number || "",
+                gst_number: res.kycDetails?.gst_number || "",
+                bank_name: res.kycDetails?.bank_name || "",
+                bank_account: res.kycDetails?.bank_account_number || "",
+                ifsc: res.kycDetails?.ifsc_code || ""
             });
             if (res.user.referral_code) {
                 // Adjust the domain to your actual production URL
@@ -458,13 +459,40 @@ export default function ProfileSection() {
             const activeImg = photoPreview || kyc?.profile_image_url || null;
             if (activeImg) {
                 const userPhoto = new Image();
-                if (activeImg.startsWith('blob:')) { userPhoto.src = activeImg; } else {
+                if (activeImg.startsWith('blob:')) {
+                    userPhoto.src = activeImg;
+                } else {
                     userPhoto.crossOrigin = "anonymous";
                     const cacheBuster = `cb=${Date.now()}`;
                     userPhoto.src = activeImg.includes('?') ? `${activeImg}&${cacheBuster}` : `${activeImg}?${cacheBuster}`;
                 }
+
                 await new Promise((res) => { userPhoto.onload = res; userPhoto.onerror = () => res(null); });
-                if (userPhoto.complete) { ctx.drawImage(userPhoto, photoX, photoY, 220, 260); ctx.strokeStyle = "#f1f5f9"; ctx.lineWidth = 4; ctx.strokeRect(photoX, photoY, 220, 260); }
+
+                if (userPhoto.complete) {
+                    const targetW = 220;
+                    const targetH = 260;
+                    const imgRatio = userPhoto.width / userPhoto.height;
+                    const targetRatio = targetW / targetH;
+                    let sx, sy, sWidth, sHeight;
+
+                    if (imgRatio > targetRatio) {
+                        sHeight = userPhoto.height;
+                        sWidth = userPhoto.height * targetRatio;
+                        sx = (userPhoto.width - sWidth) / 2;
+                        sy = 0;
+                    } else {
+                        sWidth = userPhoto.width;
+                        sHeight = userPhoto.width / targetRatio;
+                        sx = 0;
+                        sy = (userPhoto.height - sHeight) / 2;
+                    }
+
+                    ctx.drawImage(userPhoto, sx, sy, sWidth, sHeight, photoX, photoY, targetW, targetH);
+                    ctx.strokeStyle = "#f1f5f9";
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(photoX, photoY, targetW, targetH);
+                }
             }
             ctx.textAlign = "center"; ctx.fillStyle = "#2563eb"; ctx.font = "bold 38px sans-serif";
             ctx.fillText(profile.name.toUpperCase(), cvWidth / 2, 520);
@@ -545,14 +573,15 @@ export default function ProfileSection() {
                             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white bg-[#2076C7] shadow-lg shadow-[#1cada330]">
                                 <User size={18} strokeWidth={2.5} />
                             </div>
-                            <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Expertise & Profile</h2>
+                            <h2 className="text-lg sm:text-xl font-bold text-slate-800">Expertise & Profile</h2>
                         </div>
                         <div className="grid lg:grid-cols-12 gap-6 sm:gap-8">
                             <div className="lg:col-span-4">
                                 <div className="lg:col-span-4 bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 text-slate-800 border border-slate-100 shadow-xl shadow-slate-200/40 h-fit z-30">
                                     <h4 className="text-[10px] font-black uppercase text-[#1CADA3] tracking-widest mb-6 sm:mb-8">Onboarding Summary</h4>
                                     <div className="space-y-6">
-                                        <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6 mb-5 pb-5 border-b border-slate-50">
+                                        {/* Changed this container's classes */}
+                                        <div className="flex flex-col sm:flex-row lg:flex-col min-[1801px]:flex-row items-center sm:items-start lg:items-start text-center sm:text-left lg:text-left gap-4 sm:gap-6 mb-5 pb-5 border-b border-slate-50">
                                             <div className="relative">
                                                 <div className="w-24 h-24 rounded-[24px] sm:rounded-[30px] bg-slate-100 border-4 border-white shadow-xl overflow-hidden flex items-center justify-center">
                                                     {uploadingPhoto ? <Loader2 className="animate-spin text-[#1CADA3]" /> : getProfileImage() ? <img src={getProfileImage()!} className="w-full h-full object-cover" /> : <Camera className="text-slate-300" size={32} />}
@@ -569,7 +598,6 @@ export default function ProfileSection() {
                                             <div><p className="text-[10px] font-black text-slate-400 uppercase">Mobile Number</p><p className="font-medium text-md text-slate-800 text-sm">{profile.mobile}</p></div>
                                             <div><p className="text-[10px] font-black text-slate-400 uppercase">Email</p><p className="font-medium text-md text-slate-800 truncate text-sm">{profile.email}</p></div>
                                             <div><p className="text-[10px] font-black text-slate-400 uppercase">Location</p><p className="font-medium text-slate-800 text-sm">{kyc?.aadhaar_kyc_data?.full_address || `${profile.city}, ${profile.state}`}</p></div>
-                                            {/* <div><p className="text-[10px] font-black text-slate-400 uppercase">Commission Pay-out Account</p><p className="font-medium text-slate-600 text-sm">{maskAccount(profile.bank_account || "")} ({profile.ifsc})</p></div> */}
                                         </div>
                                     </div>
                                 </div>
@@ -671,7 +699,7 @@ export default function ProfileSection() {
                                             </div>
                                         ))}
                                     </div>
-                                    {/* <div className="mt-3 space-y-2">
+                                    <div className="mt-3 space-y-2">
                                         <label className="text-[14px] font-bold text-slate-600 uppercase tracking-wider block">
                                             Current Address
                                         </label>
@@ -687,7 +715,7 @@ export default function ProfileSection() {
                                                 }`}
                                             placeholder="Enter your full current address"
                                         />
-                                    </div> */}
+                                    </div>
                                     <div className="pt-3 border-t border-slate-100">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
                                             {/* Password Input Field */}
@@ -738,9 +766,15 @@ export default function ProfileSection() {
                                                         <button
                                                             disabled={saving}
                                                             onClick={async () => {
+                                                                setSaving(true);
                                                                 try {
-                                                                    setSaving(true);
-                                                                    await DashboardService.editProfile(profile);
+                                                                    const { address, ...otherData } = profile;
+                                                                    const payload = {
+                                                                        ...otherData,
+                                                                        current_address: address
+                                                                    };
+                                                                    await DashboardService.editProfile(payload);
+
                                                                     triggerPopup("Profile Updated!", "success");
                                                                     setIsEditing(false);
                                                                 } catch (e) {
@@ -768,7 +802,7 @@ export default function ProfileSection() {
                 <section id="step-1" className="transition-all duration-500 scroll-mt-10">
                     <div className="sticky top-0 z-30 bg-[#F8FAFC] py-4 sm:py-6 flex items-center justify-center gap-3 sm:gap-4 mb-2 border-b border-slate-100/50">
                         <span className={`px-3 sm:px-4 py-1.5 rounded-full flex items-center justify-center font-black text-[9px] sm:text-[10px] uppercase tracking-widest text-white ${isStep1Complete ? "bg-emerald-500" : "bg-[#2076C7]"}`}>Step 1</span>
-                        <h2 className="text-xl sm:text-2xl font-bold text-slate-800 text-center">Mobile & Email Verification</h2>
+                        <h2 className="text-lg sm:text-xl font-bold text-slate-800 text-center">Mobile & Email Verification</h2>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 bg-white p-5 sm:p-8 rounded-[24px] sm:rounded-[32px] shadow-sm">
                         <div className="space-y-4">
@@ -836,7 +870,7 @@ export default function ProfileSection() {
 
                     <div className="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 space-y-4">
 
-                    {/* Aadhaar Block */}
+                        {/* Aadhaar Block */}
                         <div className="p-4 bg-white rounded-xl border border-slate-100">
                             <div className="flex justify-between items-center mb-3">
                                 <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Aadhaar Verification</h4>
@@ -1050,23 +1084,64 @@ export default function ProfileSection() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div className="space-y-4">
                                 <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Digital Visiting Card</h4>
-                                <div className="aspect-[1.75/1] rounded-[24px] sm:rounded-[32px] shadow-2xl overflow-hidden relative border border-slate-200 bg-slate-900 group">
+
+                                {/* 1. Added '@container' class here */}
+                                <div className="aspect-[1.75/1] w-full @container rounded-[6cqw] sm:rounded-[15px] shadow-2xl overflow-hidden relative border border-slate-200 bg-slate-900 group">
+
                                     <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${CardTemplateImage.src})` }} />
-                                    <div className="absolute inset-0 px-6 sm:pl-10 pt-8 sm:pt-12 p-4 sm:p-6 flex flex-col justify-between">
-                                        <div><h4 className="text-lg sm:text-2xl font-black text-slate-700 uppercase leading-none truncate">{profile.name}</h4><p className="text-[10px] sm:text-[12px] font-bold text-slate-500 mt-1 sm:mt-2 uppercase tracking-widest">Authorized Partner</p></div>
-                                        <div className="space-y-1.5 sm:space-y-2">
-                                            <div className="flex items-center gap-2"><Phone size={10} className="text-slate-400" /><span className="text-[11px] sm:text-[13px] font-bold text-slate-700">+91 {profile.mobile}</span></div>
-                                            <div className="flex items-center gap-2"><Mail size={10} className="text-slate-400" /><span className="text-[11px] sm:text-[13px] font-bold text-slate-700 truncate">{profile.email}</span></div>
-                                            <div className="flex items-start gap-2 max-w-[180px] sm:max-w-[220px]"><MapPin size={10} className="text-slate-400 mt-0.5 shrink-0" /><span className="text-[9px] sm:text-[11px] font-bold text-slate-700 leading-tight truncate-2-lines">{kyc?.aadhaar_kyc_data?.full_address || profile.city}</span></div>
-                                            <div className="flex items-center gap-2"><Globe size={10} className="text-slate-400" /><span className="text-[11px] sm:text-[13px] font-bold text-slate-700">www.infinityarthvishva.com</span></div>
+
+                                    {/* 2. Used 'cqw' for padding and layout */}
+                                    <div className="absolute inset-0 px-[8cqw] py-[6cqw] flex flex-col justify-between">
+
+                                        <div>
+                                            {/* 3. Fluid font sizes: 5.5% of container width */}
+                                            <h4 className="text-[4.5cqw] font-black text-slate-700 uppercase leading-none truncate">
+                                                {profile.name}
+                                            </h4>
+                                            <p className="text-[2cqw] font-bold text-slate-500 mt-[1.5cqw] uppercase tracking-widest">
+                                                Authorized Partner
+                                            </p>
                                         </div>
-                                        <button onClick={downloadCardAsPhoto} className="w-fit bg-slate-800 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold flex items-center gap-2 shadow-lg">{isDownloadingCard ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />} Save Card</button>
+
+                                        {/* 4. Fluid spacing between items */}
+                                        <div className="space-y-[1.5cqw]">
+                                            <div className="flex items-center gap-[2cqw]">
+                                                <Phone className="w-[3cqw] h-[3cqw] text-slate-400" />
+                                                <span className="text-[2.5cqw] font-bold text-slate-700">+91 {profile.mobile}</span>
+                                            </div>
+                                            <div className="flex items-center gap-[2cqw]">
+                                                <Mail className="w-[3cqw] h-[3cqw] text-slate-400" />
+                                                <span className="text-[2.5cqw] font-bold text-slate-700 truncate">{profile.email}</span>
+                                            </div>
+                                            <div className="flex items-start gap-[2cqw] max-w-[60cqw]">
+                                                <MapPin className="w-[3cqw] h-[3cqw] text-slate-400 mt-[0.5cqw] shrink-0" />
+                                                <span className="text-[2.2cqw] font-bold text-slate-700 leading-tight line-clamp-2">
+                                                    {kyc?.aadhaar_kyc_data?.full_address || profile.city}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-[2cqw]">
+                                                <Globe className="w-[3cqw] h-[3cqw] text-slate-400" />
+                                                <span className="text-[2.5cqw] font-bold text-slate-700">www.infinityarthvishva.com</span>
+                                            </div>
+                                        </div>
+
+                                        {/* 5. Scaling the button */}
+                                        <button
+                                            onClick={downloadCardAsPhoto}
+                                            className="w-fit bg-slate-800 text-white px-[2.8cqw] py-[1.6cqw] rounded-[1.5cqw] text-[2cqw] font-bold flex items-center gap-[1.5cqw] shadow-lg active:scale-95 transition-transform"
+                                        >
+                                            {isDownloadingCard ?
+                                                <Loader2 className="w-[2.5cqw] h-[2.5cqw] animate-spin" /> :
+                                                <Download className="w-[2.5cqw] h-[2.5cqw]" />
+                                            }
+                                            Save Card
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="space-y-3 sm:ml-20">
-                                <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1 text-left">DSA Identity Card</h4>
+                            <div className="space-y-3 min-[1024px]:ml-20">
+                                <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest max-[1023px]:text-center max-[1023px]:mt-10 text-left">DSA Identity Card</h4>
                                 <div className="max-w-[260px] sm:max-w-[280px] aspect-[1/1.58] lg:ml-0 mx-auto rounded-2xl bg-white border border-slate-200 shadow-xl relative overflow-hidden group flex flex-col">
                                     <div className="h-2 w-full bg-[#1CADA3]"></div>
                                     <div className="p-5 sm:p-6 flex flex-col items-center h-full">
