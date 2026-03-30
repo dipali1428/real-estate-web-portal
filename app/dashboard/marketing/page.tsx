@@ -100,7 +100,7 @@ export default function ImageTemplates() {
       category: 'insurance',
       subCategory: 'life',
       description: 'Comprehensive life insurance coverage for you and your family',
-      imageUrl: '/templateimg/LifeInsurance.jpg'
+      imageUrl: `${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/templateimg/LifeInsurance.jpg`
     },
     {
       id: '2',
@@ -280,7 +280,7 @@ export default function ImageTemplates() {
       category: 'loan',
       subCategory: 'personal',
       description: 'Quick personal loans for all your needs',
-      imageUrl: '/templateimg/PersonalLoan1.jpg'
+      imageUrl: '/templateimg/PersonalLoan1.jpeg'
     },
   ]);
 
