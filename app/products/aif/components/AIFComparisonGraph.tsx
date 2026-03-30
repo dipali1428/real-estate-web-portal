@@ -6,16 +6,16 @@ import { BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const data = [
-    { name: "360 ONE Defense", score: 92, cat: "II", color: "#2076C7" },
-    { name: "Axis New Opp", score: 88, cat: "II", color: "#2076C7" },
     { name: "Abakkus 428", score: 94, cat: "II", color: "#2076C7" },
+    { name: "360 ONE Defense", score: 92, cat: "II", color: "#2076C7" },
+    { name: "ABSL Money Manager", score: 92, cat: "II", color: "#2076C7" },
     { name: "India Discovery II", score: 91, cat: "I", color: "#1CADA3" },
+    { name: "Finavenue Growth", score: 90, cat: "III", color: "#2076C7" },
+    { name: "Arnya Real Estate", score: 89, cat: "II", color: "#2076C7" },
     { name: "Equirus InnovateX", score: 89, cat: "I", color: "#1CADA3" },
-    { name: "Getfive Opp Fund", score: 87, cat: "I", color: "#1CADA3" },
-    { name: "Edelweiss Alpha", score: 86, cat: "III", color: "#2076C7" },
-    { name: "Kotak Long-Short", score: 85, cat: "III", color: "#2076C7" },
-    { name: "ICICI Pru L/S", score: 84, cat: "III", color: "#1CADA3" },
-    { name: "IIFL Long-Short", score: 85, cat: "III", color: "#1CADA3" },
+    { name: "AARTH AIF Growth", score: 88, cat: "III", color: "#2076C7" },
+    { name: "Abakkus Flexi", score: 87, cat: "III", color: "#2076C7" },
+    { name: "Accuracap Alpha", score: 86, cat: "III", color: "#2076C7" },
 ];
 
 const CustomTooltip = ({ active, payload, label }: any) => {

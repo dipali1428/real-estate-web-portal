@@ -191,9 +191,9 @@ export default function MortgageLoanPage() {
                                 initial={{ opacity: 0, x: -50 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.8, ease: "easeOut" }}
-                                className="w-full lg:w-1/2 text-left space-y-8"
+                                className="w-full lg:w-1/2 text-center lg:text-left space-y-8 flex flex-col items-center lg:items-start"
                             >
-                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E6F7F6] border border-[#1CADA3]/20 mb-6 w-fit">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E6F7F6] border border-[#1CADA3]/20 mb-6 w-fit mx-auto lg:mx-0">
                                     <Landmark className="w-4 h-4 text-[#1CADA3]" />
                                     <span className="text-xs font-bold text-[#1CADA3] tracking-wider uppercase">Property Backed Funding</span>
                                 </div>
@@ -210,12 +210,12 @@ export default function MortgageLoanPage() {
                                     {offer.description}
                                 </p>
 
-                                <div className="flex flex-wrap gap-5 pt-2">
+                                <div className="flex flex-col sm:flex-row gap-5 pt-2 items-center lg:items-start">
                                     <button
                                         onClick={handleApply}
                                         className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
                                     >
-                                        <span className="relative z-10 flex items-center gap-2">
+                                        <span className="relative z-10 flex items-center justify-center gap-2">
                                             Apply Now <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                         </span>
                                     </button>
@@ -223,7 +223,7 @@ export default function MortgageLoanPage() {
                                         onClick={handleApply}
                                         className="group relative text-[#2076C7] bg-white px-8 py-4 rounded-lg font-semibold text-lg border-2 border-[#2076C7] shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
                                     >
-                                        <span className="relative z-10 transition-colors duration-300 group-hover:text-white">Consult an Advisor</span>
+                                        <span className="relative z-10 transition-colors duration-300 group-hover:text-white flex items-center justify-center">Consult an Advisor</span>
                                         <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}></div>
                                     </button>
                                 </div>
