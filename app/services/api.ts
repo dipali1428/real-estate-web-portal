@@ -2,9 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://api.infinityarthvishva.com",
-  // "http://192.168.1.83:5000"
-  // "https://api.infinityarthvishva.com"
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   // withCredentials: true, // ⭐ SEND COOKIES AUTOMATICALLY
   headers: { "Content-Type": "application/json" },
 });
