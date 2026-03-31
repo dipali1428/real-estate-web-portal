@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Smartphone, LockKeyhole, ArrowRight, KeyRound, ChevronLeft } from "lucide-react";
+import { X, Smartphone, LockKeyhole, ArrowRight, KeyRound, ChevronLeft, Eye, EyeOff } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
 import { PublicService } from "@/app/services/publicService";
 import { useRouter } from "next/navigation";
@@ -35,6 +35,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     const [emailOrPhone, setEmailOrPhone] = useState("");
     const [otp, setOtp] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     // Forgot Password State
     const [forgotStep, setForgotStep] = useState(1); // 1: Mobile, 2: OTP, 3: New Password
@@ -218,7 +219,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
         }
     };
 
-    type UserRole = "ADMIN" | "DEPARTMENTHEAD" | "RM" | "ACCOUNTS" | "CUSTOMER" | "UNLISTEDADMIN" | "HR" | "USER";
+    type UserRole = "ADMIN" | "DEPARTMENTHEAD" | "RM" | "ACCOUNTS" | "CUSTOMER" | "UNLISTEDADMIN" | "HR" | "USER" | "DIRECTOR";
 
     const redirectByRole = (role: UserRole) => {
         const routes: Record<UserRole, string> = {
@@ -230,6 +231,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
             HR: "/hr",
             USER: "/dashboard",
             UNLISTEDADMIN: "/UnlistedAdmin",
+            DIRECTOR: "/director"
         };
         router.push(routes[role] ?? "/dashboard");
     };
@@ -279,11 +281,11 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                         <div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3]" />
 
                         {loginMethod === 'FORGOT' && (
-                            <button 
+                            <button
                                 onClick={() => {
                                     if (forgotStep > 1) setForgotStep(forgotStep - 1);
                                     else handleMethodSwitch('PASSWORD');
-                                }} 
+                                }}
                                 className="absolute top-4 left-4 p-2 text-gray-400 hover:text-[#2076C7] transition-colors z-10"
                             >
                                 <ChevronLeft size={20} />
@@ -299,13 +301,13 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                     {loginMethod === 'FORGOT' ? <LockKeyhole size={28} /> : (loginMethod === 'PASSWORD' ? <KeyRound size={28} /> : <Smartphone size={28} />)}
                                 </div>
                                 <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">
-                                    {loginMethod === 'FORGOT' 
-                                        ? (forgotStep === 1 ? "Reset Password" : forgotStep === 2 ? "Verify OTP" : "Set New Password") 
+                                    {loginMethod === 'FORGOT'
+                                        ? (forgotStep === 1 ? "Reset Password" : forgotStep === 2 ? "Verify OTP" : "Set New Password")
                                         : (otpSent ? "Verify Identity" : "Welcome Back")}
                                 </h2>
                                 <p className="text-gray-500 text-xs sm:text-sm">
-                                    {loginMethod === 'FORGOT' 
-                                        ? (forgotStep === 2 ? `Enter code sent to ${emailOrPhone}` : "Securely update your account access.") 
+                                    {loginMethod === 'FORGOT'
+                                        ? (forgotStep === 2 ? `Enter code sent to ${emailOrPhone}` : "Securely update your account access.")
                                         : (otpSent ? `Enter the code sent to ${emailOrPhone}` : "Select your preferred login method.")}
                                 </p>
                             </motion.div>
@@ -342,10 +344,29 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                                     <motion.div variants={itemVariants} className="relative group">
                                         <div className="flex justify-between items-center mb-1.5 ml-1">
                                             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide">Password</label>
-                                            <button type="button" onClick={() => handleMethodSwitch('FORGOT')} className="text-[#2076C7] text-xs font-semibold hover:underline cursor-pointer">Forgot Password?</button>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleMethodSwitch('FORGOT')}
+                                                className="text-[#2076C7] text-xs font-semibold hover:underline cursor-pointer">
+                                                Forgot Password?
+                                            </button>
                                         </div>
-                                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password"
-                                            className="w-full h-11 sm:h-12 px-4 border font-sans text-gray-700 placeholder-gray-400 rounded-xl text-base transition-all duration-200 outline-none bg-white border-gray-300 focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/10" />
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                placeholder="Enter your password"
+                                                className="w-full h-12 px-4 pr-12 border font-sans text-gray-700 placeholder-gray-400 rounded-xl text-base outline-none bg-white border-gray-300 focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/10"
+                                            />
+
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-0 h-full px-3 flex items-center justify-center text-gray-400 hover:text-[#2076C7]">
+                                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                            </button>
+                                        </div>
                                     </motion.div>
                                 )}
 
