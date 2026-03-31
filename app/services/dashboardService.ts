@@ -173,16 +173,16 @@ export const DashboardService = {
         return response.data;
     },
 
-    verifyEmailOtp: async (data: {otp: string;}) => {
-            const response = await api.post("/api/dashboard/verify-email-otp", data);
-            return response.data;
+    verifyEmailOtp: async (data: { otp: string; }) => {
+        const response = await api.post("/api/dashboard/verify-email-otp", data);
+        return response.data;
     },
 
     verifyPanAadhaarLink: async () => {
         const response = await api.post("/api/dashboard/verify-pan-aadhaar-link");
         return response.data;
     },
-    
+
     // 🔹 NEW: Get TDS Details
     getTdsDetails: async () => {
         const response = await api.get("/api/dashboard/tds");
@@ -201,6 +201,12 @@ export const DashboardService = {
 
     checkKycStatus: async () => {
         const response = await api.get("/api/dashboard/profile/kyc-status");
+        return response.data;
+    },
+    
+    // 🔹 Get Referral Users (Co-Partners)
+    getReferralUsers: async () => {
+        const response = await api.get("/api/dashboard/profile/get-referral-user");
         return response.data;
     },
 };
