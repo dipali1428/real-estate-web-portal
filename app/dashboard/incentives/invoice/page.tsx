@@ -142,18 +142,46 @@ export default function PayoutHistory() {
       <head>
       <title>Invoice_${baseRecord.invoiceNumber}</title>
       <style>
-        body{font-family: Arial, sans-serif; padding:20px; color:#333; background: #fff;}
-        .invoice-container{ width:100%; box-sizing: border-box; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1{ margin:0; font-size:22px; color: #1e3a8a; border-bottom: 2px solid #1e3a8a; display: inline-block; }
-        .meta-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 13px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
-        .top-table{width:100%; font-size:12px; margin-bottom: 20px;}
-        .main-table{width:100%; border-collapse:collapse; font-size:10px;}
-        .main-table th{background:#f8fafc; border:1px solid #e2e8f0; padding:8px; text-align:left;}
-        .main-table td{border:1px solid #e2e8f0; padding:8px;}
-        .summary-table { width: 280px; margin-left: auto; border-collapse: collapse; font-size: 12px; margin-top: 20px; }
-        .summary-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; }
-        .total-row { font-weight: bold; color: #1e3a8a; background: #f8fafc; }
+        body{
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            padding: 40px 20px; 
+            color:#333; 
+            background: #f1f5f9; 
+            margin: 0;
+        }
+        .invoice-container{ 
+            max-width: 850px; 
+            margin: 0 auto; 
+            background: #fff; 
+            padding: 40px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            min-height: 1000px;
+            display: flex;
+            flex-direction: column;
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1{ margin:0; font-size:24px; color: #1e3a8a; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #1e3a8a; display: inline-block; padding-bottom: 5px; }
+        .meta-header { display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 14px; color: #64748b; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;}
+        .top-table{width:100%; font-size:13px; margin-bottom: 30px; border-spacing: 0;}
+        .main-table{width:100%; border-collapse:collapse; font-size:11px; margin-bottom: 20px;}
+        .main-table th{background:#f8fafc; border:1px solid #e2e8f0; padding:12px 8px; text-align:left; color: #475569;}
+        .main-table td{border:1px solid #e2e8f0; padding:10px 8px;}
+        .summary-table { width: 300px; margin-left: auto; border-collapse: collapse; font-size: 13px; margin-top: 20px; }
+        .summary-table td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
+        .total-row { font-weight: bold; color: #1e3a8a; background: #f8fafc; font-size: 15px; }
+        .footer-note { 
+            margin-top: auto; 
+            padding-top: 30px; 
+            border-top: 1px dashed #cbd5e1; 
+            font-size: 11px; 
+            color: #94a3b8; 
+            line-height: 1.5;
+        }
+        @media print {
+            body { background: none; padding: 0; }
+            .invoice-container { box-shadow: none; border: none; max-width: 100%; }
+        }
       </style>
       </head>
       <body>
@@ -166,16 +194,16 @@ export default function PayoutHistory() {
           <table class="top-table">
               <tr>
                   <td width="50%" valign="top">
-                      <b style="color:#64748b">FROM:</b><br/>
+                      <div style="margin-bottom: 8px;"><b style="color:#64748b; text-transform: uppercase; font-size: 11px;">From</b></div>
                       <strong>Infinity Arthvishva Advisory Pvt Ltd</strong><br/>
                       Shivaji Nagar, Pune, 411005<br/>
-                      GSTIN: 27AAICI0723K1ZJ
+                      <b>GSTIN:</b> 27AAICI0723K1ZJ
                   </td>
                   <td width="50%" valign="top" align="right">
-                      <b style="color:#64748b">BILL TO:</b><br/>
+                      <div style="margin-bottom: 8px;"><b style="color:#64748b; text-transform: uppercase; font-size: 11px;">Bill To</b></div>
                       <strong>${userProfile?.name}</strong><br/>
-                      ${fullAddress || 'N/A'}<br/>
-                      ${userProfile?.pan ? `PAN: ${userProfile.pan}` : ''}
+                      <div style="max-width: 250px; margin-left: auto;">${fullAddress || 'N/A'}</div>
+                      ${userProfile?.pan ? `<b>PAN:</b> ${userProfile.pan}` : ''}
                   </td>
               </tr>
           </table>
@@ -189,6 +217,11 @@ export default function PayoutHistory() {
               <tr><td>TDS</td><td align="right">- ₹ ${totalTds.toLocaleString('en-IN')}</td></tr>
               <tr class="total-row"><td>TOTAL</td><td align="right">₹ ${totalNet.toLocaleString('en-IN')}</td></tr>
           </table>
+
+          <div class="text-align-center footer-note">
+            <strong>Note:</strong><br/>
+            This is a computer-generated document and does not require a physical signature.<br/> 
+          </div>
         </div>
       </body>
       </html>
@@ -319,33 +352,39 @@ export default function PayoutHistory() {
           </div>
         </div>
 
-        {/* VIEW MODAL */}
+        {/* VIEW MODAL - Refined to look like a floating document */}
         {isModalOpen && selectedPayoutId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl w-full max-w-5xl h-[95vh] flex flex-col shadow-2xl overflow-hidden">
               <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white">
-                <h3 className="font-bold text-slate-700 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-blue-500" />
-                  Invoice Preview
-                </h3>
+                <div className="flex items-center gap-3">
+                   <div className="bg-blue-50 p-2 rounded-lg"><FileText className="w-5 h-5 text-blue-500" /></div>
+                   <div>
+                    <h3 className="font-bold text-slate-700 leading-none">Invoice Preview</h3>
+                    <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold">Payout ID: {selectedPayoutId}</p>
+                   </div>
+                </div>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => downloadInvoice(selectedPayoutId)}
-                    className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#1CADA3] hover:bg-[#1CADA3] text-white rounded-lg text-sm font-medium transition-all active:scale-95 shadow-sm shadow-emerald-200"
                   >
                     <Download className="w-4 h-4" /> Download
                   </button>
+                  <div className="w-px h-6 bg-slate-200 mx-1"></div>
                   <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
                     <X className="w-6 h-6" />
                   </button>
                 </div>
               </div>
-              <div className="flex-1 overflow-auto bg-slate-50 p-4 md:p-8">
-                <div className="bg-white shadow-sm border border-slate-200 mx-auto max-w-[800px] min-h-[600px] rounded-lg overflow-hidden">
+              
+              <div className="flex-1 overflow-auto bg-slate-100/50 p-4 md:p-10 flex justify-center">
+                {/* The iframe represents the "paper" */}
+                <div className="w-full max-w-[850px] bg-white shadow-2xl border border-slate-200 rounded-sm">
                   <iframe
                     title="Invoice Preview"
                     srcDoc={getInvoiceHtml(selectedPayoutId)}
-                    className="w-full h-[700px] border-none"
+                    className="w-full h-full min-h-[1100px] border-none"
                   />
                 </div>
               </div>
