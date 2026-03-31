@@ -8,6 +8,8 @@ interface ImageCarouselProps {
   delay?: number;
 }
 
+const BASE_S3_URL = `${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public`;
+
 export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images, alt, delay = 3000 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -41,18 +43,23 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images, alt, delay
         className="flex h-full transition-transform duration-500 ease-in-out"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className="w-full h-full shrink-0"
-          >
-            <img
-              src={image}
-              alt={`${alt} ${index + 1}`}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ))}
+        {images.map((image, index) => {
+          // Construct the full URL
+          // This logic ensures we don't get double slashes if the image string starts with one
+          const fullImageUrl = image.startsWith('http') 
+            ? image 
+            : `${BASE_S3_URL}/${image.startsWith('/') ? image.slice(1) : image}`;
+
+          return (
+            <div key={index} className="w-full h-full shrink-0">
+              <img
+                src={fullImageUrl}
+                alt={`${alt} ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Navigation Arrows - Only show if images.length > 1 */}

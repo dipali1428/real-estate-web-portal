@@ -12,7 +12,7 @@ export const featuredVideos: YouTubeVideo[] = [
     description: "Don’t forget to Like, Share & Subscribe for more inspiring stories!"
   },
   {
-    image: "/ET Business Award/ET Business Award.jpeg",
+    image: `${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/ET-Business-Award/ET-Business-Award.jpeg`,
     title: "🏆 Winner at ET Business Awards 2025 – Pune",
     description: "A milestone achievement celebrating vision, execution, and excellence"
   }
