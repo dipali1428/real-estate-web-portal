@@ -112,7 +112,7 @@ const AboutSection = () => (
       <div className="rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition duration-500 bg-white">
 
         <img
-          src="/ET Business Award/ET Business Award.jpeg"
+          src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/ET-Business-Award/ET-Business-Award.jpeg`}
           alt="ET Business Award Winner"
           className="w-full h-[260px] sm:h-[320px] lg:h-[360px] object-cover"
         />

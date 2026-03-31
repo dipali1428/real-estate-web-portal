@@ -213,37 +213,37 @@ const groupEventsByMonth = (eventsByYear: { [year: string]: Event[] }) => {
 
 const EventCard: React.FC<{ event: Event; index: number }> = ({ event }) => {
   return (
- <div className="bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 transform hover:-translate-y-1 w-full font-sans border border-gray-100">
-  <LazyImageCarousel
-    images={getEventImages(event)}
-    alt={`${event.city} Business Event`}
-    delay={3500}
-  />
-  <div className="p-5">
-    {/* Date Tag moved to top for a cleaner look */}
-    <div className="flex justify-between items-start mb-2">
-      <h4 className="text-lg font-bold text-gray-900 tracking-tight leading-tight">
-        {event.city} Business Event
-      </h4>
-      <span className="bg-teal-50 text-teal-700 text-[10px] uppercase font-bold px-2 py-1 rounded-md border border-teal-100 whitespace-nowrap">
-        {event.date}
-      </span>
-    </div>
+    <div className="bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 transform hover:-translate-y-1 w-full font-sans border border-gray-100">
+      <LazyImageCarousel
+        images={getEventImages(event)}
+        alt={`${event.city} Business Event`}
+        delay={3500}
+      />
+      <div className="p-5">
+        {/* Date Tag moved to top for a cleaner look */}
+        <div className="flex justify-between items-start mb-2">
+          <h4 className="text-lg font-bold text-gray-900 tracking-tight leading-tight">
+            {event.city} Business Event
+          </h4>
+          <span className="bg-teal-50 text-teal-700 text-[10px] uppercase font-bold px-2 py-1 rounded-md border border-teal-100 whitespace-nowrap">
+            {event.date}
+          </span>
+        </div>
 
-    <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">
-      {event.desc}
-    </p>
+        <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">
+          {event.desc}
+        </p>
 
-    <div className="flex items-center pt-3 border-t border-gray-50">
-      <div className="flex items-center text-xs font-medium text-gray-400">
-        <svg className="w-3.5 h-3.5 mr-1 text-teal-500" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-        </svg>
-        {event.city}
+        <div className="flex items-center pt-3 border-t border-gray-50">
+          <div className="flex items-center text-xs font-medium text-gray-400">
+            <svg className="w-3.5 h-3.5 mr-1 text-teal-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+            </svg>
+            {event.city}
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
   );
 };
 
@@ -333,8 +333,8 @@ function GalleryImage({ src, alt }: { src: string, alt: string }) {
 
 const EventSection: React.FC = () => {
   const eventsByMonth = groupEventsByMonth(eventsByYear);
-  
- const [expanded, setExpanded] = useState({
+
+  const [expanded, setExpanded] = useState({
     contests: true, // Open by default
     stories: true, // Closed by default
     events: true,  // Closed by default
@@ -351,7 +351,7 @@ const EventSection: React.FC = () => {
 
         {/* ===== Success Contest Section ===== */}
         <div className="mb-16 pb-16 border-b border-gray-200">
-          <SectionHeader 
+          <SectionHeader
             title="Success International Contests"
             isOpen={expanded.contests}
             onToggle={() => toggle('contests')}
@@ -370,7 +370,7 @@ const EventSection: React.FC = () => {
 
         {/* ===== Success Stories Section ===== */}
         <div className="mb-16 pb-16 border-b border-gray-200">
-          <SectionHeader 
+          <SectionHeader
             title="Success Stories"
             isOpen={expanded.stories}
             onToggle={() => toggle('stories')}
@@ -378,11 +378,11 @@ const EventSection: React.FC = () => {
           />
           {expanded.stories && (
             <div className={`flex justify-center transition-all duration-500 ${featuredVideos.length === 1 ? 'max-w-2xl mx-auto' :
-                featuredVideos.length === 2 ? 'max-w-4xl mx-auto' : 'w-full'
+              featuredVideos.length === 2 ? 'max-w-4xl mx-auto' : 'w-full'
               }`}>
               <div className={`grid gap-8 w-full ${featuredVideos.length === 1 ? 'grid-cols-1' :
-                  featuredVideos.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
-                    'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                featuredVideos.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
+                  'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
                 }`}>
                 {featuredVideos.map((item, index) => (
                   <div key={index} className="group flex flex-col h-full">
@@ -412,50 +412,50 @@ const EventSection: React.FC = () => {
           )}
         </div>
 
-{/* ===== Events Section ===== */}
-<div className="mb-10 sm:mb-14 md:mb-20 font-sans">
-  {/* Main Container */}
-  <div className="bg-white rounded-2xl sm:rounded-3xl md:rounded-[2.5rem] border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8 lg:p-12 transition-all duration-500">
-    
-    <SectionHeader
-      title="Business Events"
-      isOpen={expanded.events}
-      onToggle={() => toggle("events")}
-      description={
-        <span className="text-gray-500 text-sm sm:text-base">
-          Join <span className="font-semibold text-teal-600">Infinity Arthvishva</span> across 
-          India for networking, workshops, and business growth opportunities.
-        </span>
-      }
-    />
+        {/* ===== Events Section ===== */}
+        <div className="mb-10 sm:mb-14 md:mb-20 font-sans">
+          {/* Main Container */}
+          <div className="bg-white rounded-2xl sm:rounded-3xl md:rounded-[2.5rem] border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8 lg:p-12 transition-all duration-500">
 
-    {/* Elegant Divider */}
-    <div className="mt-6 sm:mt-8 mb-8 sm:mb-10 md:mb-12 h-px w-full bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100" />
-
-    {expanded.events && (
-      <div className="space-y-5 sm:space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        {Object.keys(eventsByMonth).map((month) => (
-          <div
-            key={month}
-            className="group relative bg-white border border-gray-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 transition-all duration-500 hover:border-teal-100 hover:shadow-lg hover:shadow-teal-500/5 overflow-hidden"
-          >
-            {/* Subtle Month Header Accent */}
-            <div className="absolute left-0 top-0 w-1 sm:w-1.5 h-full bg-teal-500 rounded-l-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
-            <EventMonthSection
-              month={month}
-              events={eventsByMonth[month]}
+            <SectionHeader
+              title="Business Events"
+              isOpen={expanded.events}
+              onToggle={() => toggle("events")}
+              description={
+                <span className="text-gray-500 text-sm sm:text-base">
+                  Join <span className="font-semibold text-teal-600">Infinity Arthvishva</span> across
+                  India for networking, workshops, and business growth opportunities.
+                </span>
+              }
             />
+
+            {/* Elegant Divider */}
+            <div className="mt-6 sm:mt-8 mb-8 sm:mb-10 md:mb-12 h-px w-full bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100" />
+
+            {expanded.events && (
+              <div className="space-y-5 sm:space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                {Object.keys(eventsByMonth).map((month) => (
+                  <div
+                    key={month}
+                    className="group relative bg-white border border-gray-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 transition-all duration-500 hover:border-teal-100 hover:shadow-lg hover:shadow-teal-500/5 overflow-hidden"
+                  >
+                    {/* Subtle Month Header Accent */}
+                    <div className="absolute left-0 top-0 w-1 sm:w-1.5 h-full bg-teal-500 rounded-l-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                    <EventMonthSection
+                      month={month}
+                      events={eventsByMonth[month]}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        ))}
-      </div>
-    )}
-  </div>
-</div>
+        </div>
 
         {/* ===== Life at Infinity Section ===== */}
         <div className="mb-16 pb-16 border-b border-gray-200">
-          <SectionHeader 
+          <SectionHeader
             title="Life at Infinity Arthvishva"
             isOpen={expanded.life}
             onToggle={() => toggle('life')}
@@ -464,12 +464,12 @@ const EventSection: React.FC = () => {
           {expanded.life && (
             <div className="transition-all duration-500">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <GalleryImage src="\Team\Image-1.jpeg" alt="Team Collaboration" />
-                <GalleryImage src="\Team\Image-6.jpeg" alt="Celebration Event" />
-                <GalleryImage src="\Team\Image-2.jpeg" alt="Training Session" />
-                <GalleryImage src="\Team\Image-3.jpeg" alt="Office Environment" />
-                <GalleryImage src="\Team\Image-4.jpeg" alt="Celebration Event" />
-                <GalleryImage src="\Team\Image-5.jpeg" alt="Celebration Event" />
+                <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-1.jpeg`} alt="Team Collaboration" />
+                <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-6.jpeg`} alt="Celebration Event" />
+                <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-2.jpeg`} alt="Training Session" />
+                <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-3.jpeg`} alt="Office Environment" />
+                <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-4.jpeg`} alt="Celebration Event" />
+                <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-5.jpeg`} alt="Celebration Event" />
               </div>
             </div>
           )}

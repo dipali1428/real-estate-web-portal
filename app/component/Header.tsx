@@ -32,7 +32,7 @@ const Header = () => {
     { label: "Home", href: "/" },
     { label: "About Us", href: "/page/about", component: AboutSection },
     { label: "Media Center", href: "/page/event", component: AboutSection },
-    { label: "Cibil Check", href: "/page/cibil", component: CibilSection },
+    { label: "Cibil Check", href: "/page/cibil", component: CibilSection, badge: "New" },
     { label: "Careers", href: "/page/careers" },
   ];
 
@@ -57,7 +57,7 @@ const Header = () => {
     { label: "Education Loan", href: "/products/education-loan" },
     { label: "Vehicle Loan", href: "/products/vehicle-loan" },
     { label: "Loan Against Securities", href: "/products/loan-against-securities" },
-      { label: "Credit cards", href: "/products/credit-card" },
+    { label: "Credit cards", href: "/products/credit-card" },
   ];
 
   const insuranceOptions = [
@@ -423,6 +423,11 @@ const Header = () => {
                 href={link.href}
                 className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
                 {link.label}
+                {link.badge && (
+                  <span className="relative -top-1 ml-0.5 bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider shadow-sm animate-pulse">
+                    {link.badge}
+                  </span>
+                )}
               </a>
               <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
             </motion.div>
@@ -791,6 +796,11 @@ const Header = () => {
                   onClick={() => setIsOpen(false)}
                   className="text-gray-700 font-medium hover:text-[#1CADA3] transition text-base">
                   {link.label}
+                  {link.badge && (
+                    <span className="relative -top-2 ml-1 bg-red-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase">
+                      {link.badge}
+                    </span>
+                  )}
                 </a>
               ))}
 
