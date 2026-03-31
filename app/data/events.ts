@@ -45,6 +45,7 @@ export const events: Event[] = [
   { id: "Pune 21 mar 25", title: "Business Event", date: "Mar 21, 2025", desc: "Celebrating a successful business meet", city: "Pune" },
   { id: "Nashik 9 apr 25", title: "Business Event", date: "Apr 9, 2025", desc: "Milestones achieved, many more to go", city: "Nashik" },
   { id: "Goa 18 apr 25", title: "Business Event", date: "Apr 18, 2025", desc: "Proud moments, powerful partnerships", city: "Goa" },
+  { id: "Satara 9 may 25", title: "Business Event", date: "May 9, 2025", desc: "Success stories in the making", city: "Satara" },
   { id: "Kolkata 23 may 25", title: "Business Event", date: "May 23, 2025", desc: "A successful day of ideas and inspiration", city: "Kolkata" },
   { id: "Nashik 24 jun 25", title: "Business Event", date: "Jun 24, 2025", desc: "Cheers to growth and success", city: "Nashik" },
   { id: "Jaipur 11 jul 25", title: "Business Event", date: "Jul 11, 2025", desc: "The energy of success was everywhere", city: "Jaipur" },

@@ -100,7 +100,7 @@ export default function ImageTemplates() {
       category: 'insurance',
       subCategory: 'life',
       description: 'Comprehensive life insurance coverage for you and your family',
-      imageUrl: `${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/templateimg/LifeInsurance.jpg`
+      imageUrl: '/templateimg/LifeInsurance.jpg'
     },
     {
       id: '2',
