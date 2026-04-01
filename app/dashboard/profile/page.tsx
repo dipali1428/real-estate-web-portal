@@ -57,6 +57,7 @@ export default function ProfileSection() {
     const [emailOtpInput, setEmailOtpInput] = useState("");
     const [emailVerified, setEmailVerified] = useState(false);
     const [activeId, setActiveId] = useState<string>("step-1");
+    const [isAddressSame, setIsAddressSame] = useState(false);
 
     const isStep1Complete = mobileVerified && emailVerified;
     const isStep2Complete = isStep1Complete && (profile?.pan_verified && aadhaarVerified);
@@ -66,7 +67,147 @@ export default function ProfileSection() {
     const [referralCode, setReferralCode] = useState<string>("");
     const [isGeneratingLink, setIsGeneratingLink] = useState(false);
 
+    const [showCamera, setShowCamera] = useState(false);
 
+    const CameraCaptureModal = ({
+        onCapture,
+        onClose
+    }: {
+        onCapture: (blob: Blob) => void;
+        onClose: () => void
+    }) => {
+        const videoRef = useRef<HTMLVideoElement>(null);
+        const canvasRef = useRef<HTMLCanvasElement>(null);
+        const [stream, setStream] = useState<MediaStream | null>(null);
+        const [error, setError] = useState<string | null>(null);
+
+        const startCamera = useCallback(async () => {
+            // 1. Check if the browser even supports mediaDevices
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                setError("Camera API is not supported in this browser or context (requires HTTPS).");
+                return;
+            }
+
+            try {
+                // 2. Relaxed constraints: Try ideal, but allow the browser to fall back
+                const mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: "user",
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+
+                setStream(mediaStream);
+                if (videoRef.current) {
+                    videoRef.current.srcObject = mediaStream;
+                }
+            } catch (err: any) {
+                console.error("Camera access error:", err);
+
+                // 3. Provide specific feedback based on the error
+                if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+                    setError("Permission denied. Please enable camera access in your browser settings.");
+                } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+                    setError("No camera found on this device.");
+                } else if (err.name === "NotReadableError" || err.name === "TrackStartError") {
+                    setError("Camera is already in use by another application.");
+                } else {
+                    setError("Could not access camera. Please ensure you are using HTTPS.");
+                }
+            }
+        }, []);
+
+        useEffect(() => {
+            startCamera();
+            return () => {
+                // Cleanup: Stop all tracks when component unmounts
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+            };
+        }, [startCamera]);
+
+        const capturePhoto = () => {
+            if (videoRef.current && canvasRef.current) {
+                const video = videoRef.current;
+                const canvas = canvasRef.current;
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext("2d");
+
+                // Mirror the photo since the preview is mirrored
+                ctx?.translate(canvas.width, 0);
+                ctx?.scale(-1, 1);
+                ctx?.drawImage(video, 0, 0);
+
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        onCapture(blob);
+                        onClose();
+                    }
+                }, "image/jpeg", 0.9);
+            }
+        };
+
+        return (
+            <div className="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center p-4">
+                <div className="relative w-full max-w-md aspect-[3/4] rounded-3xl overflow-hidden bg-slate-900 shadow-2xl">
+                    {error ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+                            <AlertCircle size={48} className="text-rose-500 mb-4" />
+                            <p className="text-white font-bold">{error}</p>
+                            <button
+                                onClick={onClose}
+                                className="mt-6 px-6 py-2 bg-white/20 text-white rounded-xl font-bold"
+                            >
+                                Go Back
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <video
+                                ref={videoRef}
+                                autoPlay
+                                playsInline
+                                muted
+                                className="w-full h-full object-cover scale-x-[-1]"
+                            />
+                            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
+                                <div className="w-[70%] h-[60%] border-2 border-dashed border-white/50 rounded-[100px] relative">
+                                    <div className="absolute inset-0 border-2 border-[#1CADA3] rounded-[100px] animate-pulse opacity-50" />
+                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full mb-2">
+                                        <span className="text-white text-[10px] font-bold uppercase bg-[#1CADA3] px-2 py-1 rounded">Align Face Here</span>
+                                    </div>
+                                </div>
+                                <div className="absolute inset-0 shadow-[0_0_0_1000px_rgba(0,0,0,0.5)] rounded-[100px] w-[70%] h-[60%] m-auto" />
+                            </div>
+                        </>
+                    )}
+
+                    <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-md rounded-full text-white">
+                        <X size={24} />
+                    </button>
+                </div>
+
+                {!error && (
+                    <div className="mt-8 flex flex-col items-center gap-6">
+                        <button
+                            onClick={capturePhoto}
+                            className="w-20 h-20 bg-white rounded-full flex items-center justify-center p-1 border-4 border-[#1CADA3] active:scale-95 transition-transform"
+                        >
+                            <div className="w-full h-full bg-white rounded-full border-2 border-slate-200 flex items-center justify-center">
+                                <div className="w-14 h-14 bg-[#1CADA3] rounded-full" />
+                            </div>
+                        </button>
+                        <p className="text-white/60 text-xs font-medium">Position your face within the oval</p>
+                    </div>
+                )}
+
+                <canvas ref={canvasRef} className="hidden" />
+            </div>
+        );
+    };
 
     useEffect(() => {
         if (loading || !profile) return;
@@ -207,7 +348,7 @@ export default function ProfileSection() {
 
             setProfile({
                 ...res.user,
-                address: res.kycDetails?.current_address || "", 
+                address: res.kycDetails?.current_address || "",
                 date_of_birth: finalDob,
                 aadhaar: res.kycDetails?.aadhaar_number || "",
                 gst_number: res.kycDetails?.gst_number || "",
@@ -584,11 +725,53 @@ export default function ProfileSection() {
                                         <div className="flex flex-col sm:flex-row lg:flex-col min-[1801px]:flex-row items-center sm:items-start lg:items-start text-center sm:text-left lg:text-left gap-4 sm:gap-6 mb-5 pb-5 border-b border-slate-50">
                                             <div className="relative">
                                                 <div className="w-24 h-24 rounded-[24px] sm:rounded-[30px] bg-slate-100 border-4 border-white shadow-xl overflow-hidden flex items-center justify-center">
-                                                    {uploadingPhoto ? <Loader2 className="animate-spin text-[#1CADA3]" /> : getProfileImage() ? <img src={getProfileImage()!} className="w-full h-full object-cover" /> : <Camera className="text-slate-300" size={32} />}
+                                                    {uploadingPhoto ? (
+                                                        <Loader2 className="animate-spin text-[#1CADA3]" />
+                                                    ) : getProfileImage() ? (
+                                                        <img src={getProfileImage()!} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <Camera className="text-slate-300" size={32} />
+                                                    )}
                                                 </div>
-                                                <button onClick={() => fileInputRef.current?.click()} className="absolute -bottom-2 -right-2 p-2 bg-[#1CADA3] text-white rounded-full shadow-lg border-2 border-white"><Camera size={12} /></button>
-                                                <input type="file" ref={fileInputRef} onChange={handlePhotoChange} className="hidden" />
+
+                                                {/* Trigger Camera Modal Instead of Input */}
+                                                <button
+                                                    onClick={() => setShowCamera(true)}
+                                                    className="absolute -bottom-2 -right-2 p-2 bg-[#1CADA3] text-white rounded-full shadow-lg border-2 border-white"
+                                                >
+                                                    <Camera size={12} />
+                                                </button>
                                             </div>
+
+                                            {/* The Modal */}
+                                            {showCamera && (
+                                                <CameraCaptureModal
+                                                    onClose={() => setShowCamera(false)}
+                                                    onCapture={async (blob: Blob) => {
+                                                        const file = new File([blob], "profile_photo.jpg", { type: "image/jpeg" });
+
+                                                        // Manually trigger the handlePhotoChange logic
+                                                        const formData = new FormData();
+                                                        formData.append("profile_photo", file);
+
+                                                        let popupId: string = "";
+                                                        try {
+                                                            setUploadingPhoto(true);
+                                                            popupId = triggerPopup("Updating photo...", "loading");
+                                                            const res = await DashboardService.updateProfileImage(formData);
+                                                            if (res.profile_image_url || res.status === "success") {
+                                                                setImageTimestamp(Date.now());
+                                                                await refreshProfileData();
+                                                                triggerPopup("Photo updated!", "success", popupId);
+                                                            }
+                                                        } catch (err) {
+                                                            triggerPopup("Upload failed", "error");
+                                                        } finally {
+                                                            setUploadingPhoto(false);
+                                                        }
+                                                    }}
+                                                />
+                                            )}
                                             <div>
                                                 <h2 className="text-xl font-sans font-medium text-slate-800">{profile.name}</h2>
                                                 <p className="text-[12px] font-bold uppercase text-[#1CADA3] tracking-widest mt-1">Partner ID: {profile.adv_id}</p>
@@ -700,20 +883,48 @@ export default function ProfileSection() {
                                         ))}
                                     </div>
                                     <div className="mt-3 space-y-2">
-                                        <label className="text-[14px] font-bold text-slate-600 uppercase tracking-wider block">
-                                            Current Address
-                                        </label>
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                            <label className="text-[14px] font-bold text-slate-600 uppercase tracking-wider block">
+                                                Current Address <span className="text-[12px] text-slate-500">(optional)</span>
+                                            </label>
+
+                                            {/* Same as Permanent Address Checkbox */}
+                                            {isEditing && (
+                                                <label className="flex items-center gap-2 cursor-pointer group">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isAddressSame}
+                                                        onChange={(e) => {
+                                                            const checked = e.target.checked;
+                                                            setIsAddressSame(checked);
+                                                            if (checked) {
+                                                                const aadhaarAddr = kyc?.aadhaar_kyc_data?.full_address ?? "";
+                                                                setProfile(prev => prev ? { 
+                                                                    ...prev, 
+                                                                    address: aadhaarAddr 
+                                                                } : null);
+                                                            }
+                                                        }}
+                                                        className="w-4 h-4 rounded border-slate-300 text-[#2076C7] focus:ring-[#2076C7]"
+                                                    />
+                                                    <span className="text-[12px] font-bold text-slate-500 group-hover:text-slate-700 transition-colors">
+                                                        Same as Permanent Address
+                                                    </span>
+                                                </label>
+                                            )}
+                                        </div>
+
                                         <textarea
-                                            disabled={!isEditing}
+                                            disabled={!isEditing || isAddressSame} // Disable if not editing OR if synced with Aadhaar
                                             value={profile.address || ""}
                                             onChange={(e) => setProfile({ ...profile, address: e.target.value })}
                                             rows={1}
                                             className={`w-full border rounded-xl px-4 py-2.5 text-[14px] font-bold outline-none transition-all resize-none 
-                                                ${!isEditing
+                                            ${(!isEditing || isAddressSame)
                                                     ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed'
                                                     : 'bg-white border-slate-300 text-slate-700 focus:border-[#2076C7] shadow-sm'
                                                 }`}
-                                            placeholder="Enter your full current address"
+                                            placeholder={isAddressSame ? "Address synced from Aadhaar" : "Enter your full current address"}
                                         />
                                     </div>
                                     <div className="pt-3 border-t border-slate-100">
@@ -755,7 +966,8 @@ export default function ProfileSection() {
                                                         <button
                                                             onClick={() => {
                                                                 setIsEditing(false);
-                                                                refreshProfileData(); // Reverts local changes by re-fetching
+                                                                setIsAddressSame(false);
+                                                                refreshProfileData();
                                                             }}
                                                             className="flex-1 px-4 bg-white border border-slate-200 text-slate-500 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
                                                         >
@@ -963,8 +1175,8 @@ export default function ProfileSection() {
                                         <CheckCircle2 size={12} /> PAN Aadhaar is linked
                                     </div>
                                 ) : (
-                                    <div className="space-y-2">
-                                        <button onClick={handleCheckPanAadhaarLink} className="w-full py-2 mt-5 mb-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2">
+                                    <div className="space-y-2 animate-pulse"> {/* Added animate-pulse here */}
+                                        <button onClick={handleCheckPanAadhaarLink} className="w-full py-3 mt-5 mb-3 bg-[#1CADA3] border border-slate-200 text-white rounded-xl text-[14px] font-bold flex items-center justify-center gap-2">
                                             <ShieldCheck size={12} /> Check Aadhaar PAN link status
                                         </button>
                                         <div className="flex items-start gap-2 p-3 bg-amber-50 border mb-5 border-amber-100 rounded-xl text-amber-700 text-[11px] font-bold leading-tight">

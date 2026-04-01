@@ -128,9 +128,9 @@ export const AdminService = {
 
   // Fetch DSA List 
   dsaList: async (params?: { page?: number; limit?: number; search?: string }) => {
-  const response = await api.get("/api/admin/dsalist", { params });
-  return response.data;
-},
+    const response = await api.get("/api/admin/dsalist", { params });
+    return response.data;
+  },
 
 
   contactusData: async (formData: EnquiryPayload = {}) => {
@@ -194,8 +194,8 @@ export const AdminService = {
   },
 
   // 🔹 Get Unassigned DSAs/Leads
-  getUnassignedDsas: async () => {
-    const response = await api.get("/api/admin/unassigned-dsas");
+  getUnassignedDsas: async (params?: { limit?: number; offset: number; search?: string }) => {
+    const response = await api.get(`/api/admin/unassigned-dsas`, { params });
     return response.data;
   },
 
@@ -266,41 +266,41 @@ export const AdminService = {
   },
 
 
- // Updated to accept pagination and search params
+  // Updated to accept pagination and search params
   getAllDetailLeads: async (params?: { page?: number; limit?: number; search?: string }) => {
     const response = await api.get("/api/admin/get-all-detail-leads", { params });
     return response.data;
   },
 
   exportDetailLeads: async () => {
-  return await api.get("/api/admin/get-all-detail-leads/export", {
-    responseType: "blob",
-    headers: {
-      Accept: "text/csv",
-    },
-  });
-},
+    return await api.get("/api/admin/get-all-detail-leads/export", {
+      responseType: "blob",
+      headers: {
+        Accept: "text/csv",
+      },
+    });
+  },
   // Update a Detailed Lead
   updateDetailLead: async (id: number | string, payload: any) => {
     const response = await api.put(`/api/admin/get-all-detail-leads/${id}`, payload);
     return response.data;
   },
 
-// 🔹 TDS Management APIs
-   getTDSData: async (params?: { page?: number; limit?: number; search?: string }) => {
+  // 🔹 TDS Management APIs
+  getTDSData: async (params?: { page?: number; limit?: number; search?: string }) => {
     const response = await api.get("/api/admin/tds/data", { params });
     return response.data;
   },
 
- // Add this inside the AdminService object in adminService.ts
+  // Add this inside the AdminService object in adminService.ts
   exportTDS: async () => {
     return await api.get("/api/admin/tds/download");
   },
 
-   uploadTDS: async (file: File) => {
+  uploadTDS: async (file: File) => {
     const formData = new FormData();
     formData.append("file", file); // Backend expects the file in the 'file' field
-    
+
     const res = await api.post("/api/admin/tds/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -309,9 +309,19 @@ export const AdminService = {
     return res.data;
   },
 
-getDSAKycStatus: async (params?: { page?: number; limit?: number; search?: string }) => {
-  const response = await api.get("/api/admin/get-dsa-kyc-status", { params });
-  return response.data;
-},
+  getDSAKycStatus: async (params?: { page?: number; limit?: number; search?: string }) => {
+    const response = await api.get("/api/admin/get-dsa-kyc-status", { params });
+    return response.data;
+  },
+
+  updateDSAKycStatus: async (user_id: number, payload: any) => {
+    const res = await api.put(`/api/admin/update-dsa-kyc-status/${user_id}`, payload);
+    return res.data;
+  },
+
+  getAssignedDsas: async (params?: { limit?: number; offset: number; search?: string }) => {
+    const response = await api.get(`/api/admin/assigned-dsas`, { params });
+    return response.data;
+  },
 };
 
