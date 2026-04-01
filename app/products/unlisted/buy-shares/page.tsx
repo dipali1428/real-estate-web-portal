@@ -636,6 +636,7 @@ const BuyShares: React.FC = () => {
         </div>
 
         {/* COMPANIES GRID */}
+
         <div className="relative">
           <div className="overflow-y-auto max-h-[800px] pr-2 custom-scrollbar">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
@@ -667,6 +668,14 @@ const BuyShares: React.FC = () => {
                   </div>
 
                   <h3 className="text-xl font-bold text-gray-900 mb-1">{company.name}</h3>
+                  
+                  {/* PRICE DISPLAY - ADDED HERE */}
+                  <div className="mb-4">
+                    <span className="text-2xl font-bold text-[#10b981]">
+                      ₹{company.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  
                   <div className="text-sm text-gray-500 mb-4">{company.category}</div>
 
                   <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
