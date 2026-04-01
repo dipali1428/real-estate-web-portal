@@ -636,7 +636,6 @@ const BuyShares: React.FC = () => {
         </div>
 
         {/* COMPANIES GRID */}
-
         <div className="relative">
           <div className="overflow-y-auto max-h-[800px] pr-2 custom-scrollbar">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
@@ -645,33 +644,34 @@ const BuyShares: React.FC = () => {
                   key={company.id}
                   className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-6 flex flex-col items-center text-center h-full"
                 >
-                  <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 border-2 border-gray-100 shadow-sm">
+                  {/* RECTANGULAR IMAGE CONTAINER - CHANGED FROM CIRCLE */}
+                  <div className="w-full h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100 shadow-sm overflow-hidden">
                     {company.logo ? (
                       <img 
                         src={company.logo} 
-                        className="w-10 h-10 object-contain" 
+                        className="w-full h-full object-contain p-3" 
                         alt={company.name}
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';
                           const parent = (e.target as HTMLImageElement).parentElement;
                           if (parent) {
                             const span = document.createElement('span');
-                            span.className = 'text-xl font-bold text-[#2076C7]';
+                            span.className = 'text-2xl font-bold text-[#2076C7]';
                             span.textContent = company.name.charAt(0);
                             parent.appendChild(span);
                           }
                         }}
                       />
                     ) : (
-                      <span className="text-xl font-bold text-[#2076C7]">{company.name.charAt(0)}</span>
+                      <span className="text-3xl font-bold text-[#2076C7]">{company.name.charAt(0)}</span>
                     )}
                   </div>
 
                   <h3 className="text-xl font-bold text-gray-900 mb-1">{company.name}</h3>
                   
-                  {/* PRICE DISPLAY - ADDED HERE */}
+                  {/* PRICE DISPLAY */}
                   <div className="mb-4">
-                    <span className="text-2xl font-bold text-[#10b981]">
+                    <span className="text-2xl font-bold text-[#2076C7]">
                       ₹{company.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
@@ -785,9 +785,10 @@ const BuyShares: React.FC = () => {
             {/* HEADER */}
             <div className="bg-white border-b border-gray-100 p-6 flex items-start justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-xl bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm">
+                {/* RECTANGULAR IMAGE CONTAINER - CHANGED FROM CIRCLE */}
+                <div className="w-20 h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
                   {detailCompany.logo ? (
-                    <img src={detailCompany.logo} className="w-10 h-10 object-contain" alt={detailCompany.name} />
+                    <img src={detailCompany.logo} className="w-full h-full object-contain p-2" alt={detailCompany.name} />
                   ) : (
                     <span className="text-2xl font-bold text-[#2076C7]">{detailCompany.name.charAt(0)}</span>
                   )}

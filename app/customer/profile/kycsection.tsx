@@ -11,6 +11,40 @@ const maskAadhaar = (num: string) => (num && num.length >= 12) ? "•••• �
 const maskAccount = (num: string) => num ? "•".repeat(Math.max(0, num.length - 4)) + num.slice(-4) : "";
 const maskIFSC = (ifsc: string) => ifsc ? ifsc.slice(0, 4) + "••••" + ifsc.slice(-3) : "";
 
+// Helper function to format date of birth from YYYY-MM-DD to DD/MM/YYYY for display
+const formatDOBForDisplay = (dateStr: string) => {
+  if (!dateStr) return '';
+  // If already in DD/MM/YYYY format
+  if (dateStr.includes('/')) return dateStr;
+  // If in YYYY-MM-DD format
+  if (dateStr.includes('-')) {
+    const [year, month, day] = dateStr.split('-');
+    return `${day}/${month}/${year}`;
+  }
+  return dateStr;
+};
+
+// Helper function to format date of birth for input (DD/MM/YYYY)
+const formatDOBInput = (value: string) => {
+  let formatted = value.replace(/\D/g, '');
+  if (formatted.length >= 3 && formatted.length <= 4) {
+    formatted = `${formatted.slice(0, 2)}/${formatted.slice(2)}`;
+  } else if (formatted.length > 4) {
+    formatted = `${formatted.slice(0, 2)}/${formatted.slice(2, 4)}/${formatted.slice(4, 8)}`;
+  }
+  return formatted;
+};
+
+// Helper function to convert DD/MM/YYYY to YYYY-MM-DD for API
+const convertDOBForAPI = (dobStr: string) => {
+  if (!dobStr) return '';
+  if (dobStr.includes('/')) {
+    const [day, month, year] = dobStr.split('/');
+    return `${year}-${month}-${day}`;
+  }
+  return dobStr;
+};
+
 export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complete, isStep3Complete, onAddressUpdate }: any) => {
   const [loadingSec, setLoadingSec] = useState<string | null>(null);
   
@@ -54,10 +88,27 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
       if (profile.kycDetails?.demat_details) {
         setDematDetails(profile.kycDetails.demat_details);
       }
+      
+      // Initialize PAN details with proper DOB formatting
+      let initialDOB = profile.date_of_birth || '';
+      
+      // If there's Aadhaar KYC data with DOB, use that as priority
+      if (profile.kycDetails?.aadhaar_kyc_data?.date_of_birth) {
+        const aadhaarDob = profile.kycDetails.aadhaar_kyc_data.date_of_birth; // Format: "13-11-2001"
+        if (aadhaarDob && aadhaarDob.includes('-')) {
+          const [day, month, year] = aadhaarDob.split('-');
+          initialDOB = `${day}/${month}/${year}`; // Convert to DD/MM/YYYY for display
+        }
+      } else if (initialDOB && initialDOB.includes('-')) {
+        // Convert YYYY-MM-DD to DD/MM/YYYY for display
+        const [year, month, day] = initialDOB.split('-');
+        initialDOB = `${day}/${month}/${year}`;
+      }
+      
       setPanDetails({ 
         pan: profile.pan || '', 
         name_as_per_pan: profile.name_as_per_pan || profile.name || '', 
-        date_of_birth: profile.date_of_birth || '' 
+        date_of_birth: initialDOB
       });
       setAadhaarNum(profile.kycDetails.aadhaar_number || '');
       setBankDetails({
@@ -78,13 +129,19 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
     
     setLoadingSec('pan');
     try {
+      // Convert DOB from DD/MM/YYYY to YYYY-MM-DD for API
+      const formattedDOB = convertDOBForAPI(panDetails.date_of_birth);
+      
       const payload = {
-        ...panDetails,
-        date_of_birth: panDetails.date_of_birth
+        pan: panDetails.pan,
+        name_as_per_pan: panDetails.name_as_per_pan,
+        date_of_birth: formattedDOB
       };
 
       await customerService.verifyPan(payload);
       toast.success("PAN Verified Successfully!");
+      
+      // Refresh profile data to get updated verification status
       onRefresh();
     } catch (e: any) {
       toast.error(e.response?.data?.message || "PAN verification failed");
@@ -115,7 +172,7 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
 
   // Helper function to extract address from response
   const extractAddressFromResponse = (response: any): string | null => {
-    console.log('Full response structure:', JSON.stringify(response, null, 2)); // Debug log
+    console.log('Full response structure:', JSON.stringify(response, null, 2));
     
     // Try different possible paths for address
     if (response.data?.aadhaar_kyc_data?.full_address) {
@@ -162,10 +219,29 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
         aadhaar_number: aadhaarNum 
       });
       
-      console.log('Aadhaar verification response:', response); // Debug log
+      console.log('Aadhaar verification response:', response);
       
       // Extract address from response
       const aadhaarAddress = extractAddressFromResponse(response);
+      
+      // Extract DOB from Aadhaar response if available
+      let aadhaarDob = null;
+      if (response.data?.aadhaar_kyc_data?.date_of_birth) {
+        aadhaarDob = response.data.aadhaar_kyc_data.date_of_birth;
+      } else if (response.aadhaar_kyc_data?.date_of_birth) {
+        aadhaarDob = response.aadhaar_kyc_data.date_of_birth;
+      }
+      
+      // If DOB from Aadhaar is available, update the PAN details with it
+      if (aadhaarDob && aadhaarDob.includes('-')) {
+        const [day, month, year] = aadhaarDob.split('-');
+        const formattedDob = `${day}/${month}/${year}`;
+        setPanDetails(prev => ({
+          ...prev,
+          date_of_birth: formattedDob
+        }));
+        toast.success("Date of Birth fetched from Aadhaar!");
+      }
       
       if (aadhaarAddress && onAddressUpdate) {
         console.log('Extracted address:', aadhaarAddress);
@@ -246,17 +322,6 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
     }
   };
 
-  // Helper function to format date of birth
-  const formatDOB = (value: string) => {
-    let formatted = value.replace(/\D/g, '');
-    if (formatted.length >= 3 && formatted.length <= 4) {
-      formatted = `${formatted.slice(0, 2)}/${formatted.slice(2)}`;
-    } else if (formatted.length > 4) {
-      formatted = `${formatted.slice(0, 2)}/${formatted.slice(2, 4)}/${formatted.slice(4, 8)}`;
-    }
-    return formatted;
-  };
-
   // Get display value with masking if verified
   const getPanDisplayValue = () => {
     if (profile?.pan_verified && panDetails.pan) {
@@ -284,6 +349,14 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
       return maskIFSC(bankDetails.ifsc_code);
     }
     return bankDetails.ifsc_code || "";
+  };
+
+  // Get DOB display value (always show the actual DOB, not masked)
+  const getDOBDisplayValue = () => {
+    if (panDetails.date_of_birth) {
+      return panDetails.date_of_birth;
+    }
+    return "";
   };
 
   return (
@@ -344,9 +417,9 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
                   disabled={profile?.pan_verified}
                   placeholder="DD/MM/YYYY"
                   maxLength={10}
-                  value={panDetails.date_of_birth || ""}
+                  value={getDOBDisplayValue()}
                   onChange={(e) => {
-                    const formatted = formatDOB(e.target.value);
+                    const formatted = formatDOBInput(e.target.value);
                     setPanDetails({ ...panDetails, date_of_birth: formatted });
                   }}
                   className="flex-1 px-3 py-2 rounded-xl font-bold text-slate-700 border border-slate-200 text-sm outline-none focus:border-[#1CADA3] disabled:bg-slate-100 disabled:text-slate-500"
@@ -400,7 +473,7 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
                   placeholder="Enter 6-digit OTP"
                   value={aadhaarOtp || ""}
                   onChange={(e) => setAadhaarOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold focus:border-[#1CADA3] focus:outline-none"
+                  className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none"
                   maxLength={6}
                 />
                 <button 
@@ -466,33 +539,33 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Bank Name</label>
+            <label className="text-[10px] font-black text-slate-700 uppercase tracking-wider">Bank Name</label>
             <input 
               disabled={profile?.bank_verified} 
               value={bankDetails.bank_name} 
               onChange={(e) => setBankDetails({...bankDetails, bank_name: e.target.value.toUpperCase()})} 
-              className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
+              className="w-full px-4 py-2 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
               placeholder="Enter bank name"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Account Number</label>
+            <label className="text-[10px] font-black text-slate-700 uppercase tracking-wider">Account Number</label>
             <input 
               disabled={profile?.bank_verified} 
               value={getBankAccountDisplayValue()} 
               onChange={(e) => setBankDetails({...bankDetails, bank_account_number: e.target.value.replace(/\D/g, '')})} 
-              className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
+              className="w-full px-4 py-2 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
               placeholder="Enter account number"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">IFSC Code</label>
+            <label className="text-[10px] font-black text-slate-700 uppercase tracking-wider">IFSC Code</label>
             <div className="flex gap-2">
               <input 
                 disabled={profile?.bank_verified} 
                 value={getIFSCDisplayValue()} 
                 onChange={(e) => setBankDetails({...bankDetails, ifsc_code: e.target.value.toUpperCase()})} 
-                className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
+                className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                 placeholder="Enter IFSC code"
                 maxLength={11}
               />
