@@ -200,6 +200,11 @@ export const sidebarLinks = {
                     icon: <Landmark className="h-4 w-4 text-neutral-700" />,
                     href: "/customer/pms",
                 },
+                {
+                    label: "Bonds",
+                    icon: <Landmark className="h-4 w-4 text-neutral-700" />,
+                    href: "/customer/bonds",
+                },
                 // {
                 //     label: "Mutual Funds Panel",
                 //     icon: <Users className="h-4 w-4 text-neutral-700" />,
