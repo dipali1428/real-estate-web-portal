@@ -4,19 +4,24 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { properties as staticProperties, Property } from '../data/properties';
+import { useModal } from "../../../context/ModalContext";
+import { useWishlist } from "@/app/context/WishlistContext";
+import toast from 'react-hot-toast';
 import {
-    Filter, Search, ChevronRight, Share2, Calculator,
+    Filter, Search, ShoppingCart, ChevronRight, Share2, Calculator,
     Info, Target, ExternalLink, Download, TrendingUp,
-    Clock, Shield, MapPin, X, Star, CheckCircle, Wallet, ChevronDown, ChevronUp, HelpCircle, Plus, Minus, IndianRupee, MinusSquare, PlusSquare, ChevronLeft, Layout, Zap
+    Clock, Shield, MapPin, X, Star, CheckCircle, Wallet, ChevronDown, ChevronUp, HelpCircle, Plus, Minus, IndianRupee, MinusSquare, PlusSquare, ChevronLeft, Layout, Zap, Bookmark
 } from 'lucide-react';
 
 
 
 interface PropertiesSectionProps {
     onPropertySelect?: (id: string) => void;
+    showOnlyLive?: boolean;
 }
-
-const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
+const PropertiesSection = ({ onPropertySelect, showOnlyLive = false }: PropertiesSectionProps) => {
+    const { openApplyNow } = useModal();
+    const { toggleWishlist, isInWishlist } = useWishlist();
     const [filters, setFilters] = useState({
         search: '',
         type: '',
@@ -148,22 +153,45 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
         setFilters(prev => ({ ...prev, [field]: value }));
     };
 
+    const handleToggleWishlist = (property: Property) => {
+        toggleWishlist({
+            id: property.id,
+            category: 'real-estate',
+            name: property.title,
+            logo: property.image,
+            addedDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+            keyMetrics: {
+                price: property.price,
+                location: property.location,
+                expectedAppreciation: property.irr_percentage,
+                rentalYield: property.yield_percentage,
+                risk: 'Moderate',
+                developer: 'Infinity Arth',
+            }
+        });
+        if (!isInWishlist(property.id)) {
+            toast.success("Added to saved properties");
+        }
+    };
+
     const clearFilters = () => {
         setFilters({ search: '', type: '', minPrice: '', maxPrice: '' });
     };
 
     return (
         <div id="properties" className="animate-fade-in font-sans">
-            <div className="py-8 md:py-12 mb-6 md:mb-8 bg-white">
-                <div className="max-w-7xl mx-auto px-4 text-center">
-                    <h1 className="text-4xl md:text-5xl font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                        Real Estate Investments
-                    </h1>
-                    <p className="text-xl text-slate-500 max-w-2xl mx-auto relative z-10">
-                        Tangible property investments for wealth creation. Discover our curated collection of premium properties in Pune.
-                    </p>
+            {!showOnlyLive && (
+                <div className="py-8 md:py-12 mb-6 md:mb-8 bg-white">
+                    <div className="max-w-7xl mx-auto px-4 text-center">
+                        <h1 className="text-4xl md:text-5xl font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                            Real Estate Investments
+                        </h1>
+                        <p className="text-xl text-slate-500 max-w-2xl mx-auto relative z-10">
+                            Tangible property investments for wealth creation. Discover our curated collection of premium properties in Pune.
+                        </p>
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className="max-w-7xl mx-auto px-4 lg:px-8">
                 {/* Section: Live Opportunities */}
@@ -242,11 +270,26 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                                     <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-xs font-bold uppercase tracking-wider text-teal-600 border border-teal-100">
                                         {property.type.split(' ')[0]}
                                     </div>
+                                    {showOnlyLive && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleToggleWishlist(property);
+                                            }}
+                                            className={`absolute top-4 right-4 p-1.5 rounded-lg backdrop-blur-md transition-all duration-300 shadow-sm border ${
+                                                isInWishlist(property.id)
+                                                ? 'bg-[#2076C7] text-white border-[#2076C7] scale-110'
+                                                : 'bg-white/90 text-slate-400 border-slate-200 hover:text-[#2076C7] hover:border-[#2076C7] hover:bg-white'
+                                            }`}
+                                        >
+                                            <Bookmark size={16} fill={isInWishlist(property.id) ? "currentColor" : "none"} strokeWidth={2} />
+                                        </button>
+                                    )}
                                 </div>
 
                                 <div className="p-5 flex-1 flex flex-col">
                                     <div className="mb-4">
-                                        <h3 className="text-lg font-bold mb-1 line-clamp-1 text-brand-gradient">{property.title}</h3>
+                                        <h3 className="text-lg font-black mb-1 line-clamp-1 text-slate-900 uppercase tracking-tight">{property.title}</h3>
                                         <div className="flex items-center gap-1 text-slate-500 text-xs">
                                             <MapPin size={12} />
                                             <span className="line-clamp-1">{property.location}</span>
@@ -274,22 +317,29 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                                         </div>
                                     </div>
 
-                                    <div className="mt-auto flex justify-between items-center border-t border-slate-100 pt-4 gap-2">
-                                        <div className="flex flex-col">
-                                            <p className="text-[10px] text-slate-400">Total Value</p>
-                                            <span className="text-lg font-extrabold text-slate-800">
-                                                ₹{property.price.toLocaleString('en-IN')}
-                                                {property.price && (
-                                                    <span className="text-black font-bold text-sm leading-none shrink-0 cursor-help pt-1" title="Star Marked — Potential for future value appreciation">*</span>
-                                                )}
-                                            </span>
-
+                                    <div className="mt-auto flex flex-col gap-3 border-t border-slate-100 pt-4">
+                                        <div className="flex justify-between items-center gap-2">
+                                            <div className="flex flex-col">
+                                                <p className="text-[10px] text-slate-400">Total Value</p>
+                                                <span className="text-lg font-extrabold text-slate-800">
+                                                    ₹{property.price.toLocaleString('en-IN')}
+                                                    {property.price && (
+                                                        <span className="text-black font-bold text-sm leading-none shrink-0 cursor-help pt-1" title="Star Marked — Potential for future value appreciation">*</span>
+                                                    )}
+                                                </span>
+                                            </div>
+                                            <button
+                                                onClick={() => onPropertySelect && onPropertySelect(String(property.id))}
+                                                className="border-2 border-[#2076C7] text-[#2076C7] px-4 py-2 text-xs rounded-xl shrink-0 font-bold hover:bg-blue-50 transition-all"
+                                            >
+                                                Details
+                                            </button>
                                         </div>
                                         <button
-                                            onClick={() => onPropertySelect && onPropertySelect(String(property.id))}
-                                            className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white px-5 py-2.5 text-xs rounded-xl shrink-0 font-semibold shadow-md hover:shadow-lg transition-all"
+                                            onClick={() => openApplyNow(property.title)}
+                                            className="w-full py-3 text-xs font-black rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md hover:shadow-lg transition-all"
                                         >
-                                            View Details
+                                            Apply Now
                                         </button>
                                     </div>
                                 </div>
@@ -306,7 +356,9 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                 </div>
 
 
-                {/* Section: How We Deliver Results */}
+{!showOnlyLive && (
+                    <>
+                        {/* Section: How We Deliver Results */}
                 <section className="py-12 md:py-16 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 bg-slate-50 rounded-[3rem] mb-12">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center mb-16">
@@ -717,7 +769,9 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
                                 </button>
                             </div>
                     </div>
-                </section>
+                        </section>
+                    </>
+                )}
             </div>
 
             {/* Feedback Form Modal */}
@@ -808,6 +862,3 @@ const PropertiesSection = ({ onPropertySelect }: PropertiesSectionProps) => {
 };
 
 export default PropertiesSection;
-
-
-

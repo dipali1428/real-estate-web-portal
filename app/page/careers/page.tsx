@@ -449,7 +449,6 @@ export default function CareersContent() {
             </h2>
             <p className="text-[#666666]">Straightforward and transparent steps to join our team.</p>
           </div>
-          
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
             <ProcessStep num="1" title="Application" desc="HR reviews your qualifications against role requirements." />
             <ProcessStep num="2" title="Screening" desc="A brief conversation to discuss your interest." />
@@ -513,3 +512,6 @@ function ProcessStep({ num, title, desc }: { num: string, title: string, desc: s
     </div>
   );
 }
+
+
+
