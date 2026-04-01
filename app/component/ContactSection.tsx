@@ -4,12 +4,16 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { AuthService } from "../services/authService";
 
-const ContactSection = () => {
+interface ContactSectionProps {
+  productName?: string;
+}
+
+const ContactSection = ({ productName }: ContactSectionProps) => {
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
-    message: "",
+    message: productName ? `I am interested in applying for ${productName}. Please provide more details.` : "",
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
@@ -312,9 +316,14 @@ const ContactSection = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 rounded-xl font-semibold shadow-md hover:shadow-[0_6px_20px_rgba(28,173,163,0.4)] transition cursor-pointer"
+          className="group relative w-full px-10 py-4 rounded-lg font-semibold text-lg text-white shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+          style={{ background: "linear-gradient(to right, #1CADA3, #2076C7)" }}
         >
-          {loading ? "Sending..." : "Send Message"}
+          <div
+            className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"
+            style={{ background: "linear-gradient(to right, #189B8D, #1A68B0)" }}
+          ></div>
+          <span className="relative z-10">{loading ? "Sending..." : "Send Message"}</span>
         </button>
 
         {error && (

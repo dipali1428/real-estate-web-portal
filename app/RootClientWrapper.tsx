@@ -5,6 +5,7 @@ import { useEffect, Suspense } from "react";
 import Header from "./component/Header";
 import Footer from "./component/Footer";
 import { ModalProvider, useModal } from "./context/ModalContext";
+import { WishlistProvider } from "./context/WishlistContext";
 
 function ReferralHandler() {
   const searchParams = useSearchParams();
@@ -42,6 +43,7 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
 
   return (
     <ModalProvider>
+      <WishlistProvider>
 
       {/* ✅ Referral handler runs globally */}
       <Suspense fallback={null}>
@@ -74,7 +76,7 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
         !isHRProfile &&
         !isDirector &&
         !isBranchHead && <Footer />}
-
+</WishlistProvider>
     </ModalProvider>
   );
 }

@@ -195,7 +195,7 @@ const BankList = () => {
                                                         <td className="py-5 px-4 text-center">
                                                             <button
                                                                 onClick={openLogin}
-                                                                className="text-white font-bold text-sm px-6 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95"
+                                                                className="text-white font-bold text-sm px-6 py-2.5 rounded-2xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95 whitespace-nowrap"
                                                                 style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
                                                             >
                                                                 Apply Now
@@ -257,7 +257,7 @@ const BankList = () => {
 
                                                 <button
                                                     onClick={openLogin}
-                                                    className="w-full text-white font-bold text-sm py-3 rounded-xl shadow-md active:scale-[0.98] transition-all"
+                                                    className="w-full text-white font-bold text-sm py-3 rounded-2xl shadow-md active:scale-[0.98] transition-all"
                                                     style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
                                                 >
                                                     Apply Now
@@ -301,7 +301,7 @@ const BankList = () => {
                                 <button
                                     onClick={() => setIsCompareModalOpen(true)}
                                     disabled={selectedBanks.length < 2}
-                                    className={`font-bold text-xs md:text-sm px-6 md:px-8 py-3 rounded-xl shadow-lg transition-all transform w-full sm:w-auto ${selectedBanks.length < 2
+                                    className={`font-bold text-xs md:text-sm px-6 md:px-8 py-3 rounded-2xl shadow-lg transition-all transform w-full sm:w-auto ${selectedBanks.length < 2
                                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
                                         : 'text-white hover:-translate-y-0.5 active:scale-95'
                                         }`}
@@ -432,7 +432,7 @@ const BankList = () => {
                                                     <td key={i} className={`p-4 md:p-6 text-center ${i !== selectedBanks.length - 1 ? 'border-r border-gray-200' : ''}`}>
                                                         <button
                                                             onClick={openLogin}
-                                                            className="w-full text-white font-bold text-xs md:text-base px-3 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
+                                                            className="w-full text-white font-bold text-xs md:text-base px-3 md:px-6 py-2 md:py-3 rounded-2xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
                                                             style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
                                                         >
                                                             Apply

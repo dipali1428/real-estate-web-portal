@@ -10,14 +10,14 @@ import {
 } from "lucide-react";
 
 const documents = [
-    { title: "Aadhar Card (e-KYC)", icon: <User size={20} />, color: "text-teal-600", bg: "bg-teal-50" },
-    { title: "PAN Card (Mandatory)", icon: <Briefcase size={20} />, color: "text-teal-600", bg: "bg-teal-50" },
-    { title: "Bank Passbook/Statement", icon: <FileCheck size={20} />, color: "text-teal-600", bg: "bg-teal-50" },
-    { title: "Identity Documentation", icon: <User size={20} />, color: "text-teal-600", bg: "bg-teal-50" },
-    { title: "Address Proof (Utility Bill)", icon: <MapPin size={20} />, color: "text-teal-600", bg: "bg-teal-50" },
-    { title: "Nominee Details", icon: <User size={20} />, color: "text-teal-600", bg: "bg-teal-50" },
-    { title: "Recent Digital Photograph", icon: <User size={20} />, color: "text-teal-600", bg: "bg-teal-50" },
-    { title: "Form 15G/15H (For TDS)", icon: <FileCheck size={20} />, color: "text-teal-600", bg: "bg-teal-50" }
+    { title: "Aadhar Card (e-KYC)", icon: <User size={20} />, color: "text-[#1CADA3]", bg: "bg-[#1CADA3]/10" },
+    { title: "PAN Card (Mandatory)", icon: <Briefcase size={20} />, color: "text-[#1CADA3]", bg: "bg-[#1CADA3]/10" },
+    { title: "Bank Passbook/Statement", icon: <FileCheck size={20} />, color: "text-[#1CADA3]", bg: "bg-[#1CADA3]/10" },
+    { title: "Identity Documentation", icon: <User size={20} />, color: "text-[#1CADA3]", bg: "bg-[#1CADA3]/10" },
+    { title: "Address Proof (Utility Bill)", icon: <MapPin size={20} />, color: "text-[#1CADA3]", bg: "bg-[#1CADA3]/10" },
+    { title: "Nominee Details", icon: <User size={20} />, color: "text-[#1CADA3]", bg: "bg-[#1CADA3]/10" },
+    { title: "Recent Digital Photograph", icon: <User size={20} />, color: "text-[#1CADA3]", bg: "bg-[#1CADA3]/10" },
+    { title: "Form 15G/15H (For TDS)", icon: <FileCheck size={20} />, color: "text-[#1CADA3]", bg: "bg-[#1CADA3]/10" }
 ];
 
 export default function FDEligibility() {
