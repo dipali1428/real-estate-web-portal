@@ -1,9 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { Bond } from "../data/bondsData";
 import { TrendingUp, ShieldCheck, Calendar, Clock, Lock, Award } from "lucide-react";
 import { toast } from "react-hot-toast";
+import BondDetailModal from "./BondDetailModal";
 
 interface Props {
     bond: Bond;
@@ -11,6 +13,8 @@ interface Props {
 }
 
 export default function BondCard({ bond, onInvest }: Props) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const handleInvest = () => {
         if (onInvest) {
             onInvest(bond.id);
@@ -36,15 +40,40 @@ export default function BondCard({ bond, onInvest }: Props) {
             className="bg-white rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 hover:border-blue-200 hover:shadow-[0_20px_50px_-12px_rgba(32,118,199,0.1)] transition-all duration-500 group flex flex-col h-full relative overflow-hidden p-5 md:p-8 font-sans"
         >
             {/* Top Badges */}
-            <div className="flex gap-2 mb-4">
+            <div className="flex flex-wrap gap-2 mb-4">
                 {bond.featured && (
                     <span className="bg-gradient-to-r from-[#1CADA3] to-[#148079] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm">
                         <Award size={12} /> Top Rated
                     </span>
                 )}
+                {bond.category === "PSU" && (
+                    <span className="bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 border border-blue-100">
+                        <ShieldCheck size={12} /> PSU
+                    </span>
+                )}
                 {bond.type === "Secured" && (
                     <span className="bg-teal-50 text-teal-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 border border-teal-100">
                         <Lock size={12} /> Secured
+                    </span>
+                )}
+                {bond.type === "Tax-Free" && (
+                    <span className="bg-amber-50 text-amber-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 border border-amber-100">
+                        <TrendingUp size={12} /> Tax Free
+                    </span>
+                )}
+                {bond.type === "Gold" && (
+                    <span className="bg-yellow-50 text-yellow-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 border border-yellow-200">
+                        <Award size={12} /> SGB
+                    </span>
+                )}
+                {bond.category === "Municipal" && (
+                    <span className="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 border border-indigo-100">
+                        <ShieldCheck size={12} /> Municipal
+                    </span>
+                )}
+                {bond.category === "GSec" && (
+                    <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 border border-emerald-100">
+                        <Award size={12} /> Sovereign
                     </span>
                 )}
             </div>
@@ -105,18 +134,33 @@ export default function BondCard({ bond, onInvest }: Props) {
                     <span className="text-sm font-bold text-slate-400 uppercase">Min Investment</span>
                     <span className="text-base font-extrabold text-[#2076C7]">{bond.minInvestment}</span>
                 </div>
-                <button
-                    onClick={handleInvest}
-                    suppressHydrationWarning={true}
-                    className="relative w-full text-white px-10 py-3.5 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group"
-                    style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
-                >
-                    <span className="relative z-10 flex items-center justify-center gap-1">
-                        Invest Now
-                    </span>
-                    <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
-                </button>
+                <div className="flex gap-2 sm:gap-3">
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex-1 px-4 py-3.5 border-2 hover:border-[#2076C7] text-slate-500 hover:text-[#2076C7] rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-widest hover:bg-blue-50 transition-all duration-300 whitespace-nowrap group-hover:border-blue-200"
+                    >
+                        View Detail
+                    </button>
+                    <button
+                        onClick={handleInvest}
+                        suppressHydrationWarning={true}
+                        className="relative flex-[1.5] text-white px-4 py-3.5 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group"
+                        style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
+                    >
+                        <span className="relative z-10 flex items-center justify-center gap-1">
+                            Invest Now
+                        </span>
+                        <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
+                    </button>
+                </div>
             </div>
+
+            <BondDetailModal 
+                bond={bond} 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                onInvest={onInvest}
+            />
         </motion.div>
     );
 }

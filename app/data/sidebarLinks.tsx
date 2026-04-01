@@ -34,6 +34,9 @@ import {
     Receipt,
     BookUp,
     WalletCards,
+    Building,
+    icons,
+    Landmark
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -175,6 +178,28 @@ export const sidebarLinks = {
                         },
                     ],
                 },
+                {
+                    label: "Mutual Funds",
+                    icon: <Landmark className="h-4 w-4 text-neutral-700" />,
+                    href: "/customer/mutual-funds",
+                },
+                {
+                    label: "Fixed Deposit ",
+                    icon: <Landmark className="h-4 w-4 text-neutral-700" />,
+                    href: "/customer/FD",
+                },
+
+                {
+                    label: "AIF ",
+                    icon: <Landmark className="h-4 w-4 text-neutral-700" />,
+                    href: "/customer/aif",
+                },
+                
+                {
+                    label: "PMS",
+                    icon: <Landmark className="h-4 w-4 text-neutral-700" />,
+                    href: "/customer/pms",
+                },
                 // {
                 //     label: "Mutual Funds Panel",
                 //     icon: <Users className="h-4 w-4 text-neutral-700" />,
@@ -271,9 +296,11 @@ export const sidebarLinks = {
                 //         },
                 //     ],
                 // },
-                // {
-                //     label: "Real Estate Panel",
-                //     icon: <Users className="h-4 w-4 text-neutral-700" />,
+                   {
+                         label: "Real Estate ",
+                         href: "/customer/real-estate",
+                         icon: <Building2 className="h-4 w-4 text-neutral-700" />,
+                   },
                 //     children: [
                 //         {
                 //             label: "Real Estate1",

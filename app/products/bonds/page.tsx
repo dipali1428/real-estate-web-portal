@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import BondsHero from "./components/BondsHero";
-import MarketSnapshot from "./components/MarketSnapshot";
 import FeaturedCollections from "./components/FeaturedCollections";
-import MarketUpdates from "./components/MarketUpdates";
 import PrivateBonds from "./components/PrivateBonds";
 import StateGuaranteedBonds from "./components/StateGuaranteedBonds";
 import RiskReturnChart from "./components/RiskReturnChart";
@@ -22,7 +20,11 @@ import AllBondsListingView from "./components/views/AllBondsListingView";
 
 import { useModal } from "../../context/ModalContext";
 
-type ViewType = 'home' | 'details' | 'apply' | 'private' | 'state';
+import BondCategorySection from "./components/BondCategorySection";
+
+type ViewType = 'home' | 'details' | 'apply' | 'private' | 'state' | 'psu' | 'taxfree' | 'sgb' | 'municipal' | 'gsec';
+
+import MarketUpdates from "./components/MarketUpdates";
 
 export default function BondsPage() {
     const [view, setView] = useState<ViewType>('home');
@@ -84,16 +86,83 @@ export default function BondsPage() {
                 <>
                     <BondsHero />
                     <MarketUpdates />
-                    <MarketSnapshot />
                     <FeaturedCollections />
-                    <PrivateBonds 
-                        onInvest={handleInvestNow} 
-                        onViewAll={() => setView('private')}
-                    />
-                    <StateGuaranteedBonds 
-                        onInvest={handleInvestNow} 
-                        onViewAll={() => setView('state')}
-                    />
+                    <div id="private-section">
+                        <PrivateBonds 
+                            onInvest={handleInvestNow} 
+                            onViewAll={() => setView('private')}
+                        />
+                    </div>
+
+                    <div id="state-section">
+                        <StateGuaranteedBonds 
+                            onInvest={handleInvestNow} 
+                            onViewAll={() => setView('state')}
+                        />
+                    </div>
+                    
+                    <div id="psu-section">
+                        <BondCategorySection 
+                            category="PSU"
+                            title="PSU Bonds"
+                            subtitle="PSU Bonds"
+                            badge="Public Sector"
+                            description="Explore highly secure bonds issued by Public Sector Undertakings like NABARD, IRFC, and REC."
+                            onInvest={handleInvestNow}
+                            onViewAll={() => setView('psu')}
+                        />
+                    </div>
+
+                    <div id="tax-free-section">
+                        <BondCategorySection 
+                            category="TaxFree"
+                            title="Tax-Free Bonds"
+                            subtitle="Tax-Free Bonds"
+                            badge="Tax Savings"
+                            description="Maximize your post-tax returns with bonds that offer 100% tax-free interest income."
+                            onInvest={handleInvestNow}
+                            onViewAll={() => setView('taxfree')}
+                            bgColor="bg-slate-50"
+                        />
+                    </div>
+
+                    <div id="sgb-section">
+                        <BondCategorySection 
+                            category="SGB"
+                            title="Sovereign Gold Bonds"
+                            subtitle="SGB"
+                            badge="Gold Investment"
+                            description="Invest in gold digitally with the safety of a sovereign guarantee and additional annual interest."
+                            onInvest={handleInvestNow}
+                            onViewAll={() => setView('sgb')}
+                        />
+                    </div>
+
+                    <div id="municipal-section">
+                        <BondCategorySection 
+                            category="Municipal"
+                            title="Municipal Bonds"
+                            subtitle="Municipal"
+                            badge="City Infrastructure"
+                            description="Invest in bonds issued by urban bodies and earn returns while supporting city development."
+                            onInvest={handleInvestNow}
+                            onViewAll={() => setView('municipal')}
+                            bgColor="bg-indigo-50/50"
+                        />
+                    </div>
+
+                    <div id="gsec-section">
+                        <BondCategorySection 
+                            category="GSec"
+                            title="Government Securities"
+                            subtitle="G-Sec"
+                            badge="Highest Safety"
+                            description="Backed directly by the central government, these bonds offer the highest form of safety for your investments."
+                            onInvest={handleInvestNow}
+                            onViewAll={() => setView('gsec')}
+                        />
+                    </div>
+
                     <RiskReturnChart />
                     <InvestmentSection />
                     <HowItWorks />
@@ -122,6 +191,46 @@ export default function BondsPage() {
             {view === 'state' && (
                 <AllBondsListingView 
                     category="StateGuaranteed" 
+                    onBack={handleBack} 
+                    onInvest={handleInvestNow}
+                />
+            )}
+
+            {view === 'psu' && (
+                <AllBondsListingView 
+                    category="PSU" 
+                    onBack={handleBack} 
+                    onInvest={handleInvestNow}
+                />
+            )}
+
+            {view === 'taxfree' && (
+                <AllBondsListingView 
+                    category="TaxFree" 
+                    onBack={handleBack} 
+                    onInvest={handleInvestNow}
+                />
+            )}
+
+            {view === 'sgb' && (
+                <AllBondsListingView 
+                    category="SGB" 
+                    onBack={handleBack} 
+                    onInvest={handleInvestNow}
+                />
+            )}
+
+            {view === 'municipal' && (
+                <AllBondsListingView 
+                    category="Municipal" 
+                    onBack={handleBack} 
+                    onInvest={handleInvestNow}
+                />
+            )}
+
+            {view === 'gsec' && (
+                <AllBondsListingView 
+                    category="GSec" 
                     onBack={handleBack} 
                     onInvest={handleInvestNow}
                 />

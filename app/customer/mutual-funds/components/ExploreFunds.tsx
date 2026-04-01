@@ -549,16 +549,7 @@ function FundCard({ fund, onViewDetails, onAddToCart, isInCart, isSaved, onToggl
       </div>
 
       <div className="space-y-3 mt-auto">
-        <button 
-          onClick={(e) => { e.stopPropagation(); onAddToCart(); }} 
-          className={`w-full py-4 text-xs font-black rounded-xl flex items-center justify-center gap-2 transition-all tracking-widest uppercase ${
-            isInCart 
-            ? "bg-emerald-50 text-emerald-600 border border-emerald-100" 
-            : "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20"
-          }`}
-        >
-          {isInCart ? <><Activity size={16}/> In Cart</> : <><ShoppingCart size={16}/> Add to Cart</>}
-        </button>
+      
         <button 
           onClick={(e) => { e.stopPropagation(); onInvest(); }} 
           className="w-full py-3 bg-white border-2 border-[#1CADA3] text-[#1CADA3] text-xs font-bold rounded-lg hover:bg-teal-50 transition-all tracking-wider uppercase flex items-center justify-center gap-2"

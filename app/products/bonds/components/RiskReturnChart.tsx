@@ -10,7 +10,7 @@ import {
 } from "chart.js";
 import { motion } from "framer-motion";
 import { ShieldCheck, Zap, TrendingUp } from "lucide-react";
-import { useIsMobile } from "../../../hooks/useIsMobile";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 ChartJS.register(LinearScale, PointElement, Tooltip, Legend);
 
