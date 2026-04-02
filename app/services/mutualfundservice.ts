@@ -1,6 +1,5 @@
 
-import mfApi from "./mutualfunds/mfApi";
-// app/services/mutualfundservice.ts
+import api from "./api";
 
 export interface AmfiFund {
   schemeCode: string;
@@ -60,7 +59,7 @@ export const mutualFundService = {
 
   searchFunds: async (query: string): Promise<AmfiFund[]> => {
     try {
-      const response = await mfApi.get<AmfiFund[]>("/products/investments/mutual-funds/search", {
+      const response = await api.get<AmfiFund[]>("/api/products/investments/mutual-funds/search", {
         params: { q: query },
       });
 
@@ -75,8 +74,8 @@ export const mutualFundService = {
     schemeCode: string | number
   ): Promise<FundDetails | null> => {
     try {
-      const response = await mfApi.get<FundDetails>(
-        `/products/investments/mutual-funds/details/${schemeCode}`
+      const response = await api.get<FundDetails>(
+        `/api/products/investments/mutual-funds/details/${schemeCode}`
       );
 
       return response.data;
@@ -85,13 +84,11 @@ export const mutualFundService = {
     }
   },
 
-  /**
-   * 🚀 Top Performing Funds
-   */
+  //  Top Performing Funds (Graph)
   getTopPerforming: async (): Promise<AmfiFund[]> => {
     try {
-      const response = await mfApi.get<AmfiFund[]>(
-        "/products/investments/mutual-funds/top-performing"
+      const response = await api.get<AmfiFund[]>(
+        "/api/products/investments/mutual-funds/top-performing"
       );
 
       return response.data || [];
@@ -102,36 +99,36 @@ export const mutualFundService = {
 
   getDashboardData: async (): Promise<DashboardData | null> => {
     try {
-      const response = await mfApi.get<DashboardData>("/products/investments/mutual-funds/dashboard");
+      const response = await api.get<DashboardData>("/api/products/investments/mutual-funds/dashboard");
       return response.data;
     } catch (error) {
       return null;
     }
   },
 
-  getInvestments: async (): Promise<InvestmentRecord[]> => {
-    try {
-      const response = await mfApi.get<InvestmentRecord[]>("/products/investments/mutual-funds/investments");
-      return response.data || [];
-    } catch (error) {
-      return [];
-    }
-  },
+  // getInvestments: async (): Promise<InvestmentRecord[]> => {
+  //   try {
+  //     const response = await api.get<InvestmentRecord[]>("/api/products/investments/mutual-funds/investments");
+  //     return response.data || [];
+  //   } catch (error) {
+  //     return [];
+  //   }
+  // },
 
-  addInvestment: async (payload: {
-    fund_name: string;
-    scheme_code: string | number;
-    amount: number;
-    category: string;
-    investment_type: string;
-  }) => {
-    try {
-      const response = await mfApi.post("/products/investments/mutual-funds/investments", payload);
-      return response.data;
-    } catch (error: any) {
-      throw error?.response?.data || error;
-    }
-  },
+  // addInvestment: async (payload: {
+  //   fund_name: string;
+  //   scheme_code: string | number;
+  //   amount: number;
+  //   category: string;
+  //   investment_type: string;
+  // }) => {
+  //   try {
+  //     const response = await api.post("/api/products/investments/mutual-funds/investments", payload);
+  //     return response.data;
+  //   } catch (error: any) {
+  //     throw error?.response?.data || error;
+  //   }
+  // },
 };
 
 export default mutualFundService;

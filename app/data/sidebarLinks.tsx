@@ -36,7 +36,8 @@ import {
     WalletCards,
     Building,
     icons,
-    Landmark
+    Landmark,
+    Home
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -205,6 +206,17 @@ export const sidebarLinks = {
                     icon: <Landmark className="h-4 w-4 text-neutral-700" />,
                     href: "/customer/bonds",
                 },
+                      {
+                            label: "Home Loan",
+                            href: "/customer/home-loan",
+                            icon: <Home className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Education Loan",
+                            href: "/customer/loans/education-loan",
+                            icon: <Home className="h-4 w-4 text-neutral-700" />,
+                        },
+                // {
                 // {
                 //     label: "Mutual Funds Panel",
                 //     icon: <Users className="h-4 w-4 text-neutral-700" />,
