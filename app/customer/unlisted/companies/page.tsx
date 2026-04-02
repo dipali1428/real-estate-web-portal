@@ -1,24 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { 
-  Search, 
-  Filter, 
-  Building2, 
-  IndianRupee, 
-  TrendingUp, 
-  AlertCircle, 
-  RefreshCw, 
-  Database, 
-  Clock, 
-  Shield, 
-  X,
-  Bookmark, 
-  BookmarkCheck,
-  ShoppingCart,
-  CheckCircle
-} from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Search, Filter, Building2, IndianRupee, Loader2, TrendingUp, AlertCircle, RefreshCw, Database, X, Clock, Shield, Bookmark, BookmarkCheck, ShoppingCart, CheckCircle, TrendingDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { fetchDashboardData } from '../../../services/unlistedservices';
 import toast from 'react-hot-toast';
 import customerService, { WishlistItem } from '../../../services/customerService';
 
@@ -156,6 +141,12 @@ const saveCartToStorage = (cart: CartItem[]): void => {
 export default function CompaniesPage() {
   const router = useRouter();
   
+  // Index Data State (same logic as LiveTrends)
+  const [graphData, setGraphData] = useState<any[]>([]);
+  const [summary, setSummary] = useState<any>(null);
+  const [isGraphLoading, setIsGraphLoading] = useState(true);
+  const [graphError, setGraphError] = useState<string | null>(null);
+  
   // Company State
   const [companies, setCompanies] = useState<Company[]>([]);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
@@ -178,6 +169,48 @@ export default function CompaniesPage() {
   // Cart State
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [processingCart, setProcessingCart] = useState<Set<number>>(new Set());
+
+  // ========== INDEX DATA CALCULATIONS (same as LiveTrends) ==========
+  const currentIndex = useMemo(() => {
+    if (graphData.length === 0) return "0.00";
+    return parseFloat(graphData[graphData.length - 1].market_price).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }, [graphData]);
+
+  const todayChange = useMemo(() => {
+    if (graphData.length < 2) return "0.00";
+    const latest = parseFloat(graphData[graphData.length - 1].market_price);
+    const prev = parseFloat(graphData[graphData.length - 2].market_price);
+    return (((latest - prev) / prev) * 100).toFixed(2);
+  }, [graphData]);
+
+  const isPositive = parseFloat(todayChange) >= 0;
+
+  // ========== FETCH INDEX DATA (same logic as LiveTrends) ==========
+  useEffect(() => {
+    const fetchIndexData = async () => {
+      setIsGraphLoading(true);
+      try {
+        const response = await fetchDashboardData();
+        if (response && response.success && response.graph) {
+          setGraphData(response.graph);
+          if (response.summary) {
+            setSummary(response.summary);
+          }
+        } else {
+          setGraphError("Invalid graph data format");
+        }
+      } catch (error: any) {
+        setGraphError("Unable to connect to live API");
+      } finally {
+        setIsGraphLoading(false);
+      }
+    };
+
+    fetchIndexData();
+  }, []);
 
   // ========== CART FUNCTIONS ==========
   
@@ -211,7 +244,6 @@ export default function CompaniesPage() {
     };
     
     setCartItems(prev => {
-      // Check if already exists
       if (prev.some(item => item.id === company.id)) {
         return prev;
       }
@@ -485,9 +517,6 @@ export default function CompaniesPage() {
 
   // ========== COMPUTED VALUES ==========
   const totalCompanies = companies.length;
-  const avgPrice = companies.length > 0
-    ? companies.reduce((sum, c) => sum + parseFloat(c.price), 0) / companies.length
-    : 0;
   const minPrice = companies.length > 0
     ? Math.min(...companies.map(c => parseFloat(c.price)))
     : 0;
@@ -631,14 +660,29 @@ export default function CompaniesPage() {
             <p className="text-2xl font-bold text-gray-900">{totalCompanies}</p>
           </div>
           
+          {/* Index Value Card - Using fetched data similar to LiveTrends */}
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-              <IndianRupee size={16} className="text-emerald-600" />
-              Avg. Price
+              <TrendingUp size={16} className="text-[#2076C7]" />
+              Index Value
             </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {avgPrice > 0 ? formatCurrency(avgPrice.toFixed(2)) : 'N/A'}
-            </p>
+            {isGraphLoading ? (
+              <div className="flex items-center gap-2 py-1">
+                <Loader2 size={18} className="animate-spin text-[#2076C7]" />
+                <span className="text-sm text-gray-400">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <p className="text-2xl font-bold text-gray-900">
+                  ₹{currentIndex}
+                </p>
+                {summary?.totalSharesListed && (
+                  <div className="text-xs text-gray-400 mt-1">
+                    {summary.totalSharesListed} scrips
+                  </div>
+                )}
+              </>
+            )}
           </div>
           
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
