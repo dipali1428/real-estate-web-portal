@@ -22,6 +22,7 @@ const CATEGORY_OPTIONS = [
   { value: 'Product Information', label: 'Product Info' },
   { value: 'Lead Management', label: 'Leads' },
   { value: 'Profile Settings', label: 'Profile' },
+  { value: 'KYC/Verification', label: 'KYC/Verification' },
   { value: 'Other', label: 'Other' },
 ];
 const DATE_OPTIONS = [

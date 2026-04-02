@@ -120,7 +120,9 @@ export default function MotorInsuranceForm({ onClose }: { onClose: () => void })
     req("manufacturer", "Select manufacturer");
     req("vehicleModel", "Model is required");
     if (!form.phone || form.phone.length !== 10) errs.phone = "Invalid phone";
-    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email";
+if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+  errs.email = "Invalid email format";
+}
 
     if (!isNew) {
       req("vehicleReg", "Registration required");
@@ -209,7 +211,7 @@ export default function MotorInsuranceForm({ onClose }: { onClose: () => void })
               <Field label="Type of Vehicle" type="select" options={VEHICLE_TYPES} {...fieldProps("vehicleType")} required />
               <Field label="Client Name" placeholder="Enter full name" {...fieldProps("clientName")} required />
               <Field label="Phone Number" placeholder="10-digit number" type="tel" maxLength={10} onlyNumber {...fieldProps("phone")} required />
-              <Field label="Email ID" placeholder="Enter email address" type="email" {...fieldProps("email")} required />
+              <Field label="Email ID" placeholder="Enter email address" type="email" {...fieldProps("email")} />
               <Field label="Is this a new vehicle?" type="select" options={["Yes", "No"]} {...fieldProps("isNew")} required />
 
               {form.vehicleType === "2 Wheeler" ? (
@@ -318,7 +320,22 @@ export default function MotorInsuranceForm({ onClose }: { onClose: () => void })
 
 function Field({ label, value, onChange, type = "text", options, required, placeholder, onlyNumber, maxLength, error, disabled }: any) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
+    // Check if it's a Paste command (Ctrl+V or Cmd+V)
+    const isPaste = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v';
+    
+    // Check if it's a Copy/Select All command (Optional but recommended)
+    const isCopyOrSelect = (e.ctrlKey || e.metaKey) && ['c', 'a', 'x'].includes(e.key.toLowerCase());
+  
+    if (onlyNumber) {
+      // Allow the event if it's a paste, copy, select all, or navigation key
+      if (isPaste || isCopyOrSelect || ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) {
+        return;
+      }
+      // Prevent if it's not a number
+      if (!/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+      }
+    }
   };
   return (
     <div className={`w-full relative ${disabled ? 'opacity-70' : ''}`}>

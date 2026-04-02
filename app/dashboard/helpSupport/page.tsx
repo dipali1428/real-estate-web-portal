@@ -195,7 +195,7 @@ const HelpSupportPage: React.FC = () => {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <select name="category" value={ticketData.category} onChange={handleInputChange} required className="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
                       <option value="">Select Category</option>
-                      {["Technical Issue", "Commission Related", "Product Information", "Lead Management", "Profile Settings", "Other"].map(c => <option key={c} value={c}>{c}</option>)}
+                      {["Technical Issue", "Commission Related", "Product Information", "Lead Management", "Profile Settings", "KYC/Verification", "Other"].map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                     <input name="subject" value={ticketData.subject} onChange={handleInputChange} required placeholder="Brief Subject" className="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
