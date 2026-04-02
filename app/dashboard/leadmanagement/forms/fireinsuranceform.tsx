@@ -1,8 +1,8 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
-import { 
-  X, CheckCircle, UploadCloud, Trash2, ChevronDown, 
-  Loader2, AlertCircle 
+import {
+  X, CheckCircle, UploadCloud, Trash2, ChevronDown,
+  Loader2, AlertCircle
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
 
@@ -13,6 +13,7 @@ const STYLES = {
   btn: "w-full sm:w-auto sm:px-10 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-2.5 rounded-md hover:from-[#1a68b0] hover:to-[#18998f] transition-colors text-sm sm:text-base font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 whitespace-nowrap",
   err: "text-red-500 text-xs mt-1"
 };
+// const [errorData, setErrorData] = useState<{ message: string, existing_lead_id?: string } | null>(null);
 
 const INSURANCE_TYPES = [
   { label: "Residential Property Insurance", value: "residential" },
@@ -20,7 +21,7 @@ const INSURANCE_TYPES = [
   { label: "Stock Insurance", value: "stock" }
 ];
 
-const TENURES = ["1 Year", "2 Years", "3 Years", "4 Years", "5 Years"];
+// const TENURES = ["1 Year", "2 Years", "3 Years", "4 Years", "5 Years"];
 
 // --- Mapping for Document logic ---
 const DOC_REGISTRY = {
@@ -28,10 +29,10 @@ const DOC_REGISTRY = {
 };
 
 type QueuedFile = {
-    file: File;
-    docKey: string;
-    label: string;
-    status: "pending" | "uploading" | "success" | "error";
+  file: File;
+  docKey: string;
+  label: string;
+  status: "pending" | "uploading" | "success" | "error";
 };
 
 export default function FireInsuranceForm({ onClose }: { onClose: () => void }) {
@@ -42,8 +43,9 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  
+
   const [fileQueue, setFileQueue] = useState<QueuedFile[]>([]);
+  const [errorData, setErrorData] = useState<{message: string, existing_lead_id?: string} | null>(null);
 
   const isStock = form.insuranceType === "stock";
   const isProperty = form.insuranceType === "residential" || form.insuranceType === "commercial";
@@ -70,6 +72,7 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,15 +115,26 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
           setFileQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status: "success" } : q));
         } catch (err) {
           setFileQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status: "error" } : q));
-          throw err; 
+          throw err;
         }
       }
 
       setShowSuccess(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setStatusMsg("Submission failed.");
       setIsSubmitting(false);
+
+      // Check if server returned the specific "already exists" error
+      const serverError = err.response?.data || err;
+      if (serverError.success === false) {
+        setErrorData({
+          message: serverError.message,
+          existing_lead_id: serverError.existing_lead_id
+        });
+        setStatusMsg("");
+      } else {
+        setStatusMsg("Submission failed. Please try again.");
+      }
     }
   };
 
@@ -133,7 +147,7 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700 overflow-y-auto">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto my-auto flex flex-col relative max-h-[95vh] overflow-hidden">
-        
+
         <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white">
           <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Fire Insurance Form</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800"><X size={20} /></button>
@@ -166,24 +180,30 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
                 <div className="col-span-1 md:col-span-2">
                   <Field label="Address for Insurance Location" placeholder="Enter full property address" {...fieldProps("address")} required />
                 </div>
-                <Field label="Tenure" type="select" options={TENURES} {...fieldProps("tenure")} required />
+                <Field
+                  label="Tenure (Years)"
+                  placeholder="e.g. 1"
+                  onlyNumber
+                  {...fieldProps("tenure")}
+                  required
+                />
               </>
             )}
 
             {isStock && (
               <div className="col-span-1 md:col-span-2 mt-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FileSelectionCard 
-                        label="Stock Inventory Sheet"
-                        docKey="STOCK_INVENTORY"
-                        allowMultiple={true}
-                        selectedFiles={fileQueue.filter(f => f.docKey === "STOCK_INVENTORY")}
-                        onAdd={(files: File[]) => {
-                            const newEntries = files.map(f => ({ file: f, docKey: "STOCK_INVENTORY", label: "Stock Inventory Sheet", status: "pending" as const }));
-                            setFileQueue(prev => [...prev, ...newEntries]);
-                        }}
-                        onRemove={(name: string) => setFileQueue(prev => prev.filter(f => f.file.name !== name))}
-                    />
+                  <FileSelectionCard
+                    label="Stock Inventory Sheet"
+                    docKey="STOCK_INVENTORY"
+                    allowMultiple={true}
+                    selectedFiles={fileQueue.filter(f => f.docKey === "STOCK_INVENTORY")}
+                    onAdd={(files: File[]) => {
+                      const newEntries = files.map(f => ({ file: f, docKey: "STOCK_INVENTORY", label: "Stock Inventory Sheet", status: "pending" as const }));
+                      setFileQueue(prev => [...prev, ...newEntries]);
+                    }}
+                    onRemove={(name: string) => setFileQueue(prev => prev.filter(f => f.file.name !== name))}
+                  />
                 </div>
               </div>
             )}
@@ -191,13 +211,20 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
             {form.insuranceType && (
               <div className="col-span-1 md:col-span-2 flex justify-center mt-6 pb-2">
                 <button type="submit" disabled={isSubmitting} className={STYLES.btn}>
-                  {isSubmitting ? <><Loader2 className="animate-spin" size={18}/> {statusMsg}</> : "Submit Application"}
+                  {isSubmitting ? <><Loader2 className="animate-spin" size={18} /> {statusMsg}</> : "Submit Application"}
                 </button>
               </div>
             )}
           </form>
         </div>
         {showSuccess && <SuccessModal onClose={onClose} />}
+        {errorData && (
+  <ErrorModal 
+    message={errorData.message} 
+    leadId={errorData.existing_lead_id} 
+    onClose={() => setErrorData(null)} 
+  />
+)}
       </div>
     </div>
   );
@@ -231,50 +258,74 @@ function Field({ label, value, onChange, type = "text", options, required, place
 }
 
 function FileSelectionCard({ label, docKey, allowMultiple, selectedFiles, onAdd, onRemove }: any) {
-    const inputRef = useRef<HTMLInputElement>(null);
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = Array.from(e.target.files || []);
-      if (files.length > 0) onAdd(allowMultiple ? files : [files[0]]);
-      if (inputRef.current) inputRef.current.value = "";
-    };
-  
-    return (
-      <div className="flex flex-col bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-        <label className="text-xs font-bold text-gray-500 uppercase mb-2 truncate">{label}</label>
-        <input type="file" ref={inputRef} multiple={allowMultiple} onChange={handleFileChange} className="hidden" accept="image/*,application/pdf,.xlsx,.xls,.csv" />
-        <div className="space-y-2">
-          <button type="button" onClick={() => inputRef.current?.click()} className="w-full border border-dashed rounded-md py-2 flex flex-col items-center justify-center bg-gray-50 hover:bg-[#1CADA3]/5 border-gray-300 hover:border-[#1CADA3] group transition-colors">
-            <div className="flex items-center gap-2">
-              <UploadCloud size={16} className="text-gray-400 group-hover:text-[#1CADA3]" />
-              <span className="text-xs font-medium text-gray-500 group-hover:text-[#1CADA3]">{selectedFiles.length > 0 ? "Add More" : "Choose File"}</span>
+  const inputRef = useRef<HTMLInputElement>(null);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) onAdd(allowMultiple ? files : [files[0]]);
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
+  return (
+    <div className="flex flex-col bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+      <label className="text-xs font-bold text-gray-500 uppercase mb-2 truncate">{label}</label>
+      <input type="file" ref={inputRef} multiple={allowMultiple} onChange={handleFileChange} className="hidden" accept="image/*,application/pdf,.xlsx,.xls,.csv" />
+      <div className="space-y-2">
+        <button type="button" onClick={() => inputRef.current?.click()} className="w-full border border-dashed rounded-md py-2 flex flex-col items-center justify-center bg-gray-50 hover:bg-[#1CADA3]/5 border-gray-300 hover:border-[#1CADA3] group transition-colors">
+          <div className="flex items-center gap-2">
+            <UploadCloud size={16} className="text-gray-400 group-hover:text-[#1CADA3]" />
+            <span className="text-xs font-medium text-gray-500 group-hover:text-[#1CADA3]">{selectedFiles.length > 0 ? "Add More" : "Choose File"}</span>
+          </div>
+        </button>
+        {selectedFiles.map((f: any, idx: number) => (
+          <div key={idx} className={`flex items-center justify-between border px-2 py-1.5 rounded-md text-xs ${f.status === 'error' ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'}`}>
+            <div className="flex items-center truncate gap-2 max-w-[80%]">
+              {f.status === "uploading" ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-500 shrink-0" /> :
+                f.status === "success" ? <CheckCircle className="w-3.5 h-3.5 text-[#1CADA3] shrink-0" /> :
+                  f.status === "error" ? <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" /> :
+                    <div className="w-3.5 h-3.5 rounded-full border border-gray-300 shrink-0" />}
+              <span className="truncate text-gray-700">{f.file.name}</span>
             </div>
-          </button>
-          {selectedFiles.map((f: any, idx: number) => (
-            <div key={idx} className={`flex items-center justify-between border px-2 py-1.5 rounded-md text-xs ${f.status === 'error' ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'}`}>
-              <div className="flex items-center truncate gap-2 max-w-[80%]">
-                {f.status === "uploading" ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-500 shrink-0" /> : 
-                 f.status === "success" ? <CheckCircle className="w-3.5 h-3.5 text-[#1CADA3] shrink-0" /> : 
-                 f.status === "error" ? <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" /> : 
-                 <div className="w-3.5 h-3.5 rounded-full border border-gray-300 shrink-0" />}
-                <span className="truncate text-gray-700">{f.file.name}</span>
-              </div>
-              {f.status === "pending" && <button onClick={() => onRemove(f.file.name)} className="text-gray-400 hover:text-red-500 shrink-0"><Trash2 size={14}/></button>}
-            </div>
-          ))}
-        </div>
+            {f.status === "pending" && <button onClick={() => onRemove(f.file.name)} className="text-gray-400 hover:text-red-500 shrink-0"><Trash2 size={14} /></button>}
+          </div>
+        ))}
       </div>
-    );
+    </div>
+  );
 }
 
 function SuccessModal({ onClose }: { onClose: () => void }) {
-    return (
-      <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/60 rounded-xl">
-        <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%] animate-in zoom-in duration-300">
-          <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
-          <h3 className="text-2xl font-bold text-gray-800 mb-2">Submitted!</h3>
-          <p className="text-gray-600 mb-6">Your Fire Insurance application has been processed successfully.</p>
-          <button onClick={onClose} className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:bg-[#178e86] font-medium transition-colors">Return to Dashboard</button>
-        </div>
+  return (
+    <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/60 rounded-xl">
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%] animate-in zoom-in duration-300">
+        <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">Submitted!</h3>
+        <p className="text-gray-600 mb-6">Your Fire Insurance application has been processed successfully.</p>
+        <button onClick={onClose} className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:bg-[#178e86] font-medium transition-colors">Return to Dashboard</button>
       </div>
-    );
+    </div>
+  );
+}
+
+function ErrorModal({ message, leadId, onClose }: { message: string, leadId?: string, onClose: () => void }) {
+  return (
+    <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/60 rounded-xl p-4">
+      <div className="bg-white p-6 rounded-2xl shadow-2xl text-center max-w-sm w-full animate-in zoom-in duration-300">
+        <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+        <h3 className="text-xl font-bold text-gray-800 mb-2">Notice</h3>
+        <p className="text-gray-600 mb-2">{message}</p>
+        {leadId && (
+          <div className="bg-gray-100 p-2 rounded border border-gray-200 mb-6">
+            <span className="text-xs text-gray-500 uppercase block">Lead ID</span>
+            <span className="font-mono font-bold text-[#2076C7]">{leadId}</span>
+          </div>
+        )}
+        <button 
+          onClick={onClose} 
+          className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:opacity-70 font-medium transition-colors"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
 }
