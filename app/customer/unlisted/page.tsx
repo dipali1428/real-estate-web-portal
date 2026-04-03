@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Building2, History, LayoutGrid } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import CompaniesComponent from './companies/page';
 import TransactionsComponent from './transactions/page';
 
@@ -24,41 +25,43 @@ export default function UnlistedSharesPage() {
       <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
         <div className="max-w-full px-4 sm:px-6 lg:px-8">
           <div className="py-4">
-            {/* Tab Navigation */}
-            <div className="flex gap-2 border-b border-gray-200">
-              <button
-                onClick={() => setActiveTab('companies')}
-                className={`px-6 py-3 text-sm font-medium transition-all relative ${
-                  activeTab === 'companies'
-                    ? 'text-[#2076C7]'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Building2 size={18} />
+            {/* Tab Navigation - Updated with pill button design */}
+            <div className="flex pb-2 md:pb-0 w-full sm:w-auto mt-2 sm:mt-0 overflow-x-auto hide-scrollbar sm:overflow-visible">
+              <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                <button
+                  onClick={() => setActiveTab('companies')}
+                  className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${
+                    activeTab === 'companies' ? 'text-white' : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {activeTab === 'companies' && (
+                    <motion.div
+                      layoutId="activeTabUnlistedShares"
+                      className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <Building2 size={14} />
                   Companies
-                </div>
-                {activeTab === 'companies' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full" />
-                )}
-              </button>
+                </button>
 
-              <button
-                onClick={() => setActiveTab('transactions')}
-                className={`px-6 py-3 text-sm font-medium transition-all relative ${
-                  activeTab === 'transactions'
-                    ? 'text-[#2076C7]'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <History size={18} />
+                <button
+                  onClick={() => setActiveTab('transactions')}
+                  className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${
+                    activeTab === 'transactions' ? 'text-white' : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {activeTab === 'transactions' && (
+                    <motion.div
+                      layoutId="activeTabUnlistedShares"
+                      className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <History size={14} />
                   Transactions
-                </div>
-                {activeTab === 'transactions' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full" />
-                )}
-              </button>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -75,7 +78,7 @@ export default function UnlistedSharesPage() {
         )}
       </div>
 
-      {/* Custom Styles for Animation */}
+      {/* Custom Styles for Animation and Hide Scrollbar */}
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -90,6 +93,15 @@ export default function UnlistedSharesPage() {
         
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-out;
+        }
+
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </div>

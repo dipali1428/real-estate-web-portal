@@ -86,7 +86,6 @@ export default function TransactionsPage() {
             minute: '2-digit',
             second: '2-digit'
           }));
-          toast.success('Transactions loaded successfully');
         } else {
           setError('Failed to load transactions');
           toast.error('Failed to load transactions');

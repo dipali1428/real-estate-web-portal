@@ -1,8 +1,8 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { 
-  X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown, 
-  Loader2, ArrowRight, ArrowLeft, AlertCircle, Building2, Users, Briefcase 
+  X, CheckCircle, UploadCloud, Trash2, ChevronDown, 
+  Loader2, ArrowRight, ArrowLeft, AlertCircle 
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
 
@@ -15,549 +15,93 @@ const STYLES = {
   err: "text-red-500 text-xs mt-1"
 };
 
-// Dropdown Options
-const INVESTOR_TYPES = ["Individual", "HUF", "Company", "Trust", "Partnership Firm", "LLP", "NRI"];
-const OCCUPATIONS = ["Salaried", "Self-Employed", "Business", "Professional", "Retired", "Student", "Homemaker"];
-const INCOME_RANGES = ["0-5L", "5-10L", "10-20L", "20-50L", "50L-1Cr", "1Cr+"];
-const RELATIONS = ["Self", "Spouse", "Son", "Daughter", "Father", "Mother", "Brother", "Sister", "Other"];
-const COMPANIES_LIST = ["Unlisted Company A", "Unlisted Company B", "Unlisted Company C", "Other"];
-
 // Document Registry for Unlisted Shares
 const DOC_REGISTRY: Record<string, { key: string; label: string; multiple: boolean }> = {
+  "Client Master List": { key: "CLIENT_MASTER", label: "CML (Client Master List)", multiple: false },
   "PAN Card": { key: "PAN", label: "PAN Card", multiple: false },
-  "Aadhaar Card": { key: "AADHAAR", label: "Aadhaar Card", multiple: false },
-  "Cancelled Cheque": { key: "CANCEL_CHEQUE", label: "Cancelled Cheque", multiple: false },
-  "Income Tax Return": { key: "ITR", label: "Income Tax Return (Last 2 Years)", multiple: true },
-  "Bank Statement": { key: "BANK_STATEMENT", label: "Bank Statement (Last 6 Months)", multiple: true },
-  "Net Worth Certificate": { key: "NET_WORTH_CERT", label: "Net Worth Certificate", multiple: false },
-  "RTA Form": { key: "RTA_FORM", label: "RTA Transfer Form (Signed)", multiple: false },
-  "Share Certificate": { key: "SHARE_CERT", label: "Original Share Certificate", multiple: true },
-  "Deal Memorandum": { key: "DEAL_MEMO", label: "Deal Memorandum / Contract Note", multiple: true },
-  "Client Master List": { key: "CLIENT_MASTER", label: "Client Master List from Broker", multiple: false },
+  "Bank Statement": { key: "BANK_STATEMENT", label: "Bank Statement", multiple: false },
+  "UTR Screenshot": { key: "UTR", label: "UTR Screenshot", multiple: false }
 };
 
-type QueuedFile = {
+// Required documents
+const REQUIRED_DOCS = ["Client Master List", "PAN Card", "Bank Statement", "UTR Screenshot"];
+
+// Dropdown Options
+const INVESTOR_TYPES = ["Individual", "HUF", "Company", "Trust", "Partnership Firm", "LLP", "NRI"];
+
+// --- Types ---
+interface QueuedFile {
     file: File;
     docKey: string;
     label: string;
     status: "pending" | "uploading" | "success" | "error";
-};
-
-interface ShareHolding {
-    id: string;
-    companyName: string;
-    quantity: string;
-    purchasePrice: string;
-    currentPrice: string;
-    certificateNumber: string;
 }
 
-export default function UnlistedSharesForm({ onClose }: { onClose: () => void }) {
-  const [step, setStep] = useState(1);
-  const [leadId, setLeadId] = useState<string | null>(null);
-  const [form, setForm] = useState<any>({
-    // Primary Investor Details
-    investorType: "Individual",
-    fullName: "",
-    dateOfBirth: "",
-    pan: "",
-    mobile: "",
-    email: "",
-    alternateMobile: "",
-    occupation: "",
-    incomeRange: "",
-    
-    // Address Details
-    addressLine1: "",
-    addressLine2: "",
-    city: "",
-    state: "",
-    pincode: "",
-    cityOfResidence: "",
-    
-    // Nominee Details
-    nomineeName: "",
-    nomineeRelation: "",
-    nomineeDob: "",
-    nomineePan: "",
-    
-    // Share Holding Details
-    holdings: [{ id: "1", companyName: "", quantity: "", purchasePrice: "", currentPrice: "", certificateNumber: "" }],
-    
-    // Transaction Details
-    totalInvestmentAmount: "",
-    expectedSaleValue: "",
-    purchaseDate: "",
-    brokerName: "",
-    dematAccountNumber: "",
-    remarks: ""
-  });
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [statusMsg, setStatusMsg] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [fileQueue, setFileQueue] = useState<QueuedFile[]>([]);
-  const [isNRI, setIsNRI] = useState(false);
-
-  // Required Documents based on Investor Type
-  const requiredDocsList = useMemo(() => {
-    const labels = ["PAN Card", "Aadhaar Card", "Cancelled Cheque", "Income Tax Return", "Bank Statement"];
-    
-    if (isNRI) {
-      labels.push("Foreign Address Proof", "PIS Account Statement");
-    }
-    
-    if (form.holdings.length > 0 && form.holdings[0].companyName) {
-      labels.push("Share Certificate", "Deal Memorandum", "Client Master List");
-    }
-    
-    return labels.map(l => DOC_REGISTRY[l]).filter(Boolean);
-  }, [isNRI, form.holdings]);
-
-  const handleInputChange = (field: string, value: string) => {
-    let val = value;
-    if (field.toLowerCase().includes("mobile")) val = value.replace(/\D/g, '').slice(0, 10);
-    if (field.toLowerCase().includes("pan")) val = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
-    if (field === "pincode") val = value.replace(/\D/g, '').slice(0, 6);
-    
-    if (field.toLowerCase().includes("email")) val = val.toLowerCase();
-
-    setForm((prev: any) => ({ ...prev, [field]: val }));
-    if (errors[field]) setErrors(p => ({ ...p, [field]: "" }));
-  };
-
-  // Share Holdings Management
-  const updateHolding = (id: string, field: string, value: string) => {
-    setForm((p: any) => ({
-      ...p,
-      holdings: p.holdings.map((h: ShareHolding) => 
-        h.id === id ? { ...h, [field]: value } : h
-      )
-    }));
-  };
-
-  const addHolding = () => {
-    setForm((p: any) => ({
-      ...p,
-      holdings: [...p.holdings, { 
-        id: Date.now().toString(), 
-        companyName: "", 
-        quantity: "", 
-        purchasePrice: "", 
-        currentPrice: "", 
-        certificateNumber: "" 
-      }]
-    }));
-  };
-
-  const removeHolding = (id: string) => {
-    if (form.holdings.length > 1) {
-      setForm((p: any) => ({
-        ...p,
-        holdings: p.holdings.filter((h: ShareHolding) => h.id !== id)
-      }));
-    }
-  };
-
-  // Calculate total investment
-  const calculateTotal = () => {
-    let total = 0;
-    form.holdings.forEach((h: ShareHolding) => {
-      const qty = parseFloat(h.quantity) || 0;
-      const price = parseFloat(h.purchasePrice) || 0;
-      total += qty * price;
-    });
-    return total.toLocaleString('en-IN');
-  };
-
-  const validateStep1 = () => {
-    const errs: Record<string, string> = {};
-    const req = (f: string, msg: string) => { if (!String(form[f] || "").trim()) errs[f] = msg; };
-
-    req("investorType", "Investor Type is required");
-    req("fullName", "Full Name is required");
-    req("pan", "PAN is required");
-    req("mobile", "Mobile number is required");
-    req("email", "Email is required");
-    
-    if (form.mobile?.length !== 10) errs.mobile = "10-digit mobile required";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email";
-    if (form.pan?.length !== 10) errs.pan = "10-character PAN required";
-    
-    req("addressLine1", "Address is required");
-    req("city", "City is required");
-    req("state", "State is required");
-    req("pincode", "Pincode is required");
-    if (form.pincode?.length !== 6) errs.pincode = "6-digit pincode required";
-    
-    // Validate holdings
-    let hasValidHolding = false;
-    form.holdings.forEach((h: ShareHolding, idx: number) => {
-      if (h.companyName && h.quantity && h.purchasePrice) {
-        hasValidHolding = true;
-        const qty = parseFloat(h.quantity);
-        const price = parseFloat(h.purchasePrice);
-        if (isNaN(qty) || qty <= 0) errs[`holding_${idx}_quantity`] = "Valid quantity required";
-        if (isNaN(price) || price <= 0) errs[`holding_${idx}_price`] = "Valid price required";
-      }
-    });
-    
-    if (!hasValidHolding) errs.holdings = "At least one valid holding is required";
-
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
-  };
-
-  const handleCreateLead = async () => {
-    if (!validateStep1()) return;
-    setIsSubmitting(true);
-    setStatusMsg("Creating Application...");
-    try {
-      const payload = {
-        department: "Unlisted Shares",
-        product_type: "Unlisted Shares",
-        sub_category: "Secondary Market Transaction",
-        client: { 
-          name: form.fullName, 
-          mobile: form.mobile, 
-          email: form.email,
-          pan: form.pan,
-          investor_type: form.investorType
-        },
-        meta: { 
-          is_self_login: false,
-          is_nri: isNRI
-        },
-        form_data: { 
-          ...form, 
-          totalCalculated: calculateTotal(),
-          holdings_count: form.holdings.length
-        }
-      };
-
-      const result = await DashboardService.createLead(payload);
-      if (!result?.detail_lead_id) throw new Error("ID Missing");
-      setLeadId(result.detail_lead_id);
-      setStep(2);
-    } catch (err) {
-      console.error(err);
-      setStatusMsg("Failed to create application.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleFinalSubmission = async () => {
-    if (fileQueue.length === 0) { 
-      setShowSuccess(true); 
-      return; 
-    }
-    setIsSubmitting(true);
-    for (let i = 0; i < fileQueue.length; i++) {
-        const item = fileQueue[i];
-        setStatusMsg(`Uploading ${i + 1}/${fileQueue.length}...`);
-        setFileQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status: "uploading" } : q));
-        const formData = new FormData();
-        formData.append("leadDbId", leadId!);
-        formData.append("documents", item.file);
-        formData.append("metadata", JSON.stringify([{ key: item.docKey, label: item.label }]));
-        try {
-            await DashboardService.uploadLeadDocument(leadId!, formData);
-            setFileQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status: "success" } : q));
-        } catch (err) {
-            setFileQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status: "error" } : q));
-            setStatusMsg("Upload failed.");
-            setIsSubmitting(false);
-            return; 
-        }
-    }
-    setIsSubmitting(false);
-    setShowSuccess(true);
-  };
-
-  const fieldProps = (name: string) => ({
-    value: form[name],
-    onChange: (v: string) => handleInputChange(name, v),
-    error: errors[name]
-  });
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-5xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col relative overflow-hidden">
-        
-        {/* Header */}
-        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 bg-white shrink-0">
-          <div>
-            <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3] flex items-center gap-2">
-              Unlisted Shares Application
-            </h2>
-            <p className="text-xs text-gray-400">Step {step} of 2</p>
-          </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800"><X size={20} /></button>
-        </div>
-
-        {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50/30">
-          {step === 1 ? (
-            <div className="space-y-8">
-              {/* Investor Type */}
-              <section className="bg-gradient-to-r from-blue-50/30 to-teal-50/30 p-4 rounded-lg">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Field label="Investor Type" type="select" options={INVESTOR_TYPES} {...fieldProps("investorType")} required />
-                  <div className="flex items-center gap-3 mt-6">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" checked={isNRI} onChange={(e) => setIsNRI(e.target.checked)} className="w-4 h-4 text-[#1CADA3]" />
-                      <span className="text-sm text-gray-700">NRI Investor</span>
-                    </label>
-                  </div>
-                </div>
-              </section>
-
-              {/* Primary Investor Details */}
-              <section>
-                <h3 className="text-sm font-bold text-[#1CADA3] uppercase tracking-wider border-b pb-2 mb-4 flex items-center gap-2">
-                  <Users size={16} /> 1. Primary Investor Details
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                  <Field label="Full Name" placeholder="As per PAN" {...fieldProps("fullName")} required />
-                  <Field label="Date of Birth" type="date" {...fieldProps("dateOfBirth")} />
-                  <Field label="PAN Number" placeholder="ABCDE1234F" maxLength={10} {...fieldProps("pan")} required />
-                  <Field label="Mobile Number" placeholder="10-digit mobile" onlyNumber maxLength={10} {...fieldProps("mobile")} required />
-                  <Field label="Email Address" type="email" placeholder="investor@example.com" {...fieldProps("email")} required />
-                  <Field label="Alternate Mobile" placeholder="10-digit mobile" onlyNumber maxLength={10} {...fieldProps("alternateMobile")} />
-                  <Field label="Occupation" type="select" options={OCCUPATIONS} {...fieldProps("occupation")} />
-                  <Field label="Annual Income" type="select" options={INCOME_RANGES} {...fieldProps("incomeRange")} />
-                </div>
-              </section>
-
-              {/* Address Details */}
-              <section>
-                <h3 className="text-sm font-bold text-[#1CADA3] uppercase tracking-wider border-b pb-2 mb-4">2. Address Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="md:col-span-2">
-                    <Field label="Address Line 1" placeholder="House No, Building Name" {...fieldProps("addressLine1")} required />
-                  </div>
-                  <div className="md:col-span-2">
-                    <Field label="Address Line 2" placeholder="Street, Area" {...fieldProps("addressLine2")} />
-                  </div>
-                  <Field label="City" placeholder="City name" {...fieldProps("city")} required />
-                  <Field label="State" placeholder="State name" {...fieldProps("state")} required />
-                  <Field label="Pincode" placeholder="6-digit pincode" onlyNumber maxLength={6} {...fieldProps("pincode")} required />
-                  <Field label="City of Residence" placeholder="For KYC purposes" {...fieldProps("cityOfResidence")} />
-                </div>
-              </section>
-
-              {/* Nominee Details */}
-              <section>
-                <h3 className="text-sm font-bold text-[#1CADA3] uppercase tracking-wider border-b pb-2 mb-4">3. Nominee Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                  <Field label="Nominee Full Name" placeholder="Enter name" {...fieldProps("nomineeName")} />
-                  <Field label="Relation with Investor" type="select" options={RELATIONS} {...fieldProps("nomineeRelation")} />
-                  <Field label="Nominee Date of Birth" type="date" {...fieldProps("nomineeDob")} />
-                  <Field label="Nominee PAN" placeholder="ABCDE1234F" maxLength={10} {...fieldProps("nomineePan")} />
-                </div>
-              </section>
-
-              {/* Share Holdings */}
-              <section>
-                <h3 className="text-sm font-bold text-[#1CADA3] uppercase tracking-wider border-b pb-2 mb-4 flex items-center gap-2">
-                  <Briefcase size={16} /> 4. Share Holdings Details
-                </h3>
-                
-                {errors.holdings && <p className={STYLES.err}>{errors.holdings}</p>}
-                
-                <div className="space-y-4">
-                  {form.holdings.map((h: ShareHolding, idx: number) => (
-                    <div key={h.id} className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm relative group">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase">Holding #{idx + 1}</span>
-                        {form.holdings.length > 1 && (
-                          <button type="button" onClick={() => removeHolding(h.id)} className="text-gray-300 hover:text-red-500 transition-colors">
-                            <Trash2 size={16} />
-                          </button>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <Field 
-                            label="Company Name" 
-                            placeholder="Enter company name" 
-                            value={h.companyName} 
-                            onChange={(v: string) => updateHolding(h.id, "companyName", v)} 
-                          />
-                          {errors[`holding_${idx}_company`] && <p className={STYLES.err}>{errors[`holding_${idx}_company`]}</p>}
-                        </div>
-                        <div>
-                          <Field 
-                            label="Quantity" 
-                            placeholder="Number of shares" 
-                            onlyNumber 
-                            value={h.quantity} 
-                            onChange={(v: string) => updateHolding(h.id, "quantity", v)} 
-                          />
-                          {errors[`holding_${idx}_quantity`] && <p className={STYLES.err}>{errors[`holding_${idx}_quantity`]}</p>}
-                        </div>
-                        <div>
-                          <Field 
-                            label="Purchase Price (₹)" 
-                            placeholder="Per share price" 
-                            onlyNumber 
-                            value={h.purchasePrice} 
-                            onChange={(v: string) => updateHolding(h.id, "purchasePrice", v)} 
-                          />
-                          {errors[`holding_${idx}_price`] && <p className={STYLES.err}>{errors[`holding_${idx}_price`]}</p>}
-                        </div>
-                        <div>
-                          <Field 
-                            label="Current Market Price (₹)" 
-                            placeholder="Current value per share" 
-                            onlyNumber 
-                            value={h.currentPrice} 
-                            onChange={(v: string) => updateHolding(h.id, "currentPrice", v)} 
-                          />
-                        </div>
-                        <div className="md:col-span-2">
-                          <Field 
-                            label="Certificate Number / Folio No" 
-                            placeholder="Share certificate or folio number" 
-                            value={h.certificateNumber} 
-                            onChange={(v: string) => updateHolding(h.id, "certificateNumber", v)} 
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  <div className="flex justify-between items-center">
-                    <button type="button" onClick={addHolding} className="flex items-center gap-2 text-xs font-bold text-[#1CADA3] hover:text-[#18998f] uppercase tracking-wide py-2">
-                      <Plus size={14} /> Add Another Holding
-                    </button>
-                    {form.holdings.some((h: ShareHolding) => h.quantity && h.purchasePrice) && (
-                      <div className="text-sm bg-gray-100 px-3 py-2 rounded-lg">
-                        <span className="text-gray-600">Total Investment: </span>
-                        <span className="font-bold text-[#1CADA3]">₹ {calculateTotal()}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </section>
-
-              {/* Transaction Details */}
-              <section>
-                <h3 className="text-sm font-bold text-[#1CADA3] uppercase tracking-wider border-b pb-2 mb-4">5. Transaction Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                  <Field label="Purchase Date" type="date" {...fieldProps("purchaseDate")} />
-                  <Field label="Broker / Intermediary Name" placeholder="Name of broker if any" {...fieldProps("brokerName")} />
-                  <Field label="Demat Account Number" placeholder="16-digit BO ID / DP ID" {...fieldProps("dematAccountNumber")} />
-                  <Field label="Expected Sale Value (₹)" placeholder="Expected value on sale" onlyNumber {...fieldProps("expectedSaleValue")} />
-                  <div className="md:col-span-2">
-                    <Field label="Additional Remarks" placeholder="Any special instructions or notes" {...fieldProps("remarks")} />
-                  </div>
-                </div>
-              </section>
-            </div>
-          ) : (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg flex items-start gap-3">
-                    <CheckCircle className="text-blue-500 mt-1 shrink-0" size={18} />
-                    <div>
-                        <p className="text-sm font-semibold text-blue-900">Application Created Successfully!</p>
-                        <p className="text-xs text-blue-700">Lead ID: <span className="font-mono font-bold">{leadId}</span>. Please upload the required documents to proceed.</p>
-                    </div>
-                </div>
-                
-                <div className="mb-4">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Required Documents for Unlisted Shares Transaction:</h3>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {requiredDocsList.map(doc => (
-                      <FileSelectionCard key={doc.key} docKey={doc.key} label={doc.label} allowMultiple={doc.multiple}
-                        selectedFiles={fileQueue.filter(f => f.docKey === doc.key)}
-                        onAdd={(files: File[]) => {
-                            const newEntries = files.map(f => ({ file: f, docKey: doc.key, label: doc.label, status: "pending" as const }));
-                            setFileQueue(prev => [...prev.filter(f => !(f.docKey === doc.key && !doc.multiple)), ...newEntries]);
-                        }}
-                        onRemove={(name: string) => setFileQueue(prev => prev.filter(f => f.file.name !== name))}
-                      />
-                    ))}
-                </div>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="border-t p-4 sm:px-6 flex items-center justify-between bg-white shrink-0">
-           {step === 2 && !isSubmitting && <button onClick={() => setStep(1)} className={STYLES.secondaryBtn}><ArrowLeft size={18} /> Back</button>}
-           <div className="flex-1" />
-           <button onClick={step === 1 ? handleCreateLead : handleFinalSubmission} disabled={isSubmitting} className={STYLES.btn}>
-             {isSubmitting ? <><Loader2 className="animate-spin" size={20} /> {statusMsg}</> : 
-              step === 1 ? <>Submit Application & Upload Documents <ArrowRight size={18} /></> : "Complete Submission"}
-           </button>
-        </div>
-        {showSuccess && <SuccessModal onClose={onClose} />}
-      </div>
-    </div>
-  );
+interface FileSelectionCardProps {
+    label: string;
+    docKey: string;
+    selectedFiles: QueuedFile[];
+    onAdd: (files: File[]) => void;
+    onRemove: (name: string) => void;
 }
 
-// --- Internal Components (Same as Mutual Fund Form) ---
+interface FieldProps {
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+    type?: string;
+    required?: boolean;
+    placeholder?: string;
+    onlyNumber?: boolean;
+    maxLength?: number;
+    error?: string;
+}
 
-function Field({ label, value, onChange, type = "text", options, required, placeholder, onlyNumber, maxLength, error, disabled }: any) {
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
+// --- Helper Components ---
+
+function Field({ label, value, onChange, type = "text", required, placeholder, onlyNumber, maxLength, error }: FieldProps) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) {
+      e.preventDefault();
+    }
   };
   return (
-    <div className={`w-full relative ${disabled ? 'opacity-70' : ''}`}>
+    <div className="w-full relative">
       <label className={STYLES.label}>{label} {required && <span className="text-red-500">*</span>}</label>
-      <div className="relative">
-        {type === "select" ? (
-          <>
-            <select value={value} onChange={e => onChange(e.target.value)} disabled={disabled} className={`${STYLES.input(!!error)} cursor-pointer`}>
-              <option value="">Select {label}</option>
-              {options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
-            </select>
-            <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" size={16} />
-          </>
-        ) : (
-          <input 
-            type={type} 
-            value={value} 
-            onChange={e => onChange(e.target.value)} 
-            onKeyDown={handleKeyDown} 
-            maxLength={maxLength} 
-            placeholder={placeholder} 
-            disabled={disabled} 
-            className={`${STYLES.input(!!error)}`} 
-          />
-        )}
-      </div>
+      <input 
+        type={type} 
+        value={value} 
+        onChange={(e) => onChange(e.target.value)} 
+        onKeyDown={handleKeyDown} 
+        maxLength={maxLength} 
+        placeholder={placeholder} 
+        className={STYLES.input(!!error)} 
+      />
       {error && <p className={STYLES.err}>{error}</p>}
     </div>
   );
 }
 
-function FileSelectionCard({ label, docKey, allowMultiple, selectedFiles, onAdd, onRemove }: any) {
+function FileSelectionCard({ label, docKey, selectedFiles, onAdd, onRemove }: FileSelectionCardProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(e.target.files || []);
-      if (files.length > 0) onAdd(allowMultiple ? files : [files[0]]);
+      if (files.length > 0) onAdd([files[0]]);
       if (inputRef.current) inputRef.current.value = "";
     };
   
     return (
       <div className="flex flex-col bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-        <label className="text-[10px] font-bold text-gray-400 uppercase mb-2 truncate">{label}</label>
-        <input type="file" ref={inputRef} multiple={allowMultiple} onChange={handleFileChange} className="hidden" accept="image/*,application/pdf" />
+        <label className="text-xs font-bold text-gray-500 uppercase mb-2 truncate">{label}</label>
+        <input type="file" ref={inputRef} onChange={handleFileChange} className="hidden" accept="image/*,application/pdf" />
         <div className="space-y-2">
           <button type="button" onClick={() => inputRef.current?.click()} className="w-full border border-dashed rounded-md py-2 flex flex-col items-center justify-center bg-gray-50 hover:bg-[#1CADA3]/5 border-gray-300 hover:border-[#1CADA3] group transition-colors">
             <div className="flex items-center gap-2">
               <UploadCloud size={16} className="text-gray-400 group-hover:text-[#1CADA3]" />
-              <span className="text-xs font-medium text-gray-500 group-hover:text-[#1CADA3]">{selectedFiles.length > 0 ? "Add More" : "Choose File"}</span>
+              <span className="text-xs font-medium text-gray-500 group-hover:text-[#1CADA3]">{selectedFiles.length > 0 ? "Change File" : "Choose File"}</span>
             </div>
           </button>
-          {selectedFiles.map((f: any, idx: number) => (
+          {selectedFiles.map((f: QueuedFile, idx: number) => (
             <div key={idx} className={`flex items-center justify-between border px-2 py-1.5 rounded-md text-xs ${f.status === 'error' ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'}`}>
               <div className="flex items-center truncate gap-2 max-w-[80%]">
                 {f.status === "uploading" ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-500 shrink-0" /> : 
@@ -579,10 +123,397 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
       <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/60 rounded-xl">
         <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-sm w-[90%] animate-in zoom-in duration-300">
           <CheckCircle className="w-16 h-16 text-[#1CADA3] mx-auto mb-4" />
-          <h3 className="text-2xl font-bold text-gray-800 mb-2">Application Submitted!</h3>
-          <p className="text-gray-600 mb-6">Your unlisted shares application and documents have been submitted successfully. Our team will contact you shortly.</p>
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">Lead Submitted to RM!</h3>
+          <p className="text-gray-600 mb-6">Your unlisted shares application and documents have been submitted successfully.</p>
           <button onClick={onClose} className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:bg-[#178e86] font-medium transition-colors">Return to Dashboard</button>
         </div>
       </div>
     );
+}
+
+// --- Main Form Component ---
+
+interface FormData {
+  fullName: string;
+  mobile: string;
+  email: string;
+  pan: string;
+  utrNumber: string;
+  stockName: string;
+  quantity: string;
+  price: string;
+  remarks: string;
+  investorType: string;
+}
+
+export default function UnlistedSharesForm({ onClose }: { onClose: () => void }) {
+  const [step, setStep] = useState<number>(1);
+  const [leadId, setLeadId] = useState<string | null>(null);
+  const [form, setForm] = useState<FormData>({
+    fullName: "",
+    mobile: "",
+    email: "",
+    pan: "",
+    utrNumber: "",
+    stockName: "",
+    quantity: "",
+    price: "",
+    remarks: "",
+    investorType: "Individual"
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [statusMsg, setStatusMsg] = useState<string>("");
+  const [showSuccess, setShowSuccess] = useState<boolean>(false);
+  const [fileQueue, setFileQueue] = useState<QueuedFile[]>([]);
+  const [quotationAccepted, setQuotationAccepted] = useState<boolean>(false);
+
+  const requiredDocsList = useMemo(() => {
+    return REQUIRED_DOCS.map(label => DOC_REGISTRY[label]).filter(Boolean);
+  }, []);
+
+  const handleInputChange = (field: keyof FormData, value: string) => {
+    let val = value;
+    if (field === "mobile") val = value.replace(/\D/g, '').slice(0, 10);
+    if (field === "pan") val = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+    if (field === "quantity" || field === "price") val = value.replace(/\D/g, '');
+    if (field === "email") val = value.toLowerCase();
+    
+    setForm(prev => ({ ...prev, [field]: val }));
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
+  };
+
+  const calculateTotal = (): string => {
+    const qty = parseFloat(form.quantity) || 0;
+    const price = parseFloat(form.price) || 0;
+    return (qty * price).toLocaleString('en-IN');
+  };
+
+  const validateStep1 = (): boolean => {
+    const errs: Record<string, string> = {};
+    
+    if (!form.fullName.trim()) errs.fullName = "Full Name is required";
+    if (!form.mobile.trim()) errs.mobile = "Mobile number is required";
+    if (form.mobile.length !== 10) errs.mobile = "10-digit mobile required";
+    if (!form.email.trim()) errs.email = "Email is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Invalid email";
+    if (!form.pan.trim()) errs.pan = "PAN is required";
+    if (form.pan.length !== 10) errs.pan = "10-character PAN required";
+    if (!form.utrNumber.trim()) errs.utrNumber = "UTR number is required";
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const validateStep2 = (): boolean => {
+    const errs: Record<string, string> = {};
+    
+    if (!form.stockName.trim()) errs.stockName = "Stock name is required";
+    
+    const qty = parseFloat(form.quantity);
+    if (!form.quantity || isNaN(qty) || qty <= 0) errs.quantity = "Valid quantity required";
+    
+    const price = parseFloat(form.price);
+    if (!form.price || isNaN(price) || price <= 0) errs.price = "Valid price required";
+    
+    if (!quotationAccepted) errs.quotation = "Please accept the quotation confirmation";
+    
+    if (fileQueue.length < REQUIRED_DOCS.length) {
+      errs.documents = `Please upload all required documents (${fileQueue.length}/${REQUIRED_DOCS.length} uploaded)`;
+    }
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleCreateLead = async (): Promise<void> => {
+    if (!validateStep1()) return;
+    setIsSubmitting(true);
+    setStatusMsg("Creating Application...");
+
+    try {
+      const notes = `Investor Type: ${form.investorType}
+  PAN: ${form.pan}
+  UTR Number: ${form.utrNumber}
+  Remarks: ${form.remarks || 'N/A'}`;
+
+      const payload = {
+        lead_name: form.fullName,
+        contact_number: form.mobile,
+        email: form.email,
+        department: "Unlisted",
+        sub_category: "Unlisted",
+        notes: notes.trim()
+      };
+
+      // Log the payload for debugging
+      console.log("Sending payload:", payload);
+
+      const result = await DashboardService.createReferralLead(payload);
+      console.log("API Response:", result);
+      
+      // Check if the response indicates success
+      if (!result.success) {
+        throw new Error(result.message || "Failed to create lead");
+      }
+      
+      // Since the API doesn't return an ID, generate a temporary ID
+      // or fetch the lead ID from another endpoint
+      const tempId = `TEMP_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Store the lead data in localStorage to retrieve later
+      const pendingLeads = JSON.parse(localStorage.getItem('pending_leads') || '{}');
+      pendingLeads[tempId] = {
+        ...form,
+        created_at: new Date().toISOString(),
+        api_response: result
+      };
+      localStorage.setItem('pending_leads', JSON.stringify(pendingLeads));
+      
+      setLeadId(tempId);
+      setStep(2);
+    } catch (err: any) {
+      console.error("API Error Details:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        statusText: err.response?.statusText
+      });
+      
+      let errorMessage = "Failed to create application.";
+      
+      // Parse different error response formats
+      if (err.response?.data) {
+        if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
+        } else if (err.response.data.message) {
+          errorMessage = err.response.data.message;
+        } else if (err.response.data.error) {
+          errorMessage = err.response.data.error;
+        } else {
+          errorMessage = JSON.stringify(err.response.data);
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setStatusMsg(errorMessage);
+      // Show error alert for better visibility
+      alert(`Error: ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const uploadDocuments = async (): Promise<void> => {
+    for (let i = 0; i < fileQueue.length; i++) {
+      const currentItem = fileQueue[i];
+      setStatusMsg(`Uploading ${i + 1}/${fileQueue.length}: ${currentItem.label}`);
+
+      setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "uploading" } : item));
+
+      const formData = new FormData();
+      formData.append("leadDbId", leadId!);
+      formData.append("documents", currentItem.file);
+      formData.append("metadata", JSON.stringify([{ key: currentItem.docKey, label: currentItem.label }]));
+
+      try {
+        await DashboardService.uploadLeadDocument(leadId!, formData);
+        setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "success" } : item));
+      } catch (err) {
+        setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "error" } : item));
+        throw err;
+      }
+    }
+  };
+
+  const handleFinalSubmission = async (): Promise<void> => {
+    if (!validateStep2()) return;
+    setIsSubmitting(true);
+    setStatusMsg("Uploading documents...");
+
+    try {
+      await uploadDocuments();
+      
+      setStatusMsg("Submitting to RM Department...");
+      
+      const rmLeads = JSON.parse(localStorage.getItem('rm_unlisted_leads') || '[]');
+      rmLeads.push({
+        lead_id: leadId,
+        lead_name: form.fullName,
+        contact_number: form.mobile,
+        email: form.email,
+        pan: form.pan,
+        utr_number: form.utrNumber,
+        department: "Unlisted Shares",
+        sub_category: "Secondary Market Transaction",
+        status: "Pending_RM_Approval",
+        transaction_details: {
+          stockName: form.stockName,
+          quantity: form.quantity,
+          price: form.price,
+          total_amount: calculateTotal()
+        },
+        quotation_accepted: quotationAccepted,
+        remarks: form.remarks,
+        submitted_at: new Date().toISOString(),
+        documents_uploaded: fileQueue.map(f => f.label)
+      });
+      localStorage.setItem('rm_unlisted_leads', JSON.stringify(rmLeads));
+
+      setIsSubmitting(false);
+      setShowSuccess(true);
+    } catch (err) {
+      setStatusMsg("Submission failed. Please try again.");
+      setIsSubmitting(false);
+    }
+  };
+
+  const fieldProps = (name: keyof FormData) => ({
+    value: form[name],
+    onChange: (v: string) => handleInputChange(name, v),
+    error: errors[name]
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col relative overflow-hidden">
+        
+        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 bg-white">
+          <div>
+            <h2 className="text-lg sm:text-xl font-semibold text-[#1CADA3]">Unlisted Shares Application</h2>
+            <p className="text-xs text-gray-400">Step {step} of 2</p>
+          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800"><X size={20} /></button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50/30">
+          {step === 1 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div className="col-span-1 md:col-span-2">
+                <h3 className="text-sm font-semibold text-[#1CADA3] mb-3">Customer Details</h3>
+              </div>
+              
+              <div className="col-span-1 md:col-span-2">
+                <label className={STYLES.label}>Investor Type <span className="text-red-500">*</span></label>
+                <select 
+                  value={form.investorType} 
+                  onChange={(e) => handleInputChange("investorType", e.target.value)} 
+                  className={`${STYLES.input(!!errors.investorType)} cursor-pointer`}
+                >
+                  {INVESTOR_TYPES.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                </select>
+                {errors.investorType && <p className={STYLES.err}>{errors.investorType}</p>}
+              </div>
+              
+              <Field label="Full Name" placeholder="Enter full name" {...fieldProps("fullName")} required />
+              <Field label="Mobile Number" placeholder="10-digit number" type="tel" maxLength={10} onlyNumber {...fieldProps("mobile")} required />
+              <Field label="Email ID" placeholder="Enter email address" type="email" {...fieldProps("email")} required />
+              <Field label="PAN Number" placeholder="ABCDE1234F" maxLength={10} {...fieldProps("pan")} required />
+              <Field label="UTR Number" placeholder="Unique Transaction Reference Number" {...fieldProps("utrNumber")} required />
+              <div className="col-span-1 md:col-span-2">
+                <Field label="Remarks (Optional)" placeholder="Any additional information" {...fieldProps("remarks")} />
+              </div>
+            </div>
+          ) : (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 space-y-6">
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg flex items-start gap-3">
+                <CheckCircle className="text-blue-500 mt-1 shrink-0" size={18} />
+                <div>
+                  <p className="text-sm font-semibold text-blue-900">Application Created Successfully!</p>
+                  <p className="text-xs text-blue-700">Lead ID: <span className="font-mono font-bold">{leadId}</span></p>
+                </div>
+              </div>
+
+              {/* Documents Upload Section */}
+              <div>
+                <h3 className="text-sm font-bold text-[#1CADA3] uppercase tracking-wider mb-4">Required Documents</h3>
+                {errors.documents && <p className={STYLES.err}>{errors.documents}</p>}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {requiredDocsList.map((doc) => (
+                    <FileSelectionCard 
+                      key={doc.key} 
+                      docKey={doc.key}
+                      label={doc.label} 
+                      selectedFiles={fileQueue.filter(f => f.docKey === doc.key)}
+                      onAdd={(files: File[]) => {
+                        const newEntries: QueuedFile[] = files.map(f => ({ file: f, docKey: doc.key, label: doc.label, status: "pending" }));
+                        setFileQueue(prev => [...prev.filter(f => f.docKey !== doc.key), ...newEntries]);
+                      }}
+                      onRemove={(name: string) => setFileQueue(prev => prev.filter(f => f.file.name !== name))}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Stock Transaction */}
+              <div>
+                <h3 className="text-sm font-bold text-[#1CADA3] uppercase tracking-wider mb-4">Transaction Details</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <Field label="Stock / Company Name" placeholder="Enter unlisted company name" {...fieldProps("stockName")} required />
+                  <Field label="Quantity" placeholder="Number of shares" onlyNumber {...fieldProps("quantity")} required />
+                  <Field label="Price per Share (₹)" placeholder="Per share price" onlyNumber {...fieldProps("price")} required />
+                  
+                  {form.quantity && form.price && (
+                    <div className="col-span-1 md:col-span-2 text-right text-sm bg-gray-100 px-3 py-2 rounded-lg">
+                      <span className="text-gray-600">Total Amount: </span>
+                      <span className="font-bold text-[#1CADA3]">₹ {calculateTotal()}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Quotation Acceptance */}
+              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={quotationAccepted}
+                    onChange={(e) => setQuotationAccepted(e.target.checked)} 
+                    className="w-4 h-4 text-[#1CADA3]" 
+                  />
+                  <span className="text-sm font-medium text-gray-800">
+                    I confirm that the above quotation details are accurate and agree to proceed with the transaction.
+                  </span>
+                </label>
+                {errors.quotation && <p className={STYLES.err}>{errors.quotation}</p>}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="border-t p-4 sm:px-6 flex items-center justify-between bg-white">
+          {step === 2 && !isSubmitting && (
+            <button onClick={() => setStep(1)} className={STYLES.secondaryBtn}>
+              <ArrowLeft size={18} /> Back
+            </button>
+          )}
+          <div className="flex-1" />
+          <button 
+            onClick={step === 1 ? handleCreateLead : handleFinalSubmission} 
+            disabled={isSubmitting} 
+            className={STYLES.btn}
+          >
+            {isSubmitting ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="animate-spin" size={20} />
+                {statusMsg}
+              </div>
+            ) : step === 1 ? (
+              <div className="flex items-center gap-2">
+                Create Lead & Proceed
+                <ArrowRight size={18} />
+              </div>
+            ) : (
+              "Submit to RM Department"
+            )}
+          </button>
+        </div>
+
+        {showSuccess && <SuccessModal onClose={onClose} />}
+      </div>
+    </div>
+  );
 }
