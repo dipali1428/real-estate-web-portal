@@ -132,6 +132,12 @@ export const AdminService = {
     return response.data;
   },
 
+  //Download DSA List as CSV
+  downloadDsa: async () => {
+    const response = await api.get("/api/admin/dsalist/download");
+    return response.data;
+  },
+
 
   contactusData: async (formData: EnquiryPayload = {}) => {
     const response = await api.get("/api/admin/contactus", { params: formData });

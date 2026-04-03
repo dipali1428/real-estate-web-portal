@@ -37,7 +37,8 @@ type QueuedFile = {
 
 export default function FireInsuranceForm({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState<Record<string, string>>({
-    insuranceType: "", name: "", address: "", pincode: "", sumInsured: "", tenure: ""
+    insuranceType: "", name: "", address: "", pincode: "", sumInsured: "", tenure: "",
+    hypothecationBank: "" 
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -177,6 +178,7 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
                 </div>
                 <Field label="Pincode" placeholder="6-digit pincode" onlyNumber maxLength={6} {...fieldProps("pincode")} required />
                 <Field label="Sum Insured (₹)" placeholder="Enter amount" onlyNumber {...fieldProps("sumInsured")} required />
+                <Field label="Hypothecation Bank" placeholder="Enter bank name" {...fieldProps("hypothecationBank")} />
                 <div className="col-span-1 md:col-span-2">
                   <Field label="Address for Insurance Location" placeholder="Enter full property address" {...fieldProps("address")} required />
                 </div>

@@ -430,12 +430,12 @@ export default function CareersContent() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <GalleryImage src="\Team\Image-1.jpeg" alt="Team Collaboration" />
-            <GalleryImage src="\Team\Image-6.jpeg" alt="Celebration Event" />
-            <GalleryImage src="\Team\Image-2.jpeg" alt="Training Session" />
-            <GalleryImage src="\Team\Image-3.jpeg" alt="Office Environment" />
-            <GalleryImage src="\Team\Image-4.jpeg" alt="Celebration Event" />
-            <GalleryImage src="\Team\Image-5.jpeg" alt="Celebration Event" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-1.jpeg`} alt="Team Collaboration" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-6.jpeg`} alt="Celebration Event" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-2.jpeg`} alt="Training Session" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-3.jpeg`} alt="Office Environment" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-4.jpeg`} alt="Celebration Event" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-5.jpeg`} alt="Celebration Event" />
           </div>
         </div>
       </section>
