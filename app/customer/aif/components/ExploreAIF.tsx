@@ -110,7 +110,7 @@ export default function ExploreAIF() {
     }
   };
 
-  const visibleProducts = showAllFunds ? filteredProducts : filteredProducts.slice(0, 3);
+  const visibleProducts = showAllFunds ? filteredProducts : filteredProducts.slice(0, 4);
 
   return (
     <div className="space-y-6 relative">
@@ -171,7 +171,7 @@ export default function ExploreAIF() {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {visibleProducts.map((product, index) => (
           <motion.div
             key={index}
@@ -240,16 +240,16 @@ export default function ExploreAIF() {
             </div>
 
             {/* Actions */}
-            <div className="space-y-2 mt-auto">
+            <div className="flex flex-col items-center gap-2 mt-auto pt-4 border-t border-gray-50">
               <button
                 onClick={e => { e.stopPropagation(); setSelectedProduct(product); }}
-                className="w-full py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white hover:opacity-90"
+                className="w-40 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white hover:opacity-90 cursor-pointer"
               >
                 <FileText size={16} /> Details
               </button>
               <button
                 onClick={e => { e.stopPropagation(); }}
-                className="w-full py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 bg-white text-[#1CADA3] border-2 border-[#1CADA3]/10 hover:border-[#1CADA3]/30 hover:bg-teal-50/50"
+                className="w-40 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 bg-white text-[#1CADA3] border-2 border-[#1CADA3]/10 hover:border-[#1CADA3]/30 hover:bg-teal-50/50 cursor-pointer"
               >
                 <Calendar size={16} /> Schedule Meeting
               </button>
@@ -259,7 +259,7 @@ export default function ExploreAIF() {
       </div>
 
       {/* View More / View Less */}
-      {filteredProducts.length > 3 && (
+      {filteredProducts.length > 4 && (
         <div className="flex justify-center pt-2">
           <button
             onClick={() => setShowAllFunds(prev => !prev)}
@@ -267,7 +267,7 @@ export default function ExploreAIF() {
           >
             {showAllFunds
               ? "View Less Funds"
-              : `View More Funds (${filteredProducts.length - 3} more)`}
+              : `View More Funds (${filteredProducts.length - 4} more)`}
             <ArrowRight
               size={16}
               className={`transition-transform ${showAllFunds ? "rotate-[270deg]" : "rotate-90"}`}

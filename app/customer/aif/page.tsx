@@ -6,8 +6,8 @@ import ExploreAIF from './components/ExploreAIF';
 
 export default function AIFDashboard() {
     return (
-        <div className="min-h-screen bg-[#F8FAFC]">
-            <div className="p-4 sm:p-6">
+        <div className="min-h-screen bg-gradient-to-tr from-gray-50 via-white to-blue-50">
+            <div className="p-4 sm:p-6 lg:p-8">
                 {/* Header Section */}
                 <motion.section 
                     initial={{ opacity: 0, y: -10 }}

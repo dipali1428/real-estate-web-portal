@@ -165,19 +165,7 @@ export const sidebarLinks = {
                 {
                     label: "Unlisted Shares",
                     icon: <BarChart3 className="h-4 w-4 text-neutral-700" />,
-                    children: [
-                        
-                        {
-                            label: "Companies",
-                            href: "/customer/unlisted/companies",
-                            icon: <Building2 className="h-4 w-4 text-neutral-700" />,
-                        },
-                        {
-                            label: "Transactions",
-                            href: "/customer/unlisted/transactions",
-                            icon: <Activity className="h-4 w-4 text-neutral-700" />,
-                        },
-                    ],
+                    href: "/customer/unlisted",
                 },
                 {
                     label: "Mutual Funds",
@@ -214,6 +202,11 @@ export const sidebarLinks = {
                         {
                             label: "Education Loan",
                             href: "/customer/loans/education-loan",
+                            icon: <Home className="h-4 w-4 text-neutral-700" />,
+                        },
+                        {
+                            label: "Mortgage Loan",
+                            href: "/customer/loans/mortgage-loan",
                             icon: <Home className="h-4 w-4 text-neutral-700" />,
                         },
                 // {
