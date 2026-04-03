@@ -155,187 +155,72 @@ export const sidebarLinks = {
         { label: "My Profile", href: "/director/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
     ],
 
-    CUSTOMER: [
-        { label: "Dashboard", href: "/customer", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
-        { label: "My Profile", href: "/customer/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
-        {
-            label: "Our Products",
-            icon: <Package className="h-5 w-5 text-neutral-700" />,
-            children: [
-                {
-                    label: "Unlisted Shares",
-                    icon: <BarChart3 className="h-4 w-4 text-neutral-700" />,
-                    href: "/customer/unlisted",
-                },
-                {
-                    label: "Mutual Funds",
-                    icon: <Landmark className="h-4 w-4 text-neutral-700" />,
-                    href: "/customer/mutual-funds",
-                },
-                {
-                    label: "Fixed Deposit ",
-                    icon: <Landmark className="h-4 w-4 text-neutral-700" />,
-                    href: "/customer/FD",
-                },
+   CUSTOMER: [
+    { label: "Dashboard", href: "/customer", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
 
-                {
-                    label: "AIF ",
-                    icon: <Landmark className="h-4 w-4 text-neutral-700" />,
-                    href: "/customer/aif",
-                },
-                
-                {
-                    label: "PMS",
-                    icon: <Landmark className="h-4 w-4 text-neutral-700" />,
-                    href: "/customer/pms",
-                },
-                {
-                    label: "Bonds",
-                    icon: <Landmark className="h-4 w-4 text-neutral-700" />,
-                    href: "/customer/bonds",
-                },
-                      {
-                            label: "Home Loan",
-                            href: "/customer/home-loan",
-                            icon: <Home className="h-4 w-4 text-neutral-700" />,
-                        },
-                        {
-                            label: "Education Loan",
-                            href: "/customer/loans/education-loan",
-                            icon: <Home className="h-4 w-4 text-neutral-700" />,
-                        },
-                        {
-                            label: "Mortgage Loan",
-                            href: "/customer/loans/mortgage-loan",
-                            icon: <Home className="h-4 w-4 text-neutral-700" />,
-                        },
-                // {
-                // {
-                //     label: "Mutual Funds Panel",
-                //     icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //     children: [
-                //         {
-                //             label: "Equity Funds",
-                //             href: "/customer/mutualfunds/equity",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //         {
-                //             label: "Debt Funds",
-                //             href: "/customer/mutualfunds/debt",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //     ],
-                // },
-                // {
-                //     label: "Insurance Panel",
-                //     icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //     children: [
-                //         {
-                //             label: "Health Insurance",
-                //             href: "/customer/insurance/health",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //         {
-                //             label: "Life Insurance",
-                //             href: "/customer/insurance/life",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //     ],
-                // },
-                // {
-                //     label: "Loan Panel",
-                //     icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //     children: [
-                //         {
-                //             label: "Home Loan",
-                //             href: "/customer/insurance/home",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //         {
-                //             label: "Personal Loan",
-                //             href: "/customer/insurance/personal",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //     ],
-                // },
-                // {
-                //     label: "Credit Panel",
-                //     icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //     children: [
-                //         {
-                //             label: "Credit1",
-                //             href: "/customer/insurance/credit1",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //         {
-                //             label: "Credit2",
-                //             href: "/customer/insurance/credit2",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //     ],
-                // },
-                // {
-                //     label: "PMS Panel",
-                //     icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //     children: [
-                //         {
-                //             label: "PMS1",
-                //             href: "/customer/insurance/pms1",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //         {
-                //             label: "PMS2",
-                //             href: "/customer/insurance/pms2",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //     ],
-                // },
-                // {
-                //     label: "Investments Panel",
-                //     icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //     children: [
-                //         {
-                //             label: "Investment1",
-                //             href: "/customer/insurance/investment1",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //         {
-                //             label: "Investment2",
-                //             href: "/customer/insurance/investment2",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //     ],
-                // },
-                   {
-                         label: "Real Estate ",
-                         href: "/customer/real-estate",
-                         icon: <Building2 className="h-4 w-4 text-neutral-700" />,
-                   },
-                //     children: [
-                //         {
-                //             label: "Real Estate1",
-                //             href: "/customer/insurance/real-estate1",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //         {
-                //             label: "Real Estate2",
-                //             href: "/customer/insurance/real-estate2",
-                //             icon: <Users className="h-4 w-4 text-neutral-700" />,
-                //         },
-                //     ],
-                // },
+    { label: "My Profile", href: "/customer/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
 
-            ],
-        },
-        { label: "Portfolio", href: "/customer/portfolio", icon: <LineChart className="h-5 w-5 text-neutral-700" /> },
-        { label: "Calculator", href: "/customer/calculator", icon: <Calculator className="h-5 w-5 text-neutral-700" /> },
-        { label: "Goal Planner", href: "/customer/goalplanner", icon: <Target className="h-5 w-5 text-neutral-700" /> },
-        { label: "Reports", href: "/customer/reports", icon: <BarChart3 className="h-5 w-5 text-neutral-700" /> },
-        { label: "Wishlist", href: "/customer/wishlist", icon: <Heart className="h-5 w-5 text-neutral-700" /> },
-        { label: "Help & Support", href: "/customer/support", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },
-        { label: "Relationship Manager", href: "/customer/relationshipmanager", icon: <UserCheck className="h-5 w-5 text-neutral-700" /> },
-    ],
+    {
+        label: "Our Products",
+        icon: <Package className="h-5 w-5 text-neutral-700" />,
+        children: [
+            {
+                label: "Unlisted Shares",
+                icon: <BarChart3 className="h-4 w-4 text-neutral-700" />,
+                href: "/customer/unlisted",
+            },
+            {
+                label: "Mutual Funds",
+                icon: <Landmark className="h-4 w-4 text-neutral-700" />,
+                href: "/customer/mutual-funds",
+            },
+            {
+                label: "Fixed Deposit",
+                icon: <Landmark className="h-4 w-4 text-neutral-700" />,
+                href: "/customer/FD",
+            },
+            {
+                label: "AIF",
+                icon: <Landmark className="h-4 w-4 text-neutral-700" />,
+                href: "/customer/aif",
+            },
+            {
+                label: "PMS",
+                icon: <Landmark className="h-4 w-4 text-neutral-700" />,
+                href: "/customer/pms",
+            },
+            {
+                label: "Bonds",
+                icon: <Landmark className="h-4 w-4 text-neutral-700" />,
+                href: "/customer/bonds",
+            },
+            {
+                label: "Loans",
+                href: "/customer/loans",
+                icon: <Landmark className="h-4 w-4 text-neutral-700" />,
+            },
+            {
+                label: "Real Estate",
+                href: "/customer/real-estate",
+                icon: <Building2 className="h-4 w-4 text-neutral-700" />,
+            },
+        ],
+    },
 
+    { label: "Portfolio", href: "/customer/portfolio", icon: <LineChart className="h-5 w-5 text-neutral-700" /> },
+
+    { label: "Calculator", href: "/customer/calculator", icon: <Calculator className="h-5 w-5 text-neutral-700" /> },
+
+    { label: "Goal Planner", href: "/customer/goalplanner", icon: <Target className="h-5 w-5 text-neutral-700" /> },
+
+    { label: "Reports", href: "/customer/reports", icon: <BarChart3 className="h-5 w-5 text-neutral-700" /> },
+
+    { label: "Wishlist", href: "/customer/wishlist", icon: <Heart className="h-5 w-5 text-neutral-700" /> },
+
+    { label: "Help & Support", href: "/customer/support", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },
+
+    { label: "Relationship Manager", href: "/customer/relationshipmanager", icon: <UserCheck className="h-5 w-5 text-neutral-700" /> },
+],
     UNLISTEDADMIN: [
         { label: "Dashboard", href: "/UnlistedAdmin", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         // { label: "Company Management", href: "/UnlistedAdmin/CompanyManagement", icon: <Proportions className="h-5 w-5 text-neutral-700" /> },
