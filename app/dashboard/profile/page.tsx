@@ -249,13 +249,13 @@ export default function ProfileSection() {
                 <div className="relative flex flex-col flex-1 w-full h-full lg:flex-none lg:w-[420px] lg:h-[750px] lg:rounded-[40px] lg:overflow-hidden lg:shadow-2xl lg:border lg:border-white/10">
                     
                     {/* DEBUGGING MESSAGES */}
-                    <div className="absolute top-20 left-4 z-[300] bg-black/80 p-2 rounded border border-white/20 text-[10px] text-white font-mono pointer-events-none">
+                    {/* <div className="absolute top-20 left-4 z-[300] bg-black/80 p-2 rounded border border-white/20 text-[10px] text-white font-mono pointer-events-none">
                         <div className="text-blue-400 font-bold">AI: Running</div>
                         <div>{mathStatus}</div>
                         <div className={isAligned ? "text-emerald-400" : "text-rose-400"}>
                             STATE: {isAligned ? "VERIFIED (TRUE)" : "NOT ALIGNED (FALSE)"}
                         </div>
-                    </div>
+                    </div> */}
         
                     {/* VIDEO SECTION */}
                     <div className="relative flex-1 bg-slate-900 overflow-hidden flex items-center justify-center">
