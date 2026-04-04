@@ -6,6 +6,7 @@ import CardTemplateImage from "@/app/assets/visiting_card.png";
 import { Phone, Mail, MapPin, Globe, Landmark, Pencil, CheckCircle2, User, AlertCircle, Loader2, Camera, Eye, EyeOff, X, ShieldCheck, Download, Lock, Copy, Share2 } from "lucide-react";
 import LogoImage from "@/public/logo.png";
 import { useRouter } from "next/navigation";
+import { FaceDetector, FilesetResolver, Detection } from "@mediapipe/tasks-vision";
 
 // --- Types & Constants ---
 interface PopupMessage { id: string; message: string; type: "success" | "error" | "loading"; }
@@ -70,142 +71,236 @@ export default function ProfileSection() {
     const [isGeneratingLink, setIsGeneratingLink] = useState(false);
 
     const [showCamera, setShowCamera] = useState(false);
-
-    const CameraCaptureModal = ({
-        onCapture,
-        onClose
-    }: {
-        onCapture: (blob: Blob) => void;
-        onClose: () => void
-    }) => {
+    const CameraCaptureModal = ({ onCapture, onClose }: { onCapture: (blob: Blob) => void; onClose: () => void }) => {
         const videoRef = useRef<HTMLVideoElement>(null);
         const canvasRef = useRef<HTMLCanvasElement>(null);
         const [stream, setStream] = useState<MediaStream | null>(null);
         const [error, setError] = useState<string | null>(null);
 
-        const startCamera = useCallback(async () => {
-            // 1. Check if the browser even supports mediaDevices
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                setError("Camera API is not supported in this browser or context (requires HTTPS).");
-                return;
-            }
+        // AI STATES
+        const [faceDetector, setFaceDetector] = useState<any>(null);
+        const [isAligned, setIsAligned] = useState(false);
+        const [isModelReady, setIsModelReady] = useState(false);
+        const requestRef = useRef<number | null>(null);
 
-            try {
-                // 2. Relaxed constraints: Try ideal, but allow the browser to fall back
-                const mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: "user",
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    }
-                });
+        // DEBUGGING MESSAGES (On-Screen)
+        const [aiStatus, setAiStatus] = useState("AI: Initializing...");
+        const [mathStatus, setMathStatus] = useState("Math: Waiting...");
+        const [reactStatus, setReactStatus] = useState("State: False");
+        const [isProcessing, setIsProcessing] = useState(false);
 
-                setStream(mediaStream);
-                if (videoRef.current) {
-                    videoRef.current.srcObject = mediaStream;
-                }
-            } catch (err: any) {
-                console.error("Camera access error:", err);
-
-                // 3. Provide specific feedback based on the error
-                if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
-                    setError("Permission denied. Please enable camera access in your browser settings.");
-                } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-                    setError("No camera found on this device.");
-                } else if (err.name === "NotReadableError" || err.name === "TrackStartError") {
-                    setError("Camera is already in use by another application.");
-                } else {
-                    setError("Could not access camera. Please ensure you are using HTTPS.");
-                }
-            }
-        }, []);
-
+        // Watch the state and update the debug message
         useEffect(() => {
-            startCamera();
-            return () => {
-                // Cleanup: Stop all tracks when component unmounts
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
+            setReactStatus(`State: ${isAligned ? "TRUE (GREEN)" : "FALSE (RED)"}`);
+        }, [isAligned]);
+
+        // 1. Initialize AI
+        useEffect(() => {
+            const init = async () => {
+                try {
+                    setAiStatus("AI: Loading Files...");
+                    // const { FaceDetector, FilesetResolver } = await import("@mediapipe/tasks-vision");
+                    const vision = await FilesetResolver.forVisionTasks(
+                        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+                    );
+                    const detector = await FaceDetector.createFromOptions(vision, {
+                        baseOptions: {
+                            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite`,
+                            delegate: "CPU" // Use CPU for mobile stability
+                        },
+                        runningMode: "VIDEO"
+                    });
+                    setFaceDetector(detector);
+                    setIsModelReady(true);
+                    setAiStatus("AI: Ready & Running");
+                } catch (err: any) {
+                    setAiStatus("AI: Error " + err.message);
+                    setError("AI Init Failed");
                 }
             };
-        }, [startCamera]);
+            init();
+            return () => faceDetector?.close();
+        }, []);
+
+        // 2. Detection Loop
+        const detectFace = useCallback(() => {
+            if (isProcessing) return;
+
+            if (faceDetector && videoRef.current && videoRef.current.readyState >= 2) {
+                try {
+                    const result = faceDetector.detectForVideo(videoRef.current, performance.now());
+                    const hasFace = result.detections && result.detections.length > 0;
+
+                    if (hasFace) {
+                        const face = result.detections[0].boundingBox;
+                        const video = videoRef.current;
+
+                        // 1. Convert to percentages (0 to 1) regardless of device resolution
+                        // Some browsers return pixels (e.g. 240), some return normalized (e.g. 0.4)
+                        const normX = face.originX > 1 ? face.originX / video.videoWidth : face.originX;
+                        const normW = face.width > 1 ? face.width / video.videoWidth : face.width;
+                        const normY = face.originY > 1 ? face.originY / video.videoHeight : face.originY;
+                        const normH = face.height > 1 ? face.height / video.videoHeight : face.height;
+
+                        const centerX = normX + (normW / 2);
+                        const centerY = normY + (normH / 2);
+
+                        const isDesktop = window.innerWidth >= 1024;
+
+                        // 2. Adjust thresholds based on device
+                        // On wide desktop cams, the face is naturally a smaller % of the total width
+                        const minW = isDesktop ? 0.45 : 0.17; 
+                        const maxW = isDesktop ? 0.53 : 0.27;
+                        
+                        // On desktop, we give a bit more wiggle room for centering 
+                        // because webcams are often not perfectly centered on the monitor
+                        const hRange = isDesktop ? { min: 0.42, max: 0.58 } : { min: 0.45, max: 0.52 };
+                        const vRange = isDesktop ? { min: 0.45, max: 0.65 } : { min: 0.50, max: 0.60 };
+                        
+                        const isCenteredH = centerX > hRange.min && centerX < hRange.max;
+                        const isCenteredV = centerY > vRange.min && centerY < vRange.max;
+                        const isBigEnough = normW > minW && normW < maxW;
+
+                        const pass = isCenteredH && isCenteredV && isBigEnough;
+
+                        // 3. DEBUG FOR MOBILE (This will show on your screen)
+                        setMathStatus(`CX:${centerX.toFixed(2)} CY:${centerY.toFixed(2)} W:${normW.toFixed(2)}`);
+
+                        if (isAligned !== pass) setIsAligned(pass);
+                    } else {
+                        setMathStatus("No face in view");
+                        if (isAligned !== false) setIsAligned(false);
+                    }
+                } catch (err) {
+                    setMathStatus("Error: " + (err as Error).message);
+                }
+            }
+
+            if (!isProcessing) {
+                requestRef.current = requestAnimationFrame(detectFace);
+            }
+        }, [faceDetector, isAligned, isProcessing]);
+
+        useEffect(() => {
+            if (isModelReady) requestRef.current = requestAnimationFrame(detectFace);
+            return () => { if (requestRef.current) cancelAnimationFrame(requestRef.current); };
+        }, [isModelReady, detectFace]);
+
+        // 3. Camera Setup (Low res for speed)
+        useEffect(() => {
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "user", width: 320, height: 480 }
+            }).then(s => {
+                setStream(s);
+                if (videoRef.current) videoRef.current.srcObject = s;
+            }).catch(() => setError("Camera Denied"));
+            return () => stream?.getTracks().forEach(t => t.stop());
+        }, []);
+
+
 
         const capturePhoto = () => {
-            if (videoRef.current && canvasRef.current) {
-                const video = videoRef.current;
-                const canvas = canvasRef.current;
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const ctx = canvas.getContext("2d");
+            if (!isAligned || !videoRef.current || !canvasRef.current || isProcessing) return;
 
-                // Mirror the photo since the preview is mirrored
-                ctx?.translate(canvas.width, 0);
-                ctx?.scale(-1, 1);
-                ctx?.drawImage(video, 0, 0);
+            // 1. START CAPTURE - FREEZE EVERYTHING
+            setIsProcessing(true);
 
+            // Stop the AI detection loop immediately
+            if (requestRef.current) {
+                cancelAnimationFrame(requestRef.current);
+                requestRef.current = null;
+            }
+
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+
+            // 2. PAUSE VIDEO (This creates the "Instant Flash" feel)
+            video.pause();
+
+            // 3. DRAW TO CANVAS (Now the CPU is 100% dedicated to this)
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d", { alpha: false }); // 'alpha: false' makes it faster
+
+            if (ctx) {
+                // Mirror the photo
+                ctx.translate(canvas.width, 0);
+                ctx.scale(-1, 1);
+                ctx.drawImage(video, 0, 0);
+
+                // 4. CONVERT TO BLOB
+                // Lowering quality slightly (0.8) makes the save nearly instant on mobile
                 canvas.toBlob((blob) => {
                     if (blob) {
                         onCapture(blob);
                         onClose();
                     }
-                }, "image/jpeg", 0.9);
+                }, "image/jpeg", 0.8);
             }
         };
 
         return (
-            <div className="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center p-4">
-                <div className="relative w-full max-w-md aspect-[3/4] rounded-3xl overflow-hidden bg-slate-900 shadow-2xl">
-                    {error ? (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-                            <AlertCircle size={48} className="text-rose-500 mb-4" />
-                            <p className="text-white font-bold">{error}</p>
-                            <button
-                                onClick={onClose}
-                                className="mt-6 px-6 py-2 bg-white/20 text-white rounded-xl font-bold"
-                            >
-                                Go Back
-                            </button>
+            <div className="fixed inset-0 z-[250] bg-black flex flex-col lg:items-center lg:justify-center font-sans">
+                
+                {/* DESKTOP BACKGROUND OVERLAY (Only visible on large screens) */}
+                <div className="hidden lg:block absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+        
+                {/* MAIN MODAL BODY */}
+                <div className="relative flex flex-col flex-1 w-full h-full lg:flex-none lg:w-[420px] lg:h-[750px] lg:rounded-[40px] lg:overflow-hidden lg:shadow-2xl lg:border lg:border-white/10">
+                    
+                    {/* DEBUGGING MESSAGES */}
+                    <div className="absolute top-20 left-4 z-[300] bg-black/80 p-2 rounded border border-white/20 text-[10px] text-white font-mono pointer-events-none">
+                        <div className="text-blue-400 font-bold">AI: Running</div>
+                        <div>{mathStatus}</div>
+                        <div className={isAligned ? "text-emerald-400" : "text-rose-400"}>
+                            STATE: {isAligned ? "VERIFIED (TRUE)" : "NOT ALIGNED (FALSE)"}
                         </div>
-                    ) : (
-                        <>
-                            <video
-                                ref={videoRef}
-                                autoPlay
-                                playsInline
-                                muted
-                                className="w-full h-full object-cover scale-x-[-1]"
-                            />
-                            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
-                                <div className="w-[70%] h-[60%] border-2 border-dashed border-white/50 rounded-[100px] relative">
-                                    <div className="absolute inset-0 border-2 border-[#1CADA3] rounded-[100px] animate-pulse opacity-50" />
-                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full mb-2">
-                                        <span className="text-white text-[10px] font-bold uppercase bg-[#1CADA3] px-2 py-1 rounded">Align Face Here</span>
-                                    </div>
-                                </div>
-                                <div className="absolute inset-0 shadow-[0_0_0_1000px_rgba(0,0,0,0.5)] rounded-[100px] w-[70%] h-[60%] m-auto" />
+                    </div>
+        
+                    {/* VIDEO SECTION */}
+                    <div className="relative flex-1 bg-slate-900 overflow-hidden flex items-center justify-center">
+                        <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover scale-x-[-1]" />
+        
+                        {/* THE FACE FRAME (The Oval) */}
+                        {/* w-[70%] is your original mobile width. lg:w-[280px] fixes the desktop size. */}
+                        <div className={`relative z-10 w-[70%] lg:w-[280px] aspect-[3/4] border-[4px] rounded-[100px] transition-all duration-100 ${isAligned ? 'border-emerald-500 scale-105 shadow-[0_0_40px_rgba(16,185,129,0.5)]' : 'border-white border-dashed shadow-[0_0_0_1000px_rgba(0,0,0,0.5)]'}`}>
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-12">
+                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isAligned ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-500'}`}>
+                                    {isAligned ? "Correct" : "Align Face"}
+                                </span>
                             </div>
-                        </>
-                    )}
-
-                    <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-md rounded-full text-white">
-                        <X size={24} />
-                    </button>
-                </div>
-
-                {!error && (
-                    <div className="mt-8 flex flex-col items-center gap-6">
+                        </div>
+        
+                        {/* CLOSE BUTTON */}
+                        <button onClick={onClose} className="absolute top-4 right-4 p-3 bg-black/40 rounded-full text-white z-[60] hover:bg-black/60 transition-colors">
+                            <X size={24} />
+                        </button>
+                    </div>
+        
+                    {/* CONTROLS SECTION */}
+                    <div className="bg-slate-950 p-10 lg:p-8 flex flex-col items-center gap-4">
                         <button
                             onClick={capturePhoto}
-                            className="w-20 h-20 bg-white rounded-full flex items-center justify-center p-1 border-4 border-[#1CADA3] active:scale-95 transition-transform"
+                            disabled={!isAligned || isProcessing}
+                            className={`w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all ${isAligned && !isProcessing
+                                ? 'border-emerald-500 bg-white scale-110'
+                                : 'border-slate-800 bg-slate-900 opacity-40'
+                                }`}
                         >
-                            <div className="w-full h-full bg-white rounded-full border-2 border-slate-200 flex items-center justify-center">
-                                <div className="w-14 h-14 bg-[#1CADA3] rounded-full" />
+                            <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isAligned ? 'bg-emerald-500' : 'bg-slate-700'}`}>
+                                {isProcessing ? (
+                                    <Loader2 className="text-white animate-spin" size={32} />
+                                ) : (
+                                    <Camera size={32} className="text-white" />
+                                )}
                             </div>
                         </button>
-                        <p className="text-white/60 text-xs font-medium">Position your face within the oval</p>
+                        <p className="text-[10px] font-black text-white mt-2 uppercase tracking-widest text-center">
+                            {isProcessing ? "Saving Photo..." : isAligned ? "Tap to Capture" : "position your face inside the frame and hold still"}
+                        </p>
                     </div>
-                )}
-
+                </div>
+        
                 <canvas ref={canvasRef} className="hidden" />
             </div>
         );
@@ -711,18 +806,18 @@ export default function ProfileSection() {
                 </button>
             </div>
 
-                <div className="fixed top-5 right-5 z-[100] flex flex-col gap-3 pointer-events-none w-[calc(100%-40px)] sm:w-auto">
-                    {popups.map((p) => (
-                        <div key={p.id} className={`pointer-events-auto min-w-[280px] px-6 py-4 rounded-2xl shadow-2xl border transition-all duration-300 ${p.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : p.type === 'error' ? 'bg-rose-50 border-rose-100 text-rose-800' : 'bg-white border-slate-200 text-slate-800'}`}>
-                            <div className="flex items-center justify-between gap-4">
-                                <span className="text-sm font-bold">{p.message}</span>
-                                <button onClick={() => removePopup(p.id)} className="text-xs font-black opacity-50">X</button>
-                            </div>
+            <div className="fixed top-5 right-5 z-[100] flex flex-col gap-3 pointer-events-none w-[calc(100%-40px)] sm:w-auto">
+                {popups.map((p) => (
+                    <div key={p.id} className={`pointer-events-auto min-w-[280px] px-6 py-4 rounded-2xl shadow-2xl border transition-all duration-300 ${p.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : p.type === 'error' ? 'bg-rose-50 border-rose-100 text-rose-800' : 'bg-white border-slate-200 text-slate-800'}`}>
+                        <div className="flex items-center justify-between gap-4">
+                            <span className="text-sm font-bold">{p.message}</span>
+                            <button onClick={() => removePopup(p.id)} className="text-xs font-black opacity-50">X</button>
                         </div>
-                    ))}
-                </div>
+                    </div>
+                ))}
+            </div>
 
-            <div className="max-w-7xl xl:mr-72 xl:ml-32 px-4 md:pb-60 sm:pb-20 pb-15 bg-[#F8FAFC] min-h-screen relative font-sans">
+            <div className="max-w-7xl min[1800]:mr-72 lg:mr-40 max[1200]:ml-32 px-4 md:pb-60 sm:pb-20 pb-15 bg-[#F8FAFC] min-h-screen relative font-sans">
                 <div className="space-y-10 sm:space-y-16">
                     {isStep3Complete && (
                         <section id="profile-summary" className="animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -735,7 +830,7 @@ export default function ProfileSection() {
                             <div className="grid lg:grid-cols-12 gap-6 sm:gap-8">
                                 <div className="lg:col-span-4">
                                     <div className="lg:col-span-4 bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 text-slate-800 border border-slate-100 shadow-xl shadow-slate-200/40 h-fit z-30">
-                                        <h4 className="text-[10px] font-black uppercase text-[#1CADA3] tracking-widest mb-6 sm:mb-8">Onboarding Summary</h4>
+                                        <h4 className="text-[10px] font-black uppercase text-[#1CADA3] tracking-widest mb-6 sm:mb-8">Profile Summary</h4>
                                         <div className="space-y-6">
                                             {/* Changed this container's classes */}
                                             <div className="flex flex-col sm:flex-row lg:flex-col min-[1801px]:flex-row items-center sm:items-start lg:items-start text-center sm:text-left lg:text-left gap-4 sm:gap-6 mb-5 pb-5 border-b border-slate-50">
@@ -1413,8 +1508,8 @@ export default function ProfileSection() {
                 </div>
             </div>
 
-            <aside className="hidden xl:flex fixed right-10 top-1/2 -translate-y-1/2 z-50 flex-col items-end">
-                <div className="relative flex flex-col gap-20 pr-6">
+            <aside className="hidden xl:flex fixed right-10 top-[60%] -translate-y-1/2 z-50 flex-col items-end">
+                <div className="relative flex flex-col gap-10 min-[1500px]:gap-20 pr-6">
                     <div className="absolute right-[14px] top-0 bottom-0 w-[1.5px] bg-slate-200/50" />
                     {[
                         { id: "profile-summary", label: "Profile", done: isStep3Complete, active: isStep3Complete },
