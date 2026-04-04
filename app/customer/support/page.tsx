@@ -71,7 +71,6 @@ export default function HelpSupport() {
             setTickets(ticketData);
             setApiCategories(catRes.data || []);
             updateTabCounts(ticketData);
-            toast.success(`Loaded ${ticketData.length} tickets`);
         } catch (error) {
             toast.error('Failed to load support tickets');
         } finally {

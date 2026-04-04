@@ -8,6 +8,7 @@ import { ProfileSection } from './profilesection';
 import { KYCSection } from './kycsection';
 import { Modals } from './modal';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion'; // Ensure motion is imported
 
 export interface ProfileData {
   id?: number;
@@ -27,8 +28,8 @@ export interface ProfileData {
   ifsc?: string;
   name_as_per_pan?: string;
   date_of_birth?: string;
-  address?: string; // Add address to ProfileData
-  current_address?: string; // Add current_address
+  address?: string;
+  current_address?: string;
   kycDetails?: any;
   profile_photo?: string;
   avatar?: string;
@@ -42,14 +43,10 @@ export interface PasswordData {
   confirmPassword: string;
 }
 
-// Helper for info toast
 const showInfoToast = (message: string) => {
   toast(message, {
     icon: 'ℹ️',
-    style: {
-      background: '#3b82f6',
-      color: '#fff',
-    },
+    style: { background: '#3b82f6', color: '#fff' },
   });
 };
 
@@ -70,14 +67,9 @@ const getBaseURL = (): string => {
   return baseURL.replace(/\/api$/, '');
 };
 
-// Get profile image URL helper function
 const getProfileImageUrl = (imagePath: string | undefined): string | null => {
   if (!imagePath) return null;
-  
-  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-    return imagePath;
-  }
-  
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) return imagePath;
   const baseUrl = getBaseURL();
   return `${baseUrl}${imagePath}`;
 };
@@ -133,7 +125,6 @@ export default function ProfilePage() {
     return 'Strong';
   }, [passwordStrength]);
 
-  // Calculate password strength
   useEffect(() => {
     const password = passwordData.newPassword;
     let strength = 0;
@@ -144,18 +135,9 @@ export default function ProfilePage() {
     setPasswordStrength(strength);
   }, [passwordData.newPassword]);
 
-  // STEP LOGIC
-  const isStep1Complete = useMemo(() => {
-    return !!(profile?.name && profile?.mobile && profile?.email_verified);
-  }, [profile]);
-
-  const isStep2Complete = useMemo(() => {
-    return !!(isStep1Complete && profile?.pan_verified && profile?.aadhaar_verified);
-  }, [isStep1Complete, profile]);
-
-  const isStep3Complete = useMemo(() => {
-    return !!(isStep2Complete && profile?.bank_verified);
-  }, [isStep2Complete, profile]);
+  const isStep1Complete = useMemo(() => !!(profile?.name && profile?.mobile && profile?.email_verified), [profile]);
+  const isStep2Complete = useMemo(() => !!(isStep1Complete && profile?.pan_verified && profile?.aadhaar_verified), [isStep1Complete, profile]);
+  const isStep3Complete = useMemo(() => !!(isStep2Complete && profile?.bank_verified), [isStep2Complete, profile]);
 
   const refreshProfileData = useCallback(async () => {
     try {
@@ -165,14 +147,10 @@ export default function ProfilePage() {
         const kycData = response.kycDetails || {};
         const profileImage = userData.profile_photo || userData.profile_image || kycData.profile_image_url || '';
 
-        // Get address from multiple sources
         let userAddress = userData.address || userData.current_address || '';
-        // If Aadhaar is verified, use Aadhaar address
         if (kycData.aadhaar_verified && kycData.aadhaar_kyc_data?.full_address) {
           userAddress = kycData.aadhaar_kyc_data.full_address;
           setAadhaarAddress(kycData.aadhaar_kyc_data.full_address);
-        } else if (kycData.current_address) {
-          userAddress = kycData.current_address;
         }
 
         const updatedProfile: ProfileData = {
@@ -183,168 +161,95 @@ export default function ProfilePage() {
           aadhaar_verified: !!kycData.aadhaar_verified,
           bank_verified: !!kycData.bank_verified,
           profile_image: profileImage,
-          address: userAddress, // Set address
+          address: userAddress,
           current_address: userAddress,
           kycDetails: kycData
         };
-
         setProfile(updatedProfile);
         setOriginalProfile(updatedProfile);
         setImageTimestamp(Date.now());
         setHasChanges(false);
       }
-    } catch (error) {
-      toast.error("Failed to refresh profile");
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { toast.error("Failed to refresh profile"); } finally { setLoading(false); }
   }, []);
 
-  useEffect(() => {
-    refreshProfileData();
-  }, [refreshProfileData]);
+  useEffect(() => { refreshProfileData(); }, [refreshProfileData]);
 
-  // Handle profile field changes - Fixed type issue
   const handleProfileChange = (field: keyof ProfileData, value: string) => {
     setProfile(prev => prev ? { ...prev, [field]: value } : null);
     setHasChanges(true);
-    
-    // Validate mobile on change
-    if (field === 'mobile') {
-      const error = validateMobile(value);
-      setMobileError(error);
-    }
+    if (field === 'mobile') setMobileError(validateMobile(value));
   };
 
-  // Handle image upload from gallery
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
     const formData = new FormData();
     formData.append('profile_photo', file);
-    
     try {
       setUploadingImage(true);
       await customerService.updateProfileImage(formData);
       await refreshProfileData();
-      setImageTimestamp(Date.now());
       toast.success("Photo updated successfully!");
-    } catch (error) {
-      console.error("Upload failed:", error);
-      toast.error("Failed to update photo");
-    } finally {
-      setUploadingImage(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+    } catch (error) { toast.error("Failed to update photo"); } finally { 
+      setUploadingImage(false); 
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
-  // Handle camera capture
   const handleCameraCapture = async (blob: Blob) => {
     const file = new File([blob], `camera_capture_${Date.now()}.jpg`, { type: "image/jpeg" });
     const formData = new FormData();
     formData.append("profile_photo", file);
-    
     try {
       setUploadingImage(true);
       await customerService.updateProfileImage(formData);
       await refreshProfileData();
-      setImageTimestamp(Date.now());
       toast.success("Photo updated successfully!");
-    } catch (error) {
-      console.error("Upload failed:", error);
-      toast.error("Failed to update photo");
-    } finally {
-      setUploadingImage(false);
-    }
+    } catch (error) { toast.error("Failed to update photo"); } finally { setUploadingImage(false); }
   };
 
   const handleAddressUpdate = (address: string) => {
-    console.log('Address update received in parent:', address); // Debug log
     setAadhaarAddress(address);
-    // Update profile with this address
-    if (profile) {
-      setProfile({ ...profile, address, current_address: address });
-    }
-    // Show success message
+    if (profile) setProfile({ ...profile, address, current_address: address });
     toast.success("Address fetched from Aadhaar!");
   };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) return;
-    
-    // Validate mobile before updating
     const mobileValidationError = validateMobile(profile.mobile);
     if (mobileValidationError) {
       setMobileError(mobileValidationError);
       toast.error(mobileValidationError);
       return;
     }
-    
     try {
       setUpdating(true);
-      // Include address in update if it exists
-      const updateData: any = { 
-        name: profile.name, 
-        mobile: profile.mobile 
-      };
-      if (profile.address) {
-        updateData.current_address = profile.address;
-      }
-      
+      const updateData: any = { name: profile.name, mobile: profile.mobile };
+      if (profile.address) updateData.current_address = profile.address;
       await customerService.updateProfile(updateData);
       setIsEditing(false);
       setHasChanges(false);
       toast.success("Profile updated successfully!");
       await refreshProfileData();
-    } catch (err) {
-      toast.error("Update failed");
-    } finally {
-      setUpdating(false);
-    }
+    } catch (err) { toast.error("Update failed"); } finally { setUpdating(false); }
   };
 
-  const handleEdit = () => {
-    setIsEditing(true);
-    setMobileError(null);
-  };
-
-  const handleDiscard = () => {
-    setProfile(originalProfile);
-    setIsEditing(false);
-    setHasChanges(false);
-    setMobileError(null);
-  };
+  const handleEdit = () => { setIsEditing(true); setMobileError(null); };
+  const handleDiscard = () => { setProfile(originalProfile); setIsEditing(false); setHasChanges(false); setMobileError(null); };
 
   const handlePasswordUpdate = async (e: FormEvent) => {
     e.preventDefault();
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error("New passwords don't match");
-      return;
-    }
-    
-    if (passwordData.newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
-    
+    if (passwordData.newPassword !== passwordData.confirmPassword) { toast.error("New passwords don't match"); return; }
+    if (passwordData.newPassword.length < 6) { toast.error("Password must be at least 6 characters"); return; }
     try {
       setUpdatingPassword(true);
-      await customerService.changePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
-      });
+      await customerService.changePassword({ currentPassword: passwordData.currentPassword, newPassword: passwordData.newPassword });
       toast.success("Password updated successfully!");
       setShowPasswordModal(false);
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to update password");
-    } finally {
-      setUpdatingPassword(false);
-    }
+    } catch (error: any) { toast.error(error?.response?.data?.message || "Failed to update password"); } finally { setUpdatingPassword(false); }
   };
 
   const handleDeleteAccount = async () => {
@@ -354,31 +259,30 @@ export default function ProfilePage() {
       toast.success("Account deleted successfully");
       removeTokenCookie();
       router.push('/login');
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to delete account");
-    } finally {
-      setDeleting(false);
-      setShowDeleteModal(false);
-    }
+    } catch (error: any) { toast.error(error?.response?.data?.message || "Failed to delete account"); } finally { setDeleting(false); setShowDeleteModal(false); }
   };
 
-  // Determine the final address to display
-  const displayAddress = useMemo(() => {
-    // Priority: Aadhaar address > profile address > current_address > empty
-    if (aadhaarAddress) return aadhaarAddress;
-    if (profile?.address) return profile.address;
-    if (profile?.current_address) return profile.current_address;
-    return '';
-  }, [aadhaarAddress, profile]);
+  const displayAddress = useMemo(() => aadhaarAddress || profile?.address || profile?.current_address || '', [aadhaarAddress, profile]);
 
   if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin text-[#1CADA3]" /></div>;
 
   return (
-    <main className="max-w-[1440px] mx-auto px-4 md:px-8 py-8 bg-[#F8FAFC] min-h-screen">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-700">My Profile</h1>
-        <p className="text-slate-500">Complete your verification to unlock all features.</p>
-      </header>
+    <main className="flex-1 p-4 sm:p-6 bg-[#F8FAFC] min-h-screen font-sans">
+      
+      {/* --- UPDATED HEADER (Using Requested Css) --- */}
+      <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-8 text-white shadow-lg"
+      >
+          <h2 className="text-xl sm:text-2xl font-bold mb-2 pr-20">
+              My Profile
+          </h2>
+          <p className="text-sm sm:text-base text-white/80">
+              Complete your verification to unlock all features.
+          </p>
+      </motion.div>
 
       {/* Progress Bar */}
       <div className="mb-8 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
@@ -415,7 +319,7 @@ export default function ProfilePage() {
         onCameraCapture={handleCameraCapture}
         refreshProfile={refreshProfileData}
         imageTimestamp={imageTimestamp}
-        address={displayAddress} // Pass the computed display address
+        address={displayAddress}
       />
 
       <KYCSection 

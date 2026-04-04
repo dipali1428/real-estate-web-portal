@@ -89,7 +89,6 @@ export default function Wishlist() {
 
                 setWishlistItems(transformed);
                 updateCategoryCounts(transformed);
-                toast.success(`Loaded ${transformed.length} wishlist items`);
             } else {
                 toast.error('Failed to load wishlist');
             }

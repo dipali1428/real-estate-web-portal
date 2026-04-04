@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import CustomerService from '../../services/customerService';
+import { motion, AnimatePresence } from 'framer-motion'; // Added motion imports
 
 // Types
 interface Goal {
@@ -81,6 +82,7 @@ export default function GoalPlanner() {
     // State management
     const [goals, setGoals] = useState<Goal[]>([]);
     const [loading, setLoading] = useState(true);
+    const [customerName, setCustomerName] = useState<string>(""); // Added for the header
     const [error, setError] = useState<string | null>(null);
     const [calculating, setCalculating] = useState(false);
     const [selectedTab, setSelectedTab] = useState<'dashboard' | 'active' | 'completed' | 'create'>('dashboard');
@@ -134,6 +136,16 @@ export default function GoalPlanner() {
 
             localStorage.setItem('token', token);
             
+            // Fetch Profile for the name in header
+            try {
+                const profileRes = await CustomerService.getProfile();
+                const userData = profileRes.user || profileRes;
+                if (userData?.name) {
+                    const firstName = userData.name.split(' ')[0];
+                    setCustomerName(firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase());
+                }
+            } catch (err) {}
+
             const response = await CustomerService.getMyGoals();
             
             if (response.success) {
@@ -490,472 +502,490 @@ export default function GoalPlanner() {
                 />
             )}
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* UPDATED: flex-1 p-4 sm:p-6 bg-[#F8FAFC] and removal of max-w constraints where requested */}
+            <div className="flex-1 p-4 sm:p-6 bg-[#F8FAFC] min-h-screen font-sans">
                 
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                    <div>
-                        <div className="flex items-center gap-2 mb-2">
-                            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                                <Target className="w-8 h-8 text-[#2076C7]" />
+                {/* --- UPDATED HEADER (Requested Css) --- */}
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white shadow-lg"
+                >
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 className="text-xl sm:text-2xl font-bold mb-2 pr-20">
                                 Goal Planner
-                            </h1>
+                            </h2>
+                            <p className="text-sm sm:text-base text-white/80">
+                                Plan, track, and achieve your financial goals with ease.
+                            </p>
                         </div>
-                        <p className="text-gray-600">Plan, track, and achieve your financial goals</p>
-                    </div>
-                    
-                    <button 
-                        onClick={() => {
-                            resetForm();
-                            setSelectedTab('create');
-                        }}
-                        className="px-4 py-2.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-all hover:opacity-90"
-                    >
-                        <Plus className="w-4 h-4" />
-                        Create New Goal
-                    </button>
-                </div>
-
-                {/* Tabs */}
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-2 flex flex-wrap gap-2 mb-8">
-                    {[
-                        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-                        { id: 'active', label: 'My Goals', icon: ListChecks, count: activeCount },
-                        { id: 'completed', label: 'Completed', icon: CheckCircle, count: completedCount }
-                    ].map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setSelectedTab(tab.id as any)}
-                            className={`flex-1 min-w-[120px] px-4 py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all ${
-                                selectedTab === tab.id
-                                    ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md'
-                                    : 'text-gray-600 hover:bg-gray-50'
-                            }`}
+                        <button 
+                            onClick={() => {
+                                resetForm();
+                                setSelectedTab('create');
+                            }}
+                            className="px-4 py-2.5 bg-white text-[#2076C7] rounded-xl text-sm font-bold flex items-center gap-2 transition-all hover:bg-opacity-90 shadow-md"
                         >
-                            <tab.icon size={18} />
-                            {tab.label}
-                            {tab.count !== undefined && tab.count > 0 && (
-                                <span className={`px-2 py-0.5 rounded-full text-xs ${
-                                    selectedTab === tab.id ? 'bg-white/20' : 'bg-gray-200 text-gray-700'
-                                }`}>
-                                    {tab.count}
-                                </span>
-                            )}
+                            <Plus className="w-4 h-4" />
+                            New Goal
                         </button>
-                    ))}
-                </div>
+                    </div>
+                </motion.div>
 
-                {/* Dashboard View */}
-                {selectedTab === 'dashboard' && (
-                    <>
-                        {/* Summary Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                            
-                            {/* Total Goals */}
-                            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
-                                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-3">
-                                    <Target className="w-6 h-6 text-blue-600" />
-                                </div>
-                                <p className="text-sm font-medium text-gray-500 mb-1">Total Goals</p>
-                                <p className="text-2xl font-bold text-gray-900">{goals.length}</p>
-                                <p className="text-xs text-gray-400 mt-2">
-                                    {activeCount} active • {completedCount} completed
-                                </p>
-                            </div>
-                            
-                            {/* Total Target */}
-                            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
-                                <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
-                                    <IndianRupee className="w-6 h-6 text-emerald-600" />
-                                </div>
-                                <p className="text-sm font-medium text-gray-500 mb-1">Total Target</p>
-                                <p className="text-2xl font-bold text-emerald-600">{formatLargeCurrency(totalTarget)}</p>
-                                <p className="text-xs text-gray-400 mt-2">Combined goal amount</p>
-                            </div>
-                            
-                            {/* Current Savings */}
-                            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
-                                <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mb-3">
-                                    <Wallet className="w-6 h-6 text-amber-600" />
-                                </div>
-                                <p className="text-sm font-medium text-gray-500 mb-1">Current Savings</p>
-                                <p className="text-2xl font-bold text-amber-600">{formatLargeCurrency(totalCurrent)}</p>
-                                <p className="text-xs text-gray-400 mt-2">Already saved</p>
-                            </div>
-                            
-                            {/* Average Return */}
-                            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
-                                <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-3">
-                                    <TrendingUp className="w-6 h-6 text-purple-600" />
-                                </div>
-                                <p className="text-sm font-medium text-gray-500 mb-1">Avg. Return</p>
-                                <p className="text-2xl font-bold text-purple-600">{avgReturn}%</p>
-                                <p className="text-xs text-gray-400 mt-2">Expected p.a.</p>
-                            </div>
-                        </div>
-
-                        {/* Goals List */}
-                        {goals.length === 0 ? (
-                            <div className="bg-white rounded-3xl p-16 text-center border border-gray-200">
-                                <div className="w-24 h-24 bg-gradient-to-r from-blue-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <Target className="w-12 h-12 text-blue-600" />
-                                </div>
-                                <h3 className="text-2xl font-bold text-gray-900 mb-3">No Goals Yet</h3>
-                                <p className="text-gray-500 mb-8 max-w-md mx-auto">
-                                    Start planning your financial future by creating your first goal.
-                                </p>
+                <div className="w-full">
+                    {/* Tabs */}
+                    <div className="flex mb-8 justify-center">
+                        <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                            {[
+                                { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+                                { id: 'active', label: 'My Goals', icon: ListChecks, count: activeCount },
+                                { id: 'completed', label: 'Completed', icon: CheckCircle, count: completedCount }
+                            ].map(tab => (
                                 <button
-                                    onClick={() => setSelectedTab('create')}
-                                    className="px-8 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all"
+                                    key={tab.id}
+                                    onClick={() => setSelectedTab(tab.id as any)}
+                                    className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${
+                                        selectedTab === tab.id
+                                            ? 'text-white'
+                                            : 'text-slate-500 hover:text-slate-700'
+                                    }`}
                                 >
-                                    Create Your First Goal
+                                    {selectedTab === tab.id && (
+                                        <motion.div
+                                            layoutId="activeTabGoalPlanner"
+                                            className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        />
+                                    )}
+                                    <tab.icon size={14} />
+                                    {tab.label}
+                                    {tab.count !== undefined && tab.count > 0 && (
+                                        <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                                            selectedTab === tab.id ? 'bg-white/20' : 'bg-slate-200 text-slate-600'
+                                        }`}>
+                                            {tab.count}
+                                        </span>
+                                    )}
                                 </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Dashboard View */}
+                    {selectedTab === 'dashboard' && (
+                        <>
+                            {/* Summary Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                                
+                                {/* Total Goals */}
+                                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
+                                    <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-3">
+                                        <Target className="w-6 h-6 text-blue-600" />
+                                    </div>
+                                    <p className="text-sm font-medium text-gray-500 mb-1">Total Goals</p>
+                                    <p className="text-2xl font-bold text-gray-900">{goals.length}</p>
+                                    <p className="text-xs text-gray-400 mt-2">
+                                        {activeCount} active • {completedCount} completed
+                                    </p>
+                                </div>
+                                
+                                {/* Total Target */}
+                                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
+                                    <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
+                                        <IndianRupee className="w-6 h-6 text-emerald-600" />
+                                    </div>
+                                    <p className="text-sm font-medium text-gray-500 mb-1">Total Target</p>
+                                    <p className="text-2xl font-bold text-emerald-600">{formatLargeCurrency(totalTarget)}</p>
+                                    <p className="text-xs text-gray-400 mt-2">Combined goal amount</p>
+                                </div>
+                                
+                                {/* Current Savings */}
+                                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
+                                    <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mb-3">
+                                        <Wallet className="w-6 h-6 text-amber-600" />
+                                    </div>
+                                    <p className="text-sm font-medium text-gray-500 mb-1">Current Savings</p>
+                                    <p className="text-2xl font-bold text-amber-600">{formatLargeCurrency(totalCurrent)}</p>
+                                    <p className="text-xs text-gray-400 mt-2">Already saved</p>
+                                </div>
+                                
+                                {/* Average Return */}
+                                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
+                                    <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-3">
+                                        <TrendingUp className="w-6 h-6 text-purple-600" />
+                                    </div>
+                                    <p className="text-sm font-medium text-gray-500 mb-1">Avg. Return</p>
+                                    <p className="text-2xl font-bold text-purple-600">{avgReturn}%</p>
+                                    <p className="text-xs text-gray-400 mt-2">Expected p.a.</p>
+                                </div>
                             </div>
-                        ) : (
-                            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-                                <table className="w-full">
-                                    <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-                                        <tr>
-                                            <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Goal</th>
-                                            <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Target</th>
-                                            <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Current</th>
-                                            <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Returns</th>
-                                            <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                                            <th className="py-4 px-6 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-200">
-                                        {goals.map((goal) => {
+
+                            {/* Goals List */}
+                            {goals.length === 0 ? (
+                                <div className="bg-white rounded-3xl p-16 text-center border border-gray-200">
+                                    <div className="w-24 h-24 bg-gradient-to-r from-blue-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <Target className="w-12 h-12 text-blue-600" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-gray-900 mb-3">No Goals Yet</h3>
+                                    <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                                        Start planning your financial future by creating your first goal.
+                                    </p>
+                                    <button
+                                        onClick={() => setSelectedTab('create')}
+                                        className="px-8 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all"
+                                    >
+                                        Create Your First Goal
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                                    <table className="w-full">
+                                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                                            <tr>
+                                                <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Goal</th>
+                                                <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Target</th>
+                                                <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Current</th>
+                                                <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Returns</th>
+                                                <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                                                <th className="py-4 px-6 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-200">
+                                            {goals.map((goal) => {
+                                                const Icon = getGoalIcon(goal.goal_name);
+                                                const goalProgress = progress[goal.id] || 0;
+                                                
+                                                return (
+                                                    <tr key={goal.id} className="hover:bg-gray-50 transition-colors">
+                                                        <td className="py-4 px-6">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-100 to-emerald-100 flex items-center justify-center">
+                                                                    <Icon className="w-5 h-5 text-blue-600" />
+                                                                </div>
+                                                                <div>
+                                                                    <div className="font-medium text-gray-900">{goal.goal_name}</div>
+                                                                    <div className="text-xs text-gray-500">Created {formatDate(goal.created_at)}</div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-4 px-6">
+                                                            <div className="font-bold text-gray-900">{formatLargeCurrency(goal.target_amount)}</div>
+                                                            <div className="text-xs text-gray-500">{goal.target_years} years</div>
+                                                        </td>
+                                                        <td className="py-4 px-6">
+                                                            <div className="font-bold text-blue-600">{formatLargeCurrency(goal.current_savings)}</div>
+                                                            <div className="w-24 mt-1">
+                                                                <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                                                    <div 
+                                                                        style={{ width: `${goalProgress}%` }}
+                                                                        className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3]"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-4 px-6">
+                                                            <span className="font-bold text-emerald-600">{goal.expected_return}%</span>
+                                                        </td>
+                                                        <td className="py-4 px-6">
+                                                            <StatusBadge progress={goalProgress} />
+                                                        </td>
+                                                        <td className="py-4 px-6">
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                <button
+                                                                    onClick={() => handleViewDetails(goal)}
+                                                                    className="p-2 hover:bg-blue-100 rounded-lg transition-colors group"
+                                                                    title="View Details"
+                                                                >
+                                                                    <Eye size={16} className="text-blue-500 group-hover:text-blue-600" />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleEditGoal(goal)}
+                                                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                                                >
+                                                                    <Edit2 size={16} className="text-gray-500" />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteClick(goal.id)}
+                                                                    className="p-2 hover:bg-red-100 rounded-lg transition-colors group"
+                                                                    title="Delete Goal"
+                                                                >
+                                                                    <Trash2 size={16} className="text-gray-500 group-hover:text-red-600" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </>
+                    )}
+
+                    {/* My Goals (Active) View */}
+                    {selectedTab === 'active' && (
+                        <div className="bg-white rounded-2xl shadow-lg border border-gray-200">
+                            <div className="p-6 border-b border-gray-200">
+                                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                    <ListChecks className="w-5 h-5 text-[#2076C7]" />
+                                    My Goals
+                                </h2>
+                            </div>
+                            {activeCount === 0 ? (
+                                <div className="p-12 text-center">
+                                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Target className="w-8 h-8 text-blue-600" />
+                                    </div>
+                                    <p className="text-gray-500">No active goals</p>
+                                </div>
+                            ) : (
+                                <div className="divide-y divide-gray-200">
+                                    {goals
+                                        .filter(goal => (progress[goal.id] || 0) < 100)
+                                        .map(goal => {
                                             const Icon = getGoalIcon(goal.goal_name);
                                             const goalProgress = progress[goal.id] || 0;
                                             
                                             return (
-                                                <tr key={goal.id} className="hover:bg-gray-50 transition-colors">
-                                                    <td className="py-4 px-6">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-100 to-emerald-100 flex items-center justify-center">
-                                                                <Icon className="w-5 h-5 text-blue-600" />
-                                                            </div>
-                                                            <div>
-                                                                <div className="font-medium text-gray-900">{goal.goal_name}</div>
-                                                                <div className="text-xs text-gray-500">Created {formatDate(goal.created_at)}</div>
-                                                            </div>
+                                                <div key={goal.id} className="p-6 flex items-center justify-between hover:bg-gray-50">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                                                            <Icon className="w-6 h-6 text-blue-600" />
                                                         </div>
-                                                    </td>
-                                                    <td className="py-4 px-6">
-                                                        <div className="font-bold text-gray-900">{formatLargeCurrency(goal.target_amount)}</div>
-                                                        <div className="text-xs text-gray-500">{goal.target_years} years</div>
-                                                    </td>
-                                                    <td className="py-4 px-6">
-                                                        <div className="font-bold text-blue-600">{formatLargeCurrency(goal.current_savings)}</div>
-                                                        <div className="w-24 mt-1">
-                                                            <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                                                <div 
-                                                                    style={{ width: `${goalProgress}%` }}
-                                                                    className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3]"
-                                                                />
-                                                            </div>
+                                                        <div>
+                                                            <h3 className="font-bold text-gray-900">{goal.goal_name}</h3>
+                                                            <p className="text-sm text-gray-500">
+                                                                Target: {formatLargeCurrency(goal.target_amount)} • {goal.target_years} years
+                                                            </p>
                                                         </div>
-                                                    </td>
-                                                    <td className="py-4 px-6">
-                                                        <span className="font-bold text-emerald-600">{goal.expected_return}%</span>
-                                                    </td>
-                                                    <td className="py-4 px-6">
-                                                        <StatusBadge progress={goalProgress} />
-                                                    </td>
-                                                    <td className="py-4 px-6">
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            <button
-                                                                onClick={() => handleViewDetails(goal)}
-                                                                className="p-2 hover:bg-blue-100 rounded-lg transition-colors group"
-                                                                title="View Details"
-                                                            >
-                                                                <Eye size={16} className="text-blue-500 group-hover:text-blue-600" />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleEditGoal(goal)}
-                                                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                                            >
-                                                                <Edit2 size={16} className="text-gray-500" />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleDeleteClick(goal.id)}
-                                                                className="p-2 hover:bg-red-100 rounded-lg transition-colors group"
-                                                                title="Delete Goal"
-                                                            >
-                                                                <Trash2 size={16} className="text-gray-500 group-hover:text-red-600" />
-                                                            </button>
+                                                    </div>
+                                                    <div className="w-48">
+                                                        <div className="flex justify-between text-xs mb-1">
+                                                            <span className="text-gray-500">Progress</span>
+                                                            <span className="font-bold">{goalProgress.toFixed(1)}%</span>
                                                         </div>
-                                                    </td>
-                                                </tr>
+                                                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                            <div 
+                                                                style={{ width: `${goalProgress}%` }}
+                                                                className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3]"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             );
                                         })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </>
-                )}
-
-                {/* My Goals (Active) View */}
-                {selectedTab === 'active' && (
-                    <div className="bg-white rounded-2xl shadow-lg border border-gray-200">
-                        <div className="p-6 border-b border-gray-200">
-                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                <ListChecks className="w-5 h-5 text-[#2076C7]" />
-                                My Goals
-                            </h2>
-                        </div>
-                        {activeCount === 0 ? (
-                            <div className="p-12 text-center">
-                                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Target className="w-8 h-8 text-blue-600" />
                                 </div>
-                                <p className="text-gray-500">No active goals</p>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Completed Goals View */}
+                    {selectedTab === 'completed' && (
+                        <div className="bg-white rounded-2xl shadow-lg border border-gray-200">
+                            <div className="p-6 border-b border-gray-200">
+                                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                    <CheckCircle className="w-5 h-5 text-[#2076C7]" />
+                                    Completed Goals
+                                </h2>
                             </div>
-                        ) : (
-                            <div className="divide-y divide-gray-200">
-                                {goals
-                                    .filter(goal => (progress[goal.id] || 0) < 100)
-                                    .map(goal => {
-                                        const Icon = getGoalIcon(goal.goal_name);
-                                        const goalProgress = progress[goal.id] || 0;
-                                        
-                                        return (
-                                            <div key={goal.id} className="p-6 flex items-center justify-between hover:bg-gray-50">
+                            {completedCount === 0 ? (
+                                <div className="p-12 text-center">
+                                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <CheckCircle className="w-8 h-8 text-emerald-600" />
+                                    </div>
+                                    <p className="text-gray-500">No completed goals yet</p>
+                                </div>
+                            ) : (
+                                <div className="divide-y divide-gray-200">
+                                    {goals
+                                        .filter(goal => (progress[goal.id] || 0) >= 100)
+                                        .map(goal => (
+                                            <div key={goal.id} className="p-6 flex items-center justify-between">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                                                        <Icon className="w-6 h-6 text-blue-600" />
+                                                    <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
+                                                        <CheckCircle2 className="w-6 h-6 text-emerald-600" />
                                                     </div>
                                                     <div>
                                                         <h3 className="font-bold text-gray-900">{goal.goal_name}</h3>
                                                         <p className="text-sm text-gray-500">
-                                                            Target: {formatLargeCurrency(goal.target_amount)} • {goal.target_years} years
+                                                            Target: {formatLargeCurrency(goal.target_amount)}
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className="w-48">
-                                                    <div className="flex justify-between text-xs mb-1">
-                                                        <span className="text-gray-500">Progress</span>
-                                                        <span className="font-bold">{goalProgress.toFixed(1)}%</span>
-                                                    </div>
-                                                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                                        <div 
-                                                            style={{ width: `${goalProgress}%` }}
-                                                            className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3]"
-                                                        />
-                                                    </div>
-                                                </div>
+                                                <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
+                                                    Completed
+                                                </span>
                                             </div>
-                                        );
-                                    })}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Completed Goals View */}
-                {selectedTab === 'completed' && (
-                    <div className="bg-white rounded-2xl shadow-lg border border-gray-200">
-                        <div className="p-6 border-b border-gray-200">
-                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                <CheckCircle className="w-5 h-5 text-[#2076C7]" />
-                                Completed Goals
-                            </h2>
-                        </div>
-                        {completedCount === 0 ? (
-                            <div className="p-12 text-center">
-                                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <CheckCircle className="w-8 h-8 text-emerald-600" />
-                                </div>
-                                <p className="text-gray-500">No completed goals yet</p>
-                            </div>
-                        ) : (
-                            <div className="divide-y divide-gray-200">
-                                {goals
-                                    .filter(goal => (progress[goal.id] || 0) >= 100)
-                                    .map(goal => (
-                                        <div key={goal.id} className="p-6 flex items-center justify-between">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-                                                    <CheckCircle2 className="w-6 h-6 text-emerald-600" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-bold text-gray-900">{goal.goal_name}</h3>
-                                                    <p className="text-sm text-gray-500">
-                                                        Target: {formatLargeCurrency(goal.target_amount)}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
-                                                Completed
-                                            </span>
-                                        </div>
-                                    ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Create Goal View */}
-                {selectedTab === 'create' && (
-                    <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8 max-w-3xl mx-auto">
-                        <div className="flex items-center gap-3 mb-6">
-                            <button
-                                onClick={() => setSelectedTab('dashboard')}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            >
-                                <ArrowLeft size={20} className="text-gray-500" />
-                            </button>
-                            <h2 className="text-2xl font-bold text-gray-900">Create New Goal</h2>
-                        </div>
-
-                        <div className="space-y-6">
-                            {/* Goal Name */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Goal Name
-                                </label>
-                                <input
-                                    type="text"
-                                    value={goalForm.goal_name}
-                                    onChange={(e) => setGoalForm({ ...goalForm, goal_name: e.target.value })}
-                                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                                    placeholder="e.g., Buy a House, Child Education, Retirement"
-                                />
-                            </div>
-
-                            {/* Target Amount & Years */}
-                            <div className="grid grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Target Amount (₹)
-                                    </label>
-                                    <div className="relative">
-                                        <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                        <input 
-                                            type="number" 
-                                            value={goalForm.target_amount}
-                                            onChange={(e) => setGoalForm({...goalForm, target_amount: Number(e.target.value)})}
-                                            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                                            min={1000}
-                                            step={1000}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Years to Goal
-                                    </label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                        <input 
-                                            type="number" 
-                                            value={goalForm.target_years}
-                                            onChange={(e) => setGoalForm({...goalForm, target_years: Number(e.target.value)})}
-                                            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                                            min={1}
-                                            max={30}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Expected Return & Current Savings */}
-                            <div className="grid grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Expected Return (% p.a.)
-                                    </label>
-                                    <div className="relative">
-                                        <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                        <input 
-                                            type="number" 
-                                            value={goalForm.expected_return}
-                                            onChange={(e) => setGoalForm({...goalForm, expected_return: Number(e.target.value)})}
-                                            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                                            min={1}
-                                            max={30}
-                                            step={0.1}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Current Savings (₹)
-                                    </label>
-                                    <div className="relative">
-                                        <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                        <input 
-                                            type="number" 
-                                            value={goalForm.current_savings}
-                                            onChange={(e) => setGoalForm({...goalForm, current_savings: Number(e.target.value)})}
-                                            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                                            min={0}
-                                            step={1000}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Calculation Preview */}
-                            {calculating ? (
-                                <div className="bg-gray-50 rounded-2xl p-8 flex items-center justify-center">
-                                    <Loader2 className="w-6 h-6 text-[#2076C7] animate-spin" />
-                                </div>
-                            ) : calculationPreview && (
-                                <div className="bg-gradient-to-r from-blue-50 to-emerald-50 rounded-2xl p-6 border border-blue-100">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <Sparkles size={18} className="text-[#2076C7]" />
-                                        <h4 className="font-medium text-gray-900">Goal Preview</h4>
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div>
-                                            <p className="text-xs text-gray-500">Monthly Investment</p>
-                                            <p className="text-xl font-bold text-emerald-600">
-                                                {formatCurrency(calculationPreview.monthly_investment_required)}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-gray-500">Future Value (Current)</p>
-                                            <p className="text-lg font-bold text-blue-600">
-                                                {formatCurrency(calculationPreview.future_value_of_current_savings)}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-gray-500">Remaining Amount</p>
-                                            <p className={`text-lg font-bold ${calculationPreview.remaining_amount > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
-                                                {formatCurrency(calculationPreview.remaining_amount)}
-                                            </p>
-                                        </div>
-                                    </div>
+                                        ))}
                                 </div>
                             )}
+                        </div>
+                    )}
 
-                            {/* Action Buttons */}
-                            <div className="flex gap-4 pt-4">
+                    {/* Create Goal View */}
+                    {selectedTab === 'create' && (
+                        <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8 max-w-3xl mx-auto">
+                            <div className="flex items-center gap-3 mb-6">
                                 <button
-                                    onClick={() => {
-                                        resetForm();
-                                        setSelectedTab('dashboard');
-                                    }}
-                                    className="flex-1 py-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all"
+                                    onClick={() => setSelectedTab('dashboard')}
+                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                                 >
-                                    Cancel
+                                    <ArrowLeft size={20} className="text-gray-500" />
                                 </button>
-                                <button
-                                    onClick={handleCreateGoal}
-                                    disabled={loading || !goalForm.goal_name}
-                                    className="flex-1 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                >
-                                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus size={18} />}
-                                    Create Goal
-                                </button>
+                                <h2 className="text-2xl font-bold text-gray-900">Create New Goal</h2>
+                            </div>
+
+                            <div className="space-y-6">
+                                {/* Goal Name */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Goal Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={goalForm.goal_name}
+                                        onChange={(e) => setGoalForm({ ...goalForm, goal_name: e.target.value })}
+                                        className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                                        placeholder="e.g., Buy a House, Child Education, Retirement"
+                                    />
+                                </div>
+
+                                {/* Target Amount & Years */}
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Target Amount (₹)
+                                        </label>
+                                        <div className="relative">
+                                            <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                            <input 
+                                                type="number" 
+                                                value={goalForm.target_amount}
+                                                onChange={(e) => setGoalForm({...goalForm, target_amount: Number(e.target.value)})}
+                                                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                                                min={1000}
+                                                step={1000}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Years to Goal
+                                        </label>
+                                        <div className="relative">
+                                            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                            <input 
+                                                type="number" 
+                                                value={goalForm.target_years}
+                                                onChange={(e) => setGoalForm({...goalForm, target_years: Number(e.target.value)})}
+                                                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                                                min={1}
+                                                max={30}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Expected Return & Current Savings */}
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Expected Return (% p.a.)
+                                        </label>
+                                        <div className="relative">
+                                            <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                            <input 
+                                                type="number" 
+                                                value={goalForm.expected_return}
+                                                onChange={(e) => setGoalForm({...goalForm, expected_return: Number(e.target.value)})}
+                                                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                                                min={1}
+                                                max={30}
+                                                step={0.1}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Current Savings (₹)
+                                        </label>
+                                        <div className="relative">
+                                            <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                            <input 
+                                                type="number" 
+                                                value={goalForm.current_savings}
+                                                onChange={(e) => setGoalForm({...goalForm, current_savings: Number(e.target.value)})}
+                                                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                                                min={0}
+                                                step={1000}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Calculation Preview */}
+                                {calculating ? (
+                                    <div className="bg-gray-50 rounded-2xl p-8 flex items-center justify-center">
+                                        <Loader2 className="w-6 h-6 text-[#2076C7] animate-spin" />
+                                    </div>
+                                ) : calculationPreview && (
+                                    <div className="bg-gradient-to-r from-blue-50 to-emerald-50 rounded-2xl p-6 border border-blue-100">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <Sparkles size={18} className="text-[#2076C7]" />
+                                            <h4 className="font-medium text-gray-900">Goal Preview</h4>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-4">
+                                            <div>
+                                                <p className="text-xs text-gray-500">Monthly Investment</p>
+                                                <p className="text-xl font-bold text-emerald-600">
+                                                    {formatCurrency(calculationPreview.monthly_investment_required)}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-500">Future Value (Current)</p>
+                                                <p className="text-lg font-bold text-blue-600">
+                                                    {formatCurrency(calculationPreview.future_value_of_current_savings)}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-500">Remaining Amount</p>
+                                                <p className={`text-lg font-bold ${calculationPreview.remaining_amount > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                                                    {formatCurrency(calculationPreview.remaining_amount)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Action Buttons */}
+                                <div className="flex gap-4 pt-4">
+                                    <button
+                                        onClick={() => {
+                                            resetForm();
+                                            setSelectedTab('dashboard');
+                                        }}
+                                        className="flex-1 py-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleCreateGoal}
+                                        disabled={loading || !goalForm.goal_name}
+                                        className="flex-1 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus size={18} />}
+                                        Create Goal
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
 
+                {/* Modals and other components remain exactly the same as provided in your original logic */}
                 {/* Goal Details Modal */}
                 {showGoalDetails && selectedGoal && (
                     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -991,7 +1021,6 @@ export default function GoalPlanner() {
                                 </div>
                             ) : (
                             <div className="p-5 space-y-4">
-                                {/* Quick Stats - Compact */}
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="bg-blue-50 p-3 rounded-lg">
                                         <div className="flex items-center gap-1.5 text-blue-600 mb-1">
@@ -1009,7 +1038,6 @@ export default function GoalPlanner() {
                                     </div>
                                 </div>
 
-                                {/* Main Details - Compact */}
                                 <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                                     <h4 className="font-semibold text-sm text-gray-900 flex items-center gap-1.5">
                                         <Info size={14} className="text-[#2076C7]" />
@@ -1046,7 +1074,6 @@ export default function GoalPlanner() {
                                     </div>
                                 </div>
 
-                                {/* Progress Section - Compact */}
                                 <div className="bg-gradient-to-r from-blue-50 to-emerald-50 rounded-xl p-4">
                                     <h4 className="font-semibold text-sm text-gray-900 mb-2">Progress Tracking</h4>
                                     <div className="mb-2">
@@ -1075,19 +1102,13 @@ export default function GoalPlanner() {
                                     )}
                                 </div>
 
-                                {/* Timestamps - Compact */}
                                 <div className="border-t border-gray-200 pt-3">
                                     <div className="flex justify-between text-[10px] text-gray-500">
-                                        <div>
-                                            <span className="font-medium">Created:</span> {formatDateTime(selectedGoal.created_at)}
-                                        </div>
-                                        <div>
-                                            <span className="font-medium">Updated:</span> {formatDateTime(selectedGoal.updated_at)}
-                                        </div>
+                                        <div><span className="font-medium">Created:</span> {formatDateTime(selectedGoal.created_at)}</div>
+                                        <div><span className="font-medium">Updated:</span> {formatDateTime(selectedGoal.updated_at)}</div>
                                     </div>
                                 </div>
 
-                                {/* Action Buttons - Compact */}
                                 <div className="flex gap-2 pt-2">
                                     <button
                                         onClick={() => {
@@ -1096,8 +1117,7 @@ export default function GoalPlanner() {
                                         }}
                                         className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-all flex items-center justify-center gap-1.5"
                                     >
-                                        <Edit2 size={14} />
-                                        Edit Goal
+                                        <Edit2 size={14} /> Edit Goal
                                     </button>
                                     <button
                                         onClick={() => setShowGoalDetails(false)}
@@ -1135,11 +1155,8 @@ export default function GoalPlanner() {
                             </div>
                             
                             <div className="p-8 space-y-6">
-                                {/* Goal Name */}
                                 <div>
-                                    <label className="text-sm font-medium text-gray-700 mb-2 block">
-                                        Goal Name
-                                    </label>
+                                    <label className="text-sm font-medium text-gray-700 mb-2 block">Goal Name</label>
                                     <input
                                         type="text"
                                         value={goalForm.goal_name}
@@ -1149,12 +1166,9 @@ export default function GoalPlanner() {
                                     />
                                 </div>
 
-                                {/* Target Amount & Years */}
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
-                                        <label className="text-sm font-medium text-gray-700 mb-2 block">
-                                            Target Amount (₹)
-                                        </label>
+                                        <label className="text-sm font-medium text-gray-700 mb-2 block">Target Amount (₹)</label>
                                         <input 
                                             type="number" 
                                             value={goalForm.target_amount}
@@ -1164,9 +1178,7 @@ export default function GoalPlanner() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-sm font-medium text-gray-700 mb-2 block">
-                                            Years to Goal
-                                        </label>
+                                        <label className="text-sm font-medium text-gray-700 mb-2 block">Years to Goal</label>
                                         <input 
                                             type="number" 
                                             value={goalForm.target_years}
@@ -1177,12 +1189,9 @@ export default function GoalPlanner() {
                                     </div>
                                 </div>
 
-                                {/* Expected Return & Current Savings */}
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
-                                        <label className="text-sm font-medium text-gray-700 mb-2 block">
-                                            Expected Return (%)
-                                        </label>
+                                        <label className="text-sm font-medium text-gray-700 mb-2 block">Expected Return (%)</label>
                                         <input 
                                             type="number" 
                                             value={goalForm.expected_return}
@@ -1194,9 +1203,7 @@ export default function GoalPlanner() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-sm font-medium text-gray-700 mb-2 block">
-                                            Current Savings (₹)
-                                        </label>
+                                        <label className="text-sm font-medium text-gray-700 mb-2 block">Current Savings (₹)</label>
                                         <input 
                                             type="number" 
                                             value={goalForm.current_savings}
@@ -1207,7 +1214,6 @@ export default function GoalPlanner() {
                                     </div>
                                 </div>
 
-                                {/* Calculation Preview */}
                                 {calculating ? (
                                     <div className="bg-gray-50 rounded-2xl p-6 flex items-center justify-center">
                                         <Loader2 className="w-6 h-6 text-[#2076C7] animate-spin" />
@@ -1238,13 +1244,9 @@ export default function GoalPlanner() {
                                     </div>
                                 )}
 
-                                {/* Action Buttons */}
                                 <div className="flex gap-4 pt-4">
                                     <button
-                                        onClick={() => {
-                                            setShowGoalModal(false);
-                                            resetForm();
-                                        }}
+                                        onClick={() => { setShowGoalModal(false); resetForm(); }}
                                         className="flex-1 py-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200"
                                     >
                                         Cancel
@@ -1268,30 +1270,16 @@ export default function GoalPlanner() {
                     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
                         <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
                             <div className="p-6">
-                                {/* Icon */}
                                 <div className="flex justify-center mb-4">
                                     <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
                                         <AlertCircle className="w-8 h-8 text-red-600" />
                                     </div>
                                 </div>
-                                
-                                {/* Title */}
-                                <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
-                                    Delete Goal
-                                </h3>
-                                
-                                {/* Message */}
-                                <p className="text-gray-500 text-center mb-6">
-                                    Are you sure you want to delete this goal? This action cannot be undone.
-                                </p>
-                                
-                                {/* Buttons */}
+                                <h3 className="text-xl font-bold text-gray-900 text-center mb-2">Delete Goal</h3>
+                                <p className="text-gray-500 text-center mb-6">Are you sure you want to delete this goal? This action cannot be undone.</p>
                                 <div className="flex gap-3">
                                     <button
-                                        onClick={() => {
-                                            setShowDeleteModal(false);
-                                            setGoalToDelete(null);
-                                        }}
+                                        onClick={() => { setShowDeleteModal(false); setGoalToDelete(null); }}
                                         className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all"
                                         disabled={deleting}
                                     >
@@ -1302,17 +1290,7 @@ export default function GoalPlanner() {
                                         disabled={deleting}
                                         className="flex-1 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
-                                        {deleting ? (
-                                            <>
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                                Deleting...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Trash2 className="w-4 h-4" />
-                                                Delete
-                                            </>
-                                        )}
+                                        {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />} Delete
                                     </button>
                                 </div>
                             </div>

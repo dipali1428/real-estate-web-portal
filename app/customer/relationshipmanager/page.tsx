@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import CustomerService from '../../services/customerService';
+import { motion } from 'motion/react';
 
 // Types
 interface RelationshipManager {
@@ -136,13 +137,29 @@ const RelationshipManager: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-4 sm:mb-6 md:mb-8">
-          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-700">My Relationship Manager</h1>
-          <p className="text-gray-600 mt-1 sm:mt-2 text-xs sm:text-sm md:text-base">
-            Your dedicated partner for business growth and client management
-          </p>
-        </div>
+      {/* --- UPDATED HEADER */}
+      <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-8 text-white shadow-lg"
+      >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                  <h2 className="text-xl sm:text-2xl font-bold mb-2">
+                      My Relationship Manager
+                  </h2>
+                  <p className="text-sm sm:text-base text-white/80">
+                      Your dedicated partner for business growth and client management.
+                  </p>
+              </div>
+              
+              {/* Optional: Add a 'Contact RM' or 'Need Help' button here if required */}
+              <div className="flex gap-2">
+                  {/* If you don't need a button, you can leave this empty or remove the outer flex div */}
+              </div>
+          </div>
+      </motion.div>
 
         {/* RM Profile Card */}
         <div className="space-y-4 sm:space-y-6">
