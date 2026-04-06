@@ -15,8 +15,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import customerService from '../../../services/customerService';
-import SimpleFDCalculator from '../../../products/FD/components/SimpleFDCalculator';
+import customerService from '../../../../services/customerService';
+import SimpleFDCalculator from '../../../../products/FD/components/SimpleFDCalculator';
 
 // ==================== TYPES ====================
 

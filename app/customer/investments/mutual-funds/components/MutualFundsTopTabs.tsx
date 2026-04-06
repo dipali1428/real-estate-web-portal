@@ -7,37 +7,37 @@ import { BarChart3, Briefcase, Calculator, History as HistoryIcon, Search, Trend
 const mutualFundTabs = [
   {
     label: "Explore Funds",
-    href: "/customer/mutual-funds/explore",
+    href: "/customer/investments/mutual-funds/explore",
     icon: Search,
     description: "Discover funds by objective, category, and strategy.",
   },
-  {
-    label: "Investments",
-    href: "/customer/mutual-funds/investments",
-    icon: Briefcase,
-    description: "Track holdings, value, and allocation in one place.",
-  },
+  // {
+  //   label: "Investments",
+  //   href: "/customer/mutual-funds/investments",
+  //   icon: Briefcase,
+  //   description: "Track holdings, value, and allocation in one place.",
+  // },
   {
     label: "SIP Calculator",
-    href: "/customer/mutual-funds/sip-calculator",
+    href: "/customer/investments/mutual-funds/sip-calculator",
     icon: Calculator,
     description: "Estimate future corpus and fine-tune monthly SIPs.",
   },
   {
     label: "Compare Funds",
-    href: "/customer/mutual-funds/compare",
+    href: "/customer/investments/mutual-funds/compare",
     icon: BarChart3,
     description: "Compare multiple schemes before you invest.",
   },
   {
     label: "Transactions",
-    href: "/customer/mutual-funds/transactions",
+    href: "/customer/investments/mutual-funds/transactions",
     icon: HistoryIcon,
     description: "View your order history and status.",
   },
   {
     label: "SIP Center",
-    href: "/customer/mutual-funds/sips",
+    href: "/customer/investments/mutual-funds/sips",
     icon: TrendingUp,
     description: "Manage your active SIPs and schedules.",
   },

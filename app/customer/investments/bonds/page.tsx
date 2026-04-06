@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { bondsData, Bond } from '../../products/bonds/data/bondsData';
+import { bondsData, Bond } from '../../../products/bonds/data/bondsData';
 import { 
     ShoppingCart, CreditCard, ChevronRight, TrendingUp, 
     ShieldCheck, Filter, Bookmark, Search, Info, 
@@ -18,7 +18,7 @@ import {
 import toast from 'react-hot-toast';
 import { useWishlist } from '@/app/context/WishlistContext';
 import Link from 'next/link';
-import BondDetailModal from '../../products/bonds/components/BondDetailModal';
+import BondDetailModal from '../../../products/bonds/components/BondDetailModal';
 
 // Types for Portfolio
 interface Investment {

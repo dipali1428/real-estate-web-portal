@@ -11,7 +11,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import customerService from '../../../services/customerService';
+import customerService from '../../../../services/customerService';
 
 // ==================== TYPES ====================
 

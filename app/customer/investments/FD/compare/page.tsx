@@ -2,8 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, CheckCircle2, X, Landmark, Database, Star } from 'lucide-react';
-import { bankData } from '../../../products/FD/data/mockData';
-import type { Bank } from '../../../products/FD/data/mockData';
+import { bankData } from '../../../../products/FD/data/mockData';
+import type { Bank } from '../../../../products/FD/data/mockData';
 import { useRouter } from 'next/navigation';
 
 // ==================== HELPER FUNCTIONS ====================

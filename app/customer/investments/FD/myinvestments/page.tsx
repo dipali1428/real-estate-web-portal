@@ -22,7 +22,7 @@ import {
     Building2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { bankData } from '../../../products/FD/data/mockData';
+import { bankData } from '../../../../products/FD/data/mockData';
 
 // ==================== MOCK DATA ====================
 const PENDING_TO_LAKH = 100000;
