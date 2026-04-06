@@ -35,7 +35,7 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false }: Propertie
     const [newFeedback, setNewFeedback] = useState({ name: '', role: '', text: '', rating: 5 });
 
     // Filtered data based on static properties
-    const liveProperties = useMemo(() => {
+   const liveProperties = useMemo(() => {
         return staticProperties.filter(p => {
             if (p.status !== 'live') return false;
 
@@ -46,7 +46,7 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false }: Propertie
                 p.type.toLowerCase().includes(searchLower)
             )) return false;
             
-            if (filters.type && p.type !== filters.type) return false;
+            if (filters.type && !p.type.toLowerCase().includes(filters.type.toLowerCase())) return false;
             if (filters.minPrice && p.price < parseInt(filters.minPrice)) return false;
             if (filters.maxPrice && p.price > parseInt(filters.maxPrice)) return false;
 
@@ -181,7 +181,7 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false }: Propertie
     return (
         <div id="properties" className="animate-fade-in font-sans">
             {!showOnlyLive && (
-                <div className="py-8 md:py-12 mb-6 md:mb-8 bg-white">
+                     <div className="flex-1 p-4 sm:p-6">
                     <div className="max-w-7xl mx-auto px-4 text-center">
                         <h1 className="text-4xl md:text-5xl font-sans font-bold mb-3  bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                             Real Estate Investments
@@ -193,7 +193,7 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false }: Propertie
                 </div>
             )}
 
-            <div className="max-w-7xl mx-auto px-4 lg:px-8">
+               <div className="flex-1 p-4 sm:p-6">
                 {/* Section: Live Opportunities */}
                 <div id="live" className="mb-12 scroll-mt-32">
                     <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
@@ -222,7 +222,9 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false }: Propertie
                         <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 animate-fade-in">
                             <div>
                                 <label className="block mb-2 text-sm font-bold text-slate-700">Property Type</label>
-                                <select
+                              
+
+                                   <select
                                     value={filters.type}
                                     onChange={(e) => handleFilterChange('type', e.target.value)}
                                     className="w-full bg-white text-slate-700 p-3 rounded-lg border-2 border-slate-200 font-semibold focus:border-blue-500 outline-none">
@@ -231,6 +233,8 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false }: Propertie
                                     <option value="Apartment">Apartment</option>
                                     <option value="Mixed-Use">Mixed-Use</option>
                                     <option value="Commercial">Commercial</option>
+                                    <option value="Retail/Commercial">Retail/Commercial</option>
+                                    <option value="Residential">Residential</option>
                                     <option value="Cottage">Cottage</option>
                                 </select>
                             </div>

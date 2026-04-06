@@ -10,7 +10,7 @@ import InvestmentCalculator, { calculateInvestmentData } from './InvestmentCalcu
 interface RealEstatePropertyDetailsModalProps {
     propertyId: string;
     onClose: () => void;
-    onInvestNow: () => void;
+    onInvestNow: (propertyTitle: string) => void;
 }
 
 const PropertyInfographic = ({ property }: { property: any }) => {
@@ -471,7 +471,7 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                                             <CheckCircle size={12} /> RERA Approved
                                         </span>
                                     </div>
-                                    <h2 className="text-3xl md:text-4xl font-extrabold text-brand-gradient">{property.title}</h2>
+                                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 uppercase tracking-tight">{property.title}</h2>
                                     <div className="flex items-center gap-2 text-slate-500 mt-2 font-medium">
                                         <MapPin size={18} className="text-blue-500" />
                                         {property.location}
@@ -563,7 +563,7 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                                                 />
                                             </div>
                                             <button 
-                                                onClick={onInvestNow}
+                                                onClick={() => onInvestNow(property.title || 'Fractional Real Estate')}
                                                 className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white w-full py-4 rounded-xl text-lg uppercase tracking-tight shadow-md hover:shadow-lg transition-all flex items-center justify-center font-bold"
                                             >
                                                 Invest Now

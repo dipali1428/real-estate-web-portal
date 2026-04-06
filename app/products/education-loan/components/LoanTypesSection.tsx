@@ -104,8 +104,8 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
     };
 
     return (
-        <section className="py-2 bg-white relative overflow-hidden">
-            <div className="max-w-[1440px] mx-auto px-6 leading-relaxed">
+        <section className="py-2 relative overflow-hidden">
+          <div className="flex-1 p-4 sm:p-6">
 
                 {/* Header */}
                 {isDashboard ? (

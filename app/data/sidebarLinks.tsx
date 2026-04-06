@@ -36,7 +36,8 @@ import {
     Layers3,
     BriefcaseBusiness,
     FileBarChart,
-    LifeBuoy
+    LifeBuoy,
+    Bookmark
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -175,38 +176,6 @@ CUSTOMER: [
         label: "Investments",
          href: "/customer/investments",
         icon: <TrendingUp className="h-4 w-4 text-neutral-700" />,
-        // children: [
-        //   {
-        //     label: "Unlisted Shares",
-        //     href: "/customer/investments/unlisted",
-        //     icon: <BarChart3 className="h-4 w-4 text-neutral-700" />,
-        //   },
-        //   {
-        //     label: "Mutual Funds",
-        //     href: "/customer/mutual-funds",
-        //     icon: <PieChart className="h-4 w-4 text-neutral-700" />,
-        //   },
-        //   {
-        //     label: "Fixed Deposit",
-        //     href: "/customer/FD",
-        //     icon: <BadgeIndianRupee className="h-4 w-4 text-neutral-700" />,
-        //   },
-        //   {
-        //     label: "Bonds",
-        //     href: "/customer/bonds",
-        //     icon: <Receipt className="h-4 w-4 text-neutral-700" />,
-        //   },
-        //   {
-        //     label: "AIF",
-        //     href: "/customer/aif",
-        //     icon: <Layers3 className="h-4 w-4 text-neutral-700" />,
-        //   },
-        //   {
-        //     label: "PMS",
-        //     href: "/customer/pms",
-        //     icon: <BriefcaseBusiness className="h-4 w-4 text-neutral-700" />,
-        //   },
-        // ],
       },
 
       {
@@ -220,18 +189,11 @@ CUSTOMER: [
           },
         ],
       },
-
-      {
-        label: "Assets",
-        icon: <Building2 className="h-4 w-4 text-neutral-700" />,
-        children: [
-          {
-            label: "Real Estate",
-            href: "/customer/real-estate",
-            icon: <Building2 className="h-4 w-4 text-neutral-700" />,
-          },
-        ],
-      },
+       {
+  label: "Insurance",
+  href: "/customer/insurance",
+  icon: <Shield className="h-4 w-4 text-neutral-700" />,
+}
     ],
   },
 
@@ -262,7 +224,7 @@ CUSTOMER: [
   {
     label: "Wishlist",
     href: "/customer/wishlist",
-    icon: <Heart className="h-5 w-5 text-neutral-700" />,
+    icon: <Bookmark className="h-5 w-5 text-neutral-700" />,
   },
 
   {

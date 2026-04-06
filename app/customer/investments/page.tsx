@@ -10,6 +10,7 @@ import {
   Receipt,
   Layers3,
   BriefcaseBusiness,
+  Building2
 } from 'lucide-react';
 
 export default function InvestmentsPage() {
@@ -22,6 +23,7 @@ export default function InvestmentsPage() {
     { title: 'Bonds', desc: 'Stable income through debt instruments.', route: '/customer/investments/bonds', icon: Receipt },
     { title: 'AIF', desc: 'Alternative investments for advanced wealth creation.', route: '/customer/investments/aif', icon: Layers3 },
     { title: 'PMS', desc: 'Professionally managed personalized portfolios.', route: '/customer/investments/pms', icon: BriefcaseBusiness },
+     { title: 'Real Estate', desc: 'Professionally managed personalized portfolios.', route: '/customer/investments/real-estate', icon: Building2 },
   ];
 
   return (
