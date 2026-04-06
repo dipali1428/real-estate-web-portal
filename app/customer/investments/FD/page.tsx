@@ -1,14 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard,
-  Search,
-  BarChart3,
-  Briefcase,
-  Landmark,
-  Calculator
+  LayoutDashboard, Search, BarChart3, Briefcase, Landmark, FileText
 } from "lucide-react";
 import FDDashboard from "./dashboard/page";
 import FDCompanies from "./companies/page";
@@ -16,89 +11,106 @@ import FDCompare from "./compare/page";
 import FDInvestments from "./myinvestments/page";
 
 const tabs = [
-  { id: "DASHBOARD", label: "Overview", icon: LayoutDashboard },
-  { id: "EXPLORE", label: "Explore FDs", icon: Search },
-  { id: "COMPARE", label: "Compare FDs", icon: BarChart3 },
-  { id: "INVESTMENTS", label: "My Investments", icon: Briefcase },
+  { id: "DASHBOARD", label: "OVERVIEW", icon: LayoutDashboard },
+  { id: "EXPLORE", label: "EXPLORE", icon: Search },
+  { id: "COMPARE", label: "COMPARE", icon: BarChart3 },
+  { id: "INVESTMENTS", label: "PORTFOLIO", icon: Briefcase },
 ];
 
 export default function UnifiedFDPage() {
   const [activeTab, setActiveTab] = useState("DASHBOARD");
 
   return (
-    <div className="flex-1 p-4 sm:p-8 bg-gray-50/50 min-h-screen">
-      {/* Header Banner */}
+        <div className="flex-1 p-4 sm:p-6">
+
+      {/* Redesigned Header: Travel Insurance Style */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="relative bg-gradient-to-r from-[#1CADA3] via-[#15857e] to-[#2076C7] rounded-3xl p-6 sm:p-10 mb-8 text-white shadow-xl overflow-hidden"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-slate-200/50 border border-slate-100 mb-8 relative overflow-hidden"
       >
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-[10px] font-black tracking-widest uppercase mb-4 backdrop-blur-md border border-white/10">
-              <Landmark size={12} />
-              Fixed Deposits
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 relative z-10">
+
+          {/* Left Section: Icon, Title, Subtitle */}
+          <div className="flex items-center gap-6 w-full lg:w-auto">
+            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-[#2076C7] to-[#1CADA3] shadow-lg shadow-blue-500/20 flex items-center justify-center shrink-0">
+              <Landmark className="text-white" size={32} strokeWidth={2.5} />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black mb-2 leading-tight">
-              Fixed Deposit
-            </h1>
-            <p className="text-white/80 text-sm font-medium">Explore, compare, and manage your FDs</p>
+
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl lg:text-3xl font-black tracking-tight bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent pb-1">
+                  Fixed Deposits
+                </h1>
+                <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-lg border border-emerald-100 uppercase tracking-wider shadow-xs">
+                  4+ Plans
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 text-slate-500">
+                <FileText size={14} className="text-slate-400" />
+                <p className="text-xs lg:text-sm font-bold opacity-80">
+                  Secure your savings with high-yield FD options tailored for you.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Section: Tab Navigation */}
+          <div className="w-full lg:w-auto bg-[#F1F5F9]/80 backdrop-blur-md p-1.5 rounded-full border border-slate-200/50 flex items-center shadow-inner overflow-x-auto no-scrollbar">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`relative flex items-center gap-2.5 px-6 py-2.5 rounded-full text-[10px] font-black tracking-widest transition-all duration-300 whitespace-nowrap uppercase ${isActive
+                    ? "text-white scale-105"
+                    : "text-slate-500 hover:text-slate-900 active:scale-95"
+                    }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activePill"
+                      className="absolute inset-0 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-lg shadow-blue-500/20"
+                      transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+                    />
+                  )}
+                  <Icon size={14} className={isActive ? "text-white" : "text-slate-400"} />
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         </div>
       </motion.div>
 
-      {/* Tabs UI */}
-      <div className="flex justify-center mb-8 relative z-20 overflow-x-auto pb-4 hide-scrollbar">
-        <div className="inline-flex bg-white p-1.5 rounded-full border border-gray-200 shadow-sm whitespace-nowrap">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative z-10 flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-black transition-all duration-300 ${isActive
-                  ? "text-white shadow-md"
-                  : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
-                  }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabBadge"
-                    className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
-                <Icon size={16} className={isActive ? "text-white" : "text-gray-400"} />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* Content Rendering Section */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="min-h-[500px]"
+        >
+          {activeTab === "DASHBOARD" && <FDDashboard />}
+          {activeTab === "EXPLORE" && <FDCompanies />}
+          {activeTab === "COMPARE" && <FDCompare />}
+          {activeTab === "INVESTMENTS" && <FDInvestments />}
+        </motion.div>
+      </AnimatePresence>
 
-      {/* Dynamic Content Rendering */}
-      <motion.div
-        key={activeTab}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.3 }}
-      >
-        {activeTab === "DASHBOARD" && <FDDashboard />}
-        {activeTab === "EXPLORE" && <FDCompanies />}
-        {activeTab === "COMPARE" && <FDCompare />}
-        {activeTab === "INVESTMENTS" && <FDInvestments />}
-      </motion.div>
-
+      {/* @ts-ignore - styled-jsx is injected by Next.js */}
       <style jsx>{`
-        .hide-scrollbar::-webkit-scrollbar {
+        .no-scrollbar::-webkit-scrollbar {
           display: none;
         }
-        .hide-scrollbar {
-          -ms-overflow-style: none; /* IE and Edge */
-          scrollbar-width: none; /* Firefox */
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
     </div>

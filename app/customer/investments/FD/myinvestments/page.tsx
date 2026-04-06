@@ -194,40 +194,31 @@ export default function MyInvestmentsPage() {
     const nextMaturity = activeFDsList.length > 0 ? activeFDsList[0] : null;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
-            {/* Header */}
-            <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white shadow-lg shadow-[#2076C7]/20">
-                                <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl sm:text-2xl font-black text-gray-900 leading-tight">
-                                    My Fixed Deposits
-                                </h1>
-                                <p className="text-xs sm:text-sm text-gray-500 font-medium flex items-center gap-1.5 mt-0.5">
-                                    <Clock size={14} className="text-[#2076C7]" />
-                                    Track and manage your secure investments
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex gap-3">
-                            <button 
-                                onClick={() => setIsFormOpen(true)}
-                                className="px-4 py-2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl text-sm font-semibold hover:opacity-90 shadow-lg shadow-[#2076C7]/20 transition-all flex items-center gap-2"
-                            >
-                                <PiggyBank size={16} />
-                                <span className="hidden sm:inline">New Fixed Deposit</span>
-                                <span className="sm:hidden">New FD</span>
-                            </button>
-                        </div>
+        <div className="w-full">
+            <main className="w-full">
+                {/* Portfolio Header Section */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+                    <div>
+                        <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                            My FD Portfolio
+                            <span className="px-2 py-0.5 bg-blue-50 text-[#2076C7] text-[10px] font-black rounded-lg border border-blue-100 uppercase tracking-wider">
+                                {mockInvestments.filter(i => i.status === 'ACTIVE').length} Active
+                            </span>
+                        </h3>
+                        <p className="text-xs text-gray-500 font-medium mt-0.5 flex items-center gap-1.5">
+                            <Clock size={14} className="text-[#2076C7]" />
+                            Track and manage your high-yield secure investments
+                        </p>
                     </div>
-                </div>
-            </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                    <button 
+                        onClick={() => setIsFormOpen(true)}
+                        className="px-6 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl text-sm font-black hover:opacity-90 shadow-xl shadow-blue-500/20 transition-all flex items-center gap-2 active:scale-95"
+                    >
+                        <PiggyBank size={18} />
+                        New Fixed Deposit
+                    </button>
+                </div>
 
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
@@ -440,7 +431,7 @@ export default function MyInvestmentsPage() {
                                     When you {activeTab === 'ACTIVE' ? 'invest in' : 'have matured'} fixed deposits, they will securely appear here for your tracking.
                                 </p>
                                 <button
-                                    onClick={() => window.location.href = '/customer/FD/companies'}
+                                    onClick={() => window.location.href = '/customer/investment/FD/companies'}
                                     className="px-6 py-2.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-semibold rounded-xl hover:opacity-90 transition-opacity"
                                 >
                                     Explore Companies

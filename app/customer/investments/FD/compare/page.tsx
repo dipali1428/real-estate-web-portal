@@ -108,21 +108,8 @@ export default function CompareFDPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 p-4 md:p-8 font-sans">
-      <div className="max-w-7xl mx-auto bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden min-h-[85vh] flex flex-col">
-        {/* Header */}
-        <div className="px-6 md:px-10 py-6 flex justify-between items-center border-b border-gray-50">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[#2076C7] tracking-tight">
-            Compare FD Rates
-          </h1>
-          <button
-            onClick={() => router.back()}
-            className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors border border-gray-100 shadow-sm"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
+    <div className="w-full font-sans">
+      <div className="w-full bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden flex flex-col">
         {/* Filter Bar */}
         <div className="px-6 md:px-10 py-6 bg-white flex flex-col items-center gap-6 border-b border-gray-50">
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-sm md:text-base text-gray-600 font-medium">

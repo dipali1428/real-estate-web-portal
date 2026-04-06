@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import customerService from '../../../../services/customerService';
-import SimpleFDCalculator from '../../../../products/FD/components/SimpleFDCalculator';
+import AdvancedFDCalculator from '../../../../products/FD/components/AdvancedFDCalculator';
 
 // ==================== TYPES ====================
 
@@ -164,7 +164,7 @@ const FDDashboard: React.FC = () => {
   // ========== LOADING STATE ==========
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center p-4">
+      <div className="flex-1 p-4 sm:p-6">
         <div className="text-center w-full max-w-sm mx-auto">
           <div className="relative">
             <div className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-[#2076C7]/20 border-t-[#2076C7] rounded-full animate-spin mx-auto"></div>
@@ -211,8 +211,8 @@ const FDDashboard: React.FC = () => {
 
   // ========== MAIN RENDER ==========
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+    <div className="flex-1">
+      <main className="w-full">
 
         {/* Welcome Section */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -231,7 +231,7 @@ const FDDashboard: React.FC = () => {
           <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-16 sm:w-20 h-16 sm:h-20 bg-blue-50 rounded-bl-full -mr-5 -mt-5 opacity-50 group-hover:opacity-70 transition-opacity"></div>
             <div className="flex justify-between items-start mb-3 sm:mb-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <IndianRupee className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
               </div>
               <button
@@ -252,7 +252,7 @@ const FDDashboard: React.FC = () => {
 
           {/* Active FDs Card */}
           <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-3 sm:mb-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center shadow-lg shadow-[#2076C7]/20 mb-3 sm:mb-4">
               <Landmark className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
             </div>
             <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Active Fixed Deposits</p>
@@ -264,7 +264,7 @@ const FDDashboard: React.FC = () => {
 
           {/* Maturing Soon Card */}
           <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 sm:col-span-2 lg:col-span-1">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 mb-3 sm:mb-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center shadow-lg shadow-[#2076C7]/20 mb-3 sm:mb-4">
               <CalendarCheck className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
             </div>
             <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Maturing Soon</p>
@@ -275,27 +275,15 @@ const FDDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* FD Calculator Section */}
         <div className="mb-6 sm:mb-8">
-          <SimpleFDCalculator />
+          <AdvancedFDCalculator />
         </div>
       </main>
 
-      {/* Floating Cart Button */}
-      {bookmarkedIds.size > 0 && (
-        <button
-          onClick={() => router.push('/customer/wishlist')}
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#2076C7] rounded-full shadow-lg flex items-center justify-center hover:bg-[#1a5e9e] hover:scale-105 transition-all duration-300"
-          aria-label="View Saved Funds"
-        >
-          <ShoppingCart className="text-white w-6 h-6" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-            {bookmarkedIds.size}
-          </span>
-        </button>
-      )}
+
 
       {/* Custom animation */}
+      {/* @ts-ignore - styled-jsx is injected by Next.js */}
       <style jsx>{`
         @keyframes spin-slow {
           from { transform: rotate(0deg); }

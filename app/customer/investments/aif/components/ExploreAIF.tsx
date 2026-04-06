@@ -15,7 +15,15 @@ import {
   Bookmark,
   BookmarkCheck,
   FileText,
-  Calendar
+  Calendar,
+  Info,
+  Clock,
+  Video,
+  Phone,
+  MessageCircle,
+  MessageSquare,
+  ArrowUpRight,
+  Check
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -38,6 +46,40 @@ export default function ExploreAIF() {
   const [showAllFunds, setShowAllFunds] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [schedulingProduct, setSchedulingProduct] = useState<AIFProduct | null>(null);
+  const [meetingDate, setMeetingDate] = useState("");
+  const [meetingTime, setMeetingTime] = useState("");
+  const [meetLink, setMeetLink] = useState("https://meet.google.com/aif-consultation");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [notifyWhatsApp, setNotifyWhatsApp] = useState(true);
+  const [notifyEmail, setNotifyEmail] = useState(true);
+  const [whatsappNumber, setWhatsappNumber] = useState("+91 95952 47614");
+
+  const handleScheduleClick = (product: AIFProduct) => {
+    setSchedulingProduct(product);
+    setIsScheduleModalOpen(true);
+  };
+
+  const handleConfirmSchedule = () => {
+    if (!meetingDate || !meetingTime) {
+      setToastMessage("Please select both date and time");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      return;
+    }
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsScheduleModalOpen(false);
+      setToastMessage("Confirmation sent to your WhatsApp and Email!");
+      setShowToast(true);
+
+      setMeetingDate("");
+      setMeetingTime("");
+      setTimeout(() => setShowToast(false), 3000);
+    }, 1500);
+  };
 
   // Persistence
   useEffect(() => {
@@ -130,8 +172,38 @@ export default function ExploreAIF() {
         )}
       </AnimatePresence>
 
+      {/* --- NEW MODERN HEADER --- */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="relative bg-white rounded-2xl p-6 mb-2 shadow-sm border border-slate-100/60"
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#1CADA3] to-[#2076C7] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
+              <Layers size={24} />
+            </div>
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
+                  Explore AIF Opportunities
+                </h2>
+                <span className="px-2.5 py-1 bg-teal-100 text-teal-700 text-[10px] font-bold rounded-full border border-teal-200 whitespace-nowrap">
+                  Active
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 flex items-center gap-2">
+                <span className="text-[#1CADA3] flex items-center justify-center w-5 h-5 rounded-full bg-teal-50/50">
+                  <Info size={14} />
+                </span>
+                Access exclusive alternative investment strategies
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
-      {/* Search & Tabs Header */}
       <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-gray-100 shadow-sm sticky top-0 z-40 space-y-6">
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <div className="relative flex-1">
@@ -159,7 +231,7 @@ export default function ExploreAIF() {
                 onClick={() => setActiveCategory(cat)}
                 className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
                   activeCategory === cat
-                    ? "bg-white text-[#1CADA3] shadow-sm"
+                    ? "bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white shadow-md shadow-teal-200"
                     : "text-gray-500 hover:bg-gray-200"
                 }`}
               >
@@ -248,7 +320,7 @@ export default function ExploreAIF() {
                 <FileText size={16} /> Details
               </button>
               <button
-                onClick={e => { e.stopPropagation(); }}
+                onClick={e => { e.stopPropagation(); handleScheduleClick(product); }}
                 className="w-40 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 bg-white text-[#1CADA3] border-2 border-[#1CADA3]/10 hover:border-[#1CADA3]/30 hover:bg-teal-50/50 cursor-pointer"
               >
                 <Calendar size={16} /> Schedule Meeting
@@ -564,13 +636,216 @@ export default function ExploreAIF() {
 
                     <div className="space-y-3">
                       <button
-                        onClick={() => { }}
+                        onClick={() => handleScheduleClick(selectedProduct)}
                         className="w-full py-5 bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white rounded-[1.5rem] font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all"
                       >
                         <Calendar size={18} /> Schedule Meeting
                       </button>
                     </div>
                   </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* --- PREMIUM SCHEDULE MEETING MODAL --- */}
+      <AnimatePresence>
+        {isScheduleModalOpen && schedulingProduct && (
+          <div
+            className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[3000] p-4 sm:p-6"
+            onClick={e => e.target === e.currentTarget && setIsScheduleModalOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col md:flex-row border border-white"
+            >
+              {/* Left Side: Form Selection */}
+              <div className="flex-1 p-8 sm:p-10 space-y-8 max-h-[90vh] overflow-y-auto no-scrollbar">
+                <div className="flex justify-between items-center mb-2">
+                  <div>
+                    <h3 className="text-2xl font-black text-gray-900 leading-tight">Schedule Meeting</h3>
+                    <p className="text-[#1CADA3] text-[10px] font-black uppercase tracking-widest mt-1">Select your preferred slot</p>
+                  </div>
+                  <button
+                    onClick={() => setIsScheduleModalOpen(false)}
+                    className="md:hidden p-2 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors text-gray-400"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Date Selection */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+                      <Calendar size={14} className="text-[#1CADA3]" /> Select Date
+                    </label>
+                    <div className="relative group">
+                      <input
+                        type="date"
+                        value={meetingDate}
+                        onChange={e => setMeetingDate(e.target.value)}
+                        className="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-transparent group-hover:bg-white group-hover:border-[#1CADA3]/20 focus:bg-white focus:border-[#1CADA3] focus:ring-4 focus:ring-[#1CADA3]/10 outline-none transition-all font-bold text-gray-700 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Time Selection */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+                      <Clock size={14} className="text-[#1CADA3]" /> Select Time
+                    </label>
+                    <div className="relative group">
+                      <input
+                        type="time"
+                        value={meetingTime}
+                        onChange={e => setMeetingTime(e.target.value)}
+                        className="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-transparent group-hover:bg-white group-hover:border-[#1CADA3]/20 focus:bg-white focus:border-[#1CADA3] focus:ring-4 focus:ring-[#1CADA3]/10 outline-none transition-all font-bold text-gray-700 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Google Meet Link */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+                    <Video size={14} className="text-[#1CADA3]" /> Google Meet Link
+                  </label>
+                  <div className="relative group">
+                    <input
+                      type="text"
+                      value={meetLink}
+                      onChange={e => setMeetLink(e.target.value)}
+                      className="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-transparent group-hover:bg-white group-hover:border-[#1CADA3]/20 focus:bg-white focus:border-[#1CADA3] focus:ring-4 focus:ring-[#1CADA3]/10 outline-none transition-all font-bold text-gray-700 text-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* WhatsApp Number & Notifications */}
+                <div className="bg-gray-50/50 rounded-[2rem] p-6 border border-gray-100 space-y-6">
+                   <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+                      <MessageSquare size={14} className="text-[#1CADA3]" /> Confirm WhatsApp Number
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="+91 98765 43210"
+                      value={whatsappNumber}
+                      onChange={e => setWhatsappNumber(e.target.value)}
+                      className="w-full px-5 py-4 rounded-2xl bg-white border border-gray-200 focus:border-[#1CADA3] focus:ring-2 focus:ring-[#1CADA3]/10 outline-none transition-all font-bold text-gray-700"
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                    <button
+                      onClick={() => setNotifyWhatsApp(!notifyWhatsApp)}
+                      className={`flex-1 flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all ${
+                        notifyWhatsApp
+                          ? "bg-emerald-50 border-emerald-500 text-emerald-700"
+                          : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 transition-all ${notifyWhatsApp ? "bg-emerald-500 border-emerald-500 text-white" : "border-gray-200"}`}>
+                        {notifyWhatsApp && <Check size={12} />}
+                      </div>
+                      <span className="text-xs font-black uppercase tracking-wider">WhatsApp</span>
+                    </button>
+                    <button
+                      onClick={() => setNotifyEmail(!notifyEmail)}
+                      className={`flex-1 flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all ${
+                        notifyEmail
+                          ? "bg-blue-50 border-blue-500 text-blue-700"
+                          : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 transition-all ${notifyEmail ? "bg-blue-500 border-blue-500 text-white" : "border-gray-200"}`}>
+                        {notifyEmail && <Check size={12} />}
+                      </div>
+                      <span className="text-xs font-black uppercase tracking-wider">Email</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                   <button
+                    onClick={handleConfirmSchedule}
+                    className="flex-1 py-5 bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 shadow-xl shadow-teal-200/50 hover:shadow-2xl hover:translate-y-[-2px] transition-all"
+                  >
+                    Confirm Schedule <ArrowUpRight size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Side: Preview Ticket */}
+              <div className="hidden md:flex w-80 lg:w-96 bg-gradient-to-br from-[#1CADA3] to-[#2076C7] p-10 flex-col justify-between relative overflow-hidden text-white">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white blur-[100px] opacity-10 -mr-32 -mt-32" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-300 blur-[100px] opacity-20 -ml-32 -mb-32" />
+
+                <div className="relative z-10 flex justify-between items-start">
+                   <div className="w-16 h-16 rounded-[2rem] bg-white/10 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20">
+                     <Layers size={32} />
+                   </div>
+                   <button
+                    onClick={() => setIsScheduleModalOpen(false)}
+                    className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-colors text-white"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+
+                <div className="relative z-10 space-y-12 py-12">
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">Fund Title</p>
+                    <h4 className="text-2xl font-black leading-tight">{schedulingProduct.name}</h4>
+                  </div>
+
+                  <div className="space-y-8">
+                     <div className="flex items-center gap-4">
+                       <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-sm">
+                         <Calendar className="text-white/80" size={20} />
+                       </div>
+                       <div>
+                         <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-0.5">Scheduled Date</p>
+                         <p className="font-bold text-sm tracking-wide">{meetingDate ? new Date(meetingDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : "--"}</p>
+                       </div>
+                     </div>
+
+                     <div className="flex items-center gap-4">
+                       <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-sm">
+                         <Clock className="text-white/80" size={20} />
+                       </div>
+                       <div>
+                         <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-0.5">Scheduled Time</p>
+                         <p className="font-bold text-sm tracking-wide">{meetingTime || "--"}</p>
+                       </div>
+                     </div>
+
+                     <div className="flex items-center gap-4">
+                       <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-sm">
+                         <Video className="text-white/80" size={20} />
+                       </div>
+                       <div>
+                         <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-0.5">Meet Platform</p>
+                         <p className="font-bold text-sm tracking-wide">Google Meet</p>
+                       </div>
+                     </div>
+                  </div>
+                </div>
+
+                <div className="relative z-10 pt-10 border-t border-white/10">
+                   <div className="flex items-center gap-3">
+                     <div className="w-10 h-10 rounded-full border-2 border-white/20 p-1">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=white&color=1CADA3" className="w-full h-full rounded-full border border-white/20" alt="Icon" />
+                     </div>
+                     <div>
+                        <p className="text-[10px] font-black text-white/60 uppercase tracking-widest">Organizer</p>
+                        <p className="text-xs font-bold">AIF Specialist</p>
+                     </div>
+                   </div>
                 </div>
               </div>
             </motion.div>

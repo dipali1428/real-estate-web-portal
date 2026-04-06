@@ -328,7 +328,11 @@ export default function FDCompaniesPage() {
   };
 
   // ========== CLEAR FILTERS ==========
-  const clearFilters = (): void => {
+  const clearFilters = (e?: React.MouseEvent): void => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setSearchTerm('');
     setRateRange('ALL');
     setCategoryFilter('ALL');
@@ -402,68 +406,50 @@ export default function FDCompaniesPage() {
 
   // ========== MAIN RENDER ==========
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="w-full">
+      <main className="w-full">
 
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white shadow-lg">
-                <Landmark className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-black text-gray-900">
-                    FD Companies
-                  </h1>
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200">
-                    {totalCompanies} Companies
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 flex items-center gap-1">
-                  <Database size={12} className="text-[#2076C7]" />
-                  Compare fixed deposit rates across banks &amp; NBFCs
-                </p>
-              </div>
-            </div>
+        {/* Controls Row: Search & Filters */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+          <div>
+             <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                Explore FD Plans
+                <span className="px-2 py-0.5 bg-blue-50 text-[#2076C7] text-[10px] font-black rounded-lg border border-blue-100 uppercase tracking-wider">
+                  {totalCompanies} Available
+                </span>
+             </h3>
+             <p className="text-xs text-gray-500 font-medium mt-0.5">Compare daily updated rates from across 33+ institutions</p>
+          </div>
 
-            <div className="flex items-center gap-3">
-              {/* Search Bar */}
-              <div className="relative flex-1 md:flex-none md:w-64">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+             <div className="relative flex-1 sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search companies..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-[#2076C7] focus:shadow-[0_0_0_4px_rgba(32,118,199,0.05)] transition-all"
                 />
               </div>
 
-              {/* Filter Button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`px-4 py-2 border rounded-xl text-sm font-medium flex items-center gap-2 transition-all ${showFilters
-                    ? 'bg-[#2076C7] text-white border-[#2076C7]'
-                    : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                className={`px-5 py-2.5 rounded-xl text-sm font-black flex items-center gap-2 transition-all border ${showFilters
+                    ? 'bg-[#2076C7] text-white border-[#2076C7] shadow-lg shadow-blue-500/20'
+                    : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm'
                   }`}
               >
                 <Filter size={18} />
-                Filters
+                <span className="hidden xs:inline">Filters</span>
                 {activeFilterCount > 0 && (
-                  <span className="w-5 h-5 bg-white text-[#2076C7] rounded-full text-xs flex items-center justify-center font-bold">
+                  <span className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-black ${showFilters ? 'bg-white text-[#2076C7]' : 'bg-[#2076C7] text-white'}`}>
                     {activeFilterCount}
                   </span>
                 )}
               </button>
-            </div>
           </div>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Market Overview Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -515,10 +501,11 @@ export default function FDCompaniesPage() {
                 Filter Companies
               </h3>
               <button
-                onClick={clearFilters}
-                className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
+                type="button"
+                onClick={(e) => clearFilters(e)}
+                className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 group transition-colors"
               >
-                <X size={16} />
+                <X size={16} className="group-hover:rotate-90 transition-transform" />
                 Clear all
               </button>
             </div>
@@ -754,8 +741,9 @@ export default function FDCompaniesPage() {
                 <Database className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-600 mb-2">No companies found</p>
                 <button
-                  onClick={clearFilters}
-                  className="text-[#2076C7] text-sm font-semibold hover:underline"
+                  type="button"
+                  onClick={(e) => clearFilters(e)}
+                  className="text-[#2076C7] text-sm font-black hover:underline"
                 >
                   Clear filters
                 </button>
@@ -777,19 +765,7 @@ export default function FDCompaniesPage() {
         </div>
       )}
 
-      {/* Floating Cart Button */}
-      {bookmarkedIds.size > 0 && (
-        <button
-          onClick={() => router.push('/customer/wishlist')}
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#2076C7] rounded-full shadow-lg flex items-center justify-center hover:bg-[#1a5e9e] hover:scale-105 transition-all duration-300"
-          aria-label="View Saved Funds"
-        >
-          <ShoppingCart className="text-white w-6 h-6" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-            {bookmarkedIds.size}
-          </span>
-        </button>
-      )}
+
 
       {/* Custom Animation Styles */}
       <style jsx>{`

@@ -18,8 +18,8 @@
 //   Star,
 // } from "lucide-react";
 
-// import PayoutStructure from "../../../products/personal-loan/components/PayoutStructure";
-// import PersonalLoanForm from "../../../products/personal-loan/components/personaloanform";
+// import PayoutStructure from "../../../../products/personal-loan/components/PayoutStructure";
+// import PersonalLoanForm from "../../../../products/personal-loan/components/personaloanform";
 // import PlanDetailDrawer, { getPlansForBank, PlanInfo } from "./components/PlanDetailDrawer";
 
 // export default function PersonalLoanDashboard() {

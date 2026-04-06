@@ -54,6 +54,12 @@ export default function LoansPage() {
       desc: "Convenient vehicle financing for personal or commercial use.",
     },
     {
+      title: "Loan Protector",
+      route: "/customer/finance/loans/loan-protector",
+      icon: Car,
+      desc: "Convenient vehicle financing for personal or commercial use.",
+    },
+    {
       title: "Credit Cards",
       route: "/customer/finance/loans/credit-card",
       icon: CreditCard,
