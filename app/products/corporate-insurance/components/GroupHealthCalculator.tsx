@@ -2,20 +2,19 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Heart,
-  Activity,
-  Users,
-  CheckCircle2,
-  Info,
+    Info,
   Loader2,
 } from "lucide-react";
 import { WELLNESS_FEATURES } from "./data";
 
 interface GroupHealthCalculatorProps {
   openQuote: () => void;
+  isDashboard?: boolean;
 }
 
 export const GroupHealthCalculator: React.FC<GroupHealthCalculatorProps> = ({
   openQuote,
+  isDashboard = false,
 }) => {
   const [employees, setEmployees] = useState(100);
   const [avgAge, setAvgAge] = useState("26-30");
@@ -77,7 +76,7 @@ export const GroupHealthCalculator: React.FC<GroupHealthCalculatorProps> = ({
     <div className="relative">
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-start">
         {/* LEFT CONTENT */}
-        <div className="w-full lg:w-5/12 pt-4 lg:pt-12">
+        <div className={`w-full lg:w-5/12 ${isDashboard ? 'pt-0' : 'pt-4 lg:pt-12'}`}>
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -250,12 +249,14 @@ export const GroupHealthCalculator: React.FC<GroupHealthCalculatorProps> = ({
                 </p>
               </div>
 
-              <button
-                onClick={() => openQuote()}
-                className="w-full py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-xl shadow-[0_8px_25px_rgb(32,118,199,0.3)] hover:shadow-[0_8px_30px_rgb(28,173,163,0.4)] hover:-translate-y-1 transition-all duration-300 text-lg cursor-pointer"
-              >
-                Request Custom Group Quote
-              </button>
+              {!isDashboard && (
+                <button
+                  onClick={() => openQuote()}
+                  className="w-full py-2.5 md:py-3.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-xl shadow-[0_8px_25px_rgb(32,118,199,0.3)] hover:shadow-[0_8px_30px_rgb(28,173,163,0.4)] hover:-translate-y-1 transition-all duration-300 text-base md:text-lg cursor-pointer"
+                >
+                  Request Custom Group Quote
+                </button>
+              )}
             </div>
           </motion.div>
         </div>
