@@ -173,12 +173,14 @@ export default function Wishlist() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white shadow-lg"
-            >
-                <h2 className="text-2xl font-bold">My Wishlist</h2>
+            >   
+                <div className="flex items-center gap-2 mb-2">
+                    <Bookmark className="w-5 h-8 text-white" />
+                    <h2 className="text-2xl font-bold">My Wishlist</h2>
+                </div>
                 <p className="text-sm opacity-80 mb-4">
                     Track and manage your potential investments
                 </p>
-
                 <div className="relative">
                     <input
                         type="text"
@@ -191,23 +193,42 @@ export default function Wishlist() {
             </motion.div>
 
             {/* Tabs */}
-            <div className="flex space-x-2 overflow-x-auto pb-6 scrollbar-hide">
-                {categories.map(cat => (
+            <div className="w-full mb-6">
+            <div className="flex justify-center overflow-x-auto pb-2 scrollbar-hide">
+                <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                {categories.map((cat) => (
                     <button
-                        key={cat.id}
-                        onClick={() => setSelectedCategory(cat.id)}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center space-x-2 transition-all ${
-                            selectedCategory === cat.id
-                                ? `bg-linear-to-r ${cat.color} text-white`
-                                : 'bg-white text-gray-600 border border-gray-100'
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`relative px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-2 shrink-0 ${
+                        selectedCategory === cat.id
+                        ? 'text-white'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                    >
+                    {selectedCategory === cat.id && (
+                        <motion.div
+                        layoutId="activeTabWishlist"
+                        className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                        />
+                    )}
+
+                    <span>{cat.name}</span>
+
+                    <span
+                        className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                        selectedCategory === cat.id
+                            ? 'bg-white/20 text-white'
+                            : 'bg-slate-200 text-slate-600'
                         }`}
                     >
-                        <span>{cat.name}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/20">
-                            {cat.count}
-                        </span>
+                        {cat.count}
+                    </span>
                     </button>
                 ))}
+                </div>
+            </div>
             </div>
 
             {/* Table */}

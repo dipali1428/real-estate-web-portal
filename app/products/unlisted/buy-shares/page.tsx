@@ -86,6 +86,9 @@ const BuyShares: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
 
+  // --- PAGINATION STATE ---
+  const [visibleCount, setVisibleCount] = useState(12);
+
   // --- MODAL STATES ---
   const [detailCompany, setDetailCompany] = useState<ExtendedCompany | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'company'>('overview');
@@ -225,6 +228,11 @@ const BuyShares: React.FC = () => {
     const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  // Reset visible count when filters change
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [debouncedSearch, selectedCategory, sortBy]);
 
   // CHART INITIALIZATION
   useEffect(() => {
@@ -520,7 +528,7 @@ const BuyShares: React.FC = () => {
         {toasts.map(toast => (
           <div 
             key={toast.id} 
-            className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 border ${getToastBg(toast.type)} animate-in slide-in-from-right-5 max-w-sm`}
+            className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 border ${getToastBg(toast.type)} animate-in slide-in-from-right-5 max-w-sm cursor-pointer`}
             onClick={() => removeToast(toast.id)}
           >
             {getToastIcon(toast.type)}
@@ -631,99 +639,107 @@ const BuyShares: React.FC = () => {
         {/* RESULTS INFO */}
         <div className="flex justify-between items-center mb-4">
           <p className="text-sm text-gray-600 bg-white/60 px-4 py-2 rounded-full">
-            Showing <span className="font-bold text-[#2076C7]">{filteredCompanies.length}</span> companies
+            Showing <span className="font-bold text-[#2076C7]">{Math.min(visibleCount, filteredCompanies.length)}</span> of <span className="font-bold text-[#2076C7]">{filteredCompanies.length}</span> companies
           </p>
         </div>
 
-        {/* COMPANIES GRID */}
-        <div className="relative">
-          <div className="overflow-y-auto max-h-[800px] pr-2 custom-scrollbar">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-              {filteredCompanies.map(company => (
-                <div
-                  key={company.id}
-                  className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-6 flex flex-col items-center text-center h-full"
-                >
-                  {/* RECTANGULAR IMAGE CONTAINER - CHANGED FROM CIRCLE */}
-                  <div className="w-full h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100 shadow-sm overflow-hidden">
-                    {company.logo ? (
-                      <img 
-                        src={company.logo} 
-                        className="w-full h-full object-contain p-3" 
-                        alt={company.name}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                          const parent = (e.target as HTMLImageElement).parentElement;
-                          if (parent) {
-                            const span = document.createElement('span');
-                            span.className = 'text-2xl font-bold text-[#2076C7]';
-                            span.textContent = company.name.charAt(0);
-                            parent.appendChild(span);
-                          }
-                        }}
-                      />
-                    ) : (
-                      <span className="text-3xl font-bold text-[#2076C7]">{company.name.charAt(0)}</span>
-                    )}
-                  </div>
+        {/* COMPANIES GRID - Removed scrollbar, added View More button */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+          {filteredCompanies.slice(0, visibleCount).map(company => (
+            <div
+              key={company.id}
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-6 flex flex-col items-center text-center h-full"
+            >
+              {/* RECTANGULAR IMAGE CONTAINER */}
+              <div className="w-full h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100 shadow-sm overflow-hidden">
+                {company.logo ? (
+                  <img 
+                    src={company.logo} 
+                    className="w-full h-full object-contain p-3" 
+                    alt={company.name}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      const parent = (e.target as HTMLImageElement).parentElement;
+                      if (parent) {
+                        const span = document.createElement('span');
+                        span.className = 'text-2xl font-bold text-[#2076C7]';
+                        span.textContent = company.name.charAt(0);
+                        parent.appendChild(span);
+                      }
+                    }}
+                  />
+                ) : (
+                  <span className="text-3xl font-bold text-[#2076C7]">{company.name.charAt(0)}</span>
+                )}
+              </div>
 
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{company.name}</h3>
-                  
-                  {/* PRICE DISPLAY */}
-                  <div className="mb-4">
-                    <span className="text-2xl font-bold text-[#2076C7]">
-                      ₹{company.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                  
-                  <div className="text-sm text-gray-500 mb-4">{company.category}</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-1">{company.name}</h3>
+              
+              {/* PRICE DISPLAY */}
+              <div className="mb-4">
+                <span className="text-2xl font-bold text-[#2076C7]">
+                  ₹{company.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              
+              <div className="text-sm text-gray-500 mb-4">{company.category}</div>
 
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
-                      <div className="text-sm font-bold text-gray-900">
-                        {company.lotSize.toLocaleString()} shares
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 mb-0.5">Depository</div>
-                      <div className="text-sm font-bold text-gray-900">
-                        {company.depository?.split(' ')[0] || 'NSDL'}
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 mb-0.5">Min. Invest</div>
-                      <div className="text-sm font-bold text-gray-900">
-                        {calculateMinInvestment(company.price, company.lotSize)}
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 mb-0.5">Available</div>
-                      <div className="text-sm font-bold text-gray-900">
-                        {company.volume || '120K'}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 w-full mt-auto">
-                    <button
-                      onClick={() => handleBuyNowClick(company)}
-                      className="flex-1 py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
-                    >
-                      Buy Now
-                    </button>
-                    <button
-                      onClick={() => setDetailCompany(company)}
-                      className="flex-1 py-3.5 border-2 border-[#2076C7] text-[#2076C7] text-sm font-bold rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
-                    >
-                      Details
-                    </button>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
+                <div className="text-center">
+                  <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
+                  <div className="text-sm font-bold text-gray-900">
+                    {company.lotSize.toLocaleString()} shares
                   </div>
                 </div>
-              ))}
+                <div className="text-center">
+                  <div className="text-xs text-gray-500 mb-0.5">Depository</div>
+                  <div className="text-sm font-bold text-gray-900">
+                    {company.depository?.split(' ')[0] || 'NSDL'}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xs text-gray-500 mb-0.5">Min. Invest</div>
+                  <div className="text-sm font-bold text-gray-900">
+                    {calculateMinInvestment(company.price, company.lotSize)}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xs text-gray-500 mb-0.5">Available</div>
+                  <div className="text-sm font-bold text-gray-900">
+                    {company.volume || '120K'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 w-full mt-auto">
+                <button
+                  onClick={() => handleBuyNowClick(company)}
+                  className="flex-1 py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                >
+                  Buy Now
+                </button>
+                <button
+                  onClick={() => setDetailCompany(company)}
+                  className="flex-1 py-3.5 border-2 border-[#2076C7] text-[#2076C7] text-sm font-bold rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+                >
+                  Details
+                </button>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
+
+        {/* VIEW MORE BUTTON - Replaces scrollbar */}
+        {visibleCount < filteredCompanies.length && (
+          <div className="flex justify-center pb-12">
+            <button 
+              onClick={() => setVisibleCount(prev => prev + 12)}
+              className="flex items-center gap-2 px-8 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm hover:shadow-md"
+            >
+              View More Companies <ChevronDown size={20} />
+            </button>
+          </div>
+        )}
 
         {/* EMPTY STATE */}
         {filteredCompanies.length === 0 && (
@@ -785,7 +801,7 @@ const BuyShares: React.FC = () => {
             {/* HEADER */}
             <div className="bg-white border-b border-gray-100 p-6 flex items-start justify-between">
               <div className="flex items-center gap-4">
-                {/* RECTANGULAR IMAGE CONTAINER - CHANGED FROM CIRCLE */}
+                {/* RECTANGULAR IMAGE CONTAINER */}
                 <div className="w-20 h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
                   {detailCompany.logo ? (
                     <img src={detailCompany.logo} className="w-full h-full object-contain p-2" alt={detailCompany.name} />
@@ -1089,24 +1105,6 @@ const BuyShares: React.FC = () => {
         
         .slide-in-from-right-5 {
           animation: slideInFromRight 0.3s ease-out;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 10px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #2076C7;
-          border-radius: 10px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #1a5e9e;
         }
       `}</style>
     </div>

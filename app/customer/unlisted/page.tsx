@@ -53,7 +53,7 @@ export default function UnlistedSharesPage() {
 
   return (
     <div className="flex-1 p-4 sm:p-6 bg-[#F8FAFC] min-h-screen font-sans">
-      <div className="max-w-full mx-auto">
+      <div className="flex-1 p-4 sm:p-6 bg-[#F8FAFC] min-h-screen font-sans max-w-full mx-auto">
         
         {/* 1. STANDARDIZED HEADER SECTION (Using Real Estate CSS) */}
         <motion.div

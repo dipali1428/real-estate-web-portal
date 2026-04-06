@@ -161,16 +161,25 @@ export default function CalculatorPage({ type = 'emi', onNavigate }: any) {
         animate={{ opacity: 1, y: 0 }}
         className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white"
       >
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold mb-2">📊 {activeData.label}</h2>
-            <p className="text-sm opacity-90">{activeData.desc}</p>
+        <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                <activeData.icon className="w-5 h-5 text-white" />
+              </div>
+
+              <h2 className="text-xl sm:text-2xl font-bold">
+                {activeData.label}
+              </h2>
+            </div>
+
+            <p className="text-sm opacity-90">
+              {activeData.desc}
+            </p>
           </div>
-        </div>
       </motion.div>
 
       {/* Dropdown Selector */}
-      <div className="mb-6 relative z-50">
+      <div className="mb-6 relative z-10">
         <div className="max-w-md mx-auto relative">
           <button 
             onClick={() => setIsDropdownOpen(!isDropdownOpen)} 

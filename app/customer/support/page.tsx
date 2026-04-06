@@ -286,23 +286,42 @@ export default function HelpSupport() {
                 {view === 'list' && (
                     <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                         {/* Tabs - Horizontal Scroll on Mobile */}
-                        <div className="flex space-x-1 sm:space-x-2 overflow-x-auto pb-4 sm:pb-6 scrollbar-hide">
-                            {filterTabs.map(tab => (
+                        <div className="w-full mb-6">
+                        <div className="flex justify-center overflow-x-auto pb-2 scrollbar-hide">
+                            <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                            {filterTabs.map((tab) => (
                                 <button
-                                    key={tab.id}
-                                    onClick={() => setSelectedFilter(tab.id)}
-                                    className={`flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium flex items-center space-x-1 sm:space-x-2 transition-all whitespace-nowrap ${
-                                        selectedFilter === tab.id
-                                            ? `bg-gradient-to-r ${tab.color} text-white`
-                                            : 'bg-white text-gray-600 border border-gray-100'
+                                key={tab.id}
+                                onClick={() => setSelectedFilter(tab.id)}
+                                className={`relative px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-2 shrink-0 ${
+                                    selectedFilter === tab.id
+                                    ? 'text-white'
+                                    : 'text-slate-500 hover:text-slate-700'
+                                }`}
+                                >
+                                {selectedFilter === tab.id && (
+                                    <motion.div
+                                    layoutId="activeSupportTab"
+                                    className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+
+                                <span>{tab.name}</span>
+
+                                <span
+                                    className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                                    selectedFilter === tab.id
+                                        ? 'bg-white/20 text-white'
+                                        : 'bg-slate-200 text-slate-600'
                                     }`}
                                 >
-                                    <span className="text-xs sm:text-sm">{tab.name}</span>
-                                    <span className="text-[8px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 rounded-full bg-white/20">
-                                        {tab.count}
-                                    </span>
+                                    {tab.count}
+                                </span>
                                 </button>
                             ))}
+                            </div>
+                        </div>
                         </div>
 
                         {/* Table - Horizontal Scroll on Mobile */}
