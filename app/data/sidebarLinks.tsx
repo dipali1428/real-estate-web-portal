@@ -111,6 +111,7 @@ export const sidebarLinks = {
     ACCOUNTS: [
         { label: "Dashboard", href: "/accounts", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/accounts/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
+        { label: "KYC Management", href: "/accounts/kycmanagement", icon: <ShieldCheck className="h-5 w-5 text-neutral-700" /> },
         { label: "Receivables", href: "/accounts/reciveable", icon: <Wallet className="h-5 w-5 text-neutral-700" /> },
         { label: "TDS Management", href: "/accounts/tdsmanagement", icon: <Receipt className="h-5 w-5 text-neutral-700" /> },
         { label: "Lead Payments", href: "/accounts/leadmanagement", icon: <FileText className="h-5 w-5 text-neutral-700" /> },

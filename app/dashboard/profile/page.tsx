@@ -778,7 +778,7 @@ export default function ProfileSection() {
     return (
         <main className="w-full px-4 md:px-8 md:pb-60 sm:pb-20 pb-15 bg-[#F8FAFC] min-h-screen relative font-sans">
 
-            <div className="max-[1180px]:relative sticky top-[10px] mx-5 z-50 py-3 flex items-center justify-between gap-4">
+            <div className="max-[1180px]:relative sticky top-[10px] mx-5 z-40 py-3 flex items-center justify-between gap-4">
                 {kyc?.kyc_completed ? (
                     <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-emerald-100 rounded-2xl shadow-sm">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
@@ -794,10 +794,10 @@ export default function ProfileSection() {
                 )}
                 <button
                     onClick={() => router.push('/dashboard/helpSupport')}
-                    className="flex items-center gap-2 px-5 py-2 bg-[#1CADA3] text-white rounded-3xl shadow-lg shadow-[#1cada330] hover:opacity-90 transition-all active:scale-95 group"
+                    className="flex items-center gap-2 px-5 py-2 bg-[#ffb326] text-white rounded-3xl shadow-lg shadow-[#1cada330] hover:opacity-90 transition-all active:scale-95 group"
                 >
-                    <div className="bg-white/20 p-1 rounded-lg">
-                        <AlertCircle size={14} className="text-white group-hover:rotate-12 transition-transform" />
+                    <div className=" p-1 rounded-lg">
+                        <AlertCircle size={14} className="text-[#ff3c35] group-hover:rotate-12 transition-transform" />
                     </div>
                     <div className="flex flex-col items-start leading-none">
                         <span className="text-[10px] font-bold uppercase tracking-widest">Having issue?</span>
@@ -821,7 +821,7 @@ export default function ProfileSection() {
                 <div className="space-y-10 sm:space-y-16">
                     {isStep3Complete && (
                         <section id="profile-summary" className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="sticky top-0 z-40 bg-[#F8FAFC] py-4 sm:py-6 flex items-center justify-center gap-4 mb-2 border-b border-slate-100/50">
+                            <div className="sticky top-0 z-30 bg-[rgb(248,250,252)] py-4 sm:py-6 flex items-center justify-center gap-4 mb-2 border-b border-slate-100/50">
                                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white bg-[#2076C7] shadow-lg shadow-[#1cada330]">
                                     <User size={18} strokeWidth={2.5} />
                                 </div>
