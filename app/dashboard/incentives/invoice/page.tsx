@@ -67,7 +67,7 @@ export default function PayoutHistory() {
         }
 
         const response = await DashboardService.getCompletedDetailLeads();
-        console.log("Raw API Response:", response);
+        
         const rawList = Array.isArray(response) ? response : (response?.leads || response?.data || []);
 
         const mappedData: PayoutRecord[] = rawList.map((item: any) => ({

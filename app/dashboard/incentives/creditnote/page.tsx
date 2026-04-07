@@ -246,7 +246,6 @@ export default function CreditNotePortal() {
   const handleDownloadImage = async (payoutId: string) => {
     if (!payoutId) return;
     if (!isLibReady || !(window as any).html2canvas) {
-      alert("Preparing image library... Please try again in 2 seconds.");
       return;
     }
 
@@ -296,7 +295,6 @@ export default function CreditNotePortal() {
       setActivePayoutId(payoutId);
       setIsModalOpen(true);
     } catch (error) {
-      console.error("Error generating view:", error);
     } finally {
       setIsLoading(false);
     }
