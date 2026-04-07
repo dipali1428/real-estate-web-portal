@@ -29,6 +29,7 @@ interface PayoutRecord {
   lead_name?: string;
   lead_status?: string;
   tds_amount?: string;
+  transaction_reference_no?: string;
 }
 
 export default function PayoutHistory() {
@@ -66,6 +67,7 @@ export default function PayoutHistory() {
         }
 
         const response = await DashboardService.getCompletedDetailLeads();
+        console.log("Raw API Response:", response);
         const rawList = Array.isArray(response) ? response : (response?.leads || response?.data || []);
 
         const mappedData: PayoutRecord[] = rawList.map((item: any) => ({
@@ -77,7 +79,7 @@ export default function PayoutHistory() {
           product: item.product_type || item.sub_category || 'N/A',
           category: item.department?.toLowerCase() || 'N/A',
           paymentMode: item.payment_mode || 'N/A',
-          refNumber: item.payout_details?.transaction_id || 'N/A',
+          refNumber: item.transaction_reference_no || 'N/A',
           gstAmount: item.gst_amount || '0',
           invoiceDate: item.invoice_date || 'N/A',
           invoiceNumber: item.invoice_number || 'N/A',
@@ -128,6 +130,7 @@ export default function PayoutHistory() {
         <td>${data.clientName}</td>
         <td>${data.product}</td>
         <td>${formatValue(data.loanNumber)}</td>
+         <td>${formatValue(data.refNumber)}</td>
         <td>${data.paymentMode}</td>
         <td>₹ ${formatValue(data.amount, true)}</td>
         <td>₹ ${formatValue(data.grossAmount, true)}</td>
@@ -192,30 +195,36 @@ export default function PayoutHistory() {
               <span><b>Date:</b> ${baseRecord.invoiceDate ? new Date(baseRecord.invoiceDate).toLocaleDateString('en-IN') : ''}</span>
           </div>
           <table class="top-table">
-              <tr>
-                  <td width="50%" valign="top">
-                      <div style="margin-bottom: 8px;"><b style="color:#64748b; text-transform: uppercase; font-size: 11px;">From</b></div>
-                      <strong>Infinity Arthvishva Advisory Pvt Ltd</strong><br/>
-                      Shivaji Nagar, Pune, 411005<br/>
-                      <b>GSTIN:</b> 27AAICI0723K1ZJ
-                  </td>
-                  <td width="50%" valign="top" align="right">
-                      <div style="margin-bottom: 8px;"><b style="color:#64748b; text-transform: uppercase; font-size: 11px;">Bill To</b></div>
-                      <strong>${userProfile?.name}</strong><br/>
-                      <div style="max-width: 250px; margin-left: auto;">${fullAddress || 'N/A'}</div>
-                      ${userProfile?.pan ? `<b>PAN:</b> ${userProfile.pan}` : ''}
-                  </td>
-              </tr>
-          </table>
+    <tr>
+        <!-- FROM (Left Side) -->
+        <td width="50%" valign="top">
+            <div style="margin-bottom: 8px;">
+                <b style="color:#64748b; text-transform: uppercase; font-size: 11px;">From</b>
+            </div>
+            <strong>${userProfile?.name}</strong><br/>
+            <div style="max-width: 250px;">${fullAddress || 'N/A'}</div>
+            ${userProfile?.pan ? `<b>PAN:</b> ${userProfile.pan}` : ''}
+        </td>
+
+        <!-- TO (Right Side) -->
+        <td width="50%" valign="top" align="right">
+            <div style="margin-bottom: 8px;">
+                <b style="color:#64748b; text-transform: uppercase; font-size: 11px;">To</b>
+            </div>
+            <strong>Infinity Arthvishva Advisory Pvt Ltd</strong><br/>
+            Shivaji Nagar, Pune, 411005<br/>
+            <b>GSTIN:</b> 27AAICI0723K1ZJ
+        </td>
+    </tr>
+</table>
           <table class="main-table">
-              <thead><tr><th>#</th><th>Lead ID</th><th>Client</th><th>Product</th><th>Ref</th><th>Mode</th><th>Amount</th><th>Gross</th><th>TDS</th><th>GST</th><th>Net</th></tr></thead>
+              <thead><tr><th>#</th><th>Lead ID</th><th>Client</th><th>Product</th><th>Reference No</th><th>UTR No</th><th>Mode</th><th>Amount</th><th>Gross</th><th>TDS</th><th>GST</th><th>Net</th></tr></thead>
               <tbody>${rowsHtml}</tbody>
           </table>
           <table class="summary-table">
               <tr><td>Subtotal</td><td align="right">₹ ${totalGross.toLocaleString('en-IN')}</td></tr>
               <tr><td>GST</td><td align="right">₹ ${totalGst.toLocaleString('en-IN')}</td></tr>
-              <tr><td>TDS</td><td align="right">- ₹ ${totalTds.toLocaleString('en-IN')}</td></tr>
-              <tr class="total-row"><td>TOTAL</td><td align="right">₹ ${totalNet.toLocaleString('en-IN')}</td></tr>
+              <tr class="total-row"><td>TOTAL</td><td align="right">₹ ${totalGross.toLocaleString('en-IN')}</td></tr>
           </table>
 
           <div class="text-align-center footer-note">
@@ -317,6 +326,9 @@ export default function PayoutHistory() {
                         <div className="font-bold text-slate-700">{row.clientName}</div>
                         <div className="text-xs text-slate-400 mt-1">{row.product}</div>
                       </td>
+
+                     
+
                       <td className="px-6 py-5 text-center">
                         <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold uppercase">{row.paymentMode}</span>
                       </td>
@@ -358,11 +370,11 @@ export default function PayoutHistory() {
             <div className="bg-white rounded-2xl w-full max-w-5xl h-[95vh] flex flex-col shadow-2xl overflow-hidden">
               <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white">
                 <div className="flex items-center gap-3">
-                   <div className="bg-blue-50 p-2 rounded-lg"><FileText className="w-5 h-5 text-blue-500" /></div>
-                   <div>
+                  <div className="bg-blue-50 p-2 rounded-lg"><FileText className="w-5 h-5 text-blue-500" /></div>
+                  <div>
                     <h3 className="font-bold text-slate-700 leading-none">Invoice Preview</h3>
                     <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold">Payout ID: {selectedPayoutId}</p>
-                   </div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
@@ -377,7 +389,7 @@ export default function PayoutHistory() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="flex-1 overflow-auto bg-slate-100/50 p-4 md:p-10 flex justify-center">
                 {/* The iframe represents the "paper" */}
                 <div className="w-full max-w-[850px] bg-white shadow-2xl border border-slate-200 rounded-sm">
