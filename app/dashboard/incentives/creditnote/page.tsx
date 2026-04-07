@@ -54,7 +54,6 @@ export default function CreditNotePortal() {
       script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
       script.async = true;
       script.onload = () => {
-        console.log("html2canvas loaded successfully");
         setIsLibReady(true);
       };
       script.onerror = () => console.error("Failed to load html2canvas");
