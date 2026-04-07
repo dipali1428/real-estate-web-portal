@@ -598,23 +598,23 @@ export default function CompaniesPage() {
               
               <div className="text-xs text-gray-500 mb-4 px-3 py-1 bg-gray-100 rounded-full font-bold">Unlisted Shares</div>
 
-              {/* Stats Grid */}
+              {/* Stats Grid - Using reference font sizing (text-xs label, text-sm value) */}
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6 py-4 border-y border-gray-50">
                 <div className="text-center">
-                  <div className="text-[10px] font-bold text-gray-400 uppercase mb-0.5">Lot Size</div>
-                  <div className="text-xs font-bold text-gray-900">{company.min_lot_size?.toLocaleString() || 'N/A'}</div>
+                  <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
+                  <div className="text-sm font-bold text-gray-900">{company.min_lot_size?.toLocaleString() || 'N/A'}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-[10px] font-bold text-gray-400 uppercase mb-0.5">Depository</div>
-                  <div className="text-xs font-bold text-gray-900">{company.depository_applicable?.split(' ')[0] || 'NSDL'}</div>
+                  <div className="text-xs text-gray-500 mb-0.5">Depository</div>
+                  <div className="text-sm font-bold text-gray-900">{company.depository_applicable?.split(' ')[0] || 'NSDL'}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-[10px] font-bold text-gray-400 uppercase mb-0.5">Min. Invest</div>
-                  <div className="text-xs font-bold text-gray-900">₹{minInv.toLocaleString('en-IN')}</div>
+                  <div className="text-xs text-gray-500 mb-0.5">Min. Invest</div>
+                  <div className="text-sm font-bold text-gray-900">₹{minInv.toLocaleString('en-IN')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-[10px] font-bold text-gray-400 uppercase mb-0.5">Available</div>
-                  <div className="text-xs font-bold text-emerald-600">{company.volume}</div>
+                  <div className="text-xs text-gray-500 mb-0.5">Available</div>
+                  <div className="text-sm font-bold text-emerald-600">{company.volume}</div>
                 </div>
               </div>
 
@@ -909,6 +909,7 @@ export default function CompaniesPage() {
                           className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
                         >
                           <ShoppingCart size={18} /> Buy Now
+                          
                         </button>
                         
                         <p className="text-[10px] text-gray-400 text-center mt-4">

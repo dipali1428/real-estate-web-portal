@@ -588,13 +588,6 @@ export default function ReportsPage() {
                 <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6 max-w-md mx-auto px-4">
                   Start investing to see your portfolio distribution across different asset classes.
                 </p>
-                <Link
-                  href="/products/unlisted"
-                  className="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-semibold rounded-lg sm:rounded-xl hover:opacity-90 transition-all text-sm sm:text-base"
-                >
-                  <TrendingUp size={16} />
-                  Start Investing
-                </Link>
               </div>
             )}
 
