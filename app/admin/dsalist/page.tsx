@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Tab } from "@headlessui/react";
 import * as XLSX from "xlsx";
 import { AdminService } from "@/app/services/adminService";
+import { STATES_CITIES } from "@/app/data/statesCities";
 import {
   Pencil,
   RefreshCw,
@@ -77,7 +78,9 @@ export default function DSAManagementPage() {
 
   const tabs = ["All", "Active", "Inactive", "Pending"];
 
-  const [cities, setCities] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>(() => 
+    Array.from(new Set(Object.values(STATES_CITIES).flat())).sort()
+  );
   const [roles, setRoles] = useState<string[]>([]);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -101,7 +104,13 @@ export default function DSAManagementPage() {
       setTotalCount(count); // Setting the proper 2690 count here
 
       if (cities.length === 0) {
-        setCities(Array.from(new Set(mappedDSAs.map((d) => d.city).filter(Boolean))));
+        // Flatten all cities from all states into one unique, sorted list
+        const allCities = Object.values(STATES_CITIES)
+          .flat()
+          .filter((city) => city !== "Other"); // Optional: remove "Other" if you don't want it in the list
+        
+        const uniqueSortedCities = Array.from(new Set(allCities)).sort();
+        setCities(uniqueSortedCities);
       }
       if (roles.length === 0) {
         setRoles(Array.from(new Set(mappedDSAs.map((d) => d.role).filter(Boolean))));
