@@ -65,6 +65,12 @@ export default function LoansPage() {
       icon: CreditCard,
       desc: "Flexible credit access with reward benefits.",
     },
+     {
+      title: "SME Loan",
+      route: "/customer/finance/loans/sme",
+      icon: CreditCard,
+      desc: "Flexible credit access with reward benefits.",
+    },
   ];
 
   return (

@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, IndianRupee, ArrowRight } from 'lucide-react';
+import { Search, Filter, IndianRupee, ArrowRight, ShieldPlus, Info } from 'lucide-react';
 import HealthInsurancePlanCard from './HealthInsurancePlanCard';
 import { healthInsurancePlans } from '../healthInsuranceConstants';
+import { motion } from 'framer-motion';
 
-export default function ExploreHealthInsurance() {
+export default function ExploreHealthInsurance({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [showAllPlans, setShowAllPlans] = useState(false);
@@ -27,7 +28,62 @@ export default function ExploreHealthInsurance() {
     }, [filteredPlans, showAllPlans]);
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fadeIn">
+        <div className="space-y-6 animate-fadeIn pb-12">
+            {/* --- NEW MODERN HEADER --- */}
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="relative bg-white rounded-2xl p-6 mb-2 shadow-sm border border-slate-100/60"
+            >
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
+                            <ShieldPlus size={24} />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-3 mb-1">
+                                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
+                                    Health Insurance
+                                </h2>
+                                <span className="px-2.5 py-1 bg-blue-100 text-[#2076C7] text-[10px] font-bold rounded-full border border-blue-200 whitespace-nowrap">
+                                    {healthInsurancePlans.length} Partners
+                                </span>
+                            </div>
+                            <p className="text-sm text-slate-500 flex items-center gap-2">
+                                <span className="text-[#2076C7] flex items-center justify-center w-5 h-5 rounded-full bg-blue-50/50">
+                                    <Info size={14} />
+                                </span>
+                                Comprehensive health and medical protection
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex bg-gray-200/50 p-1.5 rounded-xl w-full sm:w-fit self-center sm:self-end md:self-center flex-wrap justify-center sm:justify-start">
+                        <button
+                            onClick={() => setActiveTab("explore")}
+                            className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                                activeTab === "explore"
+                                    ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-200"
+                                    : "text-gray-500 hover:bg-gray-200"
+                            }`}
+                        >
+                            Explore Offers
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("applications")}
+                            className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                                activeTab === "applications"
+                                    ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-teal-200"
+                                    : "text-gray-500 hover:bg-gray-200"
+                            }`}
+                        >
+                            My Policies
+                        </button>
+                    </div>
+                </div>
+            </motion.div>
+
             {/* Filter Section */}
             <div className="mb-10">
                 <div className="bg-white/90 backdrop-blur-xl p-2 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-2 items-center w-full">

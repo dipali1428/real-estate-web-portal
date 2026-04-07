@@ -10,41 +10,26 @@ export default function HealthInsuranceDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
-      {/* Global Tab Navigation */}
-      <div className="bg-white/90 backdrop-blur-md border-b border-gray-200/50 py-4 px-4 sm:px-6 lg:px-8 relative z-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex bg-gray-100/80 p-1 rounded-xl sm:rounded-2xl w-full sm:w-fit overflow-x-auto no-scrollbar">
-            <button
-              onClick={() => setActiveTab("explore")}
-              className={`flex-1 sm:flex-none px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 rounded-lg sm:rounded-xl transition-all whitespace-nowrap ${
-                activeTab === "explore"
-                  ? "bg-white text-[#2076C7] shadow-sm border border-gray-200/50"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
-              }`}
-            >
-              <Landmark size={18} />
-              Explore Offers
-            </button>
-            <button
-              onClick={() => setActiveTab("applications")}
-              className={`flex-1 sm:flex-none px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 rounded-lg sm:rounded-xl transition-all whitespace-nowrap ${
-                activeTab === "applications"
-                  ? "bg-white text-[#2076C7] shadow-sm border border-gray-200/50"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
-              }`}
-            >
-              <FileText size={18} />
-              My Applications
-            </button>
-          </div>
+      <div className="p-4 sm:p-6 lg:p-8">
+        {/* Active View */}
+        <div className="animate-fadeIn">
+          {activeTab === "explore" ? (
+            <ExploreHealthInsurance activeTab={activeTab} setActiveTab={setActiveTab} />
+          ) : (
+            <MyHealthInsurance activeTab={activeTab} setActiveTab={setActiveTab} />
+          )}
         </div>
       </div>
 
-      {/* Active View */}
-      <div>
-        {activeTab === "explore" ? <ExploreHealthInsurance /> : <MyHealthInsurance />}
-      </div>
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
-

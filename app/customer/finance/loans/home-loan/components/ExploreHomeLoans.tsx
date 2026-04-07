@@ -14,12 +14,13 @@ import {
   Database,
   Clock,
   Bookmark,
-  BookmarkCheck
+  BookmarkCheck,
+  FileText
 } from "lucide-react";
 import { categorizedPlans } from "../loanConstants";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function ExploreHomeLoans() {
+export default function ExploreHomeLoans({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
   // We use "New Purchase" plans as our base list of banks
   const initialBanks = categorizedPlans["New Purchase"] || [];
 
@@ -139,33 +140,78 @@ export default function ExploreHomeLoans() {
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
-                H
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-black text-gray-900">
-                    Home Loans
-                  </h1>
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200 whitespace-nowrap">
-                    {totalBanks} Partners
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 flex items-center gap-1">
-                  <Landmark size={12} className="text-[#2076C7]" />
-                  Compare and apply for the best partner bank offers
-                </p>
-              </div>
-            </div>
 
-            <div className="flex items-center gap-3">
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0 sm:py-2">
+        {/* --- NEW MODERN HEADER --- */}
+        <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="relative bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-100/60 mt-4"
+        >
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
+                        <Landmark size={24} />
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-3 mb-1">
+                            <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
+                                Home Loans
+                            </h2>
+                            <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200 whitespace-nowrap">
+                                {totalBanks} Partners
+                            </span>
+                        </div>
+                        <p className="text-sm text-slate-500 flex items-center gap-2">
+                            <FileText size={14} className="text-[#2076C7]" />
+                            Compare and apply for the best partner bank offers
+                        </p>
+                    </div>
+                </div>
+                
+                <div className="flex pb-2 md:pb-0 w-full sm:w-auto mt-2 sm:mt-0 overflow-x-auto hide-scrollbar sm:overflow-visible">
+                    <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                        <button
+                            onClick={() => setActiveTab('explore')}
+                            className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'explore' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                            {activeTab === 'explore' && (
+                                <motion.div
+                                    layoutId="activeTabExplore"
+                                    className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                />
+                            )}
+                            <Landmark size={14} />
+                            <span>Offers</span>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('applications')}
+                            className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'applications' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                            {activeTab === 'applications' && (
+                                <motion.div
+                                    layoutId="activeTabExplore"
+                                    className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                />
+                            )}
+                            <FileText size={14} />
+                            <span>Policies</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+
+        {/* Sticky Filters & Search */}
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-4 border border-gray-100 shadow-sm sticky top-0 z-40 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex-1 flex w-full">
               {/* Search Bar */}
-              <div className="relative flex-1 md:flex-none md:w-64">
+              <div className="relative flex-1 md:flex-none md:w-full max-w-sm">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
@@ -175,7 +221,9 @@ export default function ExploreHomeLoans() {
                   className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
                 />
               </div>
+            </div>
 
+            <div className="flex items-center gap-3 self-start sm:self-auto">
               {/* Filter Button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
@@ -193,12 +241,7 @@ export default function ExploreHomeLoans() {
                 )}
               </button>
             </div>
-          </div>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Market Overview Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">

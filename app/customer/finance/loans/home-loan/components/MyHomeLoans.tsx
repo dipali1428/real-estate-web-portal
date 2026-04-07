@@ -22,7 +22,7 @@ interface LoanApplication {
 
 // ==================== MAIN COMPONENT ====================
 
-export default function MyHomeLoans() {
+export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
   const [applications, setApplications] = useState<LoanApplication[]>([]);
   const [filteredApplications, setFilteredApplications] = useState<LoanApplication[]>([]);
   const [loading, setLoading] = useState(false);
@@ -136,25 +136,57 @@ export default function MyHomeLoans() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fadeIn">
       
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <FileText className="w-8 h-8 text-[#2076C7]" />
-              My Applications
-            </h1>
-            <span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full border border-blue-200">
-              {filteredApplications.length} of {applications.length}
-            </span>
+      {/* --- NEW MODERN HEADER --- */}
+      <div className="relative bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-100/60 mt-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
+                      <FileText size={24} />
+                  </div>
+                  <div>
+                      <div className="flex items-center gap-3 mb-1">
+                          <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
+                              My Applications
+                          </h2>
+                          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200 whitespace-nowrap">
+                              {filteredApplications.length} Policies
+                          </span>
+                      </div>
+                      <p className="text-sm text-slate-500 flex items-center gap-2">
+                          <Clock size={14} className="text-gray-400" />
+                          Last updated: {lastUpdated || 'Just now'}
+                      </p>
+                  </div>
+              </div>
+              
+              <div className="flex pb-2 md:pb-0 w-full sm:w-auto mt-2 sm:mt-0 overflow-x-auto hide-scrollbar sm:overflow-visible">
+                  <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                      <button
+                          onClick={() => setActiveTab('explore')}
+                          className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'explore' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                      >
+                          {activeTab === 'explore' && (
+                              <div className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm" />
+                          )}
+                          <Home size={14} />
+                          <span>Offers</span>
+                      </button>
+                      <button
+                          onClick={() => setActiveTab('applications')}
+                          className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'applications' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                      >
+                          {activeTab === 'applications' && (
+                              <div className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm" />
+                          )}
+                          <FileText size={14} />
+                          <span>Policies</span>
+                      </button>
+                  </div>
+              </div>
           </div>
-          <p className="text-gray-600 flex items-center gap-2">
-            <Clock size={14} className="text-gray-400" />
-            Last updated: {lastUpdated || 'Just now'}
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-3">
+      </div>
+
+      <div className="flex flex-col md:flex-row md:items-center justify-end gap-3 mb-6">
           <button 
             onClick={() => setShowFilters(!showFilters)}
             className={`px-4 py-2.5 border rounded-xl text-sm font-medium flex items-center gap-2 transition-all ${
@@ -176,7 +208,6 @@ export default function MyHomeLoans() {
             <Download className="w-4 h-4" />
             Export CSV
           </button>
-        </div>
       </div>
 
       {/* Filter Panel */}

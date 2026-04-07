@@ -68,7 +68,7 @@ export default function SIPManagementPage() {
   }, [activeSips]);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 px-4">
+   <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 font-sans">
 
       {/* Header */}
     

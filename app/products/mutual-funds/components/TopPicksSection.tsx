@@ -14,7 +14,7 @@ export default function TopPicksSection({ title, funds, renderItem }: Props) {
         {title}
       </h2>
       {/* Use global custom-scrollbar-x class (defined in globals.css) */}
-      <div className="flex gap-6 overflow-x-auto pb-4 custom-scrollbar-x">
+     <div className="flex gap-6 overflow-x-auto pb-4 custom-scrollbar-x w-fit max-w-full mx-auto">
         {funds.map((fund) => (
           <div
             key={`${fund.schemeCode}-${fund.name}`}

@@ -5,8 +5,9 @@ import {
   Building2, Download, CheckCircle, XCircle, Clock, 
   ArrowUpRight, Filter, IndianRupee, RefreshCw, AlertCircle,
   FileText, Activity, X, Search, SlidersHorizontal, Calendar,
-  Shield 
+  Shield, ShieldPlus 
 } from 'lucide-react';
+import { motion, AnimatePresence } from "framer-motion";
 
 
 // ==================== MOCK DATA ====================
@@ -53,7 +54,7 @@ const mockApplications: InsuranceApplication[] = [
 
 // ==================== MAIN COMPONENT ====================
 
-export default function MyHealthInsurance() {
+export default function MyHealthInsurance({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
   const [applications, setApplications] = useState<InsuranceApplication[]>([]);
   const [filteredApplications, setFilteredApplications] = useState<InsuranceApplication[]>([]);
   const [loading, setLoading] = useState(false);
@@ -143,63 +144,120 @@ export default function MyHealthInsurance() {
   const pendingCount = applications.filter(app => app.status === 'PENDING').length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fadeIn">
+    <div className="space-y-6 animate-fadeIn pb-12">
       
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <FileText className="w-8 h-8 text-[#2076C7]" />
-              My Applications
-            </h1>
-            <span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full border border-blue-200">
-              {filteredApplications.length} of {applications.length}
-            </span>
+      {/* --- NEW MODERN HEADER --- */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="relative bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-100/60"
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
+              <FileText size={24} />
+            </div>
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
+                  My Health Policies
+                </h2>
+                <span className="px-2.5 py-1 bg-blue-100 text-[#2076C7] text-[10px] font-bold rounded-full border border-blue-200 whitespace-nowrap">
+                  {filteredApplications.length} of {applications.length}
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 flex items-center gap-2">
+                <span className="text-[#2076C7] flex items-center justify-center w-5 h-5 rounded-full bg-blue-50/50">
+                  <Clock size={14} />
+                </span>
+                Track and manage your active health coverage
+              </p>
+            </div>
           </div>
-          <p className="text-gray-600 flex items-center gap-2">
-            <Clock size={14} className="text-gray-400" />
-            Last updated: {lastUpdated || 'Just now'}
-          </p>
+
+          <div className="flex bg-gray-200/50 p-1.5 rounded-xl w-full sm:w-fit self-center sm:self-end md:self-center flex-wrap justify-center sm:justify-start">
+            <button
+              onClick={() => setActiveTab("explore")}
+              className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                activeTab === "explore"
+                  ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-200"
+                  : "text-gray-500 hover:bg-gray-200"
+              }`}
+            >
+              Explore Offers
+            </button>
+            <button
+              onClick={() => setActiveTab("applications")}
+              className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                activeTab === "applications"
+                  ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-teal-200"
+                  : "text-gray-500 hover:bg-gray-200"
+              }`}
+            >
+              My Policies
+            </button>
+          </div>
         </div>
-        
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => setShowFilters(!showFilters)}
-            className={`px-4 py-2.5 border rounded-xl text-sm font-medium flex items-center gap-2 transition-all ${
-              showFilters 
-                ? 'bg-[#2076C7] text-white border-[#2076C7]' 
-                : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-            Filters
-          </button>
-          
-          <button className="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl text-sm font-medium flex items-center gap-2 transition-all">
-            <Download className="w-4 h-4" />
-            Export CSV
-          </button>
+      </motion.div>
+
+      {/* Action Row */}
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-gray-100 shadow-sm sticky top-0 z-40 mb-8">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="flex items-center gap-2 text-gray-600">
+            <RefreshCw size={16} className="text-[#2076C7] animate-spin-slow" />
+            <span className="text-sm font-medium">Last updated: {lastUpdated || 'Just now'}</span>
+          </div>
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-sm flex items-center justify-center gap-2 ${
+                showFilters
+                  ? 'bg-[#2076C7] text-white'
+                  : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <SlidersHorizontal size={18} />
+              Filters
+              {(statusFilter !== 'ALL' || providerSearch) && (
+                <span className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-black ${showFilters ? 'bg-white text-[#2076C7]' : 'bg-[#2076C7] text-white'}`}>
+                  {[statusFilter !== 'ALL' ? 1 : 0, providerSearch ? 1 : 0].reduce((a, b) => a + b, 0)}
+                </span>
+              )}
+            </button>
+            
+            <button className="flex-1 md:flex-none px-6 py-3 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm">
+              <Download size={18} />
+              Export CSV
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Filter Panel */}
-      {showFilters && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8 animate-fadeIn">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Filter className="w-5 h-5 text-[#2076C7]" />
-              Filter Applications
-            </h3>
-            <button 
-              onClick={clearFilters}
-              className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
-            >
-              <X size={16} />
-              Clear all
-            </button>
-          </div>
-          
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8 overflow-hidden"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Filter className="w-5 h-5 text-[#2076C7]" />
+                Filter Applications
+              </h3>
+              <button 
+                onClick={clearFilters}
+                className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
+              >
+                <X size={16} />
+                Clear all
+              </button>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
@@ -233,8 +291,9 @@ export default function MyHealthInsurance() {
                 </div>
               </div>
             </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
