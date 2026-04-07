@@ -4,6 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, Suspense } from "react";
 import Header from "./component/Header";
 import Footer from "./component/Footer";
+import GlobalAuthHandler from "./lib/global-auth-handler";
 import { ModalProvider, useModal } from "./context/ModalContext";
 
 function ReferralHandler() {
@@ -40,8 +41,22 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
   const isBranchHead = pathname?.startsWith("/branchhead");
   const isContactList = pathname?.startsWith("/page/contactlist");
 
+  const isProtectedRoute = !!(
+    isDashboard ||
+    isAdminDashboard ||
+    isRM ||
+    isdepartmenthead ||
+    isaccountProfile ||
+    iscustomerProfile ||
+    isUnlistedAdmin ||
+    isHRProfile ||
+    isDirector ||
+    isBranchHead
+  );
+
   return (
     <ModalProvider>
+      <GlobalAuthHandler isProtectedRoute={isProtectedRoute} />
 
       {/* ✅ Referral handler runs globally */}
       <Suspense fallback={null}>
