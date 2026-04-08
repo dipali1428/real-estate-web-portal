@@ -188,7 +188,7 @@ export const sidebarLinks = {
                 },
                 {
                     label: "Career Applications",
-                    href: "/admin/careerapplications",
+                    href: "/admin/careermanagement",
                     icon: <Briefcase className="h-4 w-4 text-neutral-700" />,
                 },
             ],
