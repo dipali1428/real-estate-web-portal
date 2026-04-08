@@ -61,9 +61,10 @@ export default function ProfileSection() {
     const [emailVerified, setEmailVerified] = useState(false);
     const [activeId, setActiveId] = useState<string>("step-1");
     const [isAddressSame, setIsAddressSame] = useState(false);
+    const [showAgreementModal, setShowAgreementModal] = useState(false);
 
     const isStep1Complete = mobileVerified && emailVerified;
-    const isStep2Complete = isStep1Complete && (profile?.pan_verified && aadhaarVerified);
+    const isStep2Complete = isStep1Complete && (profile?.pan_verified && aadhaarVerified && panAadhaarLinked);
     const isStep3Complete = isStep2Complete && bankVerified;
 
     const [referralLink, setReferralLink] = useState<string>("");
@@ -466,7 +467,11 @@ export default function ProfileSection() {
             setBankVerified(!!res.kycDetails?.bank_verified);
             setAadhaarVerified(!!res.kycDetails?.aadhaar_verified);
             setGstVerified(!!res.kycDetails?.gst_verified);
+            const isFullyComplete = res.kycDetails?.kyc_completed && res.kycDetails?.bank_verified;
             originalPassword.current = res.user.password;
+            if (isFullyComplete) {
+                setShowAgreementModal(true);
+            }
         } catch (error) { console.error("Refresh failed:", error); }
     };
 
@@ -1309,7 +1314,7 @@ export default function ProfileSection() {
                                             <button onClick={handleCheckPanAadhaarLink} className="w-full py-3 mt-5 mb-3 bg-[#1CADA3] border border-slate-200 text-white rounded-xl text-[14px] font-bold flex items-center justify-center gap-2">
                                                 <ShieldCheck size={12} /> Check Aadhaar PAN link status
                                             </button>
-                                            <div className="flex items-start gap-2 p-3 bg-amber-50 border mb-5 border-amber-100 rounded-xl text-amber-700 text-[11px] font-bold leading-tight">
+                                            <div className="flex items-start gap-2 p-3 bg-amber-50 border mb-5 border-amber-100 rounded-xl text-amber-700 text-[12px] font-bold leading-tight">
                                                 <AlertCircle size={12} className="shrink-0" />
                                                 <span>Note: Payout requires linked PAN-Aadhaar</span>
                                             </div>
@@ -1337,7 +1342,7 @@ export default function ProfileSection() {
                                         <span className="bg-emerald-100 text-emerald-600 px-4 py-2 rounded-lg font-black text-[10px] flex items-center justify-center">VERIFIED</span>
                                     )}
                                 </div>
-                                <div className="flex items-start gap-2 p-3 mt-4 bg-amber-50 border border-amber-100 rounded-xl text-amber-700 text-[12px] sm:text-[11px] font-bold leading-relaxed">
+                                <div className="flex items-start gap-2 p-3 mt-4 bg-amber-50 border border-amber-100 rounded-xl text-amber-700 text-[12px] sm:text-[12px] font-bold leading-relaxed">
                                     <AlertCircle size={14} className="mt-0.5 shrink-0 text-amber-500" />
                                     <span>Note: GST verification is mandatory if total payout exceeds ₹20 lakh in a financial year.</span>
                                 </div>
@@ -1535,6 +1540,38 @@ export default function ProfileSection() {
                     })}
                 </div>
             </aside>
+
+            {/* Agreement Sign-off Modal */}
+{showAgreementModal && (
+    <div className="fixed inset-0 z-[300] flex items-center justify-center px-4">
+        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAgreementModal(false)} />
+        <div className="relative bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                <CheckCircle2 className="text-emerald-600" size={32} />
+            </div>
+            
+            <h3 className="text-2xl font-bold text-slate-800 text-center mb-2">Profile Completed!</h3>
+            <p className="text-slate-500 text-center text-sm mb-8 leading-relaxed">
+                Your KYC and bank details are verified. To start earning and receiving payouts, please sign the digital partner agreement.
+            </p>
+
+            <div className="flex flex-col gap-3">
+                <button
+                    onClick={() => router.push('/dashboard/incentives/agreement')}
+                    className="w-full py-4 bg-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-200 hover:bg-[#158f87] transition-all active:scale-95"
+                >
+                    Sign Agreement Now
+                </button>
+                <button
+                    onClick={() => setShowAgreementModal(false)}
+                    className="w-full py-4 bg-white text-slate-400 rounded-xl font-bold text-sm hover:text-slate-600 transition-all"
+                >
+                    I'll do it later
+                </button>
+            </div>
+        </div>
+    </div>
+)}
 
         </main>
     );
