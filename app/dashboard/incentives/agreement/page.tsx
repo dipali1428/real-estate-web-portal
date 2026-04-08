@@ -18,7 +18,6 @@ export default function DSAAgreement() {
       try {
         const response = await DashboardService.checkKycStatus();
         setProfile(response);
-        console.log("Profile data fetched:", response);
       } catch (error) {
         console.error("Error fetching profile:", error);
       } finally {
@@ -27,17 +26,6 @@ export default function DSAAgreement() {
     };
     fetchProfileData();
   }, []);
-
-  // // ADD THIS BLOCK (around line 30)
-  // useEffect(() => {
-  //   if (profile) {
-  //     console.log("--- Profile State Verification ---");
-  //     console.log("Stored Name:", profile.name);
-  //     console.log("Stored Email:", profile.email);
-  //     console.log("Full Profile Object:", profile);
-  //     console.log("----------------------------------");
-  //   }
-  // }, [profile]); // This runs whenever 'profile' state updates
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
