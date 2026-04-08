@@ -172,7 +172,6 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
 
   // Helper function to extract address from response
   const extractAddressFromResponse = (response: any): string | null => {
-    console.log('Full response structure:', JSON.stringify(response, null, 2));
     
     // Try different possible paths for address
     if (response.data?.aadhaar_kyc_data?.full_address) {
@@ -219,7 +218,7 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
         aadhaar_number: aadhaarNum 
       });
       
-      console.log('Aadhaar verification response:', response);
+      toast.success("Aadhaar verification response received");
       
       // Extract address from response
       const aadhaarAddress = extractAddressFromResponse(response);
@@ -244,13 +243,13 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
       }
       
       if (aadhaarAddress && onAddressUpdate) {
-        console.log('Extracted address:', aadhaarAddress);
+        toast.success("Address extracted successfully");
         onAddressUpdate(aadhaarAddress);
         toast.success("Aadhaar Verified! Address fetched successfully.");
       } else {
         toast.success("Aadhaar Verified Successfully!");
         if (!aadhaarAddress) {
-          console.warn('No address found in response:', response);
+          toast("No address found in Aadhaar response");
         }
       }
       
@@ -258,7 +257,7 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
       setAadhaarOtp('');
       onRefresh();
     } catch (e) {
-      console.error('Aadhaar verification error:', e);
+      toast.error("Aadhaar verification failed");
       toast.error("Invalid OTP. Please try again");
     } finally {
       setLoadingSec(null);

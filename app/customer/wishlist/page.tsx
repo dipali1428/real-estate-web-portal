@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import customerService from '../../services/customerService';
-import { Bookmark } from 'lucide-react';
+import { Bookmark, Search } from 'lucide-react'; // Added Search icon
 import toast from 'react-hot-toast';
 
 /* ---------------- TYPES ---------------- */
@@ -166,9 +166,9 @@ export default function Wishlist() {
     /* ---------------- UI ---------------- */
 
     return (
-        <div className="flex-1 p-4 sm:p-6 bg-[#f8fafc] min-h-screen">
+        <div className="flex-1 p-4 sm:p-6 bg-[#f8fafc] min-h-screen font-sans">
 
-            {/* Header */}
+            {/* Header - Padding adjusted to p-6 */}
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -176,59 +176,58 @@ export default function Wishlist() {
             >   
                 <div className="flex items-center gap-2 mb-2">
                     <Bookmark className="w-5 h-8 text-white" />
-                    <h2 className="text-2xl font-bold">My Wishlist</h2>
+                    <h2 className="text-2xl font-bold">Wishlist</h2>
                 </div>
-                <p className="text-sm opacity-80 mb-4">
+                <p className="text-sm opacity-80">
                     Track and manage your potential investments
                 </p>
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Search your wishlist..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full px-4 py-2 pl-10 rounded-xl bg-white/20 text-white placeholder-white/60 border border-white/20 focus:outline-none"
-                    />
-                </div>
             </motion.div>
 
             {/* Tabs */}
-            <div className="w-full mb-6">
-            <div className="flex justify-center overflow-x-auto pb-2 scrollbar-hide">
-                <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
-                {categories.map((cat) => (
-                    <button
-                    key={cat.id}
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`relative px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-2 shrink-0 ${
-                        selectedCategory === cat.id
-                        ? 'text-white'
-                        : 'text-slate-500 hover:text-slate-700'
-                    }`}
-                    >
-                    {selectedCategory === cat.id && (
-                        <motion.div
-                        layoutId="activeTabWishlist"
-                        className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
-                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                        />
-                    )}
-
-                    <span>{cat.name}</span>
-
-                    <span
-                        className={`px-1.5 py-0.5 rounded-full text-[10px] ${
-                        selectedCategory === cat.id
-                            ? 'bg-white/20 text-white'
-                            : 'bg-slate-200 text-slate-600'
-                        }`}
-                    >
-                        {cat.count}
-                    </span>
-                    </button>
-                ))}
+            <div className="w-full mb-4">
+                <div className="flex justify-center overflow-x-auto pb-2 scrollbar-hide">
+                    <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                        {categories.map((cat) => (
+                            <button
+                                key={cat.id}
+                                onClick={() => setSelectedCategory(cat.id)}
+                                className={`relative px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-2 shrink-0 ${
+                                    selectedCategory === cat.id
+                                        ? 'text-white'
+                                        : 'text-slate-500 hover:text-slate-700'
+                                }`}
+                            >
+                                {selectedCategory === cat.id && (
+                                    <motion.div
+                                        layoutId="activeTabWishlist"
+                                        className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+                                <span>{cat.name}</span>
+                                <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                                    selectedCategory === cat.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'
+                                }`}>
+                                    {cat.count}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
+
+            {/* Search Bar - Positioned below items per request */}
+            <div className="mb-6 flex justify-start">
+                <div className="relative w-full max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                    <input 
+                        type="text"
+                        placeholder="Search company..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2076C7]/20 transition-all text-black text-sm"
+                    />
+                </div>
             </div>
 
             {/* Table */}
@@ -236,13 +235,13 @@ export default function Wishlist() {
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
-                            <tr className="border-b border-gray-100">
-                                <th className="px-6 py-4 text-left text-[11px] text-gray-400 uppercase">Company</th>
-                                <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase">Price</th>
-                                <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase">Min Lot</th>
-                                <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase">Min Investment</th>
-                                <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase">Depository</th>
-                                <th className="px-6 py-4 text-center text-[11px] text-gray-400 uppercase">Save</th>
+                            <tr className="border-b border-gray-100 bg-gray-50/50">
+                                <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider">Company</th>
+                                <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Price</th>
+                                <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Min Lot</th>
+                                <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Min Investment</th>
+                                <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Depository</th>
+                                <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
 
@@ -254,12 +253,11 @@ export default function Wishlist() {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="hover:bg-gray-50"
+                                        className="hover:bg-gray-50 transition-colors"
                                     >
-                                        {/* Company */}
                                         <td className="px-6 py-4">
                                             <div className="flex items-center space-x-4">
-                                                <div className="w-10 h-10 rounded-lg border overflow-hidden bg-white">
+                                                <div className="w-10 h-10 rounded-lg border overflow-hidden bg-white shadow-sm">
                                                     {item.logo_url ? (
                                                         <img
                                                             src={item.logo_url}
@@ -272,7 +270,6 @@ export default function Wishlist() {
                                                         </div>
                                                     )}
                                                 </div>
-
                                                 <div>
                                                     <div className="text-sm font-semibold text-gray-800">
                                                         {item.product_name}
@@ -283,36 +280,26 @@ export default function Wishlist() {
                                                 </div>
                                             </div>
                                         </td>
-
-                                        {/* Price */}
                                         <td className="px-6 py-4 text-center font-bold text-[#2076C7]">
                                             ₹{item.price.toFixed(2)}
                                         </td>
-
-                                        {/* Min Lot */}
-                                        <td className="px-6 py-4 text-center text-gray-800">
+                                        <td className="px-6 py-4 text-center text-gray-800 font-medium">
                                             {item.min_lot}
                                         </td>
-
-                                        {/* Min Investment */}
-                                        <td className="px-6 py-4 text-center text-gray-800">
+                                        <td className="px-6 py-4 text-center text-gray-800 font-semibold">
                                             ₹{(item.price * item.min_lot).toLocaleString('en-IN', {
                                                 minimumFractionDigits: 2,
                                             })}
                                         </td>
-
-                                        {/* Depository */}
                                         <td className="px-6 py-4 text-center">
-                                            <span className="px-3 py-1 rounded-md bg-purple-50 text-purple-600 text-xs font-bold">
+                                            <span className="px-3 py-1 rounded-md bg-purple-50 text-purple-600 text-[10px] font-bold uppercase border border-purple-100">
                                                 {item.depository}
                                             </span>
                                         </td>
-
-                                        {/* Remove */}
                                         <td className="px-6 py-4 text-center">
                                             <button
                                                 onClick={() => handleRemoveItem(item.id)}
-                                                className="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-[#2076C7] text-white hover:bg-red-500 transition-all"
+                                                className="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-[#2076C7] text-white hover:bg-red-500 transition-all shadow-sm"
                                                 title="Remove from wishlist"
                                             >
                                                 <Bookmark className="w-4 h-4 fill-current" />

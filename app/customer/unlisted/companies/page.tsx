@@ -614,7 +614,7 @@ export default function CompaniesPage() {
                 </div>
                 <div className="text-center">
                   <div className="text-xs text-gray-500 mb-0.5">Available</div>
-                  <div className="text-sm font-bold text-emerald-600">{company.volume}</div>
+                  <div className="text-sm font-bold text-gray-900">{company.volume}</div>
                 </div>
               </div>
 
