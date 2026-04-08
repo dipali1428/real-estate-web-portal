@@ -8,8 +8,6 @@ import {
   HeartPulse,
   Car,
   Plane,
-  Home,
-  Briefcase,
   FileText,
   ArrowRight,
   Flame,
@@ -86,98 +84,104 @@ export default function InsurancePage() {
   const router = useRouter();
 
   return (
-<div className="flex-1 p-4 sm:p-5 md:p-6 bg-[#F8FAFC] min-h-screen font-sans">
+    <div className="flex-1 p-4 sm:p-5 md:p-6 bg-[#F8FAFC] min-h-screen font-sans">
 
-  {/* Header */}
-  <motion.div
-    initial={{ opacity: 0, y: -10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.4 }}
-    className="mb-5 sm:mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-5 sm:p-6 text-white"
-  >
-    <h1 className="text-lg sm:text-xl md:text-2xl font-bold leading-snug">
-      Secure Every Stage of Life with Smart Insurance Solutions
-    </h1>
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-5 sm:mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-5 sm:p-6 text-white"
+      >
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold leading-snug">
+          Secure Every Stage of Life with Smart Insurance Solutions
+        </h1>
 
-    <p className="text-xs sm:text-sm md:text-base text-white/80 mt-2 leading-relaxed">
-      Explore trusted protection plans designed for health, wealth, travel, and business security.
-    </p>
-  </motion.div>
+        <p className="text-xs sm:text-sm md:text-base text-white/80 mt-2 leading-relaxed">
+          Explore trusted protection plans designed for health, wealth, travel, and business security.
+        </p>
+      </motion.div>
 
-  {/* Insurance Cards */}
-  <div className="relative bg-white rounded-3xl border border-slate-200/60 shadow-xl shadow-slate-200/40 overflow-hidden">
+      {/* Cards Wrapper */}
+      <div className="relative bg-white rounded-3xl border border-slate-200/60 shadow-xl shadow-slate-200/40 overflow-hidden">
 
-    {/* Subtle Background Glassmorphism Decor */}
-    <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-[#2076C7]/5 to-[#1CADA3]/5 blur-3xl pointer-events-none" />
+        {/* Background Decor */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-[#2076C7]/5 to-[#1CADA3]/5 blur-3xl pointer-events-none" />
 
-    <div className="flex flex-col">
-      {insuranceProducts.map((item, index) => {
-        const Icon = item.icon;
-        const isLast = index === insuranceProducts.length - 1;
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 p-4 sm:p-5 md:p-6">
 
-        return (
-          <motion.div
-            key={index}
-            initial={false}
-            whileHover={{ backgroundColor: "rgba(248, 250, 252, 0.8)" }}
-            onClick={() => router.push(item.route)}
-            className={`
-              group relative flex flex-col sm:flex-row items-center gap-4 md:gap-6 
-              px-6 py-6 sm:py-5 cursor-pointer transition-all duration-300
-              ${!isLast ? 'border-b border-slate-100/80' : ''}
-            `}
-          >
-            {/* Left Selection Indicator */}
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-linear-to-b from-[#2076C7] to-[#1CADA3] opacity-0 group-hover:opacity-100 transition-all duration-300" />
+          {insuranceProducts.map((item, index) => {
+            const Icon = item.icon;
 
-            {/* Professional Icon Treatment */}
-            <div className="relative shrink-0">
-              <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-sm">
-                <Icon className="w-6 h-6 text-[#2076C7]" />
-              </div>
+            return (
+              <motion.div
+                key={index}
+                initial={false}
+                whileHover={{
+                  y: -6,
+                  boxShadow: "0 16px 32px rgba(32,118,199,0.12)"
+                }}
+                onClick={() => router.push(item.route)}
+                className="
+                  group relative bg-white rounded-2xl
+                  border border-slate-200 hover:border-[#2076C7]/40
+                  p-4 sm:p-5 cursor-pointer transition-all duration-300
+                  overflow-hidden min-h-[200px] sm:min-h-[220px]
+                  flex flex-col justify-between
+                "
+              >
 
-              {/* Number hidden only on mobile */}
-              <span className="hidden sm:block absolute -top-2 -left-2 text-[10px] font-mono font-bold text-slate-300 group-hover:text-[#2076C7] transition-colors">
-                0{index + 1}
-              </span>
-            </div>
+                {/* Top Accent */}
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-linear-to-r from-[#2076C7] to-[#1CADA3]" />
 
-            {/* Main Content Block */}
-            <div className="flex-1 min-w-0 text-center sm:text-left">
-              <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
-                <h3 className="text-base md:text-lg font-bold text-slate-800 tracking-tight">
-                  {item.title}
-                </h3>
-                <div className="hidden md:block h-px w-0 group-hover:w-8 bg-[#1CADA3]/40 transition-all duration-500" />
-              </div>
+                {/* Top */}
+                <div>
 
-              <p className="text-sm text-slate-500 font-normal leading-relaxed max-w-xl">
-                {item.desc}
-              </p>
-            </div>
+                  {/* Icon */}
+                  <div className="relative mb-4 sm:mb-5">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center shadow-md group-hover:scale-105 transition-all duration-300">
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
 
-            {/* Interactive Metadata / Status Zone */}
-            <div className="flex items-center gap-6 shrink-0">
-              <div className="hidden lg:flex flex-col items-end">
-                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">
-                  Status
-                </span>
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-[#1CADA3]">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#1CADA3] animate-pulse" />
-                  Available
-                </span>
-              </div>
+                  {/* Title */}
+                  <h3 className="text-sm sm:text-base font-semibold text-slate-800 leading-snug group-hover:text-[#2076C7] transition-colors">
+                    {item.title}
+                  </h3>
 
-              {/* CTA Button */}
-              <div className="flex items-center justify-center w-10 h-10 rounded-full border border-slate-200 group-hover:border-[#2076C7] group-hover:bg-[#2076C7] transition-all duration-300">
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
-              </div>
-            </div>
-          </motion.div>
-        );
-      })}
+                  {/* Desc */}
+                  <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                    {item.desc}
+                  </p>
+
+                </div>
+
+                {/* Bottom */}
+                <div className="flex items-center justify-between mt-5 sm:mt-6">
+
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">
+                      Active
+                    </span>
+
+                    <div className="text-xs font-medium text-[#1CADA3] mt-1">
+                      Available
+                    </div>
+                  </div>
+
+                  <div className="w-10 h-10 rounded-xl bg-[#F8FAFC] border border-slate-200 flex items-center justify-center group-hover:bg-[#2076C7] group-hover:border-[#2076C7] transition-all duration-300">
+                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
+                  </div>
+
+                </div>
+
+              </motion.div>
+            );
+          })}
+
+        </div>
+      </div>
     </div>
-  </div>
-</div>
   );
 }

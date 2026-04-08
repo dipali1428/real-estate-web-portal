@@ -4,17 +4,16 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     IconCalculator,
-    IconHeartbeat,
+    IconShieldLock,
     IconShieldCheck,
-    IconHelmet,
     IconFileText,
 } from '@tabler/icons-react';
-import CorporateInsuranceSection from './components/CorporateInsuranceSection';
-import CorporateCalculator from './components/CorporateCalculator';
-import CorporateActiveDashboard from './components/CorporateActiveDashboard';
+import LoanProtectorSection from './components/LoanProtectorSection';
+import {LoanProtectorCalculator} from './components/LoanProtectorCalculator';
+import LoanProtectorActiveDashboard from './components/LoanProtectorActiveDashboard';
 
-export default function CorporateInsuranceDashboard() {
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'medical' | 'accident-wc' | 'calculator'>('dashboard');
+export default function LoanProtectorDashboard() {
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'plans' | 'calculator'>('dashboard');
 
     return (
         <div className="flex-1 p-4 sm:p-6 bg-[#F8FAFC] min-h-screen font-sans">
@@ -30,23 +29,15 @@ export default function CorporateInsuranceDashboard() {
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
                             {activeTab === 'calculator' ? (
                                 <IconCalculator size={24} />
-                            ) : activeTab === 'medical' ? (
-                                <IconHeartbeat size={24} />
                             ) : (
-                                <IconHelmet size={24} />
+                                <IconShieldLock size={24} />
                             )}
                         </div>
 
                         <div>
                             <div className="flex items-center gap-3 mb-1">
                                 <h2 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
-                                    {activeTab === 'dashboard'
-                                        ? "My Corporate Policies"
-                                        : activeTab === 'medical'
-                                        ? "Group Medical Insurance"
-                                        : activeTab === 'accident-wc'
-                                        ? "Liability & Accident Insurance"
-                                        : "Corporate Quote Builder"}
+                                    {activeTab === 'dashboard' ? 'My Connected Protections' : activeTab === 'plans' ? 'Loan Protection Plans' : 'Loan Protector Quote Builder'}
                                 </h2>
                                 <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black rounded-full border border-emerald-200 whitespace-nowrap uppercase tracking-wider">
                                     {activeTab === 'calculator' ? 'Instant Quote' : 'Live Plans'}
@@ -55,10 +46,8 @@ export default function CorporateInsuranceDashboard() {
                             <p className="text-sm text-slate-500 font-medium flex items-center gap-2">
                                 <IconShieldCheck size={14} className="text-[#2076C7]" />
                                 {activeTab === 'calculator'
-                                    ? "Generate official group insurance quotes instantly"
-                                    : activeTab === 'medical'
-                                    ? "Comprehensive health benefit plans for employees"
-                                    : "Statutory & accidental coverage for business continuity"}
+                                    ? "Generate official loan protection quotes instantly"
+                                    : "Specialized plans to clear outstanding loan balances automatically"}
                             </p>
                         </div>
                     </div>
@@ -68,9 +57,8 @@ export default function CorporateInsuranceDashboard() {
                         <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
                             {[
                                 { id: 'dashboard', label: 'Dashboard', icon: IconFileText },
-                                { id: 'medical', label: 'Medical', icon: IconHeartbeat },
-                                { id: 'accident-wc', label: 'Liability', icon: IconHelmet },
-                                { id: 'calculator', label: 'Calculator', icon: IconCalculator },
+                                { id: 'plans', label: 'Shield Plans', icon: IconShieldLock },
+                                { id: 'calculator', label: 'Calculator', icon: IconCalculator }
                             ].map((tab) => (
                                 <button
                                     key={tab.id}
@@ -79,7 +67,7 @@ export default function CorporateInsuranceDashboard() {
                                 >
                                     {activeTab === tab.id && (
                                         <motion.div
-                                            layoutId="activeTabCorp"
+                                            layoutId="activeTabLP"
                                             className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
                                             transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                         />
@@ -98,13 +86,13 @@ export default function CorporateInsuranceDashboard() {
                 <AnimatePresence mode="wait">
                     {activeTab === 'dashboard' ? (
                         <motion.div
-                            key="dashboard"
+                            key="dashboard-view"
                             initial={{ opacity: 0, scale: 0.98 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.98 }}
                             className="w-full"
                         >
-                            <CorporateActiveDashboard />
+                            <LoanProtectorActiveDashboard />
                         </motion.div>
                     ) : activeTab === 'calculator' ? (
                         <motion.div
@@ -116,7 +104,7 @@ export default function CorporateInsuranceDashboard() {
                         >
                             <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
                                 <div className="p-4 sm:p-6 md:p-8">
-                                    <CorporateCalculator />
+                                    <LoanProtectorCalculator />
                                 </div>
                             </div>
                         </motion.div>
@@ -128,7 +116,7 @@ export default function CorporateInsuranceDashboard() {
                             exit={{ opacity: 0 }}
                             className="w-full"
                         >
-                            <CorporateInsuranceSection activeTab={activeTab as any} />
+                            <LoanProtectorSection activeTab={activeTab as any} />
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -139,7 +127,7 @@ export default function CorporateInsuranceDashboard() {
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-sm">
                     <p className="text-sm text-slate-500 text-center leading-relaxed font-medium">
                         <strong className="text-slate-800 font-black tracking-tight underline decoration-[#1CADA3]/30">Disclaimer:</strong>{" "}
-                        Insurance is a subject matter of solicitation. Policy issuance is subject to the underwriting guidelines and discretion of the respective insurance companies. Benefits and premiums are indicative.
+                        Loan Protection Insurance (Group Credit Life) is subject to the master policy conditions and underwriting of the insurance company. Coverage starts after policy issuance and premium realization.
                     </p>
                 </div>
             </div>

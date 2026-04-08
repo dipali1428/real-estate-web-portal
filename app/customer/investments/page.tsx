@@ -10,10 +10,9 @@ import {
   Receipt,
   Layers3,
   BriefcaseBusiness,
-  Building2,
-  Landmark ,
+  Landmark,
   Home,
-  PiggyBank 
+  PiggyBank
 } from 'lucide-react';
 
 export default function InvestmentsPage() {
@@ -27,76 +26,112 @@ export default function InvestmentsPage() {
     { title: 'AIF', desc: 'Alternative investments for advanced wealth creation.', route: '/customer/investments/aif', icon: Layers3 },
     { title: 'PMS', desc: 'Professionally managed personalized portfolios.', route: '/customer/investments/pms', icon: BriefcaseBusiness },
     { title: 'Real Estate', desc: 'Invest in residential and commercial property opportunities.', route: '/customer/investments/real-estate', icon: Home },
-{ title: 'NCD', desc: 'Fixed-income debentures with stable returns and maturity benefits.', route: '/customer/investments/ncd', icon: Landmark },
-{ title: 'NPS', desc: 'Long-term retirement savings with tax benefits and market-linked growth.', route: '/customer/investments/nps', icon: PiggyBank },
+    { title: 'NCD', desc: 'Fixed-income debentures with stable returns and maturity benefits.', route: '/customer/investments/ncd', icon: Landmark },
+    { title: 'NPS', desc: 'Long-term retirement savings with tax benefits and market-linked growth.', route: '/customer/investments/nps', icon: PiggyBank },
   ];
 
   return (
-   <div className="flex-1 p-4 sm:p-5 md:p-6 bg-[#F8FAFC] min-h-screen font-sans">
+    <div className="flex-1 p-4 sm:p-5 md:p-6 bg-[#F8FAFC] min-h-screen font-sans">
 
-  {/* Header */}
-  <motion.div
-    initial={{ opacity: 0, y: -10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.4 }}
-    className="mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white"
-  >
-    <h1 className="text-lg sm:text-xl md:text-2xl font-bold leading-snug">
-      Smart Investment Opportunities for Long-Term Growth
-    </h1>
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white"
+      >
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
+          Smart Investment Opportunities for Long-Term Growth
+        </h1>
 
-    <p className="text-xs sm:text-sm md:text-base text-white/80 mt-2 leading-relaxed">
-      Explore curated investment solutions designed to diversify and strengthen your wealth journey.
-    </p>
-  </motion.div>
+        <p className="text-sm text-white/80 mt-2">
+          Explore curated investment solutions designed to diversify and strengthen your wealth journey.
+        </p>
+      </motion.div>
 
-  {/* Investment Cards */}
-  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-5">
+      {/* Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
 
-    {investments.map((item, index) => {
-      const Icon = item.icon;
+        {investments.map((item) => {
+          const Icon = item.icon;
 
-      return (
-        <motion.div
-          key={index}
-          whileHover={{ y: -4, scale: 1.01 }}
-          transition={{ duration: 0.25 }}
-          onClick={() => router.push(item.route)}
-          className="group relative bg-white rounded-2xl border border-gray-100 px-5 sm:px-6 py-5 flex items-center justify-between cursor-pointer shadow-sm hover:shadow-xl hover:border-[#D6E8FA] transition-all overflow-hidden"
-        >
-          {/* subtle hover background */}
-          <div className="absolute inset-0 bg-linear-to-r from-[#2076C7]/0 to-[#1CADA3]/0 group-hover:from-[#2076C7]/5 group-hover:to-[#1CADA3]/5 transition-all duration-300 rounded-2xl" />
+          return (
+            <motion.div
+              key={item.title}
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => router.push(item.route)}
+              className="
+                group relative bg-white rounded-2xl 
+                border border-slate-200 
+                px-5 py-5
+                cursor-pointer
+                shadow-sm hover:shadow-lg hover:border-[#2076C7]/40
+                min-h-[180px] w-full
+                flex flex-col justify-between
+                overflow-hidden
+              "
+            >
 
-          {/* Left content */}
-          <div className="relative flex items-center gap-4 min-w-0 flex-1">
+              {/* Left Gradient Border */}
+              <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-gradient-to-b from-[#2076C7] to-[#1CADA3]" />
 
-            {/* Icon */}
-            <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-[#2076C7]/10 to-[#1CADA3]/10 border border-[#E6F0FA] flex items-center justify-center shrink-0">
-              <Icon className="w-5 h-5 text-[#2076C7]" />
-            </div>
+              {/* Content */}
+              <div className="ml-1">
 
-            {/* Text */}
-            <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-800 tracking-tight">
-                {item.title}
-              </h3>
+                <div className="flex items-center gap-3 mb-3">
 
-              <p className="text-sm text-gray-500 mt-1 leading-relaxed">
-                {item.desc}
-              </p>
-            </div>
-          </div>
+                  {/* Premium Icon */}
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center shadow-md group-hover:scale-105 transition-all duration-300">
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
 
-          {/* CTA */}
-          <div className="relative flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F8FAFC] text-sm text-[#2076C7] font-medium ml-4 shrink-0 group-hover:bg-white group-hover:shadow-sm transition-all">
-            View
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-all" />
-          </div>
-        </motion.div>
-      );
-    })}
+                  <h3 className="text-base font-semibold text-slate-800 group-hover:text-[#2076C7] transition">
+                    {item.title}
+                  </h3>
 
-  </div>
-</div>
+                </div>
+
+                {/* Info */}
+                <div className="flex items-center justify-between text-sm text-slate-500">
+                  <div>
+                    <p className="text-[11px] uppercase text-slate-400">Type</p>
+                    <p className="font-medium text-slate-700">Equity</p>
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] uppercase text-slate-400">Returns</p>
+                    <p className="font-semibold text-[#1CADA3]">+12.4%</p>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="text-sm text-slate-500 mt-3 line-clamp-2">
+                  {item.desc}
+                </p>
+
+              </div>
+
+              {/* Bottom */}
+              <div className="flex items-center justify-between mt-4 ml-1">
+
+                <div className="flex items-center gap-1 text-xs text-slate-400">
+                  <span className="w-2 h-2 rounded-full bg-green-500" />
+                  Active
+                </div>
+
+                <div className="flex items-center gap-1 text-sm font-medium text-slate-400 group-hover:text-[#2076C7]">
+                  View Details
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+                </div>
+
+              </div>
+
+            </motion.div>
+          );
+        })}
+
+      </div>
+    </div>
   );
 }

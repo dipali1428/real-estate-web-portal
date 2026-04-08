@@ -180,14 +180,8 @@ CUSTOMER: [
 
       {
         label: "Finance",
+          href: "/customer/finance",
         icon: <Wallet className="h-4 w-4 text-neutral-700" />,
-        children: [
-          {
-            label: "Loans",
-            href: "/customer/finance/loans",
-            icon: <HandCoins className="h-4 w-4 text-neutral-700" />,
-          },
-        ],
       },
        {
   label: "Insurance",

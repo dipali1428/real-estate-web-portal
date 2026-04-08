@@ -13,12 +13,14 @@ import {
   Database,
   Clock,
   Bookmark,
-  BookmarkCheck
+  BookmarkCheck,
+  Home,
+  FileText
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { categorizedPlans } from "../loanConstants";
 
-export default function ExploreMortgageLoans() {
+export default function ExploreMortgageLoans({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
   const initialBanks = categorizedPlans["New Purchase"] || [];
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -133,66 +135,89 @@ export default function ExploreMortgageLoans() {
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
-                M
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-black text-gray-900">
-                    Mortgage Loans
-                  </h1>
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200 whitespace-nowrap">
-                    {totalBanks} Partners
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 flex items-center gap-1">
-                  <Landmark size={12} className="text-[#2076C7]" />
-                  Compare and apply for the best mortgage loan offers
-                </p>
-              </div>
+      {/* Modern Header */}
+      <div className="relative bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-100/60 mt-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
+              <Landmark size={24} />
             </div>
-
-            <div className="flex items-center gap-3">
-              {/* Search Bar */}
-              <div className="relative flex-1 md:flex-none md:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search partner banks..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                />
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
+                  Mortgage Loans
+                </h2>
+                <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200 whitespace-nowrap">
+                  {totalBanks} Partners
+                </span>
               </div>
+              <p className="text-sm text-slate-500 flex items-center gap-2">
+                <Landmark size={14} className="text-gray-400" />
+                Compare and apply for the best mortgage loan offers
+              </p>
+            </div>
+          </div>
 
-              {/* Filter Button */}
+          <div className="flex pb-2 md:pb-0 w-full sm:w-auto mt-2 sm:mt-0 overflow-x-auto hide-scrollbar sm:overflow-visible">
+            <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
               <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`px-4 py-2 border rounded-xl text-sm font-medium flex items-center gap-2 transition-all shrink-0 ${showFilters
-                  ? 'bg-[#2076C7] text-white border-[#2076C7]'
-                  : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
-                  }`}
+                onClick={() => setActiveTab('explore')}
+                className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'explore' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
               >
-                <Filter size={18} />
-                Filters
-                {activeFilterCount > 0 && (
-                  <span className="w-5 h-5 bg-white text-[#2076C7] rounded-full text-xs flex items-center justify-center font-bold">
-                    {activeFilterCount}
-                  </span>
+                {activeTab === 'explore' && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm" />
                 )}
+                <Home size={14} />
+                <span>Offers</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('applications')}
+                className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'applications' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                {activeTab === 'applications' && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm" />
+                )}
+                <FileText size={14} />
+                <span>Applications</span>
               </button>
             </div>
           </div>
         </div>
-      </header>
+      </div>
+
+      <div className="flex flex-col md:flex-row md:items-center justify-end gap-3 mb-6">
+        {/* Search Bar */}
+        <div className="relative w-full md:w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search partner banks..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all shadow-sm"
+          />
+        </div>
+
+        {/* Filter Button */}
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`px-4 py-2.5 border rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all shrink-0 shadow-sm ${showFilters
+            ? 'bg-[#2076C7] text-white border-[#2076C7]'
+            : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+            }`}
+        >
+          <Filter size={18} />
+          Filters
+          {activeFilterCount > 0 && (
+            <span className="w-5 h-5 bg-white text-[#2076C7] rounded-full text-xs flex items-center justify-center font-bold">
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+      </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div>
 
         {/* Market Overview Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -384,7 +409,7 @@ export default function ExploreMortgageLoans() {
             )}
           </AnimatePresence>
         </div>
-      </main>
+      </div>
 
       <style jsx>{`
         @keyframes fadeIn {
