@@ -82,7 +82,8 @@ const DashboardOverview = () => {
   }
 
   return (
-    <div className="flex-1 space-y-6 animate-fade-in">
+    // Adjusted padding, background, and min-height here
+    <div className="flex-1 p-4 sm:p-6 bg-[#F8FAFC] min-h-screen space-y-6 animate-fade-in">
       
       {/* --- WELCOME BANNER --- */}
       <motion.div
@@ -91,7 +92,7 @@ const DashboardOverview = () => {
         transition={{ duration: 0.4 }}
         className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white shadow-md"
       >
-        <h2 className="text-xl sm:text-2xl font-bold mb-2">Welcome back, Administrator.</h2>
+        <h2 className="text-xl sm:text-2xl font-bold mb-2">Welcome back, Administrator!</h2>
         <p className="text-sm sm:text-base opacity-90">The unlisted marketplace is performing stable today. Here are the key metrics.</p>
       </motion.div>
 
@@ -158,11 +159,12 @@ const DashboardOverview = () => {
         })}
       </div>
 
-      {/* --- PIE CHART SECTION (FIXED) --- */}
+      {/* --- PIE CHART SECTION --- */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100"
+        // Adjusted padding and border radius here (p-6 and rounded-2xl)
+        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
       >
         <div className="flex flex-col md:flex-row items-start gap-12">
           {/* Chart Area - Using fixed width approach */}
