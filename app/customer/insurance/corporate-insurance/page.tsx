@@ -25,8 +25,8 @@ export default function CorporateInsuranceDashboard() {
                 transition={{ duration: 0.4 }}
                 className="relative bg-white rounded-2xl p-6 mb-8 shadow-sm border border-slate-100/60"
             >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
                             {activeTab === 'calculator' ? (
                                 <IconCalculator size={24} />
@@ -38,8 +38,8 @@ export default function CorporateInsuranceDashboard() {
                         </div>
 
                         <div>
-                            <div className="flex items-center gap-3 mb-1">
-                                <h2 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
+                            <div className="flex flex-col sm:flex-row items-center gap-3 mb-1">
+                                <h2 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight leading-tight">
                                     {activeTab === 'dashboard'
                                         ? "My Corporate Policies"
                                         : activeTab === 'medical'
@@ -48,24 +48,25 @@ export default function CorporateInsuranceDashboard() {
                                         ? "Liability & Accident Insurance"
                                         : "Corporate Quote Builder"}
                                 </h2>
-                                <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black rounded-full border border-emerald-200 whitespace-nowrap uppercase tracking-wider">
-                                    {activeTab === 'calculator' ? 'Instant Quote' : 'Live Plans'}
-                                </span>
+                                {/* <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black rounded-full border border-emerald-200 whitespace-nowrap uppercase tracking-wider">
+                                    {activeTab === 'calculator' }
+                                </span> */}
                             </div>
-                            <p className="text-sm text-slate-500 font-medium flex items-center gap-2">
-                                <IconShieldCheck size={14} className="text-[#2076C7]" />
-                                {activeTab === 'calculator'
-                                    ? "Generate official group insurance quotes instantly"
-                                    : activeTab === 'medical'
-                                    ? "Comprehensive health benefit plans for employees"
-                                    : "Statutory & accidental coverage for business continuity"}
+                            <p className="text-sm text-slate-500 font-medium flex items-center justify-center sm:justify-start gap-2">
+                                <span>
+                                    {activeTab === 'calculator'
+                                        ? "Generate official group insurance quotes instantly"
+                                        : activeTab === 'medical'
+                                        ? "Comprehensive health benefit plans for employees"
+                                        : "Statutory & accidental coverage for business continuity"}
+                                </span>
                             </p>
                         </div>
                     </div>
 
-                    {/* Tab Buttons - Refined Pill Switcher */}
-                    <div className="flex pb-1 md:pb-0 w-full sm:w-auto mt-2 sm:mt-0 overflow-x-auto scrollbar-hide sm:overflow-visible">
-                        <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                    {/* Tab Buttons - Refined Grid Switcher for Mobile, Pill for Desktop */}
+                    <div className="w-full sm:w-auto mt-4 sm:mt-0">
+                        <div className="grid grid-cols-2 sm:flex sm:flex-row p-1.5 bg-slate-100/80 backdrop-blur-sm rounded-2xl sm:rounded-full gap-1.5 relative shadow-inner border border-slate-200/50">
                             {[
                                 { id: 'dashboard', label: 'Dashboard', icon: IconFileText },
                                 { id: 'medical', label: 'Medical', icon: IconHeartbeat },
@@ -75,17 +76,17 @@ export default function CorporateInsuranceDashboard() {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id as any)}
-                                    className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-black uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === tab.id ? 'text-white' : 'text-slate-400 hover:text-slate-600'}`}
+                                    className={`relative px-3 md:px-5 py-3 sm:py-2 rounded-xl sm:rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 ${activeTab === tab.id ? 'text-white' : 'text-slate-400 hover:text-slate-600'}`}
                                 >
                                     {activeTab === tab.id && (
                                         <motion.div
                                             layoutId="activeTabCorp"
-                                            className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                                            className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-xl sm:rounded-full -z-10 shadow-sm"
                                             transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                         />
                                     )}
-                                    <tab.icon size={14} />
-                                    <span>{tab.label}</span>
+                                    <tab.icon size={16} className="sm:size-[14px] transition-all duration-300" />
+                                    <span className="leading-none">{tab.label}</span>
                                 </button>
                             ))}
                         </div>
@@ -138,7 +139,7 @@ export default function CorporateInsuranceDashboard() {
             <div className="mt-12">
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-sm">
                     <p className="text-sm text-slate-500 text-center leading-relaxed font-medium">
-                        <strong className="text-slate-800 font-black tracking-tight underline decoration-[#1CADA3]/30">Disclaimer:</strong>{" "}
+                        <strong className="text-slate-800 font-bold tracking-tight underline decoration-[#1CADA3]/30">Disclaimer:</strong>{" "}
                         Insurance is a subject matter of solicitation. Policy issuance is subject to the underwriting guidelines and discretion of the respective insurance companies. Benefits and premiums are indicative.
                     </p>
                 </div>

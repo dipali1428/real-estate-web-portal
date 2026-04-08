@@ -34,7 +34,7 @@ export default function CorporateInsuranceSection({ activeTab }: { activeTab: "m
                   strokeWidth={1.8}
                 />
               </div>
-              <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+              <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">
                 {plan.category}
               </div>
               <h3 className="text-lg font-extrabold text-gray-800 mb-2 tracking-tight">

@@ -47,7 +47,7 @@ const COLORS = ['#2076C7', '#1CADA3'];
 
 const fmt = (n: number) => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(n);
 
-export default function CalculatorAndProcess() {
+export default function CalculatorAndProcess({ isDashboard = false, onShowPlans }: { isDashboard?: boolean; onShowPlans?: () => void }) {
     const { openLogin } = useModal();
     const [step, setStep] = useState(1);
     const [destination, setDestination] = useState(DESTINATIONS[2]);
@@ -85,24 +85,26 @@ export default function CalculatorAndProcess() {
     return (
         <>
             {/* --- CALCULATOR (EMI Style) --- */}
-            <section id="calculator" className="py-10 md:py-10 bg-slate-50 relative overflow-hidden">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden">
+            <section id="calculator" className={`py-10 bg-slate-50 relative overflow-hidden ${isDashboard ? 'rounded-[2.5rem] mt-4' : ''}`}>
+                <div className={`${isDashboard ? 'max-w-full' : 'max-w-7xl mx-auto px-4 sm:px-6'}`}>
+                    <div className={`${isDashboard ? '' : 'bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden'}`}>
 
-                        {/* Header */}
-                        <div className="bg-white border-b border-slate-50 py-8 sm:py-10 px-4 sm:px-6 text-center">
-                            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                                <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
-                                    Travel Premium Calculator
-                                </h2>
-                                <div className="w-24 h-1 bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] mx-auto rounded-full mb-6 opacity-30" />
-                                <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
-                                    Get personalized quotes in 3 simple steps.
-                                </p>
-                            </motion.div>
-                        </div>
+                        {/* Header - Only in Public mode */}
+                        {!isDashboard && (
+                            <div className="bg-white border-b border-slate-50 py-8 sm:py-10 px-4 sm:px-6 text-center">
+                                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                                    <h2 className="text-2xl md:text-4xl font-extrabold mb-4 md:mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
+                                        Travel Premium Calculator
+                                    </h2>
+                                    <div className="w-20 md:w-24 h-1 bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] mx-auto rounded-full mb-6 opacity-30" />
+                                    <p className="text-gray-600 max-w-2xl mx-auto font-medium text-sm md:text-lg leading-relaxed">
+                                        Get personalized quotes in 3 simple steps.
+                                    </p>
+                                </motion.div>
+                            </div>
+                        )}
 
-                        <div className="p-5 sm:p-6 lg:p-10">
+                        <div className="p-4 sm:p-6 lg:p-10">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
 
                                 {/* Left Column: Controls */}
@@ -201,7 +203,7 @@ export default function CalculatorAndProcess() {
                                             <IconArrowLeft size={20} />
                                         </button>
                                         <button
-                                            onClick={() => isStepValid() ? (step < 3 ? setStep(s => s + 1) : document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' })) : toast.error('Fill required details')}
+                                            onClick={() => isStepValid() ? (step < 3 ? setStep(s => s + 1) : (onShowPlans ? onShowPlans() : document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' }))) : toast.error('Fill required details')}
                                             className="w-full max-w-[260px] md:max-w-[300px] mx-4 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black uppercase tracking-widest text-xs md:text-sm rounded-xl shadow-lg hover:shadow-[0_20px_40px_-10px_rgba(32,118,199,0.3)] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 md:gap-3"
                                         >
                                             {step === 3 ? 'View Plans & Apply' : 'Continue'}
@@ -211,7 +213,7 @@ export default function CalculatorAndProcess() {
                                     </div>
 
                                     {/* Key Insights Box (Moved Below Button to Fill Whitespace) */}
-                                    <div className="p-6 rounded-[2rem] bg-gradient-to-br from-blue-50/50 to-teal-50/50 border border-[#2076C7]/10 mt-8 flex-grow flex flex-col justify-center">
+                                    <div className="p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-blue-50/50 to-teal-50/50 border border-[#2076C7]/10 mt-8 flex-grow flex flex-col justify-center">
                                         <div className="flex items-center gap-2 mb-4">
                                             <IconBolt size={20} className="text-[#2076C7]" />
                                             <h4 className="font-extrabold text-slate-800 text-base">Key Travel Insights</h4>
@@ -273,35 +275,35 @@ export default function CalculatorAndProcess() {
                                     </div>
 
                                     {/* Summary Box */}
-                                    <div className="bg-slate-50/50 rounded-[2.5rem] border border-blue-100/50 p-6 sm:p-8 shadow-sm flex-grow flex flex-col">
+                                    <div className="bg-slate-50/50 rounded-[2rem] md:rounded-[2.5rem] border border-blue-100/50 p-5 sm:p-8 shadow-sm flex-grow flex flex-col">
                                         <div className="flex items-center gap-4 mb-6 border-l-4 border-[#2076C7] pl-5">
                                             <h3 className="text-2xl font-extrabold text-gray-700 tracking-tight">Quote Summary</h3>
                                         </div>
                                         <div className="space-y-4 mb-6">
-                                            <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                                            <div className="flex flex-col sm:flex-row justify-between sm:items-center py-2 border-b border-slate-100 gap-1 sm:gap-4">
                                                 <span className="text-sm font-bold text-slate-500">Destination</span>
                                                 <span className="text-base font-extrabold text-[#1CADA3]">{destination.label}</span>
                                             </div>
-                                            <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                                            <div className="flex flex-col sm:flex-row justify-between sm:items-center py-2 border-b border-slate-100 gap-1 sm:gap-4">
                                                 <span className="text-sm font-bold text-slate-500">Travelers</span>
                                                 <span className="text-base font-extrabold text-[#1CADA3]">{travelers.length} Person{travelers.length > 1 ? 's' : ''}</span>
                                             </div>
-                                            <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                                            <div className="flex flex-col sm:flex-row justify-between sm:items-center py-2 border-b border-slate-100 gap-1 sm:gap-4">
                                                 <span className="text-sm font-bold text-slate-500">Duration</span>
                                                 <span className="text-base font-extrabold text-[#1CADA3]">{duration} Days</span>
                                             </div>
-                                            <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                                            <div className="flex flex-col sm:flex-row justify-between sm:items-center py-2 border-b border-slate-100 gap-1 sm:gap-4">
                                                 <span className="text-sm font-bold text-slate-500">Sum Insured</span>
                                                 <span className="text-base font-extrabold text-[#1CADA3]">{sumInsured.label}</span>
                                             </div>
-                                            <div className="flex justify-between items-center py-2">
+                                            <div className="flex flex-col sm:flex-row justify-between sm:items-center py-2 gap-1 sm:gap-4">
                                                 <span className="text-sm font-bold text-slate-500">Total Premium (incl. GST)</span>
                                                 <span className="text-lg md:text-xl font-extrabold text-[#1CADA3]">₹{fmt(totalPremium)}</span>
                                             </div>
                                         </div>
 
                                         <button
-                                            onClick={openLogin}
+                                            onClick={() => onShowPlans ? onShowPlans() : openLogin()}
                                             className="w-full mt-auto py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black uppercase tracking-widest text-sm md:text-base shadow-[0_20px_40px_-10px_rgba(32,118,199,0.3)] hover:shadow-[0_25px_50px_-10px_rgba(32,118,199,0.4)] hover:-translate-y-1.5 transition-all duration-500 group"
                                         >
                                             Apply For Travel Insurance
@@ -310,7 +312,7 @@ export default function CalculatorAndProcess() {
                                     </div>
 
                                     {/* Disclaimer */}
-                                    <div className="mt-6 p-5 bg-yellow-50/50 border border-yellow-100 rounded-[1.5rem] text-xs md:text-sm leading-relaxed text-slate-500">
+                                    <div className="mt-6 p-4 md:p-5 bg-yellow-50/50 border border-yellow-100 rounded-[1.5rem] text-xs md:text-sm leading-relaxed text-slate-500">
                                         <p>* Figures are indicative. Final premium is subject to insurer approval and verification of travel details.</p>
                                     </div>
                                 </div>
@@ -320,28 +322,30 @@ export default function CalculatorAndProcess() {
                 </div>
             </section>
 
-            {/* --- HOW IT WORKS --- */}
-            <section className="py-16 px-4 sm:px-6 bg-white">
-                <div className="max-w-7xl mx-auto">
-                    <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center max-w-3xl mx-auto mb-12">
-                        <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
-                            How It Works
-                        </h2>
-                        <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
-                            Quick and hassle-free coverage in four easy steps.
-                        </p>
-                    </motion.div>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {steps.map((s, i) => (
-                            <motion.div key={i} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }} className="bg-white p-6 rounded-2xl border-2 border-slate-100 hover:border-[#2076C7] transition-all flex flex-col items-center text-center shadow-lg hover:shadow-2xl">
-                                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center text-white shadow-lg mb-4`}><s.icon size={24} /></div>
-                                <h3 className="text-base font-black text-gray-700 mb-2">{s.title}</h3>
-                                <p className="text-gray-600 text-xs leading-relaxed">{s.desc}</p>
-                            </motion.div>
-                        ))}
+            {/* --- HOW IT WORKS --- - Only in Public mode */}
+            {!isDashboard && (
+                <section className="py-16 px-4 sm:px-6 bg-white">
+                    <div className="max-w-7xl mx-auto">
+                        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center max-w-3xl mx-auto mb-12">
+                            <h2 className="text-2xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
+                                How It Works
+                            </h2>
+                            <p className="text-gray-600 max-w-2xl mx-auto font-medium text-sm md:text-lg leading-relaxed">
+                                Quick and hassle-free coverage in four easy steps.
+                            </p>
+                        </motion.div>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {steps.map((s, i) => (
+                                <motion.div key={i} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }} className="bg-white p-6 rounded-2xl border-2 border-slate-100 hover:border-[#2076C7] transition-all flex flex-col items-center text-center shadow-lg hover:shadow-2xl">
+                                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center text-white shadow-lg mb-4`}><s.icon size={24} /></div>
+                                    <h3 className="text-base font-black text-gray-700 mb-2">{s.title}</h3>
+                                    <p className="text-gray-600 text-xs leading-relaxed">{s.desc}</p>
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
 
             <style jsx>{`
                 input[type='range']::-webkit-slider-thumb {

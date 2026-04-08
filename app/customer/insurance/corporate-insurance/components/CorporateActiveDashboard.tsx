@@ -39,8 +39,8 @@ export default function CorporateActiveDashboard() {
             <div className={`w-14 h-14 ${card.bg} ${card.color} rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-sm`}>
               <card.icon size={28} />
             </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">{card.label}</p>
-            <p className="text-3xl font-black text-slate-900">{card.value}</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1.5">{card.label}</p>
+            <p className="text-3xl font-extrabold text-slate-900">{card.value}</p>
             <div className="flex items-center gap-1.5 mt-2">
               <span className="text-[10px] font-bold text-slate-400">{card.sub}</span>
             </div>
@@ -50,7 +50,7 @@ export default function CorporateActiveDashboard() {
         {/* Active Policies List */}
         <div className="lg:col-span-12 space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-black text-slate-900 flex items-center gap-3">
+            <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-3">
               <IconShieldCheck className="text-[#2076C7]" size={24} />
               My Active Policies
             </h3>
@@ -82,7 +82,7 @@ export default function CorporateActiveDashboard() {
                               <Icon className="text-white" size={24} />
                             </div>
                             <div>
-                              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[9px] font-black uppercase text-slate-500 tracking-wider mb-1 inline-block">
+                              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[9px] font-bold uppercase text-slate-500 tracking-wider mb-1 inline-block">
                                 {policy.insurer}
                               </span>
                               <h4 className="text-base font-extrabold text-slate-800">{policy.name}</h4>
@@ -92,11 +92,11 @@ export default function CorporateActiveDashboard() {
 
                           <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full md:w-auto mt-4 md:mt-0">
                             <div>
-                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Coverage</p>
+                               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Coverage</p>
                                <p className="text-sm font-extrabold text-[#2076C7]">{policy.coverage}</p>
                             </div>
                             <div>
-                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Covered</p>
+                               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Covered</p>
                                <p className="text-sm font-extrabold text-slate-700">{policy.livesCovered}</p>
                             </div>
                             <div className="col-span-2 md:col-span-1">

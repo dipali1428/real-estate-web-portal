@@ -114,13 +114,13 @@ export default function CorporateCalculator() {
             <div className="inline-flex p-1 bg-slate-100 rounded-xl mb-6">
               <button 
                 onClick={() => setMode("gmc")}
-                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${mode === "gmc" ? "bg-white text-[#2076C7] shadow-sm" : "text-slate-400"}`}
+                className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${mode === "gmc" ? "bg-white text-[#2076C7] shadow-sm" : "text-slate-400"}`}
               >
                 Group Health
               </button>
               <button 
                 onClick={() => setMode("package")}
-                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${mode === "package" ? "bg-white text-[#2076C7] shadow-sm" : "text-slate-400"}`}
+                className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${mode === "package" ? "bg-white text-[#2076C7] shadow-sm" : "text-slate-400"}`}
               >
                 SME Asset Pack
               </button>
@@ -136,8 +136,8 @@ export default function CorporateCalculator() {
                 {/* Employee Count */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-end">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Team Size</label>
-                    <span className="text-lg font-black text-[#2076C7]">{employees} Members</span>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Team Size</label>
+                    <span className="text-lg font-extrabold text-[#2076C7]">{employees} Members</span>
                   </div>
                   <input
                     type="range" min="10" max="500" step="5" value={employees}
@@ -154,11 +154,11 @@ export default function CorporateCalculator() {
                 {/* Age Bands & Industry Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Average Age</label>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Average Age</label>
                     <select
                       value={avgAge}
                       onChange={(e) => setAvgAge(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black text-slate-700 focus:ring-2 focus:ring-[#2076C7]/20 outline-none"
+                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:ring-2 focus:ring-[#2076C7]/20 outline-none"
                     >
                       <option value="20-25">20 – 25 Yrs</option>
                       <option value="26-30">26 – 30 Yrs</option>
@@ -171,11 +171,11 @@ export default function CorporateCalculator() {
                     </select>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Industry Type</label>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Industry Type</label>
                     <select
                       value={industry}
                       onChange={(e) => setIndustry(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black text-slate-700 focus:ring-2 focus:ring-[#2076C7]/20 outline-none"
+                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:ring-2 focus:ring-[#2076C7]/20 outline-none"
                     >
                       <option value="IT">IT / Software</option>
                       <option value="Manufacturing">Manufacturing</option>
@@ -207,8 +207,8 @@ export default function CorporateCalculator() {
                 {/* Asset Value */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-end">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Asset Value</label>
-                    <span className="text-lg font-black text-[#2076C7]">{fmt(assetValue)}</span>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Asset Value</label>
+                    <span className="text-lg font-extrabold text-[#2076C7]">{fmt(assetValue)}</span>
                   </div>
                   <input
                     type="range" min="500000" max="50000000" step="500000" value={assetValue}
@@ -268,7 +268,7 @@ export default function CorporateCalculator() {
                         className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${covers[c.id as keyof typeof covers] ? "bg-teal-50 border-[#1CADA3] text-[#1CADA3]" : "bg-white border-slate-100 text-slate-400"}`}
                       >
                         <c.icon size={18} />
-                        <span className="text-[9px] font-black uppercase">{c.label}</span>
+                        <span className="text-[9px] font-bold uppercase">{c.label}</span>
                       </button>
                     ))}
                   </div>
@@ -291,8 +291,8 @@ export default function CorporateCalculator() {
           <div className="space-y-8">
             {/* Total Premium Display */}
             <div className="bg-slate-50 p-6 rounded-[2.5rem] border border-slate-100 text-center relative overflow-hidden">
-               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Estimated Premium</p>
-               <h3 className="text-4xl font-black text-[#2076C7] tracking-tight">{fmt(premium)}</h3>
+               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Estimated Premium</p>
+               <h3 className="text-4xl font-extrabold text-[#2076C7] tracking-tight">{fmt(premium)}</h3>
                <p className="text-[10px] font-bold text-slate-400 mt-1 italic">Annual including GST</p>
             </div>
 
@@ -312,7 +312,7 @@ export default function CorporateCalculator() {
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 <IconShieldCheck size={32} className="text-[#1CADA3] mb-1" />
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Policy Active</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Policy Active</span>
               </div>
             </div>
 
@@ -322,8 +322,8 @@ export default function CorporateCalculator() {
                 <div key={item.name} className="flex items-center gap-3 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
                   <div className="w-2 h-8 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                   <div>
-                    <p className="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">{item.name}</p>
-                    <p className="text-sm font-black text-slate-700">{fmt(item.value)}</p>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase leading-none mb-1">{item.name}</p>
+                    <p className="text-sm font-bold text-slate-700">{fmt(item.value)}</p>
                   </div>
                 </div>
               ))}

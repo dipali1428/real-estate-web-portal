@@ -93,23 +93,23 @@ export default function InsurancePage() {
         transition={{ duration: 0.4 }}
         className="mb-5 sm:mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-5 sm:p-6 text-white"
       >
-        <h1 className="text-lg sm:text-xl md:text-2xl font-bold leading-snug">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
           Secure Every Stage of Life with Smart Insurance Solutions
         </h1>
 
-        <p className="text-xs sm:text-sm md:text-base text-white/80 mt-2 leading-relaxed">
+        <p className="text-sm text-white/80 mt-2 leading-relaxed">
           Explore trusted protection plans designed for health, wealth, travel, and business security.
         </p>
       </motion.div>
 
-      {/* Cards Wrapper */}
-      <div className="relative bg-white rounded-3xl border border-slate-200/60 shadow-xl shadow-slate-200/40 overflow-hidden">
+      {/* Cards Section */}
+      <div className="relative">
 
         {/* Background Decor */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-[#2076C7]/5 to-[#1CADA3]/5 blur-3xl pointer-events-none" />
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 p-4 sm:p-5 md:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
 
           {insuranceProducts.map((item, index) => {
             const Icon = item.icon;
@@ -126,39 +126,40 @@ export default function InsurancePage() {
                 className="
                   group relative bg-white rounded-2xl
                   border border-slate-200 hover:border-[#2076C7]/40
-                  p-4 sm:p-5 cursor-pointer transition-all duration-300
-                  overflow-hidden min-h-[200px] sm:min-h-[220px]
+                  px-5 py-5 cursor-pointer transition-all duration-300
+                  min-h-[190px] sm:min-h-[220px]
                   flex flex-col justify-between
+                  overflow-hidden
                 "
               >
 
                 {/* Top Accent */}
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-linear-to-r from-[#2076C7] to-[#1CADA3]" />
 
-                {/* Top */}
+                {/* Content */}
                 <div>
 
                   {/* Icon */}
-                  <div className="relative mb-4 sm:mb-5">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center shadow-md group-hover:scale-105 transition-all duration-300">
-                      <Icon className="w-6 h-6 text-white" />
+                  <div className="relative mb-5">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center shadow-md group-hover:scale-105 transition-all duration-300">
+                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     </div>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-sm sm:text-base font-semibold text-slate-800 leading-snug group-hover:text-[#2076C7] transition-colors">
+                  <h3 className="text-base font-semibold text-slate-800 group-hover:text-[#2076C7] transition-colors">
                     {item.title}
                   </h3>
 
                   {/* Desc */}
-                  <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                  <p className="text-sm text-slate-500 mt-3 leading-relaxed line-clamp-2 min-h-[40px]">
                     {item.desc}
                   </p>
 
                 </div>
 
                 {/* Bottom */}
-                <div className="flex items-center justify-between mt-5 sm:mt-6">
+                <div className="flex items-center justify-between mt-5">
 
                   <div>
                     <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">

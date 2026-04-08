@@ -38,19 +38,19 @@ export default function InvestmentsPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="mb-6 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white"
+        className="mb-6 sm:mb-8 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-5 sm:p-6 text-white"
       >
         <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
           Smart Investment Opportunities for Long-Term Growth
         </h1>
 
-        <p className="text-sm text-white/80 mt-2">
+        <p className="text-sm sm:text-base text-white/80 mt-2 leading-relaxed">
           Explore curated investment solutions designed to diversify and strengthen your wealth journey.
         </p>
       </motion.div>
 
       {/* Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 p-1">
 
         {investments.map((item) => {
           const Icon = item.icon;
@@ -82,8 +82,8 @@ export default function InvestmentsPage() {
                 <div className="flex items-center gap-3 mb-3">
 
                   {/* Premium Icon */}
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center shadow-md group-hover:scale-105 transition-all duration-300">
-                    <Icon className="w-5 h-5 text-white" />
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center shadow-md group-hover:scale-105 transition-all duration-300">
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
 
                   <h3 className="text-base font-semibold text-slate-800 group-hover:text-[#2076C7] transition">
@@ -106,7 +106,7 @@ export default function InvestmentsPage() {
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-slate-500 mt-3 line-clamp-2">
+                <p className="text-sm text-slate-500 mt-3 line-clamp-2 min-h-[40px]">
                   {item.desc}
                 </p>
 
