@@ -4,7 +4,7 @@ import BusinessLoanHero from './components/BusinessLoanHero';
 import BusinessLoanFeatures from './components/BusinessLoanFeatures';
 import BusinessLoanEligibility from './components/BusinessLoanEligibility';
 import BusinessLoanFAQ from './components/BusinessLoanFAQ';
-import BusinessLoanCalculator from '@/app/page/businessloan/page';
+import BusinessLoanCalculator from './components/BusinessLoanCalculator';
 import BusinessLoanPartners from './components/BusinessLoanPartners';
 import BusinessLoanStepProcess from './components/BusinessLoanStepProcess';
 import { useModal } from '@/app/context/ModalContext';

@@ -5,19 +5,18 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   Calculator,
-  Briefcase,
   PiggyBank,
   CalendarDays,
 } from "lucide-react";
 import NPSDashboard from "./dashboard/page";
 import NPSCalculator from "./calculator/page";
-import NPSInvestments from "./investments/page";
+// import NPSInvestments from "./investments/page";
 import ScheduleMeetingModal from "./ScheduleMeetingModal";
 
 const tabs = [
   { id: "DASHBOARD", label: "Overview", icon: LayoutDashboard },
   { id: "CALCULATOR", label: "Calculator", icon: Calculator },
-  { id: "INVESTMENTS", label: "My Investments", icon: Briefcase },
+  // { id: "INVESTMENTS", label: "My Investments", icon: Briefcase },
 ];
 
 export default function UnifiedNPSPage() {
@@ -126,7 +125,7 @@ export default function UnifiedNPSPage() {
       >
         {activeTab === "DASHBOARD" && <NPSDashboard />}
         {activeTab === "CALCULATOR" && <NPSCalculator />}
-        {activeTab === "INVESTMENTS" && <NPSInvestments />}
+        {/* {activeTab === "INVESTMENTS" && <NPSInvestments />} */}
       </motion.div>
 
       {/* Modal */}

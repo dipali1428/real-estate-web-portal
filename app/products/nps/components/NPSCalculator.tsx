@@ -1,13 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, DoughnutController } from 'chart.js';
-import { motion } from 'framer-motion';
 import { ChevronRight, Lightbulb } from 'lucide-react';
 
 ChartJS.register(ArcElement, Tooltip, Legend, DoughnutController);
 
-// Global CSS for teal sliders injected once
 const sliderStyle = `
   input[type=range].nps-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -39,20 +37,60 @@ const sliderStyle = `
   }
 `;
 
+const getSliderBg = (value: number, min: number, max: number) => {
+    const pct = ((value - min) / (max - min)) * 100;
+    return `linear-gradient(to right, #1CADA3 0%, #1CADA3 ${pct}%, #e5e7eb ${pct}%, #e5e7eb 100%)`;
+};
+
+// Reusable slider + input field moved outside to prevent recreation on each render
+const SliderField = ({
+    label, value, min, max, step, onChange, unit,
+}: {
+    label: string; value: number; min: number; max: number; step: number;
+    onChange: (v: number) => void; unit: string; color: string;
+}) => (
+    <div className="mb-4">
+        <label className="block text-[#2076C7] font-semibold mb-1 text-sm">{label}</label>
+        <div className="slider-container mb-2">
+            <input
+                type="range"
+                min={min}
+                max={max}
+                step={step}
+                value={value}
+                onChange={(e) => onChange(Number(e.target.value))}
+                className="w-full h-1.5 sm:h-2 rounded-lg cursor-pointer nps-slider accent-teal-600"
+                style={{ background: getSliderBg(value, min, max) }}
+            />
+            <div className="flex justify-between text-[10px] sm:text-xs text-gray-600 mt-1 shadow-none">
+                <span>{unit === '₹' ? `₹${min.toLocaleString('en-IN')}` : unit === '%' ? `${min}%` : `${min} Yrs`}</span>
+                <span>{unit === '₹' ? (max >= 100000 ? `₹${(max / 100000).toFixed(0)}L` : `₹${max}`) : unit === '%' ? `${max}%` : `${max} Yrs`}</span>
+            </div>
+        </div>
+        <div className="relative">
+            <input
+                type="number"
+                min={min}
+                max={max}
+                step={step}
+                value={value}
+                onChange={(e) => {
+                    const v = Number(e.target.value);
+                    if (!isNaN(v)) onChange(v);
+                }}
+                className="w-full px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 transition-colors pr-10 text-gray-800 placeholder:text-gray-500 text-xs sm:text-sm"
+            />
+            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium text-xs">{unit}</span>
+        </div>
+    </div>
+);
+
 export default function NPSCalculator() {
     const [age, setAge] = useState(25);
     const [retirementAge, setRetirementAge] = useState(60);
     const [contribution, setContribution] = useState(5000);
     const [returnRate, setReturnRate] = useState(10);
     const [annuityPercentage, setAnnuityPercentage] = useState(40);
-
-    const [results, setResults] = useState({
-        totalInvested: 0,
-        totalCorpus: 0,
-        wealthGained: 0,
-        monthlyPension: 0,
-        lumpSum: 0,
-    });
 
     const chartRef = useRef<ChartJS<'doughnut'> | null>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -61,13 +99,8 @@ export default function NPSCalculator() {
         return '₹' + value.toLocaleString('en-IN');
     };
 
-    const getSliderBg = (value: number, min: number, max: number) => {
-        const pct = ((value - min) / (max - min)) * 100;
-        return `linear-gradient(to right, #1CADA3 0%, #1CADA3 ${pct}%, #e5e7eb ${pct}%, #e5e7eb 100%)`;
-    };
-
-    useEffect(() => {
-        const years = retirementAge - age;
+    const results = useMemo(() => {
+        const years = Math.max(0, retirementAge - age);
         const months = years * 12;
         const monthlyRate = returnRate / 12 / 100;
 
@@ -79,101 +112,71 @@ export default function NPSCalculator() {
         }
 
         const invested = contribution * months;
-        const wealth = corpus - invested;
+        const wealth = Math.max(0, corpus - invested);
         const annuityAmt = corpus * (annuityPercentage / 100);
         const lump = corpus - annuityAmt;
         const pension = (annuityAmt * 0.06) / 12;
 
-        setResults({
+        return {
             totalInvested: Math.round(invested),
             totalCorpus: Math.round(corpus),
             wealthGained: Math.round(wealth),
             monthlyPension: Math.round(pension),
             lumpSum: Math.round(lump),
-        });
+        };
     }, [age, retirementAge, contribution, returnRate, annuityPercentage]);
 
     useEffect(() => {
-        if (canvasRef.current) {
-            const ctx = canvasRef.current.getContext('2d');
-            if (ctx) {
-                if (chartRef.current) chartRef.current.destroy();
+        if (!canvasRef.current) return;
+        const ctx = canvasRef.current.getContext('2d');
+        if (!ctx) return;
 
-                chartRef.current = new ChartJS(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Invested Amount', 'Wealth Gained'],
-                        datasets: [{
-                            data: [results.totalInvested, results.wealthGained],
-                            backgroundColor: ['#e5e7eb', '#1CADA3'],
-                            borderWidth: 0,
-                            hoverOffset: 4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '78%',
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => context.label + ': ' + formatCurrency(context.parsed)
-                                }
-                            }
+        chartRef.current = new ChartJS(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Invested Amount', 'Wealth Gained'],
+                datasets: [{
+                    data: [results.totalInvested, results.wealthGained],
+                    backgroundColor: ['#e5e7eb', '#1CADA3'],
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '78%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => context.label + ': ' + formatCurrency(context.parsed)
                         }
                     }
-                });
+                },
+                animation: {
+                    duration: 500 // Smooth entry but not too long
+                }
             }
-        }
-        return () => chartRef.current?.destroy();
-    }, [results]);
+        });
 
-    // Reusable slider + input field
-    const SliderField = ({
-        label, value, min, max, step, onChange, unit, color,
-    }: {
-        label: string; value: number; min: number; max: number; step: number;
-        onChange: (v: number) => void; unit: string; color: string;
-    }) => (
-        <div className="mb-4">
-            <label className="block text-[#2076C7] font-semibold mb-1">{label}</label>
-            <div className="slider-container mb-2">
-                <input
-                    type="range"
-                    min={min}
-                    max={max}
-                    step={step}
-                    value={value}
-                    onChange={(e) => onChange(Number(e.target.value))}
-                    className="w-full h-2 rounded-lg cursor-pointer slider accent-teal-600"
-                    style={{ background: getSliderBg(value, min, max) }}
-                />
-                <div className="flex justify-between text-sm text-gray-600 mt-1 shadow-none">
-                    <span>{unit === '₹' ? `₹${min.toLocaleString('en-IN')}` : unit === '%' ? `${min}%` : `${min} Yrs`}</span>
-                    <span>{unit === '₹' ? (max >= 100000 ? `₹${(max / 100000).toFixed(0)}L` : `₹${max}`) : unit === '%' ? `${max}%` : `${max} Yrs`}</span>
-                </div>
-            </div>
-            <div className="relative">
-                <input
-                    type="number"
-                    min={min}
-                    max={max}
-                    step={step}
-                    value={value}
-                    onChange={(e) => {
-                        const v = Number(e.target.value);
-                        if (v >= min && v <= max) onChange(v);
-                    }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
-                />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">{unit}</span>
-            </div>
-        </div>
-    );
+        return () => {
+            if (chartRef.current) {
+                chartRef.current.destroy();
+                chartRef.current = null;
+            }
+        };
+    }, []); // Initialize only once
+
+    useEffect(() => {
+        if (chartRef.current) {
+            chartRef.current.data.datasets[0].data = [results.totalInvested, results.wealthGained];
+            chartRef.current.update('none'); // Update without animation for immediate feedback
+        }
+    }, [results.totalInvested, results.wealthGained]);
 
     return (
         <section id="calculator" className="relative py-12 md:py-16 bg-white overflow-hidden font-sans">
+            <style dangerouslySetInnerHTML={{ __html: sliderStyle }} />
             <div className="container mx-auto px-4 md:px-6">
                 <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
                     {/* Header */}

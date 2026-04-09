@@ -49,8 +49,8 @@ export const TERM_LOAN: PlanInfo = {
   badge: "Core Product",
   rateRange: "9.99% – 20.00% p.a.",
   rateStart: "9.99%",
-  amountRange: "₹1,00,000 – ₹50,00,000",
-  tenureRange: "36 – 60 Months",
+  amountRange: "₹11,00,000 – ₹50,00,000",
+  tenureRange: "36 – 84 Months",
   processingFee: "Up to 2.5% of loan amount",
   keyBenefit: "Pre-approved offers for salaried professionals with instant disbursal",
   features: [
@@ -83,8 +83,8 @@ export const BALANCE_TRANSFER: PlanInfo = {
   badge: "Save More",
   rateRange: "9.99% – 20.00% p.a.",
   rateStart: "9.99%",
-  amountRange: "₹1,00,000 – ₹50,00,000",
-  tenureRange: "36 – 60 Months",
+  amountRange: "₹11,00,000 – ₹50,00,000",
+  tenureRange: "36 – 84 Months",
   processingFee: "Up to 1.5% of transfer amount",
   keyBenefit: "Transfer your high-interest loan & save up to ₹1.5L on total interest",
   features: [
@@ -115,10 +115,10 @@ export const OVERDRAFT_FACILITY: PlanInfo = {
   icon: TrendingUp,
   color: "bg-amber-50 text-amber-500",
   badge: "Flexible Credit",
-  rateRange: "13.50% – 18.00% p.a.",
-  rateStart: "13.50%",
-  amountRange: "₹5,00,000 – ₹50,00,000",
-  tenureRange: "60 – 96 Months",
+  rateRange: "13.75% – 18.00% p.a.",
+  rateStart: "13.75%",
+  amountRange: "₹5,00,000 – ₹40,00,000",
+  tenureRange: "36 – 96 Months",
   processingFee: "Up to 2.0% of sanctioned limit",
   keyBenefit: "Pay interest only on amount utilized — withdraw & repay anytime",
   features: [
@@ -151,8 +151,8 @@ export const TOP_UP: PlanInfo = {
   badge: "Quick Top-Up",
   rateRange: "9.99% – 20.00% p.a.",
   rateStart: "9.99%",
-  amountRange: "₹1,00,000 – ₹50,00,000",
-  tenureRange: "36 – 60 Months",
+  amountRange: "₹11,00,000 – ₹50,00,000",
+  tenureRange: "36 – 84 Months",
   processingFee: "Up to 1.0% of top-up amount",
   keyBenefit: "Get additional funds on existing loan without fresh documentation",
   features: [
@@ -186,6 +186,7 @@ export const FOUR_PLAN_BANKS = [
 ];
 
 const NBFC_BANK_GROUP = [
+  "ADITYA BIRLA FINANCE",
   "BAJAJ FINANCE",
   "AXIS BANK",
   "AXIS FINANCE",
@@ -198,6 +199,8 @@ const NBFC_BANK_GROUP = [
   "L&T FINANCE",
   "POONAWALLA FINCORP",
   "PIRAMAL CAPITAL",
+  "PREFR (CREDIT VIDYA)",
+  "SMFG INDIA CREDIT",
   "TATA CAPITAL",
   "UTKARSH SMALL FINANCE BANK"
 ];
@@ -219,8 +222,8 @@ export function getPlansForBank(bankName: string): PlanInfo[] {
         ...plan,
         rateRange: "11.50% – 30.00% p.a.",
         rateStart: "11.50%",
-        amountRange: "₹1,00,000 – ₹30,00,000",
-        tenureRange: "24 – 84 Months",
+        amountRange: "₹1,00,000 – ₹50,00,000",
+        tenureRange: "36 – 60 Months",
         eligibility: plan.eligibility.map(item =>
           item.label === "Age" ? { ...item, value: "22 – 60 years" } : item
         )

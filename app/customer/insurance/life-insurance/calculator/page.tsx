@@ -81,14 +81,8 @@ export default function CustomerTermCalculatorPage() {
     ];
 
     return (
-        <section className="py-8 md:py-16 bg-[#FAFAFA] min-h-screen relative overflow-hidden font-sans">
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#2076C7]/5 rounded-full blur-[120px] pointer-events-none translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#1CADA3]/5 rounded-full blur-[120px] pointer-events-none -translate-x-1/2 translate-y-1/2" />
-            
-            <div className="container-custom relative z-10 px-4 md:px-6 max-w-6xl mx-auto">
-                
-                {/* Header */}
-                <LifeInsuranceHeader />
+        <>
+            <div className="py-8">
 
 
                 <motion.div
@@ -296,9 +290,9 @@ export default function CustomerTermCalculatorPage() {
                             </div>
                         </div>
 
-                    </div>
-                </motion.div>
             </div>
-        </section>
-    );
+        </motion.div>
+      </div>
+    </>
+  );
 }

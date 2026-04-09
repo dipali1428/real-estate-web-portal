@@ -19,23 +19,23 @@ export default function VehicleLoanHero({ onApplyClick, onCalculateClick }: Vehi
                         initial={{ opacity: 0, x: -40 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="flex flex-col items-start w-full"
+                        className="flex flex-col items-center lg:items-start w-full text-center lg:text-left"
                     >
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-[#2076C7] font-medium text-sm mb-4">
                             <ShieldCheck size={16} />
                             <span>Premium Vehicle Financing</span>
                         </div>
 
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-4 tracking-tight bg-clip-text text-transparent bg-linear-to-r from-[#2076C7] to-[#1CADA3]">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-4 tracking-tight bg-clip-text text-transparent bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-center lg:text-left">
                             Drive Your <br />
                             Dream Today
                         </h1>
 
-                        <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 leading-relaxed max-w-lg font-medium">
+                        <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 leading-relaxed max-w-lg font-medium text-center lg:text-left mx-auto lg:mx-0">
                             Experience the fastest route to ownership. <strong className="text-gray-900">Up to 100% on-road financing</strong> with industry-leading interest rates and instant approvals.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-8">
+                        <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4 w-full sm:w-auto mb-8">
                             <button
                                 onClick={onApplyClick}
                                 className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
@@ -60,17 +60,17 @@ export default function VehicleLoanHero({ onApplyClick, onCalculateClick }: Vehi
                         </div>
 
                         {/* Premium Stats Row*/}
-                        <div className="grid grid-cols-3 gap-4 sm:gap-8 border-t border-gray-200 pt-6 w-full">
-                            <div className="flex flex-col">
-                                <div className="text-2xl sm:text-3xl font-extrabold text-teal-500 mb-1 flex items-center gap-1">8.5<span className="text-teal-500">%</span></div>
+                        <div className="grid grid-cols-3 gap-4 sm:gap-8 border-t border-gray-200 pt-6 w-full text-center lg:text-left">
+                            <div className="flex flex-col items-center lg:items-start">
+                                <div className="text-2xl sm:text-3xl font-extrabold text-teal-500 mb-1 flex items-center justify-center lg:justify-start gap-1">8.5<span className="text-teal-500">%</span></div>
                                 <div className="text-xs sm:text-sm font-semibold text-gray-500">Starting APR</div>
                             </div>
-                            <div className="flex flex-col border-l border-gray-200 pl-4 sm:pl-8">
-                                <div className="text-2xl sm:text-3xl font-extrabold text-[#0A1A2F] mb-1 flex items-center gap-2"><Zap className="text-teal-500" size={24} fill="currentColor" /></div>
+                             <div className="flex flex-col border-l border-gray-200 pl-4 sm:pl-8 items-center lg:items-start">
+                                <div className="text-2xl sm:text-3xl font-extrabold text-[#0A1A2F] mb-1 flex items-center justify-center lg:justify-start gap-2"><Zap className="text-teal-500" size={24} fill="currentColor" /></div>
                                 <div className="text-xs sm:text-sm font-semibold text-gray-500">Minimal Documentation</div>
                             </div>
-                            <div className="flex flex-col border-l border-gray-200 pl-4 sm:pl-8">
-                                <div className="text-2xl sm:text-3xl font-extrabold text-[#0A1A2F] mb-1 flex items-center gap-2"><ShieldCheck className="text-teal-500" size={24} /></div>
+                             <div className="flex flex-col border-l border-gray-200 pl-4 sm:pl-8 items-center lg:items-start">
+                                <div className="text-2xl sm:text-3xl font-extrabold text-[#0A1A2F] mb-1 flex items-center justify-center lg:justify-start gap-2"><ShieldCheck className="text-teal-500" size={24} /></div>
                                 <div className="text-xs sm:text-sm font-semibold text-gray-500">Zero Prepayment</div>
                             </div>
                         </div>

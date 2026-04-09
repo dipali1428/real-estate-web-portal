@@ -8,13 +8,13 @@ import {
 import FDDashboard from "./dashboard/page";
 import FDCompanies from "./companies/page";
 import FDCompare from "./compare/page";
-import FDInvestments from "./myinvestments/page";
+// import FDInvestments from "./myinvestments/page";
 
 const tabs = [
   { id: "DASHBOARD", label: "OVERVIEW", icon: LayoutDashboard },
   { id: "EXPLORE", label: "EXPLORE", icon: Search },
   { id: "COMPARE", label: "COMPARE", icon: BarChart3 },
-  { id: "INVESTMENTS", label: "PORTFOLIO", icon: Briefcase },
+  // { id: "INVESTMENTS", label: "PORTFOLIO", icon: Briefcase },
 ];
 
 export default function UnifiedFDPage() {
@@ -99,7 +99,7 @@ export default function UnifiedFDPage() {
           {activeTab === "DASHBOARD" && <FDDashboard />}
           {activeTab === "EXPLORE" && <FDCompanies />}
           {activeTab === "COMPARE" && <FDCompare />}
-          {activeTab === "INVESTMENTS" && <FDInvestments />}
+          {/* {activeTab === "INVESTMENTS" && <FDInvestments />} */}
         </motion.div>
       </AnimatePresence>
 

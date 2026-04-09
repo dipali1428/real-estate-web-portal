@@ -50,12 +50,7 @@ export default function MyApplicationsPage() {
   ];
 
   return (
-    <div className="flex-1 p-4 md:p-10 bg-[#FAFAFA] font-sans min-h-screen">
-      
-      {/* Header */}
-      <LifeInsuranceHeader />
-
-
+    <>
       {/* ─── Primary Analytics Section (CEO WOW) ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
          
@@ -228,6 +223,6 @@ export default function MyApplicationsPage() {
 
       </div>
 
-    </div>
+    </>
   );
 }

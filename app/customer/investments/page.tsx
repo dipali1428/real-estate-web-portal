@@ -99,10 +99,10 @@ export default function InvestmentsPage() {
                     <p className="font-medium text-slate-700">Equity</p>
                   </div>
 
-                  <div>
+                  {/* <div>
                     <p className="text-[11px] uppercase text-slate-400">Returns</p>
                     <p className="font-semibold text-[#1CADA3]">+12.4%</p>
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Description */}

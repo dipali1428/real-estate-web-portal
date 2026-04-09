@@ -20,13 +20,7 @@ export default function LifeInsuranceDashboard() {
   ];
 
   return (
-    <div className="flex-1 min-h-screen bg-[#FAFAFA] font-sans">
-      <div className="max-w-[1440px] mx-auto px-6 py-6 leading-relaxed">
-
-        {/* 🔷 UPDATED HEADER */}
-        <LifeInsuranceHeader />
-
-
+    <>
         {/* ─── OFFERS BANNER ─── */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -76,7 +70,6 @@ export default function LifeInsuranceDashboard() {
           </div>
         </div>
 
-      </div>
-    </div>
+    </>
   );
 }

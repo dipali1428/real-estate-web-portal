@@ -4,7 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import {
-  Umbrella,
+  Flame,
   Calculator,
   Clock,
   Grid,
@@ -46,15 +46,14 @@ const HeaderButton = ({ label, icon: Icon, isActive, onClick, variant = "seconda
   );
 };
 
-export default function LifeInsuranceHeader() {
+export default function FireInsuranceHeader() {
   const router = useRouter();
   const pathname = usePathname();
 
   const navItems = [
-    { label: "Overview", icon: LayoutDashboard, path: "/customer/insurance/life-insurance" },
-    { label: "Holdings", icon: Clock, path: "/customer/insurance/life-insurance/holdings" },
-    { label: "Calculator", icon: Calculator, path: "/customer/insurance/life-insurance/calculator" },
-    { label: "Categories", icon: Grid, path: "/customer/insurance/life-insurance/categories" },
+    { label: "Overview", icon: LayoutDashboard, path: "/customer/insurance/fire-insurance" },
+    { label: "Holdings", icon: Clock, path: "/customer/insurance/fire-insurance/holdings" },
+    { label: "Categories", icon: Grid, path: "/customer/insurance/fire-insurance/categories" },
   ];
 
   return (
@@ -70,23 +69,23 @@ export default function LifeInsuranceHeader() {
         {/* LEFT SECTION */}
         <div 
           className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left cursor-pointer transition-opacity hover:opacity-80"
-          onClick={() => router.push("/customer/insurance/life-insurance")}
+          onClick={() => router.push("/customer/insurance/fire-insurance")}
         >
           <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold shadow-md shrink-0">
-            <Umbrella size={22} />
+            <Flame size={22} />
           </div>
 
           <div className="flex flex-col items-center sm:items-start">
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-1">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
-                Life Insurance Dashboard
+                Fire Insurance Dashboard
               </h2>
               <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200 whitespace-nowrap">
                 Asset Protection
               </span>
             </div>
             <p className="text-sm text-slate-500 flex items-center justify-center sm:justify-start gap-2">
-              Manage policies, track applications, and explore new coverage
+              Comprehensive protection for your property, stock, and business assets
             </p>
           </div>
         </div>
