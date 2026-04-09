@@ -61,11 +61,11 @@ export default function AdminLeadPanel() {
   const [loading, setLoading] = useState(true);
   const [rmLoading, setRmLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<"unassigned" | "assigned">("unassigned");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(50);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalLeads, setTotalLeads] = useState(0);
 
   const [assignConfirmation, setAssignConfirmation] = useState<AssignConfirmation>({
     show: false,
@@ -81,8 +81,20 @@ export default function AdminLeadPanel() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await AdminService.getUnassignedDsas();
-      const mapped: Lead[] = (res.dsas || []).map((item: any) => ({
+      const offset = (currentPage - 1) * itemsPerPage;
+      const params = {
+        limit: itemsPerPage,
+        offset: offset,
+        search: searchTerm,
+      };
+
+      const res = activeTab === "unassigned"
+        ? await AdminService.getUnassignedDsas(params)
+        : await AdminService.getAssignedDsas(params);
+
+      // Support "data" or "dsas" keys from API
+      const rawData = res.data || res.dsas || [];
+      const mapped: Lead[] = rawData.map((item: any) => ({
         id: String(item.id),
         name: item.name,
         email: item.email,
@@ -90,13 +102,17 @@ export default function AdminLeadPanel() {
         city: item.city,
         department: item.head?.toLowerCase().replace(/\s+/g, "_") || "",
         subCategory: item.category || "",
-        assignedTo: item.assigned_rm_name || null,
+        // Support rm_name from your JSON
+        assignedTo: item.rm_name || item.assigned_rm_name || null,
         status: "new",
         dsa: { id: item.id, name: item.name, code: item.adv_id, phone: item.mobile },
       }));
+
       setLeads(mapped);
+      // Prioritize total count field from API to show 2681 etc.
+      setTotalLeads(res.total || res.total_count || res.count || 0);
     } catch (err) {
-      toast.error("Failed to sync data");
+      toast.error("Failed to fetch leads");
     } finally {
       setLoading(false);
     }
@@ -114,6 +130,9 @@ export default function AdminLeadPanel() {
 
   useEffect(() => {
     fetchData();
+  }, [currentPage, itemsPerPage, searchTerm, activeTab]);
+
+  useEffect(() => {
     fetchRMs();
   }, []);
 
@@ -146,23 +165,9 @@ export default function AdminLeadPanel() {
     }
   };
 
-  const filteredLeads = useMemo(() => {
-    return leads.filter((l) => {
-      const matchesSearch =
-        l.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        l.dsa?.code?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesTab = activeTab === "assigned" ? l.assignedTo !== null : l.assignedTo === null;
-      return matchesSearch && matchesTab;
-    });
-  }, [leads, searchTerm, activeTab]);
+  // --- PAGINATION LOGIC ---
+  const totalPages = Math.max(1, Math.ceil(totalLeads / itemsPerPage));
 
-  const totalPages = Math.max(1, Math.ceil(filteredLeads.length / itemsPerPage));
-  const paginatedLeads = filteredLeads.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  // Consistency: Pagination Group logic from reference
   const getPaginationGroup = useMemo(() => {
     const pages: (number | string)[] = [];
     if (totalPages <= 7) {
@@ -179,6 +184,85 @@ export default function AdminLeadPanel() {
     return pages;
   }, [currentPage, totalPages]);
 
+  // Helper to render table (Used in both Tab Panels)
+  const renderTableContent = () => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      {loading ? (
+        <div className="py-12 text-center text-gray-500">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2076C7] mx-auto mb-3" /> Loading Leads...
+        </div>
+      ) : leads.length === 0 ? (
+        <div className="py-12 text-center text-gray-500">No leads found.</div>
+      ) : (
+        <div className="max-h-[60vh] overflow-x-auto scrollbar-x-thin scrollbar-thumb-gray-300 scrollbar-track-transparent md:scrollbar-thumb-gray-400">
+          <table className="min-w-[1000px] w-full text-left border-collapse">
+            <thead className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
+              <tr>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">ADV ID</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">DSA Details</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Department</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Sub-Category</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">City</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Action / Assigned To</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {leads.map((l) => (
+                <tr key={l.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">{l.dsa?.code}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{l.name}</div>
+                    <div className="text-xs text-gray-500">{l.phone}</div>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700 capitalize whitespace-nowrap">{l.department.replace("_", " ")}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600 max-w-[180px] truncate" title={l.subCategory}>{l.subCategory || "-"}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{l.city}</td>
+                  <td className="px-4 py-3 text-sm whitespace-nowrap">
+                    {l.assignedTo ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <CheckCircle className="w-3 h-3 mr-1" /> {l.assignedTo}
+                      </span>
+                    ) : (
+                      <select
+                        className="block w-full min-w-40 text-xs text-gray-700 border border-gray-300 rounded-lg focus:ring-[#2076C7] focus:border-[#2076C7] py-1 bg-white outline-none shadow-sm"
+                        value=""
+                        onChange={(e) => {
+                          const rm = rms.find((r) => String(r.id) === e.target.value);
+                          if (rm)
+                            setAssignConfirmation({
+                              show: true,
+                              leadId: l.id,
+                              leadName: l.name,
+                              rmId: String(rm.id),
+                              rmName: rm.name,
+                              rmSubCategories: rm.sub_category || "No categories listed",
+                              department: l.department,
+                              subCategory: l.subCategory,
+                            });
+                        }}
+                      >
+                        <option value="" className="text-gray-600">Select RM to Assign</option>
+                        {rmLoading ? (
+                          <option disabled>Loading RMs...</option>
+                        ) : (
+                          getRMsForLead(l).map((rm) => (
+                            <option key={rm.id} value={rm.id} className="text-gray-800 font-medium">
+                              {rm.name} ({rm.department})
+                            </option>
+                          ))
+                        )}
+                      </select>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="bg-gray-50 py-6">
       <div className="max-w-full mx-auto sm:px-4 lg:px-6">
@@ -192,10 +276,7 @@ export default function AdminLeadPanel() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => {
-                fetchData();
-                fetchRMs();
-              }}
+              onClick={() => { fetchData(); fetchRMs(); }}
               className="flex items-center gap-2 px-3 py-2 bg-[#2076C7] text-white rounded-lg text-sm font-medium hover:bg-[#1a5fa1] shadow-sm transition-colors"
             >
               <RefreshCw className={classNames("h-4 w-4", loading ? "animate-spin" : "")} /> Refresh Data
@@ -206,8 +287,8 @@ export default function AdminLeadPanel() {
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {[
-            { label: "Unassigned", value: leads.filter((l) => !l.assignedTo).length, icon: Users, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200" },
-            { label: "Assigned", value: leads.filter((l) => l.assignedTo).length, icon: CheckCircle, color: "text-green-600", bg: "bg-green-50", border: "border-green-200" },
+            { label: "Unassigned", value: activeTab === 'unassigned' ? totalLeads : '-', icon: Users, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200" },
+            { label: "Assigned", value: activeTab === 'assigned' ? totalLeads : '-', icon: CheckCircle, color: "text-green-600", bg: "bg-green-50", border: "border-green-200" },
             { label: "Total RMs", value: rms.length, icon: User, color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200" },
           ].map((stat, i) => (
             <div key={i} className={`bg-white p-4 rounded-xl shadow-sm border ${stat.border} flex items-center gap-4`}>
@@ -223,19 +304,19 @@ export default function AdminLeadPanel() {
         </div>
 
         <Tab.Group
+          selectedIndex={activeTab === "unassigned" ? 0 : 1}
           onChange={(index) => {
             setActiveTab(index === 0 ? "unassigned" : "assigned");
-            setCurrentPage(1);
+            setCurrentPage(1); 
           }}
         >
-
           <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <Tab.List className="flex p-1 bg-gray-200/50 rounded-xl w-full md:w-fit">
               <Tab className={({ selected }) => classNames("px-6 py-2 text-sm font-medium rounded-lg transition-all", selected ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-600 hover:text-gray-800")}>
-                Unassigned Leads
+                Unassigned DSA
               </Tab>
               <Tab className={({ selected }) => classNames("px-6 py-2 text-sm font-medium rounded-lg transition-all", selected ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-600 hover:text-gray-800")}>
-                Assigned Leads
+                Assigned DSA
               </Tab>
             </Tab.List>
 
@@ -252,6 +333,7 @@ export default function AdminLeadPanel() {
               </div>
             </div>
 
+            {/* FIXED COUNT DISPLAY: Using totalLeads to show 2681 */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs sm:text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 <span>Show</span>
@@ -268,96 +350,21 @@ export default function AdminLeadPanel() {
                 <span>per page</span>
               </div>
               <p>
-                Showing <span className="font-semibold">{filteredLeads.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}</span> -{" "}
-                <span className="font-semibold">{Math.min(currentPage * itemsPerPage, filteredLeads.length)}</span> of{" "}
-                <span className="font-semibold">{filteredLeads.length}</span> leads
+                Showing <span className="font-semibold">{totalLeads === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}</span> -{" "}
+                <span className="font-semibold">{Math.min(currentPage * itemsPerPage, totalLeads)}</span> of{" "}
+                <span className="font-semibold">{totalLeads}</span> leads
               </p>
             </div>
           </div>
 
-          <Tab.Panel className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            {loading ? (
-              <div className="py-12 text-center text-gray-500">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2076C7] mx-auto mb-3" /> Loading Leads...
-              </div>
-            ) : filteredLeads.length === 0 ? (
-              <div className="py-12 text-center text-gray-500">No leads found.</div>
-            ) : (
-              <div className="max-h-[60vh] overflow-x-auto scrollbar-x-thin scrollbar-thumb-gray-300 scrollbar-track-transparent md:scrollbar-thumb-gray-400">
-                <table className="min-w-[1000px] w-full text-left border-collapse">
-                  <thead className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
-                    <tr>
-                      {/* <th className="px-4 py-3"><input type="checkbox" className="rounded border-gray-300 text-[#2076C7] focus:ring-[#2076C7]" onChange={(e) => setSelectedLeads(e.target.checked ? paginatedLeads.map((l) => l.id) : [])} /></th> */}
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">ADV ID</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">DSA Details</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Department</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Sub-Category</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">City</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Action / Assigned To</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {paginatedLeads.map((l) => (
-                      <tr key={l.id} className="hover:bg-gray-50 transition-colors">
-                        {/* <td className="px-4 py-3">
-                          <input type="checkbox" checked={selectedLeads.includes(l.id)} className="rounded border-gray-300 text-[#2076C7] focus:ring-[#2076C7]" onChange={() => setSelectedLeads((p) => (p.includes(l.id) ? p.filter((x) => x !== l.id) : [...p, l.id]))} />
-                        </td> */}
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">{l.dsa?.code}</td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{l.name}</div>
-                          <div className="text-xs text-gray-500">{l.phone}</div>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-700 capitalize whitespace-nowrap">{l.department.replace("_", " ")}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600 max-w-[180px] truncate" title={l.subCategory}>{l.subCategory || "-"}</td>
-                        <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{l.city}</td>
-                        <td className="px-4 py-3 text-sm whitespace-nowrap">
-                          {l.assignedTo ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              <CheckCircle className="w-3 h-3 mr-1" /> {l.assignedTo}
-                            </span>
-                          ) : (
-                            <select
-                              className="block w-full min-w-40 text-xs text-gray-700 border border-gray-300 rounded-lg focus:ring-[#2076C7] focus:border-[#2076C7] py-1 bg-white outline-none shadow-sm"
-                              value=""
-                              onChange={(e) => {
-                                const rm = rms.find((r) => String(r.id) === e.target.value);
-                                if (rm)
-                                  setAssignConfirmation({
-                                    show: true,
-                                    leadId: l.id,
-                                    leadName: l.name,
-                                    rmId: String(rm.id),
-                                    rmName: rm.name,
-                                    rmSubCategories: rm.sub_category || "No categories listed",
-                                    department: l.department,
-                                    subCategory: l.subCategory,
-                                  });
-                              }}
-                            >
-                              <option value="" className="text-gray-600">Select RM to Assign</option>
-                              {rmLoading ? (
-                                <option disabled>Loading RMs...</option>
-                              ) : (
-                                getRMsForLead(l).map((rm) => (
-                                  <option key={rm.id} value={rm.id} className="text-gray-800 font-medium">
-                                    {rm.name} ({rm.department})
-                                  </option>
-                                ))
-                              )}
-                            </select>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </Tab.Panel>
+          <Tab.Panels>
+            <Tab.Panel>{renderTableContent()}</Tab.Panel>
+            <Tab.Panel>{renderTableContent()}</Tab.Panel>
+          </Tab.Panels>
         </Tab.Group>
 
-        {/* Updated Pagination to match reference exactly */}
-        {!loading && filteredLeads.length > 0 && (
+        {/* PAGINATION CONTROLS */}
+        {!loading && leads.length > 0 && (
           <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-gray-600">
             <div>Page <span className="font-semibold">{currentPage}</span> of <span className="font-semibold">{totalPages}</span></div>
             <div className="flex items-center gap-1 sm:gap-2">

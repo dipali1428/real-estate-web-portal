@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { PublicService } from "../../services/publicService";
+import toast from "react-hot-toast";
 
 // Temporary Mock Response based on your actual API structure
 // const MOCK_RESPONSE = {
@@ -133,6 +134,7 @@ const CreditScorePage: React.FC = () => {
     const [scoreValue, setScoreValue] = useState<string | null>(null); // New state for dedicated card
     const [showCongrats, setShowCongrats] = useState(false); // New state for congrats popup
     const [error, setError] = useState<string | null>(null);
+    const [isEligible, setIsEligible] = useState(true);
 
     // New state for dynamic report values
     const [reportSummary, setReportSummary] = useState({
@@ -300,6 +302,20 @@ const CreditScorePage: React.FC = () => {
 
         setLoading(true);
         setError(null);
+
+        // Pre-check if user exists in bureau
+        const preCheckRes = await PublicService.preCibilRequest({ mobile: formData.mobile, fullName: formData.fullName, email: formData.email, pan: formData.pan });
+        // const preCheckRes = {eligible: false}; // Mocking response for now
+
+        // If user not found in bureau
+        if (!preCheckRes?.eligible) {
+            setIsEligible(false);
+            setError(preCheckRes?.message || "No bureau record found for this mobile number.");
+
+            toast.error(preCheckRes?.message || "No bureau data found");
+            setLoading(false);
+            return;
+        }
 
         const payload = {
             fullName: formData.fullName,
@@ -764,9 +780,11 @@ const CreditScorePage: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 rounded-xl font-bold text-lg shadow-lg transition disabled:opacity-50">
-                                        {loading ? "Processing..." : "Get My Free CIBIL Score"}
-                                    </button>
+                                    {isEligible && (
+                                        <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 rounded-xl font-bold text-lg shadow-lg transition disabled:opacity-50">
+                                            {loading ? "Processing..." : "Get My Free CIBIL Score"}
+                                        </button>
+                                    )}
                                 </form>
                             ) : (
                                 /* THIS SECTION APPEARS IF MOBILE IS NOT VERIFIED */

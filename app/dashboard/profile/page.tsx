@@ -5,6 +5,8 @@ import { DashboardService } from "@/app/services/dashboardService";
 import CardTemplateImage from "@/app/assets/visiting_card.png";
 import { Phone, Mail, MapPin, Globe, Landmark, Pencil, CheckCircle2, User, AlertCircle, Loader2, Camera, Eye, EyeOff, X, ShieldCheck, Download, Lock, Copy, Share2 } from "lucide-react";
 import LogoImage from "@/public/logo.png";
+import { useRouter } from "next/navigation";
+import { FaceDetector, FilesetResolver, Detection } from "@mediapipe/tasks-vision";
 
 // --- Types & Constants ---
 interface PopupMessage { id: string; message: string; type: "success" | "error" | "loading"; }
@@ -24,6 +26,7 @@ const maskAadhaar = (num: string) => (num && num.length >= 12) ? "•••• �
 const maskGST = (gst: string) => (gst && gst.length >= 15) ? gst.slice(0, 2) + "••••••••••" + gst.slice(-3) : gst;
 
 export default function ProfileSection() {
+    const router = useRouter();
     const [popups, setPopups] = useState<PopupMessage[]>([]);
     const [verifyingPan, setVerifyingPan] = useState(false);
     const [verifyingAadhaar, setVerifyingAadhaar] = useState(false);
@@ -57,16 +60,252 @@ export default function ProfileSection() {
     const [emailOtpInput, setEmailOtpInput] = useState("");
     const [emailVerified, setEmailVerified] = useState(false);
     const [activeId, setActiveId] = useState<string>("step-1");
+    const [isAddressSame, setIsAddressSame] = useState(false);
+    const [showAgreementModal, setShowAgreementModal] = useState(false);
 
     const isStep1Complete = mobileVerified && emailVerified;
-    const isStep2Complete = isStep1Complete && (profile?.pan_verified && aadhaarVerified);
+    const isStep2Complete = isStep1Complete && (profile?.pan_verified && aadhaarVerified && panAadhaarLinked);
     const isStep3Complete = isStep2Complete && bankVerified;
 
     const [referralLink, setReferralLink] = useState<string>("");
     const [referralCode, setReferralCode] = useState<string>("");
     const [isGeneratingLink, setIsGeneratingLink] = useState(false);
 
+    const [showCamera, setShowCamera] = useState(false);
+    const CameraCaptureModal = ({ onCapture, onClose }: { onCapture: (blob: Blob) => void; onClose: () => void }) => {
+        const videoRef = useRef<HTMLVideoElement>(null);
+        const canvasRef = useRef<HTMLCanvasElement>(null);
+        const [stream, setStream] = useState<MediaStream | null>(null);
+        const [error, setError] = useState<string | null>(null);
 
+        // AI STATES
+        const [faceDetector, setFaceDetector] = useState<any>(null);
+        const [isAligned, setIsAligned] = useState(false);
+        const [isModelReady, setIsModelReady] = useState(false);
+        const requestRef = useRef<number | null>(null);
+
+        // DEBUGGING MESSAGES (On-Screen)
+        const [aiStatus, setAiStatus] = useState("AI: Initializing...");
+        const [mathStatus, setMathStatus] = useState("Math: Waiting...");
+        const [reactStatus, setReactStatus] = useState("State: False");
+        const [isProcessing, setIsProcessing] = useState(false);
+
+        // Watch the state and update the debug message
+        useEffect(() => {
+            setReactStatus(`State: ${isAligned ? "TRUE (GREEN)" : "FALSE (RED)"}`);
+        }, [isAligned]);
+
+        // 1. Initialize AI
+        useEffect(() => {
+            const init = async () => {
+                try {
+                    setAiStatus("AI: Loading Files...");
+                    // const { FaceDetector, FilesetResolver } = await import("@mediapipe/tasks-vision");
+                    const vision = await FilesetResolver.forVisionTasks(
+                        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+                    );
+                    const detector = await FaceDetector.createFromOptions(vision, {
+                        baseOptions: {
+                            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite`,
+                            delegate: "CPU" // Use CPU for mobile stability
+                        },
+                        runningMode: "VIDEO"
+                    });
+                    setFaceDetector(detector);
+                    setIsModelReady(true);
+                    setAiStatus("AI: Ready & Running");
+                } catch (err: any) {
+                    setAiStatus("AI: Error " + err.message);
+                    setError("AI Init Failed");
+                }
+            };
+            init();
+            return () => faceDetector?.close();
+        }, []);
+
+        // 2. Detection Loop
+        const detectFace = useCallback(() => {
+            if (isProcessing) return;
+
+            if (faceDetector && videoRef.current && videoRef.current.readyState >= 2) {
+                try {
+                    const result = faceDetector.detectForVideo(videoRef.current, performance.now());
+                    const hasFace = result.detections && result.detections.length > 0;
+
+                    if (hasFace) {
+                        const face = result.detections[0].boundingBox;
+                        const video = videoRef.current;
+
+                        // 1. Convert to percentages (0 to 1) regardless of device resolution
+                        // Some browsers return pixels (e.g. 240), some return normalized (e.g. 0.4)
+                        const normX = face.originX > 1 ? face.originX / video.videoWidth : face.originX;
+                        const normW = face.width > 1 ? face.width / video.videoWidth : face.width;
+                        const normY = face.originY > 1 ? face.originY / video.videoHeight : face.originY;
+                        const normH = face.height > 1 ? face.height / video.videoHeight : face.height;
+
+                        const centerX = normX + (normW / 2);
+                        const centerY = normY + (normH / 2);
+
+                        const isDesktop = window.innerWidth >= 1024;
+
+                        // 2. Adjust thresholds based on device
+                        // On wide desktop cams, the face is naturally a smaller % of the total width
+                        const minW = isDesktop ? 0.45 : 0.17;
+                        const maxW = isDesktop ? 0.53 : 0.27;
+
+                        // On desktop, we give a bit more wiggle room for centering 
+                        // because webcams are often not perfectly centered on the monitor
+                        const hRange = isDesktop ? { min: 0.42, max: 0.58 } : { min: 0.45, max: 0.52 };
+                        const vRange = isDesktop ? { min: 0.45, max: 0.65 } : { min: 0.50, max: 0.60 };
+
+                        const isCenteredH = centerX > hRange.min && centerX < hRange.max;
+                        const isCenteredV = centerY > vRange.min && centerY < vRange.max;
+                        const isBigEnough = normW > minW && normW < maxW;
+
+                        const pass = isCenteredH && isCenteredV && isBigEnough;
+
+                        // 3. DEBUG FOR MOBILE (This will show on your screen)
+                        setMathStatus(`CX:${centerX.toFixed(2)} CY:${centerY.toFixed(2)} W:${normW.toFixed(2)}`);
+
+                        if (isAligned !== pass) setIsAligned(pass);
+                    } else {
+                        setMathStatus("No face in view");
+                        if (isAligned !== false) setIsAligned(false);
+                    }
+                } catch (err) {
+                    setMathStatus("Error: " + (err as Error).message);
+                }
+            }
+
+            if (!isProcessing) {
+                requestRef.current = requestAnimationFrame(detectFace);
+            }
+        }, [faceDetector, isAligned, isProcessing]);
+
+        useEffect(() => {
+            if (isModelReady) requestRef.current = requestAnimationFrame(detectFace);
+            return () => { if (requestRef.current) cancelAnimationFrame(requestRef.current); };
+        }, [isModelReady, detectFace]);
+
+        // 3. Camera Setup (Low res for speed)
+        useEffect(() => {
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "user", width: 320, height: 480 }
+            }).then(s => {
+                setStream(s);
+                if (videoRef.current) videoRef.current.srcObject = s;
+            }).catch(() => setError("Camera Denied"));
+            return () => stream?.getTracks().forEach(t => t.stop());
+        }, []);
+
+
+
+        const capturePhoto = () => {
+            if (!isAligned || !videoRef.current || !canvasRef.current || isProcessing) return;
+
+            // 1. START CAPTURE - FREEZE EVERYTHING
+            setIsProcessing(true);
+
+            // Stop the AI detection loop immediately
+            if (requestRef.current) {
+                cancelAnimationFrame(requestRef.current);
+                requestRef.current = null;
+            }
+
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+
+            // 2. PAUSE VIDEO (This creates the "Instant Flash" feel)
+            video.pause();
+
+            // 3. DRAW TO CANVAS (Now the CPU is 100% dedicated to this)
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d", { alpha: false }); // 'alpha: false' makes it faster
+
+            if (ctx) {
+                // Mirror the photo
+                ctx.translate(canvas.width, 0);
+                ctx.scale(-1, 1);
+                ctx.drawImage(video, 0, 0);
+
+                // 4. CONVERT TO BLOB
+                // Lowering quality slightly (0.8) makes the save nearly instant on mobile
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        onCapture(blob);
+                        onClose();
+                    }
+                }, "image/jpeg", 0.8);
+            }
+        };
+
+        return (
+            <div className="fixed inset-0 z-[250] bg-black flex flex-col lg:items-center lg:justify-center font-sans">
+
+                {/* DESKTOP BACKGROUND OVERLAY (Only visible on large screens) */}
+                <div className="hidden lg:block absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+
+                {/* MAIN MODAL BODY */}
+                <div className="relative flex flex-col flex-1 w-full h-full lg:flex-none lg:w-[420px] lg:h-[750px] lg:rounded-[40px] lg:overflow-hidden lg:shadow-2xl lg:border lg:border-white/10">
+
+                    {/* DEBUGGING MESSAGES */}
+                    {/* <div className="absolute top-20 left-4 z-[300] bg-black/80 p-2 rounded border border-white/20 text-[10px] text-white font-mono pointer-events-none">
+                        <div className="text-blue-400 font-bold">AI: Running</div>
+                        <div>{mathStatus}</div>
+                        <div className={isAligned ? "text-emerald-400" : "text-rose-400"}>
+                            STATE: {isAligned ? "VERIFIED (TRUE)" : "NOT ALIGNED (FALSE)"}
+                        </div>
+                    </div> */}
+
+                    {/* VIDEO SECTION */}
+                    <div className="relative flex-1 bg-slate-900 overflow-hidden flex items-center justify-center">
+                        <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover scale-x-[-1]" />
+
+                        {/* THE FACE FRAME (The Oval) */}
+                        {/* w-[70%] is your original mobile width. lg:w-[280px] fixes the desktop size. */}
+                        <div className={`relative z-10 w-[70%] lg:w-[280px] aspect-[3/4] border-[4px] rounded-[100px] transition-all duration-100 ${isAligned ? 'border-emerald-500 scale-105 shadow-[0_0_40px_rgba(16,185,129,0.5)]' : 'border-white border-dashed shadow-[0_0_0_1000px_rgba(0,0,0,0.5)]'}`}>
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-12">
+                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isAligned ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-500'}`}>
+                                    {isAligned ? "Correct" : "Align Face"}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* CLOSE BUTTON */}
+                        <button onClick={onClose} className="absolute top-4 right-4 p-3 bg-black/40 rounded-full text-white z-[60] hover:bg-black/60 transition-colors">
+                            <X size={24} />
+                        </button>
+                    </div>
+
+                    {/* CONTROLS SECTION */}
+                    <div className="bg-slate-950 p-10 lg:p-8 flex flex-col items-center gap-4">
+                        <button
+                            onClick={capturePhoto}
+                            disabled={!isAligned || isProcessing}
+                            className={`w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all ${isAligned && !isProcessing
+                                ? 'border-emerald-500 bg-white scale-110'
+                                : 'border-slate-800 bg-slate-900 opacity-40'
+                                }`}
+                        >
+                            <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isAligned ? 'bg-emerald-500' : 'bg-slate-700'}`}>
+                                {isProcessing ? (
+                                    <Loader2 className="text-white animate-spin" size={32} />
+                                ) : (
+                                    <Camera size={32} className="text-white" />
+                                )}
+                            </div>
+                        </button>
+                        <p className="text-[10px] font-black text-white mt-2 uppercase tracking-widest text-center">
+                            {isProcessing ? "Saving Photo..." : isAligned ? "Tap to Capture" : "position your face inside the frame and hold still"}
+                        </p>
+                    </div>
+                </div>
+
+                <canvas ref={canvasRef} className="hidden" />
+            </div>
+        );
+    };
 
     useEffect(() => {
         if (loading || !profile) return;
@@ -170,7 +409,7 @@ export default function ProfileSection() {
                 });
             } catch (err) {
                 // Fallback if user cancels or share fails
-                console.log("Share cancelled or failed");
+                // console.log("Share cancelled or failed");
             }
         } else if (currentLink) {
             // Fallback to copy if Web Share API is not supported (e.g., some desktop browsers)
@@ -207,7 +446,7 @@ export default function ProfileSection() {
 
             setProfile({
                 ...res.user,
-                address: res.kycDetails?.current_address || "", 
+                address: res.kycDetails?.current_address || "",
                 date_of_birth: finalDob,
                 aadhaar: res.kycDetails?.aadhaar_number || "",
                 gst_number: res.kycDetails?.gst_number || "",
@@ -228,7 +467,13 @@ export default function ProfileSection() {
             setBankVerified(!!res.kycDetails?.bank_verified);
             setAadhaarVerified(!!res.kycDetails?.aadhaar_verified);
             setGstVerified(!!res.kycDetails?.gst_verified);
+            const isFullyComplete = res.kycDetails?.kyc_completed && res.kycDetails?.bank_verified;
             originalPassword.current = res.user.password;
+
+            // Only show the modal if KYC is complete AND status is NOT 'created'
+            if (isFullyComplete && res.agreementStatus !== "created") {
+                setShowAgreementModal(true);
+            }
         } catch (error) { console.error("Refresh failed:", error); }
     };
 
@@ -538,8 +783,9 @@ export default function ProfileSection() {
     const selectedCats = profile.category ? profile.category.split(",") : [];
 
     return (
-        <main className="max-w-7xl xl:mr-72 xl:ml-32 px-4 md:pb-60 sm:pb-20 pb-15 bg-[#F8FAFC] min-h-screen relative font-sans">
-            <div className="max-[1180px]:relative sticky top-[10px] mx-5 z-50 py-3 flex items-center justify-start gap-4">
+        <main className="w-full px-4 md:px-8 md:pb-60 sm:pb-20 pb-15 bg-[#F8FAFC] min-h-screen relative font-sans">
+
+            <div className="max-[1180px]:relative sticky top-[10px] mx-5 z-40 py-3 flex items-center justify-between gap-4">
                 {kyc?.kyc_completed ? (
                     <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-emerald-100 rounded-2xl shadow-sm">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
@@ -553,6 +799,18 @@ export default function ProfileSection() {
                         <AlertCircle size={14} className="text-amber-500 ml-1" />
                     </div>
                 )}
+                <button
+                    onClick={() => router.push('/dashboard/helpSupport')}
+                    className="flex items-center gap-2 px-5 py-2 bg-[#ffb326] text-white rounded-3xl shadow-lg shadow-[#1cada330] hover:opacity-90 transition-all active:scale-95 group"
+                >
+                    <div className=" p-1 rounded-lg">
+                        <AlertCircle size={14} className="text-[#ff3c35] group-hover:rotate-12 transition-transform" />
+                    </div>
+                    <div className="flex flex-col items-start leading-none">
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Having issue?</span>
+                        <span className="text-[8px] font-bold tracking-widest">Raise Ticket</span>
+                    </div>
+                </button>
             </div>
 
             <div className="fixed top-5 right-5 z-[100] flex flex-col gap-3 pointer-events-none w-[calc(100%-40px)] sm:w-auto">
@@ -566,607 +824,699 @@ export default function ProfileSection() {
                 ))}
             </div>
 
-            <div className="space-y-10 sm:space-y-16">
-                {isStep3Complete && (
-                    <section id="profile-summary" className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                        <div className="sticky top-0 z-40 bg-[#F8FAFC] py-4 sm:py-6 flex items-center justify-center gap-4 mb-2 border-b border-slate-100/50">
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white bg-[#2076C7] shadow-lg shadow-[#1cada330]">
-                                <User size={18} strokeWidth={2.5} />
+            <div className="max-w-7xl min[1800]:mr-72 lg:mr-40 max[1200]:ml-32 px-4 md:pb-60 sm:pb-20 pb-15 bg-[#F8FAFC] min-h-screen relative font-sans">
+                <div className="space-y-10 sm:space-y-16">
+                    {isStep3Complete && (
+                        <section id="profile-summary" className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                            <div className="sticky top-0 z-30 bg-[rgb(248,250,252)] py-4 sm:py-6 flex items-center justify-center gap-4 mb-2 border-b border-slate-100/50">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white bg-[#2076C7] shadow-lg shadow-[#1cada330]">
+                                    <User size={18} strokeWidth={2.5} />
+                                </div>
+                                <h2 className="text-lg sm:text-xl font-bold text-slate-800">Expertise & Profile</h2>
                             </div>
-                            <h2 className="text-lg sm:text-xl font-bold text-slate-800">Expertise & Profile</h2>
-                        </div>
-                        <div className="grid lg:grid-cols-12 gap-6 sm:gap-8">
-                            <div className="lg:col-span-4">
-                                <div className="lg:col-span-4 bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 text-slate-800 border border-slate-100 shadow-xl shadow-slate-200/40 h-fit z-30">
-                                    <h4 className="text-[10px] font-black uppercase text-[#1CADA3] tracking-widest mb-6 sm:mb-8">Onboarding Summary</h4>
-                                    <div className="space-y-6">
-                                        {/* Changed this container's classes */}
-                                        <div className="flex flex-col sm:flex-row lg:flex-col min-[1801px]:flex-row items-center sm:items-start lg:items-start text-center sm:text-left lg:text-left gap-4 sm:gap-6 mb-5 pb-5 border-b border-slate-50">
-                                            <div className="relative">
-                                                <div className="w-24 h-24 rounded-[24px] sm:rounded-[30px] bg-slate-100 border-4 border-white shadow-xl overflow-hidden flex items-center justify-center">
-                                                    {uploadingPhoto ? <Loader2 className="animate-spin text-[#1CADA3]" /> : getProfileImage() ? <img src={getProfileImage()!} className="w-full h-full object-cover" /> : <Camera className="text-slate-300" size={32} />}
+                            <div className="grid lg:grid-cols-12 gap-6 sm:gap-8">
+                                <div className="lg:col-span-4">
+                                    <div className="lg:col-span-4 bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 text-slate-800 border border-slate-100 shadow-xl shadow-slate-200/40 h-fit z-30">
+                                        <h4 className="text-[10px] font-black uppercase text-[#1CADA3] tracking-widest mb-6 sm:mb-8">Profile Summary</h4>
+                                        <div className="space-y-6">
+                                            {/* Changed this container's classes */}
+                                            <div className="flex flex-col sm:flex-row lg:flex-col min-[1801px]:flex-row items-center sm:items-start lg:items-start text-center sm:text-left lg:text-left gap-4 sm:gap-6 mb-5 pb-5 border-b border-slate-50">
+                                                <div className="relative">
+                                                    <div className="w-24 h-24 rounded-[24px] sm:rounded-[30px] bg-slate-100 border-4 border-white shadow-xl overflow-hidden flex items-center justify-center">
+                                                        {uploadingPhoto ? (
+                                                            <Loader2 className="animate-spin text-[#1CADA3]" />
+                                                        ) : getProfileImage() ? (
+                                                            <img src={getProfileImage()!} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <Camera className="text-slate-300" size={32} />
+                                                        )}
+                                                    </div>
+
+                                                    {/* Trigger Camera Modal Instead of Input */}
+                                                    <button
+                                                        onClick={() => setShowCamera(true)}
+                                                        className="absolute -bottom-2 -right-2 p-2 bg-[#1CADA3] text-white rounded-full shadow-lg border-2 border-white"
+                                                    >
+                                                        <Camera size={12} />
+                                                    </button>
                                                 </div>
-                                                <button onClick={() => fileInputRef.current?.click()} className="absolute -bottom-2 -right-2 p-2 bg-[#1CADA3] text-white rounded-full shadow-lg border-2 border-white"><Camera size={12} /></button>
-                                                <input type="file" ref={fileInputRef} onChange={handlePhotoChange} className="hidden" />
+
+                                                {/* The Modal */}
+                                                {showCamera && (
+                                                    <CameraCaptureModal
+                                                        onClose={() => setShowCamera(false)}
+                                                        onCapture={async (blob: Blob) => {
+                                                            const file = new File([blob], "profile_photo.jpg", { type: "image/jpeg" });
+
+                                                            // Manually trigger the handlePhotoChange logic
+                                                            const formData = new FormData();
+                                                            formData.append("profile_photo", file);
+
+                                                            let popupId: string = "";
+                                                            try {
+                                                                setUploadingPhoto(true);
+                                                                popupId = triggerPopup("Updating photo...", "loading");
+                                                                const res = await DashboardService.updateProfileImage(formData);
+                                                                if (res.profile_image_url || res.status === "success") {
+                                                                    setImageTimestamp(Date.now());
+                                                                    await refreshProfileData();
+                                                                    triggerPopup("Photo updated!", "success", popupId);
+                                                                }
+                                                            } catch (err) {
+                                                                triggerPopup("Upload failed", "error");
+                                                            } finally {
+                                                                setUploadingPhoto(false);
+                                                            }
+                                                        }}
+                                                    />
+                                                )}
+                                                <div>
+                                                    <h2 className="text-xl font-sans font-medium text-slate-800">{profile.name}</h2>
+                                                    <p className="text-[12px] font-bold uppercase text-[#1CADA3] tracking-widest mt-1">Partner ID: {profile.adv_id}</p>
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-1 gap-4">
+                                                <div><p className="text-[10px] font-black text-slate-400 uppercase">Mobile Number</p><p className="font-medium text-md text-slate-800 text-sm">{profile.mobile}</p></div>
+                                                <div><p className="text-[10px] font-black text-slate-400 uppercase">Email</p><p className="font-medium text-md text-slate-800 truncate text-sm">{profile.email}</p></div>
+                                                <div><p className="text-[10px] font-black text-slate-400 uppercase">Location</p><p className="font-medium text-slate-800 text-sm">{kyc?.aadhaar_kyc_data?.full_address || `${profile.city}, ${profile.state}`}</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-6 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 border border-slate-100 shadow-xl shadow-slate-200/40">
+                                        <h4 className="text-[13px] font-bold uppercase text-[#ffffff] tracking-widest mb-2">Referral Program</h4>
+                                        <p className="text-[13px] font-sans text-white font-medium mb-6">Invite your partners to this platform.</p>
+
+                                        <div className="space-y-4">
+                                            {!referralLink && !profile.referral_code ? (
+                                                <button
+                                                    onClick={handleGenerateReferral}
+                                                    disabled={isGeneratingLink}
+                                                    className="w-full py-3.5 bg-white text-[#1CADA3] rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 hover:opacity-90 transition-colors disabled:opacity-50"
+                                                >
+                                                    {isGeneratingLink ? <Loader2 className="animate-spin" size={16} /> : <Globe size={16} />}
+                                                    Generate Referral Link
+                                                </button>
+                                            ) : (
+                                                <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
+                                                    {/* Updated Link Field with Integrated Copy Icon */}
+                                                    <div className="p-3 bg-white rounded-xl border border-slate-100 flex items-center gap-3">
+                                                        <div className="flex-1 min-w-0">
+                                                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide block mb-0.5">Your Referral Code</span>
+                                                            <p className="text-[16px] font-mono font-medium text-slate-600 truncate">
+                                                                {referralCode}
+                                                            </p>
+                                                        </div>
+                                                        <button
+                                                            onClick={handleCopyReferral}
+                                                            className="p-2 text-slate-400 hover:text-[#1CADA3] hover:bg-white rounded-lg transition-all active:scale-90 border border-transparent hover:border-slate-100 shadow-sm"
+                                                            title="Copy Link"
+                                                        >
+                                                            <Copy size={16} />
+                                                        </button>
+                                                        <button
+                                                            disabled={isGeneratingLink}
+                                                            onClick={handleShareReferral}
+                                                            className="p-3 bg-[#1CADA3] text-white rounded-xl hover:opacity-90 transition-all flex items-center justify-center disabled:opacity-50"
+                                                            aria-label="Share"
+                                                        >
+                                                            {isGeneratingLink ? <Loader2 size={20} className="animate-spin" /> : <Share2 size={20} />}
+                                                        </button>
+                                                    </div>
+
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {/* <div className="mt-4 bg-white rounded-[24px] p-4 border border-slate-100 shadow-lg shadow-slate-200/40">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                                                <AlertCircle size={20} />
                                             </div>
                                             <div>
-                                                <h2 className="text-xl font-sans font-medium text-slate-800">{profile.name}</h2>
-                                                <p className="text-[12px] font-bold uppercase text-[#1CADA3] tracking-widest mt-1">Partner ID: {profile.adv_id}</p>
+                                                <p className="text-[12px] font-black text-slate-800 uppercase tracking-tight">Need Support?</p>
+                                                <p className="text-[10px] font-bold text-slate-400">Having trouble with KYC?</p>
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-1 gap-4">
-                                            <div><p className="text-[10px] font-black text-slate-400 uppercase">Mobile Number</p><p className="font-medium text-md text-slate-800 text-sm">{profile.mobile}</p></div>
-                                            <div><p className="text-[10px] font-black text-slate-400 uppercase">Email</p><p className="font-medium text-md text-slate-800 truncate text-sm">{profile.email}</p></div>
-                                            <div><p className="text-[10px] font-black text-slate-400 uppercase">Location</p><p className="font-medium text-slate-800 text-sm">{kyc?.aadhaar_kyc_data?.full_address || `${profile.city}, ${profile.state}`}</p></div>
-                                        </div>
+                                        <button
+                                            onClick={() => router.push('/dashboard/helpSupport')}
+                                            className="px-4 py-2 bg-slate-800 text-white rounded-xl font-bold text-[11px] hover:bg-slate-700 transition-all active:scale-95"
+                                        >
+                                            Raise Ticket
+                                        </button>
                                     </div>
+                                </div> */}
                                 </div>
-                                <div className="mt-6 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 border border-slate-100 shadow-xl shadow-slate-200/40">
-                                    <h4 className="text-[13px] font-bold uppercase text-[#ffffff] tracking-widest mb-2">Referral Program</h4>
-                                    <p className="text-[13px] font-sans text-white font-medium mb-6">Invite your partners to this platform.</p>
 
-                                    <div className="space-y-4">
-                                        {!referralLink && !profile.referral_code ? (
-                                            <button
-                                                onClick={handleGenerateReferral}
-                                                disabled={isGeneratingLink}
-                                                className="w-full py-3.5 bg-white text-[#1CADA3] rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 hover:opacity-90 transition-colors disabled:opacity-50"
-                                            >
-                                                {isGeneratingLink ? <Loader2 className="animate-spin" size={16} /> : <Globe size={16} />}
-                                                Generate Referral Link
-                                            </button>
-                                        ) : (
-                                            <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
-                                                {/* Updated Link Field with Integrated Copy Icon */}
-                                                <div className="p-3 bg-white rounded-xl border border-slate-100 flex items-center gap-3">
-                                                    <div className="flex-1 min-w-0">
-                                                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide block mb-0.5">Your Referral Code</span>
-                                                        <p className="text-[16px] font-mono font-medium text-slate-600 truncate">
-                                                            {referralCode}
-                                                        </p>
-                                                    </div>
-                                                    <button
-                                                        onClick={handleCopyReferral}
-                                                        className="p-2 text-slate-400 hover:text-[#1CADA3] hover:bg-white rounded-lg transition-all active:scale-90 border border-transparent hover:border-slate-100 shadow-sm"
-                                                        title="Copy Link"
-                                                    >
-                                                        <Copy size={16} />
-                                                    </button>
-                                                    <button
-                                                        disabled={isGeneratingLink}
-                                                        onClick={handleShareReferral}
-                                                        className="p-3 bg-[#1CADA3] text-white rounded-xl hover:opacity-90 transition-all flex items-center justify-center disabled:opacity-50"
-                                                        aria-label="Share"
-                                                    >
-                                                        {isGeneratingLink ? <Loader2 size={20} className="animate-spin" /> : <Share2 size={20} />}
-                                                    </button>
-                                                </div>
-
+                                <div className="lg:col-span-8 bg-white rounded-[24px] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+                                    <div className="h-1.5 w-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3]" />
+                                    <div className="p-5 sm:p-7 space-y-8">
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1 h-4 bg-[#2076C7] rounded-full" />
+                                                <label className="text-[14px] font-bold uppercase text-slate-600 tracking-wide">Main Expertise</label>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="lg:col-span-8 bg-white rounded-[24px] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
-                                <div className="h-1.5 w-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3]" />
-                                <div className="p-5 sm:p-7 space-y-8">
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-1 h-4 bg-[#2076C7] rounded-full" />
-                                            <label className="text-[14px] font-bold uppercase text-slate-600 tracking-wide">Main Expertise</label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {Object.keys(CATEGORY_MAP).map((head) => {
+                                                    const isActive = selectedHeads.includes(head);
+                                                    return (
+                                                        <button key={head} onClick={() => toggleHead(head)} className={`px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-[12px] font-bold border transition-all ${isActive ? "bg-[#2076C7] border-[#2076C7] text-white shadow-md shadow-blue-100" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"}`}>
+                                                            {head}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {Object.keys(CATEGORY_MAP).map((head) => {
-                                                const isActive = selectedHeads.includes(head);
-                                                return (
-                                                    <button key={head} onClick={() => toggleHead(head)} className={`px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-[12px] font-bold border transition-all ${isActive ? "bg-[#2076C7] border-[#2076C7] text-white shadow-md shadow-blue-100" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"}`}>
-                                                        {head}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-3">
-                                        {selectedHeads.filter((head) => head && CATEGORY_MAP[head]).map((head) => (
-                                            <div key={head} className="flex flex-col sm:flex-row sm:items-start gap-3 p-3 rounded-xl bg-white border border-slate-100">
+                                        <div className="space-y-3">
+                                            {selectedHeads.filter((head) => head && CATEGORY_MAP[head]).map((head) => (
+                                                <div key={head} className="flex flex-col sm:flex-row sm:items-start gap-3 p-3 rounded-xl bg-white border border-slate-100">
 
-                                                <div className="flex flex-wrap gap-1.5">
-                                                    <div className="min-w-full sm:min-w-full pt-1">
-                                                        <p className="text-[11px] sm:text-[14px] font-bold text-gray-600 uppercase mb-3 tracking-wide">{head} Categories</p>
-                                                    </div>
-                                                    {CATEGORY_MAP[head].map((cat) => (
-                                                        <button
-                                                            key={cat}
-                                                            // 1. Disable click logic
-                                                            onClick={isEditing ? () => toggleCategory(cat) : undefined}
-                                                            className={`px-3 py-1.5 rounded-md text-[10px] sm:text-[14px] font-medium transition-all 
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        <div className="min-w-full sm:min-w-full pt-1">
+                                                            <p className="text-[11px] sm:text-[14px] font-bold text-gray-600 uppercase mb-3 tracking-wide">{head} Categories</p>
+                                                        </div>
+                                                        {CATEGORY_MAP[head].map((cat) => (
+                                                            <button
+                                                                key={cat}
+                                                                // 1. Disable click logic
+                                                                onClick={isEditing ? () => toggleCategory(cat) : undefined}
+                                                                className={`px-3 py-1.5 rounded-md text-[10px] sm:text-[14px] font-medium transition-all 
                                                             ${selectedCats.includes(cat)
-                                                                    ? "bg-blue-100 text-gray-700"
-                                                                    : "bg-white text-slate-600 border border-slate-200"
-                                                                }
+                                                                        ? "bg-blue-100 text-gray-700"
+                                                                        : "bg-white text-slate-600 border border-slate-200"
+                                                                    }
                                                                 // 2. Visual difference: Lock hover effects and change opacity
                                                                 ${!isEditing
-                                                                    ? "opacity-80 cursor-default border-dashed"
-                                                                    : "hover:border-[#1CADA3] cursor-pointer"
-                                                                }
+                                                                        ? "opacity-80 cursor-default border-dashed"
+                                                                        : "hover:border-[#1CADA3] cursor-pointer"
+                                                                    }
                                                             `}
-                                                        >
-                                                            {cat}
-                                                        </button>
-                                                    ))}
+                                                            >
+                                                                {cat}
+                                                            </button>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="mt-3 space-y-2">
-                                        <label className="text-[14px] font-bold text-slate-600 uppercase tracking-wider block">
-                                            Current Address
-                                        </label>
-                                        <textarea
-                                            disabled={!isEditing}
-                                            value={profile.address || ""}
-                                            onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                                            rows={1}
-                                            className={`w-full border rounded-xl px-4 py-2.5 text-[14px] font-bold outline-none transition-all resize-none 
-                                                ${!isEditing
-                                                    ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed'
-                                                    : 'bg-white border-slate-300 text-slate-700 focus:border-[#2076C7] shadow-sm'
-                                                }`}
-                                            placeholder="Enter your full current address"
-                                        />
-                                    </div>
-                                    <div className="pt-3 border-t border-slate-100">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-                                            {/* Password Input Field */}
-                                            <div className="mt-3 space-y-2">
-                                                <label className="text-[14px] font-bold text-slate-600 uppercase tracking-wider block">Update Password</label>
-                                                <div className="relative">
-                                                    <input
-                                                        type={showPassword ? "text" : "password"}
-                                                        disabled={!isEditing}
-                                                        value={profile.password || ""}
-                                                        onChange={(e) => setProfile({ ...profile, password: e.target.value })}
-                                                        className={`w-full border rounded-xl px-4 py-2.5 text-xs font-bold outline-none transition-all 
-                                                            ${!isEditing
-                                                                ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed select-none' // Clearly locked
-                                                                : 'bg-white border-slate-300 text-slate-700 focus:border-[#2076C7] shadow-sm'
-                                                            }`}
-                                                        placeholder={`${!isEditing ? '••••••••' : ''}`}
-                                                    />
-                                                    <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
-                                                </div>
-                                            </div>
+                                            ))}
+                                        </div>
+                                        <div className="mt-3 space-y-2">
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                                <label className="text-[14px] font-bold text-slate-600 uppercase tracking-wider block">
+                                                    Current Address <span className="text-[12px] text-slate-500">(optional)</span>
+                                                </label>
 
-                                            {/* Buttons Container */}
-                                            <div className="h-[42px]">
-                                                {!isEditing ? (
-                                                    /* --- EDIT BUTTON (Full Width) --- */
-                                                    <button
-                                                        onClick={() => setIsEditing(true)}
-                                                        className="w-full h-full px-6 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-200/50 flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all"
-                                                    >
-                                                        <Pencil size={18} />
-                                                        <span>Edit Profile</span>
-                                                    </button>
-                                                ) : (
-                                                    /* --- CANCEL & SAVE BUTTONS (Side by Side) --- */
-                                                    <div className="flex gap-3 h-full animate-in fade-in slide-in-from-right-4 duration-300">
-                                                        <button
-                                                            onClick={() => {
-                                                                setIsEditing(false);
-                                                                refreshProfileData(); // Reverts local changes by re-fetching
-                                                            }}
-                                                            className="flex-1 px-4 bg-white border border-slate-200 text-slate-500 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
-                                                        >
-                                                            <X size={18} />
-                                                            <span>Cancel</span>
-                                                        </button>
-
-                                                        <button
-                                                            disabled={saving}
-                                                            onClick={async () => {
-                                                                setSaving(true);
-                                                                try {
-                                                                    const { address, ...otherData } = profile;
-                                                                    const payload = {
-                                                                        ...otherData,
-                                                                        current_address: address
-                                                                    };
-                                                                    await DashboardService.editProfile(payload);
-
-                                                                    triggerPopup("Profile Updated!", "success");
-                                                                    setIsEditing(false);
-                                                                } catch (e) {
-                                                                    triggerPopup("Update failed", "error");
-                                                                } finally {
-                                                                    setSaving(false);
+                                                {/* Same as Permanent Address Checkbox */}
+                                                {isEditing && (
+                                                    <label className="flex items-center gap-2 cursor-pointer group">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isAddressSame}
+                                                            onChange={(e) => {
+                                                                const checked = e.target.checked;
+                                                                setIsAddressSame(checked);
+                                                                if (checked) {
+                                                                    const aadhaarAddr = kyc?.aadhaar_kyc_data?.full_address ?? "";
+                                                                    setProfile(prev => prev ? {
+                                                                        ...prev,
+                                                                        address: aadhaarAddr
+                                                                    } : null);
                                                                 }
                                                             }}
-                                                            className="flex-[1.5] px-6 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-200/50 flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all"
-                                                        >
-                                                            {saving ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
-                                                            <span>Save Changes</span>
-                                                        </button>
-                                                    </div>
+                                                            className="w-4 h-4 rounded border-slate-300 text-[#2076C7] focus:ring-[#2076C7]"
+                                                        />
+                                                        <span className="text-[12px] font-bold text-slate-500 group-hover:text-slate-700 transition-colors">
+                                                            Same as Permanent Address
+                                                        </span>
+                                                    </label>
                                                 )}
+                                            </div>
+
+                                            <textarea
+                                                disabled={!isEditing || isAddressSame} // Disable if not editing OR if synced with Aadhaar
+                                                value={profile.address || ""}
+                                                onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                                                rows={1}
+                                                className={`w-full border rounded-xl px-4 py-2.5 text-[14px] font-bold outline-none transition-all resize-none 
+                                            ${(!isEditing || isAddressSame)
+                                                        ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed'
+                                                        : 'bg-white border-slate-300 text-slate-700 focus:border-[#2076C7] shadow-sm'
+                                                    }`}
+                                                placeholder={isAddressSame ? "Address synced from Aadhaar" : "Enter your full current address"}
+                                            />
+                                        </div>
+                                        <div className="pt-3 border-t border-slate-100">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                                                {/* Password Input Field */}
+                                                <div className="mt-3 space-y-2">
+                                                    <label className="text-[14px] font-bold text-slate-600 uppercase tracking-wider block">Update Password</label>
+                                                    <div className="relative">
+                                                        <input
+                                                            type={showPassword ? "text" : "password"}
+                                                            disabled={!isEditing}
+                                                            value={profile.password || ""}
+                                                            onChange={(e) => setProfile({ ...profile, password: e.target.value })}
+                                                            className={`w-full border rounded-xl px-4 py-2.5 text-xs font-bold outline-none transition-all 
+                                                            ${!isEditing
+                                                                    ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed select-none' // Clearly locked
+                                                                    : 'bg-white border-slate-300 text-slate-700 focus:border-[#2076C7] shadow-sm'
+                                                                }`}
+                                                            placeholder={`${!isEditing ? '••••••••' : ''}`}
+                                                        />
+                                                        <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Buttons Container */}
+                                                <div className="h-[42px]">
+                                                    {!isEditing ? (
+                                                        /* --- EDIT BUTTON (Full Width) --- */
+                                                        <button
+                                                            onClick={() => setIsEditing(true)}
+                                                            className="w-full h-full px-6 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-200/50 flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all"
+                                                        >
+                                                            <Pencil size={18} />
+                                                            <span>Edit Profile</span>
+                                                        </button>
+                                                    ) : (
+                                                        /* --- CANCEL & SAVE BUTTONS (Side by Side) --- */
+                                                        <div className="flex gap-3 h-full animate-in fade-in slide-in-from-right-4 duration-300">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setIsEditing(false);
+                                                                    setIsAddressSame(false);
+                                                                    refreshProfileData();
+                                                                }}
+                                                                className="flex-1 px-4 bg-white border border-slate-200 text-slate-500 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
+                                                            >
+                                                                <X size={18} />
+                                                                <span>Cancel</span>
+                                                            </button>
+
+                                                            <button
+                                                                disabled={saving}
+                                                                onClick={async () => {
+                                                                    setSaving(true);
+                                                                    try {
+                                                                        const { address, ...otherData } = profile;
+                                                                        const payload = {
+                                                                            ...otherData,
+                                                                            current_address: address
+                                                                        };
+                                                                        await DashboardService.editProfile(payload);
+
+                                                                        triggerPopup("Profile Updated!", "success");
+                                                                        setIsEditing(false);
+                                                                    } catch (e) {
+                                                                        triggerPopup("Update failed", "error");
+                                                                    } finally {
+                                                                        setSaving(false);
+                                                                    }
+                                                                }}
+                                                                className="flex-[1.5] px-6 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-200/50 flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all"
+                                                            >
+                                                                {saving ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
+                                                                <span>Save Changes</span>
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </section>
-                )}
+                        </section>
+                    )}
 
-                <section id="step-1" className="transition-all duration-500 scroll-mt-10">
-                    <div className="sticky top-0 z-30 bg-[#F8FAFC] py-4 sm:py-6 flex items-center justify-center gap-3 sm:gap-4 mb-2 border-b border-slate-100/50">
-                        <span className={`px-3 sm:px-4 py-1.5 rounded-full flex items-center justify-center font-black text-[9px] sm:text-[10px] uppercase tracking-widest text-white ${isStep1Complete ? "bg-emerald-500" : "bg-[#2076C7]"}`}>Step 1</span>
-                        <h2 className="text-lg sm:text-xl font-bold text-slate-800 text-center">Mobile & Email Verification</h2>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 bg-white p-5 sm:p-8 rounded-[24px] sm:rounded-[32px] shadow-sm">
-                        <div className="space-y-4">
-                            <label className="text-[11px] font-bold uppercase text-slate-500 tracking-widest">Phone Number</label>
-                            <div className="relative">
-                                <input disabled value={profile.mobile} className="w-full px-4 sm:px-5 py-3 sm:py-3 rounded-xl font-sans sm:rounded-2xl font-bold text-slate-700 bg-white border-1 border-slate-200 text-[14px]" />
-                                <div className="absolute right-4 inset-y-0 flex items-center">
-                                    {mobileVerified ? <CheckCircle2 className="text-emerald-500" size={18} /> : <AlertCircle className="text-amber-500" size={18} />}
-                                </div>
-                            </div>
+                    <section id="step-1" className="transition-all duration-500 scroll-mt-10">
+                        <div className="sticky top-0 z-30 bg-[#F8FAFC] py-4 sm:py-6 flex items-center justify-center gap-3 sm:gap-4 mb-2 border-b border-slate-100/50">
+                            <span className={`px-3 sm:px-4 py-1.5 rounded-full flex items-center justify-center font-black text-[9px] sm:text-[10px] uppercase tracking-widest text-white ${isStep1Complete ? "bg-emerald-500" : "bg-[#2076C7]"}`}>Step 1</span>
+                            <h2 className="text-lg sm:text-xl font-bold text-slate-800 text-center">Mobile & Email Verification</h2>
                         </div>
-                        <div className="space-y-4">
-                            <label className="text-[11px] font-bold uppercase text-slate-500 tracking-widest">Email Address</label>
-                            <div className="flex flex-col sm:flex-row gap-2">
-                                <div className="relative flex-1">
-                                    <input disabled value={profile.email} className="w-full px-4 sm:px-5 sm:pr-10 py-3 sm:py-3 font-sans rounded-xl sm:rounded-2xl font-bold text-slate-700 bg-white border-1 border-slate-200 text-sm truncate" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 bg-white p-5 sm:p-8 rounded-[24px] sm:rounded-[32px] shadow-sm">
+                            <div className="space-y-4">
+                                <label className="text-[11px] font-bold uppercase text-slate-500 tracking-widest">Phone Number</label>
+                                <div className="relative">
+                                    <input disabled value={profile.mobile} className="w-full px-4 sm:px-5 py-3 sm:py-3 rounded-xl font-sans sm:rounded-2xl font-bold text-slate-700 bg-white border-1 border-slate-200 text-[14px]" />
                                     <div className="absolute right-4 inset-y-0 flex items-center">
-                                        {emailVerified ? <CheckCircle2 className="text-emerald-500" size={18} /> : <AlertCircle className="text-amber-500" size={18} />}
+                                        {mobileVerified ? <CheckCircle2 className="text-emerald-500" size={18} /> : <AlertCircle className="text-amber-500" size={18} />}
                                     </div>
                                 </div>
-                                {!emailVerified && !emailOtpSent && (
-                                    <button
-                                        onClick={handleSendEmailOtp}
-                                        className="w-full sm:w-auto px-4 py-1.5 bg-[#1CADA3] text-white font-bold rounded-lg text-xs hover:bg-[#158f87] transition-colors self-center"
-                                    >
-                                        Verify
-                                    </button>
-                                )}
                             </div>
-                            {emailOtpSent && !emailVerified && (
-                                <div className="flex flex-col sm:flex-row gap-2 items-center animate-in slide-in-from-top-2 text-gray-700 mt-2">
-                                    <input
-                                        placeholder="Enter OTP"
-                                        value={emailOtpInput}
-                                        onChange={(e) => setEmailOtpInput(e.target.value)}
-                                        className="flex-1 w-full px-4 py-2 border border-slate-200 rounded-lg font-bold text-sm"
-                                    />
-                                    <button
-                                        onClick={handleVerifyEmailOtp}
-                                        className="w-full sm:w-auto px-4 py-2 text-xs bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors"
-                                    >
-                                        Verify OTP
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </section>
-
-                {/* STEP 2: IDENTITY (PAN & AADHAAR) */}
-                <section id="step-2" className="transition-all duration-500 scroll-mt-10 relative">
-                    {!isStep1Complete && (
-                        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/10 backdrop-blur-[1px]">
-                            <div className="bg-white px-4 py-2 rounded-lg shadow-xl border flex items-center gap-2 font-bold text-xs text-slate-600">
-                                <Lock size={14} /> Complete Step 1 to Unlock
-                            </div>
-                        </div>
-                    )}
-                    <div className="sticky top-0 z-30 bg-[#F8FAFC] py-3 sm:py-4 flex items-center justify-center gap-3 mb-2 border-b border-slate-100/50">
-                        <span className={`px-3 py-1 rounded-full flex items-center justify-center font-black text-[9px] uppercase tracking-widest text-white ${isStep2Complete ? "bg-emerald-500" : "bg-[#2076C7]"}`}>
-                            Step 2
-                        </span>
-                        <h2 className="text-lg sm:text-xl font-bold text-slate-800">KYC Verification</h2>
-                    </div>
-
-                    <div className="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 space-y-4">
-
-                        {/* Aadhaar Block */}
-                        <div className="p-4 bg-white rounded-xl border border-slate-100">
-                            <div className="flex justify-between items-center mb-3">
-                                <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Aadhaar Verification</h4>
-                                {aadhaarVerified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
-                            </div>
-                            <div className="flex flex-col gap-3">
+                            <div className="space-y-4">
+                                <label className="text-[11px] font-bold uppercase text-slate-500 tracking-widest">Email Address</label>
                                 <div className="flex flex-col sm:flex-row gap-2">
-                                    <input
-                                        disabled={aadhaarVerified}
-                                        value={aadhaarVerified ? maskAadhaar(profile.aadhaar || "") : profile.aadhaar}
-                                        onChange={(e) => setProfile({ ...profile, aadhaar: e.target.value })}
-                                        className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
-                                        placeholder="12 Digit Aadhaar Number"
-                                        maxLength={12}
-                                    />
-                                    {!aadhaarVerified && (
-                                        <button onClick={handleRequestAadhaarOtp} className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs">
-                                            Get OTP
+                                    <div className="relative flex-1">
+                                        <input disabled value={profile.email} className="w-full px-4 sm:px-5 sm:pr-10 py-3 sm:py-3 font-sans rounded-xl sm:rounded-2xl font-bold text-slate-700 bg-white border-1 border-slate-200 text-sm truncate" />
+                                        <div className="absolute right-4 inset-y-0 flex items-center">
+                                            {emailVerified ? <CheckCircle2 className="text-emerald-500" size={18} /> : <AlertCircle className="text-amber-500" size={18} />}
+                                        </div>
+                                    </div>
+                                    {!emailVerified && !emailOtpSent && (
+                                        <button
+                                            onClick={handleSendEmailOtp}
+                                            className="w-full sm:w-auto px-4 py-1.5 bg-[#1CADA3] text-white font-bold rounded-lg text-xs hover:bg-[#158f87] transition-colors self-center"
+                                        >
+                                            Verify
                                         </button>
                                     )}
                                 </div>
-                                {aadhaarOtpSent && !aadhaarVerified && (
-                                    <div className="flex flex-col sm:flex-row gap-2 animate-in slide-in-from-top-2">
+                                {emailOtpSent && !emailVerified && (
+                                    <div className="flex flex-col sm:flex-row gap-2 items-center animate-in slide-in-from-top-2 text-gray-700 mt-2">
                                         <input
-                                            placeholder="Enter Aadhaar OTP"
-                                            value={aadhaarOtpInput}
-                                            onChange={(e) => setAadhaarOtpInput(e.target.value)}
-                                            className="flex-1 px-3 py-2 border border-[#1CADA3] text-slate-700 rounded-lg font-bold text-sm outline-none"
+                                            placeholder="Enter OTP"
+                                            value={emailOtpInput}
+                                            onChange={(e) => setEmailOtpInput(e.target.value)}
+                                            className="flex-1 w-full px-4 py-2 border border-slate-200 rounded-lg font-bold text-sm"
                                         />
-                                        <button onClick={handleVerifyAadhaarOtp} className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-xs">
+                                        <button
+                                            onClick={handleVerifyEmailOtp}
+                                            className="w-full sm:w-auto px-4 py-2 text-xs bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors"
+                                        >
                                             Verify OTP
                                         </button>
                                     </div>
                                 )}
                             </div>
                         </div>
+                    </section>
 
-                        {/* PAN Block */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-white rounded-xl border border-slate-100">
-                            <div className="md:col-span-3 flex justify-between items-center">
-                                <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Permanent Account Number (PAN)</h4>
-                                {profile.pan_verified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
-                            </div>
-
-                            <input
-                                disabled={profile.pan_verified}
-                                value={profile.pan_verified ? maskPAN(profile.pan || "") : profile.pan || ""}
-                                onChange={(e) => setProfile({ ...profile, pan: e.target.value.toUpperCase() })}
-                                className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50"
-                                placeholder="PAN Number"
-                            />
-
-                            <input
-                                disabled={profile.pan_verified}
-                                value={
-                                    profile.pan_verified
-                                        ? (profile.name?.toUpperCase() || "")
-                                        : (profile.name_as_per_pan || "")
-                                }
-                                onChange={(e) => setProfile({ ...profile, name_as_per_pan: e.target.value.toUpperCase() })}
-
-                                className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50 disabled:text-slate-600"
-                                placeholder="Name as per PAN"
-                            />
-
-                            <div className="flex gap-2">
-                                <input
-                                    type="date"
-                                    disabled={profile.pan_verified}
-                                    // Changed: Always show the state value so the user can see what they are typing
-                                    value={profile.date_of_birth || ""}
-                                    onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
-                                    className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none disabled:bg-slate-50"
-                                />
-                                {!profile.pan_verified && (
-                                    <button
-                                        onClick={handlePanVerification}
-                                        className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-[#158f87]"
-                                    >
-                                        Verify
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        {profile.pan_verified && aadhaarVerified && (
-                            <div className="mt-2">
-                                {panAadhaarLinked === true ? (
-                                    <div className="flex items-center gap-2 p-2 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-[11px] font-bold">
-                                        <CheckCircle2 size={12} /> PAN Aadhaar is linked
-                                    </div>
-                                ) : (
-                                    <div className="space-y-2">
-                                        <button onClick={handleCheckPanAadhaarLink} className="w-full py-2 mt-5 mb-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2">
-                                            <ShieldCheck size={12} /> Check Aadhaar PAN link status
-                                        </button>
-                                        <div className="flex items-start gap-2 p-3 bg-amber-50 border mb-5 border-amber-100 rounded-xl text-amber-700 text-[11px] font-bold leading-tight">
-                                            <AlertCircle size={12} className="shrink-0" />
-                                            <span>Note: Payout requires linked PAN-Aadhaar</span>
-                                        </div>
-                                    </div>
-                                )}
+                    {/* STEP 2: IDENTITY (PAN & AADHAAR) */}
+                    <section id="step-2" className="transition-all duration-500 scroll-mt-10 relative">
+                        {!isStep1Complete && (
+                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/10 backdrop-blur-[1px]">
+                                <div className="bg-white px-4 py-2 rounded-lg shadow-xl border flex items-center gap-2 font-bold text-xs text-slate-600">
+                                    <Lock size={14} /> Complete Step 1 to Unlock
+                                </div>
                             </div>
                         )}
+                        <div className="sticky top-0 z-30 bg-[#F8FAFC] py-3 sm:py-4 flex items-center justify-center gap-3 mb-2 border-b border-slate-100/50">
+                            <span className={`px-3 py-1 rounded-full flex items-center justify-center font-black text-[9px] uppercase tracking-widest text-white ${isStep2Complete ? "bg-emerald-500" : "bg-[#2076C7]"}`}>
+                                Step 2
+                            </span>
+                            <h2 className="text-lg sm:text-xl font-bold text-slate-800">KYC Verification</h2>
+                        </div>
 
-                        {/* GST Block */}
-                        <div className="p-4 bg-white rounded-xl border border-slate-100">
-                            <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider mb-3">GST Details (Optional)</h4>
-                            <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 space-y-4">
+
+                            {/* Aadhaar Block */}
+                            <div className="p-4 bg-white rounded-xl border border-slate-100">
+                                <div className="flex justify-between items-center mb-3">
+                                    <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Aadhaar Verification</h4>
+                                    {aadhaarVerified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
+                                </div>
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex flex-col sm:flex-row gap-2">
+                                        <input
+                                            disabled={aadhaarVerified}
+                                            value={aadhaarVerified ? maskAadhaar(profile.aadhaar || "") : profile.aadhaar}
+                                            onChange={(e) => setProfile({ ...profile, aadhaar: e.target.value })}
+                                            className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
+                                            placeholder="12 Digit Aadhaar Number"
+                                            maxLength={12}
+                                        />
+                                        {!aadhaarVerified && (
+                                            <button onClick={handleRequestAadhaarOtp} className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs">
+                                                Get OTP
+                                            </button>
+                                        )}
+                                    </div>
+                                    {aadhaarOtpSent && !aadhaarVerified && (
+                                        <div className="flex flex-col sm:flex-row gap-2 animate-in slide-in-from-top-2">
+                                            <input
+                                                placeholder="Enter Aadhaar OTP"
+                                                value={aadhaarOtpInput}
+                                                onChange={(e) => setAadhaarOtpInput(e.target.value)}
+                                                className="flex-1 px-3 py-2 border border-[#1CADA3] text-slate-700 rounded-lg font-bold text-sm outline-none"
+                                            />
+                                            <button onClick={handleVerifyAadhaarOtp} className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-xs">
+                                                Verify OTP
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* PAN Block */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-white rounded-xl border border-slate-100">
+                                <div className="md:col-span-3 flex justify-between items-center">
+                                    <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Permanent Account Number (PAN)</h4>
+                                    {profile.pan_verified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
+                                </div>
+
                                 <input
-                                    disabled={gstVerified}
-                                    value={profile.gst_number || ""}
-                                    onChange={(e) => setProfile({ ...profile, gst_number: e.target.value.toUpperCase() })}
-                                    className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
-                                    placeholder="GST Number"
+                                    disabled={profile.pan_verified}
+                                    value={profile.pan_verified ? maskPAN(profile.pan || "") : profile.pan || ""}
+                                    onChange={(e) => setProfile({ ...profile, pan: e.target.value.toUpperCase() })}
+                                    className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50"
+                                    placeholder="PAN Number"
                                 />
-                                {!gstVerified ? (
-                                    <button onClick={handleGstVerification} className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs">
-                                        Verify
-                                    </button>
-                                ) : (
-                                    <span className="bg-emerald-100 text-emerald-600 px-4 py-2 rounded-lg font-black text-[10px] flex items-center justify-center">VERIFIED</span>
-                                )}
-                            </div>
-                            <div className="flex items-start gap-2 p-3 mt-4 bg-amber-50 border border-amber-100 rounded-xl text-amber-700 text-[12px] sm:text-[11px] font-bold leading-relaxed">
-                                <AlertCircle size={14} className="mt-0.5 shrink-0 text-amber-500" />
-                                <span>Note: GST verification is mandatory if total payout exceeds ₹20 lakh in a financial year.</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
 
-                <section id="step-3" className="transition-all duration-500 scroll-mt-10 relative">
-                    {!isStep2Complete && (
-                        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/10 backdrop-blur-[1px]">
-                            <div className="bg-white px-4 py-2 rounded-lg shadow-xl border flex items-center gap-2 font-bold text-xs text-slate-600">
-                                <Lock size={14} /> Complete Step 2
+                                <input
+                                    disabled={profile.pan_verified}
+                                    value={
+                                        profile.pan_verified
+                                            ? (profile.name?.toUpperCase() || "")
+                                            : (profile.name_as_per_pan || "")
+                                    }
+                                    onChange={(e) => setProfile({ ...profile, name_as_per_pan: e.target.value.toUpperCase() })}
+
+                                    className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50 disabled:text-slate-600"
+                                    placeholder="Name as per PAN"
+                                />
+
+                                <div className="flex gap-2">
+                                    <input
+                                        type="date"
+                                        disabled={profile.pan_verified}
+                                        // Changed: Always show the state value so the user can see what they are typing
+                                        value={profile.date_of_birth || ""}
+                                        onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
+                                        className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none disabled:bg-slate-50"
+                                    />
+                                    {!profile.pan_verified && (
+                                        <button
+                                            onClick={handlePanVerification}
+                                            className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-[#158f87]"
+                                        >
+                                            Verify
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    )}
 
-                    <div className="sticky top-0 z-30 bg-[#F8FAFC] py-3 sm:py-4 flex items-center justify-center gap-3 mb-2 border-b border-slate-100/50">
-                        <span className={`px-3 py-1 rounded-full flex items-center justify-center font-black text-[9px] uppercase tracking-widest text-white ${isStep3Complete ? "bg-emerald-500" : "bg-[#2076C7]"}`}>
-                            Step 3
-                        </span>
-                        <h2 className="text-lg sm:text-xl font-bold text-slate-800 text-center">Bank Payout Setup</h2>
-                    </div>
-
-                    <div className="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
-                        <div className="flex justify-between items-center mb-2 px-1">
-                            <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Bank Account Details</h4>
-                            {bankVerified && (
-                                <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 text-emerald-600 px-2.5 py-1 rounded-full">
-                                    <CheckCircle2 size={12} className="shrink-0" />
-                                    <span className="text-[10px] font-black uppercase tracking-tight">Verified</span>
+                            {profile.pan_verified && aadhaarVerified && (
+                                <div className="mt-2">
+                                    {panAadhaarLinked === true ? (
+                                        <div className="flex items-center gap-2 p-2 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-[11px] font-bold">
+                                            <CheckCircle2 size={12} /> PAN Aadhaar is linked
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2 animate-pulse"> {/* Added animate-pulse here */}
+                                            <button onClick={handleCheckPanAadhaarLink} className="w-full py-3 mt-5 mb-3 bg-[#1CADA3] border border-slate-200 text-white rounded-xl text-[14px] font-bold flex items-center justify-center gap-2">
+                                                <ShieldCheck size={12} /> Check Aadhaar PAN link status
+                                            </button>
+                                            <div className="flex items-start gap-2 p-3 bg-amber-50 border mb-5 border-amber-100 rounded-xl text-amber-700 text-[12px] font-bold leading-tight">
+                                                <AlertCircle size={12} className="shrink-0" />
+                                                <span>Note: Payout requires linked PAN-Aadhaar</span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Bank Name</label>
-                                <input
-                                    disabled={bankVerified}
-                                    value={profile.bank_name || ""}
-                                    onChange={(e) => setProfile({ ...profile, bank_name: e.target.value.toUpperCase() })}
-                                    className="w-full px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border-1 border-gray-300 focus:border-[#2076C7] outline-none transition-all text-sm"
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Account Number</label>
-                                <input
-                                    disabled={bankVerified}
-                                    value={bankVerified ? maskAccount(profile.bank_account || "") : profile.bank_account}
-                                    onChange={(e) => setProfile({ ...profile, bank_account: e.target.value })}
-                                    className="w-full px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border-1 border-gray-300 focus:border-[#2076C7] outline-none transition-all text-sm"
-                                />
-                            </div>
-                            <div className="space-y-1.5 md:col-span-2">
-                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">IFSC Code</label>
-                                <input
-                                    disabled={bankVerified}
-                                    value={bankVerified ? maskIFSC(profile.ifsc || "") : profile.ifsc}
-                                    onChange={(e) => setProfile({ ...profile, ifsc: e.target.value.toUpperCase() })}
-                                    className="w-full px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border-1 border-gray-300 focus:border-[#2076C7] outline-none transition-all text-sm"
-                                />
-                            </div>
-                        </div>
 
-                        {!bankVerified && (
-                            <div className="flex justify-center mt-2">
-                                <button
-                                    onClick={handleBankVerification}
-                                    className="px-10 py-2.5 bg-[#1CADA3] text-white font-bold rounded-lg shadow-lg shadow-[#1cada340] flex items-center justify-center gap-2 text-sm hover:bg-[#158f87] transition-all"
-                                >
-                                    {verifyingBank ? <Loader2 className="animate-spin" size={16} /> : <Landmark size={16} />}
-                                    Verify Account
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </section>
-
-                {isStep3Complete && (
-                    <section id="step-4" className="animate-in fade-in slide-in-from-bottom-8 duration-1000 scroll-mt-10">
-                        <div className="sticky top-0 z-30 bg-[#F8FAFC] py-4 sm:py-6 flex items-center justify-center gap-3 sm:gap-4 mb-2 border-b border-slate-100/50">
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white bg-[#2076C7]">
-                                <User size={18} strokeWidth={2.5} />
-                            </div>
-                            <h2 className="text-xl sm:text-2xl font-bold text-slate-800 text-center">Identity Assets</h2>
-                        </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            <div className="space-y-4">
-                                <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Digital Visiting Card</h4>
-
-                                {/* 1. Added '@container' class here */}
-                                <div className="aspect-[1.75/1] w-full @container rounded-[6cqw] sm:rounded-[15px] shadow-2xl overflow-hidden relative border border-slate-200 bg-slate-900 group">
-
-                                    <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${CardTemplateImage.src})` }} />
-
-                                    {/* 2. Used 'cqw' for padding and layout */}
-                                    <div className="absolute inset-0 px-[8cqw] py-[6cqw] flex flex-col justify-between">
-
-                                        <div>
-                                            {/* 3. Fluid font sizes: 5.5% of container width */}
-                                            <h4 className="text-[4.5cqw] font-black text-slate-700 uppercase leading-none truncate">
-                                                {profile.name}
-                                            </h4>
-                                            <p className="text-[2cqw] font-bold text-slate-500 mt-[1.5cqw] uppercase tracking-widest">
-                                                Authorized Partner
-                                            </p>
-                                        </div>
-
-                                        {/* 4. Fluid spacing between items */}
-                                        <div className="space-y-[1.5cqw]">
-                                            <div className="flex items-center gap-[2cqw]">
-                                                <Phone className="w-[3cqw] h-[3cqw] text-slate-400" />
-                                                <span className="text-[2.5cqw] font-bold text-slate-700">+91 {profile.mobile}</span>
-                                            </div>
-                                            <div className="flex items-center gap-[2cqw]">
-                                                <Mail className="w-[3cqw] h-[3cqw] text-slate-400" />
-                                                <span className="text-[2.5cqw] font-bold text-slate-700 truncate">{profile.email}</span>
-                                            </div>
-                                            <div className="flex items-start gap-[2cqw] max-w-[60cqw]">
-                                                <MapPin className="w-[3cqw] h-[3cqw] text-slate-400 mt-[0.5cqw] shrink-0" />
-                                                <span className="text-[2.2cqw] font-bold text-slate-700 leading-tight line-clamp-2">
-                                                    {kyc?.aadhaar_kyc_data?.full_address || profile.city}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-[2cqw]">
-                                                <Globe className="w-[3cqw] h-[3cqw] text-slate-400" />
-                                                <span className="text-[2.5cqw] font-bold text-slate-700">www.infinityarthvishva.com</span>
-                                            </div>
-                                        </div>
-
-                                        {/* 5. Scaling the button */}
-                                        <button
-                                            onClick={downloadCardAsPhoto}
-                                            className="w-fit bg-slate-800 text-white px-[2.8cqw] py-[1.6cqw] rounded-[1.5cqw] text-[2cqw] font-bold flex items-center gap-[1.5cqw] shadow-lg active:scale-95 transition-transform"
-                                        >
-                                            {isDownloadingCard ?
-                                                <Loader2 className="w-[2.5cqw] h-[2.5cqw] animate-spin" /> :
-                                                <Download className="w-[2.5cqw] h-[2.5cqw]" />
-                                            }
-                                            Save Card
+                            {/* GST Block */}
+                            <div className="p-4 bg-white rounded-xl border border-slate-100">
+                                <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider mb-3">GST Details (Optional)</h4>
+                                <div className="flex flex-col sm:flex-row gap-2">
+                                    <input
+                                        disabled={gstVerified}
+                                        value={profile.gst_number || ""}
+                                        onChange={(e) => setProfile({ ...profile, gst_number: e.target.value.toUpperCase() })}
+                                        className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
+                                        placeholder="GST Number"
+                                    />
+                                    {!gstVerified ? (
+                                        <button onClick={handleGstVerification} className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs">
+                                            Verify
                                         </button>
-                                    </div>
+                                    ) : (
+                                        <span className="bg-emerald-100 text-emerald-600 px-4 py-2 rounded-lg font-black text-[10px] flex items-center justify-center">VERIFIED</span>
+                                    )}
                                 </div>
-                            </div>
-
-                            <div className="space-y-3 min-[1024px]:ml-20">
-                                <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest max-[1023px]:text-center max-[1023px]:mt-10 text-left">DSA Identity Card</h4>
-                                <div className="max-w-[260px] sm:max-w-[280px] aspect-[1/1.58] lg:ml-0 mx-auto rounded-2xl bg-white border border-slate-200 shadow-xl relative overflow-hidden group flex flex-col">
-                                    <div className="h-2 w-full bg-[#1CADA3]"></div>
-                                    <div className="p-5 sm:p-6 flex flex-col items-center h-full">
-                                        <div className="h-10 sm:h-12 w-28 sm:w-32 mb-4 sm:mb-6"><img src={LogoImage.src} className="w-full h-full object-contain" /></div>
-                                        <div className="w-20 h-24 sm:w-24 sm:h-28 border-2 border-slate-100 rounded-lg overflow-hidden mb-4 bg-slate-50 flex items-center justify-center">{getProfileImage() ? <img src={getProfileImage()!} className="w-full h-full object-cover" /> : <div className="text-slate-300 font-bold text-[8px] uppercase text-center p-2">No Photo</div>}</div>
-                                        <div className="text-center mb-4"><h4 className="text-sm sm:text-md font-black text-blue-600 uppercase leading-tight">{profile.name}</h4><p className="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase">Authorized Partner</p><p className="text-[8px] sm:text-[9px] font-bold text-slate-700 mt-1">Partner ID - {profile.adv_id}</p></div>
-                                        <div className="w-full text-center space-y-1 border-t border-slate-100 pt-4 mb-4">
-                                            <p className="text-[10px] sm:text-[11px] font-bold text-slate-700">+91 {profile.mobile}</p>
-                                            <p className="text-[9px] sm:text-[10px] font-bold text-slate-700 px-2 leading-tight truncate-2-lines">{kyc?.aadhaar_kyc_data?.full_address || profile.city}</p>
-                                        </div>
-                                        <div className="mt-auto pt-2"><p className="text-[8px] sm:text-[9px] font-bold text-blue-600">www.infinityarthvishva.com</p></div>
-                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
-                                            <button onClick={downloadDSACardAsPhoto} className="bg-[#1CADA3] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2">{isDownloadingDSACard ? <Loader2 size={14} className="animate-spin" /> : "Download ID"}</button>
-                                        </div>
-                                    </div>
-                                    <div className="h-2 w-full bg-[#1CADA3] mt-auto"></div>
+                                <div className="flex items-start gap-2 p-3 mt-4 bg-amber-50 border border-amber-100 rounded-xl text-amber-700 text-[12px] sm:text-[12px] font-bold leading-relaxed">
+                                    <AlertCircle size={14} className="mt-0.5 shrink-0 text-amber-500" />
+                                    <span>Note: GST verification is mandatory if total payout exceeds ₹20 lakh in a financial year.</span>
                                 </div>
                             </div>
                         </div>
                     </section>
-                )}
+
+                    <section id="step-3" className="transition-all duration-500 scroll-mt-10 relative">
+                        {!isStep2Complete && (
+                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/10 backdrop-blur-[1px]">
+                                <div className="bg-white px-4 py-2 rounded-lg shadow-xl border flex items-center gap-2 font-bold text-xs text-slate-600">
+                                    <Lock size={14} /> Complete Step 2
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="sticky top-0 z-30 bg-[#F8FAFC] py-3 sm:py-4 flex items-center justify-center gap-3 mb-2 border-b border-slate-100/50">
+                            <span className={`px-3 py-1 rounded-full flex items-center justify-center font-black text-[9px] uppercase tracking-widest text-white ${isStep3Complete ? "bg-emerald-500" : "bg-[#2076C7]"}`}>
+                                Step 3
+                            </span>
+                            <h2 className="text-lg sm:text-xl font-bold text-slate-800 text-center">Bank Payout Setup</h2>
+                        </div>
+
+                        <div className="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
+                            <div className="flex justify-between items-center mb-2 px-1">
+                                <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Bank Account Details</h4>
+                                {bankVerified && (
+                                    <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 text-emerald-600 px-2.5 py-1 rounded-full">
+                                        <CheckCircle2 size={12} className="shrink-0" />
+                                        <span className="text-[10px] font-black uppercase tracking-tight">Verified</span>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Bank Name</label>
+                                    <input
+                                        disabled={bankVerified}
+                                        value={profile.bank_name || ""}
+                                        onChange={(e) => setProfile({ ...profile, bank_name: e.target.value.toUpperCase() })}
+                                        className="w-full px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border-1 border-gray-300 focus:border-[#2076C7] outline-none transition-all text-sm"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Account Number</label>
+                                    <input
+                                        disabled={bankVerified}
+                                        value={bankVerified ? maskAccount(profile.bank_account || "") : profile.bank_account}
+                                        onChange={(e) => setProfile({ ...profile, bank_account: e.target.value })}
+                                        className="w-full px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border-1 border-gray-300 focus:border-[#2076C7] outline-none transition-all text-sm"
+                                    />
+                                </div>
+                                <div className="space-y-1.5 md:col-span-2">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">IFSC Code</label>
+                                    <input
+                                        disabled={bankVerified}
+                                        value={bankVerified ? maskIFSC(profile.ifsc || "") : profile.ifsc}
+                                        onChange={(e) => setProfile({ ...profile, ifsc: e.target.value.toUpperCase() })}
+                                        className="w-full px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border-1 border-gray-300 focus:border-[#2076C7] outline-none transition-all text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            {!bankVerified && (
+                                <div className="flex justify-center mt-2">
+                                    <button
+                                        onClick={handleBankVerification}
+                                        className="px-10 py-2.5 bg-[#1CADA3] text-white font-bold rounded-lg shadow-lg shadow-[#1cada340] flex items-center justify-center gap-2 text-sm hover:bg-[#158f87] transition-all"
+                                    >
+                                        {verifyingBank ? <Loader2 className="animate-spin" size={16} /> : <Landmark size={16} />}
+                                        Verify Account
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+
+                    {isStep3Complete && (
+                        <section id="step-4" className="animate-in fade-in slide-in-from-bottom-8 duration-1000 scroll-mt-10">
+                            <div className="sticky top-0 z-30 bg-[#F8FAFC] py-4 sm:py-6 flex items-center justify-center gap-3 sm:gap-4 mb-2 border-b border-slate-100/50">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white bg-[#2076C7]">
+                                    <User size={18} strokeWidth={2.5} />
+                                </div>
+                                <h2 className="text-xl sm:text-2xl font-bold text-slate-800 text-center">Identity Assets</h2>
+                            </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div className="space-y-4">
+                                    <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Digital Visiting Card</h4>
+
+                                    {/* 1. Added '@container' class here */}
+                                    <div className="aspect-[1.75/1] w-full @container rounded-[6cqw] sm:rounded-[15px] shadow-2xl overflow-hidden relative border border-slate-200 bg-slate-900 group">
+
+                                        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${CardTemplateImage.src})` }} />
+
+                                        {/* 2. Used 'cqw' for padding and layout */}
+                                        <div className="absolute inset-0 px-[8cqw] py-[6cqw] flex flex-col justify-between">
+
+                                            <div>
+                                                {/* 3. Fluid font sizes: 5.5% of container width */}
+                                                <h4 className="text-[4.5cqw] font-black text-slate-700 leading-none truncate">
+                                                    {profile.name}
+                                                </h4>
+                                                <p className="text-[2cqw] font-bold text-slate-500 mt-[1.5cqw] uppercase tracking-widest">
+                                                    Authorized Partner
+                                                </p>
+                                            </div>
+
+                                            {/* 4. Fluid spacing between items */}
+                                            <div className="space-y-[1.5cqw]">
+                                                <div className="flex items-center gap-[2cqw]">
+                                                    <Phone className="w-[3cqw] h-[3cqw] text-slate-400" />
+                                                    <span className="text-[2.5cqw] font-bold text-slate-700">+91 {profile.mobile}</span>
+                                                </div>
+                                                <div className="flex items-center gap-[2cqw]">
+                                                    <Mail className="w-[3cqw] h-[3cqw] text-slate-400" />
+                                                    <span className="text-[2.5cqw] font-bold text-slate-700 truncate">{profile.email}</span>
+                                                </div>
+                                                <div className="flex items-start gap-[2cqw] max-w-[60cqw]">
+                                                    <MapPin className="w-[3cqw] h-[3cqw] text-slate-400 mt-[0.5cqw] shrink-0" />
+                                                    <span className="text-[2.2cqw] font-bold text-slate-700 leading-tight line-clamp-2">
+                                                        {kyc?.aadhaar_kyc_data?.full_address || profile.city}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-[2cqw]">
+                                                    <Globe className="w-[3cqw] h-[3cqw] text-slate-400" />
+                                                    <span className="text-[2.5cqw] font-bold text-slate-700">www.infinityarthvishva.com</span>
+                                                </div>
+                                            </div>
+
+                                            {/* 5. Scaling the button */}
+                                            <button
+                                                onClick={downloadCardAsPhoto}
+                                                className="w-fit bg-slate-800 text-white px-[2.8cqw] py-[1.6cqw] rounded-[1.5cqw] text-[2cqw] font-bold flex items-center gap-[1.5cqw] shadow-lg active:scale-95 transition-transform"
+                                            >
+                                                {isDownloadingCard ?
+                                                    <Loader2 className="w-[2.5cqw] h-[2.5cqw] animate-spin" /> :
+                                                    <Download className="w-[2.5cqw] h-[2.5cqw]" />
+                                                }
+                                                Save Card
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3 min-[1024px]:ml-20">
+                                    <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest max-[1023px]:text-center max-[1023px]:mt-10 text-left">DSA Identity Card</h4>
+                                    <div className="max-w-[260px] sm:max-w-[280px] aspect-[1/1.58] lg:ml-0 mx-auto rounded-2xl bg-white border border-slate-200 shadow-xl relative overflow-hidden group flex flex-col">
+                                        <div className="h-2 w-full bg-[#1CADA3]"></div>
+                                        <div className="p-5 sm:p-6 flex flex-col items-center h-full">
+                                            <div className="h-10 sm:h-12 w-28 sm:w-32 mb-4 sm:mb-6"><img src={LogoImage.src} className="w-full h-full object-contain" /></div>
+                                            <div className="w-20 h-24 sm:w-24 sm:h-28 border-2 border-slate-100 rounded-lg overflow-hidden mb-4 bg-slate-50 flex items-center justify-center">{getProfileImage() ? <img src={getProfileImage()!} className="w-full h-full object-cover" /> : <div className="text-slate-300 font-bold text-[8px] uppercase text-center p-2">No Photo</div>}</div>
+                                            <div className="text-center mb-4"><h4 className="text-sm sm:text-md font-black text-blue-600 uppercase leading-tight">{profile.name}</h4><p className="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase">Authorized Partner</p><p className="text-[8px] sm:text-[9px] font-bold text-slate-700 mt-1">Partner ID - {profile.adv_id}</p></div>
+                                            <div className="w-full text-center space-y-1 border-t border-slate-100 pt-4 mb-4">
+                                                <p className="text-[10px] sm:text-[11px] font-bold text-slate-700">+91 {profile.mobile}</p>
+                                                <p className="text-[9px] sm:text-[10px] font-bold text-slate-700 px-2 leading-tight truncate-2-lines">{kyc?.aadhaar_kyc_data?.full_address || profile.city}</p>
+                                            </div>
+                                            <div className="mt-auto pt-2"><p className="text-[8px] sm:text-[9px] font-bold text-blue-600">www.infinityarthvishva.com</p></div>
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+                                                <button onClick={downloadDSACardAsPhoto} className="bg-[#1CADA3] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2">{isDownloadingDSACard ? <Loader2 size={14} className="animate-spin" /> : "Download ID"}</button>
+                                            </div>
+                                        </div>
+                                        <div className="h-2 w-full bg-[#1CADA3] mt-auto"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    )}
+                </div>
             </div>
 
-            <aside className="hidden xl:flex fixed right-10 top-1/2 -translate-y-1/2 z-50 flex-col items-end">
-                <div className="relative flex flex-col gap-20 pr-6">
+            <aside className="hidden xl:flex fixed right-10 top-[60%] -translate-y-1/2 z-50 flex-col items-end">
+                <div className="relative flex flex-col gap-10 min-[1500px]:gap-20 pr-6">
                     <div className="absolute right-[14px] top-0 bottom-0 w-[1.5px] bg-slate-200/50" />
                     {[
                         { id: "profile-summary", label: "Profile", done: isStep3Complete, active: isStep3Complete },
@@ -1192,6 +1542,39 @@ export default function ProfileSection() {
                     })}
                 </div>
             </aside>
+
+            {/* Agreement Sign-off Modal */}
+            {showAgreementModal && (
+                <div className="fixed inset-0 z-[300] flex items-center justify-center px-4">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAgreementModal(false)} />
+                    <div className="relative bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+                        <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                            <CheckCircle2 className="text-emerald-600" size={32} />
+                        </div>
+
+                        <h3 className="text-2xl font-bold text-slate-800 text-center mb-2">Profile Completed!</h3>
+                        <p className="text-slate-500 text-center text-sm mb-8 leading-relaxed">
+                            Your KYC and bank details are verified. To start earning and receiving payouts, please sign the digital partner agreement.
+                        </p>
+
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={() => router.push('/dashboard/incentives/agreement')}
+                                className="w-full py-4 bg-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-200 hover:bg-[#158f87] transition-all active:scale-95"
+                            >
+                                Sign Agreement Now
+                            </button>
+                            <button
+                                onClick={() => setShowAgreementModal(false)}
+                                className="w-full py-4 bg-white text-slate-400 rounded-xl font-bold text-sm hover:text-slate-600 transition-all"
+                            >
+                                I'll do it later
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </main>
     );
 }

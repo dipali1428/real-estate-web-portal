@@ -38,7 +38,7 @@ const statusStyles: Record<string, string> = {
   follow_up: "bg-orange-50 text-orange-700 border-orange-200",
   sanctioned: "bg-purple-50 text-purple-700 border-purple-200",
 };
-const ALLOWED_STATUSES = ["NEW","SUBMITTED", "IN_PROGRESS", "FOLLOW_UP", "SANCTIONED", "COMPLETED", "REJECTED"];
+const ALLOWED_STATUSES = ["NEW", "SUBMITTED", "IN_PROGRESS", "FOLLOW_UP", "SANCTIONED", "COMPLETED", "REJECTED"];
 
 // --- Types ---
 interface Lead {
@@ -290,7 +290,11 @@ export default function LeadDashboard() {
                       <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Assigned RM</th>
                     )}
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Self Login</th>
-                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50">Acceptance</th>
+                    {leadType !== 'my_lead' && (
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50">
+                        Acceptance
+                      </th>
+                    )}
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Created At</th>
                     <th className="px-4 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Documents</th>
                     <th className="px-4 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
@@ -330,17 +334,16 @@ export default function LeadDashboard() {
                             className={`px-4 py-4 whitespace-nowrap transition-all duration-300 relative 
                               ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}
                           >
-                             <select
-                                value={lead.lead_status?.toUpperCase() || ""}
-                                onChange={(e) => handleStatusUpdate(lead.id, e.target.value)}
-                                disabled={processingId === lead.id}
-                                className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border cursor-pointer focus:outline-none transition-colors ${
-                                  statusStyles[lead.lead_status?.toLowerCase() || ""] || "bg-gray-50 text-gray-700 border-gray-100"
+                            <select
+                              value={lead.lead_status?.toUpperCase() || ""}
+                              onChange={(e) => handleStatusUpdate(lead.id, e.target.value)}
+                              disabled={processingId === lead.id}
+                              className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border cursor-pointer focus:outline-none transition-colors ${statusStyles[lead.lead_status?.toLowerCase() || ""] || "bg-gray-50 text-gray-700 border-gray-100"
                                 }`}
-                              >
-                                <option value="" disabled>Select</option>
-                                {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                              </select>
+                            >
+                              <option value="" disabled>Select</option>
+                              {ALLOWED_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
                           </td>
 
 
@@ -385,26 +388,28 @@ export default function LeadDashboard() {
                           </td>
 
                           {/* 9. Acceptance - MODIFIED: Buttons ONLY for Incoming Pending */}
-                          <td className="px-4 py-4 whitespace-nowrap text-sm font-bold z-20 bg-white">
-                            {leadType === 'incoming' && isPending ? (
-                              <div className="flex items-center gap-2">
-                                {processingId === lead.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                                ) : (
-                                  <>
-                                    <button onClick={() => handleAction(lead.id, 'accept')} className="p-1.5 bg-green-50 text-green-600 rounded-md hover:bg-green-100 transition-colors border border-green-100" title="Accept"><Check size={16} /></button>
-                                    <button onClick={() => handleAction(lead.id, 'reject')} className="p-1.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors border border-red-100" title="Reject"><XCircle size={16} /></button>
-                                  </>
-                                )}
-                              </div>
-                            ) : (
-                              <span className={`text-[10px] tracking-wider uppercase ${lead.rm_acceptance_status === 'ACCEPTED' ? 'text-green-600' :
-                                lead.rm_acceptance_status === 'PENDING' ? 'text-orange-500' : 'text-red-500'
-                                }`}>
-                                {lead.rm_acceptance_status}
-                              </span>
-                            )}
-                          </td>
+                          {leadType !== 'my_lead' && (
+                            <td className="px-4 py-4 whitespace-nowrap text-sm font-bold z-20 bg-white">
+                              {leadType === 'incoming' && isPending ? (
+                                <div className="flex items-center gap-2">
+                                  {processingId === lead.id ? (
+                                    <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                  ) : (
+                                    <>
+                                      <button onClick={() => handleAction(lead.id, 'accept')} className="p-1.5 bg-green-50 text-green-600 rounded-md hover:bg-green-100 transition-colors border border-green-100" title="Accept"><Check size={16} /></button>
+                                      <button onClick={() => handleAction(lead.id, 'reject')} className="p-1.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors border border-red-100" title="Reject"><XCircle size={16} /></button>
+                                    </>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className={`text-[10px] tracking-wider uppercase ${lead.rm_acceptance_status === 'ACCEPTED' ? 'text-green-600' :
+                                  lead.rm_acceptance_status === 'PENDING' ? 'text-orange-500' : 'text-red-500'
+                                  }`}>
+                                  {lead.rm_acceptance_status}
+                                </span>
+                              )}
+                            </td>
+                          )}
 
                           {/* 10. Created At */}
                           <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-600 transition-all duration-300 ${shouldBlur ? 'blur-[8px] opacity-10 select-none pointer-events-none' : ''}`}>

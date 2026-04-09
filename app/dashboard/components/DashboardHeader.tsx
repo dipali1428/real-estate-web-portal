@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { User as UserIcon, LogOut, Settings, UserCircle, ChevronDown } from "lucide-react";
 import { MobileSidebar, SidebarProvider } from "../../component/ui/sidebar";
@@ -14,6 +14,7 @@ import { DashboardService } from "@/app/services/dashboardService";
 export default function DashboardHeader({ role }: { role: Role }) {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [profileImage, setProfileImage] = useState<string | null>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
     const [userName, setUserName] = useState<string>(role); // Added state for name, defaulting to role
     const links = getSidebarLinks(role);
     const router = useRouter();
@@ -39,6 +40,22 @@ export default function DashboardHeader({ role }: { role: Role }) {
             fetchImageData();
         }
     }, [role]);
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
+                setIsProfileOpen(false);
+            }
+        };
+    
+        document.addEventListener("mousedown", handleClickOutside);
+    
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     const getActiveLabel = (items: any[]): string => {
         for (const item of items) {
@@ -78,7 +95,7 @@ export default function DashboardHeader({ role }: { role: Role }) {
                     {/* <NotificationPanel /> */}
 
                     {/* Profile Dropdown */}
-                    <div className="relative">
+                    <div className="relative" ref={dropdownRef}>
                         <button
                             onClick={() => setIsProfileOpen(!isProfileOpen)}
                             className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-50 transition-colors group"
@@ -104,7 +121,7 @@ export default function DashboardHeader({ role }: { role: Role }) {
                         <AnimatePresence>
                             {isProfileOpen && (
                                 <>
-                                    <div className="fixed inset-0 z-10" onClick={() => setIsProfileOpen(false)} />
+                                    {/* <div className="fixed inset-0 z-10 pointer-events-none" onClick={() => setIsProfileOpen(false)} /> */}
                                     <motion.div
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}

@@ -1,21 +1,21 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Target, 
-  TrendingUp, 
-  Handshake, 
-  GraduationCap, 
-  MapPin, 
-  Users, 
-  AlertTriangle, 
-  Briefcase, 
-  Clock, 
-  Quote, UserRoundCheck,SquareStack,VectorSquare,
+import {
+  Target,
+  TrendingUp,
+  Handshake,
+  GraduationCap,
+  MapPin,
+  Users,
+  AlertTriangle,
+  Briefcase,
+  Clock,
+  Quote, UserRoundCheck, SquareStack, VectorSquare,
   X, Send, Link2
 } from 'lucide-react';
 // Import the PublicService
-import { PublicService } from '@/app/services/publicService'; 
+import { PublicService } from '@/app/services/publicService';
 
 // --- Types & Data ---
 type JobCategory = 'all' | 'advisory' | 'operations' | 'sales' | 'pune';
@@ -75,7 +75,7 @@ const JOBS: Job[] = [
 export default function CareersContent() {
   const [activeFilter, setActiveFilter] = useState<JobCategory>('all');
   const [filteredJobs, setFilteredJobs] = useState<Job[]>(JOBS);
-  
+
   // Form States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -115,15 +115,15 @@ export default function CareersContent() {
     setIsSuccess(false);
     // Reset form when opening
     setFormData({
-        full_name: '',
-        email: '',
-        phone: '',
-        current_city: '',
-        total_experience: '',
-        notice_period: '',
-        current_ctc: '',
-        expected_ctc: '',
-        linkedin_url: ''
+      full_name: '',
+      email: '',
+      phone: '',
+      current_city: '',
+      total_experience: '',
+      notice_period: '',
+      current_ctc: '',
+      expected_ctc: '',
+      linkedin_url: ''
     });
   };
 
@@ -132,8 +132,8 @@ export default function CareersContent() {
     setIsSubmitting(true);
 
     const payload = {
-        ...formData,
-        applying_for: selectedJob?.title
+      ...formData,
+      applying_for: selectedJob?.title
     };
 
     try {
@@ -153,10 +153,10 @@ export default function CareersContent() {
 
   return (
     <div className="bg-white text-[#333333] selection:bg-[#e8f2fc]">
-      
+
       {/* Hero Section */}
       <section className="relative py-24 text-center overflow-hidden border-b border-gray-100">
-        <div 
+        <div
           className="absolute inset-0 z-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80')] bg-cover bg-center"
           aria-hidden="true"
         />
@@ -166,9 +166,9 @@ export default function CareersContent() {
           </h1>
           <p className="text-lg md:text-xl text-[#666666] max-w-3xl mx-auto mb-10 leading-relaxed">
             Join Infinity Arthvishva—where your growth fuels the prosperity of families and businesses across India. Be part of a trusted team that's simplifying finance.
-          </p> 
-          
-					<div className="flex flex-col sm:flex-row justify-center gap-4 transition-opacity duration-1000 delay-300">
+          </p>
+
+          <div className="flex flex-col sm:flex-row justify-center gap-4 transition-opacity duration-1000 delay-300">
             <a href='#job-listings'>
               <button className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}>
                 <span className="relative z-10">View Open Positions</span>
@@ -198,7 +198,7 @@ export default function CareersContent() {
             </h2>
             <p className="text-[#666666] max-w-2xl mx-auto">We are a one-stop financial advisory firm offering end-to-end solutions in loans, investments, insurance, and wealth management.</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <ValueCard icon={<Target size={48} />} title="Purpose-Driven Impact" desc="Directly contribute to financial stability and growth for families and businesses across India." />
             <ValueCard icon={<TrendingUp size={48} />} title="Continuous Growth" desc="Access ongoing training and development. Grow with a company expanding across 20+ cities." />
@@ -211,12 +211,12 @@ export default function CareersContent() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-5">
           <div className="text-center mb-16">
-             <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
               Employee Benefits & Growth
             </h2>
             <p className="text-[#666666]">We invest in our team's well-being and professional development.</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <BenefitItem icon={<Quote size={24} />} title="Competitive Compensation" desc="Attractive, market-aligned salary structures designed to attract and retain top talent." />
             <BenefitItem icon={<GraduationCap size={24} />} title="Career Growth Pathways" desc="Clear role progression with defined growth milestones. Leadership opportunities." />
@@ -256,11 +256,10 @@ export default function CareersContent() {
               <button
                 key={f}
                 onClick={() => setActiveFilter(f)}
-                className={`px-6 py-2 rounded-full font-semibold border transition-all text-sm ${
-                  activeFilter === f 
-                  ? "bg-[#2076C7] text-white border-[#2076C7]" 
-                  : "bg-white text-gray-600 border-gray-200 hover:border-[#2076C7] hover:text-[#2076C7]"
-                }`}
+                className={`px-6 py-2 rounded-full font-semibold border transition-all text-sm ${activeFilter === f
+                    ? "bg-[#2076C7] text-white border-[#2076C7]"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-[#2076C7] hover:text-[#2076C7]"
+                  }`}
               >
                 {f.charAt(0).toUpperCase() + f.slice(1)} {f === 'all' ? 'Positions' : ''}
               </button>
@@ -279,14 +278,14 @@ export default function CareersContent() {
                   )}
                 </div>
                 <div className="flex flex-wrap gap-4 text-xs text-[#666666] mb-6 font-medium">
-                  <div className="flex items-center gap-1.5"><MapPin size={14} className="text-[#2076C7]"/> {job.location}</div>
-                  <div className="flex items-center gap-1.5"><Briefcase size={14} className="text-[#2076C7]"/> {job.type}</div>
-                  <div className="flex items-center gap-1.5"><Clock size={14} className="text-[#2076C7]"/> {job.experience}</div>
+                  <div className="flex items-center gap-1.5"><MapPin size={14} className="text-[#2076C7]" /> {job.location}</div>
+                  <div className="flex items-center gap-1.5"><Briefcase size={14} className="text-[#2076C7]" /> {job.type}</div>
+                  <div className="flex items-center gap-1.5"><Clock size={14} className="text-[#2076C7]" /> {job.experience}</div>
                 </div>
                 <p className="text-[#666666] mb-8 text-sm leading-relaxed">{job.description}</p>
-                
+
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-gray-50">
-                  <button 
+                  <button
                     onClick={() => openApplyModal(job)}
                     className="bg-[#2076C7] hover:bg-[#1CADA3] text-white px-5 py-2 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2"
                   >
@@ -397,9 +396,9 @@ export default function CareersContent() {
 
                   {/* Submit Button */}
                   <div className="sticky bottom-0 bg-white pt-4 pb-2 border-t border-gray-50">
-                    <button 
+                    <button
                       disabled={isSubmitting}
-                      type="submit" 
+                      type="submit"
                       className={`w-full py-3.5 rounded-lg font-bold text-white transition-all shadow-md flex items-center justify-center gap-2 ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-linear-to-r from-[#2076C7] to-[#1CADA3] hover:shadow-lg active:scale-[0.99]'}`}
                     >
                       {isSubmitting ? 'Processing Application...' : 'Submit Application'}
@@ -422,7 +421,7 @@ export default function CareersContent() {
             </h2>
             <p className="text-[#666666]">Join a growing network that's empowering financial futures across India.</p>
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 font-sans text-center mb-16">
             <StatItem value="20+" label="Branches Across India" />
             <StatItem value="134+" label="Cities Covered" />
@@ -430,12 +429,12 @@ export default function CareersContent() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <GalleryImage src="\Team\Image-1.jpeg" alt="Team Collaboration" />
-            <GalleryImage src="\Team\Image-6.jpeg" alt="Celebration Event" />
-            <GalleryImage src="\Team\Image-2.jpeg" alt="Training Session" />
-            <GalleryImage src="\Team\Image-3.jpeg" alt="Office Environment" />
-            <GalleryImage src="\Team\Image-4.jpeg" alt="Celebration Event" />
-            <GalleryImage src="\Team\Image-5.jpeg" alt="Celebration Event" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-1.jpeg`} alt="Team Collaboration" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-6.jpeg`} alt="Celebration Event" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-2.jpeg`} alt="Training Session" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-3.jpeg`} alt="Office Environment" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-4.jpeg`} alt="Celebration Event" />
+            <GalleryImage src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/Team/Image-5.jpeg`} alt="Celebration Event" />
           </div>
         </div>
       </section>
@@ -444,7 +443,7 @@ export default function CareersContent() {
       <section className="py-20 bg-[#f8f9fa]">
         <div className="max-w-7xl mx-auto px-5">
           <div className="text-center mb-16">
-           <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
               Our Hiring Process
             </h2>
             <p className="text-[#666666]">Straightforward and transparent steps to join our team.</p>
@@ -500,6 +499,7 @@ function GalleryImage({ src, alt }: { src: string, alt: string }) {
     </div>
   );
 }
+
 
 function ProcessStep({ num, title, desc }: { num: string, title: string, desc: string }) {
   return (

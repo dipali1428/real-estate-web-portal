@@ -4,8 +4,9 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, Suspense } from "react";
 import Header from "./component/Header";
 import Footer from "./component/Footer";
+import GlobalAuthHandler from "./lib/global-auth-handler";
 import { ModalProvider, useModal } from "./context/ModalContext";
-import { WishlistProvider } from "./context/WishlistContext";
+// import { WishlistProvider } from "./context/WishlistContext";
 
 function ReferralHandler() {
   const searchParams = useSearchParams();
@@ -41,9 +42,22 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
   const isBranchHead = pathname?.startsWith("/branchhead");
   const isContactList = pathname?.startsWith("/page/contactlist");
 
+  const isProtectedRoute = !!(
+    isDashboard ||
+    isAdminDashboard ||
+    isRM ||
+    isdepartmenthead ||
+    isaccountProfile ||
+    iscustomerProfile ||
+    isUnlistedAdmin ||
+    isHRProfile ||
+    isDirector ||
+    isBranchHead
+  );
+
   return (
     <ModalProvider>
-      <WishlistProvider>
+      <GlobalAuthHandler isProtectedRoute={isProtectedRoute} />
 
       {/* ✅ Referral handler runs globally */}
       <Suspense fallback={null}>
@@ -76,7 +90,7 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
         !isHRProfile &&
         !isDirector &&
         !isBranchHead && <Footer />}
-</WishlistProvider>
+{/* </WishlistProvider> */}
     </ModalProvider>
   );
 }

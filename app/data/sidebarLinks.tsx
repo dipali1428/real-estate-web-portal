@@ -10,7 +10,6 @@ import {
     UserPlus,
     HelpCircle,
     ShieldCheck,
-    Building2,
     UserMinus,
     Layers,
     CreditCard,
@@ -21,7 +20,7 @@ import {
     LineChart,
     BarChart3,
     Target,
-    Heart,
+    CircleQuestionMark,
     Mail,
     Handshake,
     Share2,
@@ -31,13 +30,21 @@ import {
     Wallet,
     Receipt,
     BookUp,
-    PieChart,
-    BadgeIndianRupee,
-    Layers3,
-    BriefcaseBusiness,
-    FileBarChart,
+    WalletCards ,
+    // PieChart,
+    // BadgeIndianRupee,
+    // Layers3,
+    // BriefcaseBusiness,
+    // FileBarChart,
+    // LifeBuoy,
+    // Bookmark
+     FileBarChart,
+     Bookmark,
     LifeBuoy,
-    Bookmark
+    Notebook,
+    ShieldPlus,
+    Contact,
+    UserCheck as UserCheckIcon,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -75,11 +82,11 @@ export const sidebarLinks = {
                     href: "/dashboard/incentives/tds",
                     icon: <BookUp className="h-4 w-4 text-neutral-700" />,
                 },
-                // {
-                //     label: "Credit Note",
-                //     href: "/dashboard/incentives/creditnote",
-                //     icon: <WalletCards className="h-4 w-4 text-neutral-700" />,
-                // },
+                {
+                    label: "Credit Note",
+                    href: "/dashboard/incentives/creditnote",
+                    icon: <WalletCards className="h-4 w-4 text-neutral-700" />,
+                },
             ],
         },
 
@@ -93,20 +100,107 @@ export const sidebarLinks = {
 
     ADMIN: [
         { label: "Dashboard", href: "/admin", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
-        { label: "My Profile", href: "/admin/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
-         { label: "KYC Management", href: "/admin/kycmanagement", icon: <User className="h-5 w-5 text-neutral-700" /> },
-        { label: "Role Management", href: "/admin/roles", icon: <ShieldCheck className="h-5 w-5 text-neutral-700" /> },
-        { label: "DSA Management", href: "/admin/dsalist", icon: <Handshake className="h-5 w-5 text-neutral-700" /> },
-        { label: "Support Tickets", href: "/admin/ticket", icon: <Ticket className="h-5 w-5 text-neutral-700" /> },
-        { label: "Website Enquiries", href: "/admin/enquiry", icon: <Mail className="h-5 w-5 text-neutral-700" /> },
-        { label: "CIBIL Requests", href: "/admin/cibil", icon: <CreditCard className="h-5 w-5 text-neutral-700" /> },
-        { label: "Unassigned DSAs", href: "/admin/unassigneddsa", icon: <UserMinus className="h-5 w-5 text-neutral-700" /> },
-        { label: "All Leads", href: "/admin/totalleads", icon: <Layers className="h-5 w-5 text-neutral-700" /> },
-        { label: "User Management", href: "/admin/allusers", icon: <Users className="h-5 w-5 text-neutral-700" /> },
-        { label: "Detailed Leads", href: "/admin/detailleads", icon: <FileText className="h-5 w-5 text-neutral-700" /> },
-        { label: "Referral Leads", href: "/admin/referralleads", icon: <Share2 className="h-5 w-5 text-neutral-700" /> },
-         { label: "TDS Management", href: "/admin/tdsmanagement", icon: <BookUp className="h-5 w-5 text-neutral-700" /> },
-        { label: "Career Applications", href: "/admin/careermanagement", icon: <Briefcase className="h-5 w-5 text-neutral-700" /> },
+        { label: "My Profile", href: "/admin/profile", icon: <User className="h-5 w-5 text-neutral-700" />, },
+
+        {
+            label: "All Users",
+            icon: <Users className="h-5 w-5 text-neutral-700" />,
+            children: [
+
+                {
+                    label: "Role Management",
+                    href: "/admin/roles",
+                    icon: <ShieldCheck className="h-5 w-5 text-neutral-700" />,
+                },
+                {
+                    label: "User Management",
+                    href: "/admin/allusers",
+                    icon: <Handshake className="h-4 w-4 text-neutral-700" />,
+                },
+
+            ],
+
+        },
+        {
+            label: "Leads",
+            icon: <Notebook className="h-5 w-5 text-neutral-700" />,
+            children: [
+                {
+                    label: "All Leads",
+                    href: "/admin/totalleads",
+                    icon: <Layers className="h-4 w-4 text-neutral-700" />,
+                },
+                {
+                    label: "Detailed Leads",
+                    href: "/admin/detailleads",
+                    icon: <FileText className="h-4 w-4 text-neutral-700" />,
+                },
+                {
+                    label: "Referral Leads",
+                    href: "/admin/referralleads",
+                    icon: <Share2 className="h-4 w-4 text-neutral-700" />,
+                },
+
+
+            ],
+
+        },
+        {
+            label: "DSA Administration",
+            icon: <User className="h-5 w-5 text-neutral-700" />,
+            children: [
+                {
+                    label: "DSA Management",
+                    href: "/admin/dsalist",
+                    icon: <Contact className="h-4 w-4 text-neutral-700" />,
+                },
+                {
+                    label: "KYC Management",
+                    href: "/admin/kycmanagement",
+                    icon: <ShieldPlus className="h-5 w-5 text-neutral-700" />,
+                },
+                {
+                    label: "Unassigned DSAs",
+                    href: "/admin/unassigneddsa",
+                    icon: <UserMinus className="h-4 w-4 text-neutral-700" />,
+                },
+                {
+                    label: "TDS Management",
+                    href: "/admin/tdsmanagement",
+                    icon: <BookUp className="h-4 w-4 text-neutral-700" />,
+                },
+            ],
+
+        },
+        {
+            label: "Enquiries",
+            icon: <CircleQuestionMark className="h-5 w-5 text-neutral-700" />,
+            children: [
+
+                {
+                    label: "Support Tickets",
+                    href: "/admin/ticket",
+                    icon: <Ticket className="h-4 w-4 text-neutral-700" />,
+                },
+
+                {
+                    label: "Website Enquiries",
+                    href: "/admin/enquiry",
+                    icon: <Mail className="h-4 w-4 text-neutral-700" />,
+                },
+                {
+                    label: "CIBIL Requests",
+                    href: "/admin/cibil",
+                    icon: <CreditCard className="h-4 w-4 text-neutral-700" />,
+                },
+                {
+                    label: "Career Applications",
+                    href: "/admin/careermanagement",
+                    icon: <Briefcase className="h-4 w-4 text-neutral-700" />,
+                },
+            ],
+
+        },
     ],
 
     GM: [],
@@ -115,6 +209,7 @@ export const sidebarLinks = {
     ACCOUNTS: [
         { label: "Dashboard", href: "/accounts", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/accounts/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
+        { label: "KYC Management", href: "/accounts/kycmanagement", icon: <ShieldCheck className="h-5 w-5 text-neutral-700" /> },
         { label: "Receivables", href: "/accounts/reciveable", icon: <Wallet className="h-5 w-5 text-neutral-700" /> },
         { label: "TDS Management", href: "/accounts/tdsmanagement", icon: <Receipt className="h-5 w-5 text-neutral-700" /> },
         { label: "Lead Payments", href: "/accounts/leadmanagement", icon: <FileText className="h-5 w-5 text-neutral-700" /> },
@@ -151,8 +246,10 @@ export const sidebarLinks = {
     ],
 
     DIRECTOR: [
-        { label: "HR Dashboard", href: "/director", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
+        { label: "Dashboard", href: "/director", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/director/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
+        { label: "KYC Management", href: "/director/kycmanagement", icon: <ShieldCheck className="h-5 w-5 text-neutral-700" /> },
+        { label: "Support Tickets", href: "/director/supportticket", icon: <Ticket className="h-5 w-5 text-neutral-700" /> },
     ],
 
 CUSTOMER: [

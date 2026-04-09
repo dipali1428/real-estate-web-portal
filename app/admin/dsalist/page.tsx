@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Tab } from "@headlessui/react";
 import * as XLSX from "xlsx";
 import { AdminService } from "@/app/services/adminService";
+import { STATES_CITIES } from "@/app/data/statesCities";
 import {
   Pencil,
   RefreshCw,
@@ -16,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Trash2,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -76,8 +78,13 @@ export default function DSAManagementPage() {
 
   const tabs = ["All", "Active", "Inactive", "Pending"];
 
-  const [cities, setCities] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>(() => 
+    Array.from(new Set(Object.values(STATES_CITIES).flat())).sort()
+  );
   const [roles, setRoles] = useState<string[]>([]);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [dsaToDelete, setDsaToDelete] = useState<string | null>(null);
 
   const fetchDSAs = useCallback(async () => {
     try {
@@ -97,7 +104,13 @@ export default function DSAManagementPage() {
       setTotalCount(count); // Setting the proper 2690 count here
 
       if (cities.length === 0) {
-        setCities(Array.from(new Set(mappedDSAs.map((d) => d.city).filter(Boolean))));
+        // Flatten all cities from all states into one unique, sorted list
+        const allCities = Object.values(STATES_CITIES)
+          .flat()
+          .filter((city) => city !== "Other"); // Optional: remove "Other" if you don't want it in the list
+        
+        const uniqueSortedCities = Array.from(new Set(allCities)).sort();
+        setCities(uniqueSortedCities);
       }
       if (roles.length === 0) {
         setRoles(Array.from(new Set(mappedDSAs.map((d) => d.role).filter(Boolean))));
@@ -156,13 +169,63 @@ export default function DSAManagementPage() {
     }
   };
 
-  const downloadExcel = () => {
-    if (dsas.length === 0) return toast.error("No data to export");
-    const worksheet = XLSX.utils.json_to_sheet(dsas);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "DSAs");
-    XLSX.writeFile(workbook, `DSA_Report_${new Date().toISOString().split("T")[0]}.xlsx`);
+  // Call this when the trash icon is clicked
+  const handleDeleteClick = (id: string) => {
+    setDsaToDelete(id);
+    setIsDeleteModalOpen(true);
   };
+
+  // Call this when "Confirm" is clicked inside the custom modal
+  const handleConfirmDelete = async () => {
+    if (!dsaToDelete) return;
+
+    const loadId = toast.loading("Deleting DSA...");
+    try {
+      await AdminService.deleteDSA(dsaToDelete);
+      toast.success("DSA Deleted Successfully!", { id: loadId });
+
+      // Update local state
+      setDsas((prev) => prev.filter((dsa) => dsa.id !== dsaToDelete));
+      setTotalCount((prev) => prev - 1);
+    } catch (err) {
+      toast.error("Failed to delete DSA", { id: loadId });
+    } finally {
+      setIsDeleteModalOpen(false);
+      setDsaToDelete(null);
+    }
+  };
+
+const downloadExcel = async () => {
+  const loadId = toast.loading("Preparing all data for export...");
+  try {
+    const response = await AdminService.downloadDsa();
+
+    const allApiData = response?.dsalist || response?.dsas || [];
+    
+    if (allApiData.length === 0) {
+      toast.error("No data found to export", { id: loadId });
+      return;
+    }
+
+    // 2. Map the data to your DSA format
+    const allMappedDSAs = mapApiDataToDSA(allApiData);
+
+    // 3. Create and download the Excel file
+    const worksheet = XLSX.utils.json_to_sheet(allMappedDSAs);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "All DSAs");
+    
+    XLSX.writeFile(
+      workbook, 
+      `DSA_Full_Report_${new Date().toISOString().split("T")[0]}.xlsx`
+    );
+
+    toast.success("Export complete!", { id: loadId });
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to export data", { id: loadId });
+  }
+};
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "-";
@@ -298,7 +361,7 @@ export default function DSAManagementPage() {
                 <table className="min-w-[1600px] w-full text-left border-collapse">
                   <thead className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
                     <tr>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide w-16">Edit</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide w-24">Actions</th>
                       <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide w-16">ID</th>
                       <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide w-32">Adv ID</th>
                       <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</th>
@@ -317,8 +380,20 @@ export default function DSAManagementPage() {
                   <tbody className="divide-y divide-gray-100">
                     {filteredDSAs.map((dsa) => (
                       <tr key={dsa.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3">
-                          <button onClick={() => handleEdit(dsa)} className="p-1.5 text-gray-400 hover:text-[#2076C7] hover:bg-blue-50 rounded-md transition-colors"><Pencil size={16} /></button>
+                        <td className="px-4 py-3 flex items-center gap-2">
+                          <button
+                            onClick={() => handleEdit(dsa)}
+                            className="p-1.5 text-[#2076C7] hover:text-[#2076C7] hover:bg-blue-50 rounded-md transition-colors"
+                            title="Edit">
+                            <Pencil size={16} />
+                          </button>
+
+                          <button
+                            onClick={() => handleDeleteClick(dsa.id)}
+                            className="p-1.5 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            title="Delete">
+                            <Trash2 size={16} />
+                          </button>
                         </td>
                         <td className="px-4 py-3 text-sm font-medium text-[#2076C7]">{dsa.id}</td>
                         <td className="px-4 py-3 text-sm text-gray-700 font-medium">{dsa.adv_id}</td>
@@ -373,6 +448,36 @@ export default function DSAManagementPage() {
               <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">New Password (Optional)</label><input type="password" placeholder="Leave blank to keep current" className={inputClass} value={editingDSA.password} onChange={(e) => setEditingDSA({ ...editingDSA, password: e.target.value })} /></div>
             </div>
             <div className="p-5 border-t bg-gray-50 flex justify-end gap-3"><button onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 text-sm font-semibold text-gray-500">Cancel</button><button onClick={handleSaveEdit} className="px-6 py-2 bg-[#2076C7] text-white rounded-lg text-sm font-bold shadow-md hover:bg-[#1a5fa1]">Save Changes</button></div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-gray-100 animate-in fade-in zoom-in duration-200">
+            <div className="p-6 text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <Trash2 className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800">Confirm Delete</h3>
+              <p className="text-sm text-gray-500 mt-2">
+                Are you sure you want to delete this DSA? This action cannot be undone.
+              </p>
+            </div>
+            <div className="p-4 bg-gray-50 flex gap-3">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition-colors"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

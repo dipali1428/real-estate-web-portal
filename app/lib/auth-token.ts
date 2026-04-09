@@ -1,5 +1,6 @@
 // Get Token
 export const getToken = () => {
+    if (typeof document === "undefined") return undefined;
     return document.cookie.match(/authToken=([^;]+)/)?.[1];
 };
 
