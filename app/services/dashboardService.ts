@@ -194,7 +194,7 @@ export const DashboardService = {
         return response.data;
     },
 
-    createAgreement: async (payload: { signed_name: string }) => {
+    createAgreement: async (payload: { payment_method: string }) => {
         const response = await api.post("/api/dashboard/profile/create-agreement", payload);
         return response.data;
     },
