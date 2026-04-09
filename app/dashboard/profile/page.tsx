@@ -408,8 +408,10 @@ export default function ProfileSection() {
                     url: currentLink,
                 });
             } catch (err) {
-                // Fallback if user cancels or share fails
-                // console.log("Share cancelled or failed");
+                // Only show an error if it wasn't the user cancelling the action
+                if ((err as Error).name !== 'AbortError') {
+                    triggerPopup("Sharing failed. Please try copying the link instead.", "error");
+                }
             }
         } else if (currentLink) {
             // Fallback to copy if Web Share API is not supported (e.g., some desktop browsers)
