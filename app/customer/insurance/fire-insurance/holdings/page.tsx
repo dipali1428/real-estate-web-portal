@@ -39,11 +39,8 @@ export default function FireInsuranceHoldings() {
   ];
 
   return (
-    <div className="flex-1 min-h-screen bg-[#FAFAFA] font-sans">
-      <div className="max-w-[1440px] mx-auto px-6 py-6 leading-relaxed">
-        
-        {/* SHARED HEADER */}
-        <FireInsuranceHeader />
+    <>
+        {/* ─── SUMMARY STATS ─── */}
 
         {/* ─── SUMMARY STATS ─── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -169,7 +166,6 @@ export default function FireInsuranceHoldings() {
           </div>
         </div>
 
-      </div>
-    </div>
+    </>
   );
 }

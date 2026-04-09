@@ -8,7 +8,8 @@ import {
   Clock, Landmark, IndianRupee, Star, Percent,
   Calendar, AlertCircle, FileText, Search, Plus, Download,
   Wallet, BarChart3, PieChart as PieChartIcon, 
-  ShoppingBag, Sparkles, ChevronRight, CreditCard
+  ShoppingBag, Sparkles, ChevronRight, CreditCard,
+  LayoutDashboard
 } from "lucide-react";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -107,478 +108,288 @@ export default function NCDDashboard() {
   };
 
   const handleInvestNow = (ncd: NCDData) => {
-    // Investment action logic will go through backend here
-    // For now, let's just open the details drawer to view
     setSelectedNCD(ncd);
     setIsDrawerOpen(true);
   };
 
   return (
-    <div className="flex-1 p-4 md:p-10 bg-[#F8FAFC] font-sans min-h-screen">
-      
-      {/* Main Toggle Navigation */}
-      <div className="flex justify-start gap-4 mb-8">
-          <button
-              onClick={() => setMainTab('explore')}
-              className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-sm border border-slate-100 flex items-center gap-2 ${
-                  mainTab === 'explore'
-                      ? 'bg-gradient-to-br from-[#2076C7] to-[#1CADA3] text-white shadow-lg shadow-blue-200'
-                      : 'bg-white text-slate-500 hover:text-[#2076C7]'
-              }`}
-          >
-              <Search className={mainTab === 'explore' ? "w-4 h-4 animate-pulse" : "w-4 h-4"} /> 
-              Explore NCDs
-          </button>
-          <button
-              onClick={() => setMainTab('investments')}
-              className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-sm border border-slate-100 flex items-center gap-2 ${
-                  mainTab === 'investments'
-                      ? 'bg-gradient-to-br from-[#2076C7] to-[#1CADA3] text-white shadow-lg shadow-blue-200'
-                      : 'bg-white text-slate-500 hover:text-[#2076C7]'
-              }`}
-          >
-              <Briefcase className={mainTab === 'investments' ? "w-4 h-4 animate-pulse" : "w-4 h-4"} /> 
-              My Holdings
-          </button>
-      </div>
+    <div className="flex-1 min-h-screen bg-[#FAFAFA] font-sans">
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-6 py-6 sm:py-10 leading-relaxed">
+        
+        {/* 🔷 PREMIUM HEADER */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative bg-white rounded-2xl p-5 mb-8 shadow-sm border border-slate-100/60"
+        >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
 
-      <AnimatePresence mode="wait">
-        {mainTab === 'explore' ? (
-           <motion.div
-             key="explore"
-             initial={{ opacity: 0, x: -20 }}
-             animate={{ opacity: 1, x: 0 }}
-             exit={{ opacity: 0, x: 20 }}
-             transition={{ duration: 0.3 }}
-             className="max-w-7xl mx-auto space-y-8"
-           >
-              {/* Highlights Banner */}
-              <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-[2.5rem] p-8 md:p-10 text-white relative overflow-hidden shadow-xl">
-                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4 blur-3xl pointer-events-none" />
-                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex items-start gap-5">
-                       <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 backdrop-blur-md shadow-inner border border-white/10">
-                          <Star size={28} className="text-yellow-300" />
-                       </div>
-                       <div>
-                          <span className="bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-lg text-[9px] font-black tracking-widest uppercase mb-3 inline-block">
-                             Premium Fixed Income
-                          </span>
-                          <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-2">High Yield Corporate NCDs</h2>
-                          <p className="text-sm font-semibold text-white/80 max-w-xl leading-relaxed">
-                            Lock in interest rates up to <span className="text-yellow-300 font-bold">11.50%</span> before rate cuts happen. Diversify your fixed income portfolio with highly rated corporate papers.
-                          </p>
-                       </div>
-                    </div>
-                    <div className="flex gap-4 shrink-0">
-                       <div className="bg-white/10 border border-white/20 rounded-2xl px-5 py-4 backdrop-blur-sm text-center shadow-inner">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-1">Max Rating</p>
-                          <p className="text-lg font-black tracking-tight">CRISIL AAA</p>
-                       </div>
-                       <div className="bg-white/10 border border-white/20 rounded-2xl px-5 py-4 backdrop-blur-sm text-center shadow-inner">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-1">Min Invest</p>
-                          <p className="text-lg font-black tracking-tight">₹10,000</p>
-                       </div>
-                    </div>
-                 </div>
+            {/* LEFT (BRANDING) */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold shadow-md shrink-0">
+                <Landmark size={22} />
               </div>
 
-              {/* NCD Market Feed */}
-              <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-6 md:p-10">
-                 {/* Tabs & Search */}
-                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-6 border-b border-slate-50 gap-4">
-                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
-                      <Landmark className="text-[#2076C7]" size={24} /> Live Market
-                    </h2>
-                    
-                    <div className="flex items-center gap-4 flex-wrap">
-                      <div className="relative">
-                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-800 w-4 h-4" />
-                          <input 
-                              type="text" 
-                              placeholder="Search issuer or title..."
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              className="w-full md:w-64 pl-12 pr-4 py-3 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#2076C7]/10 bg-slate-50 transition-all text-xs font-bold text-slate-900 placeholder:text-slate-500"
-                          />
-                      </div>
-                      <div className="flex p-1 bg-slate-50 rounded-2xl border border-slate-100 shrink-0">
-                        {(["Open", "Upcoming", "Closed"] as const).map((tab) => (
-                          <button
-                            key={tab}
-                            onClick={() => setNcdStatusTab(tab)}
-                            className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all ${
-                              ncdStatusTab === tab
-                                ? "bg-white text-[#2076C7] shadow-sm border border-slate-200"
-                                : "text-slate-400 hover:text-slate-600"
-                            }`}
-                          >
-                            {tab}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                 </div>
+              <div className="flex flex-col items-center sm:items-start">
+                <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-1">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
+                    NCD Investment Portal
+                  </h2>
+                  <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200 whitespace-nowrap">
+                    Exclusive Debentures
+                  </span>
+                </div>
 
-                 {/* Rating Quick-Filters */}
-                 <div className="flex items-center gap-3 mb-8 overflow-x-auto pb-4 scrollbar-hidden">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0 mr-2">Filter Rating:</span>
-                    {ratings.map((rating) => (
-                      <button
-                        key={rating}
-                        onClick={() => setSelectedRating(rating)}
-                        className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shrink-0 ${
-                          selectedRating === rating 
-                            ? "bg-[#2076C7] border-[#2076C7] text-white shadow-md shadow-[#2076C7]/20" 
-                            : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
-                        }`}
-                      >
-                        {rating}
-                      </button>
-                    ))}
-                 </div>
-
-                 {/* Cards Grid */}
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredNCDs.length > 0 ? (
-                      filteredNCDs.map((ncd) => (
-                        <motion.div
-                          key={ncd.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="group border border-slate-100 rounded-[2rem] overflow-hidden bg-white hover:border-blue-200 hover:shadow-xl transition-all duration-300 flex flex-col pt-2"
-                        >
-                          <div className="px-6 py-4 relative">
-                             <div className="absolute top-4 right-6">
-                               <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-lg border ${
-                                  ncdStatusTab === "Open" ? "bg-emerald-50 border-emerald-100 text-emerald-600" 
-                                  : ncdStatusTab === "Upcoming" ? "bg-amber-50 border-amber-100 text-amber-600"
-                                  : "bg-red-50 border-red-100 text-red-500"
-                               }`}>
-                                 {ncdStatusTab}
-                               </span>
-                             </div>
-                             <div className="w-14 h-14 rounded-2xl bg-[#F8FAFC] flex items-center justify-center border border-slate-100 mb-4 transition-transform group-hover:scale-110">
-                                <Landmark size={24} className="text-[#2076C7]" />
-                             </div>
-                             <p className="text-[10px] font-black text-[#1CADA3] uppercase tracking-widest mb-1">{ncd.rating} • {ncd.ratingAgency}</p>
-                             <h3 className="text-lg font-black text-slate-900 leading-tight">{ncd.issuer}</h3>
-                             <p className="text-xs font-bold text-slate-500 mt-1 line-clamp-1">{ncd.title}</p>
-                          </div>
-
-                          <div className="p-6 flex-1 flex flex-col bg-slate-50/50 border-t border-slate-100 mt-2">
-                             <div className="grid grid-cols-2 gap-4 mb-6">
-                                <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Yield p.a.</p>
-                                  <p className="text-xl font-black text-[#2076C7]">{ncd.interest}</p>
-                                </div>
-                                <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Tenure</p>
-                                  <p className="text-base font-black text-slate-700 mt-1">{ncd.tenure}</p>
-                                </div>
-                                <div>
-                                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mb-1">
-                                     <IndianRupee size={10} /> Min Invest
-                                  </p>
-                                  <p className="text-sm font-bold text-slate-700">{ncd.minInvest}</p>
-                                </div>
-                                <div>
-                                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mb-1">
-                                     <Clock size={10} /> Payout
-                                  </p>
-                                  <p className="text-sm font-bold text-slate-700">{ncd.frequency}</p>
-                                </div>
-                             </div>
-                             
-                             <div className="mt-auto flex gap-3">
-                               <button 
-                                  onClick={() => handleViewDetails(ncd)}
-                                  className="flex-1 bg-white border border-slate-200 text-slate-600 py-3 rounded-xl text-xs font-black transition-all shadow-sm hover:border-[#2076C7] hover:text-[#2076C7]"
-                               >
-                                  View Details
-                               </button>
-                               {ncdStatusTab === "Open" ? (
-                                 <button onClick={() => handleInvestNow(ncd)} className="flex-1 bg-[#2076C7] text-white py-3 rounded-xl text-xs font-black shadow-md hover:shadow-lg hover:bg-[#1a5fa1] transition-all">
-                                    Invest Now
-                                 </button>
-                               ) : (
-                                 <button disabled className="flex-1 bg-slate-200 text-slate-400 py-3 rounded-xl text-xs font-black cursor-not-allowed">
-                                    {ncdStatusTab === "Upcoming" ? "Opening Soon" : "Closed"}
-                                 </button>
-                               )}
-                             </div>
-                          </div>
-                        </motion.div>
-                      ))
-                    ) : (
-                      <div className="col-span-full py-20 text-center bg-slate-50 rounded-[2.5rem] border border-slate-200 border-dashed">
-                         <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-slate-100">
-                           <Search size={32} className="text-slate-300" />
-                         </div>
-                         <h3 className="text-xl font-black text-slate-700 uppercase tracking-tight">No Results Found</h3>
-                         <p className="text-sm text-slate-500 font-medium mt-2 max-w-sm mx-auto">Try adjusting your rating filter or search query to find matching NCD issuances.</p>
-                      </div>
-                    )}
-                 </div>
+                <p className="text-sm text-slate-500 flex items-center justify-center sm:justify-start gap-2">
+                  Secure institutional-grade yields with corporate debt
+                </p>
               </div>
-           </motion.div>
-        ) : (
-           <motion.div
-             key="investments"
-             initial={{ opacity: 0, x: 20 }}
-             animate={{ opacity: 1, x: 0 }}
-             exit={{ opacity: 0, x: -20 }}
-             transition={{ duration: 0.3 }}
-             className="max-w-7xl mx-auto space-y-8"
-           >
-              <header className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-                  <div>
-                      <h1 className="text-3xl font-black text-slate-900 mb-2">My NCD Portfolio</h1>
-                      <p className="text-slate-500 text-sm font-medium italic">Consolidated view of your Corporate Debenture holdings.</p>
-                  </div>
-                  {investments.length > 0 && (
-                      <div className="flex gap-3">
-                          <button className="flex items-center gap-2 bg-white border border-slate-200 px-5 py-2.5 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
-                              <Download className="w-4 h-4" /> Export Ledger
-                          </button>
-                      </div>
+            </div>
+
+            {/* RIGHT BUTTONS (CAPSULE) */}
+            <div className="w-full sm:w-auto mt-4 sm:mt-0">
+              <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-2xl sm:rounded-full flex flex-col sm:flex-row sm:items-center gap-1 relative shadow-inner border border-slate-200/50">
+
+                <button
+                  onClick={() => setMainTab('explore')}
+                  className={`w-full sm:w-auto px-4 md:px-5 py-2.5 md:py-2 rounded-xl sm:rounded-full text-[10px] md:text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+                    mainTab === 'explore' 
+                    ? "bg-white text-[#2076C7] shadow-sm" 
+                    : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  <Search size={14} />
+                  Explore NCDs
+                </button>
+
+                <button
+                  onClick={() => setMainTab('investments')}
+                  className={`relative w-full sm:w-auto px-4 md:px-5 py-2.5 md:py-2 rounded-xl sm:rounded-full text-[10px] md:text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+                    mainTab === 'investments' 
+                    ? "text-white" 
+                    : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  {mainTab === 'investments' && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-xl sm:rounded-full -z-10 shadow-sm" />
                   )}
-              </header>
+                  <Briefcase size={14} />
+                  My Holdings
+                </button>
 
-              {/* Portfolio Summary Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-                  <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden group">
-                          <div className="flex items-center gap-3 mb-4">
-                              <div className="p-2.5 bg-blue-50 rounded-xl text-[#2076C7]">
-                                  <Wallet className="w-5 h-5" />
-                              </div>
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Investment</span>
-                          </div>
-                          <h3 className="text-2xl font-black text-slate-900">₹{portfolioStats.total.toLocaleString()}</h3>
-                          <p className="text-[10px] text-emerald-500 font-bold mt-2 flex items-center gap-1">
-                              <TrendingUp className="w-3 h-3" /> +{(portfolioStats.total > 0 ? 1.4 : 0)}% vs last quarter
-                          </p>
+              </div>
+            </div>
+
+          </div>
+        </motion.div>
+
+        <AnimatePresence mode="wait">
+          {mainTab === 'explore' ? (
+             <motion.div
+               key="explore"
+               initial={{ opacity: 0, x: -20 }}
+               animate={{ opacity: 1, x: 0 }}
+               exit={{ opacity: 0, x: 20 }}
+               transition={{ duration: 0.3 }}
+               className="space-y-8"
+             >
+                {/* Highlights Banner */}
+                <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-6 md:p-8 text-white relative overflow-hidden shadow-lg">
+                   <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4 blur-3xl pointer-events-none" />
+                   <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+                      <div className="flex items-center gap-4">
+                         <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 backdrop-blur-md shadow-sm border border-white/10">
+                            <Star size={22} className="text-white" />
+                         </div>
+                         <div>
+                            <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/70 mb-1">Premium Fixed Income</p>
+                            <h2 className="text-lg sm:text-xl md:text-2xl font-black leading-tight">
+                              Yields up to <span className="underline decoration-white/30 underline-offset-4">11.50% p.a.</span>
+                            </h2>
+                         </div>
                       </div>
-
-                      <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                          <div className="flex items-center gap-3 mb-4">
-                              <div className="p-2.5 bg-teal-50 rounded-xl text-[#1CADA3]">
-                                  <ShieldCheck className="w-5 h-5" />
-                              </div>
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Risk Exposure</span>
-                          </div>
-                          <h3 className="text-2xl font-black text-slate-900">{portfolioStats.risk}</h3>
-                          <p className="text-[10px] text-slate-500 font-bold mt-2">Rated by CRISIL/ICRA</p>
+                      <div className="flex gap-2 sm:gap-3 shrink-0 w-full md:w-auto justify-center md:justify-end">
+                         <div className="bg-white/10 border border-white/20 rounded-xl sm:rounded-2xl px-4 sm:px-5 py-2.5 sm:py-3 backdrop-blur-sm text-center flex-1 md:flex-none">
+                            <p className="text-[9px] font-black uppercase tracking-widest text-white/60 mb-0.5">Rating</p>
+                            <p className="text-xs sm:text-sm font-black">CRISIL AAA</p>
+                         </div>
+                         <div className="bg-white/10 border border-white/20 rounded-xl sm:rounded-2xl px-4 sm:px-5 py-2.5 sm:py-3 backdrop-blur-sm text-center flex-1 md:flex-none">
+                            <p className="text-[9px] font-black uppercase tracking-widest text-white/60 mb-0.5">Min Cap</p>
+                            <p className="text-xs sm:text-sm font-black">₹10,000</p>
+                         </div>
                       </div>
+                   </div>
+                </div>
 
-                      <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                          <div className="flex items-center gap-3 mb-4">
-                              <div className="p-2.5 bg-amber-50 rounded-xl text-amber-500">
-                                  <Calendar className="w-5 h-5" />
-                              </div>
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Next Payout</span>
-                          </div>
-                          <h3 className="text-2xl font-black text-slate-900">{investments.length ? portfolioStats.nextCoupon : "-"}</h3>
-                          <p className="text-[10px] text-amber-600 font-bold mt-2 flex items-center gap-1">
-                              <Clock className="w-3 h-3" /> Scheduled Interest
-                          </p>
+                {/* NCD Market Feed */}
+                <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] border border-slate-100 shadow-sm p-4 sm:p-6 md:p-10 overflow-hidden">
+                   {/* Tabs & Search */}
+                   <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 sm:mb-8 pb-5 sm:pb-6 border-b border-slate-50 gap-3 sm:gap-4">
+                      <h2 className="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-2 sm:gap-3">
+                        <TrendingUp className="text-[#2076C7]" size={22} /> Live Market
+                      </h2>
+                      
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                        <div className="relative w-full sm:w-auto">
+                            <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-800 w-4 h-4" />
+                            <input 
+                                type="text" 
+                                placeholder="Search issuer..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full sm:w-56 md:w-64 pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 rounded-2xl border border-slate-300 focus:outline-none bg-slate-50 transition-all text-xs font-bold text-slate-900"
+                            />
+                        </div>
+                        <div className="flex p-1 bg-slate-50 rounded-2xl border border-slate-100 w-full sm:w-auto">
+                          {(["Open", "Upcoming", "Closed"] as const).map((tab) => (
+                            <button
+                              key={tab}
+                              onClick={() => setNcdStatusTab(tab)}
+                              className={`flex-1 sm:flex-none px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-[0.1em] sm:tracking-[0.15em] transition-all whitespace-nowrap ${
+                                ncdStatusTab === tab
+                                  ? "bg-white text-[#2076C7] shadow-sm border border-slate-200"
+                                  : "text-slate-400 hover:text-slate-600"
+                              }`}
+                            >
+                              {tab}
+                            </button>
+                          ))}
+                        </div>
                       </div>
+                   </div>
 
-                      <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white p-6 rounded-[2rem] shadow-sm relative overflow-hidden">
-                          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3" />
-                          <div className="flex items-center gap-3 mb-4 relative z-10">
-                              <div className="p-2.5 bg-white/20 rounded-xl text-white backdrop-blur-sm">
-                                  <Percent className="w-5 h-5" />
-                              </div>
-                              <span className="text-[10px] font-black text-white/80 uppercase tracking-widest">Weighted Yield</span>
-                          </div>
-                          <h3 className="text-2xl font-black relative z-10">{portfolioStats.weightedYield}%</h3>
-                          <p className="text-[10px] text-white/90 font-bold mt-2 relative z-10">Estimated Annualized Returns</p>
-                      </div>
-                  </div>
+                   {/* Cards Grid */}
+                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                      {filteredNCDs.length > 0 ? (
+                        filteredNCDs.map((ncd) => (
+                          <motion.div
+                            key={ncd.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="group border border-slate-100 rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden bg-white hover:border-blue-200 hover:shadow-xl transition-all duration-300 flex flex-col pt-2"
+                          >
+                            <div className="px-6 py-4 relative">
+                               <div className="absolute top-4 right-6">
+                                 <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-lg border ${
+                                    ncdStatusTab === "Open" ? "bg-emerald-50 border-emerald-100 text-emerald-600" 
+                                    : ncdStatusTab === "Upcoming" ? "bg-amber-50 border-amber-100 text-amber-600"
+                                    : "bg-red-50 border-red-100 text-red-500"
+                                 }`}>
+                                   {ncdStatusTab}
+                                 </span>
+                               </div>
+                               <div className="w-14 h-14 rounded-2xl bg-[#F8FAFC] flex items-center justify-center border border-slate-100 mb-4 group-hover:scale-110 transition-transform">
+                                  <Landmark size={24} className="text-[#2076C7]" />
+                               </div>
+                               <p className="text-[10px] font-black text-[#1CADA3] uppercase tracking-widest mb-1">{ncd.rating} • {ncd.ratingAgency}</p>
+                               <h3 className="text-lg font-black text-slate-900 leading-tight">{ncd.issuer}</h3>
+                               <p className="text-xs font-bold text-slate-500 mt-1 line-clamp-1">{ncd.title}</p>
+                            </div>
 
-                  {/* Allocation Pie Chart */}
-                  <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col items-center">
-                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Issuer Allocation</h4>
-                      <div className="w-full h-[200px] relative flex items-center justify-center">
-                          {investments.length === 0 ? (
-                              <div className="text-center">
-                                  <div className="w-20 h-20 border-4 border-dashed border-slate-100 rounded-full mx-auto mb-2 flex items-center justify-center">
-                                      <PieChartIcon className="w-6 h-6 text-slate-200" />
+                            <div className="p-6 flex-1 flex flex-col bg-slate-50/50 border-t border-slate-100 mt-2">
+                               <div className="grid grid-cols-2 gap-4 mb-6">
+                                  <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Yield p.a.</p>
+                                    <p className="text-xl font-black text-[#2076C7]">{ncd.interest}</p>
                                   </div>
-                                  <span className="text-[10px] font-bold text-slate-300">Set Allocation Goal</span>
-                              </div>
-                          ) : (
-                              <ResponsiveContainer width="100%" height="100%">
-                                  <PieChart>
-                                      <Pie
-                                          data={(() => {
-                                              const counts: Record<string, number> = {};
-                                              investments.forEach(inv => {
-                                                  counts[inv.issuer] = (counts[inv.issuer] || 0) + inv.amount;
-                                              });
-                                              return Object.entries(counts).map(([name, value]) => ({ name, value }));
-                                          })()}
-                                          cx="50%"
-                                          cy="50%"
-                                          innerRadius={60}
-                                          outerRadius={80}
-                                          paddingAngle={5}
-                                          dataKey="value"
-                                      >
-                                          {investments.map((_, index) => (
-                                              <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#2076C7' : '#1CADA3'} stroke="none" />
-                                          ))}
-                                      </Pie>
-                                      <Tooltip 
-                                          contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}
-                                          itemStyle={{ fontSize: '10px', fontWeight: '900' }}
-                                      />
-                                  </PieChart>
-                              </ResponsiveContainer>
-                          )}
-                      </div>
-                      {investments.length > 0 && (
-                        <div className="flex gap-4 mt-4 text-[9px] font-black uppercase text-slate-500 tracking-widest">
-                            Diversified across {new Set(investments.map(i=>i.issuer)).size} issuer(s)
+                                  <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Tenure</p>
+                                    <p className="text-base font-black text-slate-700 mt-1">{ncd.tenure}</p>
+                                  </div>
+                               </div>
+                               <div className="mt-auto flex gap-3">
+                                 <button 
+                                    onClick={() => handleViewDetails(ncd)}
+                                    className="flex-1 bg-white border border-slate-200 text-slate-600 py-3 rounded-xl text-xs font-black transition-all hover:border-[#2076C7] hover:text-[#2076C7]"
+                                 >
+                                    Details
+                                 </button>
+                                 {ncdStatusTab === "Open" ? (
+                                   <button onClick={() => handleInvestNow(ncd)} className="flex-1 bg-[#2076C7] text-white py-3 rounded-xl text-xs font-black shadow-md hover:bg-[#1a5fa1] transition-all">
+                                      Invest
+                                   </button>
+                                 ) : (
+                                   <button disabled className="flex-1 bg-slate-200 text-slate-400 py-3 rounded-xl text-xs font-black cursor-not-allowed">
+                                      {ncdStatusTab === "Upcoming" ? "Soon" : "Closed"}
+                                   </button>
+                                 )}
+                               </div>
+                            </div>
+                          </motion.div>
+                        ))
+                      ) : (
+                        <div className="col-span-full py-20 text-center">
+                           <h3 className="text-xl font-black text-slate-700 uppercase tracking-tight">No Results Found</h3>
                         </div>
                       )}
-                  </div>
-              </div>
+                   </div>
+                </div>
+             </motion.div>
+          ) : (
+             <motion.div
+               key="investments"
+               initial={{ opacity: 0, x: 20 }}
+               animate={{ opacity: 1, x: 0 }}
+               exit={{ opacity: 0, x: -20 }}
+               transition={{ duration: 0.3 }}
+               className="space-y-8"
+             >
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+                    <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="p-2.5 bg-blue-50 rounded-xl text-[#2076C7]">
+                                    <Wallet className="w-5 h-5" />
+                                </div>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Investment</span>
+                            </div>
+                            <h3 className="text-2xl font-black text-slate-900">₹{portfolioStats.total.toLocaleString()}</h3>
+                        </div>
 
-              {investments.length === 0 ? (
-                  <motion.div 
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="bg-white rounded-[3rem] p-12 text-center border-2 border-dashed border-slate-200 shadow-sm flex flex-col items-center justify-center min-h-[350px]"
-                  >
-                      <div className="w-24 h-24 bg-blue-50/50 rounded-full flex items-center justify-center mb-6 relative border border-blue-100">
-                          <ShoppingBag className="w-10 h-10 text-[#2076C7] opacity-20" />
-                          <Sparkles className="w-6 h-6 text-[#1CADA3] absolute top-2 right-2 animate-bounce" />
-                      </div>
-                      <h2 className="text-2xl font-black text-slate-800 mb-2">No Active NCD Assets</h2>
-                      <p className="text-slate-500 max-w-sm mx-auto mb-10 leading-relaxed font-medium">
-                          You haven't invested in any Non-Convertible Debentures yet. Explore the market to start earning secure yields.
-                      </p>
-                      <button 
-                          onClick={() => setMainTab('explore')}
-                          className="flex items-center gap-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white px-8 py-5 rounded-2xl font-black text-sm hover:shadow-2xl hover:shadow-[#1CADA3]/20 transition-all active:scale-95 group"
-                      >
-                          <Plus className="w-5 h-5 bg-white/20 rounded-full p-0.5 group-hover:rotate-90 transition-transform" />
-                          Browse Open Issues
-                      </button>
-                  </motion.div>
-              ) : (
-                  <>
-                  {/* Growth Projection Line Chart */}
-                  <section className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm mb-10">
-                      <div className="flex items-center justify-between mb-8">
-                          <h3 className="text-lg font-black text-slate-800">Portfolio Returns Projection</h3>
-                          <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-black uppercase">
-                              <TrendingUp className="w-3 h-3" /> Interest Accruing
-                          </div>
-                      </div>
-                      <div className="h-[300px] w-full relative flex items-center justify-center">
-                          <ResponsiveContainer width="100%" height="100%">
-                              <LineChart data={chartData}>
-                                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                                  <XAxis 
-                                      dataKey="month" 
-                                      axisLine={false} 
-                                      tickLine={false} 
-                                      tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 900 }}
-                                      dy={10}
-                                  />
-                                  <YAxis 
-                                      axisLine={false} 
-                                      tickLine={false} 
-                                      tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 900 }}
-                                      tickFormatter={(v) => `₹${(v/1000).toFixed(1)}k`}
-                                  />
-                                  <Tooltip 
-                                      contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 50px -12px rgb(0 0 0 / 0.15)', padding: '16px' }}
-                                      itemStyle={{ color: '#2076C7', fontWeight: '900' }}
-                                  />
-                                  <Line 
-                                      type="monotone" 
-                                      dataKey="returns" 
-                                      stroke="url(#colorGradientNcd)" 
-                                      strokeWidth={5} 
-                                      dot={{ fill: '#2076C7', strokeWidth: 2, r: 5, stroke: '#fff' }}
-                                      activeDot={{ r: 9, strokeWidth: 0, fill: '#1CADA3' }}
-                                  />
-                                  <defs>
-                                      <linearGradient id="colorGradientNcd" x1="0" y1="0" x2="1" y2="0">
-                                          <stop offset="0%" stopColor="#2076C7" />
-                                          <stop offset="100%" stopColor="#1CADA3" />
-                                      </linearGradient>
-                                  </defs>
-                              </LineChart>
-                          </ResponsiveContainer>
-                      </div>
-                  </section>
+                        <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="p-2.5 bg-teal-50 rounded-xl text-[#1CADA3]">
+                                    <ShieldCheck className="w-5 h-5" />
+                                </div>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Weighted Yield</span>
+                            </div>
+                            <h3 className="text-2xl font-black text-slate-900">{portfolioStats.weightedYield}%</h3>
+                        </div>
+                    </div>
 
-                  {/* Ledger Table */}
-                  <section className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden auto-cols-min">
-                      <div className="p-8 border-b border-slate-50 flex justify-between items-center">
-                          <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
-                              <FileText className="w-5 h-5 text-[#2076C7]" /> Position Ledger
-                          </h3>
-                      </div>
-                      <div className="overflow-x-auto">
-                          <table className="w-full text-left">
-                              <thead>
-                                  <tr className="bg-slate-50/50">
-                                      <th className="px-8 py-5 text-[10px] font-black uppercase text-slate-400 tracking-wider">Issuer Detail</th>
-                                      <th className="px-8 py-5 text-[10px] font-black uppercase text-slate-400 tracking-wider">Capital Allocated</th>
-                                      <th className="px-8 py-5 text-[10px] font-black uppercase text-slate-400 tracking-wider">Interest Rate</th>
-                                      <th className="px-8 py-5 text-[10px] font-black uppercase text-slate-400 tracking-wider text-center">Status</th>
-                                      <th className="px-8 py-5 text-[10px] font-black uppercase text-slate-400 tracking-wider text-right">Certificate</th>
-                                  </tr>
-                              </thead>
-                              <tbody className="divide-y divide-slate-50">
-                                  {investments.map((inv) => (
-                                      <tr key={inv.id} className="hover:bg-slate-50 transition-colors group">
-                                          <td className="px-8 py-6">
-                                              <div className="font-bold text-slate-900 group-hover:text-[#2076C7] transition-colors">{inv.issuer}</div>
-                                              <div className="text-[10px] text-slate-400 mt-1 font-bold flex items-center gap-1 border border-slate-200 w-fit px-2 py-0.5 rounded-md">
-                                                {inv.rating}
-                                              </div>
-                                          </td>
-                                          <td className="px-8 py-6">
-                                              <div className="font-black text-slate-800">₹{inv.amount.toLocaleString()}</div>
-                                              <div className="text-[10px] text-slate-400 mt-1 font-bold">Invested {inv.investedDate}</div>
-                                          </td>
-                                          <td className="px-8 py-6">
-                                              <div className="font-black text-[#1CADA3]">{inv.interest}</div>
-                                              <div className="text-[10px] text-slate-400 mt-1 font-bold">Next Payout: {inv.nextPayout}</div>
-                                          </td>
-                                          <td className="px-8 py-6 text-center">
-                                              <span className="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-600">
-                                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                                                  {inv.status}
-                                              </span>
-                                          </td>
-                                          <td className="px-8 py-6 text-right">
-                                              <button className="p-2.5 bg-slate-50 text-slate-400 hover:text-[#2076C7] hover:bg-blue-50 rounded-xl transition-all">
-                                                  <FileText className="w-4 h-4" />
-                                              </button>
-                                          </td>
-                                      </tr>
-                                  ))}
-                              </tbody>
-                          </table>
-                      </div>
-                  </section>
-                  </>
-              )}
+                    <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col items-center justify-center">
+                        <PieChartIcon className="w-12 h-12 text-slate-200 mb-2" />
+                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Allocation Matrix</span>
+                    </div>
+                </div>
 
-           </motion.div>
-        )}
-      </AnimatePresence>
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-white rounded-[3rem] p-12 text-center border-2 border-dashed border-slate-200 shadow-sm flex flex-col items-center justify-center min-h-[350px]"
+                >
+                    <div className="w-24 h-24 bg-blue-50/50 rounded-full flex items-center justify-center mb-6 border border-blue-100">
+                        <ShoppingBag className="w-10 h-10 text-[#2076C7] opacity-20" />
+                    </div>
+                    <h2 className="text-2xl font-black text-slate-800 mb-2">No Active NCD Assets</h2>
+                    <p className="text-slate-500 max-w-sm mx-auto mb-10 leading-relaxed font-medium">
+                        You haven't invested in any Non-Convertible Debentures yet. Explore the market to start earning secure yields.
+                    </p>
+                    <button 
+                        onClick={() => setMainTab('explore')}
+                        className="flex items-center gap-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white px-8 py-5 rounded-2xl font-black text-sm hover:shadow-2xl transition-all"
+                    >
+                        <Plus size={18} />
+                        Browse Issues
+                    </button>
+                </motion.div>
+             </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* ─── NCD Detail Drawer ─── */}
+      </div>
+
       <NCDDetailDrawer 
         isOpen={isDrawerOpen}
         ncd={selectedNCD}
