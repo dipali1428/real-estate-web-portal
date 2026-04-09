@@ -38,7 +38,7 @@ type QueuedFile = {
 export default function FireInsuranceForm({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState<Record<string, string>>({
     insuranceType: "", name: "", address: "", pincode: "", sumInsured: "", tenure: "",
-    hypothecationBank: "" 
+    hypothecationBank: ""
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,7 +46,7 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
   const [showSuccess, setShowSuccess] = useState(false);
 
   const [fileQueue, setFileQueue] = useState<QueuedFile[]>([]);
-  const [errorData, setErrorData] = useState<{message: string, existing_lead_id?: string} | null>(null);
+  const [errorData, setErrorData] = useState<{ message: string, existing_lead_id?: string } | null>(null);
 
   const isStock = form.insuranceType === "stock";
   const isProperty = form.insuranceType === "residential" || form.insuranceType === "commercial";
@@ -73,7 +73,7 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
-  
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,10 +87,10 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
         department: "Insurance",
         product_type: "Fire Insurance",
         sub_category: "Fire Insurance",
-        client: { 
-            name: isStock ? "Stock Applicant" : form.name, 
-            mobile: "NA", 
-            email: "NA" 
+        client: {
+          name: isStock ? "Stock Applicant" : form.name,
+          mobile: "NA",
+          email: "NA"
         },
         meta: { is_self_login: false },
         form_data: { ...form }
@@ -221,12 +221,12 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
         </div>
         {showSuccess && <SuccessModal onClose={onClose} />}
         {errorData && (
-  <ErrorModal 
-    message={errorData.message} 
-    leadId={errorData.existing_lead_id} 
-    onClose={() => setErrorData(null)} 
-  />
-)}
+          <ErrorModal
+            message={errorData.message}
+            leadId={errorData.existing_lead_id}
+            onClose={() => setErrorData(null)}
+          />
+        )}
       </div>
     </div>
   );
@@ -236,7 +236,22 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
 
 function Field({ label, value, onChange, type = "text", options, required, placeholder, onlyNumber, maxLength, error }: any) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
+    // Check if it's a Paste command (Ctrl+V or Cmd+V)
+    const isPaste = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v';
+
+    // Check if it's a Copy/Select All command (Optional but recommended)
+    const isCopyOrSelect = (e.ctrlKey || e.metaKey) && ['c', 'a', 'x'].includes(e.key.toLowerCase());
+
+    if (onlyNumber) {
+      // Allow the event if it's a paste, copy, select all, or navigation key
+      if (isPaste || isCopyOrSelect || ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) {
+        return;
+      }
+      // Prevent if it's not a number
+      if (!/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+      }
+    }
   };
   return (
     <div className="w-full relative">
@@ -321,8 +336,8 @@ function ErrorModal({ message, leadId, onClose }: { message: string, leadId?: st
             <span className="font-mono font-bold text-[#2076C7]">{leadId}</span>
           </div>
         )}
-        <button 
-          onClick={onClose} 
+        <button
+          onClick={onClose}
           className="w-full bg-[#1CADA3] text-white py-2.5 rounded-lg hover:opacity-70 font-medium transition-colors"
         >
           Close

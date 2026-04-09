@@ -423,8 +423,23 @@ function Field({ label, value, onChange, type = "text", options, required, place
     if (maxLength && val.length > maxLength) val = val.slice(0, maxLength);
     onChange(val);
   };
-  const handleKeyDown = (e: any) => {
-    if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Check if it's a Paste command (Ctrl+V or Cmd+V)
+    const isPaste = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v';
+
+    // Check if it's a Copy/Select All command (Optional but recommended)
+    const isCopyOrSelect = (e.ctrlKey || e.metaKey) && ['c', 'a', 'x'].includes(e.key.toLowerCase());
+
+    if (onlyNumber) {
+      // Allow the event if it's a paste, copy, select all, or navigation key
+      if (isPaste || isCopyOrSelect || ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) {
+        return;
+      }
+      // Prevent if it's not a number
+      if (!/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+      }
+    }
   };
   return (
     <div className="w-full">
