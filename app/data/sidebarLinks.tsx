@@ -243,6 +243,11 @@ export const sidebarLinks = {
         { label: "My Profile", href: "/director/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "KYC Management", href: "/director/kycmanagement", icon: <ShieldCheck className="h-5 w-5 text-neutral-700" /> },
         { label: "Support Tickets", href: "/director/supportticket", icon: <Ticket className="h-5 w-5 text-neutral-700" /> },
+        { label: "Website Enquiries", href: "/director/websiteenquiry", icon: <Mail className="h-4 w-4 text-neutral-700" />, },
+        { label: "Cibil", href: "/director/cibil", icon: <CreditCard className="h-4 w-4 text-neutral-700" />, },
+        { label: "DSA Management", href: "/director/dsamanagement", icon: <Users className="h-4 w-4 text-neutral-700" />, },
+        { label: "Role Management", href: "/director/role", icon: <ShieldCheck className="h-4 w-4 text-neutral-700" />, },
+        { label: "User Management", href: "/director/allusers", icon: <Handshake className="h-4 w-4 text-neutral-700" />, }
     ],
 
     CUSTOMER: [

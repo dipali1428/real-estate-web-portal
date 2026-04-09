@@ -192,7 +192,7 @@ export default function CreditNotePortal() {
               ${userProfile?.gst ? `<div><strong>ADV_ID:</strong> ${userProfile.gst}</div>` : ''}
             </td>
             <td width="50%" style="vertical-align: top; text-align: right;">
-              <span style="color: #64748b; font-weight: bold;">BILL TO:</span><br/>
+              <span style="color: #64748b; font-weight: bold;">FROM:</span><br/>
               <strong style="font-size: 15px;">Infinity Arthvishva Advisory Private Limited</strong><br/>
               12th Floor, 1201, 7 Business Square, Shivaji Nagar, Pune, 411005<br/>
               <strong>GSTIN:</strong> 27AAICI0723K1ZJ<br/>
@@ -221,7 +221,7 @@ export default function CreditNotePortal() {
 
         <div style="display: flex; justify-content: space-between; margin-top: 20px; align-items: flex-start;">
           <div style="font-size: 13px; line-height: 1.6;">
-            <strong style="color: #1e3a8a; text-decoration: underline;">Payment Information:</strong><br/>
+            <strong style="color: #1e3a8a; text-decoration: underline;">Payment From:</strong><br/>
             <strong>Beneficiary name:</strong> Infinity Arthvishva Advisory Pvt Ltd<br/>
             <strong>Bank Name:</strong> Induslnd Bank Ltd<br/>
             <strong>Account number:</strong> 251-026-041988<br/>
@@ -231,7 +231,7 @@ export default function CreditNotePortal() {
           <table style="width: 300px; border-collapse: collapse; font-size: 13px; border: 1px solid #e2e8f0;">
             <tr><td style="padding: 10px; border-bottom: 1px solid #eee;">Subtotal</td><td align="right">₹ ${formatInr(totalGross)}</td></tr>
             <tr><td style="padding: 10px; border-bottom: 1px solid #eee;">GST</td><td align="right">₹ ${formatInr(totalGst)}</td></tr>
-            <tr style="background: #f8fafc; font-weight: bold; color: #1e3a8a;"><td style="padding: 10px;">NET PAYABLE</td><td align="right">₹ ${formatInr(totalGross)}</td></tr>
+            <tr style="background: #f8fafc; font-weight: bold; color: #1e3a8a;"><td style="padding: 10px;">NET PAYABLE</td><td align="right">₹ ${formatInr(totalNet)}</td></tr>
           </table>
         </div>
 
