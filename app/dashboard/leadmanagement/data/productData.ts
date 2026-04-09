@@ -188,7 +188,7 @@ export const productCards: ProductCards = {
   ],
   unlisted: [
     { 
-      title: "Unlisted", 
+      title: "Unlisted Shares", 
       description: "Unlisted investment opportunities in private companies and startups.",
       onClick: () => {},
       activeLeads: 0,

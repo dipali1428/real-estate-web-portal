@@ -8,6 +8,7 @@ import {
   ChevronLeft, ChevronRight, Hash, Pencil, Trash2, Plus, X,
   IndianRupee, Layers, CheckCircle, XCircle, Clock
 } from "lucide-react";
+import { toast } from 'react-hot-toast';
 
 const ShareManagement: React.FC = () => {
   const [shares, setShares] = useState<Share[]>([]);
@@ -35,7 +36,7 @@ const ShareManagement: React.FC = () => {
         setShares(response);
       }
     } catch (error) {
-      console.error('Error fetching shares:', error);
+      toast.error('Error fetching shares:');
     } finally {
       setLoading(false);
     }
@@ -101,18 +102,14 @@ const ShareManagement: React.FC = () => {
           addPayload.logo_url = selectedShare.logo_url;
         }
         
-        // ❌ DO NOT send these fields for add:
+        //  DO NOT send these fields for add:
         // - id (let backend generate)
         // - clean_name
         // - is_active
         // - status
-
-        console.log('📤 Sending add payload:', addPayload);
         
-        const response = await AdminService.addShare(addPayload);
-        console.log('📥 Response:', response);
-        
-        alert("Share added successfully!");
+        const response = await AdminService.addShare(addPayload);  
+        toast.success("Share added successfully!");
         
       } else {
         // For EDIT: Send update payload with ID in URL, not in body
@@ -127,23 +124,20 @@ const ShareManagement: React.FC = () => {
           if (selectedShare.logo_url) updatePayload.logo_url = selectedShare.logo_url;
           if (selectedShare.is_active !== undefined) updatePayload.is_active = selectedShare.is_active;
           if (selectedShare.status) updatePayload.status = selectedShare.status;
-
-          console.log('📤 Sending update payload:', updatePayload);
           
           const response = await AdminService.updateShare(selectedShare.id, updatePayload);
-          console.log('📥 Response:', response);
           
-          alert("Share updated successfully!");
+          toast.success("Share updated successfully!");
         }
       }
       
       setIsModalOpen(false);
       fetchShares();
     } catch (error: any) {
-      console.error("Submit error:", error);
-      console.error("Error response:", error.response?.data);
+      toast.error("Submit error:", error);
+      toast.error("Error response:", error.response?.data);
       const serverMessage = error.response?.data?.message || error.response?.data?.error || "Check all fields";
-      alert(`Failed: ${serverMessage}`);
+      toast.error(`Failed: ${serverMessage}`);
     } finally {
       setSubmitLoading(false);
     }
@@ -155,13 +149,13 @@ const ShareManagement: React.FC = () => {
     setDeleteLoading(true);
     try {
       await AdminService.deleteShare(shareToDelete.id);
-      alert("Share deleted successfully!");
+      toast.success("Share deleted successfully!");
       setDeleteModalOpen(false);
       setShareToDelete(null);
       fetchShares();
     } catch (error: any) {
-      console.error("Delete error:", error);
-      alert(`Delete failed: ${error.response?.data?.message || error.message}`);
+      toast.error("Delete error:", error);
+      toast.error(`Delete failed: ${error.response?.data?.message || error.message}`);
     } finally {
       setDeleteLoading(false);
     }

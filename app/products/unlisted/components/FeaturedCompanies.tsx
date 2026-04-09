@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Loader2, ArrowRight } from 'lucide-react';
-import { useModal } from '../../../context/ModalContext'; // Import useModal
+import { useModal } from '../../../context/ModalContext';
 
 interface Company {
     id: number;
@@ -13,6 +13,7 @@ interface Company {
     min_lot_size: number;
     logo_url?: string;
     depository_applicable?: string;
+    available?: string; // Add this
 }
 
 // --- Data Helpers ---
@@ -31,8 +32,14 @@ const getLotSize = (price: number) => {
     return 100;
 };
 
+const getAvailableValue = (id: number) => {
+    // Generate a consistent value based on company ID
+    const random = ((id * 997) % 100) + 20; // This creates consistent but varied numbers
+    return `${random.toFixed(1)}K`;
+};
+
 export default function FeaturedCompanies({ companies, loading, onEnquire }: any) {
-    const { openLogin } = useModal(); // Get openLogin from modal context
+    const { openLogin } = useModal();
     const sectionRef = useRef<HTMLElement>(null);
     const [isVisible, setIsVisible] = useState(false);
     const [animatedItems, setAnimatedItems] = useState<number[]>([]);
@@ -40,11 +47,14 @@ export default function FeaturedCompanies({ companies, loading, onEnquire }: any
     // Sort and Take first 5 for Home Page display
     const featured = companies
         .sort((a: any, b: any) => safeNumber(a.id) - safeNumber(b.id))
-        .slice(0, 5);
+        .slice(0, 5)
+        .map((company: any) => ({
+            ...company,
+            available: getAvailableValue(company.id) // Add static available value
+        }));
 
     // Handle Buy Now click - opens login modal and stores company in session storage
     const handleBuyNow = (company: Company) => {
-        // Store company data in session storage for after login
         sessionStorage.setItem('pendingBuyCompany', JSON.stringify({
             id: company.id,
             name: company.name,
@@ -53,8 +63,6 @@ export default function FeaturedCompanies({ companies, loading, onEnquire }: any
             logo_url: company.logo_url,
             sector: company.sector
         }));
-        
-        // Open login modal
         openLogin();
     };
 
@@ -64,8 +72,6 @@ export default function FeaturedCompanies({ companies, loading, onEnquire }: any
                 const [entry] = entries;
                 if (entry.isIntersecting) {
                     setIsVisible(true);
-                    
-                    // Stagger the animation of individual items
                     featured.forEach((_: Company, index: number) => {
                         setTimeout(() => {
                             setAnimatedItems(prev => [...prev, index]);
@@ -97,7 +103,7 @@ export default function FeaturedCompanies({ companies, loading, onEnquire }: any
         >
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
                 
-                {/* Header Section with Animation */}
+                {/* Header Section with Animation - Exact same as BuyShares */}
                 <div 
                     className={`text-center mb-10 md:mb-16 transition-all duration-1000 transform ${
                         isVisible 
@@ -122,7 +128,7 @@ export default function FeaturedCompanies({ companies, loading, onEnquire }: any
                     </div>
                 ) : (
                     <>
-                        {/* Responsive Grid with Staggered Animation */}
+                        {/* Responsive Grid - Same as BuyShares grid pattern */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
                             {featured.map((c: Company, index: number) => {
                                 const price = safeNumber(c.price);
@@ -132,11 +138,11 @@ export default function FeaturedCompanies({ companies, loading, onEnquire }: any
                                 return (
                                     <div 
                                         key={c.id} 
-                                        className={`bg-white rounded-2xl sm:rounded-[2rem] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_30px_60px_rgba(32,118,199,0.15)] transition-all duration-500 group border border-slate-100 flex flex-col h-full transform ${
+                                        className={`bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full transform ${
                                             isVisible && isAnimated
                                                 ? 'opacity-100 translate-y-0 scale-100'
                                                 : 'opacity-0 translate-y-20 scale-95'
-                                        } hover:-translate-y-2 hover:scale-[1.02]`}
+                                        }`}
                                         style={{
                                             transitionDelay: isVisible ? `${index * 100}ms` : '0ms',
                                             transitionProperty: 'opacity, transform, box-shadow',
@@ -144,64 +150,67 @@ export default function FeaturedCompanies({ companies, loading, onEnquire }: any
                                             transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)'
                                         }}
                                     >
-                                        {/* Company Logo Container - Responsive height with hover animation */}
-                                        <div className="h-40 sm:h-48 md:h-56 bg-gradient-to-br from-slate-50 to-white flex items-center justify-center p-4 sm:p-6 md:p-8 relative overflow-hidden">
+                                        {/* RECTANGULAR IMAGE CONTAINER - Exact same as BuyShares */}
+                                        <div className="w-full h-32 bg-gray-50 rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden">
                                             <img 
                                                 src={c.logo_url || `https://placehold.co/200x150/2076C7/white?text=${c.name.charAt(0)}`}
                                                 alt={c.name}
-                                                className="max-h-full max-w-full object-contain transition-all duration-700 group-hover:scale-110"
+                                                className="w-full h-full object-contain p-3 transition-all duration-700 group-hover:scale-110"
                                                 onError={(e) => {
                                                     (e.target as HTMLImageElement).src = `https://placehold.co/200x150/2076C7/white?text=${c.name.charAt(0)}`;
                                                 }}
                                             />
-                                            <span className="absolute top-3 right-3 sm:top-4 sm:right-4 px-2 sm:px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-[8px] sm:text-[10px] font-black text-[#2076C7] shadow-sm uppercase tracking-widest transform transition-all duration-300 group-hover:scale-105 group-hover:bg-[#2076C7] group-hover:text-white">
-                                                {c.sector || 'Pre-IPO'}
-                                            </span>
-                                            
-                                            {/* Animated overlay on hover */}
-                                            <div className="absolute inset-0 bg-gradient-to-t from-[#2076C7]/0 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                                         </div>
 
-                                        {/* Company Details - Responsive padding */}
-                                        <div className="p-4 sm:p-5 md:p-6 flex flex-col flex-grow">
-                                            <h4 className="text-base sm:text-lg md:text-xl font-black text-slate-800 mb-3 sm:mb-4 line-clamp-1 group-hover:text-[#2076C7] transition-colors duration-300">
+                                        {/* Company Details - Same padding and styling as BuyShares */}
+                                        <div className="p-5 flex flex-col flex-grow">
+                                            <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-1 group-hover:text-[#2076C7] transition-colors duration-300">
                                                 {c.name}
                                             </h4>
                                             
-                                            {/* Price and Lot - Responsive layout */}
-                                            <div className="flex justify-between items-end mb-4 sm:mb-6">
-                                                <div>
-                                                    <div className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase mb-1">Price/Share</div>
-                                                    <div className="text-xl sm:text-2xl md:text-3xl font-black text-[#2076C7] tracking-tight group-hover:scale-105 transition-transform duration-300 origin-left">
-                                                        {formatPrice(price)}
+                                            {/* Price Display - Exact same as BuyShares with #2076C7 color */}
+                                            <div className="mb-4 text-center">
+                                                <span className="text-2xl font-bold text-[#2076C7]">
+                                                    {formatPrice(price)}
+                                                </span>
+                                            </div>
+                                            
+                                            <div className="text-sm text-gray-500 text-center mb-4">{c.sector || 'Pre-IPO'}</div>
+
+                                            {/* Info Grid - Same grid layout as BuyShares */}
+                                            <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
+                                                <div className="text-center">
+                                                    <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
+                                                    <div className="text-sm font-bold text-gray-900">
+                                                        {lot.toLocaleString()} shares
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <div className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase mb-1">Min. Lot</div>
-                                                    <div className="font-bold text-slate-700 text-sm sm:text-base md:text-lg group-hover:text-[#2076C7] group-hover:scale-105 transition-all duration-300">
-                                                        {lot.toLocaleString()}
+                                                <div className="text-center">
+                                                    <div className="text-xs text-gray-500 mb-0.5">Depository</div>
+                                                    <div className="text-sm font-bold text-gray-900">
+                                                        {c.depository_applicable?.replace(/&AMP;/gi, '&').split(' ')[0] || 'NSDL'}
+                                                    </div>
+                                                </div>
+                                                <div className="text-center">
+                                                    <div className="text-xs text-gray-500 mb-0.5">Min. Invest</div>
+                                                    <div className="text-sm font-bold text-gray-900">
+                                                        ₹{(price * lot).toLocaleString()}
+                                                    </div>
+                                                </div>
+                                                <div className="text-center">
+                                                    <div className="text-xs text-gray-500 mb-0.5">Available</div>
+                                                    <div className="text-sm font-bold text-gray-900">
+                                                        {c.available} {/* Use static value instead of random */}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {/* Investment range - Responsive */}
-                                            <div className="flex items-center justify-between mb-4 sm:mb-6">
-                                                <span className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-tight">
-                                                    Available Now
-                                                </span>
-                                                <span className="text-[10px] sm:text-xs font-black text-[#1CADA3] bg-emerald-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
-                                                    Min: ₹{(price * lot).toLocaleString()}
-                                                </span>
-                                            </div>
-
-                                            {/* Buy Now Button - Opens login modal */}
+                                            {/* Buy Now Button - Exact same styling as BuyShares */}
                                             <button
                                                 onClick={() => handleBuyNow(c)}
-                                                className="mt-auto w-full py-3 sm:py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95 transition-all duration-300 uppercase tracking-widest text-[10px] sm:text-xs cursor-pointer relative overflow-hidden group/btn"
+                                                className="w-full py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
                                             >
-                                                <span className="relative z-10 block group-hover:scale-105 transition-transform duration-300">Buy Now</span>
-                                                <div className="absolute inset-0 bg-gradient-to-r from-[#1CADA3] to-[#2076C7] opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
-                                                <div className="absolute inset-0 transform translate-x-[-100%] group-hover/btn:translate-x-0 bg-white/20 transition-transform duration-500" />
+                                                Buy Now
                                             </button>
                                         </div>
                                     </div>

@@ -33,6 +33,7 @@ import NrpLoanForm from "./forms/nrploanform";
 import LeadTable from "./components/LeadTable";
 import CorporateInsuranceForm from "./forms/corporateinsuranceform";
 import LoanProtectorForm from "./forms/loanprotectorform";
+import UnlistedSharesForm from "./forms/unlistedsharesform";
 
 export default function LeadManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,6 +66,7 @@ export default function LeadManagementPage() {
   const [showNrpLoanForm, setShowNrpLoanForm] = useState(false);
   const [showCorporateInsuranceForm, setShowCorporateInsuranceForm] = useState(false);
   const [showLoanProtectorForm, setShowLoanProtectorForm] = useState(false);
+  const [showUnlistedSharesForm, setShowUnlistedSharesForm] = useState(false);
 
   function getClickHandler(title: string): () => void {
     const handlerMap: { [key: string]: () => void } = {
@@ -93,6 +95,7 @@ export default function LeadManagementPage() {
       "Fixed Deposit": () => setShowFixedDepositForm(true),
       "Bonds": () => setShowBondsForm(true),
       "Real Estate": () => setShowRealEstateForm(true),
+      "Unlisted Shares": () => setShowUnlistedSharesForm(true),
     };
     return handlerMap[title] || (() => console.log(`No handler for ${title}`));
   }
@@ -131,6 +134,7 @@ export default function LeadManagementPage() {
   if (showNrpLoanForm) return <NrpLoanForm onClose={() => setShowNrpLoanForm(false)} />;
   if (showCorporateInsuranceForm) return <CorporateInsuranceForm onClose={() => setShowCorporateInsuranceForm(false)} />;
   if (showLoanProtectorForm) return <LoanProtectorForm onClose={() => setShowLoanProtectorForm(false)} />;
+  if (showUnlistedSharesForm) return <UnlistedSharesForm onClose={() => setShowUnlistedSharesForm(false)} />;
 
   const tabs = [
     { id: 'loans' as const, name: 'Loans' },

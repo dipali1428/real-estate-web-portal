@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useModal } from "../../context/ModalContext"; 
-import { Loader2, CheckCircle, X, User, Mail, Phone, Package } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { fetchAllShares, createEnquiry } from '../../services/unlistedservices';
 
 // Components
@@ -13,6 +13,7 @@ import UnlistedBenefits from './components/UnlistedBenefits';
 import FAQSection from './components/UnlistedFAQ';
 import UnlistedCTA from './components/UnlistedCTA';
 import ScrollToTop from '../../component/ScrollToTop';
+import { toast } from 'react-hot-toast';
 
 interface Company {
     id: number;
@@ -41,7 +42,7 @@ export default function UnlistedHomePage() {
                 const res = await fetchAllShares();
                 const data = Array.isArray(res) ? res : res?.data || res?.shares || [];
                 setCompanies(data);
-            } catch (err) { console.error(err); } finally { setLoading(false); }
+            } catch (err) { toast.error('Error fetching companies:'); } finally { setLoading(false); }
         };
         loadData();
     }, []);

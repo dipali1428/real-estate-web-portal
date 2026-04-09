@@ -2,13 +2,11 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
-// Import Recharts components
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { fetchAllShares } from "../services/unlistedservices"; 
 import customerService from "../services/customerService";
 import { 
-  TrendingUp, Layers, Home, BarChart3, 
-  Clock, Globe, CheckCircle 
+  TrendingUp, Layers, Home, BarChart3, CheckCircle 
 } from 'lucide-react';
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
