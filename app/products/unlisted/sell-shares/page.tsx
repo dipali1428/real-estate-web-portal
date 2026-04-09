@@ -15,22 +15,18 @@ import {
   Check,
   X,
   HelpCircle,
-  FileCheck,
   Clock,
   Send,
-  TrendingUp,
   Package,
   Filter,
-  Loader2,
   AlertCircle,
   IndianRupee,
   MapPin,
-  Activity,
-  FileText,
   Info
 } from 'lucide-react';
 import { fetchAllShares } from '../../../services/unlistedservices';
 import { useModal } from '../../../context/ModalContext';
+import { toast } from 'react-hot-toast';
 
 // Toast Component Interface
 interface Toast {
@@ -131,7 +127,7 @@ const SellShares: React.FC = () => {
       const activeCompanies = companiesData.filter((c: ApiCompany) => c.is_active !== false);
       setCompanies(activeCompanies);
     } catch (err: any) {
-      console.error('Error fetching companies:', err);
+      toast.error('Error fetching companies:');
       setError(err.response?.data?.message || 'Failed to load companies. Please try again.');
       showToast('Failed to load market data. Please try again.', 'error');
     } finally {

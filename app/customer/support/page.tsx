@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import customerService from '../../services/customerService';
 import { 
-    Plus, Send, X, AlertCircle, User, Headset, Eye, CheckCircle2,
+    Send, X, User, Headset, Eye, CheckCircle2,
     ArrowLeft, ShieldCheck, Loader2, Bookmark, Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';

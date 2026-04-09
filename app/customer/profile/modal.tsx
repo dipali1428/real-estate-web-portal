@@ -10,7 +10,6 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
-  Trash2,
   AlertCircle,
   Info
 } from 'lucide-react';

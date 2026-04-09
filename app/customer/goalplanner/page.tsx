@@ -4,15 +4,14 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { 
     Target, Plus, TrendingUp, Calendar, Wallet, CheckCircle2, AlertCircle,
     Home, GraduationCap, Car, Plane, Briefcase,
-    Sparkles, Clock, IndianRupee, X, Save, Edit2, 
+    Sparkles, IndianRupee, X, Save, Edit2, 
     Trash2, Loader2, LayoutDashboard, ListChecks,
     CheckCircle, ArrowLeft, Eye,
-    Info, CalendarDays, Percent, PiggyBank,
-    RefreshCw
+    Info, RefreshCw
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import CustomerService from '../../services/customerService';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 // --- Types ---
 interface Goal {
@@ -102,7 +101,6 @@ export default function GoalPlanner() {
     const [calculationPreview, setCalculationPreview] = useState<GoalCalculation | null>(null);
     const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
     const [showGoalDetails, setShowGoalDetails] = useState(false);
-    const [loadingGoalDetails, setLoadingGoalDetails] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [goalToDelete, setGoalToDelete] = useState<number | null>(null);
     const [deleting, setDeleting] = useState(false);

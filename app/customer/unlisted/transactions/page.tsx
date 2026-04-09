@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   History, Download, CheckCircle, XCircle, Clock, 
-  ArrowUpRight, ArrowDownRight, Filter, 
-  Calendar, IndianRupee, Loader2, RefreshCw, AlertCircle,
-  FileText, TrendingUp, TrendingDown, X,
+  ArrowUpRight, ArrowDownRight, IndianRupee,TrendingUp, TrendingDown, X,
   Search, SlidersHorizontal
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';

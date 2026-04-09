@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import customerService from '../../services/customerService';
 import { ProfileSection } from './profilesection';
 import { KYCSection } from './kycsection';
 import { Modals } from './modal';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion'; // Ensure motion is imported
+import { motion } from 'framer-motion'; 
 
 export interface ProfileData {
   id?: number;

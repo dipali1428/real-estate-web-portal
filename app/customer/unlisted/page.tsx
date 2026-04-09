@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import CompaniesComponent from './companies/page';
 import TransactionsComponent from './transactions/page';
 import customerService from '../../services/customerService';
+import { toast } from 'react-hot-toast';
 
 export default function UnlistedSharesPage() {
   const router = useRouter();
@@ -28,15 +29,17 @@ export default function UnlistedSharesPage() {
         if (userData) {
           setCustomer({ name: capitalizeFullName(userData.name || '') });
         }
+
         const companiesRes = await customerService.getAllCompanies();
         const companiesData = companiesRes?.data || companiesRes || [];
         setTotalCompanies(companiesData.length);
       } catch (err) {
-        console.error(err);
+        toast.error('Failed to fetch profile or companies. Please try again.');
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 

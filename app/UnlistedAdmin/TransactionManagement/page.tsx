@@ -8,6 +8,7 @@ import { ArrowLeftRight, RotateCw, Search, CheckCircle, XCircle, Clock, Layers, 
   X, Plus, Calendar, Hash, History, Download, Loader2, ChevronLeft, ChevronRight, Inbox,
   ShoppingCart, HandCoins, Package, Building2
 } from "lucide-react";
+import { toast } from 'react-hot-toast';
 
 // Define the interface based on your API response
 interface Transaction {
@@ -101,9 +102,9 @@ const handleSubmit = async (e: React.FormEvent) => {
     onSuccess();
     onClose();
   } catch (error: any) {
-    console.error('Failed to add transaction:', error);
+    toast.error('Failed to add transaction:');
     const msg = error.response?.data?.message || error.response?.data?.error || 'Failed to add transaction';
-    alert(`Error: ${msg}`);
+    toast.error(`Error: ${msg}`);
   } finally {
     setSubmitting(false);
   }
@@ -253,17 +254,16 @@ const TransactionManagement: React.FC = () => {
     try {
       // Direct API call to get transactions
       const response = await api.get('/api/unlisted/admin/transactions');
-      console.log('API Response:', response.data); // Debug log
       
       // Handle the response - it's already an array
       if (Array.isArray(response.data)) {
         setTransactions(response.data);
       } else {
-        console.error('Unexpected response format:', response.data);
+        toast.error('Unexpected response format:');
         setTransactions([]);
       }
     } catch (error) {
-      console.error('Error fetching transactions:', error);
+      toast.error('Error fetching transactions:');
       setTransactions([]);
     } finally {
       setLoading(false);
@@ -293,8 +293,8 @@ const TransactionManagement: React.FC = () => {
       window.URL.revokeObjectURL(url);
 
     } catch (err: any) {
-      console.error("Export failed", err);
-      alert("Failed to export transactions: " + (err.response?.data?.message || "Check your permissions."));
+      toast.error("Export failed", err);
+      toast.error("Failed to export transactions: " + (err.response?.data?.message || "Check your permissions."));
     } finally {
       setExporting(false);
     }
@@ -309,7 +309,7 @@ const TransactionManagement: React.FC = () => {
       setConfirmModal({ show: false, type: null, txnId: null });
       fetchTransactions(); // Refresh after action
     } catch (error) {
-      alert("Action failed.");
+      toast.error("Action failed.");
     }
   };
 

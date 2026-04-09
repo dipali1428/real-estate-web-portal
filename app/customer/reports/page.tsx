@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  TrendingUp, Wallet, PieChart as PieChartIcon, Building, ArrowUpRight, Clock, FolderOpen, Banknote,
+  TrendingUp, Wallet, PieChart as PieChartIcon, Building, ArrowUpRight, FolderOpen, Banknote,
   BarChart3, Inbox, FileText, Package, Activity,
   CheckCircle, Clock as ClockIcon, IndianRupee, Table
 } from 'lucide-react';
@@ -11,7 +11,6 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import customerService from "../../services/customerService";
-import Link from 'next/link';
 
 // ==================== TYPES ====================
 

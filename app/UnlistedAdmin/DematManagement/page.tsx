@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminService, DematDetails } from "../../services/unlistedadminservices";
 import { 
@@ -9,6 +9,7 @@ import {
   User, Calendar, Fingerprint, CreditCard, Database,
   AlertCircle, Loader2
 } from "lucide-react";
+import { toast } from 'react-hot-toast';
 
 interface LocalDemat extends DematDetails {
   fetchedAt?: string;
@@ -55,7 +56,7 @@ const DematManagement: React.FC = () => {
       setFetchError('No Demat details found for this ID');
     }
   } catch (error: any) {
-    console.error('❌ Error fetching demat by ID:', error);
+    toast.error(' Error fetching demat by ID:');
     if (error.response?.status === 404) {
       setFetchError('No Demat record found with this ID');
     } else {
@@ -94,7 +95,7 @@ const DematManagement: React.FC = () => {
         );
       }
     } catch (error) {
-      console.error(`Failed to refresh demat ID ${record.id}:`, error);
+      toast.error(`Failed to refresh demat ID ${record.id}:`);
     }
   };
 

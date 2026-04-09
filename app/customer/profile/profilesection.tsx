@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { User, Loader2, Edit2, Save, X, Key, Camera, Mail, CheckCircle2, AlertCircle } from 'lucide-react';
+import { User, Loader2, X, Key, Camera, CheckCircle2, AlertCircle } from 'lucide-react';
 import customerService from '../../services/customerService';
 import toast from 'react-hot-toast';
 

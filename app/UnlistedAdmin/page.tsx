@@ -12,10 +12,9 @@ import {
   HandCoins,
   CheckCircle 
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const DashboardOverview = () => {
-  const router = useRouter();
-  
   const [stats, setStats] = useState<UnlistedDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +36,7 @@ const DashboardOverview = () => {
       const statsData = await AdminService.getDashboardStats();
       setStats(statsData);
     } catch (err: any) {
-      console.error('Dashboard fetch error:', err);
+      toast.error('Dashboard fetch error:');
       setError(err.response?.data?.message || 'Failed to load dashboard data');
       setStats({
         total_users: "0",

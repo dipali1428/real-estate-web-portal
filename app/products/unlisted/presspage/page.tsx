@@ -6,14 +6,12 @@ import {
   Newspaper,
   ExternalLink,
   Search,
-  Building2,
   Grid,
   List,
   ArrowLeft,
   Loader2,
   X,
   Calendar,
-  FileText,
   Tag
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,6 +22,7 @@ import {
   CorporateAction
 } from '../../../services/unlistedservices';
 import api from '../../../services/api';
+import { toast } from 'react-hot-toast';
 
 interface CompanyOption {
   name: string;
@@ -65,7 +64,7 @@ export default function PressMediaPage() {
       data.forEach(item => { if (item.logo_url) mapping[item.shares_name] = item.logo_url; });
       setLogoMap(mapping);
     } catch (err) {
-      console.error("Error fetching logos:", err);
+      toast.error("Error fetching logos:");
     }
   };
 
@@ -95,7 +94,7 @@ export default function PressMediaPage() {
         setCompanyOptions(options);
       }
     } catch (err) {
-      console.error("Error fetching data:", err);
+      toast.error("Error fetching data:");
     } finally {
       setLoading(false);
     }

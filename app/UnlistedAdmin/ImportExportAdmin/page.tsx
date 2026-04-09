@@ -9,7 +9,6 @@ import {
   Upload, 
   FileSpreadsheet, 
   X,
-  Zap,
   Loader2,
   Database,
   Download,
@@ -20,6 +19,7 @@ import {
   History,
   Clock
 } from "lucide-react";
+import { toast } from 'react-hot-toast';
 
 const ImportExportAdmin: React.FC = () => {
   const router = useRouter();
@@ -31,7 +31,7 @@ const ImportExportAdmin: React.FC = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState({ percent: 0, status: 'Waiting...' });
   const [logs, setLogs] = useState<string[]>([]);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [toastMessage, setToastMessage] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [importResult, setImportResult] = useState<{
     rowsProcessed?: number;
     rowsSkipped?: number;
@@ -49,7 +49,7 @@ const ImportExportAdmin: React.FC = () => {
   // --- EXPORT SHARES ONLY ---
   const handleExportShares = async () => {
     setIsExporting(true);
-    setToast({ message: 'Preparing export...', type: 'info' });
+    setToastMessage({ message: 'Preparing export...', type: 'info' });
     
     try {
       const endpoint = "/api/unlisted/admin/analytics/shares/export";
@@ -74,35 +74,35 @@ const ImportExportAdmin: React.FC = () => {
       // Success message
       const successMsg = '✓ Shares exported successfully';
       setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${successMsg}`]);
-      setToast({ message: successMsg, type: 'success' });
+      setToastMessage({ message: successMsg, type: 'success' });
       
       // Auto-hide toast after 3 seconds
-      setTimeout(() => setToast(null), 3000);
+      setTimeout(() => setToastMessage(null), 3000);
 
-    } catch (err: any) {
-      console.error("Export failed", err);
+    }  catch (err: any) {
       const errorMsg = `✗ Export failed: ${err.response?.data?.message || err.message}`;
-      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${errorMsg}`]);
-      setToast({ message: errorMsg, type: 'error' });
       
-      // Auto-hide toast after 5 seconds for errors
-      setTimeout(() => setToast(null), 5000);
-    } finally {
-      setIsExporting(false);
-    }
-  };
+      // log to local state if you want
+      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${errorMsg}`]);
+
+      // show toast
+      toast.error(errorMsg, { duration: 5000 }); // auto-hide after 5 seconds
+      } finally {
+        setIsExporting(false);
+      }
+    };
 
   // --- IMPORT LOGIC WITH MODE SELECTION ---
   const startImport = async () => {
     if (!file) {
-      setToast({ message: 'Please select a file first', type: 'error' });
-      setTimeout(() => setToast(null), 3000);
+      setToastMessage({ message: 'Please select a file first', type: 'error' });
+      setTimeout(() => setToastMessage(null), 3000);
       return;
     }
     
     setIsImporting(true);
     setProgress({ percent: 30, status: 'Processing...' });
-    setToast({ message: `Importing file with ${importType} mode...`, type: 'info' });
+    setToastMessage({ message: `Importing file with ${importType} mode...`, type: 'info' });
     setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] Starting ${importType} import of ${file.name}...`]);
     setImportResult(null);
     
@@ -130,24 +130,24 @@ const ImportExportAdmin: React.FC = () => {
       // Success message
       const successMsg = `✓ File imported successfully in ${importType} mode (${response.rowsProcessed} rows processed)`;
       setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${successMsg}`]);
-      setToast({ message: successMsg, type: 'success' });
+      setToastMessage({ message: successMsg, type: 'success' });
       
       // Clear file after successful import (delayed)
       setTimeout(() => {
         setFile(null);
         setProgress({ percent: 0, status: 'Waiting...' });
-        setToast(null);
+        setToastMessage(null);
       }, 3000);
       
     } catch (err: any) {
       const errorMsg = `✗ Import failed: ${err.response?.data?.message || err.message}`;
       setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${errorMsg}`]);
       setProgress({ percent: 0, status: 'Failed' });
-      setToast({ message: errorMsg, type: 'error' });
+      setToastMessage({ message: errorMsg, type: 'error' });
       setImportResult(null);
       
       // Auto-hide error toast after 5 seconds
-      setTimeout(() => setToast(null), 5000);
+      setTimeout(() => setToastMessage(null), 5000);
     } finally {
       setIsImporting(false);
     }
@@ -183,29 +183,29 @@ const ImportExportAdmin: React.FC = () => {
 
         {/* Toast Message */}
         <AnimatePresence>
-          {toast && (
+          {toastMessage && (
             <motion.div
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
               className={`fixed top-24 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${
-                toast.type === 'success' 
+                toastMessage.type === 'success' 
                   ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
-                  : toast.type === 'error'
+                  : toastMessage.type === 'error'
                   ? 'bg-red-50 border-red-200 text-red-700'
                   : 'bg-blue-50 border-blue-200 text-blue-700'
               }`}
             >
-              {toast.type === 'success' ? (
+              {toastMessage.type === 'success' ? (
                 <CheckCircle className="w-5 h-5" />
-              ) : toast.type === 'error' ? (
+              ) : toastMessage.type === 'error' ? (
                 <AlertCircle className="w-5 h-5" />
               ) : (
                 <RefreshCw className="w-5 h-5" />
               )}
-              <span className="text-sm font-medium">{toast.message}</span>
+              <span className="text-sm font-medium">{toastMessage.message}</span>
               <button 
-                onClick={() => setToast(null)}
+                onClick={() => setToastMessage(null)}
                 className="p-1 hover:bg-black/5 rounded-lg transition-colors"
               >
                 <X className="w-4 h-4" />

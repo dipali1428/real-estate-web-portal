@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { createEnquiry } from '../../../services/unlistedservices';
 import { useModal } from '../../../context/ModalContext';
+import { toast } from 'react-hot-toast';
 
 // Define Enquiry type matching the service
 interface EnquiryPayload {
@@ -154,8 +155,6 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                 quantity: quantityNum,
                 message: `Enquiry for company ID ${companyIdNum} - ${quantityNum} shares`
             };
-
-            console.log('Sending enquiry payload:', payload);
             
             await createEnquiry(payload);
             
@@ -172,7 +171,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
             showNotification('Enquiry submitted successfully!', 'success');
             
         } catch (err: any) {
-            console.error('Enquiry error:', err);
+            toast.error('Enquiry error:');
             const errorMessage = err.response?.data?.message || err.message || 'Failed to submit enquiry. Please try again.';
             setEnquiryError(errorMessage);
             showNotification(errorMessage, 'error');

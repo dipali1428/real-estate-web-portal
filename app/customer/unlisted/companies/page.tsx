@@ -374,7 +374,7 @@ export default function CompaniesPage() {
             grid: { color: 'rgba(0, 0, 0, 0.05)' },
             ticks: { 
               callback: (val) => `₹${val}`,
-              font: { size: 11 }
+              font: { size: 10 }
             }
           },
           x: {
@@ -383,7 +383,7 @@ export default function CompaniesPage() {
               autoSkip: true,
               maxRotation: 0,
               autoSkipPadding: 20,
-              font: { size: 10 }
+              font: { size: 9 }
             }
           }
         }
@@ -598,7 +598,7 @@ export default function CompaniesPage() {
               
               <div className="text-xs text-gray-500 mb-4 px-3 py-1 bg-gray-100 rounded-full font-bold">Unlisted Shares</div>
 
-              {/* Stats Grid - Using reference font sizing (text-xs label, text-sm value) */}
+              {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6 py-4 border-y border-gray-50">
                 <div className="text-center">
                   <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
@@ -657,7 +657,7 @@ export default function CompaniesPage() {
         </div>
       )}
 
-      {/* DETAIL MODAL */}
+      {/* DETAIL MODAL - SMALLER VERSION */}
       <AnimatePresence>
         {selectedCompany && (() => {
           const enriched = getEnrichedCompany(selectedCompany);
@@ -674,105 +674,105 @@ export default function CompaniesPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 overflow-hidden flex flex-col border border-gray-100"
+                className="bg-white rounded-2xl w-full max-w-4xl shadow-2xl my-8 overflow-hidden flex flex-col border border-gray-100"
               >
                 
-                {/* HEADER */}
-                <div className="bg-white border-b border-gray-100 p-6 flex flex-wrap items-start justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
+                {/* HEADER - Compact */}
+                <div className="bg-white border-b border-gray-100 p-4 flex flex-wrap items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
                       {enriched.logo_url ? (
-                        <img src={enriched.logo_url} className="w-full h-full object-contain p-2" alt={enriched.shares_name} />
+                        <img src={enriched.logo_url} className="w-full h-full object-contain p-1" alt={enriched.shares_name} />
                       ) : (
-                        <span className="text-2xl font-bold text-[#2076C7]">{enriched.shares_name.charAt(0)}</span>
+                        <span className="text-xl font-bold text-[#2076C7]">{enriched.shares_name.charAt(0)}</span>
                       )}
                     </div>
                     <div>
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full">
+                      <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                        <span className="px-2 py-0.5 bg-blue-50 text-[#2076C7] text-[10px] font-bold rounded-full">
                           {enriched.category || 'Unlisted Shares'}
                         </span>
                       </div>
-                      <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{enriched.shares_name}</h2>
-                      <p className="text-sm text-gray-500 mt-1 flex items-center gap-1 flex-wrap">
-                        <MapPin className="w-3.5 h-3.5 flex-shrink-0" /> {enriched.headquarters || 'India'} • Est. {enriched.founded_year}
+                      <h2 className="text-xl font-bold text-gray-900">{enriched.shares_name}</h2>
+                      <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1 flex-wrap">
+                        <MapPin className="w-3 h-3 flex-shrink-0" /> {enriched.headquarters || 'India'} • Est. {enriched.founded_year}
                       </p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3">
                     <div className="text-right">
-                      <p className="text-xs text-gray-500 font-medium">Current Price</p>
-                      <div className="text-2xl md:text-3xl font-bold text-[#10b981]">
+                      <p className="text-[10px] text-gray-500 font-medium">Current Price</p>
+                      <div className="text-xl font-bold text-[#10b981]">
                         {formatCurrency(enriched.price)}
                       </div>
                     </div>
                     <button 
                       onClick={() => setSelectedCompany(null)} 
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600 flex-shrink-0"
+                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600 flex-shrink-0"
                     >
-                      <X size={24} />
+                      <X size={20} />
                     </button>
                   </div>
                 </div>
 
-                {/* BODY */}
-                <div className="p-6 md:p-8 bg-gray-50/30 overflow-y-auto max-h-[calc(90vh-120px)]">
+                {/* BODY - Compact */}
+                <div className="p-4 bg-gray-50/30 overflow-y-auto max-h-[calc(85vh-100px)]">
                   
-                  {/* Metric Cards Row - Responsive */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                  {/* Metric Cards Row - Smaller */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
                     {[
                       { label: 'Minimum Lot', value: `${(enriched.min_lot_size || 100).toLocaleString()} Shares`, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
                       { label: 'Min Investment', value: `₹${calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}`, icon: IndianRupee, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                       { label: 'Face Value', value: `₹${enriched.face_value || '10'}`, icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50' },
                       { label: 'Market Cap', value: enriched.market_cap || 'N/A', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50' }
                     ].map((item, i) => (
-                      <div key={i} className="bg-white p-4 md:p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                        <div className={`w-8 h-8 md:w-10 md:h-10 ${item.bg} ${item.color} rounded-lg flex items-center justify-center mb-3`}>
-                          <item.icon size={18} className="md:w-5 md:h-5" />
+                      <div key={i} className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                        <div className={`w-7 h-7 ${item.bg} ${item.color} rounded-lg flex items-center justify-center mb-2`}>
+                          <item.icon size={14} />
                         </div>
-                        <p className="text-[10px] md:text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{item.label}</p>
-                        <p className="text-sm md:text-lg font-bold text-gray-900 break-words">{item.value}</p>
+                        <p className="text-[9px] font-medium text-gray-500 uppercase tracking-wider mb-0.5">{item.label}</p>
+                        <p className="text-xs font-bold text-gray-900 break-words">{item.value}</p>
                       </div>
                     ))}
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     
                     {/* LEFT: Graph & Description */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="lg:col-span-2 space-y-4">
                       
-                      {/* Chart Section */}
-                      <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                      {/* Chart Section - Compact */}
+                      <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                           <div>
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="text-xs font-medium text-gray-500">Price History</span>
-                              <span className="text-[10px] font-medium text-gray-400">•</span>
-                              <span className="text-[10px] font-medium text-gray-400">
+                            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                              <span className="text-[10px] font-medium text-gray-500">Price History</span>
+                              <span className="text-[9px] font-medium text-gray-400">•</span>
+                              <span className="text-[9px] font-medium text-gray-400">
                                 {graphTimeRange === 'All' ? 'All Time' : 
                                 graphTimeRange === '3M' ? '3 Months' : 
                                 graphTimeRange === '1M' ? '1 Month' : 
                                 graphTimeRange === '1W' ? '1 Week' : ''}
                               </span>
                             </div>
-                            <div className="flex items-baseline gap-3 flex-wrap">
-                              <h3 className="text-2xl font-bold text-gray-900">
+                            <div className="flex items-baseline gap-2 flex-wrap">
+                              <h3 className="text-lg font-bold text-gray-900">
                                 {formatCurrency(enriched.price)}
                               </h3>
-                              <span className="text-sm font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">
                                 +{(Math.random() * 5).toFixed(2)}%
                               </span>
                             </div>
-                            <p className="text-xs text-gray-400 mt-1">Current Price</p>
+                            <p className="text-[10px] text-gray-400 mt-0.5">Current Price</p>
                           </div>
                           
-                          <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80 self-start sm:self-auto">
+                          <div className="flex gap-1 bg-gray-50/80 p-0.5 rounded-lg border border-gray-200/80 self-start sm:self-auto">
                             {['All', '3M', '1M', '1W'].map(r => (
                               <button 
                                 key={r} 
                                 onClick={() => setGraphTimeRange(r)} 
-                                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+                                className={`px-2.5 py-1 text-[10px] font-medium rounded-md transition-all ${
                                   graphTimeRange === r 
                                     ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200' 
                                     : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
@@ -784,121 +784,105 @@ export default function CompaniesPage() {
                           </div>
                         </div>
 
-                        <div className="h-64 w-full relative mb-8">
+                        <div className="h-48 w-full relative mb-4">
                           {isModalGraphLoading ? (
                             <div className="h-full flex items-center justify-center">
-                              <Loader2 className="animate-spin text-[#2076C7]" size={32} />
+                              <Loader2 className="animate-spin text-[#2076C7]" size={24} />
                             </div>
                           ) : modalGraphData.length > 0 ? (
                             <canvas ref={chartRef}></canvas>
                           ) : (
                             <div className="h-full flex items-center justify-center">
-                              <p className="text-sm text-gray-400">No price data available</p>
+                              <p className="text-xs text-gray-400">No price data available</p>
                             </div>
                           )}
                         </div>
 
-                        {/* 52 Week High/Low - Responsive Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2">
-                          <div className="bg-gray-50/50 rounded-lg p-3">
-                            <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">
-                              52W High
-                            </p>
-                            <p className="text-base md:text-lg font-bold text-gray-900">
-                              ₹{high52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                            </p>
-                            <p className="text-[10px] text-gray-500 font-medium mt-0.5 truncate">
+                        {/* 52 Week High/Low - Compact */}
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="bg-gray-50/50 rounded-lg p-2">
+                            <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wider mb-0.5">52W High</p>
+                            <p className="text-sm font-bold text-gray-900">₹{high52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                            <p className="text-[9px] text-gray-500 font-medium mt-0.5 truncate">
                               {highDate ? new Date(highDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A'}
                             </p>
                           </div>
-                          
-                          <div className="bg-gray-50/50 rounded-lg p-3">
-                            <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">
-                              52W Low
-                            </p>
-                            <p className="text-base md:text-lg font-bold text-gray-900">
-                              ₹{low52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                            </p>
-                            <p className="text-[10px] text-gray-500 font-medium mt-0.5 truncate">
+                          <div className="bg-gray-50/50 rounded-lg p-2">
+                            <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wider mb-0.5">52W Low</p>
+                            <p className="text-sm font-bold text-gray-900">₹{low52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                            <p className="text-[9px] text-gray-500 font-medium mt-0.5 truncate">
                               {lowDate ? new Date(lowDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A'}
                             </p>
                           </div>
-                          
-                          <div className="bg-gray-50/50 rounded-lg p-3">
-                            <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">
-                              Avg Volume
-                            </p>
-                            <p className="text-base md:text-lg font-bold text-gray-900">
-                              {enriched.volume || '45.2K'}
-                            </p>
-                            <p className="text-[10px] text-gray-500 font-medium mt-0.5">
-                              Daily average
-                            </p>
+                          <div className="bg-gray-50/50 rounded-lg p-2">
+                            <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wider mb-0.5">Avg Volume</p>
+                            <p className="text-sm font-bold text-gray-900">{enriched.volume || '45.2K'}</p>
+                            <p className="text-[9px] text-gray-500 font-medium mt-0.5">Daily avg</p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Description Card */}
-                      <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
-                        <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-                          <Info className="text-[#1CADA3]" size={20} />
+                      {/* Description Card - Compact */}
+                      <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
+                        <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-1.5">
+                          <Info className="text-[#1CADA3]" size={14} />
                           About the Company
                         </h3>
-                        <p className="text-gray-600 leading-relaxed text-sm">
-                          {enriched.description || `${enriched.shares_name} is a leading player in the ${enriched.category || 'unlisted shares'} sector with strong growth potential and a proven track record of innovation.`}
+                        <p className="text-gray-600 leading-relaxed text-xs">
+                          {enriched.description || `${enriched.shares_name} is a leading player in the ${enriched.category || 'unlisted shares'} sector with strong growth potential.`}
                         </p>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
+                        <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-gray-100">
                           <div>
-                            <p className="text-xs text-gray-500 mb-1">ISIN</p>
-                            <p className="text-sm font-semibold text-gray-900 break-words">{enriched.isin || 'N/A'}</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">ISIN</p>
+                            <p className="text-xs font-semibold text-gray-900 break-words">{enriched.isin || 'N/A'}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 mb-1">Depository</p>
-                            <p className="text-sm font-semibold text-gray-900">{enriched.depository_applicable?.split(' ')[0] || 'NSDL'}</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">Depository</p>
+                            <p className="text-xs font-semibold text-gray-900">{enriched.depository_applicable?.split(' ')[0] || 'NSDL'}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 mb-1">Face Value</p>
-                            <p className="text-sm font-semibold text-gray-900">₹{enriched.face_value || '10'}</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">Face Value</p>
+                            <p className="text-xs font-semibold text-gray-900">₹{enriched.face_value || '10'}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 mb-1">Lot Size</p>
-                            <p className="text-sm font-semibold text-gray-900">{(enriched.min_lot_size || 100).toLocaleString()} shares</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">Lot Size</p>
+                            <p className="text-xs font-semibold text-gray-900">{(enriched.min_lot_size || 100).toLocaleString()} shares</p>
                           </div>
                         </div>
                       </div>
                     </div>
                     
-                    {/* RIGHT: Sidebar */}
-                    <div className="space-y-6">
+                    {/* RIGHT: Sidebar - Compact */}
+                    <div className="space-y-4">
                       
-                      {/* Key Statistics Card */}
-                      <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
-                        <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                          <Activity size={16} className="text-[#2076C7]" />
+                      {/* Key Statistics Card - Compact */}
+                      <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
+                        <h4 className="text-xs font-bold text-gray-900 mb-2 flex items-center gap-1.5">
+                          <Activity size={12} className="text-[#2076C7]" />
                           Key Statistics
                         </h4>
                         
-                        <div className="space-y-4">
+                        <div className="space-y-2">
                           {[
                             { label: 'P/E Ratio', value: enriched.pe_ratio || 'N/A' },
                             { label: 'P/B Ratio', value: enriched.pb_ratio || 'N/A' },
                             { label: 'ROE', value: enriched.roe ? `${enriched.roe}%` : 'N/A' },
                             { label: '24h Volume', value: enriched.volume || 'N/A' }
                           ].map((stat, i) => (
-                            <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
-                              <span className="text-xs text-gray-500">{stat.label}</span>
-                              <span className="text-sm font-bold text-gray-900">{stat.value}</span>
+                            <div key={i} className="flex justify-between items-center py-1 border-b border-gray-50 last:border-0">
+                              <span className="text-[10px] text-gray-500">{stat.label}</span>
+                              <span className="text-xs font-bold text-gray-900">{stat.value}</span>
                             </div>
                           ))}
                         </div>
                       </div>
 
-                      {/* Action Card */}
-                      <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 md:p-6 border border-gray-200 shadow-sm">
-                        <h4 className="text-sm font-bold text-gray-900 mb-3">Ready to Invest?</h4>
-                        <p className="text-xs text-gray-500 mb-6">
-                          Minimum investment: ₹{calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}
+                      {/* Action Card - Compact */}
+                      <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-3 border border-gray-200 shadow-sm">
+                        <h4 className="text-xs font-bold text-gray-900 mb-2">Ready to Invest?</h4>
+                        <p className="text-[10px] text-gray-500 mb-3">
+                          Min: ₹{calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}
                         </p>
                         
                         <button
@@ -906,32 +890,31 @@ export default function CompaniesPage() {
                             setSelectedCompany(null);
                             handleBuyNow(enriched);
                           }}
-                          className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                          className="w-full py-2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-xs font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-1.5"
                         >
-                          <ShoppingCart size={18} /> Buy Now
-                          
+                          <ShoppingCart size={14} /> Buy Now
                         </button>
                         
-                        <p className="text-[10px] text-gray-400 text-center mt-4">
-                          Our team will contact you within 24 hours
+                        <p className="text-[9px] text-gray-400 text-center mt-2">
+                          Contact within 24 hours
                         </p>
                       </div>
 
-                      {/* Valuation Progress Bars */}
-                      <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
-                        <h4 className="text-sm font-bold text-gray-900 mb-4">Valuation Metrics</h4>
-                        <div className="space-y-5">
+                      {/* Valuation Progress Bars - Compact */}
+                      <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
+                        <h4 className="text-xs font-bold text-gray-900 mb-2">Valuation Metrics</h4>
+                        <div className="space-y-2">
                           {[
                             { label: 'Industry Position', value: '85%', percent: 85 },
                             { label: 'Growth Potential', value: '72%', percent: 72 },
                             { label: 'Market Demand', value: '68%', percent: 68 }
                           ].map((metric, i) => (
                             <div key={i}>
-                              <div className="flex justify-between items-center mb-1.5">
-                                <span className="text-xs text-gray-600">{metric.label}</span>
-                                <span className="text-xs font-bold text-gray-900">{metric.value}</span>
+                              <div className="flex justify-between items-center mb-0.5">
+                                <span className="text-[9px] text-gray-600">{metric.label}</span>
+                                <span className="text-[9px] font-bold text-gray-900">{metric.value}</span>
                               </div>
-                              <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
                                 <div 
                                   className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full" 
                                   style={{ width: metric.percent }}

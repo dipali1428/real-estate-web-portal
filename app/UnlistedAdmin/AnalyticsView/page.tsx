@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { UnlistedAnalyticsService } from '../../services/unlistedAnalyticsService';
 import { 
-  Building2, IndianRupee, TrendingUp, Activity, CheckCircle2, AlertCircle, 
+  Building2, IndianRupee, TrendingUp, Activity, CheckCircle2,
   Clock, Loader2, BarChart3, LineChart, PieChart, ArrowUpRight, ArrowDownRight, 
-  Download, Filter, Search, AlertTriangle, Shield, Bell, Eye, Database, FileText,
-  LayoutDashboard, Layers, Flame, X, Calendar, Hash, User, Briefcase, Package,
-  ShoppingCart, HandCoins, Inbox
+  Filter, Bell, Database, FileText,
+  LayoutDashboard, Layers, Flame, Package,
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 // Types
 interface HighInvestmentAlert {
@@ -170,7 +170,7 @@ const AnalyticsView = () => {
       }
 
     } catch (error) {
-      console.error("Analytics fetch error:", error);
+      toast.error("Analytics fetch error:");
       setShareFilters([]);
       setTransactionFilters([]);
       setHighInvestmentAlerts([]);
@@ -190,7 +190,7 @@ const AnalyticsView = () => {
       const data = await UnlistedAnalyticsService.filterShares(params);
       setShareFilters(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Error applying share filters:", error);
+      toast.error("Error applying share filters:");
       setShareFilters([]);
     }
   };
@@ -205,7 +205,7 @@ const AnalyticsView = () => {
       const data = await UnlistedAnalyticsService.filterTransactions(params);
       setTransactionFilters(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Error applying transaction filters:", error);
+      toast.error("Error applying transaction filters:");
       setTransactionFilters([]);
     }
   };

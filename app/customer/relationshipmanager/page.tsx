@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import CustomerService from '../../services/customerService';
 import { motion } from 'motion/react';
 import { UserCheck } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 // Types
 interface RelationshipManager {
@@ -30,29 +31,28 @@ const RelationshipManager: React.FC = () => {
     phone: '1800-532-7600'
   });
 
-  // Fetch API Data
-  useEffect(() => {
-    const fetchRM = async () => {
-      try {
-        const response = await CustomerService.getrmcustomer();
+useEffect(() => {
+  const fetchRM = async () => {
+    try {
+      const response = await CustomerService.getrmcustomer();
 
-        if (response?.success && response?.data) {
-          const rmData = response.data;
+      if (response?.success && response?.data) {
+        const rmData = response.data;
 
-          setRelationshipManager({
-            id: rmData.id?.toString() || 'assigned-rm',
-            name: rmData.name || 'Your RM will be assigned soon',
-            email: rmData.email || 'info@infinityarthvishva.com',
-            phone: rmData.mobile ? `+91 ${rmData.mobile}` : '1800-532-7600'
-          });
-        }
-      } catch (error) {
-        console.error('RM fetch failed:', error);
+        setRelationshipManager({
+          id: rmData.id?.toString() || 'assigned-rm',
+          name: rmData.name || 'Your RM will be assigned soon',
+          email: rmData.email || 'info@infinityarthvishva.com',
+          phone: rmData.mobile ? `+91 ${rmData.mobile}` : '1800-532-7600'
+        });
       }
-    };
+    } catch (error) {
+      toast.error('Failed to fetch RM details. Please try again later.');
+    }
+  };
 
-    fetchRM();
-  }, []);
+  fetchRM();
+}, []);
 
   // Contact Cards Data
   const contactCards: ContactCard[] = [

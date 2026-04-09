@@ -7,6 +7,7 @@ import {
   Users, Search, RotateCw, 
   ChevronLeft, ChevronRight, Phone, Hash, Pencil, Trash2, Plus, X
 } from "lucide-react";
+import { toast } from 'react-hot-toast';
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<UnlistedUser[]>([]);
@@ -30,7 +31,7 @@ const UserManagement: React.FC = () => {
         setTotalPages(response.totalPages || 1); 
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
+      toast.error('Error fetching users:');
     } finally {
       setLoading(false);
     }
@@ -48,8 +49,7 @@ const UserManagement: React.FC = () => {
       await AdminService.deleteUser(id); 
       fetchUsers(currentPage);
     } catch (error) {
-      console.error("Delete error:", error);
-      alert("Delete failed. Check console for details.");
+      toast.error("Delete error:");
     }
   };
 
@@ -60,7 +60,7 @@ const UserManagement: React.FC = () => {
     try {
       if (modalType === 'add') {
         if (!selectedUser?.name || !selectedUser?.email || !selectedUser?.mobile) {
-          alert("Name, Email and Mobile are required fields");
+          toast.error("Name, Email and Mobile are required fields");
           setSubmitLoading(false);
           return;
         }
@@ -74,7 +74,7 @@ const UserManagement: React.FC = () => {
         };
         
         await AdminService.addUser(payload);
-        alert("User added successfully!");
+        toast.success("User added successfully!");
       } else {
         if (selectedUser?.id) {
           const payload: UpdateUserPayload = {};
@@ -86,16 +86,16 @@ const UserManagement: React.FC = () => {
           if (selectedUser.adv_id !== undefined) payload.adv_id = selectedUser.adv_id;
 
           await AdminService.updateUser(selectedUser.id, payload);
-          alert("User updated successfully!");
+          toast.success("User updated successfully!");
         }
       }
       
       setIsModalOpen(false);
       fetchUsers(currentPage);
     } catch (error: any) {
-      console.error("Submit error:", error);
+      toast.error("Submit error:", error);
       const serverMessage = error.response?.data?.message || error.response?.data?.error || "Check all fields";
-      alert(`Failed: ${serverMessage}`);
+      toast.error(`Failed: ${serverMessage}`);
     } finally {
       setSubmitLoading(false);
     }

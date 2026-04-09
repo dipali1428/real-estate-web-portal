@@ -5,8 +5,9 @@ import { AdminService } from '../../services/unlistedadminservices';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageSquare, Search, CheckCircle, User, Mail, Phone, Calendar, Eye, ShoppingCart, X,
-  Archive, Clock, Filter, Tag, HandCoins, Building2, Package, RefreshCw, Inbox
+  Archive, Clock, Filter, Tag, HandCoins, Building2, Package, Inbox
 } from "lucide-react";
+import { toast } from 'react-hot-toast';
 
 // Define the Enquiry type locally to match your API response
 interface LocalEnquiry {
@@ -410,7 +411,7 @@ const fetchEnquiries = async () => {
     }));
     setEnquiries(mappedData);
   } catch (error) {
-    console.error('Error fetching enquiries:', error);
+    toast.error('Error fetching enquiries:');
   } finally {
     setLoading(false);
   }
@@ -423,7 +424,7 @@ const fetchEnquiries = async () => {
       ));
       setShowDetailModal(false);
     } catch (error) {
-      console.error('Failed to resolve enquiry:', error);
+      toast.error('Failed to resolve enquiry:');
     }
   };
 
@@ -434,7 +435,7 @@ const fetchEnquiries = async () => {
       ));
       setShowDetailModal(false);
     } catch (error) {
-      console.error('Failed to archive enquiry:', error);
+      toast.error('Failed to archive enquiry:');
     }
   };
 

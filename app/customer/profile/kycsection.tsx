@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Landmark, CheckCircle2, AlertCircle, Fingerprint, Loader2, ShieldCheck, Lock, Save, Database, Info } from 'lucide-react';
+import {CheckCircle2, AlertCircle, Fingerprint, Loader2, ShieldCheck, Lock, Save, Database, Info } from 'lucide-react';
 import customerService from '../../services/customerService';
 import toast from 'react-hot-toast';
 
@@ -10,19 +10,6 @@ const maskPAN = (pan: string) => (pan && pan.length >= 10) ? pan.slice(0, 2) + "
 const maskAadhaar = (num: string) => (num && num.length >= 12) ? "•••• •••• " + num.slice(-4) : num;
 const maskAccount = (num: string) => num ? "•".repeat(Math.max(0, num.length - 4)) + num.slice(-4) : "";
 const maskIFSC = (ifsc: string) => ifsc ? ifsc.slice(0, 4) + "••••" + ifsc.slice(-3) : "";
-
-// Helper function to format date of birth from YYYY-MM-DD to DD/MM/YYYY for display
-const formatDOBForDisplay = (dateStr: string) => {
-  if (!dateStr) return '';
-  // If already in DD/MM/YYYY format
-  if (dateStr.includes('/')) return dateStr;
-  // If in YYYY-MM-DD format
-  if (dateStr.includes('-')) {
-    const [year, month, day] = dateStr.split('-');
-    return `${day}/${month}/${year}`;
-  }
-  return dateStr;
-};
 
 // Helper function to format date of birth for input (DD/MM/YYYY)
 const formatDOBInput = (value: string) => {
