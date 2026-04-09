@@ -242,8 +242,22 @@ function Field({ label, value, onChange, type = "text", options, required, place
           </>
         ) : (
           <input type={type} value={value} onChange={e => onChange(e.target.value)} onKeyDown={e => {
-            if (onlyNumber && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
-          }} maxLength={maxLength} placeholder={placeholder} className={STYLES.input(!!error)} />
+              if (onlyNumber) {
+                // 1. Allow navigation and control keys
+                const isControlKey = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab", "Enter", "Escape"].includes(e.key);
+                
+                // 2. Allow Ctrl/Command shortcuts (A, C, V, X)
+                const isShortcut = (e.ctrlKey === true || e.metaKey === true) && ["a", "c", "v", "x"].includes(e.key.toLowerCase());
+
+                // 3. Allow numbers
+                const isNumber = /^[0-9]$/.test(e.key);
+
+                // If it's none of the above, prevent the character from being typed
+                if (!isControlKey && !isShortcut && !isNumber) {
+                  e.preventDefault();
+                }
+              }
+            }} maxLength={maxLength} placeholder={placeholder} className={STYLES.input(!!error)} />
         )}
       </div>
       {error && <p className={STYLES.err}>{error}</p>}
