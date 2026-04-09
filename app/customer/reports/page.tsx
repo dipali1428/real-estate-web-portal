@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  TrendingUp, Wallet, PieChart as PieChartIcon, Building, ArrowUpRight, Clock, FolderOpen, Banknote,
+  TrendingUp, Wallet, PieChart as PieChartIcon, Building, ArrowUpRight, FolderOpen, Banknote,
   BarChart3, Inbox, FileText, Package, Activity,
   CheckCircle, Clock as ClockIcon, IndianRupee, Table
 } from 'lucide-react';
@@ -11,7 +11,6 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import customerService from "../../services/customerService";
-import Link from 'next/link';
 
 // ==================== TYPES ====================
 
@@ -267,26 +266,45 @@ export default function ReportsPage() {
         </motion.div>
 
         {/* Tabs Navigation - Horizontal Scroll on Mobile */}
-        <div className="flex space-x-1 sm:space-x-2 mb-4 sm:mb-6 overflow-x-auto pb-2 scrollbar-hide">
-          {[
-            { id: 'overview', name: 'Overview', icon: <Activity size={14} className="sm:w-4 sm:h-4" /> },
-            { id: 'products', name: 'Product Summary', icon: <Package size={14} className="sm:w-4 sm:h-4" /> },
-            { id: 'distribution', name: 'Distribution', icon: <PieChartIcon size={14} className="sm:w-4 sm:h-4" /> }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex-shrink-0 flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'bg-[#2076C7] text-white shadow-md'
-                  : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-              }`}
-            >
-              {tab.icon}
-              <span className="hidden sm:inline">{tab.name}</span>
-              <span className="sm:hidden">{tab.name === 'Product Summary' ? 'Products' : tab.name === 'Distribution' ? 'Dist.' : tab.name}</span>
-            </button>
-          ))}
+        <div className="w-full mb-6">
+          <div className="flex justify-center overflow-x-auto pb-2 scrollbar-hide">
+            <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+              {[
+                { id: 'overview', name: 'Overview', icon: <Activity size={14} /> },
+                { id: 'products', name: 'Product Summary', icon: <Package size={14} /> },
+                { id: 'distribution', name: 'Distribution', icon: <PieChartIcon size={14} /> }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`relative px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-2 shrink-0 ${
+                    activeTab === tab.id
+                      ? 'text-white'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {activeTab === tab.id && (
+                    <motion.div
+                      layoutId="activeTabPortfolio"
+                      className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+
+                  {tab.icon}
+
+                  <span className="hidden sm:inline">{tab.name}</span>
+                  <span className="sm:hidden">
+                    {tab.name === 'Product Summary'
+                      ? 'Products'
+                      : tab.name === 'Distribution'
+                      ? 'Dist.'
+                      : tab.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Overview Tab */}
@@ -569,13 +587,6 @@ export default function ReportsPage() {
                 <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6 max-w-md mx-auto px-4">
                   Start investing to see your portfolio distribution across different asset classes.
                 </p>
-                <Link
-                  href="/products/unlisted"
-                  className="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-semibold rounded-lg sm:rounded-xl hover:opacity-90 transition-all text-sm sm:text-base"
-                >
-                  <TrendingUp size={16} />
-                  Start Investing
-                </Link>
               </div>
             )}
 

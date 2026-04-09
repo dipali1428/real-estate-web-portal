@@ -9,8 +9,8 @@ import {
     type DashboardSummary,
     type GraphPoint
 } from '../../../services/unlistedservices';
+import { toast } from 'react-hot-toast';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 import {
     ArrowLeft,
     TrendingUp,
@@ -227,7 +227,7 @@ const LiveTrends: React.FC = () => {
     }, [chartRef.current]);
 
     // ========== CHART INITIALIZATION ==========
-  const initializeChart = useCallback(() => {
+    const initializeChart = useCallback(() => {
         if (!chartRef.current || graphData.length === 0) {
             return;
         }
@@ -333,7 +333,7 @@ const LiveTrends: React.FC = () => {
         try {
             chartInstance.current = new Chart(ctx, config);
         } catch (error) {
-            console.error('Chart creation error:', error);
+            toast.error('Chart creation error:');
         }
     }, [graphData, period]);
 
@@ -376,7 +376,7 @@ const LiveTrends: React.FC = () => {
                         <a 
                             href="/products/unlisted" 
                             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-[0_4px_16px_rgba(32,118,199,0.1)] hover:bg-white hover:border-[#2076C7]/40 active:scale-95 transition-all group cursor-pointer"
-                            >
+                        >
                             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                             <span className="font-semibold">Back</span>
                         </a>
@@ -555,7 +555,7 @@ const LiveTrends: React.FC = () => {
                                                     <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
                                                         {gainer.logo_url ? (
                                                             <img 
-                                                                src={gainer.logo_url.startsWith('http') ? gainer.logo_url : `${BASE_URL}${gainer.logo_url}`} 
+                                                                src={gainer.logo_url} 
                                                                 alt={gainer.shares_name} 
                                                                 className="w-full h-full object-contain p-1"
                                                                 onError={(e) => {
@@ -614,7 +614,7 @@ const LiveTrends: React.FC = () => {
                                                     <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
                                                         {loser.logo_url ? (
                                                             <img 
-                                                                src={loser.logo_url.startsWith('http') ? loser.logo_url : `${BASE_URL}${loser.logo_url}`} 
+                                                                src={loser.logo_url} 
                                                                 alt={loser.shares_name} 
                                                                 className="w-full h-full object-contain p-1"
                                                                 onError={(e) => {
@@ -668,7 +668,7 @@ const LiveTrends: React.FC = () => {
                     </div>
                     
                     {/* Scrollable Body - Height set to show exactly 10 rows, then scroll */}
-                    <div className="overflow-y-auto" style={{ maxHeight: '560px' }}> {/* 10 rows × 56px per row */}
+                    <div className="overflow-y-auto" style={{ maxHeight: '560px' }}>
                     {isSharesLoading ? (
                         <div className="flex justify-center items-center py-12">
                         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -693,13 +693,15 @@ const LiveTrends: React.FC = () => {
                                     <div className="w-10 h-10 rounded-md bg-white border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
                                         {share.logo_url ? (
                                             <img 
-                                                src={share.logo_url.startsWith('http') ? share.logo_url : `${BASE_URL}${share.logo_url}`} 
+                                                src={share.logo_url} 
                                                 alt={share.shares_name} 
                                                 className="w-full h-full object-contain p-1"
                                                 onError={(e) => {
                                                     const target = e.target as HTMLImageElement;
                                                     target.style.display = 'none';
-                                                    target.parentElement!.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 flex items-center justify-center text-[#2076C7] font-bold text-xs">${getCompanyInitials(share.shares_name)}</div>`;
+                                                    if (target.parentElement) {
+                                                        target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 flex items-center justify-center text-[#2076C7] font-bold text-xs">${getCompanyInitials(share.shares_name)}</div>`;
+                                                    }
                                                 }}
                                             />
                                         ) : (

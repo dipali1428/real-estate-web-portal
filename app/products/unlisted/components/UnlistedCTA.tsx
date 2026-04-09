@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { IconArrowRight, IconUsers } from '@tabler/icons-react';
+import { IconArrowRight } from '@tabler/icons-react';
 import React, { useState } from 'react';
 import { useModal } from '../../../context/ModalContext';
 import { createEnquiry } from '../../../services/unlistedservices';

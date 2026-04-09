@@ -7,32 +7,24 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Loader2,
   RefreshCw,
   Search,
-  Filter,
   ChevronDown,
   ChevronUp,
-  Calendar,
   IndianRupee,
-  Package,
   TrendingUp,
   TrendingDown,
   Eye,
   Download,
-  Printer,
   FileText,
   Home,
   Bell,
-  Settings,
   LogOut,
-  ArrowUpRight,
-  ArrowDownRight,
-  Info,
   X
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import customerService from '../../../services/customerService';
+import { toast } from 'react-hot-toast';
 
 // ==================== TYPES ====================
 
@@ -115,7 +107,7 @@ export default function OrdersPage() {
   //         setError('Failed to load orders');
   //       }
   //     } catch (err: any) {
-  //       console.error('Orders fetch error:', err);
+  //       toast.error('Orders fetch error:', err);
         
   //       if (err.response?.status === 401) {
   //         showNotification('Session expired. Please login again.', 'error');
@@ -219,15 +211,15 @@ export default function OrdersPage() {
   };
 
   // ========== HANDLE LOGOUT ==========
-  const handleLogout = async () => {
-    try {
-      removeTokenCookie();
+ const handleLogout = async () => {
+  const router = useRouter();
+
+  try {
+    removeTokenCookie();
       localStorage.removeItem('token');
-      showNotification('Logged out successfully', 'success');
       router.push('/');
     } catch (err) {
-      console.error('Logout error:', err);
-      showNotification('Failed to logout', 'error');
+      toast.error('Failed to logout. Please try again.');
     }
   };
 
