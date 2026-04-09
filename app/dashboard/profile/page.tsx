@@ -150,14 +150,14 @@ export default function ProfileSection() {
 
                         // 2. Adjust thresholds based on device
                         // On wide desktop cams, the face is naturally a smaller % of the total width
-                        const minW = isDesktop ? 0.45 : 0.17; 
+                        const minW = isDesktop ? 0.45 : 0.17;
                         const maxW = isDesktop ? 0.53 : 0.27;
-                        
+
                         // On desktop, we give a bit more wiggle room for centering 
                         // because webcams are often not perfectly centered on the monitor
                         const hRange = isDesktop ? { min: 0.42, max: 0.58 } : { min: 0.45, max: 0.52 };
                         const vRange = isDesktop ? { min: 0.45, max: 0.65 } : { min: 0.50, max: 0.60 };
-                        
+
                         const isCenteredH = centerX > hRange.min && centerX < hRange.max;
                         const isCenteredV = centerY > vRange.min && centerY < vRange.max;
                         const isBigEnough = normW > minW && normW < maxW;
@@ -242,13 +242,13 @@ export default function ProfileSection() {
 
         return (
             <div className="fixed inset-0 z-[250] bg-black flex flex-col lg:items-center lg:justify-center font-sans">
-                
+
                 {/* DESKTOP BACKGROUND OVERLAY (Only visible on large screens) */}
                 <div className="hidden lg:block absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
-        
+
                 {/* MAIN MODAL BODY */}
                 <div className="relative flex flex-col flex-1 w-full h-full lg:flex-none lg:w-[420px] lg:h-[750px] lg:rounded-[40px] lg:overflow-hidden lg:shadow-2xl lg:border lg:border-white/10">
-                    
+
                     {/* DEBUGGING MESSAGES */}
                     {/* <div className="absolute top-20 left-4 z-[300] bg-black/80 p-2 rounded border border-white/20 text-[10px] text-white font-mono pointer-events-none">
                         <div className="text-blue-400 font-bold">AI: Running</div>
@@ -257,11 +257,11 @@ export default function ProfileSection() {
                             STATE: {isAligned ? "VERIFIED (TRUE)" : "NOT ALIGNED (FALSE)"}
                         </div>
                     </div> */}
-        
+
                     {/* VIDEO SECTION */}
                     <div className="relative flex-1 bg-slate-900 overflow-hidden flex items-center justify-center">
                         <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover scale-x-[-1]" />
-        
+
                         {/* THE FACE FRAME (The Oval) */}
                         {/* w-[70%] is your original mobile width. lg:w-[280px] fixes the desktop size. */}
                         <div className={`relative z-10 w-[70%] lg:w-[280px] aspect-[3/4] border-[4px] rounded-[100px] transition-all duration-100 ${isAligned ? 'border-emerald-500 scale-105 shadow-[0_0_40px_rgba(16,185,129,0.5)]' : 'border-white border-dashed shadow-[0_0_0_1000px_rgba(0,0,0,0.5)]'}`}>
@@ -271,13 +271,13 @@ export default function ProfileSection() {
                                 </span>
                             </div>
                         </div>
-        
+
                         {/* CLOSE BUTTON */}
                         <button onClick={onClose} className="absolute top-4 right-4 p-3 bg-black/40 rounded-full text-white z-[60] hover:bg-black/60 transition-colors">
                             <X size={24} />
                         </button>
                     </div>
-        
+
                     {/* CONTROLS SECTION */}
                     <div className="bg-slate-950 p-10 lg:p-8 flex flex-col items-center gap-4">
                         <button
@@ -301,7 +301,7 @@ export default function ProfileSection() {
                         </p>
                     </div>
                 </div>
-        
+
                 <canvas ref={canvasRef} className="hidden" />
             </div>
         );
@@ -409,7 +409,7 @@ export default function ProfileSection() {
                 });
             } catch (err) {
                 // Fallback if user cancels or share fails
-                console.log("Share cancelled or failed");
+                // console.log("Share cancelled or failed");
             }
         } else if (currentLink) {
             // Fallback to copy if Web Share API is not supported (e.g., some desktop browsers)
@@ -469,7 +469,9 @@ export default function ProfileSection() {
             setGstVerified(!!res.kycDetails?.gst_verified);
             const isFullyComplete = res.kycDetails?.kyc_completed && res.kycDetails?.bank_verified;
             originalPassword.current = res.user.password;
-            if (isFullyComplete) {
+
+            // Only show the modal if KYC is complete AND status is NOT 'created'
+            if (isFullyComplete && res.agreementStatus !== "created") {
                 setShowAgreementModal(true);
             }
         } catch (error) { console.error("Refresh failed:", error); }
@@ -1542,36 +1544,36 @@ export default function ProfileSection() {
             </aside>
 
             {/* Agreement Sign-off Modal */}
-{showAgreementModal && (
-    <div className="fixed inset-0 z-[300] flex items-center justify-center px-4">
-        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAgreementModal(false)} />
-        <div className="relative bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <CheckCircle2 className="text-emerald-600" size={32} />
-            </div>
-            
-            <h3 className="text-2xl font-bold text-slate-800 text-center mb-2">Profile Completed!</h3>
-            <p className="text-slate-500 text-center text-sm mb-8 leading-relaxed">
-                Your KYC and bank details are verified. To start earning and receiving payouts, please sign the digital partner agreement.
-            </p>
+            {showAgreementModal && (
+                <div className="fixed inset-0 z-[300] flex items-center justify-center px-4">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAgreementModal(false)} />
+                    <div className="relative bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+                        <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                            <CheckCircle2 className="text-emerald-600" size={32} />
+                        </div>
 
-            <div className="flex flex-col gap-3">
-                <button
-                    onClick={() => router.push('/dashboard/incentives/agreement')}
-                    className="w-full py-4 bg-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-200 hover:bg-[#158f87] transition-all active:scale-95"
-                >
-                    Sign Agreement Now
-                </button>
-                <button
-                    onClick={() => setShowAgreementModal(false)}
-                    className="w-full py-4 bg-white text-slate-400 rounded-xl font-bold text-sm hover:text-slate-600 transition-all"
-                >
-                    I'll do it later
-                </button>
-            </div>
-        </div>
-    </div>
-)}
+                        <h3 className="text-2xl font-bold text-slate-800 text-center mb-2">Profile Completed!</h3>
+                        <p className="text-slate-500 text-center text-sm mb-8 leading-relaxed">
+                            Your KYC and bank details are verified. To start earning and receiving payouts, please sign the digital partner agreement.
+                        </p>
+
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={() => router.push('/dashboard/incentives/agreement')}
+                                className="w-full py-4 bg-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-200 hover:bg-[#158f87] transition-all active:scale-95"
+                            >
+                                Sign Agreement Now
+                            </button>
+                            <button
+                                onClick={() => setShowAgreementModal(false)}
+                                className="w-full py-4 bg-white text-slate-400 rounded-xl font-bold text-sm hover:text-slate-600 transition-all"
+                            >
+                                I'll do it later
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </main>
     );
