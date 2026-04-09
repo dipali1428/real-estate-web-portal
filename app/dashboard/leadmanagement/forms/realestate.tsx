@@ -204,9 +204,33 @@ function Input({ label, value, onChange, type = "text", onlyNumber, maxLength, p
   const restrictNumber = (e: any) => {
     if (!onlyNumber) return;
 
-    if (["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) return;
+    // 1. Allow navigation and functional keys
+    const isControlKey = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab", "Enter", "Escape"].includes(e.key);
+    
+    // 2. Allow Clipboard/Selection shortcuts (Ctrl+V, Ctrl+C, Ctrl+A, Ctrl+X)
+    const isModifierPressed = e.ctrlKey || e.metaKey; // metaKey is for Mac Command key
+    const isClipboardAction = isModifierPressed && ["v", "c", "x", "a"].includes(e.key.toLowerCase());
 
-    if (!/^[0-9]$/.test(e.key)) e.preventDefault();
+    // 3. Allow numeric keys
+    const isNumber = /^[0-9]$/.test(e.key);
+
+    // If it's none of the above, block the input
+    if (!isControlKey && !isClipboardAction && !isNumber) {
+      e.preventDefault();
+    }
+  };
+
+  const handleInputChange = (e: any) => {
+    let val = e.target.value;
+    
+    // If onlyNumber is true, strip out anything that isn't a digit (important for pastes)
+    if (onlyNumber) {
+      val = val.replace(/\D/g, ""); 
+    }
+    
+    // Call the parent's onChange with the sanitized value
+    // We recreate the event-like object structure expected by the parent
+    onChange({ target: { value: val } });
   };
 
   return (
@@ -217,7 +241,7 @@ function Input({ label, value, onChange, type = "text", onlyNumber, maxLength, p
         type={type}
         maxLength={maxLength}
         onKeyDown={restrictNumber}
-        onChange={onChange}
+        onChange={handleInputChange} // Use the local handler for sanitization
         placeholder={placeholder}
         className="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:ring-2 focus:ring-[#1CADA3] text-sm sm:text-base placeholder-gray-400"
       />
