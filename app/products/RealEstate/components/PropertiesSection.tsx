@@ -5,12 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import { properties as staticProperties, Property } from '../data/properties';
 import { useModal } from "../../../context/ModalContext";
-import { useWishlist } from "@/app/context/WishlistContext";
-import toast from 'react-hot-toast';
 import {
     Filter, Search, ShoppingCart, ChevronRight, Share2, Calculator,
     Info, Target, ExternalLink, Download, TrendingUp,
-    Clock, Shield, MapPin, X, Star, CheckCircle, Wallet, ChevronDown, ChevronUp, HelpCircle, Plus, Minus, IndianRupee, MinusSquare, PlusSquare, ChevronLeft, Layout, Zap, Bookmark
+    Clock, Shield, MapPin, X, Star, CheckCircle, Wallet, ChevronDown, ChevronUp, HelpCircle, Plus, Minus, IndianRupee, MinusSquare, PlusSquare, ChevronLeft, Layout, Zap
 } from 'lucide-react';
 
 
@@ -21,7 +19,6 @@ interface PropertiesSectionProps {
 }
 const PropertiesSection = ({ onPropertySelect, showOnlyLive = false }: PropertiesSectionProps) => {
     const { openApplyNow } = useModal();
-    const { toggleWishlist, isInWishlist } = useWishlist();
     const [filters, setFilters] = useState({
         search: '',
         type: '',
@@ -153,27 +150,6 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false }: Propertie
         setFilters(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleToggleWishlist = (property: Property) => {
-        toggleWishlist({
-            id: property.id,
-            category: 'real-estate',
-            name: property.title,
-            logo: property.image,
-            addedDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-            keyMetrics: {
-                price: property.price,
-                location: property.location,
-                expectedAppreciation: property.irr_percentage,
-                rentalYield: property.yield_percentage,
-                risk: 'Moderate',
-                developer: 'Infinity Arth',
-            }
-        });
-        if (!isInWishlist(property.id)) {
-            toast.success("Added to saved properties");
-        }
-    };
-
     const clearFilters = () => {
         setFilters({ search: '', type: '', minPrice: '', maxPrice: '' });
     };
@@ -274,21 +250,6 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false }: Propertie
                                     <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-xs font-bold uppercase tracking-wider text-teal-600 border border-teal-100">
                                         {property.type.split(' ')[0]}
                                     </div>
-                                    {showOnlyLive && (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleToggleWishlist(property);
-                                            }}
-                                            className={`absolute top-4 right-4 p-1.5 rounded-lg backdrop-blur-md transition-all duration-300 shadow-sm border ${
-                                                isInWishlist(property.id)
-                                                ? 'bg-[#2076C7] text-white border-[#2076C7] scale-110'
-                                                : 'bg-white/90 text-slate-400 border-slate-200 hover:text-[#2076C7] hover:border-[#2076C7] hover:bg-white'
-                                            }`}
-                                        >
-                                            <Bookmark size={16} fill={isInWishlist(property.id) ? "currentColor" : "none"} strokeWidth={2} />
-                                        </button>
-                                    )}
                                 </div>
 
                                 <div className="p-5 flex-1 flex flex-col">

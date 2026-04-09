@@ -1,12 +1,14 @@
+
 'use client';
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { IconCheck, IconX, IconSchool, IconBuildingBank, IconWorld, IconAward, IconCurrencyRupee, IconPercentage, IconShieldCheck, IconClock, IconHistory, IconReceiptTax, IconFileText, IconFirstAidKit, IconArrowRight, IconUser, IconPhone, IconBook, IconMapPin, IconBookmark, IconUpload, IconSearch, IconFilter } from '@tabler/icons-react';
+import { IconCheck, IconX, IconSchool, IconBuildingBank, IconWorld, IconAward, IconCurrencyRupee, IconPercentage, IconShieldCheck, IconClock, IconHistory, IconReceiptTax, IconFileText, IconFirstAidKit, IconArrowRight, IconUser, IconPhone, IconBook, IconMapPin, IconUpload, IconSearch, IconFilter } from '@tabler/icons-react';
 import { useModal } from '../../../context/ModalContext';
-import { useWishlist } from '@/app/context/WishlistContext';
 import toast from 'react-hot-toast';
 import { AnimatePresence } from 'framer-motion';
+import EligibilityAndProcess from './EligibilityAndProcess';
+import BenefitsSection from './BenefitsSection';
 import EMICalculator from './EMICalculator';
 import MarketComparison from './MarketComparision';
 
@@ -81,105 +83,77 @@ const comparison = [
 
 export default function LoanTypesSection({ showOnlyLive = false, isDashboard = false }: { showOnlyLive?: boolean, isDashboard?: boolean }) {
     const { openLogin, openApplyNow } = useModal();
-    const { toggleWishlist, isInWishlist } = useWishlist();
     const [activeTab, setActiveTab] = useState<'plans' | 'details' | 'calculator'>('plans');
 
-    const handleToggleWishlist = (loan: any) => {
-        toggleWishlist({
-            id: loan.id,
-            category: 'education-loan',
-            name: loan.title,
-            logo: '/products/education.png', // Fallback path if exists, otherwise handled by substrings in wishlist page
-            addedDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-            keyMetrics: {
-                amount: loan.amount,
-                rate: loan.rate,
-                tenure: loan.tenure,
-                risk: 'Low'
-            }
-        });
-        if (!isInWishlist(loan.id)) {
-            toast.success("Added to saved loans");
-        }
-    };
-
     return (
-        <section className="py-2 relative overflow-hidden">
-          <div className="flex-1 p-4 sm:p-6">
+        <section className={isDashboard ? '' : "py-2 bg-white relative overflow-hidden"}>
+            <div className={isDashboard ? '' : "max-w-[1440px] mx-auto px-6 leading-relaxed"}>
 
-                {/* Header */}
+                {/* NAVIGATION HEADER */}
                 {isDashboard ? (
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4 }}
-                        className="relative bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-100/60"
+                        className="relative bg-white rounded-2xl p-6 mb-8 shadow-sm border border-slate-100/60"
                     >
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div className="flex items-center gap-4">
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
                                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
-                                    <IconSchool size={24} />
+                                    {activeTab === 'calculator' ? (
+                                        <IconBuildingBank size={24} />
+                                    ) : activeTab === 'details' ? (
+                                        <IconFileText size={24} />
+                                    ) : (
+                                        <IconSchool size={24} />
+                                    )}
                                 </div>
+
                                 <div>
-                                    <div className="flex items-center gap-3 mb-1">
-                                        <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
-                                            {activeTab === 'plans' ? 'Education Loans' : activeTab === 'details' ? 'Loan Details' : 'EMI Calculator'}
+                                    <div className="flex flex-col sm:flex-row items-center gap-3 mb-1">
+                                        <h2 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight leading-tight">
+                                            {activeTab === 'plans'
+                                                ? 'Education Loans'
+                                                : activeTab === 'details'
+                                                    ? 'Loan Details'
+                                                    : 'EMI Calculator'}
                                         </h2>
-                                        <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200 whitespace-nowrap">
-                                            {loanTypes.length} Plans
-                                        </span>
                                     </div>
-                                    <p className="text-sm text-slate-500 flex items-center gap-2">
-                                        <IconFileText size={14} className="text-[#2076C7]" />
-                                        {activeTab === 'plans' ? 'Explore and compare education loans' : activeTab === 'details' ? 'Everything you need to know' : 'Calculate your monthly repayments'}
+                                    <p className="text-xs text-slate-500 font-medium flex items-center justify-center sm:justify-start gap-2">
+                                        <span>
+                                            {activeTab === 'plans'
+                                                ? 'Explore and compare education loans'
+                                                : activeTab === 'details'
+                                                    ? 'Everything you need to know'
+                                                    : 'Calculate your monthly repayments'}
+                                        </span>
                                     </p>
                                 </div>
                             </div>
-                            
-                            <div className="flex pb-2 md:pb-0 w-full sm:w-auto mt-2 sm:mt-0 overflow-x-auto hide-scrollbar sm:overflow-visible">
-                                <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
-                                    <button
-                                        onClick={() => setActiveTab('plans')}
-                                        className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'plans' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
-                                    >
-                                        {activeTab === 'plans' && (
-                                            <motion.div
-                                                layoutId="activeTab"
-                                                className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
-                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                            />
-                                        )}
-                                        <IconSchool size={14} />
-                                        <span>Plans</span>
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab('details')}
-                                        className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'details' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
-                                    >
-                                        {activeTab === 'details' && (
-                                            <motion.div
-                                                layoutId="activeTab"
-                                                className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
-                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                            />
-                                        )}
-                                        <IconFileText size={14} />
-                                        <span>Details</span>
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab('calculator')}
-                                        className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'calculator' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
-                                    >
-                                        {activeTab === 'calculator' && (
-                                            <motion.div
-                                                layoutId="activeTab"
-                                                className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
-                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                            />
-                                        )}
-                                        <IconBuildingBank size={14} />
-                                        <span>Calc</span>
-                                    </button>
+
+                            <div className="w-full sm:w-auto mt-4 sm:mt-0">
+                                <div className="flex flex-wrap justify-center sm:flex-nowrap sm:flex-row p-1.5 bg-slate-100/80 backdrop-blur-sm rounded-2xl sm:rounded-full gap-1.5 relative shadow-inner border border-slate-200/50">
+                                    {[
+                                        { id: 'plans', label: 'Plans', icon: IconSchool },
+                                        { id: 'details', label: 'Details', icon: IconFileText },
+                                        { id: 'calculator', label: 'Calculator', icon: IconBuildingBank },
+                                    ].map((tab) => (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => setActiveTab(tab.id as any)}
+                                            className={`relative w-[calc(50%-0.5rem)] sm:w-auto px-3 md:px-5 py-3 sm:py-2 rounded-xl sm:rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 ${activeTab === tab.id ? 'text-white' : 'text-slate-400 hover:text-slate-600'}`}
+                                        >
+                                            {activeTab === tab.id && (
+                                                <motion.div
+                                                    layoutId="activeTabLoan"
+                                                    className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-xl sm:rounded-full -z-10 shadow-sm"
+                                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                                />
+                                            )}
+                                            <tab.icon size={16} className="sm:size-[14px] transition-all duration-300" />
+                                            <span className="leading-none">{tab.label}</span>
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -204,8 +178,6 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                     </motion.div>
                 )}
 
-
-
                 <AnimatePresence mode="wait">
                     {(!isDashboard || activeTab === 'plans') && (
                         <motion.div
@@ -228,20 +200,6 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                                             transition={{ duration: 0.5, delay: i * 0.1 }}
                                             className={`relative rounded-[2rem] border ${loan.border} ${loan.bg} p-6 md:p-8 flex flex-col h-full hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group ${loan.featured ? 'ring-2 ring-[#2076C7]/30 shadow-xl' : ''}`}
                                         >
-                                            {showOnlyLive && (
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleToggleWishlist(loan);
-                                                    }}
-                                                    className={`absolute top-6 right-6 p-2 rounded-xl backdrop-blur-md transition-all duration-300 shadow-sm border ${isInWishlist(loan.id)
-                                                            ? 'bg-[#2076C7] text-white border-[#2076C7] scale-110'
-                                                            : 'bg-white/90 text-slate-400 border-slate-200 hover:text-[#2076C7] hover:border-[#2076C7] hover:bg-white'
-                                                        }`}
-                                                >
-                                                    <IconBookmark size={20} fill={isInWishlist(loan.id) ? "currentColor" : "none"} strokeWidth={2} />
-                                                </button>
-                                            )}
                                             {loan.featured && (
                                                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1 rounded-full shadow">
                                                     Most Popular
@@ -282,7 +240,7 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                                             {/* Apply Now Button */}
                                             <div className="mt-auto flex justify-center">
                                                 <button
-                                                    onClick={() => openApplyNow(loan.title)}
+                                                    onClick={() => openApplyNow(loan.title, isDashboard)}
                                                     className="relative inline-flex items-center gap-2 px-10 py-3.5 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group whitespace-nowrap"
                                                     style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
                                                 >
@@ -304,7 +262,7 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                                     initial={{ opacity: 0, y: 40 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
-                                    className="mt-8" // Further reduced top margin
+                                    className="mt-8"
                                 >
                                     <div className="text-center mb-8">
                                         <h3 className="text-2xl md:text-4xl font-extrabold mb-4 md:mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
@@ -452,7 +410,7 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                                                         [].map((item, i) => (
                                                             <div key={i} className="flex items-center justify-between p-3 md:p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all">
                                                                 <div>
-                                                                    <p className="text-xs md:text-sm font-black text-slate-800">{}</p>
+                                                                    <p className="text-xs md:text-sm font-black text-slate-800">{ }</p>
                                                                 </div>
                                                                 <span className="text-xs md:text-sm font-black text-[#1CADA3]"></span>
                                                             </div>
@@ -569,13 +527,10 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                             exit={{ opacity: 0, scale: 0.98 }}
                             transition={{ duration: 0.4 }}
                         >
-                            <EMICalculator onApplyClick={() => setActiveTab('plans')} hidePartners={showOnlyLive} />
+                            <EMICalculator onApplyClick={() => setActiveTab('plans')} hidePartners={showOnlyLive} isDashboard={isDashboard} />
                         </motion.div>
                     )}
                 </AnimatePresence>
-
-                {/* Legacy Comparison Section (Hidden now as it's merged into the tabs) */}
-                {/* {!showOnlyLive && activeTab === 'plans' && ( ... )} */}
             </div>
         </section>
     );

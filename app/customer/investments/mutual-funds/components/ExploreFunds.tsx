@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import {Search,X,BarChart3,TrendingUp,Shield,Activity,IndianRupee,ShoppingCart,Trash2,ChevronRight,Bookmark
+import {
+  Search, X, TrendingUp, Shield, Activity, IndianRupee, ChevronRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useModal } from "@/app/context/ModalContext";
 import mutualFundService from "../../../../services/mutualfundservice";
+import customerService from "../../../../services/customerService";
 import toast from "react-hot-toast";
 import { TOP_PICKS } from "@/app/products/mutual-funds/components/TopPicks";
 import TopPicksSection from "@/app/products/mutual-funds/components/TopPicksSection";
@@ -19,6 +21,7 @@ import {
   LineElement,
   Title,
   Tooltip,
+
   Legend,
   Filler,
 } from "chart.js";
@@ -34,26 +37,20 @@ interface Fund {
   category?: string;
   risk?: string;
 }
-
-// import { useCart } from "@/app/context/CartContext";
-import { useWishlist } from "@/app/context/WishlistContext";
-
 export default function ExploreFunds() {
   const { openLogin } = useModal();
-  // const { cart, addToCart } = useCart();
-  const { toggleWishlist, isInWishlist } = useWishlist();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [categorizedFunds, setCategorizedFunds] = useState<Record<string, Fund[]>>({});
   const [isSearching, setIsSearching] = useState(false);
 
-// --- Detail Modal & Chart State ---
+  // --- Detail Modal & Chart State ---
   const [selectedFund, setSelectedFund] = useState<Fund | null>(null);
   const [chartData, setChartData] = useState<any[]>([]);
   const [isChartLoading, setIsChartLoading] = useState(false);
   const [timeRange, setTimeRange] = useState<"1Y" | "3Y" | "5Y">("1Y");
-  const [calcAmount, setCalcAmount] = useState<number>(10000); // Changed default from 0 to 10000
+  const [calcAmount, setCalcAmount] = useState<number>(10000);
   const [calcPeriod, setCalcPeriod] = useState<string>("3Y");
 
   // --- Order Placement State ---
@@ -157,24 +154,21 @@ export default function ExploreFunds() {
       setLoading(true);
       try {
         const topPickNames = Object.values(TOP_PICKS).flat();
-        
         const allResults = await Promise.all(
-          topPickNames.map((name) => 
+          topPickNames.map((name) =>
             mutualFundService.searchFunds(name).then(res => {
-               const matches = res.filter(f => 
-                  f.name.toLowerCase().includes(name.toLowerCase()) && 
-                  !f.name.toLowerCase().includes('direct')
-               );
-               const growthMatch = matches.find(f => f.name.toLowerCase().includes('growth'));
-               const mainMatch = growthMatch || (matches.length > 0 ? matches[0] : null);
-               return mainMatch ? [mainMatch] : [];
+              const matches = res.filter(f =>
+                f.name.toLowerCase().includes(name.toLowerCase()) &&
+                !f.name.toLowerCase().includes('direct')
+              );
+              const growthMatch = matches.find(f => f.name.toLowerCase().includes('growth'));
+              const mainMatch = growthMatch || (matches.length > 0 ? matches[0] : null);
+              return mainMatch ? [mainMatch] : [];
             }).catch(() => [])
           )
         );
-        
         const merged = allResults.flat();
         const uniqueFunds = Array.from(new Map(merged.map((f: any) => [f.schemeCode, f])).values());
-
         const groups: Record<string, Fund[]> = {};
         Object.entries(TOP_PICKS).forEach(([category, names]) => {
           groups[category] = uniqueFunds
@@ -192,6 +186,7 @@ export default function ExploreFunds() {
         });
         setCategorizedFunds(groups);
       } catch (error) {
+        console.error("Error loading funds:", error);
       } finally {
         setLoading(false);
       }
@@ -237,43 +232,9 @@ export default function ExploreFunds() {
         setChartData(history);
       }
     } catch (e) {
+      console.error("Error fetching fund details:", e);
     } finally {
       setIsChartLoading(false);
-    }
-  };
-
-  // const handleAddToCart = (fund: Fund) => {
-  //   if (cart.find((item: any) => item.id === fund.code)) {
-  //     toast.success("Already in cart");
-  //     return;
-  //   }
-  //   addToCart({
-  //     id: fund.code,
-  //     name: fund.name,
-  //     type: "MF",
-  //     investmentType: "LUMPSUM",
-  //     amount: 5000,
-  //   }, true);
-  // };
-
-  const handleToggleWishlist = (fund: Fund) => {
-    toggleWishlist({
-      id: fund.code,
-      name: fund.name,
-      category: 'mutual-funds',
-      logo: fund.name.charAt(0),
-      addedDate: new Date().toLocaleDateString('en-GB'),
-      keyMetrics: {
-        nav: Number(fund.nav),
-        risk: fund.risk || "Moderately High",
-        returns: { '1Y': 12.5, '3Y': 15.2, '5Y': 18.4 }
-      }
-    });
-    
-    if (isInWishlist(fund.code)) {
-      toast.success("Removed from wishlist");
-    } else {
-      toast.success("Added to wishlist");
     }
   };
 
@@ -309,8 +270,7 @@ export default function ExploreFunds() {
                 <div className="p-10 text-center text-gray-500 font-medium">No funds found matching "{searchQuery}"</div>
               ) : (
                 <div className="divide-y divide-gray-50">
-                    {searchResults.map((fund) => {
-                    const isSaved = isInWishlist(Number(fund.schemeCode));
+                  {searchResults.map((fund) => {
                     return (
                       <div
                         key={fund.schemeCode}
@@ -318,26 +278,10 @@ export default function ExploreFunds() {
                         onClick={() => handleViewDetails({ code: fund.schemeCode, name: fund.name, nav: fund.nav || "0", date: fund.date || "" })}
                       >
                         <div className="flex-1 flex flex-col gap-1 pr-4">
-                          <p className="font-bold text-gray-800 group-hover/row:text-[#2076C7] transition-colors leading-snug">{fund.name}</p>
-                          <span className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Code: {fund.schemeCode}</span>
+                          <p className="font-semibold text-gray-800 group-hover/row:text-[#2076C7] transition-colors leading-snug">{fund.name}</p>
+                          <span className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Code: {fund.schemeCode}</span>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleWishlist({
-                                code: Number(fund.schemeCode),
-                                name: fund.name,
-                                nav: fund.nav || "0",
-                                date: fund.date || ""
-                              });
-                            }}
-                            className={`p-2.5 rounded-xl transition-all ${isSaved ? "text-[#2076C7] bg-blue-50" : "text-gray-300 hover:text-[#2076C7] hover:bg-blue-50"}`}
-                          >
-                            <Bookmark size={18} fill={isSaved ? "currentColor" : "none"} />
-                          </button>
-                          <ChevronRight size={20} className="text-gray-300 group-hover/row:translate-x-1 transition-transform" />
-                        </div>
+                        <ChevronRight size={20} className="text-gray-300 group-hover/row:translate-x-1 transition-transform" />
                       </div>
                     );
                   })}
@@ -354,7 +298,7 @@ export default function ExploreFunds() {
           <div className="animate-pulse space-y-8">
             <div className="h-10 w-64 bg-gray-200 rounded-lg"></div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-               {[1, 2, 3].map(i => <div key={i} className="h-80 bg-gray-100 rounded-3xl"></div>)}
+              {[1, 2, 3].map(i => <div key={i} className="h-80 bg-gray-100 rounded-3xl"></div>)}
             </div>
           </div>
         ) : (
@@ -365,13 +309,9 @@ export default function ExploreFunds() {
                 title={cat.charAt(0).toUpperCase() + cat.slice(1).replace(/cap$/, " Cap") + " Funds"}
                 funds={funds}
                 renderItem={(fund: any) => (
-                  <FundCard 
-                    fund={fund} 
-                    // isInCart={cart.some((item: any) => item.id === fund.code)}
-                    isSaved={isInWishlist(fund.code)}
-                    onViewDetails={() => handleViewDetails(fund)} 
-                    // onAddToCart={() => handleAddToCart(fund)} 
-                    onToggleWishlist={() => handleToggleWishlist(fund)}
+                  <FundCard
+                    fund={fund}
+                    onViewDetails={() => handleViewDetails(fund)}
                     onInvest={() => handleOpenOrder(fund)}
                   />
                 )}
@@ -383,19 +323,19 @@ export default function ExploreFunds() {
               <div className="flex justify-center -mt-8">
                 <button
                   onClick={() => setShowAllCategories(true)}
-                  className="group flex items-center gap-3 px-10 py-4 bg-[#2076C7] text-white rounded-full font-black shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95"
+                  className="group flex items-center gap-3 px-10 py-4 bg-[#2076C7] text-white rounded-full font-bold shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95"
                 >
                   Explore All Fund Categories
                   <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             )}
-            
+
             {showAllCategories && (
               <div className="flex justify-center -mt-8">
                 <button
                   onClick={() => setShowAllCategories(false)}
-                  className="group flex items-center gap-3 px-10 py-4 bg-white border-2 border-[#2076C7] text-[#2076C7] rounded-full font-black hover:bg-blue-50 transition-all active:scale-95 shadow-md"
+                  className="group flex items-center gap-3 px-10 py-4 bg-white border-2 border-[#2076C7] text-[#2076C7] rounded-full font-bold hover:bg-blue-50 transition-all active:scale-95 shadow-md"
                 >
                   Show Less
                 </button>
@@ -417,13 +357,13 @@ export default function ExploreFunds() {
         {selectedFund && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center z-[2000] sm:p-6" onClick={(e) => e.target === e.currentTarget && setSelectedFund(null)}>
             <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 100 }} className="bg-white w-full sm:rounded-[3rem] rounded-t-[2.5rem] h-[92dvh] sm:h-auto sm:max-h-[90vh] sm:max-w-6xl shadow-2xl overflow-hidden flex flex-col border border-gray-100">
-              
+
               <div className="bg-white border-b border-gray-100 px-8 py-7 flex items-center justify-between sticky top-0 z-10">
                 <div className="flex items-center gap-5">
                   <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center font-black text-2xl text-[#2076C7] shadow-inner">{selectedFund.name.charAt(0)}</div>
                   <div>
-                    <h2 className="text-2xl font-black text-gray-900 leading-tight mb-0.5">{selectedFund.name}</h2>
-                    <span className="text-xs font-black text-[#1CADA3] tracking-[0.2em] uppercase">SCHEME CODE: {selectedFund.code}</span>
+                    <h2 className="text-2xl font-bold text-gray-900 leading-tight mb-0.5">{selectedFund.name}</h2>
+                    <span className="text-xs font-bold text-[#1CADA3] tracking-[0.2em] uppercase">SCHEME CODE: {selectedFund.code}</span>
                   </div>
                 </div>
                 <button onClick={() => setSelectedFund(null)} className="p-3 bg-gray-50 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-900 transition-all"><X size={24} /></button>
@@ -435,17 +375,17 @@ export default function ExploreFunds() {
                     <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm relative">
                       <div className="flex items-center justify-between mb-8">
                         <div>
-                          <h3 className="text-xl font-black text-gray-900">Historical Performance</h3>
-                          <p className="text-sm text-gray-400 font-bold">NAV Tracking</p>
+                          <h3 className="text-xl font-bold text-gray-900">Historical Performance</h3>
+                          <p className="text-sm text-gray-400 font-semibold">NAV Tracking</p>
                         </div>
                         <div className="flex gap-2 bg-gray-100/80 p-1.5 rounded-2xl">
                           {["1Y", "3Y", "5Y"].map((r) => (
-                            <button key={r} onClick={() => setTimeRange(r as any)} className={`px-5 py-2 rounded-xl text-xs font-black transition-all ${timeRange === r ? "bg-[#2076C7] text-white shadow-lg" : "text-gray-400 hover:text-gray-600"}`}>{r}</button>
+                            <button key={r} onClick={() => setTimeRange(r as any)} className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${timeRange === r ? "bg-[#2076C7] text-white shadow-lg" : "text-gray-400 hover:text-gray-600"}`}>{r}</button>
                           ))}
                         </div>
                       </div>
                       <div className="h-[350px] w-full relative">
-                        {isChartLoading ? <div className="absolute inset-0 flex items-center justify-center"><div className="w-10 h-10 border-4 border-[#2076C7] border-t-transparent rounded-full animate-spin"></div></div> : 
+                        {isChartLoading ? <div className="absolute inset-0 flex items-center justify-center"><div className="w-10 h-10 border-4 border-[#2076C7] border-t-transparent rounded-full animate-spin"></div></div> :
                           <Line data={{ labels: filteredChartData.map(d => d.date), datasets: [{ label: "NAV", data: filteredChartData.map(d => d.nav), borderColor: "#2076C7", backgroundColor: "rgba(32, 118, 199, 0.08)", fill: true, tension: 0.4, pointRadius: 0, borderWidth: 3 }] }} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, padding: 12, bodyFont: { weight: 'bold' } } }, scales: { x: { display: false }, y: { ticks: { font: { weight: 'bold', size: 11 }, color: '#94a3b8' }, grid: { color: '#f1f5f9' } } } }} />
                         }
                       </div>
@@ -463,7 +403,7 @@ export default function ExploreFunds() {
                     {availableCalcPeriods.length > 0 && calcResult && (
                       <div className="bg-white p-8 rounded-[2.5rem] border border-blue-100 shadow-xl shadow-blue-900/5 space-y-6 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full -mr-16 -mt-16" />
-                        <h3 className="font-black text-gray-900 text-lg relative z-10">Return Calculator</h3>
+                        <h3 className="font-bold text-gray-900 text-lg relative z-10">Return Calculator</h3>
                         <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-1">
                           <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">If You Invested:</span>
                           <div className="flex items-center gap-2">
@@ -484,18 +424,7 @@ export default function ExploreFunds() {
                             <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-black rounded-md">{calcResult.cagr}% CAGR</span>
                           </div>
                         </div>
-                      </div>
-                    )}
-
-                    {/* <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-4">
-                        <button 
-                          onClick={() => { handleAddToCart(selectedFund); setSelectedFund(null); }} 
-                          className="w-full py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-3 shadow-lg shadow-blue-500/20 hover:scale-[1.02] transition-transform"
-                        >
-                          <ShoppingCart size={20} /> Add to Cart
-                        </button>
-                        <button onClick={openLogin} className="w-full py-5 border-2 border-[#2076C7] text-[#2076C7] rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-blue-50 transition-colors">Start One-Click SIP</button>
-                    </div> */}
+                      </div>)}
                   </div>
                 </div>
               </div>
@@ -519,48 +448,40 @@ function StatItem({ icon: Icon, label, value, color, bg }: any) {
       <div className={`w-12 h-12 ${bg} ${color} rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
         <Icon size={22} />
       </div>
-      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">{label}</div>
-      <div className="text-sm font-black text-gray-900 leading-tight">{value}</div>
+      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">{label}</div>
+      <div className="text-sm font-bold text-gray-900 leading-tight">{value}</div>
     </div>
   );
 }
 
-function FundCard({ fund, onViewDetails, onAddToCart, isInCart, isSaved, onToggleWishlist, onInvest }: any) {
+function FundCard({ fund, onViewDetails, onInvest }: any) {
   return (
     <motion.div className="bg-white rounded-[2rem] shadow-md border border-gray-100 hover:border-[#2076C7] hover:shadow-xl transition-all p-6 flex flex-col h-full group w-full relative">
-      <button 
-        onClick={(e) => { e.stopPropagation(); onToggleWishlist(); }}
-        className={`absolute top-5 right-5 p-2.5 rounded-full transition-all z-10 ${isSaved ? "text-[#2076C7] bg-blue-50 shadow-sm" : "text-gray-300 hover:text-[#2076C7] bg-gray-50"}`}
-      >
-        <Bookmark size={20} fill={isSaved ? "currentColor" : "none"} />
-      </button>
-
       <div className="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center mb-6 mx-auto group-hover:scale-105 transition-transform shadow-inner">
-        <span className="text-3xl font-black text-[#2076C7]">{fund.name.charAt(0)}</span>
+        <span className="text-3xl font-bold text-[#2076C7]">{fund.name.charAt(0)}</span>
       </div>
-      
+
       <div className="h-14 mb-4">
-        <h3 className="text-base font-black text-center text-gray-900 line-clamp-2 leading-tight">{fund.name}</h3>
+        <h3 className="text-base font-bold text-center text-gray-900 line-clamp-2 leading-tight">{fund.name}</h3>
       </div>
 
       <div className="flex flex-col items-center py-4 bg-gray-50 rounded-2xl mb-6 group-hover:bg-blue-50/50 transition-colors">
-        <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Current NAV</span>
-        <span className="text-2xl font-black text-[#2076C7]">₹{fund.nav}</span>
+        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Current NAV</span>
+        <span className="text-2xl font-bold text-[#2076C7]">₹{fund.nav}</span>
       </div>
 
       <div className="space-y-3 mt-auto">
-      
-        <button 
-          onClick={(e) => { e.stopPropagation(); onInvest(); }} 
+        <button
+          onClick={(e) => { e.stopPropagation(); onInvest(); }}
           className="w-full py-3 bg-white border-2 border-[#1CADA3] text-[#1CADA3] text-xs font-bold rounded-lg hover:bg-teal-50 transition-all tracking-wider uppercase flex items-center justify-center gap-2"
         >
           <TrendingUp size={16} /> Invest Now
         </button>
-        <button 
-            onClick={onViewDetails} 
-            className="w-full py-4 border-2 border-[#2076C7]/10 text-[#2076C7] text-xs font-black rounded-xl hover:bg-blue-50 hover:border-[#2076C7] transition-all tracking-widest uppercase"
+        <button
+          onClick={onViewDetails}
+          className="w-full py-4 border-2 border-[#2076C7]/10 text-[#2076C7] text-xs font-bold rounded-xl hover:bg-blue-50 hover:border-[#2076C7] transition-all tracking-widest uppercase"
         >
-            View Details
+          View Details
         </button>
       </div>
     </motion.div>

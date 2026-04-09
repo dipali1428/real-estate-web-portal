@@ -94,13 +94,13 @@ export interface CreditCardMetrics {
     risk: string;
 }
 
-export type ProductMetrics = 
-    | MutualFundMetrics 
-    | PMSMetrics 
-    | AIFMetrics 
-    | FixedIncomeMetrics 
-    | NPSMetrics 
-    | RealEstateMetrics 
+export type ProductMetrics =
+    | MutualFundMetrics
+    | PMSMetrics
+    | AIFMetrics
+    | FixedIncomeMetrics
+    | NPSMetrics
+    | RealEstateMetrics
     | UnlistedMetrics
     | EducationLoanMetrics
     | GenericInsuranceMetrics
