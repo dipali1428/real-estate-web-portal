@@ -47,10 +47,10 @@ const AboutSection = () => {
             image: "/leader/Sandip-Powar.jpeg"
         },
         {
-            name: "Mr. Satyen Mehta",
+            name: "Mr. Ajay Mundada",
             title: "General Manager",
-            description: "Mr. Satyen Mehta brings 25+ years of banking experience in Home Loans, LAP, Insurance, and Real Estate, leading overall strategy, revenue growth, operational excellence, and sustainable business expansion.",
-            image: "/leader/Satyen-Mehta (2).jpeg"
+            description: "Ajay Mundada As the BGO (Business Growth Officer) at Infinity Arthvishva, he leads business expansion, strategic alliances, and performance-driven growth. With a strong focus on data-backed decision-making, risk management, and market adaptability, he ensures consistent value creation across evolving financial landscapes.",
+            image: "/leader/Ajay-Mundada.jpeg"
         },
         {
             name: "Mr. Sharad Kulkarni",
