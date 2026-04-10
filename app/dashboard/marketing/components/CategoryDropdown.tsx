@@ -1,4 +1,4 @@
-import investmentService from "@/app/products/mutual-funds/services/investmentService";
+// import investmentService from "@/app/products/mutual-funds/services/investmentService";
 
 interface CategoryDropdownProps {
   type: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest';

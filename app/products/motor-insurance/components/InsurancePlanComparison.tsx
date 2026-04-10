@@ -12,13 +12,16 @@ interface InsurancePlanComparisonProps {
     setActiveVehicleType?: (type: string) => void;
     defaultVehicleType?: string;
     showVehicleSelection?: boolean;
+    viewDetailsText?: string;
 }
+
 
 export default function InsurancePlanComparison({
     activeVehicleType: controlledVehicleType,
     setActiveVehicleType: setControlledVehicleType,
     defaultVehicleType = "car",
-    showVehicleSelection = true
+    showVehicleSelection = true,
+    viewDetailsText = "View Details" // ✅ ADDED ONLY
 }: InsurancePlanComparisonProps) {
     const [internalVehicleType, setInternalVehicleType] = React.useState(defaultVehicleType);
     const [activePlanType, setActivePlanType] = useState("comprehensive");
@@ -103,6 +106,12 @@ export default function InsurancePlanComparison({
             default: return `${ccLabel || "100cc two-wheeler"}`;
         }
     };
+
+    const handleViewDetails = (company: any) => {
+    if (!company) return;
+
+    console.log("Selected Company:", company);
+};
 
     return (
         <section id="plans" className="py-12 md:py-16 pt-32 sm:pt-16 bg-white font-sans">
@@ -376,13 +385,18 @@ export default function InsurancePlanComparison({
                                                 </div>
 
                                                 {/* Button */}
-                                                <button
-                                                    type="button"
-                                                    className="w-full sm:w-auto px-5 py-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] hover:opacity-90 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 whitespace-nowrap text-sm cursor-pointer sm:ml-2"
-                                                >
-                                                    View Details
-                                                    <span className="text-lg leading-none">→</span>
-                                                </button>
+                                              <button
+    type="button"
+    onClick={() => handleViewDetails(company)}
+    className="w-full sm:w-auto px-5 py-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] hover:opacity-90 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 whitespace-nowrap text-sm cursor-pointer sm:ml-2"
+>
+    {activePlanType === "thirdParty"
+        ? "View TP Details"
+        : activePlanType === "ownDamage"
+        ? "View OD Details"
+        : "View Full Details"}
+    <span className="text-lg leading-none">→</span>
+</button>
                                             </div>
                                         </motion.div>
                                     );

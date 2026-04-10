@@ -58,7 +58,7 @@ const providers = [
     },
 ];
 
-export function ProviderComparison() {
+export function ProviderComparison({ isDashboard = false }: { isDashboard?: boolean } = {}) {
     const { openLogin } = useModal();
     return (
         <section className="py-10 px-4 sm:px-6 bg-slate-50">
@@ -146,7 +146,7 @@ export function ProviderComparison() {
 }
 
 // --- Section 2: PetPlanTypes ---
-const plans = [
+export const plans = [
     {
         icon: IconFeather,
         title: 'Basic Paws',
@@ -193,7 +193,7 @@ const plans = [
     },
 ];
 
-export function PetPlanTypes() {
+export function PetPlanTypes({ isDashboard = false }: { isDashboard?: boolean } = {}) {
     const { openLogin } = useModal();
 
     return (

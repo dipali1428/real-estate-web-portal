@@ -2,9 +2,9 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { 
-    IconCheck, 
-    IconBookmark, 
+import {
+    IconCheck,
+    IconBookmark,
     IconBuildingBank,
     IconBriefcase,
     IconTractor,
@@ -139,8 +139,15 @@ const GOVT_SCHEMES = [
     },
 ];
 
-export default function SMELoanTypesSection({ activeTab }: { activeTab: 'commercial' | 'govt' }) {
-    const products = activeTab === 'commercial' ? COMMERCIAL_PRODUCTS : GOVT_SCHEMES;
+export default function SMELoanTypesSection({ activeTab, showOnlyLive, }: {
+    activeTab?: 'commercial' | 'govt'; showOnlyLive?: boolean
+}) {
+    // decide tab dynamically
+    const tabToUse: 'commercial' | 'govt' =
+        activeTab ?? (showOnlyLive ? 'commercial' : 'govt');
+
+    const products =
+        tabToUse === 'commercial' ? COMMERCIAL_PRODUCTS : GOVT_SCHEMES;
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -153,9 +160,8 @@ export default function SMELoanTypesSection({ activeTab }: { activeTab: 'commerc
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.5, delay: i * 0.1 }}
-                        className={`group relative rounded-[2rem] border ${loan.border} ${loan.bg} p-6 md:p-8 flex flex-col h-full hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 ${
-                            loan.featured ? 'ring-2 ring-[#2076C7]/30 shadow-xl' : ''
-                        }`}
+                        className={`group relative rounded-[2rem] border ${loan.border} ${loan.bg} p-6 md:p-8 flex flex-col h-full hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 ${loan.featured ? 'ring-2 ring-[#2076C7]/30 shadow-xl' : ''
+                            }`}
                     >
 
                         {/* Icon & Category */}

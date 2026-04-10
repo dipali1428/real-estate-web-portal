@@ -3,6 +3,7 @@
 import SMELoanTypesSection from '../components/SMELoanTypesSection';
 
 export default function SMELoanPlansPage() {
+    
     return (
         <div className="min-h-screen bg-white">
             {/* SME Loan Products Section */}

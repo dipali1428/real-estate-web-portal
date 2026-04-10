@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { investmentService } from '../products/mutual-funds/services/investmentService';
+import { mutualFundService } from "../services/mutualfundservice";
 // import { fetchTopPerformingFunds } from '../products/mutualfunds/services/mfApi';
 import api from '../services/api';
 
@@ -12,7 +12,7 @@ export const useDashboardData = () => {
             try {
                 // Determine if we should mock or fetch based on auth
                 // Ideally this hook is only used when authenticated.
-                const dashboardData = await investmentService.getDashboardData();
+                const dashboardData = await mutualFundService.getDashboardData();
                 setData(dashboardData);
             } catch (error) {
                 console.error("Failed to load dashboard data", error);
@@ -60,68 +60,68 @@ export const useMarketIndices = () => {
 
     return { data, isLoading };
 };
-export const useGoals = () => {
-    const [data, setData] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [refresh, setRefresh] = useState(0);
+// export const useGoals = () => {
+//     const [data, setData] = useState<any[]>([]);
+//     const [isLoading, setIsLoading] = useState(true);
+//     const [refresh, setRefresh] = useState(0);
 
-    useEffect(() => {
-        const loadGoals = async () => {
-            try {
-                const goals = await investmentService.getGoals();
-                setData(goals);
-            } catch (error) {
-                console.error("Failed to load goals", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        loadGoals();
-    }, [refresh]);
+//     useEffect(() => {
+//         const loadGoals = async () => {
+//             try {
+//                 const goals = await mutualFundService.getGoals();
+//                 setData(goals);
+//             } catch (error) {
+//                 console.error("Failed to load goals", error);
+//             } finally {
+//                 setIsLoading(false);
+//             }
+//         };
+//         loadGoals();
+//     }, [refresh]);
 
-    const mutate = () => setRefresh(prev => prev + 1);
+//     const mutate = () => setRefresh(prev => prev + 1);
 
-    return { data, isLoading, mutate };
-};
+//     return { data, isLoading, mutate };
+// };
 
-export const usePortfolio = () => {
-    const [data, setData] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+// export const usePortfolio = () => {
+//     const [data, setData] = useState<any[]>([]);
+//     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const loadPortfolio = async () => {
-            try {
-                const portfolio = await investmentService.getPortfolio();
-                setData(portfolio);
-            } catch (error) {
-                console.error("Failed to load portfolio", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        loadPortfolio();
-    }, []);
+//     useEffect(() => {
+//         const loadPortfolio = async () => {
+//             try {
+//                 const portfolio = await mutualFundService.getPortfolio();
+//                 setData(portfolio);
+//             } catch (error) {
+//                 console.error("Failed to load portfolio", error);
+//             } finally {
+//                 setIsLoading(false);
+//             }
+//         };
+//         loadPortfolio();
+//     }, []);
 
-    return { data, isLoading };
-};
+//     return { data, isLoading };
+// };
 
-export const usePortfolioSummary = () => {
-    const [data, setData] = useState<any>({});
-    const [isLoading, setIsLoading] = useState(true);
+// export const usePortfolioSummary = () => {
+//     const [data, setData] = useState<any>({});
+//     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const loadSummary = async () => {
-            try {
-                const summaryValue = await investmentService.getPortfolioSummary();
-                setData(summaryValue);
-            } catch (error) {
-                console.error("Failed to load portfolio summary", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        loadSummary();
-    }, []);
+//     useEffect(() => {
+//         const loadSummary = async () => {
+//             try {
+//                 const summaryValue = await mutualFundService.getPortfolioSummary();
+//                 setData(summaryValue);
+//             } catch (error) {
+//                 console.error("Failed to load portfolio summary", error);
+//             } finally {
+//                 setIsLoading(false);
+//             }
+//         };
+//         loadSummary();
+//     }, []);
 
-    return { data, isLoading };
-};
+//     return { data, isLoading };
+// };
