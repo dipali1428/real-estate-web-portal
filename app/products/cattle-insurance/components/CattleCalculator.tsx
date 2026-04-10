@@ -21,6 +21,11 @@ import {
 } from 'recharts';
 import { useModal } from '../../../context/ModalContext';
 
+type CattleCalculatorProps = {
+    isDashboard?: boolean;
+    onShowPlans?: () => void;
+};
+
 const LIVESTOCK_TYPES = [
     { id: 'cow', label: 'Cow', rate: 0.045, maxAge: 10, baseValue: 50000 },
     { id: 'buffalo', label: 'Buffalo', rate: 0.045, maxAge: 12, baseValue: 60000 },
@@ -51,7 +56,10 @@ const getSliderStyle = (value: number, min: number, max: number) => {
     };
 };
 
-export default function CattleCalculator() {
+export default function CattleCalculator({
+    isDashboard = false,
+    onShowPlans,
+}: CattleCalculatorProps) {
     const { openLogin } = useModal();
     const [step, setStep] = useState(1);
     const [animal, setAnimal] = useState(LIVESTOCK_TYPES[0]);

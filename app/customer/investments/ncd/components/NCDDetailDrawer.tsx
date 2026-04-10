@@ -19,7 +19,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
-import { NCDData } from "../../../products/NCD/data/ncdData";
+import { NCDData } from "../../../../products/NCD/data/ncdData";
 
 interface NCDDetailDrawerProps {
   ncd: NCDData | null;

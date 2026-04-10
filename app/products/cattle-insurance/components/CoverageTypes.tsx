@@ -100,8 +100,12 @@ const coverageTypes = [
         bg: 'bg-blue-50/30'
     },
 ];
-
-export default function CoverageTypes() {
+type CoverageTypesProps = {
+    isDashboard?: boolean;
+};
+export default function CoverageTypes({
+    isDashboard = false,
+}: CoverageTypesProps) {
     const { openLogin } = useModal();
     const [showAll, setShowAll] = useState(false);
 
@@ -184,7 +188,13 @@ export default function CoverageTypes() {
                                 {/* Apply Now Button — in natural flow, always below exclusions */}
                                 <div className="mt-auto pt-4">
                                     <button
-                                        onClick={openLogin}
+                                        onClick={() => {
+                                            if (isDashboard) {
+                                                openLogin(); // or custom dashboard flow
+                                            } else {
+                                                openLogin();
+                                            }
+                                        }}
                                         className="w-full py-4 px-6 rounded-xl bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-[0_10px_30px_-10px_rgba(32,118,199,0.5)] hover:shadow-[0_20px_50px_-12px_rgba(32,118,199,0.6)] hover:scale-[1.02] active:scale-[0.98] group/btn overflow-hidden relative"
                                     >
                                         <span className="relative z-10">Apply Now</span>

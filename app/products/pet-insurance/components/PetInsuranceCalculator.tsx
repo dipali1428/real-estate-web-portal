@@ -23,6 +23,10 @@ interface PetType {
     icon: React.ElementType;
 }
 
+interface PetInsuranceCalculatorProps {
+    isDashboard?: boolean;
+    onShowPlans?: () => void;
+}
 const PET_TYPES: PetType[] = [
     { id: 'dog', label: 'Dog', baseRate: 299, icon: IconDog },
     { id: 'cat', label: 'Cat', baseRate: 199, icon: IconCat },
@@ -53,7 +57,10 @@ const COLORS = ['#2076C7', '#1CADA3'];
 
 const fmt = (n: number) => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(n);
 
-export default function PetInsuranceCalculator() {
+export default function PetInsuranceCalculator({
+    isDashboard = false,
+    onShowPlans
+}: PetInsuranceCalculatorProps) {
     const { openLogin } = useModal();
     const [step, setStep] = useState(1);
     const [petName, setPetName] = useState('');
@@ -223,14 +230,15 @@ export default function PetInsuranceCalculator() {
                                     <button
                                         onClick={() => {
                                             if (isStepValid()) {
-                                                if (step < 3) {
-                                                    nextStep();
-                                                } else {
-                                                    setShowPlans(true);
-                                                    setTimeout(() => {
-                                                        document.getElementById('recommended-plans')?.scrollIntoView({ behavior: 'smooth' });
-                                                    }, 100);
-                                                }
+                                              if (step < 3) {
+    nextStep();
+} else {
+    if (onShowPlans) {
+        onShowPlans(); // dashboard case
+    } else {
+        setShowPlans(true); // normal page case
+    }
+}
                                             } else {
                                                 toast.error("Please enter pet's name");
                                             }

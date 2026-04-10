@@ -9,8 +9,8 @@ import {
 import { Beef, Milk, Calendar, AlertCircle } from 'lucide-react';
 
 import CoverageTypes from '@/app/products/cattle-insurance/components/CoverageTypes';
-import { coverageTypes } from '@/app/products/cattle-insurance/components/CoverageTypes';
-import ComparisonchartAndGraph from '@/app/products/cattle-insurance/components/ComparisonchartAndGraph';
+// import { coverageTypes } from '@/app/products/cattle-insurance/components/CoverageTypes';
+import ComparisonchartAndGraph from '../../../../products/cattle-insurance/components/ComparisonchartAndGraph';
 import CattleCalculator from '@/app/products/cattle-insurance/components/CattleCalculator';
 
 
@@ -380,7 +380,10 @@ export default function CattleInsuranceSection({ isDashboard = false }: { isDash
                             exit={{ opacity: 0, x: 20 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <CattleCalculator isDashboard={true} onShowPlans={() => setActiveTab('plans')} />
+                            <CattleCalculator 
+  isDashboard={true} 
+  onShowPlans={() => setActiveTab('plans')} 
+/>
                         </motion.div>
                     )}
                 </AnimatePresence>

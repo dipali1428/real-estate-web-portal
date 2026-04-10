@@ -373,7 +373,7 @@ export default function PetInsuranceSection({ isDashboard = false }: { isDashboa
                             <PetInsuranceCalculator isDashboard={true} onShowPlans={() => setActiveTab('plans')} />
                         </motion.div>
                     )}
-                </AnimatePresence>
+                </AnimatePresence>                                                                                                                                                 
             </div>
         </section>
     );
