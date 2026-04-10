@@ -249,7 +249,7 @@ export default function UTIREOpportunitiesDetail() {
 
                         {/* Fee Structure */}
                         <section className="bg-white rounded-[3rem] p-8 shadow-xl border border-gray-100">
-                            <h4 classNametext-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Fee Structure</h4>
+                            <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Fee Structure</h4>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center border-b border-gray-100 pb-3">
                                     <span className="text-gray-500 font-medium text-sm">Management Fee</span>

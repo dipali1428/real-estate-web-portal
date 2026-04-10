@@ -102,7 +102,7 @@ export default function ArnyaRealEstateDebtDetail() {
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
                         <Link href="/products/aif" className="inline-flex items-center text-gray-500 hover:text-[#2076C7] transition-colors mb-6 group">
                             <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3 group-hover:bg-[#2076C7] group-hover:text-white transition-all">
-                                <ArrowLeft size(16) />
+                                <ArrowLeft size={16} />
                             </div>
                             <span className="font-bold tracking-wider uppercase text-sm">Back to AIF Products</span>
                         </Link>
@@ -144,7 +144,7 @@ export default function ArnyaRealEstateDebtDetail() {
                         <section className="bg-white rounded-[3rem] p-10 shadow-xl border border-gray-100">
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="w-12 h-12 bg-[#2076C7]/10 text-[#2076C7] rounded-2xl flex items-center justify-center">
-                                    <Target size(24) />
+                                    <Target size={24}/>
                                 </div>
                                 <h3 className="text-2xl font-bold text-gray-900 font-sans">Investment Strategy</h3>
                             </div>
@@ -219,7 +219,7 @@ export default function ArnyaRealEstateDebtDetail() {
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
                             <div className="flex items-center gap-4 mb-6 relative z-10">
                                 <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                                    <Users size(24) />
+                                    <Users size={24} />
                                 </div>
                                 <div>
                                     <h4 className="font-black text-xl leading-none">Investment Manager</h4>
@@ -260,7 +260,7 @@ export default function ArnyaRealEstateDebtDetail() {
                             <p className="text-slate-400 text-sm mb-8 font-medium">Invest in secured real estate backed debt instruments.</p>
                             <div className="space-y-3">
                                 <button className="w-full py-4 bg-[#2076C7] hover:bg-[#2076C7]/90 text-white rounded-2xl font-black shadow-lg shadow-[#2076C7]/30 transition-all flex items-center justify-center gap-3 cursor-pointer">
-                                    <FileText size(20) />
+                                    <FileText size={24} />
                                     Apply Now
                                 </button>
                                 <div className="grid grid-cols-2 gap-3 text-[10px] font-black uppercase tracking-wider">
