@@ -219,7 +219,7 @@ export default function ArnyaRealEstateDebtDetail() {
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
                             <div className="flex items-center gap-4 mb-6 relative z-10">
                                 <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                                    <Users size(24) />
+                                    <Users size={24} />
                                 </div>
                                 <div>
                                     <h4 className="font-black text-xl leading-none">Investment Manager</h4>
@@ -260,7 +260,7 @@ export default function ArnyaRealEstateDebtDetail() {
                             <p className="text-slate-400 text-sm mb-8 font-medium">Invest in secured real estate backed debt instruments.</p>
                             <div className="space-y-3">
                                 <button className="w-full py-4 bg-[#2076C7] hover:bg-[#2076C7]/90 text-white rounded-2xl font-black shadow-lg shadow-[#2076C7]/30 transition-all flex items-center justify-center gap-3 cursor-pointer">
-                                    <FileText size(20) />
+                                    <FileText size={24} />
                                     Apply Now
                                 </button>
                                 <div className="grid grid-cols-2 gap-3 text-[10px] font-black uppercase tracking-wider">
