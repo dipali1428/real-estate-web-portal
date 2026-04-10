@@ -102,7 +102,7 @@ export default function ArnyaRealEstateDebtDetail() {
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
                         <Link href="/products/aif" className="inline-flex items-center text-gray-500 hover:text-[#2076C7] transition-colors mb-6 group">
                             <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3 group-hover:bg-[#2076C7] group-hover:text-white transition-all">
-                                <ArrowLeft size(16) />
+                                <ArrowLeft size={16} />
                             </div>
                             <span className="font-bold tracking-wider uppercase text-sm">Back to AIF Products</span>
                         </Link>
@@ -144,7 +144,7 @@ export default function ArnyaRealEstateDebtDetail() {
                         <section className="bg-white rounded-[3rem] p-10 shadow-xl border border-gray-100">
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="w-12 h-12 bg-[#2076C7]/10 text-[#2076C7] rounded-2xl flex items-center justify-center">
-                                    <Target size(24) />
+                                    <Target size={24}/>
                                 </div>
                                 <h3 className="text-2xl font-bold text-gray-900 font-sans">Investment Strategy</h3>
                             </div>
