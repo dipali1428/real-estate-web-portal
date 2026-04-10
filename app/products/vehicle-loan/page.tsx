@@ -7,6 +7,7 @@ import VehicleLoanProcess from './components/VehicleLoanProcess';
 import VehicleLoanCalculator from './components/VehicleLoanCalculator';
 import VehicleLoanEligibility from './components/VehicleLoanEligibility';
 import VehicleLoanFAQ from './components/VehicleLoanFAQ';
+import VehicleLoanPartners from './components/VehicleLoanPartners';
 import CTASection from '@/app/component/CTASection';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Zap } from 'lucide-react';
@@ -60,10 +61,10 @@ export default function VehicleLoanPage() {
             />
             <VehicleLoanTypes />
             <VehicleLoanCalculator />
+            <VehicleLoanPartners />
             <VehicleLoanFeatures />
             <VehicleLoanEligibility />
             <VehicleLoanProcess />
-
             {/* Disclaimer Section */}
             <div className="bg-white py-6 md:py-8 px-4">
                 <div className="max-w-6xl mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">

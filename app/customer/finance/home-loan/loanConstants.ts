@@ -1,0 +1,161 @@
+// Home Loan - Bank Data Constants
+
+export const CATEGORIES = [
+    'New Purchase',
+    'Resale Property',
+    'Takeover',
+    'Home Renovation',
+    'Plot + Construction'
+];
+
+export const HOME_LOAN_TYPES = [
+    {
+        title: "New Purchase Home Loan",
+        category: "New Purchase",
+        icon: "Home",
+        description: "Buy your dream home with attractive interest rates and flexible repayment options.",
+        bestFor: "Buying a new flat, apartment, or under-construction property from a builder.",
+        benefits: [
+            "Competitive interest rates",
+            "High loan eligibility",
+            "Flexible tenure up to 30 years",
+            "Quick approval process"
+        ],
+        color: "blue"
+    },
+    {
+        title: "Resale Property Home Loan",
+        category: "Resale Property",
+        icon: "Building2",
+        description: "Finance the purchase of a resale or second-hand property from an individual seller.",
+        bestFor: "Ready-to-move-in resale homes.",
+        benefits: [
+            "Legal & technical property verification",
+            "Transparent documentation",
+            "Suitable for salaried & self-employed applicants"
+        ],
+        color: "peacock-green"
+    },
+    {
+        title: "Takeover / Balance Transfer Home Loan",
+        category: "Takeover",
+        icon: "Repeat",
+        description: "Transfer your existing home loan to another bank to get lower interest rates and better terms.",
+        bestFor: "Reducing EMI or interest burden.",
+        benefits: [
+            "Lower interest rate options",
+            "Top-up facility available",
+            "Minimal documentation"
+        ],
+        color: "blue"
+    },
+    {
+        title: "Home Renovation Loan",
+        category: "Home Renovation",
+        icon: "Wrench",
+        description: "Upgrade, repair, or renovate your existing home with flexible funding.",
+        bestFor: "Interior work, structural repair, house extension.",
+        benefits: [
+            "Quick approval",
+            "Flexible repayment options",
+            "Available as standalone or top-up loan"
+        ],
+        color: "peacock-green"
+    },
+    {
+        title: "Plot + Construction Loan",
+        category: "Plot + Construction",
+        icon: "Construction",
+        description: "Purchase a plot and construct your home with stage-wise disbursement.",
+        bestFor: "Buying land and building your own house.",
+        benefits: [
+            "Stage-wise fund release",
+            "Flexible tenure",
+            "Suitable for salaried & self-employed"
+        ],
+        color: "blue"
+    },
+];
+
+export const categorizedPlans: Record<string, any[]> = {
+    'New Purchase': [
+        { bank: 'State Bank of India (SBI)', interest: '7.50% p.a.', fee: '₹1,100 + GST ', benefits: ['Lowest interest rates', "India's most trusted bank", 'Quick approval'], color: 'blue' },
+        { bank: 'HDFC Bank', interest: '7.20% p.a.', fee: '₹9,000 + GST', benefits: ['Fast processing', 'Large network', 'Digital documentation'], color: 'blue' },
+        { bank: 'ICICI Bank', interest: '7.30% p.a.', fee: '₹5,000 For Salaried, 0.2% For Self-Employed', benefits: ['Digital loan journey', 'Quick sanction', 'Flexible eligibility'], color: 'blue' },
+        { bank: 'Axis Bank', interest: '7.25% p.a.', fee: '₹7,000 + GST', benefits: ['Competitive rates', 'Good for salaried', 'Online tracking'], color: 'peacock-green' },
+        { bank: 'Bank of Baroda', interest: '7.35% p.a.', fee: '₹10,500 includes legal and technical fees', benefits: ['No processing fee', 'PSU trust', 'Stable rates'], color: 'blue' },
+        { bank: 'Punjab National Bank', interest: '7.20% p.a.', fee: '₹2,500 - ₹15,000', benefits: ['Government backed', 'Pan-India presence', 'Long tenure options'], color: 'peacock-green' },
+        { bank: 'Bank of Maharashtra', interest: '7.15% p.a.', fee: 'NIL', benefits: ['Attractive rates', 'Quick processing', 'No hidden charges'], color: 'blue' },
+        { bank: 'Central Bank of India', interest: '7.15% p.a.', fee: 'NIL', benefits: ['PSU trust', 'Flexible tenure', 'Transparent process'], color: 'peacock-green' },
+        { bank: 'IDBI Bank', interest: '7.50% p.a.', fee: '₹2,950', benefits: ['Customized loans', 'Easy documentation', 'Fast sanction'], color: 'peacock-green' },
+        { bank: 'Union Bank', interest: '7.15% p.a.', fee: '₹17,000-₹20,000', benefits: ['Zero prepay charges', 'Quick eligibility check', 'PSU benefit'], color: 'blue' },
+        { bank: 'Kotak Mahindra Bank', interest: '7.70% p.a.', fee: 'Salaried: ₹10,000+ GST, Self-Employed: 2.25% + GST,Commercial: 0.5%', benefits: ['Digital process', 'Fast turnaround', 'Attractive rates'], color: 'peacock-green' },
+    ],
+    'Resale Property': [
+        { bank: 'State Bank of India (SBI)', interest: '7.50% p.a.', fee: '₹1,100 + GST', benefits: ['Lowest interest rates', "India's most trusted bank", 'Quick approval for resale'], color: 'blue' },
+        { bank: 'HDFC Bank', interest: '7.20% p.a.', fee: '₹9,000 + GST', benefits: ['Fast processing', 'Large network', 'Digital documentation'], color: 'blue' },
+        { bank: 'ICICI Bank', interest: '7.30% p.a.', fee: '₹5,000 For Salaried, 0.2% For Self-Employed', benefits: ['Digital loan journey', 'Quick sanction', 'Flexible eligibility'], color: 'blue' },
+        { bank: 'Axis Bank', interest: '7.25% p.a.', fee: '₹10,000 + GST', benefits: ['Competitive rates', 'Good for salaried', 'Online tracking'], color: 'peacock-green' },
+        { bank: 'Bank of Baroda', interest: '7.35% p.a.', fee: '₹10,500 includes legal and technical fees', benefits: ['No processing fee', 'PSU trust', 'Stable rates'], color: 'blue' },
+        { bank: 'Punjab National Bank', interest: '7.20% p.a.', fee: '₹2,500 - ₹15,000', benefits: ['Government backed', 'Pan-India presence', 'Long tenure options'], color: 'peacock-green' },
+        { bank: 'Bank of Maharashtra', interest: '7.15% p.a.', fee: 'NIL', benefits: ['Attractive rates', 'Quick processing', 'No hidden charges'], color: 'blue' },
+        { bank: 'Central Bank of India', interest: '7.15% p.a.', fee: '0.5%', benefits: ['PSU trust', 'Flexible tenure', 'Transparent process'], color: 'peacock-green' },
+        { bank: 'IDBI Bank', interest: '7.50% p.a.', fee: '₹2,950', benefits: ['Customized loans', 'Easy documentation', 'Fast sanction'], color: 'peacock-green' },
+        { bank: 'Union Bank', interest: '7.15% p.a.', fee: '₹17,000-₹20,000', benefits: ['Zero prepay charges', 'Quick eligibility check', 'PSU benefit'], color: 'blue' },
+        { bank: 'Kotak Mahindra Bank', interest: '7.70% p.a.', fee: 'Salaried: ₹10,000+ GST, Self-Employed: 2.25% + GST,Commercial: 0.5%', benefits: ['Digital process', 'Fast turnaround', 'Attractive rates'], color: 'peacock-green' },
+    ],
+    'Takeover': [
+        { bank: 'State Bank of India (SBI)', interest: '7.50% p.a.', fee: '₹1,100 + GST', benefits: ['Best rates for transfer', 'Transparent charges', 'Wide branch support'], color: 'blue' },
+        { bank: 'HDFC Bank', interest: '7.20% p.a.', fee: '₹9,000 + GST', benefits: ['Smooth balance transfer', 'Top-up facility', 'Established track record'], color: 'blue' },
+        { bank: 'ICICI Bank', interest: '7.30% p.a.', fee: '₹5,000 For Salaried, 0.2% For Self-Employed', benefits: ['Quick takeover process', 'Top-up available', 'Digital tracking'], color: 'blue' },
+        { bank: 'Axis Bank', interest: '7.25% p.a.', fee: '₹10,000 + GST', benefits: ['Minimal documentation', 'Fast processing', 'Lower EMIs'], color: 'peacock-green' },
+        { bank: 'Bank of Baroda', interest: '7.35% p.a.', fee: '₹10,500 includes legal and technical fees', benefits: ['Zero processing fee', 'PSU trust', 'Flexible terms'], color: 'blue' },
+        { bank: 'Punjab National Bank', interest: '7.20% p.a.', fee: '₹2,500 - ₹15,000', benefits: ['Easy transfer', 'No hidden charges', 'Good for salaried'], color: 'peacock-green' },
+        { bank: 'Bank of Maharashtra', interest: '7.15% p.a.', fee: 'NIL', benefits: ['Lowest takeover ROI', 'Extra top-up funds', 'Zero processing fee'], color: 'blue' },
+        { bank: 'Central Bank of India', interest: '7.15% p.a.', fee: '0.5%', benefits: ['Stable rates', 'PSU transparency', 'Easy handover'], color: 'peacock-green' },
+        { bank: 'IDBI Bank', interest: '7.50% p.a.', fee: '₹2,950', benefits: ['Smooth transitions', 'Top-up loans', 'Flexible terms'], color: 'peacock-green' },
+        { bank: 'Union Bank', interest: '7.15% p.a.', fee: '₹17,000-₹20,000', benefits: ['PSU benefit', 'Easy documentation', 'Fast takeover process'], color: 'blue' },
+        { bank: 'Kotak Mahindra Bank', interest: '7.70% p.a.', fee: 'Salaried: ₹10,000+ GST, Self-Employed: 2.25% + GST,Commercial: 0.5%', benefits: ['Competitive takeover rates', 'Fast turnaround', 'Digital process'], color: 'peacock-green' },
+    ],
+    'Home Renovation': [
+        { bank: 'State Bank of India (SBI)', interest: '7.50% p.a.', fee: '₹1,100 + GST', benefits: ['Reliable funding', "India's most trusted bank", 'Quick approval'], color: 'blue' },
+        { bank: 'HDFC Bank', interest: '7.20% p.a.', fee: '₹9,000 + GST', benefits: ['Fast processing', 'Network reach', 'Easy repair loans'], color: 'blue' },
+        { bank: 'ICICI Bank', interest: '7.30% p.a.', fee: '₹5,000 For Salaried, 0.2% For Self-Employed', benefits: ['Digital loan journey', 'Quick sanction', 'Flexible eligibility'], color: 'blue' },
+        { bank: 'Axis Bank', interest: '7.25% p.a.', fee: '₹10,000 + GST', benefits: ['Competitive rates', 'Good for salaried', 'Online tracking'], color: 'peacock-green' },
+        { bank: 'Bank of Baroda', interest: '7.35% p.a.', fee: '₹10500 includes legal and technical fees', benefits: ['Standalone repair loans', 'Easy appraisals', 'PSU reliability'], color: 'blue' },
+        { bank: 'Punjab National Bank', interest: '7.20% p.a.', fee: '₹2,500 - ₹15,000', benefits: ['Government backed', 'Pan-India presence', 'Long tenure options'], color: 'peacock-green' },
+        { bank: 'Bank of Maharashtra', interest: '7.15% p.a.', fee: 'NIL', benefits: ['Attractive rates', 'Quick processing', 'Dedicated support'], color: 'blue' },
+        { bank: 'Central Bank of India', interest: '7.15% p.a.', fee: 'NIL', benefits: ['PSU trust', 'Flexible tenure', 'Renovation specific features'], color: 'peacock-green' },
+        { bank: 'Bank of India', interest: '8.55% p.a.', fee: '0.50%', benefits: ['Low processing fee', 'High loan amount', 'Customer friendly'], color: 'blue' },
+        { bank: 'IDBI Bank', interest: '7.50% p.a.', fee: '₹2,950', benefits: ['Customized repair loans', 'Easy documentation', 'Fast sanction'], color: 'peacock-green' },
+        { bank: 'Union Bank', interest: '7.15% p.a.', fee: '₹17,000-₹20,000', benefits: ['Fast approval pipeline', 'Quick eligibility check', 'PSU benefit'], color: 'blue' },
+        { bank: 'Kotak Mahindra Bank', interest: '7.70% p.a.', fee: 'Salaried: ₹10,000+ GST, Self-Employed: 2.25% + GST,Commercial: 0.5%', benefits: ['Digital process', 'Fast turnaround', 'Attractive repair rates'], color: 'peacock-green' },
+    ],
+    'Plot + Construction': [
+        { bank: 'State Bank of India (SBI)', interest: '7.50% p.a.', fee: '₹1,100 + GST', benefits: ['Stage-wise disbursement', 'Trusted checking', 'Plot+build loans'], color: 'blue' },
+        { bank: 'HDFC Bank', interest: '7.20% p.a.', fee: '₹9,000 + GST', benefits: ['Fast processing', 'Expert evaluation', 'Digital tracking'], color: 'blue' },
+        { bank: 'ICICI Bank', interest: '7.30% p.a.', fee: '₹5,000 For Salaried, 0.2% For Self-Employed', benefits: ['Digital tracking', 'Quick stage sanction', 'Flexible disbursal'], color: 'blue' },
+        { bank: 'Axis Bank', interest: '7.25% p.a.', fee: '₹10,000 + GST', benefits: ['Competitive rates', 'Good for self-construction', 'Online tracking'], color: 'peacock-green' },
+        { bank: 'Bank of Baroda', interest: '7.35% p.a.', fee: '₹10,500 includes legal and technical fees', benefits: ['No processing fee', 'PSU trust', 'Stable plot rates'], color: 'blue' },
+        { bank: 'Punjab National Bank', interest: '7.20% p.a.', fee: '₹2,500 - ₹15000', benefits: ['Government backed', 'Pan-India presence', 'Long tenure options'], color: 'peacock-green' },
+        { bank: 'Bank of Maharashtra', interest: '7.15% p.a.', fee: 'NIL', benefits: ['Attractive rates', 'Quick stage checks', 'No hidden charges'], color: 'blue' },
+        { bank: 'Central Bank of India', interest: '7.15% p.a.', fee: 'NIL', benefits: ['PSU trust', 'Flexible tenure', 'Transparent stage payments'], color: 'peacock-green' },
+        { bank: 'IDBI Bank', interest: '7.50% p.a.', fee: '1%', benefits: ['Funding for warehouses', 'Industrial project support', 'Quick technical check'], color: 'blue' },
+        { bank: 'Union Bank', interest: '7.15% p.a.', fee: '0.50%', benefits: ['Zero prepay charges', 'Quick eligibility check', 'PSU benefit'], color: 'blue' },
+        { bank: 'Kotak Mahindra Bank', interest: '7.70% p.a.', fee: 'Salaried: ₹10,000+ GST, Self-Employed: 2.25% + GST,Commercial: 0.5%', benefits: ['Digital tracking', 'Fast turnaround', 'Attractive construction rates'], color: 'peacock-green' },
+    ]
+};
+
+export const PARTNER_BANKS = [
+    { name: "BANK OF MAHARASHTRA", color: "#2076C7" },
+    { name: "CENTRAL BANK OF INDIA", color: "#1CADA3" },
+    { name: "BANK OF BARODA", color: "#2076C7" },
+    { name: "PUNJAB NATIONAL BANK", color: "#1CADA3" },
+    { name: "STATE BANK OF INDIA (SBI)", color: "#2076C7" },
+    { name: "HDFC BANK", color: "#1CADA3" },
+    { name: "ICICI BANK", color: "#2076C7" },
+    { name: "AXIS BANK", color: "#1CADA3" },
+    { name: "IDBI BANK", color: "#2076C7" },
+    { name: "UNION BANK", color: "#1CADA3" },
+    { name: "KOTAK MAHINDRA BANK", color: "#2076C7" },
+];

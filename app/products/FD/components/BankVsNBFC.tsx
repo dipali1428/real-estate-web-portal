@@ -6,7 +6,7 @@ import { Landmark, Building2, ShieldCheck, HeartPulse, Clock, ArrowRightLeft, Tr
 
 const BankVsNBFC = () => {
     return (
-        <section className="py-20 bg-white relative overflow-hidden">
+        <section className="pt-8 pb-20 bg-white relative overflow-hidden">
             {/* Subtle background decoration */}
             <div className="absolute top-0 right-0 w-72 h-72 bg-[#1CADA3]/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#2076C7]/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl pointer-events-none" />

@@ -239,9 +239,9 @@ const AIFProductsContent = () => {
                 {/* AIF Hero Section */}
                 <section className="relative py-20 lg:py-28 overflow-hidden bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                        <div className="grid lg:grid-cols-2 gap-12 items-center">
-                            <div className="text-left">
-                                <div className="mb-6 flex flex-wrap items-center gap-4">
+                        <div className="grid lg:grid-cols-2 gap-12 items-center text-center lg:text-left">
+                            <div className="max-w-4xl lg:max-w-none mx-auto lg:mx-0">
+                                <div className="mb-6 flex flex-wrap items-center justify-center lg:justify-start gap-4">
                                     <div className="bg-[#1CADA3]/10 text-[#1CADA3] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">
                                         Advanced Investments
                                     </div>
@@ -253,8 +253,8 @@ const AIFProductsContent = () => {
                                     transition={{ duration: 0.5, delay: 0.1 }}
                                     className="text-5xl md:text-6xl lg:text-7xl font-bold font-sans bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent leading-[1.1] mb-6 tracking-tight"
                                 >
-                                    Strategic Wealth <br />
-                                    Creation via <br />
+                                    Strategic Wealth <br className="hidden sm:block" />
+                                    Creation via <br className="hidden sm:block" />
                                     <span className="text-[#2076C7]">Alternative Investment Funds</span>
                                 </motion.h1>
 
@@ -262,7 +262,7 @@ const AIFProductsContent = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5, delay: 0.2 }}
-                                    className="text-xl md:text-2xl text-gray-600 max-w-xl leading-relaxed mb-10"
+                                    className="text-lg md:text-xl lg:text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-10"
                                 >
                                     Exclusive alternative investment opportunities for sophisticated portfolios.
                                 </motion.p>
@@ -274,7 +274,7 @@ const AIFProductsContent = () => {
                                 >
                                     <button
                                         onClick={() => openLogin()}
-                                        className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-lg font-semibold text-white shadow-lg text-lg bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                                        className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-lg font-semibold text-white shadow-lg text-lg bg-gradient-to-r from-[#1CADA3] to-[#2076C7] hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                                     >
                                         Apply Now
                                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -286,7 +286,7 @@ const AIFProductsContent = () => {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 1, delay: 0.2 }}
-                                className="relative h-[350px] md:h-[400px] lg:h-[500px] w-full block mt-8 lg:mt-0"
+                                className="relative h-[300px] md:h-[400px] lg:h-[450px] w-full block order-last lg:order-none"
                             >
                                 <AIFHeroVisual />
                             </motion.div>
@@ -350,7 +350,7 @@ const AIFProductsContent = () => {
                 </section>
 
                 {/* Content Section */}
-                <section className="py-24 bg-neutral-50 text-gray-700">
+                <section className="py-12 bg-neutral-50 text-gray-700">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} className="text-center mb-12">
                             <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
@@ -386,7 +386,7 @@ const AIFProductsContent = () => {
                                         key={cat}
                                         onClick={() => setSelectedCategory(cat)}
                                         className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${selectedCategory === cat
-                                            ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg'
+                                            ? 'bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white shadow-lg'
                                             : 'bg-white text-gray-600 border border-gray-100 hover:border-[#1CADA3]/30 hover:bg-teal-50 hover:text-[#1CADA3]'
                                             }`}
                                     >
@@ -396,7 +396,7 @@ const AIFProductsContent = () => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="flex flex-col gap-4 md:max-h-[800px] md:overflow-y-auto md:pr-2 md:custom-scrollbar">
                             <AnimatePresence>
                                 {filteredStrategies.length > 0 ? (
                                     filteredStrategies.map((fund, idx) => (
@@ -409,49 +409,86 @@ const AIFProductsContent = () => {
                                             transition={{ duration: 0.3 }}
                                             className="w-full"
                                         >
-                                            <div
-                                                className='block cursor-pointer'
-                                                onClick={(e) => {
-                                                    if (fund.details) {
-                                                        setSelectedFund(fund);
-                                                        setIsDetailModalOpen(true);
-                                                    }
-                                                }}
-                                            >
-                                                <motion.div
-                                                    whileHover={{ scale: 1.01, x: 5 }}
-                                                    className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-lg transition-all duration-300 relative overflow-hidden group"
+                                            {fund.slug ? (
+                                                <Link href={`/products/aif/${fund.slug}`} className="block w-full">
+                                                    <motion.div
+                                                        whileHover={{ scale: 1.01 }}
+                                                        className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 relative overflow-hidden group"
+                                                    >
+                                                        {/* Colour bar */}
+                                                        <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl" style={{ backgroundColor: fund.color }} />
+
+                                                        <div className="pl-6 pr-4 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                                                            {/* Name & tags */}
+                                                            <div className="flex-1 min-w-0">
+                                                                <h3 className="text-base sm:text-lg font-bold text-gray-700 mb-1.5 group-hover:text-[#2076C7] transition-colors leading-snug">{fund.name}</h3>
+                                                                <div className="flex flex-wrap gap-1.5">
+                                                                    <span className="px-2 py-0.5 bg-[#1CADA3]/10 text-[#1CADA3] rounded text-[10px] font-bold uppercase tracking-wider">{fund.category}</span>
+                                                                    <span className="px-2 py-0.5 bg-[#2076C7]/10 text-[#2076C7] rounded text-[10px] font-bold uppercase tracking-wider">{fund.theme}</span>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Manager info — shown on lg only */}
+                                                            <div className="hidden lg:block flex-[2] text-gray-500 text-sm border-l border-gray-100 pl-5 min-w-0">
+                                                                <p className="line-clamp-1"><span className="font-semibold text-gray-700">Manager:</span> {fund.manager}</p>
+                                                                <p className="text-gray-400 text-xs italic line-clamp-2 mt-0.5">{fund.desc}</p>
+                                                            </div>
+
+                                                            {/* CTA */}
+                                                            <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-3 sm:pt-0 border-t sm:border-none border-gray-100">
+                                                                <span className="text-xs font-bold text-[#2076C7] uppercase tracking-wider">View Page</span>
+                                                                <div className="p-2 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-[#2076C7] group-hover:text-white transition-all shadow-sm">
+                                                                    <ArrowRight size={16} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </motion.div>
+                                                </Link>
+                                            ) : (
+                                                <div
+                                                    className="block cursor-pointer w-full"
+                                                    onClick={() => {
+                                                        if (fund.details) {
+                                                            setSelectedFund(fund);
+                                                            setIsDetailModalOpen(true);
+                                                        }
+                                                    }}
                                                 >
-                                                    <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ backgroundColor: fund.color }} />
+                                                    <motion.div
+                                                        whileHover={{ scale: 1.01 }}
+                                                        className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 relative overflow-hidden group"
+                                                    >
+                                                        {/* Colour bar */}
+                                                        <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl" style={{ backgroundColor: fund.color }} />
 
-                                                    {/* Primary Info: Name & Tags */}
-                                                    <div className="flex-1 min-w-0 md:max-w-xs lg:max-w-sm">
-                                                        <h3 className="text-xl font-bold text-gray-700 mb-2 group-hover:text-[#2076C7] transition-colors truncate">{fund.name}</h3>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            <span className="px-2 py-1 bg-[#1CADA3]/10 text-[#1CADA3] rounded text-[10px] font-bold uppercase tracking-wider">{fund.category}</span>
-                                                            <span className="px-2 py-1 bg-[#2076C7]/10 text-[#2076C7] rounded text-[10px] font-bold uppercase tracking-wider truncate">{fund.theme}</span>
-                                                        </div>
-                                                    </div>
+                                                        <div className="pl-6 pr-4 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                                                            {/* Name & tags */}
+                                                            <div className="flex-1 min-w-0">
+                                                                <h3 className="text-base sm:text-lg font-bold text-gray-700 mb-1.5 group-hover:text-[#2076C7] transition-colors leading-snug">{fund.name}</h3>
+                                                                <div className="flex flex-wrap gap-1.5">
+                                                                    <span className="px-2 py-0.5 bg-[#1CADA3]/10 text-[#1CADA3] rounded text-[10px] font-bold uppercase tracking-wider">{fund.category}</span>
+                                                                    <span className="px-2 py-0.5 bg-[#2076C7]/10 text-[#2076C7] rounded text-[10px] font-bold uppercase tracking-wider">{fund.theme}</span>
+                                                                </div>
+                                                            </div>
 
-                                                    {/* Secondary Info: Manager & Description */}
-                                                    <div className="flex-[2] text-gray-500 text-sm border-l border-gray-100 pl-6 hidden lg:block">
-                                                        <div className="space-y-1">
-                                                            <p className="line-clamp-1"><span className="font-semibold text-gray-700">Manager:</span> {fund.manager}</p>
-                                                            <p className="text-gray-400 text-xs italic line-clamp-2">{fund.desc}</p>
-                                                        </div>
-                                                    </div>
+                                                            {/* Manager info — shown on lg only */}
+                                                            <div className="hidden lg:block flex-[2] text-gray-500 text-sm border-l border-gray-100 pl-5 min-w-0">
+                                                                <p className="line-clamp-1"><span className="font-semibold text-gray-700">Manager:</span> {fund.manager}</p>
+                                                                <p className="text-gray-400 text-xs italic line-clamp-2 mt-0.5">{fund.desc}</p>
+                                                            </div>
 
-                                                    {/* Action / Arrow */}
-                                                    <div className="flex items-center gap-4 shrink-0">
-                                                        <div className="hidden sm:block text-right">
-                                                            <div className="text-xs font-bold text-[#2076C7] group-hover:translate-x-[-4px] transition-transform">VIEW DETAILS</div>
+                                                            {/* CTA */}
+                                                            <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-3 sm:pt-0 border-t sm:border-none border-gray-100">
+                                                                <span className="text-xs font-bold text-[#2076C7] uppercase tracking-wider">View Details</span>
+                                                                <div className="p-2 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-[#2076C7] group-hover:text-white transition-all shadow-sm">
+                                                                    <ArrowRight size={16} />
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div className="p-3 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-[#2076C7] group-hover:text-white transition-all shadow-sm">
-                                                            <ArrowRight size={20} />
-                                                        </div>
-                                                    </div>
-                                                </motion.div>
-                                            </div>
+                                                    </motion.div>
+                                                </div>
+                                            )}
+
                                         </motion.div>
                                     ))
                                 ) : (
@@ -482,7 +519,7 @@ const AIFProductsContent = () => {
                 </section>
 
                 {/* Strategy Comparison Table */}
-                <section className="py-24 bg-white">
+                <section className="py-12 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
                             <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
@@ -525,7 +562,7 @@ const AIFProductsContent = () => {
                 </section>
 
                 {/* Educational Section */}
-                <section className="py-24 bg-neutral-50">
+                <section className="py-12 bg-neutral-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
                             <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
@@ -568,7 +605,7 @@ const AIFProductsContent = () => {
                 </section>
 
                 {/* Intelligence Section */}
-                <section className="py-24 bg-white">
+                <section className="py-12 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
                         <motion.div initial="hidden" whileInView="visible" variants={staggerContainer} viewport={{ once: true }} className="text-center mb-16">
                             <motion.h2 variants={slideUpFade} className="text-3xl md:text-4xl font-extrabold font-sans mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
@@ -582,7 +619,7 @@ const AIFProductsContent = () => {
                     </div>
                 </section>
 
-                <section className="py-24 bg-neutral-50">
+                <section className="py-12 bg-neutral-50">
                     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
                         <motion.div variants={slideUpFade} initial="hidden" whileInView="visible" viewport={{ once: true }} className="p-4 bg-yellow-50 border border-yellow-100 rounded-xl flex items-start gap-3 text-sm text-yellow-800">
                             <ShieldCheck className="w-5 h-5 shrink-0 mt-0.5" />

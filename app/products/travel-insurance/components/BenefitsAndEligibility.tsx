@@ -57,68 +57,94 @@ const documentGroups = [
     { icon: <ShieldCheck size={24} />, title: 'For Claims', items: ['Medical bills', 'Police report (theft)', 'Airline PIR', 'Cancellation proof'], color: 'from-[#1CADA3] to-[#2076C7]' },
 ];
 
-export default function BenefitsAndEligibility() {
+export default function BenefitsAndEligibility({ isDashboard = false }: { isDashboard?: boolean }) {
     const [showEligibility, setShowEligibility] = useState(false);
     const [expandedIdx, setExpandedIdx] = useState<number | null>(0);
 
     return (
         <>
             {/* --- WHY CHOOSE US (BENEFITS) --- */}
-            <section className="py-16 bg-white overflow-hidden relative">
-                {/* Decorative Background Elements */}
-                <div className="absolute top-10 -right-20 w-80 h-80 bg-[#1CADA3]/5 rounded-full blur-3xl" />
-                <div className="absolute bottom-10 -left-20 w-80 h-80 bg-[#2076C7]/5 rounded-full blur-3xl" />
+            {!isDashboard && (
+                <section className="py-16 bg-white overflow-hidden relative">
+                    {/* Decorative Background Elements */}
+                    <div className="absolute top-10 -right-20 w-80 h-80 bg-[#1CADA3]/5 rounded-full blur-3xl" />
+                    <div className="absolute bottom-10 -left-20 w-80 h-80 bg-[#2076C7]/5 rounded-full blur-3xl" />
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-                    <div className="flex flex-col items-center text-center max-w-7xl mx-auto">
-                        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                            <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
-                                Why Choose Our Travel Insurance?
-                            </h2>
-                            <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
-                                We offer more than just coverage — we provide peace of mind for your global adventures with tailor-made plans.
-                            </p>
-                            <h2 className="text-2xl md:text-3xl font-extrabold mb-6 text-[#1CADA3] drop-shadow-sm tracking-tight leading-tight">
-                                Who Can Apply?
-                            </h2>
-                        </motion.div>
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+                        <div className="flex flex-col items-center text-center max-w-7xl mx-auto">
+                            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                                <h2 className="text-2xl md:text-4xl font-extrabold mb-4 md:mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
+                                    Why Choose Our Travel Insurance?
+                                </h2>
+                                <p className="text-gray-600 max-w-2xl mx-auto font-medium text-sm md:text-lg leading-relaxed mb-6 md:mb-8">
+                                    We offer more than just coverage — we provide peace of mind for your global adventures with tailor-made plans.
+                                </p>
+                                <h2 className="text-xl md:text-3xl font-extrabold mb-4 md:mb-6 text-[#1CADA3] drop-shadow-sm tracking-tight leading-tight">
+                                    Who Can Apply?
+                                </h2>
+                            </motion.div>
 
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-                            {benefits.map((b, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: i * 0.1 }}
-                                    viewport={{ once: true }}
-                                    className="bg-white p-6 rounded-[2rem] shadow-lg hover:shadow-2xl transition-all border border-slate-100 group flex flex-col items-center"
-                                >
-                                    <div className="p-4 rounded-2xl bg-white shadow-md mb-4 group-hover:scale-110 transition-transform flex items-center justify-center">
-                                        <b.icon size={32} stroke={2} className="text-[#2076C7]" />
-                                    </div>
-                                    <h4 className="text-base font-black text-gray-600 mb-2">{b.title}</h4>
-                                    <p className="text-[13px] text-gray-500 font-medium leading-tight">{b.desc}</p>
-                                </motion.div>
-                            ))}
+                            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+                                {benefits.map((b, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        whileInView={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: i * 0.1 }}
+                                        viewport={{ once: true }}
+                                        className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-lg hover:shadow-2xl transition-all border border-slate-100 group flex flex-col items-center"
+                                    >
+                                        <div className="p-3.5 md:p-4 rounded-2xl bg-white shadow-md mb-4 group-hover:scale-110 transition-transform flex items-center justify-center">
+                                            <b.icon size={28} className="md:w-[32px] md:h-[32px] text-[#2076C7]" stroke={2} />
+                                        </div>
+                                        <h4 className="text-sm md:text-base font-black text-gray-600 mb-2">{b.title}</h4>
+                                        <p className="text-[12px] md:text-[13px] text-gray-500 font-medium leading-tight">{b.desc}</p>
+                                    </motion.div>
+                                ))}
+                            </div>
                         </div>
                     </div>
+                    <WaveDivider />
+                </section>
+            )}
+
+            {/* In Dashboard mode, we still show the benefits grid but without the section wrapper and with dashboard styling */}
+            {isDashboard && (
+                <div className="mb-16">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mb-16">
+                        {benefits.map((b, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: i * 0.1 }}
+                                viewport={{ once: true }}
+                                className="bg-slate-50/50 p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-sm hover:shadow-md transition-all border border-slate-100 group flex flex-col items-center"
+                            >
+                                <div className="p-3.5 md:p-4 rounded-2xl bg-white shadow-sm mb-4 group-hover:scale-110 transition-transform flex items-center justify-center">
+                                    <b.icon size={28} className="md:w-[32px] md:h-[32px] text-[#2076C7]" stroke={2} />
+                                </div>
+                                <h4 className="text-sm md:text-base font-black text-gray-700 mb-2">{b.title}</h4>
+                                <p className="text-[12px] md:text-[13px] text-gray-500 font-medium leading-tight text-center">{b.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
-                <WaveDivider />
-            </section>
+            )}
 
             {/* --- ELIGIBILITY CHECKLIST --- */}
             <section className="py-16 px-4 sm:px-6 bg-white">
-                <div className="max-w-7xl mx-auto rounded-[3rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row border-2 border-[#2076C7]/30">
-                    <div className="lg:w-1/2 p-8 sm:p-10 lg:p-12">
+                <div className="max-w-7xl mx-auto rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row border-2 border-[#2076C7]/30">
+                    <div className="lg:w-1/2 p-6 sm:p-10 lg:p-12">
                         <h3 className="text-xl sm:text-2xl md:text-3xl font-black bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent inline-block mb-6">Quick Checklist</h3>
                         <div className="grid sm:grid-cols-2 gap-3 mb-8">
                             {requirements.map((req, i) => (
-                                <div key={i} className="flex items-start gap-3"><div className="bg-[#2076C7]/10 text-[#2076C7] p-1.5 rounded-full shrink-0"><IconCheck size={16} stroke={3} /></div><span className="text-gray-700 text-base font-semibold">{req}</span></div>
+                                <div key={i} className="flex items-start gap-3"><div className="bg-[#2076C7]/10 text-[#2076C7] p-1 rounded md:p-1.5 rounded-full shrink-0"><IconCheck size={14} className="md:w-[16px] md:h-[16px]" stroke={3} /></div><span className="text-gray-700 text-sm md:text-base font-semibold">{req}</span></div>
                             ))}
                         </div>
                         <button
                             onClick={() => setShowEligibility(!showEligibility)}
-                            className="bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-sm md:text-base shadow-lg hover:scale-[1.02] transition-all w-full md:w-auto flex items-center justify-center gap-2"
+                            className="bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white px-8 py-4 md:px-10 md:py-5 rounded-2xl font-black uppercase tracking-widest text-xs md:text-sm lg:text-base shadow-lg hover:scale-[1.02] transition-all w-full md:w-auto flex items-center justify-center gap-2"
                         >
                             {showEligibility ? 'Hide Criteria' : 'Check Eligibility & Documents'}
                             <IconChevronDown
@@ -148,7 +174,7 @@ export default function BenefitsAndEligibility() {
                             transition={{ duration: 0.35, ease: 'easeOut' }}
                             className="max-w-7xl mx-auto mt-6"
                         >
-                            <div className="rounded-[3rem] border-2 border-[#2076C7]/20 bg-white shadow-xl overflow-hidden">
+                            <div className="rounded-[2rem] md:rounded-[3rem] border-2 border-[#2076C7]/20 bg-white shadow-xl overflow-hidden">
                                 <div className="px-10 pt-10 pb-4">
                                     <h3 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent inline-block mb-1">
                                         Eligibility Criteria
@@ -162,10 +188,10 @@ export default function BenefitsAndEligibility() {
                                             initial={{ opacity: 0, y: 12 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: i * 0.07 }}
-                                            className="p-8 lg:p-10 flex flex-col gap-5 border-b sm:border-b-0 sm:border-r border-slate-100 last:border-0"
+                                            className="p-6 md:p-8 lg:p-10 flex flex-col gap-4 md:gap-5 border-b sm:border-b-0 sm:border-r border-slate-100 last:border-0"
                                         >
-                                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1CADA3] to-[#2076C7] flex items-center justify-center text-white shadow-lg shrink-0">
-                                                <crit.icon size={28} />
+                                            <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-[#1CADA3] to-[#2076C7] flex items-center justify-center text-white shadow-lg shrink-0">
+                                                <crit.icon size={24} className="md:w-[28px] md:h-[28px]" />
                                             </div>
                                             <h4 className="font-black text-gray-800 text-base leading-tight">{crit.title}</h4>
                                             <ul className="space-y-3">

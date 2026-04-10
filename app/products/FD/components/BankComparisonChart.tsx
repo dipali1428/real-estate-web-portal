@@ -12,7 +12,7 @@ const SectorComparisonMatrix = () => {
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="w-full relative overflow-hidden font-sans pb-10"
+            className="w-full relative overflow-hidden font-sans pb-0"
         >
             {/* SVG Gradient Definition for Icons */}
             <svg width="0" height="0" className="absolute">

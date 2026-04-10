@@ -15,11 +15,12 @@ import { BUSINESS_TYPES, LIABILITY_TIERS } from "./data";
 
 interface CorporatePremiumCalculatorProps {
   openQuote: () => void;
+  isDashboard?: boolean;
 }
 
 export const CorporatePremiumCalculator: React.FC<
   CorporatePremiumCalculatorProps
-> = ({ openQuote }) => {
+> = ({ openQuote, isDashboard = false }) => {
   // State
   const [businessType, setBusinessType] = useState(BUSINESS_TYPES[0]);
   const [assetValue, setAssetValue] = useState<number>(1000000); // 10 Lakhs default
@@ -84,7 +85,7 @@ export const CorporatePremiumCalculator: React.FC<
     <div className="relative">
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-start">
         {/* LEFT: CONTENT */}
-        <div className="w-full lg:w-5/12 pt-4 lg:pt-12">
+        <div className={`w-full lg:w-5/12 ${isDashboard ? 'pt-0' : 'pt-4 lg:pt-12'}`}>
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -331,7 +332,7 @@ export const CorporatePremiumCalculator: React.FC<
                         {premiums.fire > 0 && (
                           <div className="flex justify-between items-center gap-3">
                             <span className="flex items-center gap-2 text-sm min-w-0">
-                              <Flame className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                              <Flame className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                               <span className="truncate">Fire</span>
                             </span>
                             <span className="font-bold text-slate-800 shrink-0">
@@ -371,12 +372,14 @@ export const CorporatePremiumCalculator: React.FC<
                     </p>
                   </div>
 
-                  <button
-                    onClick={() => openQuote()}
-                    className="w-full lg:w-auto px-6 sm:px-7 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold hover:shadow-[0_8px_25px_rgb(32,118,199,0.3)] transition-all transform hover:-translate-y-1 shrink-0 cursor-pointer"
-                  >
-                    Get Detailed Quote
-                  </button>
+                  {!isDashboard && (
+                    <button
+                      onClick={() => openQuote()}
+                      className="w-full lg:w-auto px-6 sm:px-10 py-2.5 md:py-3.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-base md:text-lg hover:shadow-[0_8px_25px_rgb(32,118,199,0.3)] transition-all transform hover:-translate-y-1 shrink-0 cursor-pointer"
+                    >
+                      Get Detailed Quote
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

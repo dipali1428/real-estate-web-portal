@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calculator, TrendingUp, TrendingDown, Target, LayoutGrid, Shield } from "lucide-react";
-import { useIsMobile } from "../../../hooks/useIsMobile";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 export default function InvestmentSection() {
     const isMobile = useIsMobile();

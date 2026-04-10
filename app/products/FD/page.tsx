@@ -28,18 +28,28 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col font-sans bg-white min-h-screen">
+    <main className="min-h-screen bg-gray-50 overflow-x-hidden font-sans text-center md:text-left">
       <ScrollToTop />
 
       {/* Fixed Back to Home Button */}
-      <div className="fixed z-50 top-16 left-2 md:top-24 md:left-8">
+      <div className="fixed z-50 top-20 left-4 md:top-24 md:left-8">
+        {/* Mobile: icon only */}
         <button
           onClick={handleBackHome}
-          className="inline-flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 text-xs md:text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group"
           aria-label="Back to Home"
+          className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
         >
-          <ArrowLeft className="w-4 h-4 md:w-4 md:h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
-          <span className="hidden md:inline">Back to Home</span>
+          <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+            <ArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+          </div>
+        </button>
+        {/* Desktop: full text button */}
+        <button
+          onClick={handleBackHome}
+          className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+          Back to Home
         </button>
       </div>
 
@@ -47,14 +57,14 @@ export default function Home() {
       <FDHero openLogin={openLogin} scrollToCalculator={scrollToCalculator} />
 
       {/* 2. Bank List Section - Compare FD Rates */}
-      <section id="compare" className="pt-16 pb-12">
+      <section id="compare" className="pt-16 pb-12 bg-white border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <BankList />
         </div>
       </section>
 
       {/* 3. Comparison & Calculator Section */}
-      <section className="py-12 relative z-20 scroll-mt-20">
+      <section className="pt-12 pb-4 relative z-20 scroll-mt-20 bg-white border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 animate-fade-in-up">
           <div id="calculator" className="grid grid-cols-1 gap-12 mb-20 scroll-mt-24">
             <FDCalculator />
@@ -67,13 +77,13 @@ export default function Home() {
       </section>
 
       {/* 4. Bank vs NBFC Comparison */}
-      <div className="bg-white">
+      <div className="bg-white border-b border-gray-100">
         <BankVsNBFC />
       </div>
 
 
       {/* 6. Features Section - Why Choose Us */}
-      <div id="about" className="bg-white">
+      <div id="about" className="bg-white border-b border-gray-100">
         <Features />
       </div>
 
@@ -85,11 +95,13 @@ export default function Home() {
       </div>
 
       {/* Disclaimer Section */}
-      <div className="max-w-4xl mx-auto mb-10 mt-16 bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
-        <p className="text-sm text-gray-700 text-center leading-relaxed font-medium">
-          <strong className="text-black">Disclaimer:</strong> Fixed Deposit rates are subject to change based on bank policies and RBI guidelines. Please verify latest rates before investing.
-        </p>
-      </div>
+      <section className="bg-white px-4 pt-16 pb-10">
+        <div className="max-w-4xl mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
+          <p className="text-sm text-gray-700 text-center leading-relaxed font-medium">
+            <strong className="text-black">Disclaimer:</strong> Fixed Deposit rates are subject to change based on bank policies and RBI guidelines. Please verify latest rates before investing.
+          </p>
+        </div>
+      </section>
 
       {/* 8. FAQs */}
       <FAQ />
@@ -102,6 +114,6 @@ export default function Home() {
         buttonText="Get a Consultation"
         buttonLink="/#contact"
       />
-    </div>
+    </main>
   );
 }

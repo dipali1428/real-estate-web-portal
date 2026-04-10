@@ -543,19 +543,19 @@ const FDCalculator: React.FC = () => {
                             <div className="bg-teal-50/30 p-6 sm:p-6 rounded-2xl sm:rounded-xl border-l-4 border-[#1CADA3] mb-8 lg:mb-0">
                                 <div className="text-center mb-6">
                                     <div className="text-xs sm:text-sm text-[#2076C7] font-bold sm:font-medium mb-1 uppercase tracking-wider">Maturity Amount</div>
-                                    <div className="text-3xl sm:text-3xl font-extrabold text-[#1CADA3] font-sans">
+                                    <div className="text-2xl sm:text-2xl font-extrabold text-[#1CADA3] font-sans">
                                         {maturityAmount > 0 ? formatCurrency(maturityAmount) : '₹0'}
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-start divide-x divide-teal-100">
                                     <div className="text-center flex-1 px-2">
-                                        <div className="text-base sm:text-lg font-bold sm:font-medium font-sans text-slate-700">
+                                        <div className="text-sm sm:text-base font-bold sm:font-medium font-sans text-slate-700">
                                             {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                                         </div>
                                         <div className="text-[10px] sm:text-sm text-[#1CADA3] mt-1 font-bold sm:font-normal uppercase">Total Interest</div>
                                     </div>
                                     <div className="text-center flex-1 px-2">
-                                        <div className="text-base sm:text-lg font-bold sm:font-medium font-sans text-slate-700">
+                                        <div className="text-sm sm:text-base font-bold sm:font-medium font-sans text-slate-700">
                                             {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                                         </div>
                                         <div className="text-[10px] sm:text-sm text-[#1CADA3] mt-1 font-bold sm:font-normal uppercase text-nowrap">Est. Returns</div>

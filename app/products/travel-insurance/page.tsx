@@ -1,8 +1,6 @@
 'use client';
 
-import { Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { IconArrowLeft } from '@tabler/icons-react';
 import HeroAndHighlights from './components/HeroAndHighlights';
 import ProvidersAndPlans from './components/ProvidersAndPlans';
 import CoverageHighlights from './components/CoverageHighlights';
@@ -18,7 +16,6 @@ export default function TravelInsurancePage() {
 
     return (
         <main className="min-h-screen bg-white text-slate-800 font-sans scroll-smooth">
-            <Toaster position="bottom-right" />
 
 
             <HeroAndHighlights />

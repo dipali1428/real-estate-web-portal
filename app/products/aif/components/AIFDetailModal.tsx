@@ -12,7 +12,26 @@ interface AIFDetailModalProps {
     fund: any; // Using any for flexibility with the strategy object structure
 }
 
-const COLORS = ['#2076C7', '#1CADA3', '#2076C7', '#1CADA3'];
+const COLORS = ['#2076C7', '#1CADA3'];
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-white/95 backdrop-blur-sm p-3 shadow-xl border border-gray-100 rounded-xl min-w-[150px]">
+                <p className="text-sm font-bold text-gray-800 mb-2 border-b border-gray-100 pb-1.5">{label}</p>
+                {payload.map((entry: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between gap-4">
+                        <span className="text-xs font-medium text-gray-500 capitalize">{entry.name}:</span>
+                        <span className="text-xs font-bold" style={{ color: entry.color || entry.fill || '#2076C7' }}>
+                            {entry.value}{entry.unit || '%'}
+                        </span>
+                    </div>
+                ))}
+            </div>
+        );
+    }
+    return null;
+};
 
 export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModalProps) {
     const { openLogin } = useModal();
@@ -42,42 +61,42 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                     />
 
                     {/* Modal Container */}
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto pointer-events-none">
+                    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-6 overflow-y-auto pointer-events-none">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-white w-full max-w-5xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto"
+                            className="bg-white w-full max-w-5xl max-h-[92vh] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto my-3 sm:my-0"
                         >
                             {/* Header */}
-                            <div className="relative bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-8 text-white shrink-0">
+                            <div className="relative bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-5 sm:p-8 text-white shrink-0">
                                 <button
                                     onClick={onClose}
-                                    className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                                    className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
                                 >
-                                    <X className="w-6 h-6" />
+                                    <X className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </button>
-                                <div className="flex items-start gap-4">
-                                    <div className="mt-1 p-3 bg-white/10 rounded-xl backdrop-blur-md">
-                                        <ShieldCheck className="w-8 h-8" />
+                                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+                                    <div className="p-3 bg-white/10 rounded-xl backdrop-blur-md shrink-0">
+                                        <ShieldCheck className="w-6 h-6 sm:w-8 sm:h-8" />
                                     </div>
-                                    <div>
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider">
+                                    <div className="w-full sm:w-auto">
+                                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 mb-3">
+                                            <span className="px-2.5 py-1 bg-white/20 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap">
                                                 {details.category || "Category II AIF"}
                                             </span>
-                                            <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider">
+                                            <span className="px-2.5 py-1 bg-white/20 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap">
                                                 {details.structure || "Closed-Ended"}
                                             </span>
                                         </div>
-                                        <h2 className="text-3xl font-bold mb-2">{fund.name}</h2>
-                                        <p className="text-white/80 text-lg">Managed by {details.manager || fund.manager}</p>
+                                        <h2 className="text-2xl sm:text-3xl font-bold mb-2 pr-8 sm:pr-0">{fund.name}</h2>
+                                        <p className="text-white/80 text-sm sm:text-lg leading-snug">Managed by {details.manager || fund.manager}</p>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Scrollable Content */}
-                            <div className="overflow-y-auto flex-1 p-8 bg-gray-50/50">
+                            <div className="overflow-y-auto flex-1 p-4 sm:p-8 bg-gray-50/50 overscroll-contain">
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                                     {/* Left Column (Main Info) */}
@@ -101,6 +120,24 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                                 ))}
                                             </div>
                                         </section>
+
+                                        {/* Suitable For */}
+                                        {details.suitableFor && (
+                                            <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                                                <h3 className="flex items-center gap-2 text-xl font-bold text-gray-800 mb-4">
+                                                    <Users className="w-5 h-5 text-[#1CADA3]" />
+                                                    Suitable For
+                                                </h3>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    {details.suitableFor.map((item: string, idx: number) => (
+                                                        <div key={idx} className="flex items-center gap-3 p-3 bg-teal-50/50 rounded-lg border border-teal-100">
+                                                            <div className="w-2 h-2 rounded-full bg-[#2076C7] shrink-0" />
+                                                            <span className="text-gray-700 font-medium">{item}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </section>
+                                        )}
 
                                         {/* Charts Section */}
                                         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -127,7 +164,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                                         ))}
                                                                     </Pie>
-                                                                    <Tooltip />
+                                                                    <Tooltip content={<CustomTooltip />} />
                                                                     <Legend layout="vertical" verticalAlign="bottom" iconType="circle" />
                                                                 </PieChart>
                                                             ) : (
@@ -150,9 +187,36 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                                                 <BarChart data={details.graphs.stageAllocation}>
                                                                     <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                                                                     <YAxis hide />
-                                                                    <Tooltip cursor={{ fill: 'transparent' }} />
+                                                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(32, 118, 199, 0.05)' }} />
                                                                     <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                                                                         {details.graphs.stageAllocation.map((entry: any, index: number) => (
+                                                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                                        ))}
+                                                                    </Bar>
+                                                                </BarChart>
+                                                            ) : (
+                                                                <div />
+                                                            )}
+                                                        </ResponsiveContainer>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Yield Profile */}
+                                            {details.graphs?.yieldProfile && (
+                                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+                                                    <h4 className="font-bold text-gray-700 mb-6 flex items-center gap-2">
+                                                        <TrendingUp className="w-4 h-4 text-[#1CADA3]" /> {details.graphs.yieldProfileTitle || "Yield Profile"}
+                                                    </h4>
+                                                    <div className="h-64 w-full">
+                                                        <ResponsiveContainer width="100%" height="100%">
+                                                            {mounted ? (
+                                                                <BarChart data={details.graphs.yieldProfile} layout="vertical">
+                                                                    <XAxis type="number" hide />
+                                                                    <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 11, fontWeight: 500 }} />
+                                                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(28, 173, 163, 0.05)' }} />
+                                                                    <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24}>
+                                                                        {details.graphs.yieldProfile.map((entry: any, index: number) => (
                                                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                                         ))}
                                                                     </Bar>
@@ -183,14 +247,13 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                                                     labelLine={false}
                                                                     label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                                                                     outerRadius={80}
-                                                                    fill="#8884d8"
                                                                     dataKey="value"
                                                                 >
                                                                     {details.graphs.longShortSplit.map((entry: any, index: number) => (
                                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                                     ))}
                                                                 </Pie>
-                                                                <Tooltip />
+                                                                <Tooltip content={<CustomTooltip />} />
                                                             </PieChart>
                                                         ) : (
                                                             <div />
@@ -212,7 +275,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                                             <BarChart data={details.graphs.portfolioConcentration} layout="vertical">
                                                                 <XAxis type="number" hide />
                                                                 <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 12, fontWeight: 500 }} />
-                                                                <Tooltip cursor={{ fill: 'transparent' }} />
+                                                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(32, 118, 199, 0.05)' }} />
                                                                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={32}>
                                                                     {details.graphs.portfolioConcentration.map((entry: any, index: number) => (
                                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -239,7 +302,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                                             <BarChart data={details.graphs.capitalProtection} layout="vertical">
                                                                 <XAxis type="number" hide />
                                                                 <YAxis dataKey="name" type="category" width={140} tick={{ fontSize: 11, fontWeight: 500 }} />
-                                                                <Tooltip cursor={{ fill: 'transparent' }} />
+                                                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(28, 173, 163, 0.05)' }} />
                                                                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24}>
                                                                     {details.graphs.capitalProtection.map((entry: any, index: number) => (
                                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -266,7 +329,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                                             <BarChart data={details.graphs.recoveryStrategy} layout="vertical">
                                                                 <XAxis type="number" hide />
                                                                 <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 11, fontWeight: 500 }} />
-                                                                <Tooltip cursor={{ fill: 'transparent' }} />
+                                                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(32, 118, 199, 0.05)' }} />
                                                                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24}>
                                                                     {details.graphs.recoveryStrategy.map((entry: any, index: number) => (
                                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -293,7 +356,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                                             <BarChart data={details.graphs.capitalStructure} layout="vertical">
                                                                 <XAxis type="number" hide />
                                                                 <YAxis dataKey="name" type="category" width={140} tick={{ fontSize: 11, fontWeight: 500 }} />
-                                                                <Tooltip cursor={{ fill: 'transparent' }} />
+                                                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(32, 118, 199, 0.05)' }} />
                                                                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24}>
                                                                     {details.graphs.capitalStructure.map((entry: any, index: number) => (
                                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -320,7 +383,7 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                                             <BarChart data={details.graphs.securityStructure} layout="vertical">
                                                                 <XAxis type="number" hide />
                                                                 <YAxis dataKey="name" type="category" width={150} tick={{ fontSize: 11, fontWeight: 500 }} />
-                                                                <Tooltip cursor={{ fill: 'transparent' }} />
+                                                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(28, 173, 163, 0.05)' }} />
                                                                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24}>
                                                                     {details.graphs.securityStructure.map((entry: any, index: number) => (
                                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -391,6 +454,16 @@ export default function AIFDetailModal({ isOpen, onClose, fund }: AIFDetailModal
                                                     </span>
                                                     <span className="font-bold text-green-600">{details.targetIRR}</span>
                                                 </li>
+                                                {details.liquidity && (
+                                                    <li className="flex flex-col gap-2 pt-3 border-t border-gray-100">
+                                                        <span className="text-gray-500 font-medium flex items-center gap-2.5 text-sm">
+                                                            <ShieldCheck className="w-4 h-4 text-[#1CADA3]" /> Liquidity & Lock-in
+                                                        </span>
+                                                        <p className="text-xs text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-100 italic">
+                                                            {details.liquidity}
+                                                        </p>
+                                                    </li>
+                                                )}
                                             </ul>
                                         </div>
 

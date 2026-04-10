@@ -1,8 +1,9 @@
 "use client";
-
-import React, { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { useModal } from "../../context/ModalContext";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Chatbot from "../../component/chatbot/page";
 import {
   PieChart,
   TrendingUp,
@@ -25,7 +26,6 @@ import {
   Minus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -39,10 +39,11 @@ import {
 } from "chart.js";
 import MutualFundComparison from "./components/MutualFundComparison";
 import SIPCalculator from "./components/SIPCalculator";
-import MarketOverview from "./components/MarketOverview";
 import FinancialGoalPlanner from "./components/FinancialGoalPlanner";
 import CTASection from "@/app/component/CTASection";
+import ScrollToTop from "@/app/component/ScrollToTop";
 import Funds from "./components/Funds";
+import FundTypeComparison from "./components/FundTypeComparison";
 
 // Register ChartJS Components
 ChartJS.register(
@@ -57,71 +58,20 @@ ChartJS.register(
 );
 
 // --- Animation Variants ---
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-};
-
 const staggerContainer = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
-
 const cardHover = {
   rest: { scale: 1, y: 0 },
   hover: { scale: 1.02, y: -5, transition: { duration: 0.2 } },
 };
 
 export default function MutualFundsLandingPage() {
-  const { openSignup } = useModal();
+  const { openLogin } = useModal();
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [showAllFaqs, setShowAllFaqs] = useState(false);
-  const [currentNfoIndex, setCurrentNfoIndex] = useState(0);
-
-  // Auto-rotate NFOs
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentNfoIndex((prevIndex) => (prevIndex + 1) % nfos.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const getNfoStatus = (launchDateStr: string, closeDateStr: string) => {
-    const parseDate = (dateStr: string) => {
-      // Handle "02 Feb 2026" format
-      const parts = dateStr.split(" ");
-      if (parts.length !== 3) return new Date();
-      const monthMap: { [key: string]: number } = {
-        Jan: 0,
-        Feb: 1,
-        Mar: 2,
-        Apr: 3,
-        May: 4,
-        Jun: 5,
-        Jul: 6,
-        Aug: 7,
-        Sep: 8,
-        Oct: 9,
-        Nov: 10,
-        Dec: 11,
-      };
-      const day = parseInt(parts[0], 10);
-      const month = monthMap[parts[1]] !== undefined ? monthMap[parts[1]] : 0;
-      const year = parseInt(parts[2], 10);
-      return new Date(year, month, day);
-    };
-
-    const today = new Date();
-    // Reset time for comparison
-    today.setHours(0, 0, 0, 0);
-
-    const launch = parseDate(launchDateStr);
-    const close = parseDate(closeDateStr);
-
-    if (today < launch) return "UPCOMING NFO";
-    if (today >= launch && today <= close) return "LIVE NFO";
-    return "CLOSED NFO";
-  };
+  const router = useRouter();
 
   // Consolidated Fund Categories
   const categories = [
@@ -206,90 +156,6 @@ export default function MutualFundsLandingPage() {
     },
   ];
 
-
-  // Combined all NFOs from your prompt
-  const nfos = [
-    {
-      name: "LIC MF Technology Fund",
-      type: "Equity Sectoral",
-      launchDate: "20 Feb 2026",
-      closeDate: "06 Mar 2026",
-      minInvestment: "₹5,000",
-      desc: "Invests in global and domestic technology companies.",
-      logo: "/Logos/lic.png",
-    },
-
-    {
-      name: "Motilal Oswal Multi Factor Passive FoF",
-      type: "Passive / ETF FoF",
-      launchDate: "20 Feb 2026",
-      closeDate: "06 Mar 2026",
-      minInvestment: "₹5,000",
-      desc: "Passive strategy combining multiple quantitative factors.",
-      logo: "/Logos/motilal.webp",
-    },
-
-    {
-      name: "Capitalmind Arbitrage Fund",
-      type: "Hybrid Arbitrage",
-      launchDate: "23 Feb 2026",
-      closeDate: "09 Mar 2026",
-      minInvestment: "₹5,000",
-      desc: "Generates low-risk returns using arbitrage opportunities.",
-      logo: "/Logos/capital.png",
-    },
-
-    {
-      name: "TRUSTMF Mid Cap Fund",
-      type: "Equity Midcap",
-      launchDate: "27 Feb 2026",
-      closeDate: "13 Mar 2026",
-      minInvestment: "₹5,000",
-      desc: "Focuses on high growth mid-cap companies.",
-      logo: "/Logos/trust.png",
-    },
-
-    {
-      name: "Canara Robeco Banking & Financial Services Fund",
-      type: "Sectoral Equity",
-      launchDate: "27 Feb 2026",
-      closeDate: "13 Mar 2026",
-      minInvestment: "₹5,000",
-      desc: "Invests in banking and financial sector companies.",
-      logo: "/Logos/canararobeco.png",
-    },
-
-    {
-      name: "Abakkus Small Cap Fund",
-      type: "Equity Small Cap",
-      launchDate: "26 Feb 2026",
-      closeDate: "12 Mar 2026",
-      minInvestment: "₹5,000",
-      desc: "Invests in emerging small cap businesses.",
-      logo: "/Logos/abakkus.jpg",
-    },
-
-    {
-      name: "Groww Nifty PSU Bank ETF",
-      type: "ETF",
-      launchDate: "06 Mar 2026",
-      closeDate: "20 Mar 2026",
-      minInvestment: "₹5,000",
-      desc: "Tracks Nifty PSU Bank Index.",
-      logo: "/Logos/grow.avif",
-    },
-
-    {
-      name: "Kotak Quality Overseas Equity FoF",
-      type: "Global Equity",
-      launchDate: "06 Mar 2026",
-      closeDate: "20 Mar 2026",
-      minInvestment: "₹5,000",
-      desc: "Invests in high quality global companies.",
-      logo: "/MF/kotak.png",
-    },
-  ];
-
   const faqs = [
     {
       q: "What is a mutual fund, and how does it work?",
@@ -326,70 +192,66 @@ export default function MutualFundsLandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-slate-800">
+    <div className="min-h-screen bg-white text-gray-800 font-sans selection:bg-[#2076C7]/10 selection:text-[#2076C7] relative w-full overflow-x-hidden">
       {/* HERO SECTION */}
       <header
         id="offers"
-        className="relative w-full overflow-hidden pt-12 pb-20 bg-white"
+        className="relative w-full overflow-hidden pt-14 sm:pt-16 md:pt-20 pb-14 sm:pb-16 md:pb-20 bg-white"
       >
+        {/* Back Button */}
+        <Link
+          href="/"
+          className="absolute top-4 left-4 sm:top-5 sm:left-6 z-20 inline-flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2 rounded-full sm:rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-200 sm:border-gray-300 hover:bg-white shadow-sm hover:shadow-md active:scale-95 transition-all group"
+        >
+          <ArrowLeft
+            className="w-5 h-5 group-hover:-translate-x-1 transition-transform"
+            strokeWidth={2}
+          />
+          <span className="hidden sm:inline">Back to Home</span>
+        </Link>
         <div className="container mx-auto px-6 relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             {/* LEFT HERO TEXT */}
-            <div className="w-full lg:w-1/2 text-center lg:text-left space-y-8">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm border border-gray-300 hover:bg-white shadow-sm hover:shadow-md active:scale-95 transition-all group mb-2">
-                <ArrowLeft
-                  className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
-                  strokeWidth={2}
-                />
-                Back to Home
-              </Link>
-              <br />
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.5 }}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold bg-teal-50 border border-teal-200 text-teal-700 mb-2"
-              >
-                <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse inline-block" />
-                AMFI Registered &amp; Secure
-              </motion.div>
+            <div className="w-full lg:w-1/2 text-center lg:text-left space-y-8 relative">
+              <div className="flex justify-center lg:justify-start">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, duration: 0.5 }}
+                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold bg-teal-50 border border-teal-200 text-teal-700 mb-2"
+                >
+                  <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse inline-block" />
+                  AMFI Registered
+                </motion.div>
+              </div>
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.7 }}
-                className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-6 min-h-16 md:min-h-20 leading-tight"
-                style={{
-                  background:
-                    "linear-gradient(to right, #2076C7, #1CADA3, #2076C7)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
+                className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight font-sans px-2"
               >
-                Invest Smarter with Expert-Curated Mutual Funds
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">
+                  Invest Smarter with Mutual Funds
+                </span>
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.7 }}
-                className="text-lg md:text-xl text-slate-700 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal"
+                className="text-lg md:text-xl lg:text-2xl text-slate-700 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal"
               >
                 Start your journey towards financial freedom with our curated
                 selection of top-performing funds and expert guidance.
               </motion.p>
-              {/* Change this section in your Hero */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.7 }}
-                className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 pt-4"
+                className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4 w-full"
               >
-                {/* REPLACED LINK WITH BUTTON ONCLICK */}
                 <button
-                  onClick={openSignup}
-                  className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                  onClick={openLogin}
+                  className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                   style={{
                     background: "linear-gradient(to right, #1CADA3, #2076C7)",
                   }}
@@ -402,28 +264,12 @@ export default function MutualFundsLandingPage() {
                     }}
                   ></div>
                 </button>
-
                 <Link href="#popular">
                   <button
-                    className="group relative bg-white px-8 py-4 rounded-lg font-semibold text-lg border-2 hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-lg w-full sm:w-auto"
+                    className="group relative bg-white px-8 py-4 rounded-lg font-semibold text-lg border-2 hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-lg"
                     style={{ color: "#2076C7", borderColor: "#2076C7" }}
                   >
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      Explore Funds
-                      <svg
-                        className="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13 7l5 5m0 0l-5 5m5-5H6"
-                        />
-                      </svg>
-                    </span>
+                    Explore Funds
                   </button>
                 </Link>
               </motion.div>
@@ -431,217 +277,30 @@ export default function MutualFundsLandingPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="flex items-center gap-6 pt-4 text-sm text-slate-600 font-medium"
+                className="flex items-center justify-center lg:justify-start gap-6 pt-4 text-sm text-slate-600 font-medium"
               >
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" /> Paperless &
-                  Secure
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  Paperless & Secure
                 </div>
               </motion.div>
             </div>
-            {/* RIGHT HERO: DYNAMIC NFO CAROUSEL */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center relative h-[320px] sm:h-[400px] lg:h-[600px]">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentNfoIndex}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.5 }}
-                  className="absolute w-full max-w-md lg:max-w-xl">
-                  {/* DYNAMIC LABEL OUTSIDE BOUNDARY */}
-                  <div className="absolute -top-10 left-0 right-0 flex justify-center z-20">
-                    <div
-                      className={`px-4 py-1.5 rounded-full text-xs font-bold shadow-sm border ${getNfoStatus(
-                        nfos[currentNfoIndex].launchDate,
-                        nfos[currentNfoIndex].closeDate,
-                      ) === "LIVE NFO"
-                        ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
-                        : "bg-blue-100 text-blue-700 border-blue-200"
-                        }`}
-                    >
-                      {getNfoStatus(
-                        nfos[currentNfoIndex].launchDate,
-                        nfos[currentNfoIndex].closeDate,
-                      )}
-                    </div>
-                  </div>
 
-                  <div className="h-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden group">
-                    <div className="bg-gray-50/50 p-4 lg:p-5 border-b border-gray-100 flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        {nfos[currentNfoIndex].logo && (
-                          <img
-                            src={nfos[currentNfoIndex].logo}
-                            alt={nfos[currentNfoIndex].name + " logo"}
-                            className="w-10 h-10 lg:w-12 lg:h-12 object-contain rounded bg-white p-0.5 shadow-sm"
-                          />
-                        )}
-                        <div>
-                          <h3 className="text-lg lg:text-2xl font-semibold text-slate-800 line-clamp-1">
-                            {nfos[currentNfoIndex].name}
-                          </h3>
-                          <p className="text-sm lg:text-base text-slate-600 mt-0.5">
-                            {nfos[currentNfoIndex].type}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="inline-block bg-white/50 text-slate-600 text-[10px] lg:text-xs font-bold px-2 py-1 rounded border border-slate-200 whitespace-nowrap">
-                        {currentNfoIndex + 1} / {nfos.length}
-                      </span>
-                    </div>
-                    <div className="p-6 lg:p-8 space-y-5">
-                      <p className="text-sm lg:text-lg text-slate-600 min-h-10">
-                        {nfos[currentNfoIndex].desc}
-                      </p>
-                      <div className="space-y-3 lg:space-y-4 pt-2 text-sm lg:text-lg">
-                        <div className="flex justify-between items-center border-b border-dashed border-gray-100 pb-2">
-                          <span className="text-slate-500 font-medium">
-                            Launch Date
-                          </span>
-                          <span className="font-semibold lg:font-bold text-slate-800 lg:text-xl">
-                            {nfos[currentNfoIndex].launchDate}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center border-b border-dashed border-gray-100 pb-2">
-                          <span className="text-slate-500 font-medium">
-                            Closing Date
-                          </span>
-                          <span className="font-semibold lg:font-bold text-rose-500 lg:text-xl">
-                            {nfos[currentNfoIndex].closeDate}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-slate-500 font-medium">
-                            Min Investment
-                          </span>
-                          <span className="font-semibold lg:font-bold text-slate-800 lg:text-xl">
-                            {nfos[currentNfoIndex].minInvestment}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+            {/* RIGHT HERO IMAGE */}
+            <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl">
+              <img
+                src="/MF/mf.jpeg"
+                alt="Mutual Funds Investment"
+                className="w-full h-auto object-contain"
+              />
             </div>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 sm:px-6 py-10 sm:py-16 space-y-16 sm:space-y-24">
-        {" "}
-        {/* MARKET OVERVIEW SECTION */}
-        <motion.section
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <MarketOverview />
-        </motion.section>
-        {/* NFO SECTION */}
-        <motion.section
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={staggerContainer}
-        >
-          <div className="text-center mb-12">
-            <motion.div className="flex justify-center mb-4">
-              <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 px-4 py-2 rounded-full">
-                <Sparkles className="w-4 h-4 text-amber-600" />
-                <span className="text-xs font-semibold text-amber-700">
-                  UPCOMING NFOs
-                </span>
-              </div>
-            </motion.div>
-            <motion.h2 className="text-3xl md:text-4xl font-bold font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
-              New Fund Offers Coming Soon
-            </motion.h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {nfos.map((nfo, idx) => (
-              <motion.div
-                key={idx}
-                whileHover="hover"
-                initial="rest"
-                animate="rest"
-              >
-                <motion.div
-                  variants={cardHover}
-                  className="relative h-full bg-white rounded-2xl overflow-hidden group flex flex-col w-full border border-gray-100/80"
-                  style={{
-                    boxShadow:
-                      "0 2px 4px rgba(28,173,163,0.04), 0 8px 24px rgba(28,173,163,0.08), inset 0 1px 0 rgba(255,255,255,0.9)",
-                  }}
-                >
-                  <div className="bg-gradient-to-r from-[#F2F8FB] to-[#F7FCFC] p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      {nfo.logo && (
-                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-1.5 shrink-0 border border-slate-100">
-                          <img
-                            src={nfo.logo}
-                            alt={nfo.name + " logo"}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                      )}
-                      <div>
-                        <h3 className="font-bold text-[#0F2942] text-lg leading-tight transition-colors line-clamp-1 group-hover:text-[#2076C7]">
-                          {nfo.name}
-                        </h3>
-                        <p className="text-sm text-[#597A96] mt-0.5">
-                          {nfo.type}
-                        </p>
-                      </div>
-                    </div>
-                    <span
-                      className={`text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2 ${getNfoStatus(nfo.launchDate, nfo.closeDate) ===
-                        "LIVE NFO"
-                        ? "bg-green-100 text-green-700 animate-pulse"
-                        : "bg-blue-100 text-blue-700"
-                        }`}
-                    >
-                      {getNfoStatus(nfo.launchDate, nfo.closeDate)}
-                    </span>
-                  </div>
-                  <div className="p-6 space-y-4 flex-grow px-4">
-                    <p className="text-lg text-slate-600 line-clamp-2">
-                      {nfo.desc}
-                    </p>
-                    <div className="space-y-4 pt-2 text-lg">
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-[#597A96] font-medium text-lg">
-                          Launch
-                        </span>
-                        <span className="font-bold text-[#0F2942] text-xl">
-                          {nfo.launchDate}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-[#597A96] font-medium text-lg">
-                          Closing
-                        </span>
-                        <span className="font-bold text-[#DE2A56] text-xl">
-                          {nfo.closeDate}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-[#597A96] font-medium text-lg">
-                          Min Inv.
-                        </span>
-                        <span className="font-bold text-[#0F2942] text-xl">
-                          {nfo.minInvestment}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
         <Funds />
+
         {/* FINANCIAL GOAL PLANNER SECTION */}
         <motion.section
           initial="hidden"
@@ -650,6 +309,7 @@ export default function MutualFundsLandingPage() {
         >
           <FinancialGoalPlanner />
         </motion.section>
+
         {/* COMPARISON SECTION */}
         <motion.section
           initial="hidden"
@@ -658,6 +318,7 @@ export default function MutualFundsLandingPage() {
         >
           <MutualFundComparison />
         </motion.section>
+
         {/* SIP CALCULATOR SECTION */}
         <motion.section
           initial="hidden"
@@ -666,6 +327,7 @@ export default function MutualFundsLandingPage() {
         >
           <SIPCalculator />
         </motion.section>
+
         {/* CATEGORIES SECTION */}
         <motion.section
           id="categories"
@@ -675,37 +337,40 @@ export default function MutualFundsLandingPage() {
           variants={staggerContainer}
         >
           <div className="text-center mb-12">
-            <motion.h2 className="text-3xl md:text-4xl font-extrabold mb-3">
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">
+            <motion.h2 className="text-3xl md:text-4xl font-bold mb-3">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">
                 Explore Fund Categories
               </span>
             </motion.h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
             {categories.map((cat, idx) => (
               <motion.div
                 key={idx}
                 whileHover="hover"
                 initial="rest"
                 animate="rest"
+                className="min-w-[85%] sm:min-w-[45%] lg:min-w-[30%] snap-start"
               >
                 <motion.div
                   variants={cardHover}
-                  className="relative h-full bg-white p-8 rounded-2xl overflow-hidden border border-gray-100/80 transition-all duration-300 group cursor-pointer"
+                  className="relative h-full bg-white p-6 sm:p-8 rounded-xl sm:rounded-2xl border border-gray-100/80 transition-all duration-300 group cursor-pointer text-center md:text-left"
                   style={{
                     boxShadow:
                       "0 2px 4px rgba(28,173,163,0.04), 0 8px 24px rgba(28,173,163,0.08), inset 0 1px 0 rgba(255,255,255,0.9)",
                   }}
                 >
                   <div
-                    className={`w-14 h-14 ${cat.bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}
+                    className={`w-14 h-14 ${cat.bg} rounded-xl flex items-center justify-center mb-6 mx-auto md:mx-0`}
                   >
                     <cat.icon className={`w-7 h-7 ${cat.color}`} />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-[#2076C7] transition-colors">
+
+                  <h3 className="text-xl font-bold text-slate-800 mb-3">
                     {cat.title}
                   </h3>
-                  <p className="text-slate-600 leading-relaxed text-lg">
+
+                  <p className="text-slate-600 text-sm sm:text-base">
                     {cat.desc}
                   </p>
                 </motion.div>
@@ -713,6 +378,16 @@ export default function MutualFundsLandingPage() {
             ))}
           </div>
         </motion.section>
+
+        {/* STRATEGY COMPARISON TABLE */}
+        <motion.section
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <FundTypeComparison />
+        </motion.section>
+
         {/* WHY CHOOSE US */}
         <motion.section
           initial="hidden"
@@ -721,34 +396,32 @@ export default function MutualFundsLandingPage() {
           variants={staggerContainer}
         >
           <div className="text-center mb-16">
-            <motion.h2 className="text-3xl md:text-4xl font-extrabold mb-3">
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">
+            <motion.h2 className="text-3xl md:text-4xl font-bold mb-3">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">
                 Why Choose Us
               </span>
             </motion.h2>
           </div>
-
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((benefit, idx) => (
               <motion.div
                 key={idx}
-                className="relative bg-white p-6 rounded-xl border border-gray-100/80 overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                style={{
-                  boxShadow:
-                    "0 2px 4px rgba(28,173,163,0.04), 0 6px 16px rgba(28,173,163,0.07), inset 0 1px 0 rgba(255,255,255,0.9)",
-                }}
+                className="relative bg-white p-6 md:p-8 rounded-2xl border border-gray-200 hover:border-[#2076C7] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg text-center md:text-left h-full group"
               >
-                <benefit.icon className="w-10 h-10 text-[#1CADA3] mb-4" />
+                <div className="w-12 h-12 rounded-xl bg-[#1CADA3]/10 flex items-center justify-center mb-4 mx-auto md:mx-0 group-hover:bg-[#2076C7]/10 transition">
+                  <benefit.icon className="w-6 h-6 text-[#1CADA3] group-hover:text-[#2076C7]" />
+                </div>
                 <h4 className="text-xl font-bold text-slate-800 mb-2">
                   {benefit.title}
                 </h4>
-                <p className="text-lg text-slate-600 leading-relaxed">
+                <p className="text-sm md:text-base text-slate-600 leading-relaxed">
                   {benefit.desc}
                 </p>
               </motion.div>
             ))}
           </div>
         </motion.section>
+
         {/* MARKET RISK DISCLAIMER */}
         <motion.section
           initial="hidden"
@@ -764,7 +437,6 @@ export default function MutualFundsLandingPage() {
                 scheme-related documents carefully before investing.
               </p>
             </div>
-
             <div
               className="relative bg-white border border-gray-100/80 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-4 text-center md:text-left overflow-hidden transition-all duration-300 hover:-translate-y-1"
               style={{
@@ -777,19 +449,19 @@ export default function MutualFundsLandingPage() {
               </div>
               <div>
                 <h4 className="text-slate-800 font-semibold mb-1">
-                  <b>Infinity Arthvishva Mutual Fund Distributor LLP</b>
+                  <b>AMFI registered Mutual Funds distributor</b> - Infinity
+                  Arthvishva Mutual Fund Distributor LLP
                 </h4>
                 <p className="text-slate-600 text-sm leading-relaxed">
-                  Registered with AMFI. In case of any grievances, please write
-                  to us or contact the compliance officer.
+                  <b>LLPIN ACP</b>-0126 | <b>ARN</b>-347839 | <b>GST Number</b>
+                  -27AALFI4941B1ZH
                   <br />
-                  <b> LLPIN ACP</b>-0126 |<b> ARN</b> -347839 |{" "}
-                  <b>GST Number</b> -27AALFI4941B1ZH
                 </p>
               </div>
             </div>
           </div>
         </motion.section>
+
         {/* FAQ SECTION */}
         <motion.section
           initial="hidden"
@@ -799,11 +471,10 @@ export default function MutualFundsLandingPage() {
         >
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <motion.h2 className="text-3xl md:text-4xl font-bold font-sans bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
+              <motion.h2 className="text-3xl md:text-4xl font-bold font-sans bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
                 Frequently Asked Questions
               </motion.h2>
             </div>
-
             <div className="space-y-4">
               {(showAllFaqs ? faqs : faqs.slice(0, 5)).map((faq, idx) => (
                 <div
@@ -846,7 +517,6 @@ export default function MutualFundsLandingPage() {
                 </div>
               ))}
             </div>
-
             {faqs.length > 5 && (
               <div className="text-center mt-8">
                 <button
@@ -866,9 +536,9 @@ export default function MutualFundsLandingPage() {
       </main>
 
       {/* CTA SECTION */}
-      <CTASection onClick={openSignup} buttonText="Apply Now" />
+      <ScrollToTop />
+      <CTASection />
+      <Chatbot />
     </div>
   );
 }
-
-

@@ -30,9 +30,16 @@ import {
     Wallet,
     Receipt,
     BookUp,
-    WalletCards,
-    FileBarChart,
-    Bookmark,
+    WalletCards ,
+    // PieChart,
+    // BadgeIndianRupee,
+    // Layers3,
+    // BriefcaseBusiness,
+    // FileBarChart,
+    // LifeBuoy,
+    // Bookmark
+     FileBarChart,
+     Bookmark,
     LifeBuoy,
     Notebook,
     ShieldPlus,
@@ -250,91 +257,84 @@ export const sidebarLinks = {
         { label: "User Management", href: "/director/allusers", icon: <Handshake className="h-4 w-4 text-neutral-700" />, }
     ],
 
-    CUSTOMER: [
-        {
-            label: "Dashboard",
-            href: "/customer",
-            icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" />,
-        },
+CUSTOMER: [
+  {
+    label: "Dashboard",
+    href: "/customer",
+    icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" />,
+  },
 
-        {
-            label: "My Profile",
-            href: "/customer/profile",
-            icon: <User className="h-5 w-5 text-neutral-700" />,
-        },
+  {
+    label: "My Profile",
+    href: "/customer/profile",
+    icon: <User className="h-5 w-5 text-neutral-700" />,
+  },
 
-        {
-            label: "Our Products",
-            icon: <Briefcase className="h-5 w-5 text-neutral-700" />,
-            children: [
-                {
-                    label: "Investments",
-                    href: "/customer/investments",
-                    icon: <TrendingUp className="h-4 w-4 text-neutral-700" />,
-                },
+  {
+    label: "Our Products",
+    icon: <Briefcase className="h-5 w-5 text-neutral-700" />,
+    children: [
+      {
+        label: "Investments",
+         href: "/customer/investments",
+        icon: <TrendingUp className="h-4 w-4 text-neutral-700" />,
+      },
 
-                {
-                    label: "Finance",
-                    icon: <Wallet className="h-4 w-4 text-neutral-700" />,
-                    children: [
-                        {
-                            label: "Loans",
-                            href: "/customer/finance/loans",
-                            icon: <HandCoins className="h-4 w-4 text-neutral-700" />,
-                        },
-                    ],
-                },
-                {
-                    label: "Insurance",
-                    href: "/customer/insurance",
-                    icon: <Shield className="h-4 w-4 text-neutral-700" />,
-                }
-            ],
-        },
-
-        {
-            label: "Portfolio",
-            href: "/customer/portfolio",
-            icon: <LineChart className="h-5 w-5 text-neutral-700" />,
-        },
-
-        {
-            label: "Calculator",
-            href: "/customer/calculator",
-            icon: <Calculator className="h-5 w-5 text-neutral-700" />,
-        },
-
-        {
-            label: "Goal Planner",
-            href: "/customer/goalplanner",
-            icon: <Target className="h-5 w-5 text-neutral-700" />,
-        },
-
-        {
-            label: "Reports",
-            href: "/customer/reports",
-            icon: <FileBarChart className="h-5 w-5 text-neutral-700" />,
-        },
-
-        {
-            label: "Wishlist",
-            href: "/customer/wishlist",
-            icon: <Bookmark className="h-5 w-5 text-neutral-700" />,
-        },
-
-        {
-            label: "Help & Support",
-            href: "/customer/support",
-            icon: <LifeBuoy className="h-5 w-5 text-neutral-700" />,
-        },
-
-        {
-            label: "Relationship Manager",
-            href: "/customer/relationshipmanager",
-            icon: <UserCheck className="h-5 w-5 text-neutral-700" />,
-        },
+      {
+        label: "Finance",
+          href: "/customer/finance",
+        icon: <Wallet className="h-4 w-4 text-neutral-700" />,
+      },
+       {
+  label: "Insurance",
+  href: "/customer/insurance",
+  icon: <Shield className="h-4 w-4 text-neutral-700" />,
+}
     ],
+  },
 
+  {
+    label: "Portfolio",
+    href: "/customer/portfolio",
+    icon: <LineChart className="h-5 w-5 text-neutral-700" />,
+  },
+
+  {
+    label: "Calculator",
+    href: "/customer/calculator",
+    icon: <Calculator className="h-5 w-5 text-neutral-700" />,
+  },
+
+  {
+    label: "Goal Planner",
+    href: "/customer/goalplanner",
+    icon: <Target className="h-5 w-5 text-neutral-700" />,
+  },
+
+  {
+    label: "Reports",
+    href: "/customer/reports",
+    icon: <FileBarChart className="h-5 w-5 text-neutral-700" />,
+  },
+
+  {
+    label: "Wishlist",
+    href: "/customer/wishlist",
+    icon: <Bookmark className="h-5 w-5 text-neutral-700" />,
+  },
+
+  {
+    label: "Help & Support",
+    href: "/customer/support",
+    icon: <LifeBuoy className="h-5 w-5 text-neutral-700" />,
+  },
+
+  {
+    label: "Relationship Manager",
+    href: "/customer/relationshipmanager",
+    icon: <UserCheck className="h-5 w-5 text-neutral-700" />,
+  },
+],
     UNLISTEDADMIN: [
         { label: "Dashboard", href: "/UnlistedAdmin", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         // { label: "Company Management", href: "/UnlistedAdmin/CompanyManagement", icon: <Proportions className="h-5 w-5 text-neutral-700" /> },

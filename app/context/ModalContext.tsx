@@ -5,6 +5,9 @@ import PartnershipPage from "../auth/register/page";
 import CustomerRegistrationForm from "../auth/signup/page"; // Import your new Customer file
 import QuoteRequestForm from "../products/corporate-insurance/components/QuoteRequestForm"; // Import Quote Form
 import { X } from "lucide-react";
+import ApplyNowModal from "../component/ApplyNowModal";
+import ContactSection from "../component/ContactSection";
+import ContactFormModal from "../component/ContactFormModal";
 
 const ModalContext = createContext({
     isLoginOpen: false,
@@ -19,6 +22,12 @@ const ModalContext = createContext({
     isQuoteOpen: false, // Added Quote
     openQuote: (productName?: string) => { }, // Added Quote
     closeQuote: () => { }, // Added Quote
+    isApplyNowOpen: false,
+    openApplyNow: (productName?: string, isDashboard?: boolean) => { },
+    closeApplyNow: () => { },
+    isContactOpen: false,
+    openContact: (productName?: string) => { },
+    closeContact: () => { },
     closeAll: () => { },
 });
 
@@ -30,12 +39,19 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
     const [isSignupOpen, setIsSignupOpen] = useState(false); // New state
     const [isQuoteOpen, setIsQuoteOpen] = useState(false); // Quote State
     const [quoteProduct, setQuoteProduct] = useState<string | undefined>(undefined); // Product for Quote
+    const [isApplyNowOpen, setIsApplyNowOpen] = useState(false);
+    const [isContactOpen, setIsContactOpen] = useState(false);
+    const [appliedProduct, setAppliedProduct] = useState<string | undefined>(undefined);
+    const [isDashboardFlow, setIsDashboardFlow] = useState(false);
 
     const closeAll = () => {
         setIsLoginOpen(false);
         setIsPartnerOpen(false);
         setIsSignupOpen(false);
+        setIsSignupOpen(false);
         setIsQuoteOpen(false);
+        setIsApplyNowOpen(false);
+        setIsContactOpen(false);
     };
 
     return (
@@ -60,6 +76,27 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                     setIsQuoteOpen(true);
                 },
                 closeQuote: () => setIsQuoteOpen(false),
+
+                isApplyNowOpen,
+                openApplyNow: (productName?: string, isDashboard: boolean = false) => {
+                    closeAll();
+                    if (isDashboard) {
+                        setAppliedProduct(productName);
+                        setIsDashboardFlow(true);
+                        setIsContactOpen(true);
+                    } else {
+                        setIsLoginOpen(true);
+                    }
+                },
+                closeApplyNow: () => setIsApplyNowOpen(false),
+
+                isContactOpen,
+                openContact: (productName?: string) => {
+                    closeAll();
+                    if (productName) setAppliedProduct(productName);
+                    setIsContactOpen(true);
+                },
+                closeContact: () => setIsContactOpen(false),
 
                 closeAll,
             }}>
@@ -105,6 +142,51 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                     onClose={() => setIsQuoteOpen(false)}
                     initialProduct={quoteProduct}
                 />
+            )}
+
+            {/* Apply Now (Processing) Modal */}
+            <ApplyNowModal
+                isOpen={isApplyNowOpen}
+                onClose={() => setIsApplyNowOpen(false)}
+                productName={appliedProduct}
+                onConfirm={() => {
+                    setIsApplyNowOpen(false);
+                    setIsContactOpen(true);
+                }}
+            />
+
+            {/* Contact Form Modal */}
+            {isContactOpen && isDashboardFlow && (
+                <div className="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
+                    <div className="relative bg-white rounded-3xl w-full max-w-2xl my-8 shadow-2xl">
+                        <button
+                            onClick={() => setIsContactOpen(false)}
+                            className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors z-[1010] p-2 bg-slate-50 rounded-full hover:bg-slate-100 shadow-sm"
+                        >
+                            <X size={24} />
+                        </button>
+                        <div className="max-h-[85vh] overflow-y-auto rounded-3xl p-2 md:p-6 lg:p-8">
+                           <ContactFormModal productName={appliedProduct} />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Contact Section Modal */}
+            {isContactOpen && !isDashboardFlow && (
+                <div className="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
+                    <div className="relative bg-white rounded-[3rem] w-full max-w-6xl my-8 shadow-2xl">
+                        <button
+                            onClick={() => setIsContactOpen(false)}
+                            className="absolute top-8 right-8 text-slate-400 hover:text-slate-600 transition-colors z-[1010] p-2 bg-slate-50 rounded-full hover:bg-slate-100 shadow-sm"
+                        >
+                            <X size={24} />
+                        </button>
+                        <div className="max-h-[85vh] overflow-y-auto rounded-[3rem]">
+                           <ContactSection productName={appliedProduct} />
+                        </div>
+                    </div>
+                </div>
             )}
         </ModalContext.Provider>
     );

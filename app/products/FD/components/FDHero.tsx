@@ -14,7 +14,7 @@ interface FDHeroProps {
 
 const FDHero: React.FC<FDHeroProps> = ({ openLogin, scrollToCalculator }) => {
     return (
-        <section className="relative lg:h-[calc(100vh-64px)] flex items-center justify-center overflow-hidden pt-20 pb-8 font-sans">
+        <section className="relative lg:h-[calc(100vh-64px)] flex items-center justify-center overflow-hidden pt-20 pb-8 font-sans bg-white border-b border-gray-100">
             <div className="container mx-auto px-4 md:px-6 relative z-10 w-full">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
                     {/* Left Content */}
@@ -22,41 +22,51 @@ const FDHero: React.FC<FDHeroProps> = ({ openLogin, scrollToCalculator }) => {
                         initial={{ opacity: 0, x: -40 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="flex flex-col items-start w-full"
+                        className="flex flex-col items-center text-center lg:items-start lg:text-left w-full"
                     >
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-[#2076C7] font-medium text-sm mb-4">
-                            <ShieldCheck size={16} />
-                            <span>Premium Fixed Deposit Investment</span>
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="inline-flex items-center gap-2 px-4 py-2 mb-4 lg:mb-8 bg-slate-50 border rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm"
+                            style={{ color: "#2076C7", borderColor: "rgba(32,118,199,0.2)" }}
+                        >
+                            <ShieldCheck size={14} /> Premium Fixed Deposit Investment
+                        </motion.div>
 
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-4 tracking-tight bg-clip-text text-transparent bg-linear-to-r from-[#2076C7] to-[#1CADA3]">
+                        <h1 
+                            className="font-sans text-[48px] font-extrabold mb-4 lg:mb-6 leading-tight tracking-tight px-4 sm:px-0"
+                            style={{
+                                background: "linear-gradient(to right, #2076C7, #1CADA3, #2076C7)",
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                                backgroundClip: "text",
+                            }}
+                        >
                             Grow Your Wealth With <br />
                             Fixed Deposits
                         </h1>
 
-                        <p className="text-sm sm:text-base md:text-lg text-slate-600 mb-6 leading-relaxed max-w-lg font-medium">
+                        <p className="text-base md:text-xl text-gray-600 mb-6 lg:mb-8 leading-relaxed max-w-xl">
                             Sophisticated fixed-income solutions for secure wealth growth.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-8">
                             <button
                                 onClick={openLogin}
-                                className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
-                                style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}
+                                className="group relative text-white px-8 py-4 rounded-2xl font-extrabold text-lg shadow-lg hover:shadow-blue-500/25 transform hover:-translate-y-0.5 transition-all duration-300 overflow-hidden cursor-pointer bg-linear-to-r from-[#2076C7] to-[#1CADA3] active:scale-[0.98]"
                             >
-                                <div className="relative z-10 flex items-center justify-center gap-2">
+                                <div className="relative z-10 flex items-center justify-center gap-3">
                                     <span>Apply Now</span>
                                     <ArrowRight
                                         size={22}
                                         className="group-hover:translate-x-1 transition-transform"
                                     />
                                 </div>
-                                <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #1A68B0, #189B8D)' }}></div>
                             </button>
                             <button
                                 onClick={scrollToCalculator}
-                                className="group relative bg-white px-8 py-4 rounded-lg font-semibold text-lg border-2 hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-lg cursor-pointer"
-                                style={{ color: '#2076C7', borderColor: '#2076C7' }}
+                                className="group relative bg-white px-8 py-4 rounded-2xl font-extrabold text-lg border-2 border-[#2076C7] text-[#2076C7] hover:bg-blue-50 transform hover:-translate-y-0.5 transition-all duration-300 shadow-md hover:shadow-lg active:scale-[0.98] cursor-pointer"
                             >
                                 <span className="relative z-10">Calculate Returns</span>
                             </button>
