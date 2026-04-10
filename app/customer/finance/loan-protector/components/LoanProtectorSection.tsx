@@ -1,202 +1,323 @@
 "use client";
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from "react";
 import {
-    IconHome,
-    IconCash,
-    IconBuildingStore,
-    IconShieldLock,
-    IconBolt,
-    IconCheck,
-    IconCalculator,
-} from '@tabler/icons-react';
-import { LoanProtectorCalculator } from '@/app/products/loan-protector/components/Calculator';
+  IconShieldCheck,
+  IconPlus,
+  IconMinus,
+} from "@tabler/icons-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { BASE_RATES, TENURE_FACTORS, LOAN_TYPES, PLAN_TYPES } from "@/app/products/loan-protector/components/data";
 
-const PROTECTOR_PLANS = [
-    {
-        id: 'lp-1',
-        category: 'Home Loan',
-        title: 'Mortgage Shield Premium',
-        insurer: 'HDFC ERGO',
-        amount: '₹ 1.2 Cr',
-        tenure: '25 Years',
-        rate: '96.71% Claims',
-        color: 'from-[#2076C7] to-[#1CADA3]',
-        border: 'border-blue-100',
-        bg: 'bg-blue-50/30',
-        icon: IconHome,
-        features: ['Reducing Balance Cover', 'Mortgage Protection', 'Accidental Death Rider'],
-    },
-    {
-        id: 'lp-2',
-        category: 'Personal Loan',
-        title: 'Liability Guard Pro',
-        insurer: 'ICICI Lombard',
-        amount: '₹ 25.0 Lac',
-        tenure: '5 Years',
-        rate: '98.54% Claims',
-        color: 'from-[#2076C7] to-[#1CADA3]',
-        border: 'border-teal-100',
-        bg: 'bg-teal-50/30',
-        icon: IconCash,
-        features: ['Debt-Free Family', 'Critical Illness Cover', 'Job Loss Rider'],
-    },
-    {
-        id: 'lp-3',
-        category: 'LAP',
-        title: 'Asset Liability Shelter',
-        insurer: 'Tata AIG',
-        amount: '₹ 5.0 Cr',
-        tenure: '15 Years',
-        rate: '97.10% Claims',
-        color: 'from-[#2076C7] to-[#1CADA3]',
-        border: 'border-indigo-100',
-        bg: 'bg-indigo-50/30',
-        icon: IconBuildingStore,
-        features: ['Business Asset Protection', 'Property Shield', 'Total Disability Cover'],
-    }
-];
+export const LoanProtectorCalculator = () => {
+  // State from product calculator
+  const [planType, setPlanType] = useState(PLAN_TYPES[0].title);
+  const [loanAmount, setLoanAmount] = useState(5000000); // 50 Lakhs
+  const [loanType, setLoanType] = useState(LOAN_TYPES[0]);
+  const [tenure, setTenure] = useState(20);
+  const [interestRate, setInterestRate] = useState(8.5);
+  const [age, setAge] = useState(35);
+  const [jointAge, setJointAge] = useState(30);
+  const [gender, setGender] = useState<"Male" | "Female">("Male");
+  const [isSmoker, setIsSmoker] = useState(false);
+  const [coverType, setCoverType] = useState<"Reducing" | "Level">("Reducing");
+  const [premiumType, setPremiumType] = useState<"Single" | "Regular">("Single");
 
-export default function LoanProtectorSection() {
-    const [activeTab, setActiveTab] = useState<'plans' | 'calculator'>('plans');
-    const [planType, setPlanType] = useState("Home Loan Protection Plan");
+  // Output State
+  const [premium, setPremium] = useState(0);
+  const [breakdown, setBreakdown] = useState<any[]>([]);
 
-    return (
-        <div className="space-y-6 sm:space-y-8">
+  useEffect(() => {
+    // 1. Base Rate (based on age)
+    const effectiveAge = planType === "Joint Loan Protection Plan" ? Math.max(age, jointAge) : age;
 
-            {/* HEADER */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-slate-50/80 p-6 md:p-8 rounded-[3rem] border border-slate-100 shadow-sm"
-            >
-                <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-[#1CADA3] to-[#2076C7] rounded-2xl flex items-center justify-center shadow-xl">
-                        {activeTab === 'calculator' 
-                            ? <IconCalculator size={28} className="text-white" /> 
-                            : <IconShieldLock size={28} className="text-white" />
-                        }
-                    </div>
+    const baseRateObj = BASE_RATES.find((r) => effectiveAge <= r.maxAge) || BASE_RATES[BASE_RATES.length - 1];
+    const baseRate = baseRateObj.rate;
 
-                    <div>
-                        <h2 className="text-xl md:text-2xl font-black text-slate-800 uppercase">
-                            {activeTab === 'calculator' ? 'Quote Builder' : 'Debt Protection Suites'}
-                        </h2>
+    // 2. Tenure Factor
+    const tenureFactorObj = TENURE_FACTORS.find((t) => tenure <= t.maxTenure) || TENURE_FACTORS[TENURE_FACTORS.length - 1];
+    const factorTenure = tenureFactorObj.factor;
 
-                        <p className="text-sm text-slate-500 font-semibold mt-1 flex items-center gap-2">
-                            <IconBolt size={16} className="text-[#1CADA3]" />
-                            {activeTab === 'calculator' 
-                                ? 'Generate official loan protection quotes instantly' 
-                                : 'Specialized plans to clear outstanding loan balances automatically.'
-                            }
-                        </p>
-                    </div>
-                </div>
+    // 3. Actuarial Factors
+    const genderFactor = gender === "Male" ? 1.05 : 1.0;
+    const smokerFactor = isSmoker ? 1.4 : 1.0;
+    const planFactor = PLAN_TYPES.find((p) => p.title === planType)?.factor || 1.0;
 
-                {/* TABS */}
-                <div className="flex items-center gap-2 bg-white p-2 rounded-2xl shadow-inner border border-slate-100 w-full lg:w-auto overflow-x-auto scrollbar-hide">
-                    {[
-                        { id: 'plans', label: 'Shield Plans' },
-                        { id: 'calculator', label: 'Quote Builder' }
-                    ].map((tab) => (
-                        <button 
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id as any)}
-                            className={`px-5 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 whitespace-nowrap ${
-                                activeTab === tab.id 
-                                ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg' 
-                                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                            }`}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
-            </motion.div>
+    // 4. Dynamic Cover Type Factor
+    const coverTypeFactor = coverType === "Reducing" ? 0.75 + (tenure / 30) * 0.1 : 1.0;
 
-            {/* CONTENT */}
-            <div className="relative min-h-[500px]">
-                <AnimatePresence mode="wait">
-                    {activeTab === 'calculator' ? (
-                        <motion.div
-                            key="lp-calc"
-                            initial={{ opacity: 0, scale: 0.98 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.98 }}
-                            className="max-w-7xl mx-auto"
-                        >
-                            <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden text-slate-900">
-                                <div className="p-4 sm:p-6 md:p-8 lg:p-12">
-                                    <LoanProtectorCalculator 
-                                        planType={planType} 
-                                        setPlanType={setPlanType} 
-                                        isDashboard={true} 
-                                    />
-                                </div>
-                            </div>
-                        </motion.div>
-                    ) : (
-                        <motion.div 
-                            key="lp-grid"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 md:gap-8"
-                        >
-                            {PROTECTOR_PLANS.map((loan, i) => {
-                                const Icon = loan.icon;
+    // 5. Loan Type Factor
+    const loanTypeFactorMap: Record<string, number> = {
+      "Home Loan": 1.0,
+      "Personal Loan": 1.15,
+      "Car Loan": 1.1,
+      "Business Loan": 1.2,
+      "Education Loan": 0.95,
+    };
+    const loanTypeFactor = loanTypeFactorMap[loanType] || 1.0;
 
-                                return (
-                                    <motion.div
-                                        key={loan.id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: i * 0.1 }}
-                                        className={`group relative rounded-[3rem] border ${loan.border} ${loan.bg} p-5 sm:p-6 md:p-8 pb-16 sm:pb-20 shadow-sm hover:shadow-md hover:-translate-y-2 transition-all duration-500`}
-                                    >
+    // 6. Premium Mode Factor
+    const premiumModeFactor = premiumType === "Single" ? 8.5 : 1.0;
 
-                                        {/* Icon & Category */}
-                                        <div className="flex flex-col items-center text-center mb-5 sm:mb-6 md:mb-8">
-                                            <div className={`w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br ${loan.color} rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg group-hover:scale-110 transition-transform duration-500`}>
-                                                <Icon size={28} className="text-white" strokeWidth={1.5} />
-                                            </div>
-                                            <span className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-1 sm:mb-2">{loan.category}</span>
-                                            <h3 className="text-base sm:text-lg md:text-xl font-bold text-slate-800 leading-tight">{loan.title}</h3>
-                                            <p className="text-xs sm:text-sm text-slate-500 mt-1 font-semibold">{loan.insurer}</p>
-                                        </div>
+    // Base calculation
+    let annualPremium =
+      (loanAmount / 100000) *
+      baseRate *
+      factorTenure *
+      genderFactor *
+      smokerFactor *
+      planFactor *
+      coverTypeFactor *
+      loanTypeFactor *
+      premiumModeFactor;
 
-                                        {/* Stats */}
-                                        <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                                            {[
-                                                { label: 'Sum Insured', val: loan.amount, color: 'text-[#2076C7]' },
-                                                { label: 'Loan Tenure', val: loan.tenure, color: 'text-slate-700' },
-                                                { label: 'Claim Ratio', val: loan.rate, color: 'text-[#1CADA3]' }
-                                            ].map((stat, idx) => (
-                                                <div key={idx} className="flex justify-between items-center pb-2 sm:pb-3 border-b border-slate-200/50">
-                                                    <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">{stat.label}</span>
-                                                    <span className={`text-xs sm:text-sm font-black ${stat.color}`}>{stat.val}</span>
-                                                </div>
-                                            ))}
-                                        </div>
+    // 7. Minimum Premium Floor
+    annualPremium = Math.max(annualPremium, 500);
 
-                                        {/* Features */}
-                                        <ul className="space-y-2 sm:space-y-3">
-                                            {loan.features.map((feat) => (
-                                                <li key={feat} className="flex items-start gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold text-slate-600">
-                                                    <IconCheck size={14} className="text-[#1CADA3] shrink-0 mt-0.5" strokeWidth={3} />
-                                                    <span className="break-words">{feat}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </motion.div>
-                                );
-                            })}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+    const calculatedPremium = premiumType === "Single" ? annualPremium : annualPremium / 12;
+    
+    const baseVal = Math.round(calculatedPremium);
+    const gstVal = Math.round(baseVal * 0.18);
+    
+    setPremium(baseVal + gstVal);
+    setBreakdown([
+      { name: "Net Premium", value: baseVal },
+      { name: "GST (18%)", value: gstVal },
+    ]);
+  }, [planType, loanAmount, loanType, tenure, interestRate, age, jointAge, gender, isSmoker, coverType, premiumType]);
+
+  const fmt = (n: number) => `₹${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(Math.round(n))}`;
+  const formatCompact = (n: number) => {
+    if (n >= 10000000) return `₹${(n / 10000000).toFixed(1)}Cr`;
+    if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
+    return `₹${(n / 1000).toFixed(0)}K`;
+  };
+
+  const COLORS = ["#2076C7", "#1CADA3"];
+  
+  const getSliderStyle = (value: number, min: number, max: number) => {
+    const percentage = ((value - min) / (max - min)) * 100;
+    return {
+      background: `linear-gradient(to right, #2076C7 0%, #1CADA3 ${percentage}%, #f1f5f9 ${percentage}%, #f1f5f9 100%)`,
+    };
+  };
+
+  return (
+    <div className="w-full font-sans">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        
+        {/* --- LEFT: INPUTS --- */}
+        <div className="space-y-8 lg:pr-8 lg:border-r border-slate-100">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-4 bg-slate-50 border rounded-full text-[10px] font-black uppercase tracking-widest text-[#2076C7]">
+              <IconShieldCheck size={14} /> Debt Security Architect
             </div>
+            <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Loan Shield Estimator</h2>
+            <p className="text-xs text-slate-500 font-bold mt-1 uppercase tracking-tight">Protecting family from outstanding liabilities</p>
+          </div>
+
+          <div className="space-y-7">
+            {/* Plan Type Selection */}
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Protection Plan</label>
+              <div className="flex bg-slate-50 p-1 rounded-2xl border overflow-x-auto">
+                {PLAN_TYPES.slice(0, 3).map((plan) => (
+                  <button
+                    key={plan.title}
+                    onClick={() => setPlanType(plan.title)}
+                    className={`flex-1 min-w-max px-4 py-2 text-[10px] font-black rounded-xl transition-all whitespace-nowrap ${planType === plan.title ? "bg-white text-[#2076C7] shadow-sm border border-slate-100" : "text-slate-400 hover:text-slate-600"}`}
+                  >
+                    {plan.title.replace(" Loan Protection Plan", "").replace(" Insurance Plan", "")}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Loan Amount */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-end">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Loan Amount</label>
+                <span className="text-lg font-black text-[#2076C7]">{formatCompact(loanAmount)}</span>
+              </div>
+              <input
+                type="range" min="100000" max="20000000" step="100000" value={loanAmount}
+                onChange={(e) => setLoanAmount(Number(e.target.value))}
+                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#2076C7]"
+                style={getSliderStyle(loanAmount, 100000, 20000000)}
+              />
+              <div className="flex gap-2">
+                <button onClick={() => setLoanAmount(v => Math.max(100000, v - 100000))} className="p-2 border rounded-lg hover:bg-slate-50"><IconMinus size={14}/></button>
+                <div className="flex-grow text-center py-2 bg-slate-50 border rounded-lg font-bold text-slate-600">{fmt(loanAmount)}</div>
+                <button onClick={() => setLoanAmount(v => Math.min(20000000, v + 100000))} className="p-2 border rounded-lg hover:bg-slate-50"><IconPlus size={14}/></button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8">
+              {/* Tenure */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tenure</label>
+                  <span className="text-sm font-black text-slate-700">{tenure} Yrs</span>
+                </div>
+                <input type="range" min="1" max="30" value={tenure} onChange={(e) => setTenure(Number(e.target.value))} 
+                  className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-[#2076C7]" style={getSliderStyle(tenure, 1, 30)} />
+              </div>
+              {/* Rate */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Interest Rate</label>
+                  <span className="text-sm font-black text-slate-700">{interestRate}%</span>
+                </div>
+                <input type="range" min="5" max="15" step="0.1" value={interestRate} onChange={(e) => setInterestRate(Number(e.target.value))} 
+                  className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-[#2076C7]" style={getSliderStyle(interestRate, 5, 15)} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8">
+              {/* Age */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Borrower Age</label>
+                  <span className="text-sm font-black text-slate-700">{age} Yrs</span>
+                </div>
+                <input type="range" min="18" max="70" value={age} onChange={(e) => setAge(Number(e.target.value))} 
+                  className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-[#2076C7]" style={getSliderStyle(age, 18, 70)} />
+              </div>
+              
+              {/* Joint Age */}
+              <div className={`space-y-4 transition-all ${planType === "Joint Loan Protection Plan" ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Co-Borrower</label>
+                  <span className="text-sm font-black text-slate-700">{jointAge} Yrs</span>
+                </div>
+                <input type="range" min="18" max="70" value={jointAge} onChange={(e) => setJointAge(Number(e.target.value))} 
+                  className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-[#2076C7]" style={getSliderStyle(jointAge, 18, 70)} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gender</label>
+                <div className="flex p-0.5 bg-slate-50 border rounded-xl">
+                  <button onClick={() => setGender("Male")} className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-lg transition-all ${gender === "Male" ? "bg-white border border-slate-200 text-[#2076C7] shadow-sm" : "text-slate-400"}`}>Male</button>
+                  <button onClick={() => setGender("Female")} className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-lg transition-all ${gender === "Female" ? "bg-white border border-slate-200 text-[#2076C7] shadow-sm" : "text-slate-400"}`}>Female</button>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tobacco Use</label>
+                <div className="flex p-0.5 bg-slate-50 border rounded-xl">
+                  <button onClick={() => setIsSmoker(false)} className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-lg transition-all ${!isSmoker ? "bg-white border border-slate-200 text-[#2076C7] shadow-sm" : "text-slate-400"}`}>No</button>
+                  <button onClick={() => setIsSmoker(true)} className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-lg transition-all ${isSmoker ? "bg-red-500 border border-red-500 text-white shadow-sm" : "text-slate-400"}`}>Yes</button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cover Detail</label>
+                <div className="flex p-0.5 bg-slate-50 border rounded-xl">
+                  <button onClick={() => setCoverType("Reducing")} className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-lg transition-all ${coverType === "Reducing" ? "bg-white border border-slate-200 text-[#1CADA3] shadow-sm" : "text-slate-400"}`}>Reducing</button>
+                  <button onClick={() => setCoverType("Level")} className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-lg transition-all ${coverType === "Level" ? "bg-white border border-slate-200 text-[#1CADA3] shadow-sm" : "text-slate-400"}`}>Level</button>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Premium Mode</label>
+                <div className="flex p-0.5 bg-slate-50 border rounded-xl">
+                  <button onClick={() => setPremiumType("Regular")} className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-lg transition-all ${premiumType === "Regular" ? "bg-white border border-slate-200 text-[#2076C7] shadow-sm" : "text-slate-400"}`}>Regular</button>
+                  <button onClick={() => setPremiumType("Single")} className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-lg transition-all ${premiumType === "Single" ? "bg-white border border-slate-200 text-[#2076C7] shadow-sm" : "text-slate-400"}`}>Single</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Loan Type */}
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Asset Facility Type</label>
+              <select value={loanType} onChange={(e) => setLoanType(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black text-slate-700 focus:ring-2 focus:ring-[#2076C7]/20 outline-none">
+                  {LOAN_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
+              </select>
+            </div>
+          </div>
         </div>
-    );
-}
+
+        {/* --- RIGHT: OUTPUTS --- */}
+        <div className="flex flex-col h-full space-y-8">
+           <div className="space-y-8 lg:sticky top-6">
+              {/* Premium Result */}
+              <div className="bg-gradient-to-br from-[#1CADA3]/5 to-transparent p-6 rounded-[2.5rem] border-2 border-[#1CADA3]/20 shadow-sm text-center relative overflow-hidden">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                    {premiumType === "Single" ? "Estimated Single Premium" : "Estimated Monthly Premium"}
+                </p>
+                <h3 className="text-4xl lg:text-5xl font-extrabold text-[#1CADA3] tracking-tighter my-2">{fmt(premium)}</h3>
+                <p className="text-[10px] font-bold text-slate-400">
+                    {premiumType === "Single" ? `One-time premium for ${tenure} years` : `Payable over ${tenure} years`} (inc. GST)
+                </p>
+              </div>
+
+              {/* Chart */}
+              <div className="h-[250px] relative">
+                 <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={breakdown} cx="50%" cy="50%"
+                        innerRadius="70%" outerRadius="85%"
+                        paddingAngle={5} dataKey="value" stroke="none"
+                      >
+                        {breakdown.map((_, index) => (
+                          <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: any) => fmt(value)} contentStyle={{ borderRadius: "1rem", border: "none" }} />
+                    </PieChart>
+                 </ResponsiveContainer>
+                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-2xl font-black text-[#2076C7] mb-1">{formatCompact(loanAmount)}</span>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sum Assured</span>
+                 </div>
+              </div>
+
+              {/* Breakdown Cards */}
+              <div className="grid grid-cols-2 gap-3">
+                 {breakdown.map((item, i) => (
+                   <div key={item.name} className="flex items-center gap-3 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                      <div className="w-1.5 h-8 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                      <div>
+                        <p className="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">{item.name}</p>
+                        <p className="text-sm font-black text-slate-700">{fmt(item.value)}</p>
+                      </div>
+                   </div>
+                 ))}
+              </div>
+           </div>
+
+        </div>
+      </div>
+      <style jsx>{`
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 18px;
+          height: 18px;
+          background: #2076c7;
+          border: 3px solid #fff;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 4px 8px rgba(32, 118, 199, 0.2);
+          transition: all 0.3s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+          transform: scale(1.15);
+          box-shadow: 0 5px 12px rgba(32, 118, 199, 0.3);
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type="number"] {
+          -moz-appearance: textfield;
+        }
+      `}</style>
+    </div>
+  );
+};
