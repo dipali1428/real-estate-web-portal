@@ -50,7 +50,7 @@ const AboutSection = () => {
             name: "Mr. Ajay Mundada",
             title: "General Manager",
             description: "Ajay Mundada As the BGO (Business Growth Officer) at Infinity Arthvishva, he leads business expansion, strategic alliances, and performance-driven growth. With a strong focus on data-backed decision-making, risk management, and market adaptability, he ensures consistent value creation across evolving financial landscapes.",
-            image: "/leader/Ajay-Mundada.jpeg"
+            image: "/leader/Ajay-mundada.jpeg"
         },
         {
             name: "Mr. Sharad Kulkarni",
