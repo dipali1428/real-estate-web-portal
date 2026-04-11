@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Tab } from "@headlessui/react";
 import * as XLSX from "xlsx";
 import { AdminService } from "@/app/services/adminService";
@@ -222,7 +222,7 @@ const downloadExcel = async () => {
 
     toast.success("Export complete!", { id: loadId });
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     toast.error("Failed to export data", { id: loadId });
   }
 };

@@ -25,7 +25,7 @@ const MarineInsuranceTable = () => {
                         Detailed Provider Comparison
                     </h2>
                     <p className="text-lg md:text-xl text-gray-500 font-bold max-w-2xl mx-auto px-4">
-                        A feature-by-feature technical breakdown of India's leading marine insurers
+                        A feature-by-feature technical breakdown of India&apos;s leading marine insurers
                     </p>
                 </div>
 
@@ -91,7 +91,7 @@ const MarineInsuranceTable = () => {
                             </div>
                             <div>
                                 <h3 className="text-xl font-sans font-bold text-gray-900 tracking-[0.1em] leading-none mb-2">Technical Feature Matrix</h3>
-                                <p className="text-[11px] text-gray-500 font-bold tracking-widest uppercase">Comparing India's top 5 market leaders side-by-side</p>
+                                <p className="text-[11px] text-gray-500 font-bold tracking-widest uppercase">Comparing India&apos;s top 5 market leaders side-by-side</p>
                             </div>
                         </div>
                         <div className="relative z-10 flex items-center gap-3">

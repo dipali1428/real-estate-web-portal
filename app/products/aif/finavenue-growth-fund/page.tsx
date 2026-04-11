@@ -204,7 +204,7 @@ export default function FinavenueGrowthFundDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-teal-50 rounded-2xl border border-teal-100">
                                         <p className="text-xs text-teal-800 font-medium italic">
-                                            "Hedged and market-neutral strategies help maintain stability while capturing alpha from high-conviction positions."
+                                            Hedged and market-neutral strategies help maintain stability while capturing alpha from high-conviction positions.
                                         </p>
                                     </div>
                                 </div>
@@ -227,7 +227,7 @@ export default function FinavenueGrowthFundDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "Specializes in quantitative & discretionary strategies, active portfolio management, and risk-managed hedge investing."
+                                Specializes in quantitative & discretionary strategies, active portfolio management, and risk-managed hedge investing.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

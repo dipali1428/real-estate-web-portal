@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
-import { X, CheckCircle, UploadCloud, Trash2, ChevronDown, Download, Info, AlertCircle, Loader2 } from "lucide-react";
+import { X, CheckCircle, UploadCloud, Trash2, ChevronDown, Download, Info, AlertCircle } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
 import * as XLSX from "xlsx"; // Required: npm install xlsx
 

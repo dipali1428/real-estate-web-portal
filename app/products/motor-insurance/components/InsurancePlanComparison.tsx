@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, Filter } from "lucide-react";
 import React, { useState } from "react";
-import Link from "next/link";
 import { companiesData, vehicleTypes, planTypes, bikeCCSegments, carCCSegments, commercialCCSegments, miscCCSegments, commercialGVWSegments } from "./insuranceData";
 
 
@@ -110,7 +109,7 @@ export default function InsurancePlanComparison({
     const handleViewDetails = (company: any) => {
     if (!company) return;
 
-    console.log("Selected Company:", company);
+    // console.log("Selected Company:", company);
 };
 
     return (

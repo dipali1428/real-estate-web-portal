@@ -5,14 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, Suspense, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import {
-    CheckCircle, Clock, ShieldCheck, FileText, Users,
-    TrendingUp, ArrowLeft, Home, IndianRupee, Briefcase,
-    Factory, Car, Landmark, GraduationCap, Building,
-    Globe, Heart, Shield, Banknote, Award, Zap, Star, Plane, PieChart, X,
-    ArrowRight, User, Mail, Smartphone, Wallet, CreditCard, Ship, Anchor,
-    Flame, HardHat, Building2, Trees, Gem, Landmark as Bank, Key, ShoppingBag,
-    Stethoscope, Activity, Truck, MapPin, Search, Warehouse, Coins, BadgePercent,
-    PiggyBank, BarChart3, Receipt, Scale, UserCheck, CircleDollarSign,
+    CheckCircle, Clock, ShieldCheck, FileText,
+    TrendingUp, ArrowLeft, Home, Landmark, Building, Zap, X,
+    ArrowRight, Building2, Landmark as Bank, Coins,
     Repeat, Wrench, Construction, ChevronDown, Plus, Minus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -191,8 +186,7 @@ export default function MortgageLoanPage() {
                                 initial={{ opacity: 0, x: -50 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.8, ease: "easeOut" }}
-                                className="w-full lg:w-1/2 text-center lg:text-left space-y-8 flex flex-col items-center lg:items-start"
-                            >
+                                className="w-full lg:w-1/2 text-center lg:text-left space-y-8 flex flex-col items-center lg:items-start">
                                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E6F7F6] border border-[#1CADA3]/20 mb-6 w-fit mx-auto lg:mx-0">
                                     <Landmark className="w-4 h-4 text-[#1CADA3]" />
                                     <span className="text-xs font-bold text-[#1CADA3] tracking-wider uppercase">Property Backed Funding</span>
@@ -201,7 +195,7 @@ export default function MortgageLoanPage() {
                                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-sans font-bold bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-clip-text text-transparent leading-tight mb-6 tracking-tight">
                                     <>
                                         Unlock Your <br />
-                                        <span className="text-[#2076C7]">Property's Value</span> <br />
+                                        <span className="text-[#2076C7]">Property&apos;s Value</span> <br />
                                         with Rates as <span className="text-[#1CADA3]">Lowest</span>
                                     </>
                                 </h1>
@@ -213,10 +207,10 @@ export default function MortgageLoanPage() {
                                 <div className="flex flex-col sm:flex-row gap-5 pt-2 items-center lg:items-start">
                                     <button
                                         onClick={handleApply}
-                                        className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
-                                    >
+                                        className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer">
                                         <span className="relative z-10 flex items-center justify-center gap-2">
-                                            Apply Now <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                            Apply Now <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                                            />
                                         </span>
                                     </button>
                                     <button

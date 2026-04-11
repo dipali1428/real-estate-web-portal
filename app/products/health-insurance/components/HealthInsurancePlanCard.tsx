@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, ArrowRight, Shield, Heart, Zap, Crosshair } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
 
 interface PlanProps {
     name: string;

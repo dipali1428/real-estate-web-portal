@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShieldCheck, TrendingUp, Briefcase, FileText, Phone, Download, PieChart as PieIcon, BarChart as BarIcon, Target, Users, Clock, IndianRupee } from 'lucide-react';
+import { X, ShieldCheck, TrendingUp, FileText, PieChart as PieIcon, BarChart as BarIcon, Target, Users, Clock, IndianRupee } from 'lucide-react';
 import { useModal } from '../../../context/ModalContext';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 

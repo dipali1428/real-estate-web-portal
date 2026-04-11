@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Banknote, ShieldCheck, TrendingUp, PieChart, Home, Layers,
-  ChevronRight, ArrowLeft, Mail, Phone, Calendar,
+  ChevronRight, ArrowLeft,
   LucideIcon, Loader2
 } from 'lucide-react';
 import { AdminService } from '../../services/adminService';

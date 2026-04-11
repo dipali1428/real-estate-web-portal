@@ -3,7 +3,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import {
-  IconHome,
   IconBuildingBank,
   IconShieldLock,
   IconFileText,
@@ -11,7 +10,6 @@ import {
   IconActivity,
   IconCheck,
   IconDownload,
-  IconCar,
 } from "@tabler/icons-react";
 
 export default function LoanProtectorActiveDashboard() {

@@ -22,7 +22,6 @@ import {
   AlertTriangle,
   Activity,
   Handshake,
-  Scale,
 } from "lucide-react";
 
 export interface Insurer {

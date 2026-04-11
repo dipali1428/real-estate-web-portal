@@ -109,13 +109,12 @@ export default function FeaturedCompanies({ companies, loading, onEnquire }: any
                         isVisible 
                             ? 'opacity-100 translate-y-0' 
                             : 'opacity-0 translate-y-10'
-                    }`}
-                >
+                    }`}>
                     <h3 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
                         Featured Opportunities
                     </h3>
                     <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto mb-4">
-                        Discover exclusive pre-IPO investment opportunities in India's most promising companies
+                        Discover exclusive pre-IPO investment opportunities in India&apos;s most promising companies
                     </p>
                     <div className="w-16 h-1 mx-auto bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full transform transition-all duration-1000 delay-300 scale-x-0 origin-center" 
                          style={{ transform: isVisible ? 'scaleX(1)' : 'scaleX(0)' }}

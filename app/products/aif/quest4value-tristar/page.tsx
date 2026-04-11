@@ -206,7 +206,7 @@ export default function Quest4ValueTristarDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
                                         <p className="text-xs text-blue-800 font-medium italic">
-                                            "Boutique approach focusing on high-conviction mid and small-cap opportunities."
+                                            Boutique approach focusing on high-conviction mid and small-cap opportunities.
                                         </p>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function Quest4ValueTristarDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "Public equity expertise with a focus on high-conviction investing and long-term wealth creation."
+                                Public equity expertise with a focus on high-conviction investing and long-term wealth creation.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

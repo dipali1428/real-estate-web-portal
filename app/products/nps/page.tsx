@@ -13,7 +13,7 @@ import CTASection from '@/app/component/CTASection';
 import ScrollToTop from '@/app/component/ScrollToTop';
 import { useRouter } from 'next/navigation';
 import { useModal } from '@/app/context/ModalContext';
-import { ArrowLeft, Zap } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();

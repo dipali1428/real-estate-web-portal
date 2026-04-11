@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { ShieldCheck, CloudLightning, Bomb, Plane, Ship, Bus, Wind, Trash2, Droplets, ShieldAlert } from 'lucide-react';
+import { ShieldCheck, CloudLightning, Bomb, Plane, Bus, Wind, Trash2, Droplets, ShieldAlert } from 'lucide-react';
 
 export default function CoverageGrid() {
   const includedPerils = [

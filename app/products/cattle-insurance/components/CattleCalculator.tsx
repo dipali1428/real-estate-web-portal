@@ -72,8 +72,15 @@ export default function CattleCalculator({
     const [totalPremium, setTotalPremium] = useState(0);
 
     useEffect(() => {
-        setMarketValue(animal.baseValue);
-        if (age > animal.maxAge) setAge(animal.maxAge);
+        const rafId = requestAnimationFrame(() => {
+            setMarketValue(animal.baseValue);
+
+            if (age > animal.maxAge) {
+                setAge(animal.maxAge);
+            }
+        });
+
+        return () => cancelAnimationFrame(rafId);
     }, [animal]);
 
     useEffect(() => {

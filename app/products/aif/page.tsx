@@ -4,8 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-    TrendingUp, PieChart, ShieldCheck, ArrowRight,
-    Activity, BarChart, Zap, ArrowLeft, ChevronDown, Plus, Minus, Search, Filter
+    TrendingUp, PieChart, ShieldCheck, ArrowRight, BarChart, Zap, ArrowLeft, Plus, Minus, Search, Filter
 } from 'lucide-react';
 import { motion, Variants, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
 
@@ -53,22 +52,19 @@ const AIFHeaderRecommended = () => {
 };
 
 const AIFHeroVisual = () => {
-    const [mounted, setMounted] = useState(false);
+    // const [mounted, setMounted] = useState(false);
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
     const rotateX = useTransform(mouseY, [-300, 300], [5, -5]);
     const rotateY = useTransform(mouseX, [-300, 300], [-5, 5]);
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-
+    // useEffect(() => {
+    //     setMounted(true);
+    // }, []);
 
     return (
         <div
-            className="relative w-full h-[450px] lg:h-[450px] flex items-center justify-center overflow-hidden scale-75 md:scale-90 lg:scale-100"
-        >
+            className="relative w-full h-[450px] lg:h-[450px] flex items-center justify-center overflow-hidden scale-75 md:scale-90 lg:scale-100">
             <div className="absolute inset-0 opacity-30">
                 <svg width="100%" height="100%" className="absolute inset-0">
                     <defs>
@@ -97,19 +93,16 @@ const AIFHeroVisual = () => {
             ))}
 
             <div
-                className="relative z-20 w-64 h-64"
-            >
+                className="relative z-20 w-64 h-64">
                 <div className="relative w-full h-full perspective-1000">
                     <div
-                        className="w-full h-full relative preserve-3d"
-                    >
+                        className="w-full h-full relative preserve-3d">
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-teal-400/10 rounded-[2.5rem] blur-md" />
                         <div className="absolute inset-0 bg-white/40 backdrop-blur-2xl border border-white/60 shadow-xl rounded-[2.5rem] flex items-center justify-center overflow-hidden group">
                             <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-teal-400/10 animate-pulse" />
                             <div className="relative z-10 flex flex-col items-center">
                                 <div
-                                    className="w-20 h-20 bg-gradient-to-br from-white to-blue-50 rounded-2xl flex items-center justify-center shadow-lg border border-blue-100 mb-3"
-                                >
+                                    className="w-20 h-20 bg-gradient-to-br from-white to-blue-50 rounded-2xl flex items-center justify-center shadow-lg border border-blue-100 mb-3">
                                     <ShieldCheck className="text-[#1CADA3] w-10 h-10 drop-shadow-sm" />
                                 </div>
                                 <div className="h-px w-16 bg-gradient-to-r from-transparent via-primary/50 to-transparent my-2" />
@@ -124,8 +117,7 @@ const AIFHeroVisual = () => {
                 {aifFloatingTags.map((tag, i) => (
                     <div
                         key={i}
-                        className={`absolute ${tag.pos} z-30`}
-                    >
+                        className={`absolute ${tag.pos} z-30`}>
                         <div className="relative group">
                             <div
                                 className="absolute inset-0 rounded-full blur-md opacity-30 group-hover:opacity-50 transition-opacity"
@@ -247,7 +239,7 @@ const AIFProductsContent = () => {
                                     </div>
                                 </div>
 
-                                <motion.h1 
+                                <motion.h1
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5, delay: 0.1 }}
@@ -258,7 +250,7 @@ const AIFProductsContent = () => {
                                     <span className="text-[#2076C7]">Alternative Investment Funds</span>
                                 </motion.h1>
 
-                                <motion.p 
+                                <motion.p
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5, delay: 0.2 }}
@@ -267,7 +259,7 @@ const AIFProductsContent = () => {
                                     Exclusive alternative investment opportunities for sophisticated portfolios.
                                 </motion.p>
 
-                                <motion.div 
+                                <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5, delay: 0.3 }}
@@ -495,20 +487,18 @@ const AIFProductsContent = () => {
                                     <motion.div
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        className="py-20 text-center bg-white rounded-3xl border border-dashed border-gray-300"
-                                    >
+                                        className="py-20 text-center bg-white rounded-3xl border border-dashed border-gray-300">
                                         <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-50 rounded-full mb-4">
                                             <Search className="w-10 h-10 text-gray-300" />
                                         </div>
                                         <h4 className="text-xl font-bold text-gray-700 mb-2">No matching funds found</h4>
-                                        <p className="text-gray-500">Try adjusting your filters or search query to find what you're looking for.</p>
+                                        <p className="text-gray-500">Try adjusting your filters or search query to find what you&apos;re looking for.</p>
                                         <button
                                             onClick={() => {
                                                 setSearchQuery("");
                                                 setSelectedCategory("All");
                                             }}
-                                            className="mt-6 font-bold text-[#2076C7] hover:underline"
-                                        >
+                                            className="mt-6 font-bold text-[#2076C7] hover:underline">
                                             Clear all filters
                                         </button>
                                     </motion.div>

@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingUp, Wallet, GraduationCap, Anchor, Coins, RefreshCcw, Zap, ShieldCheck, Star, FileCheck, Landmark } from "lucide-react";
-import TiltCard from "./TiltCard";
+import { TrendingUp, Wallet, GraduationCap, Anchor, Zap, ShieldCheck, Star } from "lucide-react";
 import React, { useState } from "react";
 
 const insurancePlans = [
@@ -72,13 +71,12 @@ export default function InsuranceTypes() {
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 text-[#2076C7] font-sans leading-[1.1] tracking-tight"
-                    >
+                        className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 text-[#2076C7] font-sans leading-[1.1] tracking-tight">
                         Protect What <br />
                         <span className="text-transparent bg-clip-text bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-[length:200%_auto] animate-gradient-x">Matters Most</span>
                     </motion.h2>
                     <p className="text-gray-500 text-lg md:text-2xl leading-relaxed font-medium font-sans max-w-2xl">
-                        Whatever your life stage, we have a simple and secure plan to protect your family's future.
+                        Whatever your life stage, we have a simple and secure plan to protect your family&apos;s future.
                     </p>
                 </div>
 

@@ -1,7 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
     IconCheck,
     IconBuildingBank,
@@ -10,13 +9,8 @@ import {
     IconShieldCheck,
     IconBriefcase,
     IconChartPie,
-    IconBolt,
-    IconCalculator,
-    IconFileText,
-    IconUsers,
 } from '@tabler/icons-react';
 
-import { LASCalculator } from './LASCalculator';
 
 // --- DATA CONFIGURATION ---
 

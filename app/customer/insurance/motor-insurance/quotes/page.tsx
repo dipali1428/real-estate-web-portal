@@ -1,10 +1,6 @@
 import React from 'react';
-import {
-   Car,
-   Info,
-   Plus,
-   ChevronRight,
-} from 'lucide-react';
+
+
 import InsurancePlanComparison from '../../../../products/motor-insurance/components/InsurancePlanComparison';
 
 const MotorQuotes: React.FC = () => {

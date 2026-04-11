@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { bondsData, Bond } from '../../../products/bonds/data/bondsData';
 import { 
-    Search, Briefcase, TrendingUp, ShieldCheck, 
+    Search, TrendingUp, ShieldCheck, 
     LayoutDashboard
 } from 'lucide-react';
 import toast from 'react-hot-toast';

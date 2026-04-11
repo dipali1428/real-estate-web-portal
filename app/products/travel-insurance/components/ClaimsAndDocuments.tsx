@@ -1,7 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { IconFileDescription, IconUpload, IconCheckbox, IconHeadset } from '@tabler/icons-react';
 import { useModal } from '../../../context/ModalContext';
 

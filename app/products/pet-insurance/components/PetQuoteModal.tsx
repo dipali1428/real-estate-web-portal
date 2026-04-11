@@ -6,8 +6,6 @@ import {
     IconX,
     IconChevronDown,
     IconCheck,
-    IconUser,
-    IconInfoCircle,
     IconBrandWhatsapp,
     IconChevronUp,
     IconChevronLeft,
@@ -169,7 +167,7 @@ export default function PetQuoteModal({ isOpen, onClose }: PetQuoteModalProps) {
                                                 <IconHeart size={14} stroke={3} />
                                             </div>
                                             <p className="text-sm text-slate-700 leading-relaxed">
-                                                <span className="font-bold text-blue-700">Pawsitively Protected</span> — Join over <span className="font-bold text-blue-600">50,000+</span> pet parents who trust us for their pet's health and happiness.
+                                                <span className="font-bold text-blue-700">Pawsitively Protected</span> — Join over <span className="font-bold text-blue-600">50,000+</span> pet parents who trust us for their pet&apos;s health and happiness.
                                             </p>
                                         </div>
 
@@ -245,9 +243,8 @@ export default function PetQuoteModal({ isOpen, onClose }: PetQuoteModalProps) {
                                                         name="petAge"
                                                         value={formData.petAge}
                                                         onChange={handleInputChange}
-                                                        className={`w-full h-14 px-5 rounded-2xl border-2 outline-none font-bold text-slate-900 appearance-none bg-white transition-all ${showErrors && !formData.petAge ? 'border-red-100 bg-red-50/30' : 'border-slate-100 focus:border-blue-500'}`}
-                                                    >
-                                                        <option value="">Select pet's age</option>
+                                                        className={`w-full h-14 px-5 rounded-2xl border-2 outline-none font-bold text-slate-900 appearance-none bg-white transition-all ${showErrors && !formData.petAge ? 'border-red-100 bg-red-50/30' : 'border-slate-100 focus:border-blue-500'}`}>
+                                                        <option value="">Select pet&apos;s age</option>
                                                         <option value="Puppy/Kitten">Puppy/Kitten (&lt; 1 yr)</option>
                                                         <option value="Adult">Adult (1 - 7 yrs)</option>
                                                         <option value="Senior">Senior (7+ yrs)</option>
@@ -335,15 +332,14 @@ export default function PetQuoteModal({ isOpen, onClose }: PetQuoteModalProps) {
                                                     </div>
                                                 )}
                                             </div>
-                                            <p className="text-sm text-slate-500">This helps us tailor the best coverage for your pet's needs.</p>
+                                            <p className="text-sm text-slate-500">This helps us tailor the best coverage for your pet&apos;s needs.</p>
 
                                             <div className="grid grid-cols-1 gap-3 pt-2">
                                                 {['Chronic Conditions', 'Recent Injuries', 'Genetic Disorders', 'No pre-existing conditions'].map((condition) => (
                                                     <button
                                                         key={condition}
                                                         onClick={() => { setSelectedCondition(condition); setShowStep2Error(false); }}
-                                                        className={`flex items-center justify-between p-4 bg-white rounded-xl border-2 transition-all group ${selectedCondition === condition ? 'border-blue-500 bg-blue-50/50' : showStep2Error && !selectedCondition ? 'border-red-100' : 'border-slate-100 hover:border-blue-500'}`}
-                                                    >
+                                                        className={`flex items-center justify-between p-4 bg-white rounded-xl border-2 transition-all group ${selectedCondition === condition ? 'border-blue-500 bg-blue-50/50' : showStep2Error && !selectedCondition ? 'border-red-100' : 'border-slate-100 hover:border-blue-500'}`}>
                                                         <span className={`font-bold transition-colors ${selectedCondition === condition ? 'text-blue-600' : 'text-slate-700 group-hover:text-blue-600'}`}>{condition}</span>
                                                         <div className={`w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center ${selectedCondition === condition ? 'border-blue-500 bg-blue-600' : 'border-slate-200 group-hover:border-blue-500'}`}>
                                                             {selectedCondition === condition && <IconCheck size={14} className="text-white" stroke={3} />}
@@ -392,13 +388,12 @@ export default function PetQuoteModal({ isOpen, onClose }: PetQuoteModalProps) {
                                         <div className="space-y-2">
                                             <h3 className="text-3xl font-black text-slate-900">Paw-some!</h3>
                                             <p className="text-lg text-slate-500 max-w-md">
-                                                Your pet's details have been submitted. Our experts will contact you with the best pet insurance quotes shortly.
+                                                Your pet&apos;s details have been submitted. Our experts will contact you with the best pet insurance quotes shortly.
                                             </p>
                                         </div>
                                         <button
                                             onClick={onClose}
-                                            className="h-14 px-8 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-black text-lg rounded-2xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
-                                        >
+                                            className="h-14 px-8 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-black text-lg rounded-2xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
                                             Close Form
                                         </button>
                                     </motion.div>

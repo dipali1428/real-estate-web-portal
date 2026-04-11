@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard, Search, BarChart3, Briefcase, Landmark, FileText
+  LayoutDashboard, Search, BarChart3, Landmark, FileText
 } from "lucide-react";
 import FDDashboard from "./dashboard/page";
 import FDCompanies from "./companies/page";

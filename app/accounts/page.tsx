@@ -5,14 +5,9 @@ import { motion } from "framer-motion";
 import { AccountService } from "../services/accountsService";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import StatsCard from "../admin/components/DashboardStatsCard";
-import DashboardSectionHeader from "../admin/components/DashboardSectionHeader";
 
-import {
-  Mail,
-  UserCheck,
-  IndianRupee,
-} from "lucide-react";
+
+
 
 export default function Dashboard() {
   const [user, setUser] = useState("");

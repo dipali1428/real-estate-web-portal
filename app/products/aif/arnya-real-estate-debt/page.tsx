@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
     ArrowLeft, TrendingUp, ShieldCheck,
-    Briefcase, FileText, Activity,
+    Briefcase, FileText,
     CheckCircle, BarChart as BarChartIcon, PieChart as PieChartIcon,
     AlertCircle, Target, Users, Clock, IndianRupee
 } from 'lucide-react';
@@ -204,7 +204,7 @@ export default function ArnyaRealEstateDebtDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-teal-50 rounded-2xl border border-teal-100">
                                         <p className="text-xs text-teal-800 font-medium italic">
-                                            "Focus on secured debt and structured credit for income stability."
+                                            Focus on secured debt and structured credit for income stability.
                                         </p>
                                     </div>
                                 </div>
@@ -227,7 +227,7 @@ export default function ArnyaRealEstateDebtDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "Specialists in real estate financing and structured credit deals with a conservative approach to risk."
+                                Specialists in real estate financing and structured credit deals with a conservative approach to risk.
                             </p>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="bg-white/10 p-2 rounded-lg text-[10px] font-bold text-center">RE Debt</div>

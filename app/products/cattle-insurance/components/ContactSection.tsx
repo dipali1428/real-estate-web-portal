@@ -109,7 +109,7 @@ export default function ContactSection() {
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="mb-4">
                                     <h3 className="text-2xl font-extrabold text-[grey-500] tracking-tight leading-none">Get a Free Quote</h3>
-                                    <p className="text-slate-400 text-sm font-bold mt-3">Fill in your details and we'll reach out to you.</p>
+                                    <p className="text-slate-400 text-sm font-bold mt-3">Fill in your details and we&apos;ll reach out to you.</p>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

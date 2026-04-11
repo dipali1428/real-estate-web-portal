@@ -6,12 +6,7 @@ import {
     ChevronRight,
     ShieldCheck,
     ShieldAlert,
-    ShieldX,
-    Heart,
-    Activity,
-    Users,
-    CircleDashed,
-    Flame
+    ShieldX
 } from "lucide-react";
 import Link from "next/link";
 

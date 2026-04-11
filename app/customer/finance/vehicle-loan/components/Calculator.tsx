@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { motion } from "framer-motion";
 import {
   PieChart as ReChartsPie,
   Pie,
@@ -10,10 +9,7 @@ import {
   Tooltip
 } from "recharts";
 import {
-  IndianRupee as RupeeIcon,
-  Calculator as CalculatorIcon,
   Car as CarIcon,
-  Info as InfoIcon,
 } from "lucide-react";
 
 

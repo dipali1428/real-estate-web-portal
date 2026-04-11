@@ -93,12 +93,12 @@ export default function BusinessLoanPartners() {
                     </div>
 
                     <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                        Our Banking Partners and HFC's
+                        Our Banking Partners and HFC&apos;s
                     </h2>
 
                     <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
-                        Widest network for the most competitive rates. We've collaborated
-                        with India's premier financial institutions to provide you with the
+                        Widest network for the most competitive rates. We&apos;ve collaborated
+                        with India&apos;s premier financial institutions to provide you with the
                         most competitive interest rates.
                     </p>
                 </motion.div>

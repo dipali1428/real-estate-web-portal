@@ -1,6 +1,4 @@
-import React from "react";
 import {
-  TrendingDown,
   Shield,
   Home,
   Banknote,
@@ -9,12 +7,8 @@ import {
   TrendingUp,
   Clock,
   Award,
-  ShieldCheck,
-  Activity,
   User,
   Zap,
-  IndianRupee,
-  Smartphone,
   Users,
   Landmark,
   Building2,

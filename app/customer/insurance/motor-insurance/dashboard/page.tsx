@@ -5,15 +5,8 @@ import {
    FileText,
    CheckCircle2,
    Clock,
-   History,
    Download,
-   Plus,
-   MoreVertical,
-   Calendar,
-   Layers,
-   Search,
    Settings2,
-   ChevronRight,
    Car
 } from "lucide-react";
 

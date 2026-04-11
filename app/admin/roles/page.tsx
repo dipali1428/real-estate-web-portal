@@ -5,7 +5,6 @@ import {
   SquarePen,
   X,
   Plus,
-  Users,
   Search,
   Clock,
   ShieldCheck,

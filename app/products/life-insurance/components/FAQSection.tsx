@@ -74,7 +74,7 @@ const LifeInsuranceFAQ = () => {
                     ></div>
 
                     <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
-                        Got questions about life insurance? We've got answers.
+                        Got questions about life insurance? We&apos;ve got answers.
                     </p>
                 </div>
 

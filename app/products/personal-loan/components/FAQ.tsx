@@ -104,7 +104,7 @@ const PersonalLoanFAQ = () => {
                     ></div>
 
                     <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
-                        Got questions about personal loans? We've got answers.
+                        Got questions about personal loans? We&apos;ve got answers.
                     </p>
                 </div>
 

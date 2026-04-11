@@ -5,8 +5,7 @@ import {
   Search,
   MapPin,
   Mail,
-  Loader2,
-  AlertCircle
+  Loader2
 } from 'lucide-react';
 import { DepartmentHeadService } from '../../services/departmentHeadService';
 

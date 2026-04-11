@@ -66,7 +66,7 @@ export default function VehicleLoanPartners() {
                     </h2>
 
                     <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
-                        We've collaborated with India's premier financial institutions to 
+                        We&apos;ve collaborated with India&apos;s premier financial institutions to 
                         provide you with the most competitive vehicle loan interest rates.
                     </p>
                 </motion.div>

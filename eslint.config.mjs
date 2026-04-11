@@ -2,6 +2,10 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
+// IMPORT PLUGINS (IMPORTANT)
+import unusedImports from "eslint-plugin-unused-imports";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -12,7 +16,60 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "node_modules/**"
   ]),
+
+  {
+    // FIXED: plugins as object
+    plugins: {
+      "unused-imports": unusedImports,
+      "simple-import-sort": simpleImportSort
+    },
+
+    rules: {
+      /* -------------------- AUTO CLEAN -------------------- */
+
+      "unused-imports/no-unused-imports": "error",
+      "@typescript-eslint/no-unused-vars": "off",
+      "unused-imports/no-unused-vars": [
+        "off",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_"
+        }
+      ],
+
+      /* -------------------- IMPORTANT ERRORS -------------------- */
+
+      "no-console": "error",
+      "no-alert": "error",
+      "no-debugger": "error",
+      "no-duplicate-imports": "error",
+      "no-unsafe-optional-chaining": "error",
+
+      // "eqeqeq": ["warn", "always"],
+      "no-var": "error",
+      "prefer-const": "error",
+
+      "@typescript-eslint/no-explicit-any": "off", // warn
+
+      /* -------------------- DISABLED -------------------- */
+
+      "curly": "off",
+      "sort-imports": "off",
+      "arrow-body-style": "off",
+      "react/self-closing-comp": "off",
+      "@typescript-eslint/consistent-type-imports": "off",
+      "react-hooks/exhaustive-deps": "off",
+
+      /* -------------------- FORMATTING -------------------- */
+
+      "semi": "off",
+      "quotes": "off",
+      "indent": "off",
+      "comma-dangle": "off"
+    }
+  }
 ]);
 
 export default eslintConfig;

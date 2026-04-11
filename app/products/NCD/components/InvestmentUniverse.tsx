@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { ShieldCheck, ArrowUpRight, } from 'lucide-react';
 
 const InvestmentUniverse = () => {

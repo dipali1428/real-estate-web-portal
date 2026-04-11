@@ -32,7 +32,7 @@ const TaxGuideContent = () => {
                 <div>
                     <p className="text-xs font-black uppercase tracking-[0.2em] mb-1 opacity-80">PRO TIP: Tax Optimization</p>
                     <p className="text-xl font-black leading-tight">
-                        "{taxGuideData.sections[4].content}"
+                        {taxGuideData.sections[4].content}
                     </p>
                 </div>
             </div>

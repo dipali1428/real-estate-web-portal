@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import {
-  FileText, Clock, Inbox, Download, Building2, Eye, X, Image as ImageIcon
+import { Inbox, Building2, Eye, X
 } from 'lucide-react';
 import { DashboardService } from '@/app/services/dashboardService';
 
@@ -63,7 +62,7 @@ export default function CreditNotePortal() {
 
   const formatValue = (val: any, stripDecimals = false) => {
     if (!val) return "0";
-    let str = val.toString().replace(/^"|"$/g, "").replace(/"/g, "").trim();
+    const str = val.toString().replace(/^"|"$/g, "").replace(/"/g, "").trim();
     if (stripDecimals) return str.split('.')[0];
     return str;
   };

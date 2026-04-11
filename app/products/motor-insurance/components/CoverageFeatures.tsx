@@ -51,7 +51,7 @@ export default function CoverageFeatures() {
                         Comprehensive Coverage Features
                     </h2>
                     <p className="text-gray-600">
-                        We've got you covered against all odds. Drive with complete peace of mind.
+                        We&apos;ve got you covered against all odds. Drive with complete peace of mind.
                     </p>
                 </div>
 

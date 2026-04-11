@@ -1,16 +1,14 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   PiggyBank,
   Shield,
   Users,
   CheckCircle2,
-  Clock,
   Percent,
   BarChart3,
   ArrowRight,
-  FileText,
   Target,
   BadgeCheck,
   TrendingUp,

@@ -1,12 +1,11 @@
 'use client';
-import { useRef } from 'react';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAllShares, fetchIdGraphData, GraphPoint } from '../../../services/unlistedservices';
-import { 
-  ArrowLeft, Search, Filter, CheckCircle, Package, Info,  
-  TrendingUp, X,  FileText, ChevronDown, ChevronUp,
+import {
+  ArrowLeft, Search, Filter, CheckCircle, Package, Info,
+  TrendingUp, X, FileText, ChevronDown, ChevronUp,
   ShoppingCart, IndianRupee, MapPin, Activity, Clock,
   FileSignature, Calculator, HelpCircle, Loader2,
   HandCoins, AlertTriangle
@@ -66,14 +65,14 @@ const FAQ_ITEMS = [
 const BuyShares: React.FC = () => {
   const router = useRouter();
   const { openLogin } = useModal();
-  
+
   // --- DATA STATES ---
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstance = useRef<any>(null);
   const [companies, setCompanies] = useState<ExtendedCompany[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // --- GRAPH DATA STATES ---
   const [graphData, setGraphData] = useState<GraphPoint[]>([]);
   const [isGraphLoading, setIsGraphLoading] = useState(false);
@@ -92,10 +91,10 @@ const BuyShares: React.FC = () => {
   // --- MODAL STATES ---
   const [detailCompany, setDetailCompany] = useState<ExtendedCompany | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'company'>('overview');
-  
+
   // --- TOAST STATE ---
   const [toasts, setToasts] = useState<Toast[]>([]);
-  
+
   // --- FAQ STATE ---
   const [activeFaqs, setActiveFaqs] = useState<number[]>([]);
 
@@ -119,13 +118,13 @@ const BuyShares: React.FC = () => {
       try {
         setIsLoading(true);
         const result = await fetchAllShares();
-        
+
         const rawData = Array.isArray(result) ? result : [];
-        
+
         const mappedData: ExtendedCompany[] = rawData.map((item: any) => {
           let category = 'Unlisted Shares';
           const name = item.shares_name || '';
-          
+
           if (name.toLowerCase().includes('tech') || name.toLowerCase().includes('software')) category = 'Technology';
           else if (name.toLowerCase().includes('fin') || name.toLowerCase().includes('bank') || name.toLowerCase().includes('microfinance')) category = 'Fintech';
           else if (name.toLowerCase().includes('health') || name.toLowerCase().includes('pharma') || name.toLowerCase().includes('clinical')) category = 'Healthcare';
@@ -136,11 +135,11 @@ const BuyShares: React.FC = () => {
           else if (name.toLowerCase().includes('cement')) category = 'Construction';
           else if (name.toLowerCase().includes('hospital')) category = 'Healthcare';
           else if (name.toLowerCase().includes('exchange')) category = 'Financial Services';
-          
+
           const id = Number(item.id) || 0;
           const price = parseFloat(item.price) || 0;
           const lotSize = Number(item.min_lot_size) || 100;
-          
+
           return {
             id: id,
             name: item.shares_name || 'Unknown Company',
@@ -168,7 +167,7 @@ const BuyShares: React.FC = () => {
             volume: `${(Math.random() * 100 + 20).toFixed(1)}K`,
           };
         });
-        
+
         setCompanies(mappedData);
         setError(null);
       } catch {
@@ -188,10 +187,10 @@ const BuyShares: React.FC = () => {
 
       setIsGraphLoading(true);
       setGraphData([]);
-      
+
       try {
         const response = await fetchIdGraphData(detailCompany.id);
-        
+
         if (response && response.success && response.graph && Array.isArray(response.graph)) {
           const formattedData: GraphPoint[] = response.graph
             .filter(item => item && item.price_date && item.market_price !== null && item.market_price !== undefined)
@@ -199,7 +198,7 @@ const BuyShares: React.FC = () => {
               price_date: item.price_date,
               market_price: item.market_price?.toString() || '0'
             }));
-          
+
           if (formattedData.length > 0) {
             setGraphData(formattedData);
           } else {
@@ -262,7 +261,7 @@ const BuyShares: React.FC = () => {
       cutoffDate.setMonth(now.getMonth() - 3);
       filteredData = graphData.filter(item => new Date(item.price_date) >= cutoffDate);
     }
-    
+
     filteredData.sort((a, b) => new Date(a.price_date).getTime() - new Date(b.price_date).getTime());
 
     const labels = filteredData.map(item => {
@@ -304,7 +303,7 @@ const BuyShares: React.FC = () => {
         scales: {
           y: {
             grid: { color: 'rgba(0, 0, 0, 0.05)' },
-            ticks: { 
+            ticks: {
               callback: (val) => `₹${val}`,
               font: { size: 11 }
             }
@@ -337,8 +336,8 @@ const BuyShares: React.FC = () => {
 
     if (debouncedSearch) {
       const term = debouncedSearch.toLowerCase();
-      result = result.filter(c => 
-        c.name.toLowerCase().includes(term) || 
+      result = result.filter(c =>
+        c.name.toLowerCase().includes(term) ||
         c.category.toLowerCase().includes(term)
       );
     }
@@ -362,9 +361,9 @@ const BuyShares: React.FC = () => {
   };
 
   // DYNAMIC CATEGORIES
-  const categories = useMemo(() => 
+  const categories = useMemo(() =>
     Array.from(new Set(companies.map(c => c.category))).sort()
-  , [companies]);
+    , [companies]);
 
   // FAQ TOGGLE
   const toggleFaq = (idx: number) => {
@@ -394,7 +393,7 @@ const BuyShares: React.FC = () => {
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     const filteredData = getFilteredGraphData();
     if (!filteredData.length) return;
-    
+
     const svg = e.currentTarget;
     const rect = svg.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -410,9 +409,9 @@ const BuyShares: React.FC = () => {
 
   const getFilteredGraphData = () => {
     if (!graphData.length) return [];
-    
+
     const now = new Date();
-    
+
     switch (graphTimeRange) {
       case '1W': {
         const cutoffDate = new Date();
@@ -438,14 +437,14 @@ const BuyShares: React.FC = () => {
   const getGraphPoints = () => {
     const filteredData = getFilteredGraphData();
     if (!filteredData.length) return '';
-    
+
     const width = 100;
     const height = 40;
     const values = filteredData.map(d => parseFloat(d.market_price));
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
     const range = (maxVal - minVal) || 1;
-    
+
     return filteredData.map((point, i) => {
       const x = (i / (filteredData.length - 1)) * width;
       const y = height - (((parseFloat(point.market_price) - minVal) / range) * height * 0.8) - 4;
@@ -461,9 +460,9 @@ const BuyShares: React.FC = () => {
   const formatShortDate = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', { 
-      day: '2-digit', 
-      month: 'short' 
+    return date.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short'
     }).replace(',', '');
   };
 
@@ -490,8 +489,8 @@ const BuyShares: React.FC = () => {
             <p className="text-sm opacity-90 mb-2">{error}</p>
             <p className="text-xs text-gray-500">Please check your connection and try again</p>
           </div>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="px-8 py-3 bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition-colors"
           >
             Retry Connection
@@ -526,8 +525,8 @@ const BuyShares: React.FC = () => {
       {/* TOAST CONTAINER - Replaces notification system */}
       <div className="fixed top-20 right-5 z-[5000] flex flex-col gap-3">
         {toasts.map(toast => (
-          <div 
-            key={toast.id} 
+          <div
+            key={toast.id}
             className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 border ${getToastBg(toast.type)} animate-in slide-in-from-right-5 max-w-sm cursor-pointer`}
             onClick={() => removeToast(toast.id)}
           >
@@ -541,8 +540,8 @@ const BuyShares: React.FC = () => {
         {/* BACK BUTTON */}
         <div className="sticky top-[72px] z-40 mb-8 bg-gradient-to-br from-gray-50 to-white pt-2 pb-2">
           <div className="container mx-auto px-4">
-            <a 
-              href="/products/unlisted" 
+            <a
+              href="/products/unlisted"
               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-[0_4px_16px_rgba(32,118,199,0.1)] hover:bg-white hover:border-[#2076C7]/40 active:scale-95 transition-all group cursor-pointer"
             >
               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
@@ -600,18 +599,18 @@ const BuyShares: React.FC = () => {
           {/* Filter Row */}
           <div className="flex flex-wrap gap-4 items-center justify-between">
             <div className="flex flex-wrap gap-3 flex-1">
-              <select 
-                className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-gray-900 min-w-[180px]" 
-                value={selectedCategory} 
+              <select
+                className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-gray-900 min-w-[180px]"
+                value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
                 <option value="" className="text-gray-900">All Categories</option>
                 {categories.map(cat => <option key={cat} value={cat} className="text-gray-900">{cat}</option>)}
               </select>
-              
-              <select 
-                className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-gray-900 min-w-[180px]" 
-                value={sortBy} 
+
+              <select
+                className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-gray-900 min-w-[180px]"
+                value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
                 <option value="name-asc" className="text-gray-900">Name: A to Z</option>
@@ -627,8 +626,8 @@ const BuyShares: React.FC = () => {
               </div>
             </div>
 
-            <button 
-              onClick={handleApplyFilters} 
+            <button
+              onClick={handleApplyFilters}
               className="px-6 py-2.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold hover:opacity-90 transition-all flex items-center gap-2 shadow-md whitespace-nowrap"
             >
               <Filter className="w-4 h-4" /> Apply Filters
@@ -653,9 +652,9 @@ const BuyShares: React.FC = () => {
               {/* RECTANGULAR IMAGE CONTAINER */}
               <div className="w-full h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100 shadow-sm overflow-hidden">
                 {company.logo ? (
-                  <img 
-                    src={company.logo} 
-                    className="w-full h-full object-contain p-3" 
+                  <img
+                    src={company.logo}
+                    className="w-full h-full object-contain p-3"
                     alt={company.name}
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
@@ -674,14 +673,14 @@ const BuyShares: React.FC = () => {
               </div>
 
               <h3 className="text-xl font-bold text-gray-900 mb-1">{company.name}</h3>
-              
+
               {/* PRICE DISPLAY */}
               <div className="mb-4">
                 <span className="text-2xl font-bold text-[#2076C7]">
                   ₹{company.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
-              
+
               <div className="text-sm text-gray-500 mb-4">{company.category}</div>
 
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
@@ -732,7 +731,7 @@ const BuyShares: React.FC = () => {
         {/* VIEW MORE BUTTON - Replaces scrollbar */}
         {visibleCount < filteredCompanies.length && (
           <div className="flex justify-center pb-12">
-            <button 
+            <button
               onClick={() => setVisibleCount(prev => prev + 12)}
               className="flex items-center gap-2 px-8 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm hover:shadow-md"
             >
@@ -750,7 +749,7 @@ const BuyShares: React.FC = () => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">No Companies Found</h3>
               <p className="text-gray-600 mb-8 text-lg">Try adjusting your search or filters</p>
-              <button 
+              <button
                 onClick={() => {
                   setSearchTerm('');
                   setSelectedCategory('');
@@ -767,14 +766,14 @@ const BuyShares: React.FC = () => {
         {/* FAQ SECTION */}
         <section className="mb-12 mt-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-            <HelpCircle className="w-6 h-6 text-[#2076C7]" /> 
+            <HelpCircle className="w-6 h-6 text-[#2076C7]" />
             Frequently Asked Questions
           </h2>
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-4">
             {FAQ_ITEMS.map((item, idx) => (
               <div key={idx} className="border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 transition-all">
-                <div 
-                  className="p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-all" 
+                <div
+                  className="p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-all"
                   onClick={() => toggleFaq(idx)}
                 >
                   <h3 className="font-bold text-gray-900">{item.q}</h3>
@@ -797,7 +796,7 @@ const BuyShares: React.FC = () => {
       {detailCompany && (
         <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
           <div className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 animate-fadeIn overflow-hidden flex flex-col border border-gray-100">
-            
+
             {/* HEADER */}
             <div className="bg-white border-b border-gray-100 p-6 flex items-start justify-between">
               <div className="flex items-center gap-4">
@@ -821,7 +820,7 @@ const BuyShares: React.FC = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-4">
                 <div className="text-right">
                   <p className="text-xs text-gray-500 font-medium">Current Price</p>
@@ -829,8 +828,8 @@ const BuyShares: React.FC = () => {
                     ₹{detailCompany.price.toLocaleString('en-IN')}
                   </div>
                 </div>
-                <button 
-                  onClick={() => setDetailCompany(null)} 
+                <button
+                  onClick={() => setDetailCompany(null)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600"
                 >
                   <X size={24} />
@@ -840,7 +839,7 @@ const BuyShares: React.FC = () => {
 
             {/* BODY */}
             <div className="p-6 md:p-8 bg-gray-50/30 overflow-y-auto max-h-[calc(90vh-120px)]">
-              
+
               {/* Metric Cards Row */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {[
@@ -860,10 +859,10 @@ const BuyShares: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
+
                 {/* LEFT: Graph & Description */}
                 <div className="lg:col-span-2 space-y-6">
-                  
+
                   {/* Chart Section */}
                   <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
                     <div className="flex items-center justify-between mb-6">
@@ -871,12 +870,12 @@ const BuyShares: React.FC = () => {
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-xs font-medium text-gray-500">Price History</span>
                           <span className="text-[10px] font-medium text-gray-400">•</span>
-                            <span className="text-[10px] font-medium text-gray-400">
-                              {graphTimeRange === 'All' ? 'All Time' : 
-                              graphTimeRange === '3M' ? '3 Months' : 
-                              graphTimeRange === '1M' ? '1 Month' : 
-                              graphTimeRange === '1W' ? '1 Week' : ''}
-                            </span>
+                          <span className="text-[10px] font-medium text-gray-400">
+                            {graphTimeRange === 'All' ? 'All Time' :
+                              graphTimeRange === '3M' ? '3 Months' :
+                                graphTimeRange === '1M' ? '1 Month' :
+                                  graphTimeRange === '1W' ? '1 Week' : ''}
+                          </span>
                         </div>
                         <div className="flex items-baseline gap-3">
                           <h3 className="text-2xl font-bold text-gray-900">
@@ -888,17 +887,16 @@ const BuyShares: React.FC = () => {
                         </div>
                         <p className="text-xs text-gray-400 mt-1">Current Price</p>
                       </div>
-                      
+
                       <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80">
                         {['All', '3M', '1M', '1W'].map(r => (
-                          <button 
-                            key={r} 
-                            onClick={() => setGraphTimeRange(r)} 
-                            className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-all ${
-                              graphTimeRange === r 
-                                ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200' 
+                          <button
+                            key={r}
+                            onClick={() => setGraphTimeRange(r)}
+                            className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-all ${graphTimeRange === r
+                                ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200'
                                 : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
-                            }`}
+                              }`}
                           >
                             {r}
                           </button>
@@ -926,33 +924,33 @@ const BuyShares: React.FC = () => {
                           52W High
                         </p>
                         <p className="text-lg font-bold text-gray-900">
-                          ₹{graphData.length > 0 
+                          ₹{graphData.length > 0
                             ? Math.max(...graphData.map(d => parseFloat(d.market_price))).toLocaleString('en-IN', { minimumFractionDigits: 2 })
                             : detailCompany.price.toLocaleString('en-IN')}
                         </p>
                         <p className="text-[10px] text-gray-500 font-medium mt-0.5">
-                          {graphData.length > 0 
+                          {graphData.length > 0
                             ? new Date(graphData.find(d => parseFloat(d.market_price) === Math.max(...graphData.map(p => parseFloat(p.market_price))))?.price_date || '').toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
                             : 'N/A'}
                         </p>
                       </div>
-                      
+
                       <div className="bg-gray-50/50 rounded-lg p-3">
                         <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">
                           52W Low
                         </p>
                         <p className="text-lg font-bold text-gray-900">
-                          ₹{graphData.length > 0 
+                          ₹{graphData.length > 0
                             ? Math.min(...graphData.map(d => parseFloat(d.market_price))).toLocaleString('en-IN', { minimumFractionDigits: 2 })
                             : detailCompany.price.toLocaleString('en-IN')}
                         </p>
                         <p className="text-[10px] text-gray-500 font-medium mt-0.5">
-                          {graphData.length > 0 
+                          {graphData.length > 0
                             ? new Date(graphData.find(d => parseFloat(d.market_price) === Math.min(...graphData.map(p => parseFloat(p.market_price))))?.price_date || '').toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
                             : 'N/A'}
                         </p>
                       </div>
-                      
+
                       <div className="bg-gray-50/50 rounded-lg p-3">
                         <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">
                           Avg Volume
@@ -976,7 +974,7 @@ const BuyShares: React.FC = () => {
                     <p className="text-gray-600 leading-relaxed text-sm">
                       {detailCompany.description || `${detailCompany.name} is a leading player in the ${detailCompany.category} sector with strong growth potential and a proven track record of innovation. The company has shown consistent performance and is poised for significant expansion in the coming years.`}
                     </p>
-                    
+
                     <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">ISIN</p>
@@ -997,17 +995,17 @@ const BuyShares: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* RIGHT: Sidebar */}
                 <div className="space-y-6">
-                  
+
                   {/* Key Statistics Card */}
                   <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
                     <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
                       <Activity size={16} className="text-[#2076C7]" />
                       Key Statistics
                     </h4>
-                    
+
                     <div className="space-y-4">
                       {[
                         { label: 'P/E Ratio', value: detailCompany.pe_ratio },
@@ -1029,7 +1027,7 @@ const BuyShares: React.FC = () => {
                     <p className="text-xs text-gray-500 mb-6">
                       Minimum investment: {calculateMinInvestment(detailCompany.price, detailCompany.lotSize)}
                     </p>
-                    
+
                     <button
                       onClick={() => {
                         setDetailCompany(null);
@@ -1039,7 +1037,7 @@ const BuyShares: React.FC = () => {
                     >
                       Buy Now
                     </button>
-                    
+
                     <p className="text-[10px] text-gray-400 text-center mt-4">
                       Our team will contact you within 24 hours
                     </p>
@@ -1060,8 +1058,8 @@ const BuyShares: React.FC = () => {
                             <span className="text-xs font-bold text-gray-900">{metric.value}</span>
                           </div>
                           <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full" 
+                            <div
+                              className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full"
                               style={{ width: metric.percent }}
                             />
                           </div>

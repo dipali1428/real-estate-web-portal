@@ -108,10 +108,10 @@ export default function BharathTransformationDetail() {
                         </Link>
                         <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tighter font-sans leading-[1.1] bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-clip-text text-transparent drop-shadow-sm">
                             Bharath <br />
-                            Transformation Fund – Fund I
+                            Transformation Fund &ndash; Fund I
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-600 max-w-3xl leading-relaxed">
-                            Thematic growth AIF focused on capturing opportunities arising from India's structural transformation and economic expansion across key industrial sectors.
+                            Thematic growth AIF focused on capturing opportunities arising from India&apos;s structural transformation and economic expansion across key industrial sectors.
                         </p>
                     </motion.div>
                 </div>
@@ -206,7 +206,7 @@ export default function BharathTransformationDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
                                         <p className="text-xs text-blue-800 font-medium italic">
-                                            "Strong focus on growth and expansion capital to leverage India's transformation."
+                                            Strong focus on growth and expansion capital to leverage India&apos;s transformation.
                                         </p>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function BharathTransformationDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "Focused on thematic investing and growth opportunities with a deep India-centric research approach."
+                                Focused on thematic investing and growth opportunities with a deep India-centric research approach.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">
@@ -268,7 +268,7 @@ export default function BharathTransformationDetail() {
 
                         {/* CTA Section */}
                         <section className="bg-slate-900 rounded-[3rem] p-8 text-white shadow-2xl">
-                            <h4 className="text-2xl font-black mb-4 leading-tight">Join India's <br /> Growth Story</h4>
+                            <h4 className="text-2xl font-black mb-4 leading-tight">Join India&apos;s <br /> Growth Story</h4>
                             <p className="text-slate-400 text-sm mb-8 font-medium">Ideal for thematic investors looking to capture long-term structural economic gains.</p>
                             <div className="space-y-3">
                                 <button className="w-full py-4 bg-[#2076C7] hover:bg-[#2076C7]/90 text-white rounded-2xl font-black shadow-lg shadow-[#2076C7]/30 transition-all flex items-center justify-center gap-3 cursor-pointer">

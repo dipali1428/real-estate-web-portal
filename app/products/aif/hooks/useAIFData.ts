@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import aifDataService from '../services/aifDataService';
 
 /**
  * Hook for fetching AIF Category Metrics - simulating real-time data

@@ -77,8 +77,7 @@ const NCDYieldChart = () => {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2076C7]/5 border border-[#2076C7]/10 text-[#2076C7] text-xs font-black uppercase tracking-widest mb-6"
-                    >
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2076C7]/5 border border-[#2076C7]/10 text-[#2076C7] text-xs font-black uppercase tracking-widest mb-6">
                         <TrendingUp size={14} className="animate-pulse" />
                         Wealth Projection 2024-2029
                     </motion.div>
@@ -88,7 +87,7 @@ const NCDYieldChart = () => {
                     </h2>
 
                     <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed">
-                        Don't just save, grow. See how your investment compounds significantly better with secured NCDs compared to traditional banking.
+                        Don&apos;t just save, grow. See how your investment compounds significantly better with secured NCDs compared to traditional banking.
                     </p>
                 </div>
 
@@ -99,8 +98,7 @@ const NCDYieldChart = () => {
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="w-full xl:w-[380px] space-y-6"
-                    >
+                        className="w-full xl:w-[380px] space-y-6">
                         <div className="bg-[#F8FBFE] p-6 md:p-8 rounded-[2.5rem] md:rounded-[3rem] border border-blue-50 shadow-sm relative overflow-hidden group">
 
                             

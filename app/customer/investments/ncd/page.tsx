@@ -4,17 +4,12 @@ import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
-  Briefcase, TrendingUp, ShieldCheck, Zap, ArrowRight,
-  Clock, Landmark, IndianRupee, Star, Percent,
-  Calendar, AlertCircle, FileText, Search, Plus, Download,
-  Wallet, BarChart3, PieChart as PieChartIcon, 
-  ShoppingBag, Sparkles, ChevronRight, CreditCard,
-  LayoutDashboard
+  Briefcase, TrendingUp, ShieldCheck, Landmark, Star, Search, Plus,
+  Wallet, PieChart as PieChartIcon, 
+  ShoppingBag
 } from "lucide-react";
-import {
-  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-  PieChart, Pie, Cell
-} from "recharts";
+
+
 import { ncdData, NCDData } from "../../../products/NCD/data/ncdData";
 import NCDDetailDrawer from "./components/NCDDetailDrawer";
 

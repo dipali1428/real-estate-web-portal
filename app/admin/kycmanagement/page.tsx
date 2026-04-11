@@ -4,8 +4,9 @@ import { AdminService } from '@/app/services/adminService';
 import {
   Search, RefreshCcw,
   ShieldCheck, Loader2, ChevronLeft, ChevronRight,
-  Edit, X, CheckCircle2, AlertCircle
+  Edit, X
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function KycStatusPage() {
   const [data, setData] = useState<any[]>([]);
@@ -33,7 +34,8 @@ export default function KycStatusPage() {
         setTotalRecords(response.total || 0);
       }
     } catch (err) {
-      console.error("Fetch Error:", err);
+      // console.error("Fetch Error:", err);
+      toast.error("Failed to fetch data. Please try again.");
       setData([]);
     } finally {
       setLoading(false);
@@ -87,13 +89,15 @@ export default function KycStatusPage() {
       const res = await AdminService.updateDSAKycStatus(editingDsa.id, payload);
       if (res.success) {
         setData(prev => prev.map(item => item.id === editingDsa.id ? { ...item, ...payload } : item));
+        toast.success("KYC status updated successfully");
         setIsModalOpen(false);
       } else {
-        alert(res.message || "Update failed");
+        toast.error(res.message || "Update failed");
       }
     } catch (error) {
-      console.error("Update Error:", error);
-      alert("An error occurred during save.");
+      // console.error("Update Error:", error);
+      toast.error("An error occurred while saving. Please try again.");
+      // alert("An error occurred during save.");
     } finally {
       setSaveLoading(false);
     }
@@ -241,7 +245,7 @@ export default function KycStatusPage() {
 
               <div className="hidden md:flex items-center gap-1">
                 {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                  let pageNum = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
+                  const pageNum = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
                   if (pageNum > totalPages || pageNum <= 0) return null;
                   return (
                     <button

@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import {
     IconArrowRight,
-    IconBuildingBank,
     IconChevronDown,
     IconPlus,
     IconMinus
@@ -333,8 +332,7 @@ export default function EMICalculator({ onApplyClick, hidePartners = false, isDa
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="mt-20 relative"
-                    >
+                        className="mt-20 relative">
                         <div className="relative bg-white/70 backdrop-blur-xl rounded-[4rem] p-8 md:p-14 border border-white shadow-[0_40px_100px_-20px_rgba(32,118,199,0.12)] overflow-hidden">
                             {/* More prominent background glow */}
                             <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#1CADA3]/10 blur-[100px] rounded-full" />
@@ -346,13 +344,12 @@ export default function EMICalculator({ onApplyClick, hidePartners = false, isDa
                                         Our Partner Banks & HFCs
                                     </h3>
                                     <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed border-l-4 border-[#1CADA3] pl-6 md:block hidden font-sans">
-                                        Strategic Alliances with India's Premier Lending Institutions
+                                        Strategic Alliances with India&apos;s Premier Lending Institutions
                                     </p>
                                 </div>
                                 <button
                                     onClick={() => setShowAllBanks(!showAllBanks)}
-                                    className="group relative inline-flex items-center gap-6 px-10 py-4 bg-white text-[#2076C7] rounded-full text-base font-black shadow-2xl shadow-blue-100/50 hover:shadow-[#2076C7]/30 transition-all active:scale-95 border border-blue-50"
-                                >
+                                    className="group relative inline-flex items-center gap-6 px-10 py-4 bg-white text-[#2076C7] rounded-full text-base font-black shadow-2xl shadow-blue-100/50 hover:shadow-[#2076C7]/30 transition-all active:scale-95 border border-blue-50">
                                     <span className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
                                     <span className="relative flex items-center gap-3 group-hover:text-white transition-colors duration-300">
                                         {showAllBanks ? 'Show Fewer Banks' : 'View All 18 Partners'}
@@ -370,8 +367,7 @@ export default function EMICalculator({ onApplyClick, hidePartners = false, isDa
                                         initial={{ opacity: 0, y: 15 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.03 }}
-                                        className="group relative flex items-center gap-3 sm:gap-4 md:gap-5 px-4 py-4 sm:px-6 sm:py-5 rounded-[2rem] bg-white/90 backdrop-blur-sm border border-blue-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-[#1CADA3]/50 hover:shadow-[0_20px_50px_rgba(32,118,199,0.12)] hover:-translate-y-1.5 transition-all duration-500 cursor-default overflow-hidden"
-                                    >
+                                        className="group relative flex items-center gap-3 sm:gap-4 md:gap-5 px-4 py-4 sm:px-6 sm:py-5 rounded-[2rem] bg-white/90 backdrop-blur-sm border border-blue-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-[#1CADA3]/50 hover:shadow-[0_20px_50px_rgba(32,118,199,0.12)] hover:-translate-y-1.5 transition-all duration-500 cursor-default overflow-hidden">
                                         {/* Subtle internal glow on hover */}
                                         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 via-transparent to-[#1CADA3]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
 import { TrendingUp, PieChart, Calculator, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { useRouter } from "next/navigation";
 
 // Register Chart.js components
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
@@ -131,8 +132,8 @@ export const FDCalculatorContent: React.FC = () => {
           }
           break;
         case 'tenure':
-          const roundedTenure = tenureType === 'years' 
-            ? Math.round(numValue * 10) / 10 
+          const roundedTenure = tenureType === 'years'
+            ? Math.round(numValue * 10) / 10
             : Math.round(numValue);
           setTenure(roundedTenure);
           if (roundedTenure > 0) {
@@ -156,9 +157,9 @@ export const FDCalculatorContent: React.FC = () => {
     setIsCalculating(true);
 
     const tenureInYears = tenureType === 'months' ? tenure / 12 : tenure;
-    
+
     let periodsPerYear: number;
-    switch(compoundingFrequency) {
+    switch (compoundingFrequency) {
       case 'monthly':
         periodsPerYear = 12;
         break;
@@ -171,7 +172,7 @@ export const FDCalculatorContent: React.FC = () => {
       default:
         periodsPerYear = 4;
     }
-    
+
     const ratePerPeriod = interestRate / (100 * periodsPerYear);
     const totalPeriods = periodsPerYear * tenureInYears;
     const amount = principalAmount * Math.pow(1 + ratePerPeriod, totalPeriods);
@@ -179,7 +180,7 @@ export const FDCalculatorContent: React.FC = () => {
 
     const roundedAmount = Math.round(amount * 100) / 100;
     const roundedInterest = Math.round(totalInterestEarned * 100) / 100;
-    
+
     setMaturityAmount(roundedAmount);
     setTotalInterest(roundedInterest);
     setEstimatedReturns(roundedInterest);
@@ -221,7 +222,7 @@ export const FDCalculatorContent: React.FC = () => {
               },
               tooltip: {
                 callbacks: {
-                  label: function(context) {
+                  label: function (context) {
                     let label = context.label || '';
                     if (label) {
                       label += ': ';
@@ -304,9 +305,9 @@ export const FDCalculatorContent: React.FC = () => {
   // Handle tenure type toggle with auto-conversion
   const handleTenureTypeToggle = (type: 'years' | 'months') => {
     if (type === tenureType) return;
-    
+
     let convertedValue = tenure;
-    
+
     if (type === 'months') {
       convertedValue = Math.max(1, Math.round(tenure * 12));
       if (convertedValue > 360) convertedValue = 360;
@@ -316,7 +317,7 @@ export const FDCalculatorContent: React.FC = () => {
       if (convertedValue > 30) convertedValue = 30;
       convertedValue = Math.round(convertedValue * 10) / 10;
     }
-    
+
     setTenure(convertedValue);
     setTenureType(type);
     setErrors(prev => ({ ...prev, tenure: '' }));
@@ -360,11 +361,11 @@ export const FDCalculatorContent: React.FC = () => {
   const calculateInsights = () => {
     const insights = {
       interestPercentageOfPrincipal: principalAmount > 0 ? ((totalInterest / principalAmount) * 100).toFixed(1) : '0',
-      averageAnnualInterest: principalAmount > 0 
-        ? (totalInterest / (tenureType === 'years' ? tenure : tenure / 12)).toFixed(0) 
+      averageAnnualInterest: principalAmount > 0
+        ? (totalInterest / (tenureType === 'years' ? tenure : tenure / 12)).toFixed(0)
         : '0',
-      interestPerDay: totalInterest > 0 
-        ? (totalInterest / (tenure * (tenureType === 'years' ? 365 : 30.4))).toFixed(0) 
+      interestPerDay: totalInterest > 0
+        ? (totalInterest / (tenure * (tenureType === 'years' ? 365 : 30.4))).toFixed(0)
         : '0',
       doublingYears: interestRate > 0 ? (72 / interestRate).toFixed(1) : '0'
     };
@@ -376,7 +377,7 @@ export const FDCalculatorContent: React.FC = () => {
 
   // Get compounding frequency description
   const getCompoundingDescription = () => {
-    switch(compoundingFrequency) {
+    switch (compoundingFrequency) {
       case 'monthly':
         return 'Compounded monthly (12 times a year)';
       case 'quarterly':
@@ -394,7 +395,7 @@ export const FDCalculatorContent: React.FC = () => {
         <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
           {/* Input Section */}
           <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
-            
+
             {/* Principal Amount */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
@@ -548,33 +549,30 @@ export const FDCalculatorContent: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setCompoundingFrequency('monthly')}
-                  className={`py-2 px-3 rounded-lg border text-sm transition-all ${
-                    compoundingFrequency === 'monthly' 
-                      ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium' 
-                      : 'border-gray-300 hover:border-gray-400 text-gray-700'
-                  }`}
+                  className={`py-2 px-3 rounded-lg border text-sm transition-all ${compoundingFrequency === 'monthly'
+                    ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
+                    : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                    }`}
                 >
                   Monthly
                 </button>
                 <button
                   type="button"
                   onClick={() => setCompoundingFrequency('quarterly')}
-                  className={`py-2 px-3 rounded-lg border text-sm transition-all ${
-                    compoundingFrequency === 'quarterly' 
-                      ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium' 
-                      : 'border-gray-300 hover:border-gray-400 text-gray-700'
-                  }`}
+                  className={`py-2 px-3 rounded-lg border text-sm transition-all ${compoundingFrequency === 'quarterly'
+                    ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
+                    : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                    }`}
                 >
                   Quarterly
                 </button>
                 <button
                   type="button"
                   onClick={() => setCompoundingFrequency('annually')}
-                  className={`py-2 px-3 rounded-lg border text-sm transition-all ${
-                    compoundingFrequency === 'annually' 
-                      ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium' 
-                      : 'border-gray-300 hover:border-gray-400 text-gray-700'
-                  }`}
+                  className={`py-2 px-3 rounded-lg border text-sm transition-all ${compoundingFrequency === 'annually'
+                    ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
+                    : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                    }`}
                 >
                   Annually
                 </button>
@@ -682,7 +680,7 @@ export const FDCalculatorContent: React.FC = () => {
                     </span>{' '}
                     in {tenure > 0 ? `${tenure} ${tenureType}` : '0'} at {interestRate > 0 ? interestRate.toFixed(1) : '0'}% interest
                   </li>
-                  
+
                   <li>
                     You will earn{' '}
                     <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
@@ -694,7 +692,7 @@ export const FDCalculatorContent: React.FC = () => {
                     </span>{' '}
                     of your principal amount
                   </li>
-                  
+
                   <li>
                     Your FD will generate{' '}
                     <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
@@ -702,18 +700,18 @@ export const FDCalculatorContent: React.FC = () => {
                     </span>{' '}
                     average annual interest
                   </li>
-                  
+
                   {(() => {
                     if (interestRate > 1 && principalAmount > 0 && tenure > 0) {
                       const higherRate = interestRate + 1;
-                      const periodsPerYear = compoundingFrequency === 'monthly' ? 12 : 
-                                            compoundingFrequency === 'quarterly' ? 4 : 1;
+                      const periodsPerYear = compoundingFrequency === 'monthly' ? 12 :
+                        compoundingFrequency === 'quarterly' ? 4 : 1;
                       const ratePerPeriod = higherRate / (100 * periodsPerYear);
                       const tenureInYears = tenureType === 'months' ? tenure / 12 : tenure;
                       const totalPeriods = periodsPerYear * tenureInYears;
                       const higherAmount = principalAmount * Math.pow(1 + ratePerPeriod, totalPeriods);
                       const extraEarnings = higherAmount - maturityAmount;
-                      
+
                       if (extraEarnings > 0) {
                         return (
                           <li>
@@ -727,7 +725,7 @@ export const FDCalculatorContent: React.FC = () => {
                     }
                     return null;
                   })()}
-                  
+
                   {(() => {
                     if (compoundingFrequency !== 'monthly' && principalAmount > 0 && interestRate > 0 && tenure > 0) {
                       const monthlyRate = interestRate / (100 * 12);
@@ -735,7 +733,7 @@ export const FDCalculatorContent: React.FC = () => {
                       const months = tenureInYears * 12;
                       const monthlyAmount = principalAmount * Math.pow(1 + monthlyRate, months);
                       const difference = monthlyAmount - maturityAmount;
-                      
+
                       if (difference > 0) {
                         return (
                           <li>
@@ -750,13 +748,13 @@ export const FDCalculatorContent: React.FC = () => {
                     }
                     return null;
                   })()}
-                  
+
                   {(() => {
                     if (totalInterest > 0) {
                       const taxableAmount = Math.max(0, totalInterest - 40000);
                       const taxPayable = taxableAmount > 0 ? taxableAmount * 0.10 : 0;
                       const netReturn = totalInterest - taxPayable;
-                      
+
                       if (taxableAmount > 0) {
                         return (
                           <li>
@@ -770,14 +768,14 @@ export const FDCalculatorContent: React.FC = () => {
                     }
                     return null;
                   })()}
-                  
+
                   {(() => {
                     if (maturityAmount > 0 && totalInterest > 0) {
                       const inflationRate = 6;
-                      const inflationAdjustedValue = maturityAmount / Math.pow(1 + inflationRate/100, 
-                                                                             tenureType === 'months' ? tenure/12 : tenure);
+                      const inflationAdjustedValue = maturityAmount / Math.pow(1 + inflationRate / 100,
+                        tenureType === 'months' ? tenure / 12 : tenure);
                       const realReturn = inflationAdjustedValue - principalAmount;
-                      
+
                       return (
                         <li>
                           Adjusted for 6% inflation, your real return would be{' '}
@@ -790,7 +788,7 @@ export const FDCalculatorContent: React.FC = () => {
                     }
                     return null;
                   })()}
-                  
+
                   <li>
                     Your FD generates{' '}
                     <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
@@ -807,16 +805,16 @@ export const FDCalculatorContent: React.FC = () => {
                     (using the Rule of 72)
                   </li>
                 </ul>
-                
+
                 <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-xs text-yellow-800">
-                    <strong>Investment Tip:</strong> Senior citizens (above 60 years) typically get 0.5% higher FD rates. 
+                    <strong>Investment Tip:</strong> Senior citizens (above 60 years) typically get 0.5% higher FD rates.
                     Consider splitting large FDs into smaller ones to maintain liquidity and avoid breaking the entire FD for partial withdrawals.
                   </p>
                 </div>
-                
+
                 <p className="text-[11px] text-gray-500 mt-2">
-                  <strong>Note:</strong> FD interest is fully taxable. TDS is deducted at 10% if interest exceeds ₹40,000 
+                  <strong>Note:</strong> FD interest is fully taxable. TDS is deducted at 10% if interest exceeds ₹40,000
                   (₹50,000 for senior citizens). Interest rates vary between banks and change periodically.
                 </p>
               </div>
@@ -833,11 +831,12 @@ export const FDCalculatorContent: React.FC = () => {
 // =============================================
 const FDCalculatorStandalone: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
+
   const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'fd') || CALCULATOR_OPTIONS[0];
+  const router = useRouter();
 
   const handleCalculatorChange = (path: string) => {
-    window.location.href = path;
+    router.push(path);
   };
 
   return (
@@ -854,7 +853,7 @@ const FDCalculatorStandalone: React.FC = () => {
       {/* Dropdown */}
       <div className="container mx-auto px-4 py-4 max-w-md">
         <div className="relative">
-          <button 
+          <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
           >
@@ -869,7 +868,7 @@ const FDCalculatorStandalone: React.FC = () => {
 
           <AnimatePresence>
             {isDropdownOpen && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -882,21 +881,18 @@ const FDCalculatorStandalone: React.FC = () => {
                       handleCalculatorChange(calc.path);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
-                      calc.id === 'fd' ? 'bg-teal-500/5' : ''
-                    }`}
+                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${calc.id === 'fd' ? 'bg-teal-500/5' : ''
+                      }`}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      calc.id === 'fd' 
-                        ? 'bg-teal-500 text-white' 
-                        : 'bg-gray-100 text-gray-500'
-                    }`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${calc.id === 'fd'
+                      ? 'bg-teal-500 text-white'
+                      : 'bg-gray-100 text-gray-500'
+                      }`}>
                       <calc.icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1">
-                      <span className={`font-medium ${
-                        calc.id === 'fd' ? 'text-teal-600' : 'text-gray-700'
-                      }`}>
+                      <span className={`font-medium ${calc.id === 'fd' ? 'text-teal-600' : 'text-gray-700'
+                        }`}>
                         {calc.label}
                       </span>
                       <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
@@ -914,7 +910,7 @@ const FDCalculatorStandalone: React.FC = () => {
 
       {/* Calculator Content */}
       <FDCalculatorContent />
-      
+
       {/* Font Awesome */}
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     </div>

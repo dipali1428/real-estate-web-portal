@@ -6,12 +6,10 @@ import {
   Shield,
   TrendingUp,
   AlertCircle,
-  Clock,
   Plus,
   ArrowUpRight,
   Filter,
   Download,
-  Search,
   PieChart as PieChartIcon,
   LayoutGrid,
   FileText
@@ -21,10 +19,8 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  Tooltip,
-  Legend
+  Tooltip
 } from "recharts";
-import FireInsuranceHeader from "../components/FireInsuranceHeader";
 
 // Colors for the "No Data" state or future data
 const COLORS = ["#E2E8F0", "#CBD5E1", "#94A3B8"];

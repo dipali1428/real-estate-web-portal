@@ -1,21 +1,14 @@
 "use client";
 
-import { motion, useSpring, useTransform, AnimatePresence } from "framer-motion";
-import { ShieldCheck, Zap, Users, CheckCircle2, ArrowRight, Play, Star } from "lucide-react";
-import Magnetic from "./Magnetic";
+import { useSpring, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { useMousePosition } from "../../../hooks/useMousePosition";
-import React, { useState, useEffect } from "react";
 import { useModal } from '@/app/context/ModalContext';
 
 
 export default function Hero() {
   const { openLogin } = useModal();
   const { x, y } = useMousePosition();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Physics-based movement for orbs
   const mouseXSpring = useSpring(x, { stiffness: 50, damping: 30 });
@@ -62,8 +55,7 @@ export default function Hero() {
               <button
                 onClick={(e) => { e.preventDefault(); openLogin(); }}
                 className="group relative text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer inline-block text-center"
-                style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
-              >
+                style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}>
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   Apply Now
                   <ArrowRight size={18} className="transform group-hover:translate-x-1 transition-transform" />
@@ -113,7 +105,7 @@ export default function Hero() {
         </div>
       </div>
 
-   
+
     </section>
   );
 }

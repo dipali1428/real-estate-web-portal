@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { bondsData } from '../../data/bondsData';
 import {
     ArrowLeft,
-    ShieldCheck,
     User,
     CreditCard,
     Building2,
@@ -43,6 +42,10 @@ export default function BondInvestmentFormView({ id, onBack, onSuccess }: Props)
         nomineeName: '',
         nomineeRelation: ''
     });
+
+    const [referenceId] = useState(() =>
+        `INV-${Math.random().toString(36).substring(7).toUpperCase()}`
+    );
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -109,14 +112,15 @@ export default function BondInvestmentFormView({ id, onBack, onSuccess }: Props)
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-500 text-sm font-medium">Reference:</span>
-                                    <span className="font-bold text-[#0B1C2E] font-mono text-sm leading-none">INV-{Math.random().toString(36).substring(7).toUpperCase()}</span>
+                                    <span className="font-bold text-[#0B1C2E] font-mono text-sm leading-none">
+                                        {referenceId}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                         <button
                             onClick={onSuccess}
-                            className="w-full py-5 bg-[#1CADA3] text-white font-black rounded-2xl hover:bg-[#168a82] transition-all shadow-lg active:scale-95"
-                        >
+                            className="w-full py-5 bg-[#1CADA3] text-white font-black rounded-2xl hover:bg-[#168a82] transition-all shadow-lg active:scale-95">
                             Return to Bonds Hub
                         </button>
                     </div>

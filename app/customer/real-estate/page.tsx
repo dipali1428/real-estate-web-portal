@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Building2, TrendingUp, LayoutGrid, BarChart3, Info } from 'lucide-react';
+import { Building2, LayoutGrid, BarChart3 } from 'lucide-react';
 import CustomerPropertiesSection from './components/PropertiesSection';
 import InvestmentGrowth from './components/InvestmentGrowth';
 import RealEstatePropertyDetailsModal from '@/app/products/RealEstate/components/PropertyDetailsModal';

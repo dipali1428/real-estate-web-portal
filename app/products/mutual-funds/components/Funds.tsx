@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import { useModal } from "../../../context/ModalContext";
-import mutualFundService, { AmfiFund, FundDetails } from "@/app/services/mutualfundservice";
+import mutualFundService, { AmfiFund } from "@/app/services/mutualfundservice";
 import { Search, X, Package, BarChart3, TrendingUp, Shield, Activity, Calendar, IndianRupee } from "lucide-react";
 import { TOP_PICKS as TOP_PICKS_DATA } from "./TopPicks";
 import TopPicksSection from "./TopPicksSection";

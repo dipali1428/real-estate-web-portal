@@ -5,17 +5,8 @@ import {
    FileText,
    CheckCircle2,
    Clock,
-   History,
-   Download,
-   Plus,
-   MoreVertical,
-   Calendar,
-   Layers,
-   Search,
-   Settings2,
-   ChevronRight
+   Layers
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 interface MyApplicationsProps {
    searchQuery: string;

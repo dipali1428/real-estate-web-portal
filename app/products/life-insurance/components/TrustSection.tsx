@@ -37,12 +37,12 @@ export default function TrustSection() {
             </div>
 
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-6 leading-tight">
-              Supported by India's Trusted Insurers
+              Supported by India&apos;s Trusted Insurers
             </h2>
 
             <p className="text-gray-500 text-lg md:text-xl font-light mb-10 leading-relaxed">
-              Partnering with India's most respected insurers to ensure your
-              family's future stays safe and secure.
+              Partnering with India&apos;s most respected insurers to ensure your
+              family&apos;s future stays safe and secure.
             </p>
 
             <div className="space-y-5 max-w-md mx-auto lg:mx-0">

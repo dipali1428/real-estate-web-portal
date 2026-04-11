@@ -2,6 +2,7 @@
 import { useState, useRef, useMemo } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
+import toast from "react-hot-toast";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -30,27 +31,27 @@ interface HomeLoanFormProps {
 
 export default function HomeLoanForm({ onClose, prefilledData }: HomeLoanFormProps) {
   const [form, setForm] = useState<Record<string, string>>({
-    loanAmount: "", 
+    loanAmount: "",
     clientName: prefilledData?.name || "", // Prefilled from Verification
     location: "",
-    loanType: "", 
+    loanType: "",
     phone: prefilledData?.mobile || "",   // Prefilled from Verification
     email: prefilledData?.email || "",    // Prefilled from Verification
     dob: "",
-    hasOtherLoan: "", 
+    hasOtherLoan: "",
     otherLoanAmount: "",
-    employmentType: "", 
-    otherIncome: "", 
+    employmentType: "",
+    otherIncome: "",
     otherIncomeAmount: ""
   });
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const requiredDocs = useMemo(() => {
-    let docs = [...(DOC_MAP[form.employmentType] || [])];
+    const docs = [...(DOC_MAP[form.employmentType] || [])];
     if (form.employmentType === "Other") docs.push(...(DOC_MAP[form.otherIncome] || []));
     if (form.hasOtherLoan === "Yes" && docs.length) docs.push("Existing Loan Statement");
     return [...new Set(docs)];
@@ -101,8 +102,8 @@ export default function HomeLoanForm({ onClose, prefilledData }: HomeLoanFormPro
       await AuthService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
-      console.error("Submission error:", err);
-      alert("Something went wrong. Please try again.");
+      // console.error("Submission error:", err);
+      toast.error("Failed to submit application. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -124,7 +125,7 @@ export default function HomeLoanForm({ onClose, prefilledData }: HomeLoanFormPro
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            
+
             <Field label="Type of Home Loan" type="select" options={LOAN_TYPES} {...fieldProps("loanType")} required />
             <Field label="Client Name" placeholder="Enter full name" {...fieldProps("clientName")} required />
             <Field label="Phone Number" placeholder="10-digit number" type="tel" maxLength={10} onlyNumber {...fieldProps("phone")} required />
@@ -166,7 +167,7 @@ export default function HomeLoanForm({ onClose, prefilledData }: HomeLoanFormPro
             </div>
           </form>
         </div>
-        
+
         {showSuccess && <SuccessModal onClose={onClose} />}
       </div>
     </div>
@@ -216,7 +217,7 @@ function FileUpload({ label, allowMultiple, onUpdate, error }: any) {
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState("");
   const ref = useRef<HTMLInputElement>(null);
-  
+
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = Array.from(e.target.files || []);
     if (!newFiles.length) return;

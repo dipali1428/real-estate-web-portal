@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { AdminService, UnlistedDashboardStats } from '../services/unlistedadminservices';

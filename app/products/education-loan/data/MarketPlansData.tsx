@@ -1,4 +1,3 @@
-import { IconBuildingBank, IconBuildingCommunity, IconBuildingStore, IconBuildingEstate } from '@tabler/icons-react';
 
 export interface MarketPlan {
     id: string;

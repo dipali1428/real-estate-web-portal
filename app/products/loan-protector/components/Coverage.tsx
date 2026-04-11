@@ -19,7 +19,7 @@ export function Coverage() {
 
           <motion.h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold font-sans mb-4 leading-tight">
             <span className="text-transparent bg-clip-text bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7]">
-              What's Covered Under Loan Protection?
+              What&apos;s Covered Under Loan Protection?
             </span>
           </motion.h2>
 

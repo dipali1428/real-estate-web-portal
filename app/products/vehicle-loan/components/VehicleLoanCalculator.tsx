@@ -257,7 +257,7 @@ export default function VehicleLoanCalculator() {
                 chartRef.current = null;
             }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, []);
 
     useEffect(() => {

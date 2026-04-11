@@ -2,15 +2,9 @@
 
 import { motion } from 'framer-motion';
 import {
-    TrendingUp,
-    ShieldCheck,
-    Zap,
     Lock,
     Calendar,
     ArrowRightCircle,
-    PiggyBank,
-    Coins,
-    ChevronRight,
 } from 'lucide-react';
 
 

@@ -2,9 +2,9 @@
 
 import { motion } from "framer-motion";
 import {
-    ShieldCheck, Zap, Heart, Coins,
+    ShieldCheck, Zap, Coins,
     GraduationCap, Anchor, Gem, ArrowRight,
-    TrendingUp, Shield, HelpCircle, Star
+    TrendingUp, Star
 } from "lucide-react";
 
 const plans = [

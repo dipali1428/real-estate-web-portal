@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import { IconCheck, IconExternalLink, IconBackpack, IconBriefcase, IconSchool, IconUsers } from '@tabler/icons-react';
 import WaveDivider from './WaveDivider';
 import { useModal } from '../../../context/ModalContext';
@@ -108,7 +107,7 @@ export default function ProvidersAndPlans() {
                             Tailored Travel Insurance Plans
                         </h2>
                         <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
-                            Choose the perfect coverage designed for your specific travel needs, whether it's a quick vacation or a year abroad.
+                            Choose the perfect coverage designed for your specific travel needs, whether it&apos;s a quick vacation or a year abroad.
                         </p>
                     </motion.div>
 

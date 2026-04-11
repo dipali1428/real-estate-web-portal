@@ -1,7 +1,8 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { X, CheckCircle, ChevronDown } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import toast from "react-hot-toast";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -87,8 +88,9 @@ export default function FixedDepositForm({ onClose }: { onClose: () => void }) {
       await DashboardService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
-      console.error("Submission error:", err);
-      alert("Something went wrong. Please try again.");
+      // console.error(":", err);
+      // alert("Something went wrong. Please try again.");
+      toast.error("Submission error. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

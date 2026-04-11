@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconChevronDown, IconPlus, IconMinus, IconAlertTriangle } from '@tabler/icons-react';
+import { IconPlus, IconMinus } from '@tabler/icons-react';
 
 // --- Section 1: PetFAQSection ---
 const faqs = [

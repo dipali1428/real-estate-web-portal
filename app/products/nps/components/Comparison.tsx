@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, X, Minus, TrendingUp, ShieldCheck, Clock, PiggyBank, AlertCircle } from 'lucide-react';
+import { Check, TrendingUp, ShieldCheck, Clock, PiggyBank, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Comparison() {

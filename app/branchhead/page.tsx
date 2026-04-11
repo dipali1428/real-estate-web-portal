@@ -5,7 +5,7 @@ import { motion, Variants } from "framer-motion";
 import { 
   Users, Mail, Clock, CheckCircle, 
   FolderOpen, ArrowRight, Activity, 
-  BarChart3, ArrowUpRight, MapPin, Trophy
+  BarChart3, ArrowUpRight, MapPin
 } from "lucide-react";
 
 export default function Dashboard() {

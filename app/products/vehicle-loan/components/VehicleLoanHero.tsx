@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Car, ArrowRight, CheckCircle, Zap, ShieldCheck } from "lucide-react";
+import { ArrowRight, Zap, ShieldCheck } from "lucide-react";
 
 interface VehicleLoanHeroProps {
     onApplyClick?: () => void;

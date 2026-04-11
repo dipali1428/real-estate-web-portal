@@ -6,7 +6,6 @@ import { ArrowLeft as IconArrowLeft } from 'lucide-react';
 import Hero from "./components/Hero";
 import LifeProductGrid from "./components/LifeProductGrid";
 import TopPlansComparison from "./components/TopPlansComparison";
-import RecommendedPlansGraph from "./components/RecommendedPlansGraph";
 import InsurersMarquee from "./components/InsurersMarquee";
 import TopRecommendedPlans from "./components/TopRecommendedPlans";
 import WealthAnalysis from "./components/WealthAnalysis";
@@ -15,7 +14,7 @@ import EligibilityDocs from "./components/EligibilityDocs";
 import TrustSection from "./components/TrustSection";
 import TermCalculator from "./components/TermCalculator";
 import FAQSection from "./components/FAQSection";
-import { motion, MotionConfig } from "framer-motion";
+import { MotionConfig } from "framer-motion";
 import ScrollToTop from "@/app/component/ScrollToTop";
 import ChatbotWidget from "@/app/component/chatbot/page";
 

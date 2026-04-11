@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft, ShieldCheck, Clock, Calendar, Lock, Award, Info, TrendingUp, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Lock, Award, Info, TrendingUp, AlertTriangle } from "lucide-react";
 import { bondsData } from "../../data/bondsData";
 
 interface Props {

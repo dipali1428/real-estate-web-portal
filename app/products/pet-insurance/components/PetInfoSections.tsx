@@ -19,8 +19,7 @@ import {
     IconCat,
     IconAward,
     IconFeather,
-    IconPaw,
-    IconFish
+    IconPaw
 } from '@tabler/icons-react';
 import { useModal } from '@/app/context/ModalContext';
 
@@ -158,7 +157,7 @@ export function PetInsuranceOverview() {
                     </h2>
                      <div className="w-24 h-1 mx-auto bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] rounded-full mt-4 mb-4" />
                     <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
-                         Explore what's covered and which pets are eligible — all in one place.
+                         Explore what&apos;s covered and which pets are eligible — all in one place.
                     </p>
                 </motion.div>
 
@@ -425,7 +424,7 @@ export function PetEligibility() {
                 >
                     <div className="relative z-10 w-full">
                          <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                        Recognized by India's Top Vets
+                        Recognized by India&apos;s Top Vets
                     </h2>
                     <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
                         We work closely with veterinary associations to ensure our coverage meets the actual health needs of pets in India.

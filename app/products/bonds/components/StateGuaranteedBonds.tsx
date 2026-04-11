@@ -4,7 +4,6 @@ import { bondsData } from "../data/bondsData";
 import BondCard from "./BondCard";
 
 
-import Link from "next/link";
 
 interface Props {
     onInvest: (id: number) => void;

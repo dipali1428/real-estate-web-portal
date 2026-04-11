@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { User as UserIcon, LogOut, Settings, UserCircle, ChevronDown } from "lucide-react";
+import { User as UserIcon, LogOut, UserCircle, ChevronDown } from "lucide-react";
 import { MobileSidebar, SidebarProvider } from "../../component/ui/sidebar";
 import { useRouter, usePathname } from "next/navigation";
 import { getSidebarLinks } from "@/app/utils/getSidebarLinks";

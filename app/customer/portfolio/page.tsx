@@ -3,15 +3,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  TrendingUp, Wallet, Briefcase, PieChart as PieChartIcon,
-  RefreshCw, AlertCircle, Building, IndianRupee,
-  ArrowUpRight, Clock, Database, FolderOpen, Banknote,
-  Home, BarChart3, Layers, Download, Eye, Shield, Inbox
+  TrendingUp, Wallet, Briefcase, PieChart as PieChartIcon, AlertCircle, Building,
+  ArrowUpRight, FolderOpen, Banknote, Shield
 } from 'lucide-react';
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import customerService from "../../services/customerService";
-import Link from 'next/link';
 
 // ==================== TYPES ====================
 

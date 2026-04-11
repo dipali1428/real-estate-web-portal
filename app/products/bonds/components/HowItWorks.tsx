@@ -1,4 +1,3 @@
-import { ListChecks } from "lucide-react";
 
 import { motion } from "framer-motion";
 

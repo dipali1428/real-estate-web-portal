@@ -1,7 +1,7 @@
 "use client"
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { X, Phone, Mail, MapPin } from "lucide-react";
+import { X } from "lucide-react";
 import { AuthService } from "../services/authService";
 
 interface ContactModalProps {

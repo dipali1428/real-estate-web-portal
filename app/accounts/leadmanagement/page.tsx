@@ -2,12 +2,9 @@
 import React, { useState, useMemo } from 'react';
 import { 
   Search, Filter, Plus, UserPlus, 
-  CheckCircle2, Clock, XCircle, TrendingUp,
-  MoreVertical, Calendar, Phone, Mail,
-  LucideIcon, Inbox, Eye, X, Trash2, Building2,
-  FileText, CheckCircle
+  CheckCircle2, Clock, TrendingUp, Inbox, Eye, X,
+  FileText
 } from 'lucide-react';
-import { Toaster } from 'react-hot-toast';
 
 // --- Types ---
 type LeadStatus = 'In Progress' | 'Disbursed' | 'Rejected' | 'Document Pending';

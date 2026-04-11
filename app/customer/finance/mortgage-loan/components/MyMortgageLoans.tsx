@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Building2, Download, CheckCircle, XCircle, Clock,
-  Filter, IndianRupee, AlertCircle,
+  Filter, IndianRupee,
   FileText, Home, X, Search, SlidersHorizontal, Calendar
 } from 'lucide-react';
 

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useMemo, useEffect } from "react";
-import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown, Search } from "lucide-react";
+import { X, CheckCircle, UploadCloud, Trash2, ChevronDown, Search } from "lucide-react";
 import { RTO_LIST } from "@/app/dashboard/leadmanagement/data/rtoData";
 import { AuthService } from "@/app/services/authService";
 

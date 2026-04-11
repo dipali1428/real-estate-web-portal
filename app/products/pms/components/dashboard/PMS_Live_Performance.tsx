@@ -13,7 +13,7 @@ import {
     Filler
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { TrendingUp, RefreshCw, Download, Info, AlertCircle } from 'lucide-react';
+import { TrendingUp, RefreshCw, Info, AlertCircle } from 'lucide-react';
 import { usePMSLivePerformance } from '../../hooks/useRealTimeData';
 import FinancialDataService from '../../services/FinancialDataService';
 
@@ -45,7 +45,7 @@ export default function PMS_Live_Performance() {
             const sectors = await FinancialDataService.getSectorPerformance();
             setSectorData(sectors);
         } catch (err) {
-            console.error('Error fetching real benchmarks:', err);
+            // console.error('Error fetching real benchmarks:', err);
             setError('Real-time market feed currently unavailable. Displaying historical benchmarks.');
         }
     }, []);

@@ -4,10 +4,9 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
-    TrendingUp, ShieldCheck, PieChart, BarChart3, ArrowRight, ArrowLeft,
-    CheckCircle, Clock, Target, Calendar, Award,
-    Briefcase, FileText, Download, Phone, UserCheck, Users,
-    X, Percent, Activity, Sliders, Layers
+    TrendingUp, ShieldCheck, PieChart, BarChart3, ArrowLeft,
+    CheckCircle, Clock, Target, Calendar,
+    Briefcase, UserCheck, Activity, Layers
 } from 'lucide-react';
 import {
     Chart as ChartJS,
@@ -259,7 +258,7 @@ export default function PGIMIndiaEquityDetail() {
                             </div>
                             <div className="bg-neutral-50 rounded-2xl p-4 border border-gray-100 flex items-center justify-center text-center">
                                 <p className="text-sm text-gray-600 italic font-medium">
-                                    "The portfolio has delivered steady performance with lower volatility compared to broader markets."
+                                    The portfolio has delivered steady performance with lower volatility compared to broader markets.
                                 </p>
                             </div>
                         </div>

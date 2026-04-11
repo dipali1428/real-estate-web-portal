@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {CheckCircle2, AlertCircle, Fingerprint, Loader2, ShieldCheck, Lock, Save, Database, Info } from 'lucide-react';
+import {CheckCircle2, AlertCircle, Loader2, ShieldCheck, Lock, Save, Database, Info } from 'lucide-react';
 import customerService from '../../services/customerService';
 import toast from 'react-hot-toast';
 

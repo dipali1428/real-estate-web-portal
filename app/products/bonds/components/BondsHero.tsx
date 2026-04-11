@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { TrendingUp, ShieldCheck, IndianRupee, ArrowRight } from 'lucide-react';
 import { useModal } from "../../../context/ModalContext";
 import Image from "next/image";

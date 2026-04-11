@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo, useRef } from "react";
-import { X, Search, Activity, Trash2, PlusCircle, Loader2, CheckCircle, RotateCcw, ShieldCheck, TrendingUp, Info, ChevronRight } from "lucide-react";
+import { X, Search, Activity, PlusCircle, Loader2, TrendingUp } from "lucide-react";
 import mutualFundService, { AmfiFund } from "@/app/services/mutualfundservice";
 import {
   Chart as ChartJS,
@@ -12,7 +12,6 @@ import {
   Tooltip,
   Legend,
   Filler,
-  ChartOptions,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { motion, AnimatePresence } from "framer-motion";

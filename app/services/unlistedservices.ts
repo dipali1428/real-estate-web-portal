@@ -1,4 +1,5 @@
 // services/unlistedservices.ts
+import toast from "react-hot-toast";
 import api from "./api";
 
 export interface EnquiryPayload {
@@ -113,8 +114,9 @@ export const fetchAllShares = async () => {
     const response = await api.get("/api/unlisted/public/shares");
     return response.data;
   } catch (error: any) {
-    console.error("DEBUG - URL called:", error.config?.url);
-    console.error("DEBUG - Status code:", error.response?.status);
+    toast.error("Failed to fetch shares. Please try again later.");
+    // console.error("DEBUG - URL called:", error.config?.url);
+    // console.error("DEBUG - Status code:", error.response?.status);
     throw error;
   }
 };
@@ -137,7 +139,7 @@ export const fetchIdGraphData = async (share_id: number): Promise<ShareGraphResp
     const response = await api.get(`/api/unlisted/public/${share_id}/graph`); 
     return response.data;
   } catch (error: any) {
-    console.error("DEBUG - Graph Error:", error.response?.data);
+    // console.error("DEBUG - Graph Error:", error.response?.data);
     throw error;
   }
 };
@@ -150,8 +152,8 @@ export const fetchTopGainers = async (limit: number = 5): Promise<TopMoversRespo
     });
     return response.data;
   } catch (error: any) {
-    console.error("DEBUG - Top Gainers URL called:", error.config?.url);
-    console.error("DEBUG - Top Gainers Error:", error.response?.data);
+    // console.error("DEBUG - Top Gainers URL called:", error.config?.url);
+    // console.error("DEBUG - Top Gainers Error:", error.response?.data);
     throw error;
   }
 };
@@ -164,8 +166,8 @@ export const fetchTopLosers = async (limit: number = 5): Promise<TopMoversRespon
     });
     return response.data;
   } catch (error: any) {
-    console.error("DEBUG - Top Losers URL called:", error.config?.url);
-    console.error("DEBUG - Top Losers Error:", error.response?.data);
+    // console.error("DEBUG - Top Losers URL called:", error.config?.url);
+    // console.error("DEBUG - Top Losers Error:", error.response?.data);
     throw error;
   }
 };
@@ -176,9 +178,9 @@ export const createEnquiry = async (payload: EnquiryPayload): Promise<EnquiryRes
     const response = await api.post("/api/unlisted/public/enquiries", payload); 
     return response.data;
   } catch (error: any) {
-    console.error("DEBUG - Enquiry URL called:", error.config?.url);
-    console.error("DEBUG - Enquiry Status code:", error.response?.status);
-    console.error("DEBUG - Enquiry Error:", error.response?.data);
+    // console.error("DEBUG - Enquiry URL called:", error.config?.url);
+    // console.error("DEBUG - Enquiry Status code:", error.response?.status);
+    // console.error("DEBUG - Enquiry Error:", error.response?.data);
     throw error;
   }
 };
@@ -192,8 +194,8 @@ export const fetchAllCorporateActions = async (): Promise<CorporateActionsRespon
     const response = await api.get("/api/unlisted/public/corporate-actions");
     return response.data;
   } catch (error: any) {
-    console.error("DEBUG - Corporate Actions URL called:", error.config?.url);
-    console.error("DEBUG - Corporate Actions Error:", error.response?.data);
+    // console.error("DEBUG - Corporate Actions URL called:", error.config?.url);
+    // console.error("DEBUG - Corporate Actions Error:", error.response?.data);
     throw error;
   }
 };
@@ -203,8 +205,8 @@ export const fetchDashboardData = async (): Promise<GraphResponse> => {
     const response = await api.get("/api/unlisted/public/graph");
     return response.data;
   } catch (error: any) {
-    console.error("DEBUG - Dashboard URL called:", error.config?.url);
-    console.error("DEBUG - Dashboard Error:", error.response?.data);
+    // console.error("DEBUG - Dashboard URL called:", error.config?.url);
+    // console.error("DEBUG - Dashboard Error:", error.response?.data);
     throw error;
   }
 };
@@ -218,8 +220,8 @@ export const fetchCorporateActionsByShareId = async (shareId: number): Promise<C
     const response = await api.get(`/api/unlisted/public/corporate-actions/share/${shareId}`);
     return response.data;
   } catch (error: any) {
-    console.error("DEBUG - Corporate Actions by Share URL called:", error.config?.url);
-    console.error("DEBUG - Corporate Actions by Share Error:", error.response?.data);
+    // console.error("DEBUG - Corporate Actions by Share URL called:", error.config?.url);
+    // console.error("DEBUG - Corporate Actions by Share Error:", error.response?.data);
     throw error;
   }
 };
@@ -233,8 +235,8 @@ export const fetchCorporateActionsByType = async (type: string): Promise<Corpora
     const response = await api.get(`/api/unlisted/public/corporate-actions/type/${type}`);
     return response.data;
   } catch (error: any) {
-    console.error("DEBUG - Corporate Actions by Type URL called:", error.config?.url);
-    console.error("DEBUG - Corporate Actions by Type Error:", error.response?.data);
+    // console.error("DEBUG - Corporate Actions by Type URL called:", error.config?.url);
+    // console.error("DEBUG - Corporate Actions by Type Error:", error.response?.data);
     throw error;
   }
 };

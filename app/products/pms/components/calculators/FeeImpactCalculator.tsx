@@ -2,8 +2,6 @@
 
 import React, { useState } from 'react';
 import CalculatorSlider from './CalculatorSlider';
-import ResultCard from './ResultCard';
-import { motion } from 'framer-motion';
 
 export default function FeeImpactCalculator() {
     const [investment, setInvestment] = useState(10000000); // ₹1 Cr

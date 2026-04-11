@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Bond } from "../data/bondsData";
-import { X, TrendingUp, ShieldCheck, Calendar, Clock, Lock, Award, Activity, IndianRupee, PieChart, Info, CheckCircle2 } from "lucide-react";
+import { X, TrendingUp, ShieldCheck, Calendar, Clock, Lock, Award, Activity, IndianRupee, Info, CheckCircle2 } from "lucide-react";
 import { AreaChart, Area, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { toast } from "react-hot-toast";
 import { getBondInsight } from "../utils/bondContentEngine";
@@ -31,7 +31,7 @@ const generateChartData = (coupon: string, frequency: string) => {
     const rateMatch = coupon.match(/(\d+(\.\d+)?)/);
     const rate = rateMatch ? parseFloat(rateMatch[0]) : 8.5; // default to 8.5%
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     let paymentsPerYear = 1;
     if (frequency.toLowerCase().includes("semi")) paymentsPerYear = 2;
     if (frequency.toLowerCase().includes("quarter")) paymentsPerYear = 4;

@@ -52,7 +52,7 @@ export default function BusinessLoanForm({ onClose }: { onClose: () => void }) {
   const [fileQueue, setFileQueue] = useState<QueuedFile[]>([]);
 
   const requiredDocsList = useMemo(() => {
-    let docs = [...BASE_DOCS];
+    const docs = [...BASE_DOCS];
     if (form.hasOtherLoan === "Yes") docs.push("Existing Loan Statement");
     return docs.map(label => DOC_REGISTRY[label]).filter(Boolean);
   }, [form.hasOtherLoan]);

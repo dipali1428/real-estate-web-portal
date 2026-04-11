@@ -8,7 +8,6 @@ import { motion } from 'framer-motion';
 // Data & Services
 import { homeLoanData as offer } from './data';
 import { categorizedPlans, PARTNER_BANKS } from './loanConstants';
-import { AuthService } from "@/app/services/authService";
 import { useModal } from '@/app/context/ModalContext';
 
 // Components

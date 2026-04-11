@@ -12,8 +12,6 @@ import {
   Star,
   Bookmark,
   CheckCircle,
-  ShoppingCart,
-  ChevronRight,
   X,
   Percent
 } from 'lucide-react';

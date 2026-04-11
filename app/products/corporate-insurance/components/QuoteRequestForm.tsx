@@ -43,8 +43,6 @@ export default function QuoteRequestForm({ isOpen, onClose, initialProduct }: Qu
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        console.log("Quote Request Submitted:", formData);
-
         setIsSubmitting(false);
         setIsSuccess(true);
 

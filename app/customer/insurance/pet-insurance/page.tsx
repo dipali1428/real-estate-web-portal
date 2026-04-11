@@ -1,12 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    IconDog, 
-    IconShieldCheck, 
-    IconInfoCircle 
-} from '@tabler/icons-react';
+import React from 'react';
+
+
 import PetInsuranceSection from './components/PetInsuranceSection';
 
 export default function PetInsuranceDashboard() {

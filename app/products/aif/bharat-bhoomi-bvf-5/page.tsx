@@ -206,7 +206,7 @@ export default function BharatBhoomiDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-teal-50 rounded-2xl border border-teal-100">
                                         <p className="text-xs text-teal-800 font-medium italic">
-                                            "Balanced exposure across equity and structured debt."
+                                            Balanced exposure across equity and structured debt.
                                         </p>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function BharatBhoomiDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "Established platform focused on real estate and alternative strategies."
+                                Established platform focused on real estate and alternative strategies.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

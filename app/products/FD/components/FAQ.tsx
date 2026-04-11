@@ -22,7 +22,7 @@ const FAQ = () => {
                     </h2>
                     <div className="w-24 h-1 mx-auto rounded-full mb-4" style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}></div>
                     <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
-                        Got questions about Fixed Deposits? We've got you covered.
+                        Got questions about Fixed Deposits? We&apos;ve got you covered.
                     </p>
                 </div>
 

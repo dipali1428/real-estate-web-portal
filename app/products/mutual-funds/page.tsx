@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useModal } from "../../context/ModalContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,10 +14,7 @@ import {
   Banknote,
   Globe,
   Zap,
-  LineChart,
-  UserPlus,
   ArrowLeft,
-  Sparkles,
   Layers,
   BarChart2,
   Coins,

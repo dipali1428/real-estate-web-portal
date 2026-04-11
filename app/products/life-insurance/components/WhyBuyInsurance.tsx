@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, TrendingUp, Heart, Wallet, BadgeIndianRupee, FileCheck, Clock, Users } from "lucide-react";
+import { TrendingUp, BadgeIndianRupee, FileCheck, Users } from "lucide-react";
 
 const reasons = [
     {
@@ -64,12 +64,11 @@ export default function WhyBuyInsurance() {
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 md:mb-8 text-[#2076C7] leading-tight font-sans"
-                    >
+                        className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 md:mb-8 text-[#2076C7] leading-tight font-sans">
                         Why <span className="text-transparent bg-clip-text bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-[length:200%_auto] animate-gradient-x">Infinity Artvishva?</span>
                     </motion.h2>
                     <p className="text-gray-500 text-lg md:text-xl leading-relaxed font-medium font-sans max-w-2xl mx-auto">
-                        We don't just provide policies; we ensure complete peace of mind for you and your family.
+                        We don&apos;t just provide policies; we ensure complete peace of mind for you and your family.
                     </p>
                 </div>
 

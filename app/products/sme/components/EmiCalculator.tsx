@@ -1,11 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
   IconArrowRight,
   IconBuildingBank,
-  IconChevronDown,
   IconPlus,
   IconMinus,
 } from "@tabler/icons-react";

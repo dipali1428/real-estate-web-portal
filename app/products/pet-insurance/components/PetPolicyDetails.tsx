@@ -4,19 +4,15 @@ import { motion } from 'framer-motion';
 import {
     IconCheck,
     IconExternalLink,
-    IconBone,
     IconVaccine,
     IconStethoscope,
     IconHeart,
     IconWheelchair,
     IconFeather,
-    IconFileDescription,
     IconUpload,
     IconCheckbox,
-    IconHeadset,
     IconReceipt,
     IconId,
-    IconCertificate,
     IconClipboardText,
     IconDog
 } from '@tabler/icons-react';
@@ -70,10 +66,10 @@ export function ProviderComparison({ isDashboard = false }: { isDashboard?: bool
                     className="text-center max-w-3xl mx-auto mb-10 md:mb-12"
                 >
                     <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                         Compare Top Pet Insurers
+                        Compare Top Pet Insurers
                     </h2>
                     <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
-                        We've analyzed the leading pet insurance providers in India to help you find the best value for your pet's needs.
+                        We&apos;ve analyzed the leading pet insurance providers in India to help you find the best value for your pet&apos;s needs.
                     </p>
                 </motion.div>
 
@@ -203,15 +199,14 @@ export function PetPlanTypes({ isDashboard = false }: { isDashboard?: boolean } 
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="flex flex-col items-center text-center mb-12 gap-6 mx-auto"
-                >
+                    className="flex flex-col items-center text-center mb-12 gap-6 mx-auto">
                     <div className="max-w-3xl">
-                         <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                        Tailored plans for Your Pet's Life
-                    </h2>
-                    <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
-                        Choose the perfect plan for your furry family member. Each plan comes with 24/7 support and easy online claims.
-                    </p>
+                        <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                            Tailored plans for Your Pet&apos;s Life
+                        </h2>
+                        <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
+                            Choose the perfect plan for your furry family member. Each plan comes with 24/7 support and easy online claims.
+                        </p>
                     </div>
                 </motion.div>
 
@@ -375,11 +370,11 @@ export function PetClaimsProcess() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-10 md:mb-16"
                 >
-                     <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Simple 4-Step Claims Process
                     </h2>
                     <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
-                       We know vet emergencies are stressful. Our digital-first claims process ensures you get your money back as fast as possible.
+                        We know vet emergencies are stressful. Our digital-first claims process ensures you get your money back as fast as possible.
                     </p>
                 </motion.div>
 
@@ -521,8 +516,8 @@ export function PetDocumentsSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     className="text-center mb-10 md:mb-16">
-                     <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                         Documents Checklist
+                    <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                        Documents Checklist
                     </h2>
                     <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
                         Keep these documents handy for a smooth application and fast claim settlement experience.

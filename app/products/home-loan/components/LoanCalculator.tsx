@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, ChangeEvent, WheelEvent, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
 
 // Register Chart.js components
@@ -760,8 +760,7 @@ export default function LoanCalculator() {
                                     animate={{ height: "auto", opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
                                     transition={{ duration: 0.3 }}
-                                    className="overflow-hidden"
-                                >
+                                    className="overflow-hidden">
                                     <div className="p-6 pt-4 text-gray-700 leading-relaxed border-t border-gray-100">
                                         <ul className="list-disc pl-5 mb-4 space-y-4">
                                             <li>
@@ -773,7 +772,7 @@ export default function LoanCalculator() {
                                             </li>
 
                                             <li>
-                                                You'll pay{' '}
+                                                You&apos;ll pay{' '}
                                                 <span className="bg-blue-50 px-2 py-1 rounded font-medium font-sans">
                                                     {formatCurrency(totalInterest)}
                                                 </span>{' '}
@@ -929,7 +928,7 @@ export default function LoanCalculator() {
                                         </div>
 
                                         <p className="text-sm text-gray-600 mt-4">
-                                            <strong>Note:</strong> This calculation doesn't account for processing fees, prepayment charges, or insurance costs.
+                                            <strong>Note:</strong> This calculation doesn&apos;t account for processing fees, prepayment charges, or insurance costs.
                                             Actual terms may vary based on lender policies and your credit profile.
                                         </p>
                                     </div>

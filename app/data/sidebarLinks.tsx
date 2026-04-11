@@ -44,7 +44,6 @@ import {
     Notebook,
     ShieldPlus,
     Contact,
-    UserCheck as UserCheckIcon,
 } from "lucide-react";
 
 export const sidebarLinks = {

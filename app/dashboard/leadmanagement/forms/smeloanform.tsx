@@ -5,6 +5,7 @@ import {
   Loader2, ArrowRight, ArrowLeft, AlertCircle 
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import toast from "react-hot-toast";
 
 // --- Constants & Styles ---
 const STYLES = {
@@ -54,7 +55,7 @@ export default function SMELoanForm({ onClose }: { onClose: () => void }) {
   const [fileQueue, setFileQueue] = useState<QueuedFile[]>([]);
 
   const requiredDocsList = useMemo(() => {
-    let docs = [...BASE_DOCS];
+    const docs = [...BASE_DOCS];
     if (form.hasOtherLoan === "Yes") docs.push("Existing Loan Statement");
     return docs.map(label => DOC_REGISTRY[label]).filter(Boolean);
   }, [form.hasOtherLoan]);
@@ -106,7 +107,8 @@ export default function SMELoanForm({ onClose }: { onClose: () => void }) {
       setLeadId(result.detail_lead_id);
       setStep(2);
     } catch (err) {
-      console.error(err);
+      // console.error(err);
+      toast.error("Failed to create application. Please try again.");
       setStatusMsg("Failed to create application.");
     } finally {
       setIsSubmitting(false);

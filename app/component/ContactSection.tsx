@@ -1,6 +1,5 @@
 "use client"
 import { MapPin, Phone, Mail } from "lucide-react"
-import { motion } from "framer-motion";
 import { useState } from "react";
 import { AuthService } from "../services/authService";
 

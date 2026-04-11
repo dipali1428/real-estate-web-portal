@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { X, UploadCloud, CheckCircle } from "lucide-react";
+import { X, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface FormModalProps {

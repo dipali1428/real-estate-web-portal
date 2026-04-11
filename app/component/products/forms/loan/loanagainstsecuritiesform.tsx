@@ -1,7 +1,8 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
-import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
+import { X, CheckCircle, UploadCloud, Trash2, ChevronDown } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
+import toast from "react-hot-toast";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -23,13 +24,13 @@ interface LoanAgainstSecuritiesFormProps {
 
 export default function LoanAgainstSecuritiesForm({ onClose, prefilledData }: LoanAgainstSecuritiesFormProps) {
   const [form, setForm] = useState<Record<string, string>>({
-    clientName: prefilledData?.name || "", 
-    phone: prefilledData?.mobile || "", 
-    email: prefilledData?.email || "", 
-    dob: "", 
+    clientName: prefilledData?.name || "",
+    phone: prefilledData?.mobile || "",
+    email: prefilledData?.email || "",
+    dob: "",
     location: "",
-    loanAmount: "", 
-    hasOtherLoan: "", 
+    loanAmount: "",
+    hasOtherLoan: "",
     otherLoanAmount: ""
   });
 
@@ -88,8 +89,8 @@ export default function LoanAgainstSecuritiesForm({ onClose, prefilledData }: Lo
       await AuthService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
-      console.error("Submission error:", err);
-      alert("Something went wrong. Please try again.");
+      // console.error("Submission error:", err);
+      toast.error("Failed to submit application. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -113,7 +114,7 @@ export default function LoanAgainstSecuritiesForm({ onClose, prefilledData }: Lo
             <Field label="Date of Birth" type="date" {...fProps("dob")} required />
             <Field label="Location" placeholder="Enter city" {...fProps("location")} required />
             <Field label="Loan Amount" placeholder="Desired amount" onlyNumber {...fProps("loanAmount")} required />
-            
+
             <Field label="Any Other Loan Obligations?" type="select" options={["Yes", "No"]} {...fProps("hasOtherLoan")} required />
             {form.hasOtherLoan === "Yes" && <Field label="Existing Loan Amount" placeholder="Enter amount" onlyNumber {...fProps("otherLoanAmount")} required />}
 
@@ -133,7 +134,7 @@ export default function LoanAgainstSecuritiesForm({ onClose, prefilledData }: Lo
             </div>
           </form>
         </div>
-        
+
         {showSuccess && <SuccessModal onClose={onClose} />}
       </div>
     </div>

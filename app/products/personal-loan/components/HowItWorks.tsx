@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { FormInput, FileText, BadgeCheck, HandCoins } from 'lucide-react';
 
 export default function HowItWorks() {
@@ -38,7 +38,7 @@ export default function HowItWorks() {
                         How It Works
                     </h2>
                     <p className="text-lg text-gray-600">
-                        Getting a personal loan shouldn't be complicated. We mapped out a frictionless four-step roadmap to get you funded as fast as possible.
+                        Getting a personal loan shouldn&apos;t be complicated. We mapped out a frictionless four-step roadmap to get you funded as fast as possible.
                     </p>
                 </div>
 

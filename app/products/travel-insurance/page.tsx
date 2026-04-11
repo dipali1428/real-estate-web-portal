@@ -16,8 +16,6 @@ export default function TravelInsurancePage() {
 
     return (
         <main className="min-h-screen bg-white text-slate-800 font-sans scroll-smooth">
-
-
             <HeroAndHighlights />
             <ProvidersAndPlans />
             <CoverageHighlights />

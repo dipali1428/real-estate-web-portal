@@ -1,11 +1,10 @@
 'use client';
 import { useState, useMemo, useEffect } from 'react';
 import { 
-  IndianRupee, Search, Filter, Download, Eye, 
-  Wallet, Clock, FileText, Info, Calculator, 
-  ArrowUpRight, ChevronRight, TrendingUp,
+  IndianRupee, Search, Filter, Download, 
+  Wallet, Clock, Calculator, ChevronRight, TrendingUp,
   Building2, ShieldCheck, PieChart, Briefcase, Landmark,
-  Inbox, FileDown, Users, ListChecks, Coins
+  Inbox, Users, Coins
 } from 'lucide-react';
 import { DashboardService } from '@/app/services/dashboardService';
 

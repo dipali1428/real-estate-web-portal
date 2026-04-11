@@ -10,7 +10,6 @@ import {
 
 // Components
 import Filters from './components/Filters';
-import QuickStats from './components/QuickStats';
 import ProductDistribution from './components/ProductDistribution';
 import NavigationTabs from './components/NavigationTabs';
 import ClientDetails from './components/ClientDetails';

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { X, CheckCircle, ChevronDown } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
 

@@ -37,6 +37,10 @@ const PolicyBuyingGuide = () => {
         setRecommendedCover((income * multiplier) / 100);
     }, [income, age]);
 
+    const [referenceId] = useState(() =>
+        `LH-PRT-${Math.floor(Math.random() * 100000)}-${age}`
+    );
+
     return (
         <section className="py-16 md:py-24 bg-white relative overflow-hidden font-sans" id="buying-guide">
             {/* Ambient background glows */}
@@ -201,8 +205,7 @@ const PolicyBuyingGuide = () => {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="bg-white w-full max-w-[650px] rounded-[3rem] shadow-2xl relative z-11 overflow-hidden"
-                        >
+                            className="bg-white w-full max-w-[650px] rounded-[3rem] shadow-2xl relative z-11 overflow-hidden">
                             <div className="bg-linear-to-r from-[#0B1C2E] to-[#2076C7] p-8 text-white relative">
                                 <div className="absolute top-0 right-0 p-6 flex gap-3">
                                     <div className="px-3 py-1 rounded-full bg-white/10 border border-white/20 flex items-center gap-2">
@@ -212,8 +215,7 @@ const PolicyBuyingGuide = () => {
                                     <button
                                         suppressHydrationWarning
                                         onClick={() => setIsQuoteModalOpen(false)}
-                                        className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all font-sans"
-                                    >
+                                        className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all font-sans">
                                         ✕
                                     </button>
                                 </div>
@@ -222,8 +224,13 @@ const PolicyBuyingGuide = () => {
                                         <ShieldCheck className="w-6 h-6 text-white" />
                                     </div>
                                     <div>
-                                        <h3 className="text-3xl font-black font-sans uppercase tracking-tight leading-none mb-1">Elite Audit <span className="text-[#1CADA3]">Quote</span></h3>
-                                        <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] font-sans">Reference: LH-PRT-{Math.floor(Math.random() * 100000)}-{age}</p>
+                                        <h3 className="text-3xl font-black font-sans uppercase tracking-tight leading-none mb-1">
+                                            Elite Audit <span className="text-[#1CADA3]">Quote</span>
+                                        </h3>
+
+                                        <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] font-sans">
+                                            Reference: {referenceId}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -289,7 +296,7 @@ const PolicyBuyingGuide = () => {
                                             <Zap className="w-4 h-4" />
                                         </div>
                                         <p className="text-[10px] text-amber-900 font-bold leading-tight">
-                                            Limited Time: This quote includes a 5% "Early Action" discount if activated within 24 hours.
+                                            Limited Time: This quote includes a 5% Early Action discount if activated within 24 hours.
                                         </p>
                                     </div>
                                     <button

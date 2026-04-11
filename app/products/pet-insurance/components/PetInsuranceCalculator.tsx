@@ -4,10 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
-    IconCheck, IconShieldCheck, IconArrowRight, IconArrowLeft,
-    IconInfoCircle, IconDog, IconCat, IconBone, IconCalendar,
-    IconWorld, IconChevronDown, IconBolt, IconPaw, IconFeather,
-    IconCurrencyRupee
+    IconCheck, IconShieldCheck, IconArrowRight, IconArrowLeft, IconDog, IconCat, IconChevronDown, IconBolt, IconPaw, IconFeather
 } from '@tabler/icons-react';
 import {
     PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend
@@ -133,7 +130,7 @@ export default function PetInsuranceCalculator({
                                         <motion.div key="1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
                                             {/* Pet Name */}
                                             <div className="space-y-4">
-                                                <label className="block text-base md:text-lg font-extrabold text-[#2076C7]">Pet's Name</label>
+                                                <label className="block text-base md:text-lg font-extrabold text-[#2076C7]">Pet&apos;s Name</label>
                                                 <input
                                                     type="text"
                                                     value={petName}

@@ -2,7 +2,6 @@
 
 import { Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { IconArrowLeft } from '@tabler/icons-react';
 import { useModal } from '../../context/ModalContext';
 import HeroSection from './components/HeroSection';
 import LoanTypesSection from './components/LoanTypesSection';

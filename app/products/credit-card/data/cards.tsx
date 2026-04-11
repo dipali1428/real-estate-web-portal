@@ -1,7 +1,7 @@
 import {
     IconShoppingBag, IconPlaneDeparture, IconCash, IconGift, IconCrown,
     IconGasStation, IconToolsKitchen2, IconDeviceMobile, IconPlane,
-    IconHeartbeat, IconBallFootball, IconStar
+    IconHeartbeat, IconBallFootball
 } from '@tabler/icons-react';
 
 export interface CreditCard {

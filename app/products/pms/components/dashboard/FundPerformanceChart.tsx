@@ -14,9 +14,10 @@ import {
     ScriptableContext
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { TrendingUp, RefreshCw, Info, Activity } from 'lucide-react';
+import { RefreshCw, Info, Activity } from 'lucide-react';
 import FinancialDataService from '../../services/FinancialDataService';
 import { Fund } from '../../data/funds';
+import toast from 'react-hot-toast';
 
 ChartJS.register(
     CategoryScale,
@@ -96,7 +97,8 @@ export default function FundPerformanceChart({ fund }: { fund: Fund }) {
 
             setChartData(processedData);
         } catch (error) {
-            console.error('Error generating chart data:', error);
+            // console.error('Error generating chart data:', error);
+            toast.error("Error generating chart data");
             generateSyntheticData();
         } finally {
             setLoading(false);

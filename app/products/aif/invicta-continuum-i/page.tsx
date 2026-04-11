@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
     ArrowLeft, TrendingUp, ShieldCheck,
-    Briefcase, FileText, Activity,
+    Briefcase, FileText,
     CheckCircle, BarChart as BarChartIcon, PieChart as PieChartIcon,
     AlertCircle, Target, Users, Clock, IndianRupee
 } from 'lucide-react';
@@ -206,7 +206,7 @@ export default function InvictaContinuumDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
                                         <p className="text-xs text-blue-800 font-medium italic">
-                                            "Targeting scalable businesses in their peak growth phase."
+                                            Targeting scalable businesses in their peak growth phase.
                                         </p>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function InvictaContinuumDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "Focused on growth equity investments and private equity strategies in mid-market opportunities."
+                                Focused on growth equity investments and private equity strategies in mid-market opportunities.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
     ArrowLeft, TrendingUp, ShieldCheck,
-    Briefcase, FileText, Activity,
+    Briefcase, FileText,
     CheckCircle, BarChart as BarChartIcon, PieChart as PieChartIcon,
     AlertCircle, Target, Users, Clock, IndianRupee
 } from 'lucide-react';
@@ -204,7 +204,7 @@ export default function ElementOneCreditDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
                                         <p className="text-xs text-blue-800 font-medium italic">
-                                            "A specialized Fund of Funds structure providing institutional access and risk optimization."
+                                            A specialized Fund of Funds structure providing institutional access and risk optimization.
                                         </p>
                                     </div>
                                 </div>
@@ -227,7 +227,7 @@ export default function ElementOneCreditDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "A specialized platform utilizing an institutional-grade due diligence framework for top credit opportunities."
+                                A specialized platform utilizing an institutional-grade due diligence framework for top credit opportunities.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertTriangle, ShieldCheck, TrendingDown, RefreshCcw, Info, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, ShieldCheck, TrendingDown, RefreshCcw, CheckCircle2 } from 'lucide-react';
 
 const Risks = () => {
     const [activeRisk, setActiveRisk] = useState(0);

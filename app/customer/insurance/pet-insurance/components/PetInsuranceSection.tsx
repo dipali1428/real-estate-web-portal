@@ -4,11 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { 
     IconHistory, IconInfoCircle, IconMapPin, IconStethoscope, IconDog, IconPaw, IconHeart, IconId, IconCheck,
-    IconShieldCheck, IconFileText, IconCalculator, IconDownload, IconSearch, IconFilter
+    IconShieldCheck, IconFileText, IconCalculator, IconDownload
 } from '@tabler/icons-react';
-import { AlertCircle } from 'lucide-react';
 
-import { PetPlanTypes, ProviderComparison, plans as petPlans } from '@/app/products/pet-insurance/components/PetPolicyDetails';
+import { PetPlanTypes, ProviderComparison } from '@/app/products/pet-insurance/components/PetPolicyDetails';
 import PetInsuranceCalculator from '@/app/products/pet-insurance/components/PetInsuranceCalculator';
 
 const coverageBenefits = [

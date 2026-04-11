@@ -68,7 +68,7 @@ const Portfolio = () => {
                             </div>
 
                             <p className="text-slate-500 font-medium mb-8 leading-relaxed border-l-4 border-[#1CADA3]/20 pl-4 py-1">
-                                "{p.desc}"
+                                {p.desc}
                             </p>
 
                             <div className="bg-slate-50 rounded-3xl p-6 mb-8 border border-gray-100 transition-colors group-hover:bg-[#F0F9F8]">

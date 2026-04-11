@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, ShieldCheck, AlertOctagon, Shield } from "lucide-react";
+import { CheckCircle2, XCircle, ShieldCheck, AlertOctagon } from "lucide-react";
 
 const inclusions = [
     {
@@ -65,7 +65,7 @@ export default function CoverageInclusionsExclusions() {
                         transition={{ duration: 0.5 }}
                     >
                         <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                            What's Covered & What's Not
+                            What&apos;s Covered & What&apos;s Not
                         </h2>
                         <p className="text-gray-500 mb-6 max-w-lg mx-auto">
                             While we aim for comprehensive coverage, it&apos;s important to understand what falls outside the policy to avoid surprises during claims.
@@ -130,7 +130,7 @@ export default function CoverageInclusionsExclusions() {
                                     </div>
                                     <div>
                                         <h3 className="text-2xl font-bold text-gray-900">Exclusions</h3>
-                                        <p className="text-[#1CADA3] font-medium">What we don't cover</p>
+                                        <p className="text-[#1CADA3] font-medium">What we don&apos;t cover</p>
                                     </div>
                                 </div>
 

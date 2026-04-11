@@ -206,7 +206,7 @@ export default function Quest4ValueScaleDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-teal-50 rounded-2xl border border-teal-100">
                                         <p className="text-xs text-teal-800 font-medium italic">
-                                            "Focus on small and mid-cap companies for high growth potential."
+                                            Focus on small and mid-cap companies for high growth potential.
                                         </p>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function Quest4ValueScaleDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "Boutique investment firm focused on public equity investing and high-conviction portfolios."
+                                Boutique investment firm focused on public equity investing and high-conviction portfolios.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

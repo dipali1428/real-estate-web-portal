@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -96,8 +96,7 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Link
                                     href="#properties"
-                                    className="group relative text-white px-8 md:px-10 py-4 md:py-5 rounded-lg font-bold text-lg md:text-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer flex items-center justify-center" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
-                                >
+                                    className="group relative text-white px-8 md:px-10 py-4 md:py-5 rounded-lg font-bold text-lg md:text-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer flex items-center justify-center" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}>
                                     <span className="relative z-10 flex items-center justify-center gap-1">
                                         View Opportunities 
                                     </span>

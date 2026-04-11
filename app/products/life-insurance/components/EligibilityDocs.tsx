@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
-    UserCheck, FileText, CheckCircle2, Info, Globe,
-    Briefcase, GraduationCap, ChevronDown, ShieldCheck,
-    Lock, Smartphone, Zap, Clock, Landmark
+    UserCheck, CheckCircle2, Globe,
+    Briefcase, ShieldCheck, Zap, Clock, Landmark
 } from "lucide-react";
 import { useModal } from '@/app/context/ModalContext';
 

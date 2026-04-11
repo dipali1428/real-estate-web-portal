@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
     ArrowLeft, TrendingUp, ShieldCheck,
-    Briefcase, FileText, Activity,
+    Briefcase, FileText,
     CheckCircle, BarChart as BarChartIcon, PieChart as PieChartIcon,
     AlertCircle, Target, Users, Clock, IndianRupee
 } from 'lucide-react';
@@ -206,7 +206,7 @@ export default function InCredCreditDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
                                         <p className="text-xs text-blue-800 font-medium italic">
-                                            "A focus on secured lending and structured credit for attractive risk-adjusted returns."
+                                            A focus on secured lending and structured credit for attractive risk-adjusted returns.
                                         </p>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function InCredCreditDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "A leading alternative investment platform with strong expertise in credit and structured finance."
+                                A leading alternative investment platform with strong expertise in credit and structured finance.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

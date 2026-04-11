@@ -53,7 +53,7 @@ export default function BenefitsSection() {
                              Features & Benefits of Our Credit Cards 
                         </h2>
                         <p className="text-gray-600 max-w-3xl mx-auto text-xl md:text-1xl">
-                            Experience a seamless financial journey with benefits designed for every lifestyle. From zero liability to global access, we've got you covered.
+                            Experience a seamless financial journey with benefits designed for every lifestyle. From zero liability to global access, we&apos;ve got you covered.
                         </p>
                     </motion.div>
                 </div>

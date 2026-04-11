@@ -10,9 +10,7 @@ import {
   Wallet,
   Sparkles,
   Landmark,
-  CalendarCheck,
-  ShoppingCart,
-  ChevronRight
+  CalendarCheck
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import customerService from '../../../../services/customerService';

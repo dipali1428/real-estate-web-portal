@@ -50,8 +50,7 @@ export default function PartnerBanksSection({ activeCategory, setActiveCategory,
                                     className={`px-4 md:px-6 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeCategory === category
                                         ? 'bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-white shadow-md'
                                         : 'text-gray-500 hover:bg-white hover:text-[#2076C7]'
-                                        }`}
-                                >
+                                        }`}>
                                     {category}
                                 </button>
                             ))}

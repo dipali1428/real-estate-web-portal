@@ -4,11 +4,9 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
-    ArrowLeft, Download, Calculator, TrendingUp, ShieldCheck,
-    User, Briefcase, ChevronRight, FileText, Activity,
-    CheckCircle, BarChart as BarChartIcon, PieChart as PieChartIcon,
-    AlertCircle, Info, MessageSquare, PhoneCall, Award, Users,
-    Search, TrendingDown, Clock, Calendar as CalendarIcon
+    ArrowLeft, TrendingUp, ShieldCheck, Briefcase, Activity, PieChart as PieChartIcon,
+    AlertCircle, Award,
+    Search, Clock, Calendar as CalendarIcon
 } from 'lucide-react';
 import {
     Chart as ChartJS,

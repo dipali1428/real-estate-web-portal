@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { RotateCcw, Download, Lightbulb } from 'lucide-react';
+import { useState } from 'react';
+import { Download } from 'lucide-react';
 
 const Calculator = ({ isWidget = false }) => {
     // State for inputs

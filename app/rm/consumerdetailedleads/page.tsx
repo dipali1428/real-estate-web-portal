@@ -2,6 +2,7 @@
 import React, { FC, useState, useMemo, useEffect, ChangeEvent } from "react";
 import { RmService } from "../../services/rmService";
 import { Search, FileUp, Loader2 } from 'lucide-react';
+import toast from "react-hot-toast";
 
 // Interface matching the reference design structure
 export interface Lead {
@@ -43,7 +44,7 @@ const ConsumerDetailedLeads: FC = () => {
       
       if (response && response.success && Array.isArray(response.leads)) {
         const mappedLeads: Lead[] = response.leads.map((item: any) => {
-          console.log("Raw lead item:", response); // Debug log
+          // console.log("Raw lead item:", response); // Debug log
           const dateObj = new Date(item.created_at);
           return {
             id: item.id.toString(),
@@ -61,7 +62,8 @@ const ConsumerDetailedLeads: FC = () => {
         setData(mappedLeads);
       }
     } catch (error) {
-      console.error("Failed to fetch consumer leads:", error);
+      // console.error("Failed to fetch consumer leads:", error);
+      toast.error("Failed to fetch consumer leads. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -83,7 +85,8 @@ const ConsumerDetailedLeads: FC = () => {
         });
       }
     } catch (error) {
-      console.error("Error fetching documents:", error);
+      // console.error("Error fetching documents:", error);
+      toast.error("Error fetching documents. Please try again.");
     } finally {
       setFetchingDocs(false);
     }
@@ -107,11 +110,13 @@ const ConsumerDetailedLeads: FC = () => {
     try {
       const response = await (RmService as any).uploadDocument(activeLeadId, formData);
       if (response.success) {
-        alert("Document uploaded successfully!");
+        // alert("Document uploaded successfully!");
+        toast.success("Document uploaded successfully!");
         loadDocuments(activeLeadId);
       }
     } catch (error) {
-      console.error("Upload failed:", error);
+      // console.error("Upload failed:", error);
+      toast.error("Document upload failed. Please try again.");
     } finally {
       setUploadingKey(null);
     }

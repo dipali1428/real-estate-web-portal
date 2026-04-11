@@ -2,9 +2,7 @@
 
 import React, { useState } from 'react';
 import CalculatorSlider from './CalculatorSlider';
-import ResultCard from './ResultCard';
-import { Shield, Info, TrendingUp, Landmark } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Shield, Info, Landmark } from 'lucide-react';
 
 export default function TaxImpactCalculator() {
     const [investment, setInvestment] = useState(10000000);

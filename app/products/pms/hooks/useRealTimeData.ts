@@ -3,6 +3,7 @@ import marketDataService from '../services/marketDataService';
 import websocketService from '../services/websocketService';
 import FinancialDataService from '../services/FinancialDataService';
 import RealTimeWebSocket from '../services/RealTimeWebSocket';
+import toast from 'react-hot-toast';
 
 /**
  * Hook for fetching live market data using real APIs with mock fallback
@@ -26,7 +27,8 @@ export const useRealTimeMarketData = (symbols: string[] = []) => {
                         return { symbol, data: await FinancialDataService.getStockQuote(symbol) };
                     }
                 } catch (err) {
-                    console.warn(`Real API failed for ${symbol}, falling back to mock:`, err);
+                    // console.warn(`Real API failed for ${symbol}, falling back to mock:`, err);
+                    toast.error(`Error fetching data for ${symbol} from real API. Using fallback data.`);
                     return { symbol, data: await marketDataService.getLiveStockPrice(symbol) };
                 }
             });
@@ -44,7 +46,7 @@ export const useRealTimeMarketData = (symbols: string[] = []) => {
             setError(null);
         } catch (err) {
             setError('Failed to fetch market data');
-            console.error(err);
+            // console.error(err);
         } finally {
             setLoading(false);
         }
@@ -129,7 +131,8 @@ export const usePMSLivePerformance = (portfolioId: string, timeFrame = '1Y') => 
             });
 
         } catch (error) {
-            console.error('Error fetching real PMS performance:', error);
+            // console.error('Error fetching real PMS performance:', error);
+            toast.error("Error fetching PMS performance");
         } finally {
             setLoading(false);
         }
@@ -170,7 +173,8 @@ export const useMarketPulse = (timeFrame = '1D') => {
             setPulseData(data);
             setError(null);
         } catch (err) {
-            console.error('Error fetching market pulse hook:', err);
+            // console.error('Error fetching market pulse hook:', err);
+            toast.error("Error Fetching market pulse");
             setError('Failed to load market pulse');
         } finally {
             setLoading(false);

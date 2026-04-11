@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { ShieldCheck, TrendingUp, Landmark, Coins, ArrowRight, Sparkles, UserCheck, Activity } from "lucide-react";
-import { useModal } from "../../../context/ModalContext";
 
 const collections = [
     {

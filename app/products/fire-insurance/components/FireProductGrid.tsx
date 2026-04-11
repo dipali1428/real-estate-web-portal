@@ -5,8 +5,7 @@ import { motion } from "framer-motion";
 import {
   Home, Building2, Factory, Store,
   ShieldCheck, Zap, ArrowRight,
-  TrendingUp, Shield, Star, Users,
-  Briefcase, Landmark, HardHat, FileText
+  TrendingUp, Shield, Users, HardHat
 } from "lucide-react";
 
 const products = [

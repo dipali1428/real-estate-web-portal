@@ -6,30 +6,20 @@ import { useRouter } from 'next/navigation';
 import { motion, Variants, AnimatePresence } from 'framer-motion';
 import {
     ShieldCheck,
-    Clock,
     FileText,
-    Headphones,
     LineChart,
-    RefreshCcw,
     ArrowRight,
     Zap,
-    ChevronDown,
     Plus,
     Minus,
-    MapPin,
-    ArrowUpRight,
-    Calculator,
     CheckCircle2,
     ArrowLeft,
-    IndianRupee,
-    Baby,
     Users2,
     Activity,
     Stethoscope,
     HeartPulse,
     ClipboardCheck,
     Search,
-    Filter,
     Hospital,
     TestTube,
     Pill,
@@ -38,10 +28,8 @@ import {
     Brain,
     UserPlus,
     CreditCard,
-    Stethoscope as StethoscopeIcon,
-    AlertCircle
+    Stethoscope as StethoscopeIcon
 } from 'lucide-react';
-import Link from 'next/link';
 import { useModal } from '../../context/ModalContext';
 
 // Components
@@ -438,22 +426,19 @@ const HealthInsurancePage = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.1 }}
-                                    className="text-xl md:text-2xl text-gray-600 max-w-xl leading-relaxed mb-10"
-                                >
-                                    Secure your family's future with India's most trusted health insurance plans.
+                                    className="text-xl md:text-2xl text-gray-600 max-w-xl leading-relaxed mb-10">
+                                    Secure your family&apos;s future with India&apos;s most trusted health insurance plans.
                                 </motion.p>
 
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2 }}
-                                    className="flex flex-wrap gap-5 pt-4"
-                                >
+                                    className="flex flex-wrap gap-5 pt-4">
                                     <button
                                         onClick={() => handleApply('General Health Plan')}
                                         className="group relative px-8 py-4 rounded-xl font-bold text-sm md:text-base text-white shadow-lg hover:brightness-110 transform hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden"
-                                        style={{ background: "linear-gradient(to right, #2076C7, #1CADA3)" }}
-                                    >
+                                        style={{ background: "linear-gradient(to right, #2076C7, #1CADA3)" }}>
                                         <span className="relative z-10 flex items-center gap-2">
                                             Apply Now <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                         </span>
@@ -682,7 +667,7 @@ const HealthInsurancePage = () => {
                                             <ul className="text-xs text-gray-600 space-y-2 font-medium">
                                                 <li className="flex items-center gap-2">• Hospital Bills & Receipts</li>
                                                 <li className="flex items-center gap-2">• Discharge Summary</li>
-                                                <li className="flex items-center gap-2">• Doctor's Prescriptions</li>
+                                                <li className="flex items-center gap-2">• Doctor&apos;s Prescriptions</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -839,7 +824,7 @@ const HealthInsurancePage = () => {
                                 Frequently Asked Questions
                             </h2>
                             <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed font-light">
-                                Got questions about health insurance? We've got answers.
+                                Got questions about health insurance? We&apos;ve got answers.
                             </p>
                         </motion.div>
 

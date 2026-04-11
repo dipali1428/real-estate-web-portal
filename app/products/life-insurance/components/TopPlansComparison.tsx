@@ -4,7 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import {
   ShieldCheck, Star, Zap, Anchor,
-  GraduationCap, Landmark, Info,
+  GraduationCap, Landmark,
   CheckCircle2, AlertCircle
 } from "lucide-react";
 

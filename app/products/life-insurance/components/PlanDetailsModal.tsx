@@ -3,9 +3,8 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    X, CheckCircle2, Info, ArrowRight,
-    Shield, Target, Award, Sparkles,
-    Calendar, IndianRupee, Clock, ArrowUpRight
+    X, CheckCircle2, ArrowRight,
+    Shield, Target, Award, Sparkles
 } from "lucide-react";
 
 type Plan = {
@@ -165,7 +164,7 @@ export default function PlanDetailsModal({ plan, onClose, onGetQuote }: PlanDeta
                                 <div className="relative z-10">
                                     <h4 className="text-slate-800 font-black text-lg mb-2">Why choose {plan.insurer}?</h4>
                                     <p className="text-slate-500 text-xs font-medium leading-relaxed max-w-sm">
-                                        {plan.insurer} is among India's top life insurers with high Claim Settlement Ratio and digital-first support architecture.
+                                        {plan.insurer} is among India&apos;s top life insurers with high Claim Settlement Ratio and digital-first support architecture.
                                     </p>
                                     <div className="mt-6 flex items-center gap-6">
                                         <div className="flex flex-col">

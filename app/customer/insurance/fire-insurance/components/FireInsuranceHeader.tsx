@@ -5,9 +5,7 @@ import { motion } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Flame,
-  Calculator,
   Clock,
-  Grid,
   LayoutDashboard,
   LucideIcon
 } from "lucide-react";

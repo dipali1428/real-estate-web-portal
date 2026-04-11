@@ -4,10 +4,9 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
-    TrendingUp, ShieldCheck, PieChart, BarChart3, ArrowRight, ArrowLeft,
+    TrendingUp, PieChart, BarChart3, ArrowLeft,
     CheckCircle, Clock, Target, Calendar, Award,
-    Briefcase, FileText, Download, Phone, UserCheck, Users,
-    X, Percent, Activity, Sliders, Layers, AlertCircle, Zap
+    Briefcase, Activity, Sliders, Layers, AlertCircle, Zap
 } from 'lucide-react';
 import {
     Chart as ChartJS,
@@ -447,7 +446,7 @@ export default function CarnelianCompounderDetail() {
                                 </div>
                             </div>
                             <p className="text-sm font-medium italic mt-6 text-center opacity-80">
-                                "The strategy has delivered outperformance with lower volatility across market cycles."
+                                The strategy has delivered outperformance with lower volatility across market cycles.
                             </p>
                         </div>
                     </div>

@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
     Calculator,
     ChevronDown,
     ShieldCheck,
     Zap,
-    Info,
     ArrowRight,
     User,
     Wind,
@@ -36,7 +35,7 @@ export default function TermCalculator() {
     useEffect(() => {
         // Base monthly for 18yr female, non-smoker, 1Cr
         // Market baseline is roughly ₹350-400 for these criteria
-        let baseMonthly = 370;
+        const baseMonthly = 370;
 
         // 1. Age Factor: Real-world premiums grow exponentially, not linearly.
         // Approx 5.2% compounded growth per year of age.
@@ -104,8 +103,7 @@ export default function TermCalculator() {
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="flex items-center justify-center gap-3 mb-6"
-                    >
+                        className="flex items-center justify-center gap-3 mb-6">
                         <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-[#2076C7]">
                             <Calculator className="w-5 h-5" />
                         </div>
@@ -115,12 +113,11 @@ export default function TermCalculator() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-3xl lg:text-5xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-6"
-                    >
+                        className="text-3xl lg:text-5xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-6">
                         Term Insurance Calculator
                     </motion.h2>
                     <p className="text-gray-500 text-xl font-light leading-relaxed">
-                        Calculate the exact premium for your family's protection. Our tool analyzes age, lifestyle, and coverage needs to give you the most accurate market rates.
+                        Calculate the exact premium for your family&apos;s protection. Our tool analyzes age, lifestyle, and coverage needs to give you the most accurate market rates.
                     </p>
                 </div>
 
@@ -129,8 +126,7 @@ export default function TermCalculator() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="bg-white rounded-[3rem] border border-slate-100 border-b-[6px] border-b-slate-200/50 shadow-[0_30px_80px_rgba(32,118,199,0.08)] hover:-translate-y-2 hover:shadow-[0_40px_100px_rgba(32,118,199,0.12)] transition-all duration-500 overflow-hidden flex flex-col lg:flex-row"
-                    >
+                        className="bg-white rounded-[3rem] border border-slate-100 border-b-[6px] border-b-slate-200/50 shadow-[0_30px_80px_rgba(32,118,199,0.08)] hover:-translate-y-2 hover:shadow-[0_40px_100px_rgba(32,118,199,0.12)] transition-all duration-500 overflow-hidden flex flex-col lg:flex-row">
                         {/* Left Side: Inputs */}
                         <div className="lg:w-7/12 p-8 md:p-12 space-y-10">
                             {/* Special Offer Badge */}

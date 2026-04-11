@@ -6,7 +6,8 @@ import CardTemplateImage from "@/app/assets/visiting_card.png";
 import { Phone, Mail, MapPin, Globe, Landmark, Pencil, CheckCircle2, User, AlertCircle, Loader2, Camera, Eye, EyeOff, X, ShieldCheck, Download, Lock, Copy, Share2 } from "lucide-react";
 import LogoImage from "@/public/logo.png";
 import { useRouter } from "next/navigation";
-import { FaceDetector, FilesetResolver, Detection } from "@mediapipe/tasks-vision";
+import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
+import toast from "react-hot-toast";
 
 // --- Types & Constants ---
 interface PopupMessage { id: string; message: string; type: "success" | "error" | "loading"; }
@@ -392,7 +393,8 @@ export default function ProfileSection() {
                 setReferralCode(res.referral_code);
             }
         } catch (e) {
-            console.error("Referral Error:", e);
+            // console.error("Referral Error:", e);
+            // toast.error("Failed to prepare referral link. Please try again.");
             triggerPopup("Failed to prepare referral link", "error");
             return;
         } finally {
@@ -476,7 +478,10 @@ export default function ProfileSection() {
             if (isFullyComplete && res.agreementStatus !== "created") {
                 setShowAgreementModal(true);
             }
-        } catch (error) { console.error("Refresh failed:", error); }
+        } catch (error) {
+            // console.error("Refresh failed:", error);
+            toast.error("Failed to load profile data. Please refresh the page.");
+        }
     };
 
     useEffect(() => {
@@ -676,8 +681,8 @@ export default function ProfileSection() {
             const words = locationText.split(' ');
             let line = ''; const maxWidth = 600; const lineHeight = 32; let currentY = startY + gap * 2 - 4;
             for (let n = 0; n < words.length; n++) {
-                let testLine = line + words[n] + ' ';
-                let metrics = ctx.measureText(testLine);
+                const testLine = line + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
                 if (metrics.width > maxWidth && n > 0) { ctx.fillText(line, textX, currentY); line = words[n] + ' '; currentY += lineHeight; } else { line = testLine; }
             }
             ctx.fillText(line, textX, currentY);
@@ -751,8 +756,8 @@ export default function ProfileSection() {
             const fullLocation = `Location: ${locationText}`; const words = fullLocation.split(' ');
             let line = ''; const maxWidth = 500; const lineHeight = 28; let currentY = detailsStartY + 100;
             for (let n = 0; n < words.length; n++) {
-                let testLine = line + words[n] + ' ';
-                let metrics = ctx.measureText(testLine);
+                const testLine = line + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
                 if (metrics.width > maxWidth && n > 0) { ctx.fillText(line, cvWidth / 2, currentY); line = words[n] + ' '; currentY += lineHeight; } else { line = testLine; }
             }
             ctx.fillText(line, cvWidth / 2, currentY);
@@ -1562,15 +1567,13 @@ export default function ProfileSection() {
                         <div className="flex flex-col gap-3">
                             <button
                                 onClick={() => router.push('/dashboard/incentives/agreement')}
-                                className="w-full py-4 bg-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-200 hover:bg-[#158f87] transition-all active:scale-95"
-                            >
+                                className="w-full py-4 bg-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-200 hover:bg-[#158f87] transition-all active:scale-95">
                                 Sign Agreement Now
                             </button>
                             <button
                                 onClick={() => setShowAgreementModal(false)}
-                                className="w-full py-4 bg-white text-slate-400 rounded-xl font-bold text-sm hover:text-slate-600 transition-all"
-                            >
-                                I'll do it later
+                                className="w-full py-4 bg-white text-slate-400 rounded-xl font-bold text-sm hover:text-slate-600 transition-all">
+                                I&apos;ll do it later
                             </button>
                         </div>
                     </div>
@@ -1579,8 +1582,4 @@ export default function ProfileSection() {
 
         </main>
     );
-}
-
-function setReferralCode(arg0: string) {
-    throw new Error("Function not implemented.");
 }

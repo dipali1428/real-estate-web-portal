@@ -7,11 +7,7 @@ import {
   IconShieldCheck,
   IconFileText,
   IconCalendarEvent,
-  IconHeartbeat,
-  IconHelmet,
-  IconArrowUpRight,
   IconDownload,
-  IconPlus,
 } from "@tabler/icons-react";
 
 export default function CorporateActiveDashboard() {

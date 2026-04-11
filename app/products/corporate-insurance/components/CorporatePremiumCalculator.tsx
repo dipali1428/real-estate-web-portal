@@ -43,7 +43,7 @@ export const CorporatePremiumCalculator: React.FC<
 
   // Calculate Premium
   useEffect(() => {
-    setIsAnimating(true);
+    const rafId = requestAnimationFrame(() => setIsAnimating(true));
 
     const timer = setTimeout(() => {
       let firePremium = 0;
@@ -55,18 +55,23 @@ export const CorporatePremiumCalculator: React.FC<
       if (covers.liability) liabilityPremium = turnover.premium;
 
       const total = Math.round(
-        firePremium + burglaryPremium + liabilityPremium,
+        firePremium + burglaryPremium + liabilityPremium
       );
+
       setPremiums({
         fire: Math.round(firePremium),
         burglary: Math.round(burglaryPremium),
         liability: Math.round(liabilityPremium),
         total: total,
       });
+
       setIsAnimating(false);
     }, 400);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timer);
+    };
   }, [businessType, assetValue, turnover, covers]);
 
   const formatCurrency = (amount: number) => {
@@ -187,7 +192,7 @@ export const CorporatePremiumCalculator: React.FC<
                     onChange={(e) =>
                       setBusinessType(
                         BUSINESS_TYPES.find((b) => b.id === e.target.value) ||
-                          BUSINESS_TYPES[0],
+                        BUSINESS_TYPES[0],
                       )
                     }
                     className="w-full p-4 rounded-xl border border-slate-200 bg-white text-black font-semibold outline-none focus:ring-4 focus:ring-[#2076C7]/10 transition-all appearance-none cursor-pointer"

@@ -2,13 +2,10 @@
 
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
-    IconChevronRight, IconCalendar, IconMapPin, IconWorld, IconShieldCheck,
-    IconPlaneDeparture, IconAlertCircle, IconAmbulance, IconLuggage, IconId,
-    IconCheck, IconArrowLeft, IconHeadset
+    IconChevronRight, IconCalendar, IconMapPin, IconWorld, IconShieldCheck, IconAlertCircle, IconArrowLeft
 } from '@tabler/icons-react';
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import WaveDivider from './WaveDivider';
 import { useModal } from '../../../context/ModalContext';
 
 export default function HeroAndHighlights() {

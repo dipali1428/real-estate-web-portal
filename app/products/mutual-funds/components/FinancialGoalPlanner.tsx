@@ -77,7 +77,7 @@ export default function FinancialGoalPlanner() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <div className="space-y-6">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">What's the goal?</label>
+              <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">What&apos;s the goal?</label>
               <input
                 type="text"
                 value={formData.name}

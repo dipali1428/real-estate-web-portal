@@ -5,11 +5,7 @@ import { RmService } from '../../services/rmService';
 import {
   Search,
   X,
-  Mail,
-  MapPin,
-  IndianRupee,
   FileText,
-  Info,
   ExternalLink,
   FileUp,
   ChevronLeft,
@@ -17,16 +13,12 @@ import {
   Loader2,
   UserCheck,
   Clock,
-  ShieldCheck,
-  Calendar,
-  Smartphone,
-  Building,
   Files,
   CheckCircle2,
-  AlertCircle,
   Check,
   XCircle
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 // --- Status Styles from Second Code ---
 const statusStyles: Record<string, string> = {
@@ -107,6 +99,7 @@ export default function LeadDashboard() {
   const [processingId, setProcessingId] = useState<number | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewType, setPreviewType] = useState<'image' | 'pdf' | 'other' | null>(null);
+  const [rejectModalId, setRejectModalId] = useState<number | null>(null);
 
   const [openStatusDropdown, setOpenStatusDropdown] = useState<number | null>(null);
   // --- Pagination States ---
@@ -132,7 +125,8 @@ export default function LeadDashboard() {
         setLeads([]);
       }
     } catch (error) {
-      console.error("Error fetching leads:", error);
+      // console.error("Error fetching leads:", error);
+      toast.error("Failed to fetch leads. Please try again later.");
       setLeads([]);
     } finally {
       setLoading(false);
@@ -145,13 +139,15 @@ export default function LeadDashboard() {
       const response = await RmService.updateDetailLeadStatus(leadId, status);
       if (response.success) {
         fetchLeads();
+        toast.success("Status updated successfully.");
         setOpenStatusDropdown(null);
       } else {
-        alert(response.message || "Failed to update status");
+        // alert(response.message || "Failed to update status");
+        toast.error(response.message || "Failed to update status. Please try again.");
       }
     } catch (error: any) {
       // console.error("Error updating status:", error);
-      //  alert(error.response?.data?.message || "Server error");
+      toast.error("Failed to update status. Please try again later.");
     } finally {
       setProcessingId(null);
     }
@@ -168,21 +164,25 @@ export default function LeadDashboard() {
   }, [searchTerm]);
 
   const handleAction = async (id: number, action: 'accept' | 'reject') => {
-    if (action === 'reject' && !confirm("Are you sure you want to reject this lead?")) return;
-
     setProcessingId(id);
     try {
       const response = action === 'accept'
         ? await RmService.acceptDetailLead(id)
         : await RmService.rejectDetailLead(id);
+  
       if (response.success) {
-        fetchLeads();
+        toast.success(`Lead ${action}ed successfully`);
+        
+        // 1. Refresh the list
+        await fetchLeads(); 
+        
+        // 2. IMPORTANT: Close the modal here
+        setRejectModalId(null); 
       } else {
-        alert(response.message || `Failed to ${action} lead`);
+        toast.error(response.message || `Failed to ${action} lead`);
       }
     } catch (error: any) {
-      console.error(`Error during ${action}:`, error);
-      alert(error.response?.data?.message || `Server error during ${action}`);
+      toast.error(error.response?.data?.message || `Server error during ${action}`);
     } finally {
       setProcessingId(null);
     }
@@ -397,7 +397,9 @@ export default function LeadDashboard() {
                                   ) : (
                                     <>
                                       <button onClick={() => handleAction(lead.id, 'accept')} className="p-1.5 bg-green-50 text-green-600 rounded-md hover:bg-green-100 transition-colors border border-green-100" title="Accept"><Check size={16} /></button>
-                                      <button onClick={() => handleAction(lead.id, 'reject')} className="p-1.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors border border-red-100" title="Reject"><XCircle size={16} /></button>
+                                      <button onClick={() => setRejectModalId(lead.id)} className="p-1.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors border border-red-100" title="Reject">
+  <XCircle size={16} />
+</button>
                                     </>
                                   )}
                                 </div>
@@ -701,6 +703,36 @@ export default function LeadDashboard() {
           </div>
         </div>
       </div>
+      <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-300 ${rejectModalId ? 'visible opacity-100' : 'invisible opacity-0'}`}>
+  <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setRejectModalId(null)} />
+  <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transition-all duration-300 transform ${rejectModalId ? 'scale-100' : 'scale-95'}`}>
+    <div className="flex flex-col items-center text-center">
+      <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4">
+        <XCircle size={32} />
+      </div>
+      <h3 className="text-xl font-bold text-gray-900">Reject Lead?</h3>
+      <p className="text-sm text-gray-500 mt-2">
+        Are you sure you want to reject this lead? This action cannot be undone.
+      </p>
+      
+      <div className="flex flex-col w-full gap-2 mt-6">
+        <button
+          onClick={() => rejectModalId && handleAction(rejectModalId, 'reject')}
+          disabled={processingId !== null}
+          className="w-full py-2.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+        >
+          {processingId ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : "Yes, Reject Lead"}
+        </button>
+        <button
+          onClick={() => setRejectModalId(null)}
+          className="w-full py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
     </div>
   );
 }

@@ -1,13 +1,13 @@
 "use client";
 import React from 'react';
-import { ShieldCheck, Clock, Percent, Zap, TrendingUp, CheckCircle, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Clock, Percent, Zap, TrendingUp, ArrowRight } from 'lucide-react';
 import { useModal } from '@/app/context/ModalContext';
 
 
-interface PersonalLoanHeroProps {
-}
+// interface PersonalLoanHeroProps {
+// }
 
-export default function PersonalLoanHero({ }: PersonalLoanHeroProps) {
+export default function PersonalLoanHero() {
     const { openLogin } = useModal();
 
     return (

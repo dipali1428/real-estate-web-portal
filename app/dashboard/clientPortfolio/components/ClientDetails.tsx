@@ -1,5 +1,5 @@
 "use client"
-import React, { FC, useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 // import ClientAvatar from './ClientAvatar';
 import Pagination from './Pagination';
 import { Client } from '../types';

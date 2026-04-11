@@ -1,7 +1,6 @@
 "use client";
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import FDHero from './components/FDHero';
 import FDCalculator from './components/FDCalculator';
 import BankList from './components/BankList';

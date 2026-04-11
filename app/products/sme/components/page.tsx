@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ChevronLeft, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function SMEApplyPage() {
   const [step, setStep] = useState(1);
@@ -37,8 +38,8 @@ export default function SMEApplyPage() {
     if (step < 4) {
       nextStep();
     } else {
-      // Do nothing currently
-      console.log("Form Submitted", formData);
+      toast.success("Application submitted successfully! Our team will contact you soon.");
+      // console.log("Form Submitted", formData);
     }
   };
 
@@ -316,8 +317,7 @@ export default function SMEApplyPage() {
                         name="cibil"
                         value={formData.cibil}
                         onChange={handleChange}
-                        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-[#0056D2] outline-none transition-all text-slate-700"
-                      >
+                        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-[#0056D2] outline-none transition-all text-slate-700">
                         <option value="">Select Estimate</option>
                         <option value="Excellent (750+)">
                           Excellent (750+)
@@ -325,7 +325,7 @@ export default function SMEApplyPage() {
                         <option value="Good (700-750)">Good (700-750)</option>
                         <option value="Fair (650-700)">Fair (650-700)</option>
                         <option value="Below 650">
-                          Below 650 or Don't Know
+                          Below 650 or Don&apos;t Know
                         </option>
                       </select>
                     </div>

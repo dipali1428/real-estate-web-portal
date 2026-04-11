@@ -7,7 +7,6 @@ import {
     TrendingUp,
     ArrowUpRight,
     Clock,
-    Download,
     MoreVertical,
     ShieldCheck,
     RefreshCw,
@@ -18,8 +17,7 @@ import {
     X,
     ChevronDown,
     Check,
-    Banknote,
-    Building2
+    Banknote
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { bankData } from '../../../../products/FD/data/mockData';

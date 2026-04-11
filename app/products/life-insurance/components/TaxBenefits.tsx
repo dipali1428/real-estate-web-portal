@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, ArrowUpRight, Scale, BadgePercent, Sparkles, ArrowRight } from "lucide-react";
+import { ShieldCheck, ArrowUpRight, Scale, Sparkles, ArrowRight } from "lucide-react";
 
 const benefits = [
     {
@@ -49,19 +49,17 @@ export default function TaxBenefits() {
                     <motion.span
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="text-[#2076C7] font-black uppercase text-[10px] md:text-xs tracking-[0.4em] mb-4 block font-sans"
-                    >
+                        className="text-[#2076C7] font-black uppercase text-[10px] md:text-xs tracking-[0.4em] mb-4 block font-sans">
                         YOUR TAX SAVINGS
                     </motion.span>
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 md:mb-8 text-[#2076C7] leading-tight font-sans"
-                    >
+                        className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 md:mb-8 text-[#2076C7] leading-tight font-sans">
                         Save More with <span className="text-transparent bg-clip-text bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-[length:200%_auto] animate-gradient-x">Tax Privileges</span>
                     </motion.h2>
                     <p className="text-gray-500 text-lg md:text-xl leading-relaxed font-medium font-sans">
-                        Maximize your savings for your family's future with simple tax planning built into every policy.
+                        Maximize your savings for your family&apos;s future with simple tax planning built into every policy.
                     </p>
                 </div>
 
@@ -73,8 +71,7 @@ export default function TaxBenefits() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.05 }}
-                            className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-[0_15px_35px_rgba(0,0,0,0.02)] flex flex-col items-center text-center group hover:border-[#2076C7]/20 hover:shadow-[0_30px_60px_rgba(32,118,199,0.06)] transition-all duration-700 relative overflow-hidden h-full"
-                        >
+                            className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-[0_15px_35px_rgba(0,0,0,0.02)] flex flex-col items-center text-center group hover:border-[#2076C7]/20 hover:shadow-[0_30px_60px_rgba(32,118,199,0.06)] transition-all duration-700 relative overflow-hidden h-full">
                             {/* Accent bar */}
                             <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-[#2076C7] to-[#1CADA3] scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left" />
 
@@ -103,8 +100,7 @@ export default function TaxBenefits() {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mt-12 p-8 md:p-12 bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-[length:200%_auto] animate-gradient-x rounded-[3rem] text-center max-w-5xl mx-auto text-white relative overflow-hidden shadow-2xl shadow-[#2076C7]/20"
-                >
+                    className="mt-12 p-8 md:p-12 bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-[length:200%_auto] animate-gradient-x rounded-[3rem] text-center max-w-5xl mx-auto text-white relative overflow-hidden shadow-2xl shadow-[#2076C7]/20">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                     <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                         <div className="text-left max-w-xl">

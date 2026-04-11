@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plane, Heart, Home, GraduationCap, Briefcase, ShoppingCart } from 'lucide-react';
+import { Plane, Heart, Home, GraduationCap, Briefcase } from 'lucide-react';
 
 const plans = [
     {
@@ -55,7 +55,7 @@ export default function LoanPlans() {
                         Personal Loan Plans
                     </h2>
                     <p className="text-gray-600">
-                        Whether it's an emergency, a beautiful milestone, or clearing out old debt, Infinity Arthvishva has the right personal loan for you.
+                        Whether it&apos;s an emergency, a beautiful milestone, or clearing out old debt, Infinity Arthvishva has the right personal loan for you.
                     </p>
                 </div>
 

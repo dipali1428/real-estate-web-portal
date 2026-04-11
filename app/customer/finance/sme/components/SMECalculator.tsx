@@ -1,11 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
-  IconArrowRight,
   IconBuildingBank,
-  IconChevronDown,
   IconPlus,
   IconMinus,
 } from "@tabler/icons-react";
@@ -19,8 +16,6 @@ import {
 } from "recharts";
 import { useModal } from "@/app/context/ModalContext";
 
-import { IconDownload } from "@tabler/icons-react";
-import toast from "react-hot-toast";
 
 export const EMICalculator = ({ mode = 'default' }: { mode?: 'default' | 'customer' }) => {
   const { openLogin } = useModal();

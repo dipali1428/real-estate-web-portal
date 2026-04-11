@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { IconArrowRight, IconPlus, IconMinus } from '@tabler/icons-react';
@@ -110,10 +111,10 @@ export default function SupportAndFaqs() {
             <section className="bg-linear-to-r from-teal-600 to-teal-500 text-white py-16 font-sans">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-8">
                     <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">Ready to Secure Your<br />International Journey?</h2>
-                    <p className="text-white/80 font-bold text-lg leading-relaxed">Get instant coverage from India's top insurers. 24/7 expert assistance.</p>
+                    <p className="text-white/80 font-bold text-lg leading-relaxed">Get instant coverage from India&apos;s top insurers. 24/7 expert assistance.</p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                         <button onClick={openLogin} className="px-10 py-5 bg-white text-teal-600 rounded-2xl font-black shadow-lg hover:scale-[1.02] transition-all w-full sm:w-auto flex items-center justify-center gap-3 uppercase text-xs md:text-sm tracking-widest">Apply For Travel Insurance <IconArrowRight size={20} /></button>
-                        <a href="/#contact" className="px-10 py-5 border-2 border-white/40 text-white rounded-2xl font-black hover:bg-white/10 transition-all w-full sm:w-auto uppercase text-xs md:text-sm tracking-widest text-center">Talk to Expert</a>
+                        <Link href="/#contact" className="px-10 py-5 border-2 border-white/40 text-white rounded-2xl font-black hover:bg-white/10 transition-all w-full sm:w-auto uppercase text-xs md:text-sm tracking-widest text-center">Talk to Expert</Link>
                     </div>
                 </div>
             </section>

@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { 
-  FileText, Search, MoreVertical, CheckCircle2, 
+import { Search, MoreVertical, CheckCircle2, 
   XCircle, Clock, Download, Users, UserCheck, 
-  Timer, X, Plus, Loader2, Linkedin, MapPin
+  Timer, Loader2, Linkedin, MapPin
 } from 'lucide-react';
 import { AdminService } from "@/app/services/adminService"; // Ensure this path is correct
 import toast from 'react-hot-toast';

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, Shield, ArrowRight, Ship, Box, AlertCircle, IndianRupee, Info } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Calculator, Shield, ArrowRight, AlertCircle, IndianRupee, Info } from 'lucide-react';
 
 const MarineInsuranceCalculator = () => {
     const [cargoValue, setCargoValue] = useState(1000000); // 10 Lakh default

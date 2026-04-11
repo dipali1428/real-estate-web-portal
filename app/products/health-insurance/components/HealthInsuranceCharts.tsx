@@ -174,7 +174,7 @@ const HealthInsuranceCharts = () => {
                             Market Insights & Claim Transparency
                         </h2>
                         <p className="text-sm sm:text-base md:text-xl text-gray-500 font-medium max-w-3xl mx-auto px-2 md:px-0">
-                            Data-driven decisions for your family's future. We track claim performance and market trends to ensure you always have the best protection.
+                            Data-driven decisions for your family&apos;s future. We track claim performance and market trends to ensure you always have the best protection.
                         </p>
                     </motion.div>
                 </div>

@@ -5,15 +5,12 @@ import { motion } from "framer-motion";
 import { 
   Users, Mail, Clock, CheckCircle, LineChart as LineChartIcon, 
   FolderOpen, ArrowUpRight, Plus, Download, Filter,
-  TrendingUp, BarChart3, PieChart as PieIcon, 
-  Target, Zap, Globe, ArrowDownRight, MoreHorizontal,
-  Activity, ShieldCheck, Map, Smartphone, MousePointer2,
-  Calendar, Award, Briefcase, ZapOff, Layers, TableProperties
+  TrendingUp, 
+  Target, MoreHorizontal, ShieldCheck, Layers, TableProperties
 } from "lucide-react";
 
 // Advanced Chart Imports
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
+import { Area, XAxis, YAxis, CartesianGrid, Tooltip, 
   ResponsiveContainer, BarChart, Bar, Cell, PieChart, Pie, 
   Legend, ComposedChart, Line, RadialBarChart, RadialBar,
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -161,8 +158,7 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="lg:col-span-2 relative overflow-hidden bg-linear-to-br from-[#2076C7] to-[#1CADA3] rounded-2xl p-8 text-white shadow-xl shadow-blue-100"
-        >
+          className="lg:col-span-2 relative overflow-hidden bg-linear-to-br from-[#2076C7] to-[#1CADA3] rounded-2xl p-8 text-white shadow-xl shadow-blue-100">
           <div className="relative z-10 flex flex-col h-full justify-center">
             <h2 className="text-2xl sm:text-3xl font-bold mb-2">Systems are running smooth.</h2>
             <p className="opacity-90 max-w-md mb-6">
@@ -185,8 +181,7 @@ export default function Dashboard() {
         <motion.div 
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between"
-        >
+          className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
           <div className="flex justify-between items-start">
             <div className="p-3 bg-purple-50 rounded-xl text-purple-600">
               <LineChartIcon size={24} />

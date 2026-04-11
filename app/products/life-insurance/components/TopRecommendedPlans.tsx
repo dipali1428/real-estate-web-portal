@@ -3,11 +3,10 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  CheckCircle2, ExternalLink,
+  CheckCircle2,
   ShieldCheck, Star, Zap, Anchor,
   TrendingUp, GraduationCap, Heart,
-  Briefcase, Gift, Landmark, Info,
-  ChevronRight, Search, X, ArrowRight
+  Briefcase, Gift, Landmark, Search
 } from "lucide-react";
 // import GetQuoteModal from "./GetQuoteModal";
 import PlanDetailsModal from "./PlanDetailsModal";

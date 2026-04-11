@@ -206,7 +206,7 @@ export default function BharatValueDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
                                         <p className="text-xs text-blue-800 font-medium italic">
-                                            "Strategic emphasis on deep value and special situations."
+                                            Strategic emphasis on deep value and special situations.
                                         </p>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function BharatValueDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "Specialized expertise in value investing and special situation opportunities."
+                                Specialized expertise in value investing and special situation opportunities.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

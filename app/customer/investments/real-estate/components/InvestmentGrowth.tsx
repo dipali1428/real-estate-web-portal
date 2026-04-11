@@ -1,16 +1,13 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { 
-    Briefcase,
+import {
     TrendingUp,
     FileText,
     Download,
     Eye,
     EyeOff,
     Building2,
-    Calendar,
-    ArrowRight,
     Wallet,
     BarChart3,
     ShieldCheck
@@ -25,7 +22,6 @@ import {
     ResponsiveContainer
 } from 'recharts';
 import { properties as staticProperties } from '@/app/products/RealEstate/data/properties';
-import Link from 'next/link';
 
 // --- TYPES ---
 interface Investment {

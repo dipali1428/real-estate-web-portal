@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import {
-  Plus,
   Calendar,
   Activity,
   Pause,
@@ -14,7 +13,6 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import Link from "next/link";
 
 interface SIP {
   id: string;

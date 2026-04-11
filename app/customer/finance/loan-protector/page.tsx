@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     IconCalculator,
     IconShieldLock,
-    IconShieldCheck,
     IconFileText,
 } from '@tabler/icons-react';
 import LoanProtectorSection from './components/LoanProtectorSection';

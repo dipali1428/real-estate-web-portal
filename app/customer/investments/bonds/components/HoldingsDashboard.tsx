@@ -9,9 +9,7 @@ import {
     CheckCircle2, LayoutDashboard, Globe
 } from 'lucide-react';
 import { 
-    ResponsiveContainer, PieChart, Pie, Cell, Tooltip, 
-    LineChart, Line, XAxis, YAxis, CartesianGrid, AreaChart, Area,
-    BarChart, Bar
+    ResponsiveContainer, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, CartesianGrid, AreaChart, Area
 } from 'recharts';
 import InvestmentTable from './InvestmentTable';
 

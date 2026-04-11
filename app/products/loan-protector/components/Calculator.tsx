@@ -7,7 +7,13 @@ import {
   Store,
   Shield,
   Activity,
+  TrendingDown,
+  Users,
+  Lightbulb,
+  CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
+
 import { useModal } from "../../../context/ModalContext";
 import { BASE_RATES, TENURE_FACTORS, LOAN_TYPES, PLAN_TYPES } from "./data";
 
@@ -572,10 +578,3 @@ export function LoanProtectorCalculator({
   );
 }
 
-import {
-  TrendingDown,
-  Users,
-  Lightbulb,
-  CheckCircle2,
-  AlertTriangle,
-} from "lucide-react";

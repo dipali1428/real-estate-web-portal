@@ -45,8 +45,7 @@ const Features = () => {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm"
-                    >
+                        className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                         Why Choose Our Fixed Deposits?
                     </motion.h2>
 
@@ -55,9 +54,8 @@ const Features = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed"
-                    >
-                        We partner with India's top banks and NBFCs to bring you the safest and highest yielding fixed deposit options.
+                        className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
+                        We partner with India&apos;s top banks and NBFCs to bring you the safest and highest yielding fixed deposit options.
                     </motion.p>
                 </div>
 

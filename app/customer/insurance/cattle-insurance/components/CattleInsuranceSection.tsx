@@ -2,15 +2,13 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { 
-    IconCheck, IconDownload, IconFileText, IconCalculator, IconShieldCheck,
-    IconHistory, IconInfoCircle, IconMapPin, IconStethoscope, IconId, IconVaccine, IconSearch, IconFilter
+import { IconDownload, IconFileText, IconCalculator, IconShieldCheck,
+    IconHistory, IconInfoCircle, IconMapPin, IconStethoscope, IconId, IconVaccine
 } from '@tabler/icons-react';
 import { Beef, Milk, Calendar, AlertCircle } from 'lucide-react';
 
 import CoverageTypes from '@/app/products/cattle-insurance/components/CoverageTypes';
 // import { coverageTypes } from '@/app/products/cattle-insurance/components/CoverageTypes';
-import ComparisonchartAndGraph from '../../../../products/cattle-insurance/components/ComparisonchartAndGraph';
 import CattleCalculator from '@/app/products/cattle-insurance/components/CattleCalculator';
 
 

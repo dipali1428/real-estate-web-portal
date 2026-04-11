@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Heart, Info, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import {
-  Heart,
-    Info,
-  Loader2,
-} from "lucide-react";
 import { WELLNESS_FEATURES } from "./data";
 
 interface GroupHealthCalculatorProps {
@@ -24,10 +20,11 @@ export const GroupHealthCalculator: React.FC<GroupHealthCalculatorProps> = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
+    const rafId = requestAnimationFrame(() => setLoading(true));
+
     const timer = setTimeout(() => {
       let baseRate = 2500;
-      // Age multipliers — 5-year bands
+
       const ageMultipliers: Record<string, number> = {
         "20-25": 0.85,
         "26-30": 1.0,
@@ -39,7 +36,6 @@ export const GroupHealthCalculator: React.FC<GroupHealthCalculatorProps> = ({
         "55+": 2.22,
       };
 
-      // Industry multipliers
       const industryMultipliers: Record<string, number> = {
         IT: 0.9,
         Manufacturing: 1.3,
@@ -62,7 +58,11 @@ export const GroupHealthCalculator: React.FC<GroupHealthCalculatorProps> = ({
       setPremium(Math.round(baseRate * employees));
       setLoading(false);
     }, 600);
-    return () => clearTimeout(timer);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timer);
+    };
   }, [employees, avgAge, sumInsured, industry]);
 
   const formatCurrency = (val: number) =>
@@ -80,8 +80,7 @@ export const GroupHealthCalculator: React.FC<GroupHealthCalculatorProps> = ({
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-          >
+            viewport={{ once: true }}>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-[#2076C7] rounded-full text-xs font-bold uppercase tracking-wider mb-6 border border-blue-100">
               <Heart className="w-3.5 h-3.5" />
               Employee Wellness
@@ -101,8 +100,7 @@ export const GroupHealthCalculator: React.FC<GroupHealthCalculatorProps> = ({
               {WELLNESS_FEATURES.map((feature, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"
-                >
+                  className="flex items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                   <feature.icon
                     className={`w-5 h-5 ${feature.color} shrink-0`}
                   />
@@ -132,8 +130,7 @@ export const GroupHealthCalculator: React.FC<GroupHealthCalculatorProps> = ({
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="bg-white rounded-2xl shadow-[0_10px_40px_rgb(0,0,0,0.08)] border border-slate-100 overflow-hidden"
-          >
+            className="bg-white rounded-2xl shadow-[0_10px_40px_rgb(0,0,0,0.08)] border border-slate-100 overflow-hidden">
             <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-6 sm:p-8 text-white text-center">
               <h3 className="font-bold font-sans text-2xl mb-1">
                 GMC Premium Calculator
@@ -178,8 +175,7 @@ export const GroupHealthCalculator: React.FC<GroupHealthCalculatorProps> = ({
                   <select
                     value={sumInsured}
                     onChange={(e) => setSumInsured(Number(e.target.value))}
-                    className="w-full p-4 rounded-xl border border-slate-200 bg-white text-black font-semibold outline-none focus:ring-4 focus:ring-[#2076C7]/10 transition-all appearance-none cursor-pointer"
-                  >
+                    className="w-full p-4 rounded-xl border border-slate-200 bg-white text-black font-semibold outline-none focus:ring-4 focus:ring-[#2076C7]/10 transition-all appearance-none cursor-pointer">
                     <option value={200000}>₹2 Lakhs</option>
                     <option value={300000}>₹3 Lakhs</option>
                     <option value={500000}>₹5 Lakhs</option>
@@ -194,15 +190,14 @@ export const GroupHealthCalculator: React.FC<GroupHealthCalculatorProps> = ({
                   <select
                     value={avgAge}
                     onChange={(e) => setAvgAge(e.target.value)}
-                    className="w-full p-4 rounded-xl border border-slate-200 bg-white text-black font-semibold outline-none focus:ring-4 focus:ring-[#2076C7]/10 transition-all appearance-none cursor-pointer"
-                  >
-                    <option value="20-25">20 – 25 Yrs</option>
-                    <option value="26-30">26 – 30 Yrs</option>
-                    <option value="31-35">31 – 35 Yrs</option>
-                    <option value="36-40">36 – 40 Yrs</option>
-                    <option value="41-45">41 – 45 Yrs</option>
-                    <option value="46-50">46 – 50 Yrs</option>
-                    <option value="51-55">51 – 55 Yrs</option>
+                    className="w-full p-4 rounded-xl border border-slate-200 bg-white text-black font-semibold outline-none focus:ring-4 focus:ring-[#2076C7]/10 transition-all appearance-none cursor-pointer">
+                    <option value="20-25">20 &ndash; 25 Yrs</option>
+                    <option value="26-30">26 &ndash; 30 Yrs</option>
+                    <option value="31-35">31 &ndash; 35 Yrs</option>
+                    <option value="36-40">36 &ndash; 40 Yrs</option>
+                    <option value="41-45">41 &ndash; 45 Yrs</option>
+                    <option value="46-50">46 &ndash; 50 Yrs</option>
+                    <option value="51-55">51 &ndash; 55 Yrs</option>
                     <option value="55+">55+ Yrs</option>
                   </select>
                 </div>

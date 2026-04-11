@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import { FileText, CheckCircle, X, Download, AlertCircle, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { FileText, CheckCircle, X, AlertCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { DashboardService } from "@/app/services/dashboardService";
 import toast, { Toaster } from 'react-hot-toast';
@@ -19,8 +19,8 @@ export default function DSAAgreement() {
       try {
         const response = await DashboardService.checkKycStatus();
         setProfile(response);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
+      } catch (error : any) {
+        toast.error("Error fetching profile data. Please try again later.", error);
       } finally {
         setLoading(false);
       }
@@ -36,7 +36,7 @@ export default function DSAAgreement() {
       setIsSubmitting(true);
       const nameToSubmit = signedName || profile?.name || "Agent";
 
-      const response = await DashboardService.createAgreement({ 
+      const response = await DashboardService.createAgreement({
         // signed_name: nameToSubmit,
         payment_method: paymentChoice // Pass the choice to your backend
       });

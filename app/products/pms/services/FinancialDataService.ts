@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import REAL_APIS from './marketDataApis';
+import toast from 'react-hot-toast';
 
 class FinancialDataService {
     private nseInstance: AxiosInstance;
@@ -39,7 +40,8 @@ class FinancialDataService {
             const data = this.processNSEIndexData(response.data);
             if (data) return this.cacheAndReturn(cacheKey, data);
         } catch (error) {
-            console.warn('NSE fetch failed, falling back to Alpha Vantage');
+            // console.warn('NSE fetch failed, falling back to Alpha Vantage');
+            toast.error(`Error fetching Nifty 50 data from NSE: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
 
         try {
@@ -58,7 +60,8 @@ class FinancialDataService {
                 return this.cacheAndReturn(cacheKey, data);
             }
         } catch (error) {
-            console.warn('Alpha Vantage fetch failed');
+            // console.warn('Alpha Vantage fetch failed');
+            toast.error(`Error fetching Nifty 50 data: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
 
         return this.getMockNiftyData();

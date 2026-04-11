@@ -73,7 +73,7 @@ const BondsFAQ = () => {
                         Frequently Asked Questions
                     </h2>
                     <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg mt-6 font-medium leading-relaxed px-4 md:px-0">
-                        Got questions about bond investments? We've got answers. Everything you need to know about Corporate and State Guaranteed Bonds.
+                        Got questions about bond investments? We&apos;ve got answers. Everything you need to know about Corporate and State Guaranteed Bonds.
                     </p>
                 </div>
 
@@ -82,13 +82,11 @@ const BondsFAQ = () => {
                     {(showAllFaqs ? bondsFaqs : bondsFaqs.slice(0, 5)).map((faq, idx) => (
                         <div
                             key={idx}
-                            className="border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-md"
-                        >
+                            className="border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-md">
                             <button
                                 onClick={() => toggleFAQ(idx)}
                                 suppressHydrationWarning={true}
-                                className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left flex justify-between items-start gap-3 bg-gray-50 hover:bg-blue-50/50 transition-colors"
-                            >
+                                className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left flex justify-between items-start gap-3 bg-gray-50 hover:bg-blue-50/50 transition-colors">
                                 <span className="font-bold text-gray-700 text-sm sm:text-lg pr-2 hover:text-blue-600 transition-colors">
                                     {faq.question}
                                 </span>

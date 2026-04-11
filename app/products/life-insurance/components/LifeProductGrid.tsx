@@ -3,9 +3,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import {
-  ShieldCheck, Zap, Heart, Coins,
-  GraduationCap, Anchor, Gem, ArrowRight,
-  TrendingUp, Shield, Star, Users,
+  ShieldCheck, Zap, Heart,
+  GraduationCap, Anchor, Gem, ArrowRight, Shield, Star, Users,
   Briefcase, UserPlus, Gift, Landmark
 } from "lucide-react";
 

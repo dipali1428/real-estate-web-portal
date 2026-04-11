@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     X, ShieldCheck, User, Phone, Mail, Calendar,
     IndianRupee, ChevronRight, CheckCircle2, Loader2,
-    Baby, Briefcase, Anchor, TrendingUp, Cigarette,
+    Baby, Anchor, Cigarette,
 } from "lucide-react";
 
 type Plan = {
@@ -98,6 +98,10 @@ export default function GetQuoteModal({ plan, onClose }: GetQuoteModalProps) {
     }, [plan]);
 
     const update = (key: string, val: string) => setForm(f => ({ ...f, [key]: val }));
+
+    const [referenceId] = useState(() =>
+        `INF-${Date.now().toString().slice(-6)}`
+    );
 
     const isStep1Valid = form.name && form.phone.length >= 10 && form.age;
     const isStep2Valid = form.coverageAmount && form.policyTerm;
@@ -476,14 +480,13 @@ export default function GetQuoteModal({ plan, onClose }: GetQuoteModalProps) {
                                     </div>
 
                                     <p className="text-[9px] text-slate-300 font-medium italic">
-                                        Reference ID: INF-{Date.now().toString().slice(-6)} · IRDAI Certified
+                                        Reference ID: {referenceId} · IRDAI Certified
                                     </p>
 
                                     <button
                                         onClick={onClose}
                                         className="font-sans mt-6 px-8 py-3 rounded-xl text-sm font-black text-white transition-all hover:opacity-90"
-                                        style={{ backgroundColor: plan.accentColor }}
-                                    >
+                                        style={{ backgroundColor: plan.accentColor }}>
                                         Done
                                     </button>
                                 </motion.div>

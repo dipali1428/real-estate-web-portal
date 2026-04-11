@@ -2,13 +2,11 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowRight,
     ArrowLeft,
-    CheckCircle2,
     Search,
-    Info,
     Plus,
     Minus,
     HelpCircle,
@@ -18,10 +16,8 @@ import {
     Box,
     Ship,
     Anchor,
-    IndianRupee,
-    Truck
+    IndianRupee
 } from 'lucide-react';
-import Link from 'next/link';
 
 // Components
 import MarineInsuranceCalculator from './components/MarineInsuranceCalculator';
@@ -565,7 +561,7 @@ const MarineInsurancePage = () => {
             <section className="bg-white py-12 px-4">
                 <div className="max-w-4xl mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
                     <p className="text-sm text-gray-700 text-center leading-relaxed font-sans">
-                        <strong className="text-black">Disclaimer:</strong> Marine Insurance coverage, premium rates, and policy terms are subject to the insurer's underwriting guidelines and the Maritime Laws of India. Final approval and claim settlements are at the sole discretion of the respective insurance providers.
+                        <strong className="text-black">Disclaimer:</strong> Marine Insurance coverage, premium rates, and policy terms are subject to the insurer&apos;s underwriting guidelines and the Maritime Laws of India. Final approval and claim settlements are at the sole discretion of the respective insurance providers.
                     </p>
                 </div>
             </section>

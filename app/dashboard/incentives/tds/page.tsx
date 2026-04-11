@@ -1,15 +1,11 @@
 "use client";
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
-  Search, 
   Download, 
   FileText, 
   Loader2, 
-  ChevronLeft, 
-  ChevronRight, 
   X, 
   User, 
-  Calendar, 
   Building2, 
   Clock,
   CheckCircle2,

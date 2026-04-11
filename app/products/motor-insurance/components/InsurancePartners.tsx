@@ -2,7 +2,6 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck } from "lucide-react";
 
 const partners = [
     { name: "Royal Sundaram", logo: "/motor-insurance/Royal_Sundaram.png" },

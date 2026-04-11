@@ -1,7 +1,6 @@
 'use client';
 import { useState, useMemo, useEffect } from 'react';
-import {
-  Search, Filter, Download, Wallet, Clock, FileText, Inbox, Eye, X
+import { Download, Wallet, Clock, FileText, Inbox, Eye, X
 } from 'lucide-react';
 import { DashboardService } from '@/app/services/dashboardService';
 
@@ -43,7 +42,7 @@ export default function PayoutHistory() {
 
   const formatValue = (val: any, stripDecimals = false) => {
     if (!val) return "";
-    let str = val.toString().replace(/^"|"$/g, "").replace(/"/g, "").trim();
+    const str = val.toString().replace(/^"|"$/g, "").replace(/"/g, "").trim();
     if (stripDecimals) {
       return str.split('.')[0];
     }

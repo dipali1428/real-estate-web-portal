@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
     ArrowLeft, TrendingUp, ShieldCheck,
-    Briefcase, FileText, Activity,
+    Briefcase, FileText,
     CheckCircle, BarChart as BarChartIcon, PieChart as PieChartIcon,
     AlertCircle, Target, Users, Clock, IndianRupee
 } from 'lucide-react';
@@ -206,7 +206,7 @@ export default function ICICIOfficeYieldDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
                                         <p className="text-xs text-blue-800 font-medium italic">
-                                            "Focus on lease-backed debt and structured credit for stable yield generation."
+                                            Focus on lease-backed debt and structured credit for stable yield generation.
                                         </p>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function ICICIOfficeYieldDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "One of India’s leading AMCs with expertise in real estate investing and alternative strategies."
+                                One of India&apos;s leading AMCs with expertise in real estate investing and alternative strategies.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

@@ -222,11 +222,10 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                     <motion.div 
                         initial={{ opacity: 0, x: -40 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="space-y-8 flex flex-col items-center lg:items-start text-center lg:text-left"
-                    >
+                        className="space-y-8 flex flex-col items-center lg:items-start text-center lg:text-left">
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full text-[10px] font-black uppercase tracking-widest text-[#2076C7] mt-10 md:mt-0">
                             <TrendingUp size={14} />
-                            India's Premier Pre-IPO Platform
+                            India&apos;s Premier Pre-IPO Platform
                         </div>
                         
                         <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-clip-text text-transparent">

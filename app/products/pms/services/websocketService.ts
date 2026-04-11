@@ -20,7 +20,7 @@ class MockWebSocketService {
     connect() {
         if (typeof window === 'undefined') return;
 
-        console.log('Mock WebSocket service connected');
+        // console.log('Mock WebSocket service connected');
 
         // Start generating mock data for each channel
         Object.keys(this.mockDataGenerators).forEach(channel => {
@@ -70,7 +70,7 @@ class MockWebSocketService {
         this.intervalIds.forEach(intervalId => clearInterval(intervalId));
         this.intervalIds.clear();
         this.subscribers.clear();
-        console.log('Mock WebSocket service disconnected');
+        // console.log('Mock WebSocket service disconnected');
     }
 
     // Mock data generators

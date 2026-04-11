@@ -1,14 +1,10 @@
 
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { IconCheck, IconX, IconSchool, IconBuildingBank, IconWorld, IconAward, IconCurrencyRupee, IconPercentage, IconShieldCheck, IconClock, IconHistory, IconReceiptTax, IconFileText, IconFirstAidKit, IconArrowRight, IconUser, IconPhone, IconBook, IconMapPin, IconUpload, IconSearch, IconFilter } from '@tabler/icons-react';
+import { IconCheck, IconSchool, IconBuildingBank, IconWorld, IconAward, IconCurrencyRupee, IconPercentage, IconShieldCheck, IconClock, IconHistory, IconReceiptTax, IconFileText, IconFirstAidKit, IconArrowRight, IconPhone, IconUpload } from '@tabler/icons-react';
 import { useModal } from '../../../context/ModalContext';
-import toast from 'react-hot-toast';
-import { AnimatePresence } from 'framer-motion';
-import EligibilityAndProcess from './EligibilityAndProcess';
-import BenefitsSection from './BenefitsSection';
 import EMICalculator from './EMICalculator';
 import MarketComparison from './MarketComparision';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { IconCheck, IconFileText, IconUserCheck, IconBriefcase, IconClock, IconArrowRight, IconInfoCircle, IconCreditCard, IconStar, IconShieldCheck } from '@tabler/icons-react';
+import { IconCheck, IconFileText, IconUserCheck, IconClock, IconInfoCircle, IconCreditCard, IconStar } from '@tabler/icons-react';
 
 const steps = [
     { icon: IconCreditCard, step: '01', title: 'Check Eligibility', desc: 'Provide your basic professional details and income to see which cards you qualify for.', color: 'bg-blue-100 text-blue-600' },

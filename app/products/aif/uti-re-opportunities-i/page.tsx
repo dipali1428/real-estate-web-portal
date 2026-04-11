@@ -206,7 +206,7 @@ export default function UTIREOpportunitiesDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
                                         <p className="text-xs text-blue-800 font-medium italic">
-                                            "Balanced allocation across equity, debt, and mezzanine."
+                                            Balanced allocation across equity, debt, and mezzanine.
                                         </p>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function UTIREOpportunitiesDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "Established investment platform with deep real estate expertise."
+                                Established investment platform with deep real estate expertise.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

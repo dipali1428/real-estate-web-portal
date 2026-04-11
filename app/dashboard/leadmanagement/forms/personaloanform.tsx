@@ -5,6 +5,7 @@ import {
   Loader2, ArrowRight, ArrowLeft, AlertCircle 
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import toast from "react-hot-toast";
 
 // --- Constants & Styles ---
 const STYLES = {
@@ -179,7 +180,7 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
   const [fileQueue, setFileQueue] = useState<QueuedFile[]>([]);
 
   const requiredDocsList = useMemo(() => {
-    let docs = [...BASE_DOCS];
+    const docs = [...BASE_DOCS];
     if (form.hasOtherLoan === "Yes") docs.push("Existing Loan Statement");
     return [...new Set(docs)].map(label => DOC_REGISTRY[label]).filter(Boolean);
   }, [form.hasOtherLoan]);
@@ -236,7 +237,8 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
 
       setStep(2);
     } catch (err) {
-      console.error(err);
+      // console.error(err);
+      toast.error("Failed to create application. Please try again.");
       setStatusMsg("Failed to create application.");
     } finally {
       setIsSubmitting(false);
@@ -268,7 +270,8 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
             await DashboardService.uploadLeadDocument(leadId!, formData);
             setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "success" } : item));
         } catch (err) {
-            console.error(err);
+            // console.error(err);
+            toast.error("Failed to upload document. Please try again.");
             setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "error" } : item));
             setStatusMsg("Upload failed. Please try again.");
             setIsSubmitting(false);

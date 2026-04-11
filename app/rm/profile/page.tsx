@@ -46,7 +46,7 @@ export default function ProfileSection() {
                 setReferralCode(res.referral_code);
             }
         } catch (e) {
-            console.error("Referral Error:", e);
+            // console.error("Referral Error:", e);
             triggerPopup("Failed to prepare referral link", "error");
             return;
         } finally {
@@ -61,7 +61,8 @@ export default function ProfileSection() {
                     url: currentLink,
                 });
             } catch (err) {
-                console.log("Share cancelled or failed");
+                // console.log("Share cancelled or failed");
+                toast.error("Sharing failed or cancelled.");
             }
         } else if (currentLink) {
             handleCopyReferral();
@@ -83,7 +84,7 @@ export default function ProfileSection() {
                 throw new Error("Link not found in response");
             }
         } catch (e) {
-            console.error("Referral Error:", e);
+            // console.error("Referral Error:", e);
             triggerPopup("Failed to generate link", "error");
         } finally {
             setIsGeneratingLink(false);
@@ -112,7 +113,7 @@ export default function ProfileSection() {
                 // Set the code from profile if it exists
                 if (res.user.referral_code) setReferralCode(res.user.referral_code);
             } catch (err) {
-                console.error("Profile load error", err);
+                // console.error("Profile load error", err);
                 toast.error("Failed to fetch profile.");
             } finally {
                 setLoading(false);
@@ -132,7 +133,7 @@ export default function ProfileSection() {
                 const res = await RmService.getRmProfile();
                 setProfile(res.user);
             } catch (err) {
-                console.error("Profile load error", err);
+                // console.error("Profile load error", err);
                 toast.error("Failed to fetch profile.");
             } finally {
                 setLoading(false);

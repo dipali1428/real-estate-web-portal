@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, IndianRupee, ArrowRight, ShieldPlus, Info } from 'lucide-react';
+import { Search, ArrowRight, ShieldPlus, Info } from 'lucide-react';
 import HealthInsurancePlanCard from './HealthInsurancePlanCard';
 import { healthInsurancePlans } from '../healthInsuranceConstants';
 import { motion } from 'framer-motion';

@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     IconCalculator, 
     IconBuildingBank, 
-    IconFileText, 
     IconBriefcase, 
     IconUsers 
 } from '@tabler/icons-react';

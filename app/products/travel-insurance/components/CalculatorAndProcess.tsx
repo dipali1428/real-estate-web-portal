@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
-    IconPlus, IconMinus, IconArrowRight, IconArrowLeft,
+    IconMinus, IconArrowRight, IconArrowLeft,
     IconUsers, IconShieldCheck,
     IconCalendarEvent, IconSearch, IconMapPin, IconFileText, IconBolt
 } from '@tabler/icons-react';
@@ -53,19 +53,36 @@ export default function CalculatorAndProcess({ isDashboard = false, onShowPlans 
     const [destination, setDestination] = useState(DESTINATIONS[2]);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [duration, setDuration] = useState(7);
+    // const [duration, setDuration] = useState(7);
     const [travelers, setTravelers] = useState([{ id: 1, ageGroup: AGE_GROUPS[1] }]);
     const [hasMedicalCondition, setHasMedicalCondition] = useState(false);
     const [sumInsured, setSumInsured] = useState(SUM_INSURED_OPTIONS[1]);
     const [totalPremium, setTotalPremium] = useState(0);
 
-    useEffect(() => {
+    // useEffect(() => {
+    //     if (startDate && endDate) {
+    //         const start = new Date(startDate);
+    //         const end = new Date(endDate);
+    //         const diffDays = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    //         if (diffDays > 0) setDuration(diffDays);
+    //     }
+    // }, [startDate, endDate]);
+    const duration = useMemo(() => {
         if (startDate && endDate) {
             const start = new Date(startDate);
             const end = new Date(endDate);
-            const diffDays = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-            if (diffDays > 0) setDuration(diffDays);
+
+            if (end < start) return 0; // prevent invalid range
+
+            const diffDays =
+                Math.ceil(
+                    (end.getTime() - start.getTime()) /
+                    (1000 * 60 * 60 * 24)
+                ) + 1;
+
+            return diffDays;
         }
+        return 7;
     }, [startDate, endDate]);
 
     useEffect(() => {

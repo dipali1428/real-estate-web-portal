@@ -6,15 +6,13 @@ import { useState } from 'react';
 import { 
     IconCheck, IconDownload, IconBackpack, IconBriefcase, 
     IconSchool, IconUsers, IconLoader, IconPlane, 
-    IconFileText, IconCalculator, IconWorld, IconShieldCheck,
-    IconClock, IconMapPin, IconChevronDown, IconPhoneCall,
-    IconHistory, IconFileCertificate, IconEmergencyBed, IconAlertCircle,
-    IconArrowRight, IconUserCheck, IconInfoCircle, IconBolt, IconTruckDelivery,
-    IconStethoscope, IconLuggage, IconPlaneArrival, IconCreditCard, IconAlarm, IconSearch, IconPlus, IconFilter
+    IconFileText, IconCalculator, IconWorld, IconShieldCheck, IconMapPin,
+    IconHistory, IconFileCertificate,
+    IconStethoscope, IconLuggage, IconPlaneArrival
 } from '@tabler/icons-react';
 import { useModal } from '@/app/context/ModalContext';
 import toast from 'react-hot-toast';
-import { travelInsurancePlans, travelInsuranceAddons } from '../data';
+import { travelInsurancePlans } from '../data';
 
 // --- Shared Data ---
 const providers = [
@@ -143,8 +141,7 @@ export default function TravelInsuranceSection({ isDashboard = false }: { isDash
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-center mb-10"
-                    >
+                        className="text-center mb-10">
                         <span className="inline-flex items-center gap-2 text-[#2076C7] font-black tracking-widest uppercase text-xs mb-4">
                             <IconShieldCheck size={14} />
                             Travel Insurance
@@ -153,7 +150,7 @@ export default function TravelInsuranceSection({ isDashboard = false }: { isDash
                             Tailored Travel Insurance Plans
                         </h2>
                         <p className="text-gray-600 max-w-2xl mx-auto font-medium text-sm md:text-lg leading-relaxed">
-                            Choose the perfect coverage designed for your specific travel needs, whether it's a quick vacation or a year abroad.
+                            Choose the perfect coverage designed for your specific travel needs, whether it&apos;s a quick vacation or a year abroad.
                         </p>
                     </motion.div>
                 )}
@@ -165,8 +162,7 @@ export default function TravelInsuranceSection({ isDashboard = false }: { isDash
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
-                            transition={{ duration: 0.3 }}
-                        >
+                            transition={{ duration: 0.3 }}>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16 px-2">
                                 {travelInsurancePlans.map((plan, idx) => {
                                     const Icon = getPlanIcon(plan.title);

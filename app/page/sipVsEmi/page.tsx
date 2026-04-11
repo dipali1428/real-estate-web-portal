@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TrendingUp, PieChart, Calculator, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
 
@@ -291,14 +291,14 @@ export const LoanTenureCalculatorContent: React.FC = () => {
   };
 
   useEffect(() => {
-    calculateImpact();
+    // calculateImpact();
   }, [calculateImpact]);
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
         <div className="p-6 lg:p-8 font-sans">
-          
+
           {/* Loan & Investment Parameters Card */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
             <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
@@ -491,15 +491,15 @@ export const LoanTenureCalculatorContent: React.FC = () => {
                   of your total loan cost
                 </li>
               </ul>
-              
+
               <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-xs text-yellow-800 flex items-start gap-2">
                   <span><strong>Pro Tip:</strong> Consider investing the EMI difference in a disciplined SIP to build wealth while managing your loan payments effectively.</span>
                 </p>
               </div>
-              
+
               <p className="text-[11px] text-gray-500 mt-2 flex items-start gap-1">
-                <span><strong>Note:</strong> This analysis assumes consistent SIP returns and doesn't account for inflation or tax implications. Actual results may vary.</span>
+                <span><strong>Note:</strong> This analysis assumes consistent SIP returns and doesn&apos;t account for inflation or tax implications. Actual results may vary.</span>
               </p>
             </div>
           </div>
@@ -509,7 +509,7 @@ export const LoanTenureCalculatorContent: React.FC = () => {
 
       {/* Font Awesome */}
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-      
+
       {/* Notification */}
       {notification.show && (
         <div className={`fixed top-5 right-5 bg-white rounded-lg shadow-lg z-50 max-w-sm border-l-4 ${notification.type === 'success' ? 'border-[#1CADA3]' : 'border-red-500'}`}>
@@ -531,7 +531,7 @@ export const LoanTenureCalculatorContent: React.FC = () => {
 // =============================================
 const LoanTenureCalculatorStandalone: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
+
   const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'sipVsEmi') || CALCULATOR_OPTIONS[0];
 
   const handleCalculatorChange = (path: string) => {
@@ -552,7 +552,7 @@ const LoanTenureCalculatorStandalone: React.FC = () => {
       {/* Dropdown */}
       <div className="container mx-auto px-4 py-4 max-w-md">
         <div className="relative">
-          <button 
+          <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
           >
@@ -567,7 +567,7 @@ const LoanTenureCalculatorStandalone: React.FC = () => {
 
           <AnimatePresence>
             {isDropdownOpen && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -580,21 +580,18 @@ const LoanTenureCalculatorStandalone: React.FC = () => {
                       handleCalculatorChange(calc.path);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
-                      calc.id === 'sipVsEmi' ? 'bg-teal-500/5' : ''
-                    }`}
+                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${calc.id === 'sipVsEmi' ? 'bg-teal-500/5' : ''
+                      }`}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      calc.id === 'sipVsEmi' 
-                        ? 'bg-teal-500 text-white' 
-                        : 'bg-gray-100 text-gray-500'
-                    }`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${calc.id === 'sipVsEmi'
+                      ? 'bg-teal-500 text-white'
+                      : 'bg-gray-100 text-gray-500'
+                      }`}>
                       <calc.icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1">
-                      <span className={`font-medium ${
-                        calc.id === 'sipVsEmi' ? 'text-teal-600' : 'text-gray-700'
-                      }`}>
+                      <span className={`font-medium ${calc.id === 'sipVsEmi' ? 'text-teal-600' : 'text-gray-700'
+                        }`}>
                         {calc.label}
                       </span>
                       <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>

@@ -1,10 +1,11 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { 
-  X, CheckCircle, UploadCloud, Trash2, ChevronDown, 
+  X, CheckCircle, UploadCloud, Trash2, 
   Loader2, ArrowRight, ArrowLeft, AlertCircle 
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import toast from "react-hot-toast";
 
 // --- Constants & Styles ---
 const STYLES = {
@@ -248,10 +249,10 @@ export default function UnlistedSharesForm({ onClose }: { onClose: () => void })
       };
 
       // Log the payload for debugging
-      console.log("Sending payload:", payload);
+      // console.log("Sending payload:", payload);
 
       const result = await DashboardService.createReferralLead(payload);
-      console.log("API Response:", result);
+      // console.log("API Response:", result);
       
       // Check if the response indicates success
       if (!result.success) {
@@ -300,7 +301,8 @@ export default function UnlistedSharesForm({ onClose }: { onClose: () => void })
       
       setStatusMsg(errorMessage);
       // Show error alert for better visibility
-      alert(`Error: ${errorMessage}`);
+      // alert(`Error: ${errorMessage}`);
+      toast.error(`Error: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }

@@ -3,13 +3,9 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {
-    CheckCircle, TrendingUp, PieChart, ShieldCheck, ArrowRight, Users, Settings,
-    Activity, FileText, BarChart, Layers, Search, Award, HelpCircle, Info,
-    BookOpen, Smartphone, MessageSquare, IndianRupee, Target, ChevronDown, ChevronUp, Briefcase, Building,
-    Globe, Clock, Zap, AlertTriangle, ArrowLeft
+import { TrendingUp, PieChart, ArrowRight, BarChart, IndianRupee, ArrowLeft
 } from 'lucide-react';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 
 // Components
 import PMS_Live_Performance from './components/dashboard/PMS_Live_Performance';

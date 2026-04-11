@@ -9,13 +9,12 @@ const LifeInsuranceCTA = () => (
                 Ready to Secure Your Financial Future?
             </h2>
             <p className="text-lg mb-8 max-w-3xl mx-auto opacity-90">
-                Don't wait to achieve your dreams. Whether it is your home, growing your assets, or
+                Don&apos;t wait to achieve your dreams. Whether it is your home, growing your assets, or
                 protecting your family, we support are here to guide you. Get started on your financial success today.
             </p>
             <Link
                 href="/#contact"
-                className="bg-white text-teal-600 px-8 py-3 rounded font-semibold hover:bg-gray-100 transition cursor-pointer inline-block"
-            >
+                className="bg-white text-teal-600 px-8 py-3 rounded font-semibold hover:bg-gray-100 transition cursor-pointer inline-block">
                 Get a Consultation
             </Link>
         </div>

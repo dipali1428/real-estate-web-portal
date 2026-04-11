@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import CalculatorSlider from './CalculatorSlider';
 import { motion } from 'framer-motion';
-import { Target, AlertCircle, TrendingUp, Shield } from 'lucide-react';
+import { Target, AlertCircle } from 'lucide-react';
 
 export default function StrategyAllocationCalculator() {
     const [totalInvestment, setTotalInvestment] = useState(20000000); // ₹2 Cr

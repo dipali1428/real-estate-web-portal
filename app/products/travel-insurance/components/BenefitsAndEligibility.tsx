@@ -209,7 +209,7 @@ export default function BenefitsAndEligibility({ isDashboard = false }: { isDash
                                 {/* --- DOCUMENTS SUB-SECTION (NOW INSIDE ELIGIBILITY) --- */}
                                 <div className="mt-0 border-t border-slate-100 p-8 sm:p-10 lg:p-12 bg-slate-50/50">
                                     <h3 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent inline-block mb-2">
-                                        Documents You'll Need
+                                        Documents You&apos;ll Need
                                     </h3>
                                     <p className="text-gray-500 text-sm font-medium mb-8">Required files for a smooth, hassle-free process.</p>
 

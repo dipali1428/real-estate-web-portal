@@ -69,13 +69,12 @@ export default function VehicleLoanEligibility() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-center max-w-3xl mx-auto mb-16"
-                    >
+                        className="text-center max-w-3xl mx-auto mb-16">
                         <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
                             Eligibility Criteria
                         </h2>
                         <p className="text-lg text-gray-600 font-medium leading-relaxed">
-                            We've kept our requirements simple and flexible so you can hit the road sooner.
+                            We&apos;ve kept our requirements simple and flexible so you can hit the road sooner.
                         </p>
                     </motion.div>
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft as IconArrowLeft } from 'lucide-react';
 
 import Hero from '../NCD/components/Hero';

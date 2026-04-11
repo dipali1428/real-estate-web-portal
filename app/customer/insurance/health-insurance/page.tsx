@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Landmark, FileText } from "lucide-react";
 import ExploreHealthInsurance from "./components/ExploreHealthInsurance";
 import MyHealthInsurance from "./components/MyHealthInsurance";
 

@@ -164,7 +164,7 @@ export default function GuideAndClaims() {
                             Hassle-Free Claims Process
                         </h2>
                         <p className="text-gray-600">
-                            We're committed to making your claim experience as smooth as possible. Here's a quick guide to help you through the process.
+                            We&apos;re committed to making your claim experience as smooth as possible. Here&apos;s a quick guide to help you through the process.
                         </p>
                     </div>
 

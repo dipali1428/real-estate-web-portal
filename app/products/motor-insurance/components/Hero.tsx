@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, ArrowRight, Check, Star } from "lucide-react";
+import { ShieldCheck, ArrowRight, Check } from "lucide-react";
 
 export default function Hero() {
     return (

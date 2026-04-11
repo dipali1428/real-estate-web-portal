@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, MessageSquare, Send, User, Mail, Phone, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, MessageSquare, Send, User, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import { AdminService } from '@/app/services/adminService';
 
 const TicketDetailsModal = ({ 

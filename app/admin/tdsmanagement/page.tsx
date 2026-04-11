@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useRef, useMemo, useEffect } from 'react';
-import { Search, Upload, Download, FileText, Trash2, Plus, Loader2, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, Download, FileText, Plus, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AdminService } from '../../services/adminService';
+import toast from 'react-hot-toast';
 
 interface TDS {
   id: number;
@@ -25,12 +26,12 @@ export default function TDSManagement() {
   const [isExporting, setIsExporting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch data when page or search changes
@@ -46,7 +47,7 @@ export default function TDSManagement() {
         limit: 10,
         search: searchQuery
       });
-      
+
       if (response.success) {
         setRecords(response.data);
         setTotalPages(response.totalPages);
@@ -69,7 +70,8 @@ export default function TDSManagement() {
         await AdminService.uploadTDS(file);
         fetchTDSData(); // Refresh list
       } catch (error) {
-        console.error("Upload failed", error);
+        // console.error("Upload failed", error);
+        toast.error("Failed to upload file. Please try again.");
       } finally {
         setIsUploading(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
@@ -98,23 +100,23 @@ export default function TDSManagement() {
   };
 
   const deleteRecord = (id: number) => {
-    if(confirm("Are you sure you want to delete this record?")) {
-        setRecords(records.filter(r => r.id !== id));
+    if (confirm("Are you sure you want to delete this record?")) {
+      setRecords(records.filter(r => r.id !== id));
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 lg:p-12 text-slate-900">
       <div className="max-w-7xl mx-auto">
-        
+
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">TDS Management</h1>
             <p className="text-slate-500 mt-1">Manage quarterly TDS documents and certificates.</p>
           </div>
-          
+
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={downloadCSV}
               disabled={isExporting}
               className="flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition shadow-sm disabled:opacity-50"
@@ -122,8 +124,8 @@ export default function TDSManagement() {
               {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               {isExporting ? "Exporting..." : "Export CSV"}
             </button>
-            
-            <button 
+
+            <button
               onClick={triggerUpload}
               disabled={isUploading}
               className="flex items-center gap-2 bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold text-white hover:bg-blue-700 transition shadow-sm disabled:opacity-50"
@@ -160,14 +162,14 @@ export default function TDSManagement() {
                   <th className="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Quarter 1</th>
                   <th className="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Quarter 2</th>
                   <th className="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Quarter 3</th>
-                
+
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {isLoading ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center">
-                        <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
+                      <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
                     </td>
                   </tr>
                 ) : records.length > 0 ? (
@@ -175,23 +177,23 @@ export default function TDSManagement() {
                     <tr key={record.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex flex-col">
-                            <span className="font-mono text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded w-fit mb-1">
+                          <span className="font-mono text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded w-fit mb-1">
                             {record.adv_id}
-                            </span>
-                            <p className="font-medium text-slate-800">{record.name}</p>
-                            <p className="text-xs text-slate-400">PAN: {record.pan}</p>
+                          </span>
+                          <p className="font-medium text-slate-800">{record.name}</p>
+                          <p className="text-xs text-slate-400">PAN: {record.pan}</p>
                         </div>
                       </td>
-                      
+
                       {/* Quarter columns using your specific pdf_url fields */}
                       {[1, 2, 3].map((q) => {
                         const url = record[`q${q}_pdf_url` as keyof TDS];
                         return (
                           <td key={q} className="px-6 py-4 text-center">
                             {url ? (
-                              <a 
-                                href={url as string} 
-                                target="_blank" 
+                              <a
+                                href={url as string}
+                                target="_blank"
                                 rel="noreferrer"
                                 className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-50 px-2 py-1 rounded"
                               >
@@ -205,7 +207,7 @@ export default function TDSManagement() {
                         );
                       })}
 
-                      
+
                     </tr>
                   ))
                 ) : (
@@ -218,27 +220,27 @@ export default function TDSManagement() {
               </tbody>
             </table>
           </div>
-          
+
           <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
             <p className="text-xs text-slate-500">
               Showing {(currentPage - 1) * 10 + 1} to {Math.min(currentPage * 10, totalRecords)} of {totalRecords} records
             </p>
             <div className="flex gap-2">
-                <button 
-                  disabled={currentPage === 1 || isLoading}
-                  onClick={() => setCurrentPage(p => p - 1)}
-                  className="p-1 rounded border bg-white disabled:opacity-50"
-                >
-                    <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="text-sm font-medium px-2 py-1">Page {currentPage} of {totalPages}</span>
-                <button 
-                  disabled={currentPage === totalPages || isLoading}
-                  onClick={() => setCurrentPage(p => p + 1)}
-                  className="p-1 rounded border bg-white disabled:opacity-50"
-                >
-                    <ChevronRight className="w-4 h-4" />
-                </button>
+              <button
+                disabled={currentPage === 1 || isLoading}
+                onClick={() => setCurrentPage(p => p - 1)}
+                className="p-1 rounded border bg-white disabled:opacity-50"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-sm font-medium px-2 py-1">Page {currentPage} of {totalPages}</span>
+              <button
+                disabled={currentPage === totalPages || isLoading}
+                onClick={() => setCurrentPage(p => p + 1)}
+                className="p-1 rounded border bg-white disabled:opacity-50"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation'; // Import the router
-import { ArrowLeft } from 'lucide-react'; // Optional: icon library or use the SVG below
+// Optional: icon library or use the SVG below
 
 export default function PrivacyPolicy() {
   const router = useRouter(); // Initialize the router

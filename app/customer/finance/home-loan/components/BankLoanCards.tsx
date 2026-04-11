@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Landmark, Search, X, CheckCircle, Percent, ArrowDownSquare, ShieldCheck, ShoppingCart, Briefcase, Activity, Banknote } from "lucide-react";
+import { Landmark, Search, X, Percent, ArrowDownSquare, ShieldCheck, ShoppingCart, Banknote } from "lucide-react";
 import { categorizedPlans } from "../loanConstants";
 
 export default function BankLoanCards() {

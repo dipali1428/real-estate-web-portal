@@ -7,7 +7,6 @@ import {
   Star
 } from "lucide-react";
 import TopRecommendedPlans from "../../../products/life-insurance/components/TopRecommendedPlans";
-import LifeInsuranceHeader from "./components/LifeInsuranceHeader";
 
 
 export default function LifeInsuranceDashboard() {

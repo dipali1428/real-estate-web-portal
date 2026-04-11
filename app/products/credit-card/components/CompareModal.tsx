@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconX, IconCheck, IconStar, IconCurrencyRupee } from '@tabler/icons-react';
+import { IconX, IconCheck } from '@tabler/icons-react';
 
 interface Card {
     id: number;

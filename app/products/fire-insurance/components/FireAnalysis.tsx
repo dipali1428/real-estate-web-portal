@@ -3,7 +3,7 @@
 import React from 'react';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend
+  BarChart, Bar, XAxis, YAxis, Legend
 } from 'recharts';
 import { ShieldAlert, TrendingUp, Activity, Zap } from 'lucide-react';
 

@@ -5,6 +5,7 @@ import {
   ShieldCheck, Loader2, ArrowRight, ArrowLeft, AlertCircle 
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import toast from "react-hot-toast";
 
 // --- Constants & Styles --- 
 
@@ -204,7 +205,7 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
 
   const requiredDocsList = useMemo(() => {
     if (isSelfLoginActive) return [];
-    let docs = [...(DOC_MAP[form.employmentType] || [])];
+    const docs = [...(DOC_MAP[form.employmentType] || [])];
     if (form.employmentType === "Other") docs.push(...(DOC_MAP[form.otherIncome] || []));
     if (form.hasOtherLoan === "Yes" && docs.length) docs.push("Existing Loan Statement");
     return [...new Set(docs)].map(label => DOC_REGISTRY[label]).filter(Boolean);
@@ -275,7 +276,7 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
       const result = await DashboardService.createLead(payload);
       
       // --- LOGGING CREATE LEAD API RESPONSE ---
-      console.log("<<< API RESPONSE: DashboardService.createLead", result);
+      // console.log("<<< API RESPONSE: DashboardService.createLead", result);
       
       const id = result?.detail_lead_id;
 
@@ -288,7 +289,7 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
         setStep(2);
       }
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       setStatusMsg("Failed to create application.");
     } finally {
       setIsSubmitting(false);
@@ -320,7 +321,8 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
             await DashboardService.uploadLeadDocument(leadId!, formData);
             setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "success" } : item));
         } catch (err) {
-            console.error(err);
+            // console.error(err);
+            toast.error("Failed to upload document. Please try again.");
             setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "error" } : item));
             setStatusMsg("Upload failed. Please try again.");
             setIsSubmitting(false);

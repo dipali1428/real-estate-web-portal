@@ -7,8 +7,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useModal } from "@/app/context/ModalContext";
 import mutualFundService from "../../../../services/mutualfundservice";
-import customerService from "../../../../services/customerService";
-import toast from "react-hot-toast";
 import { TOP_PICKS } from "@/app/products/mutual-funds/components/TopPicks";
 import TopPicksSection from "@/app/products/mutual-funds/components/TopPicksSection";
 import OrderPlacementModal from "./OrderPlacementModal";

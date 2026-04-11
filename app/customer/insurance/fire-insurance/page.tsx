@@ -8,20 +8,12 @@ import {
   Building,
   Store,
   Warehouse,
-  FileCheck,
   Zap,
   Clock,
-  ArrowRight,
-  Plus,
-  HelpCircle,
-  AlertTriangle,
   Factory,
   Briefcase,
-  Layers,
-  ShieldCheck,
-  Truck
+  ShieldCheck
 } from "lucide-react";
-import FireInsuranceHeader from "./components/FireInsuranceHeader";
 
 const features = [
   { title: "Standard Fire & Special Perils", desc: "Includes coverage for lightning, floods, and riots.", icon: Zap },

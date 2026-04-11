@@ -8,11 +8,7 @@ import {
   CheckCircle2,
   Percent,
   ArrowRight,
-  Car,
-  Bike,
-  Truck,
   Zap,
-  History,
   IndianRupee,
   Calendar
 } from "lucide-react";

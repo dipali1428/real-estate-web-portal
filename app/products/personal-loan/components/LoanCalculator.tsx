@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, ChangeEvent, WheelEvent, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
 
 // Register Chart.js components

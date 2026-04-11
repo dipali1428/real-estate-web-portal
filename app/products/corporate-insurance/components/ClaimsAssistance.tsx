@@ -31,7 +31,7 @@ export const ClaimsAssistance: React.FC = () => {
             </span>
           </h2>
           <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto font-normal">
-            We don't just sell policies; we settle claims. Our dedicated team
+            We don&apos;t just sell policies; we settle claims. Our dedicated team
             ensures you get what you were promised.
           </p>
         </motion.div>

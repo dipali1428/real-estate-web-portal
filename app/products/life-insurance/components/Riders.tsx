@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Activity, Skull, Zap, AlertCircle, ShieldCheck, HeartPulse } from "lucide-react";
+import { Activity, Zap, ShieldCheck, HeartPulse, CheckCircle2 } from "lucide-react";
 
 const riders = [
     {
@@ -41,20 +41,18 @@ export default function Riders() {
                         <motion.span
                             initial={{ opacity: 0, y: 10 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            className="text-[#2076C7] font-black uppercase text-[10px] md:text-xs tracking-[0.4em] mb-4 block font-sans"
-                        >
+                            className="text-[#2076C7] font-black uppercase text-[10px] md:text-xs tracking-[0.4em] mb-4 block font-sans">
                             POLICY ENHANCEMENTS
                         </motion.span>
                         <motion.h2
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 md:mb-8 text-[#2076C7] leading-tight font-sans"
-                        >
+                            className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 md:mb-8 text-[#2076C7] leading-tight font-sans">
                             High-Impact <br />
                             <span className="text-transparent bg-clip-text bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] bg-[length:200%_auto] animate-gradient-x">Add-on Covers</span>
                         </motion.h2>
                         <p className="text-gray-500 text-lg md:text-xl mb-10 leading-relaxed font-medium font-sans">
-                            Strengthen your base policy with riders that provide specialized protection against life's most challenging surprises.
+                            Strengthen your base policy with riders that provide specialized protection against life&apos;s most challenging surprises.
                         </p>
 
                         <div className="space-y-4 mb-10">
@@ -111,4 +109,3 @@ export default function Riders() {
     );
 }
 
-import { CheckCircle2 } from "lucide-react";

@@ -1,8 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
-import { motion, AnimatePresence } from 'motion/react';
-import { Calculator, TrendingUp, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
 
 // Register Chart.js components
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
@@ -64,11 +62,11 @@ const BusinessLoanCalculator: React.FC = () => {
     const [effectiveAnnualRate, setEffectiveAnnualRate] = useState<number>(0);
 
     // Errors
-    const [errors, setErrors] = useState({
-        loanAmount: '',
-        interestRate: '',
-        loanTermMonths: ''
-    });
+    // const [errors, setErrors] = useState({
+    //     loanAmount: '',
+    //     interestRate: '',
+    //     loanTermMonths: ''
+    // });
 
     // Chart reference
     const chartRef = useRef<Chart<'doughnut'> | null>(null);
@@ -85,9 +83,6 @@ const BusinessLoanCalculator: React.FC = () => {
         const loanTermYears = loanTermMonths / 12;
 
         let calculatedPaymentAmount: number;
-        let calculatedTotalPayment: number;
-        let calculatedTotalInterest: number;
-        let calculatedEffectiveAnnualRate: number;
 
         // Standard periodic payments calculation
         const totalPayments = Math.ceil(loanTermYears * paymentsPerYear);
@@ -100,9 +95,9 @@ const BusinessLoanCalculator: React.FC = () => {
             calculatedPaymentAmount = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
         }
 
-        calculatedTotalPayment = calculatedPaymentAmount * totalPayments;
-        calculatedTotalInterest = calculatedTotalPayment - loanAmount;
-        calculatedEffectiveAnnualRate = (Math.pow(1 + periodicInterestRate, paymentsPerYear) - 1) * 100;
+        const calculatedTotalPayment = calculatedPaymentAmount * totalPayments;
+        const calculatedTotalInterest = calculatedTotalPayment - loanAmount;
+        const calculatedEffectiveAnnualRate = (Math.pow(1 + periodicInterestRate, paymentsPerYear) - 1) * 100;
 
         setPaymentAmount(calculatedPaymentAmount);
         setTotalInterest(calculatedTotalInterest);

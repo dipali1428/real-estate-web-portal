@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { UserCheck, FileText, TrendingUp, CheckCircle2, ChevronRight, Award } from 'lucide-react';
+import { FileText, TrendingUp, ChevronRight, Award } from 'lucide-react';
 
 const InvestmentGuide = () => {
     const [activeTab, setActiveTab] = useState<'benefits' | 'documents' | 'process'>('benefits');

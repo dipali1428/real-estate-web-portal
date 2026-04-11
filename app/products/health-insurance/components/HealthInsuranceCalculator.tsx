@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, Users, Shield, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Calculator, Shield, ArrowRight } from 'lucide-react';
 
 const HealthInsuranceCalculator = () => {
     const [age, setAge] = useState('26-35');
@@ -15,7 +15,7 @@ const HealthInsuranceCalculator = () => {
 
     const calculatePremium = () => {
         // Base premium for 18-25, 3L, Individual
-        let base = 399;
+        const base = 399;
 
         // Age Multiplier
         const ageMultipliers: { [key: string]: number } = {

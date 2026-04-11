@@ -2,14 +2,10 @@
 
 import React, { useState } from "react";
 import {
-  Building2,
   Search,
-  Settings2,
   Bookmark,
-  Clock,
   Percent,
   TrendingDown,
-  Calendar,
   Landmark,
   ShieldCheck,
   ChevronRight

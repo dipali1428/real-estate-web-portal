@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import ExploreMortgageLoans from "./components/ExploreMortgageLoans";
 import MyMortgageLoans from "./components/MyMortgageLoans";
-import { Landmark, FileText } from "lucide-react";
 
 export default function MortgageLoanDashboard() {
   const [activeTab, setActiveTab] = useState<"explore" | "applications">("explore");

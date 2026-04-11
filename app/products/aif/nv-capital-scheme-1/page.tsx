@@ -78,7 +78,7 @@ export default function NVCapitalDetail() {
     return (
         <div className="bg-gray-50 min-h-screen font-sans text-gray-700">
             {/* Hero Header — matches modal exactly */}
-            <div className="relative bg-gradient-to-r from-[#2076C7] to-[#1CADA3] pt-28 pb-10 text-white">
+            <div className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] pt-28 pb-10 text-white">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
                         <Link href="/products/aif" className="inline-flex items-center gap-2 mb-6 text-white/80 hover:text-white transition-colors group">

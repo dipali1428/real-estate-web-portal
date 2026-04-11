@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Send, FileSearch, Verified, CheckCircle2, ShieldCheck, Users, Clock, Phone } from "lucide-react";
+import { Send, FileSearch, Verified, CheckCircle2, Users, Clock, Phone } from "lucide-react";
 
 const steps = [
     {
@@ -45,19 +45,17 @@ const ClaimProcess = () => {
                     <motion.span
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="text-[#2076C7] font-black uppercase text-[10px] md:text-xs tracking-[0.4em] mb-4 block font-sans"
-                    >
+                        className="text-[#2076C7] font-black uppercase text-[10px] md:text-xs tracking-[0.4em] mb-4 block font-sans">
                         PERSONAL CLAIM SUPPORT
                     </motion.span>
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="text-3xl lg:text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4"
-                    >
+                        className="text-3xl lg:text-4xl font-bold bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent mb-4">
                         Hassle-Free Claim Journey
                     </motion.h2>
                     <p className="text-gray-500 text-xl font-light leading-relaxed font-sans max-w-2xl mx-auto">
-                        We're with you when it matters most. Every family gets a dedicated support person to handle everything — no queues, no stress.
+                        We&apos;re with you when it matters most. Every family gets a dedicated support person to handle everything — no queues, no stress.
                     </p>
                 </div>
 

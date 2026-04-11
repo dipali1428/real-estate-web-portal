@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
-import { X, CheckCircle, UploadCloud, Trash2, Plus, ChevronDown } from "lucide-react";
+import { X, CheckCircle, UploadCloud, Trash2, ChevronDown } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
 
 const STYLES = {

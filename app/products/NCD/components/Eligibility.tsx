@@ -1,6 +1,6 @@
 'use client';
 
-import { Users, Building2, UserCheck, Briefcase, FileText, CheckCircle2, CreditCard, PlayCircle } from 'lucide-react';
+import { Users, Building2, UserCheck, Briefcase, CheckCircle2, CreditCard, PlayCircle } from 'lucide-react';
 
 const Eligibility = () => {
     const groups = [

@@ -6,8 +6,6 @@ import {
   IconCheck,
   IconArrowRight,
   IconAward,
-  IconBuildingBank,
-  IconTrendingUp,
 } from "@tabler/icons-react";
 import { COMMERCIAL_PRODUCTS, GOVT_SCHEMES } from "./data";
 

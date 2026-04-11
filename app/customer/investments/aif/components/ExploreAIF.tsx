@@ -8,10 +8,8 @@ import {
   TrendingUp,
   ShoppingCart,
   Trash2,
-  Activity,
   ArrowRight,
   Layers,
-  CheckCircle,
   Bookmark,
   BookmarkCheck,
   FileText,
@@ -19,14 +17,11 @@ import {
   Info,
   Clock,
   Video,
-  Phone,
-  MessageCircle,
   MessageSquare,
   ArrowUpRight,
   Check
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 
 interface CartItem {
   id: string;

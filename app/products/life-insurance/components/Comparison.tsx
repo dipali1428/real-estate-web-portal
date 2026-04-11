@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Shield, ShieldOff, CheckCircle2, TrendingUp, Star, Zap, Activity, Heart, ShieldCheck, UserCheck } from "lucide-react";
+import { ArrowRight, ShieldOff, CheckCircle2, TrendingUp, Star, Zap, Activity, Heart, UserCheck } from "lucide-react";
 
 const comparisonData = [
     {
@@ -169,5 +169,3 @@ export default function Comparison() {
         </section>
     );
 }
-
-import { ArrowRight } from "lucide-react";

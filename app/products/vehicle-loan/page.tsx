@@ -10,7 +10,7 @@ import VehicleLoanFAQ from './components/VehicleLoanFAQ';
 import VehicleLoanPartners from './components/VehicleLoanPartners';
 import CTASection from '@/app/component/CTASection';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Zap } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import ScrollToTop from '@/app/component/ScrollToTop';
 import { useModal } from '@/app/context/ModalContext';
 

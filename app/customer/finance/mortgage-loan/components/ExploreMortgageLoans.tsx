@@ -6,7 +6,6 @@ import {
   Filter,
   Landmark,
   Percent,
-  Banknote,
   ArrowDownSquare,
   X,
   ShieldCheck,

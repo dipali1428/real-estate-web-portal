@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Activity, PieChart, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
+import { PieChart, AlertTriangle, CheckCircle } from 'lucide-react';
 
 export default function PortfolioHealthCalculator() {
     const [currentAllocation, setCurrentAllocation] = useState([

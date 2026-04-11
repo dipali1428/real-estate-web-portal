@@ -206,7 +206,7 @@ export default function RMSGrowthDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-teal-50 rounded-2xl border border-teal-100">
                                         <p className="text-xs text-teal-800 font-medium italic">
-                                            "Primary focus on growth-stage capital for scalable business models."
+                                            Primary focus on growth-stage capital for scalable business models.
                                         </p>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function RMSGrowthDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "Focused on growth equity investments and private equity strategies for mid-market expansion."
+                                Focused on growth equity investments and private equity strategies for mid-market expansion.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

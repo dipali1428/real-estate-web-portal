@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { RmService } from '@/app/services/rmService';
 import * as XLSX from 'xlsx';
 import { FileUp, ClipboardList, ChevronLeft, ChevronRight, X } from "lucide-react";
+import toast from 'react-hot-toast';
 
 const statusStyles: Record<string, string> = {
   completed: "bg-green-50 text-green-700 border-green-100",
@@ -162,7 +163,8 @@ export default function ReferralLeadsDashboard() {
         updateLocalLeads(leadId, newStatus);
       }
     } catch (err) {
-      console.error('Failed to update status:', err);
+      // console.error('Failed to update status:', err);
+      toast.error('Failed to update status. Please try again.');
     }
   };
 
@@ -176,7 +178,8 @@ export default function ReferralLeadsDashboard() {
         setPendingUpdate(null);
       }
     } catch (err) {
-      console.error('Failed to update rejection status:', err);
+      // console.error('Failed to update rejection status:', err);
+      toast.error('Failed to update status. Please try again.');
     }
   };
 

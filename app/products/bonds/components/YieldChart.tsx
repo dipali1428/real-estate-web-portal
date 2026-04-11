@@ -9,9 +9,7 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    Cell,
-    ReferenceLine,
-    Label
+    Cell
 } from "recharts";
 import { bondsData } from "../data/bondsData";
 import { motion } from "framer-motion";
@@ -150,8 +148,7 @@ export default function YieldChart() {
                                     <Bar
                                         dataKey="yield"
                                         radius={[8, 8, 8, 8]}
-                                        animationDuration={1500}
-                                    >
+                                        animationDuration={1500}>
                                         {chartData.map((entry, index) => (
                                             <Cell
                                                 key={`cell-${index}`}

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion } from "framer-motion";
 import { Plus, Minus } from 'lucide-react';
 
 const vehicleLoanFaqs = [

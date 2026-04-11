@@ -7,8 +7,7 @@ import {
     IconCheck, IconX, IconCreditCard, IconCash,
     IconCurrencyRupee, IconShieldCheck, IconGift, IconPlane,
     IconShoppingBag, IconFilter, IconStar,
-    IconSearch, IconChevronDown, IconChevronUp,
-    IconFileText
+    IconSearch, IconChevronDown, IconChevronUp
 } from '@tabler/icons-react';
 import {
     CreditCard,
@@ -29,7 +28,6 @@ import {
     Fuel,
     Wifi,
     ChevronRight,
-    X,
 } from 'lucide-react';
 import { useModal } from '@/app/context/ModalContext';
 import toast from 'react-hot-toast';

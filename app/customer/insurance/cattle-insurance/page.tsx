@@ -1,12 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    IconBuildingStore, 
-    IconShieldCheck, 
-    IconInfoCircle 
-} from '@tabler/icons-react';
+import React from 'react';
+
+
 import CattleInsuranceSection from './components/CattleInsuranceSection';
 
 export default function CattleInsuranceDashboard() {

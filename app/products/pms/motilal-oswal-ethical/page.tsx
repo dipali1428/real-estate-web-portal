@@ -4,11 +4,9 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
-    ArrowLeft, Download, Calculator, TrendingUp, ShieldCheck,
-    User, Briefcase, ChevronRight, FileText, Activity,
-    CheckCircle, BarChart as BarChartIcon, PieChart as PieChartIcon,
-    AlertCircle, Info, MessageSquare, PhoneCall, Award, Users, Shield,
-    Calendar, Clock, Zap
+    ArrowLeft, TrendingUp, ShieldCheck, Activity, BarChart as BarChartIcon, PieChart as PieChartIcon,
+    AlertCircle,
+    Calendar, Clock
 } from 'lucide-react';
 import {
     Chart as ChartJS,
@@ -21,9 +19,7 @@ import {
     Title,
     Tooltip,
     Legend,
-    Filler,
-    Scale,
-    CoreScaleOptions
+    Filler
 } from 'chart.js';
 import { Line, Bar, Pie } from 'react-chartjs-2';
 

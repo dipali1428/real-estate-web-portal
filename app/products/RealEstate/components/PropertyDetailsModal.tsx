@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { properties as staticProperties } from '../data/properties';
-import { MapPin, CheckCircle, Info, Layout, Shield, Dumbbell, Zap, Coffee, X, Share2, Download, Loader, Calculator, FileText } from 'lucide-react';
+import { MapPin, CheckCircle, Info, Shield, X, Share2, Download, Loader, Calculator, FileText } from 'lucide-react';
 import InvestmentCalculator, { calculateInvestmentData } from './InvestmentCalculator';
 
 interface RealEstatePropertyDetailsModalProps {

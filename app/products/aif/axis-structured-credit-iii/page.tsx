@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
     ArrowLeft, TrendingUp, ShieldCheck,
-    Briefcase, FileText, Activity,
+    Briefcase, FileText,
     CheckCircle, BarChart as BarChartIcon, PieChart as PieChartIcon,
     AlertCircle, Target, Users, Clock, IndianRupee
 } from 'lucide-react';
@@ -204,7 +204,7 @@ export default function AxisStructuredCreditDetail() {
                                 <div className="mt-8 space-y-4">
                                     <div className="p-4 bg-teal-50 rounded-2xl border border-teal-100">
                                         <p className="text-xs text-teal-800 font-medium italic">
-                                            "Focus on collateral-backed lending and predictable cash flows for downside protection."
+                                            Focus on collateral-backed lending and predictable cash flows for downside protection.
                                         </p>
                                     </div>
                                 </div>
@@ -227,7 +227,7 @@ export default function AxisStructuredCreditDetail() {
                                 </div>
                             </div>
                             <p className="text-white/90 text-sm leading-relaxed mb-6 font-medium italic">
-                                "A leading AMC with a strong presence in private credit, fixed income, and alternative investments."
+                                A leading AMC with a strong presence in private credit, fixed income, and alternative investments.
                             </p>
                             <ul className="space-y-2 text-xs font-bold font-sans">
                                 <li className="flex items-center gap-2">

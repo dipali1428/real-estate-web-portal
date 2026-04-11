@@ -1,10 +1,9 @@
 'use client';
 import React, { useState, useMemo } from 'react';
 import { 
-  Search, Filter, Download, Clock, CheckCircle2, 
-  AlertCircle, MoreVertical, Banknote, Calendar, 
-  Building2, FileStack, LucideIcon, Inbox, X,
-  User, Hash, FileText, CreditCard
+  Search, Download, Clock, CheckCircle2, 
+  AlertCircle, MoreVertical, Banknote, 
+  Building2, FileStack, Inbox, X
 } from 'lucide-react';
 
 // --- Types ---

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React from "react";
 import { motion, useSpring, useMotionValue, useTransform } from "framer-motion";
 
 export default function TiltCard({ children }: { children: React.ReactNode }) {

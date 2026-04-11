@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import {
-    IconCreditCard, IconArrowRight, IconCheck, IconStar, IconArrowLeft
+    IconCreditCard, IconArrowRight, IconArrowLeft
 } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 

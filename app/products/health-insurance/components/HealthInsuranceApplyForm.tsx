@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, User, Mail, Phone, MapPin, Calculator, ShieldCheck } from 'lucide-react';
+import { X, Send, User, Mail, Phone, MapPin } from 'lucide-react';
 
 interface ApplyFormProps {
     isOpen: boolean;

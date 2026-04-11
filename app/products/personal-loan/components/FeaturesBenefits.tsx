@@ -1,11 +1,10 @@
 "use client";
-import React from 'react';
-import { ShieldCheck, Banknote, Zap, History, FileText, Gift, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Banknote, Zap, History, FileText, Gift } from 'lucide-react';
 
-interface FeaturesBenefitsProps {
-}
+// interface FeaturesBenefitsProps {
+// }
 
-export default function FeaturesBenefits({ }: FeaturesBenefitsProps) {
+export default function FeaturesBenefits() {
     const features = [
         {
             icon: Zap,

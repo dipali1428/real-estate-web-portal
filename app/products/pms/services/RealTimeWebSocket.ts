@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { io, Socket } from 'socket.io-client';
 
 type Callback = (data: any) => void;
@@ -27,18 +28,18 @@ class RealTimeWebSocket {
         });
 
         this.socket.on('connect', () => {
-            console.log('WebSocket connected:', this.socket?.id);
+            // console.log('WebSocket connected:', this.socket?.id);
             this.reconnectAttempts = 0;
             this.subscribeToDefaultChannels();
         });
 
         this.socket.on('disconnect', (reason) => {
-            console.log('WebSocket disconnected:', reason);
+            // console.log('WebSocket disconnected:', reason);
             this.handleDisconnection(reason);
         });
 
         this.socket.on('connect_error', (error) => {
-            console.error('WebSocket connection error:', error);
+            // console.error('WebSocket connection error:', error);
             this.handleConnectionError(error);
         });
 
@@ -93,7 +94,8 @@ class RealTimeWebSocket {
                 try {
                     callback(data);
                 } catch (error) {
-                    console.error('Error in subscriber callback:', error);
+                    toast.error(`Error processing ${channel} update: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                    // console.error('Error in subscriber callback:', error);
                 }
             });
         }

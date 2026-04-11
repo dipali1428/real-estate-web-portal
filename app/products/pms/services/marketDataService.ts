@@ -48,7 +48,7 @@ class MarketDataService {
 
             return data;
         } catch (error) {
-            console.error('Error fetching stock price:', error);
+            // console.error('Error fetching stock price:', error);
             return this.getMockStockData(symbol);
         }
     }
@@ -57,7 +57,7 @@ class MarketDataService {
         try {
             return this.getMockNiftyData();
         } catch (error) {
-            console.error('Error fetching Nifty data:', error);
+            // console.error('Error fetching Nifty data:', error);
             return this.getMockNiftyData();
         }
     }

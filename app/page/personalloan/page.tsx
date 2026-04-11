@@ -1,23 +1,24 @@
 "use client";
 
-import { useState, useEffect, ChangeEvent, WheelEvent, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
 import { TrendingUp, PieChart, Calculator, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { useRouter } from "next/navigation";
 
 // Register Chart.js components
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
-type PaymentFrequency = 
-  | 'daily' 
-  | 'weekly' 
-  | 'biweekly' 
-  | 'semimonthly' 
-  | 'monthly' 
-  | 'bimonthly' 
-  | 'quarterly' 
-  | 'semiannually' 
-  | 'annually' 
+type PaymentFrequency =
+  | 'daily'
+  | 'weekly'
+  | 'biweekly'
+  | 'semimonthly'
+  | 'monthly'
+  | 'bimonthly'
+  | 'quarterly'
+  | 'semiannually'
+  | 'annually'
   | 'continuous';
 
 interface PaymentScheduleEntry {
@@ -75,7 +76,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
   const [annualInterestRate, setAnnualInterestRate] = useState<number>(8.5);
   const [loanTermMonths, setLoanTermMonths] = useState<number>(60);
   const [paymentFrequency, setPaymentFrequency] = useState<PaymentFrequency>('monthly');
-  
+
   // State for pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(12);
@@ -105,10 +106,10 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
 
   const formatLoanTerm = (months: number) => {
     if (months === 0) return '0 months';
-    
+
     const years = Math.floor(months / 12);
     const remainingMonths = months % 12;
-    
+
     if (years > 0) {
       return `${years} year${years !== 1 ? 's' : ''}${remainingMonths > 0 ? `, ${remainingMonths} month${remainingMonths !== 1 ? 's' : ''}` : ''}`;
     }
@@ -142,13 +143,13 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
     const paymentsPerYear = frequencyMap[paymentFrequency];
     const annualRateDecimal = annualInterestRate / 100;
     const loanTermYears = loanTermMonths / 12;
-    
+
     let calculatedPaymentAmount: number;
     let calculatedTotalPayment: number;
     let calculatedTotalInterest: number;
     let calculatedEffectiveAnnualRate: number;
     let totalPayments: number;
-    
+
     if (paymentFrequency === 'continuous') {
       // Continuously compounded interest
       calculatedTotalPayment = loanAmount * Math.exp(annualRateDecimal * loanTermYears);
@@ -160,19 +161,19 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
       // Standard periodic payments
       totalPayments = Math.ceil(loanTermYears * paymentsPerYear);
       const periodicInterestRate = annualRateDecimal / paymentsPerYear;
-      
+
       if (periodicInterestRate === 0) {
         calculatedPaymentAmount = loanAmount / totalPayments;
       } else {
         const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
         calculatedPaymentAmount = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
       }
-      
+
       calculatedTotalPayment = calculatedPaymentAmount * totalPayments;
       calculatedTotalInterest = calculatedTotalPayment - loanAmount;
       calculatedEffectiveAnnualRate = (Math.pow(1 + periodicInterestRate, paymentsPerYear) - 1) * 100;
     }
-    
+
     // Generate FULL amortization schedule (all periods)
     const fullSchedule = generateFullAmortizationSchedule(
       loanAmount,
@@ -182,14 +183,14 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
       paymentsPerYear,
       paymentFrequency
     );
-    
+
     // Set full schedule
     setFullAmortizationSchedule(fullSchedule);
-    
+
     // Set initial display schedule (first page)
     const initialDisplaySchedule = fullSchedule.slice(0, itemsPerPage);
     setAmortizationSchedule(initialDisplaySchedule);
-    
+
     setPaymentAmount(calculatedPaymentAmount);
     setTotalInterest(calculatedTotalInterest);
     setTotalPayment(calculatedTotalPayment);
@@ -197,7 +198,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
 
     // Update chart
     updateChart(loanAmount, calculatedTotalInterest);
-    
+
     // Reset to first page
     setCurrentPage(1);
   };
@@ -213,11 +214,11 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
   ): PaymentScheduleEntry[] => {
     const schedule: PaymentScheduleEntry[] = [];
     let balance = initialLoanAmount;
-    
+
     for (let period = 1; period <= totalPayments; period++) {
       let interestPayment: number;
       let principalPayment: number;
-      
+
       if (frequency === 'continuous') {
         if (period === 1) {
           interestPayment = balance * (Math.exp(annualInterestRate * (totalPayments / 12)) - 1);
@@ -230,21 +231,21 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
         const periodicInterestRate = annualInterestRate / paymentsPerYear;
         interestPayment = balance * periodicInterestRate;
         principalPayment = monthlyPayment - interestPayment;
-        
+
         // Adjust last payment
         if (balance - principalPayment < 0) {
           principalPayment = balance;
           interestPayment = monthlyPayment - principalPayment;
         }
-        
+
         balance -= principalPayment;
-        
+
         if (balance < 0) {
           principalPayment += balance;
           balance = 0;
         }
       }
-      
+
       schedule.push({
         period,
         payment: monthlyPayment,
@@ -252,10 +253,10 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
         interest: interestPayment,
         balance: Math.max(0, balance)
       });
-      
+
       if (balance <= 0) break;
     }
-    
+
     return schedule;
   };
 
@@ -291,7 +292,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
               },
               tooltip: {
                 callbacks: {
-                  label: function(context) {
+                  label: function (context) {
                     let label = context.label || '';
                     if (label) {
                       label += ': ';
@@ -333,7 +334,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
 
   // Pagination controls
   const totalPages = Math.ceil(fullAmortizationSchedule.length / itemsPerPage);
-  
+
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
@@ -438,7 +439,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
         <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
           {/* Input Section */}
           <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
-            
+
             {/* Loan Amount */}
             <div className="mb-6">
               <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-2">
@@ -564,11 +565,10 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                     key={option.value}
                     type="button"
                     onClick={() => setPaymentFrequency(option.value)}
-                    className={`py-2 px-3 rounded-lg border text-sm transition-all ${
-                      paymentFrequency === option.value 
-                        ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium' 
-                        : 'border-gray-300 hover:border-gray-400 text-gray-700'
-                    }`}
+                    className={`py-2 px-3 rounded-lg border text-sm transition-all ${paymentFrequency === option.value
+                      ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
+                      : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                      }`}
                   >
                     {option.label}
                   </button>
@@ -670,9 +670,9 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                     </span>{' '}
                     will continue for {loanTermMonths > 0 ? formatLoanTerm(loanTermMonths) : '0 months'}
                   </li>
-                  
+
                   <li>
-                    You'll pay{' '}
+                    You&apos;ll pay{' '}
                     <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
                       {formatCurrency(totalInterest)}
                     </span>{' '}
@@ -682,7 +682,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                     </span>{' '}
                     of your loan amount
                   </li>
-                  
+
                   <li>
                     For every ₹100 you repay,{' '}
                     <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
@@ -694,7 +694,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                     </span>{' '}
                     reduces your principal
                   </li>
-                  
+
                   {(() => {
                     // Calculate if tenure extension reduces EMI significantly
                     if (loanTermMonths > 0 && loanAmount > 0 && annualInterestRate > 0) {
@@ -704,7 +704,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                       const rateFactor = Math.pow(1 + periodicInterestRate, extendedPayments);
                       const extendedEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
                       const emiReduction = paymentAmount - extendedEMI;
-                      
+
                       if (emiReduction > 0) {
                         return (
                           <li>
@@ -719,7 +719,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                     }
                     return null;
                   })()}
-                  
+
                   {(() => {
                     // Calculate impact of 1% lower interest rate
                     if (annualInterestRate > 1 && loanAmount > 0 && loanTermMonths > 0) {
@@ -730,7 +730,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                         const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
                         const lowerEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
                         const totalSavings = (paymentAmount - lowerEMI) * totalPayments;
-                        
+
                         return (
                           <li>
                             A 1% lower interest rate would save you{' '}
@@ -744,7 +744,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                     }
                     return null;
                   })()}
-                  
+
                   {(() => {
                     // Early repayment insight
                     if (totalInterest > 0) {
@@ -761,7 +761,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                     }
                     return null;
                   })()}
-                  
+
                   <li>
                     Your effective annual rate is{' '}
                     <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
@@ -778,16 +778,16 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                     than home loans because they are unsecured with no collateral
                   </li>
                 </ul>
-                
+
                 <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-xs text-yellow-800">
-                    <strong>Pro Tip:</strong> Consider making at least one extra payment each year. 
+                    <strong>Pro Tip:</strong> Consider making at least one extra payment each year.
                     Since personal loans have higher interest rates, early repayments can save significant interest costs.
                   </p>
                 </div>
-                
+
                 <p className="text-[11px] text-gray-500 mt-2">
-                  <strong>Note:</strong> Personal loans typically come with processing fees (1-3%), prepayment charges, 
+                  <strong>Note:</strong> Personal loans typically come with processing fees (1-3%), prepayment charges,
                   and other costs. Actual terms may vary based on lender policies, credit score, and loan purpose.
                 </p>
               </div>
@@ -805,11 +805,12 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
 const PersonalLoanCalculatorStandalone: React.FC = () => {
   // Dropdown state
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
+
   const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'personalloan') || CALCULATOR_OPTIONS[0];
+  const router = useRouter();
 
   const handleCalculatorChange = (path: string) => {
-    window.location.href = path;
+    router.push(path);
   };
 
   return (
@@ -826,10 +827,9 @@ const PersonalLoanCalculatorStandalone: React.FC = () => {
       {/* Dropdown */}
       <div className="container mx-auto px-4 py-4 max-w-md">
         <div className="relative">
-          <button 
+          <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
-          >
+            className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
                 <activeData.icon className="w-5 h-5 text-teal-600" />
@@ -841,7 +841,7 @@ const PersonalLoanCalculatorStandalone: React.FC = () => {
 
           <AnimatePresence>
             {isDropdownOpen && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -854,21 +854,17 @@ const PersonalLoanCalculatorStandalone: React.FC = () => {
                       handleCalculatorChange(calc.path);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
-                      calc.id === 'personalloan' ? 'bg-teal-500/5' : ''
-                    }`}
-                  >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      calc.id === 'personalloan' 
-                        ? 'bg-teal-500 text-white' 
-                        : 'bg-gray-100 text-gray-500'
-                    }`}>
+                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${calc.id === 'personalloan' ? 'bg-teal-500/5' : ''
+                      }`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${calc.id === 'personalloan'
+                      ? 'bg-teal-500 text-white'
+                      : 'bg-gray-100 text-gray-500'
+                      }`}>
                       <calc.icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1">
-                      <span className={`font-medium ${
-                        calc.id === 'personalloan' ? 'text-teal-600' : 'text-gray-700'
-                      }`}>
+                      <span className={`font-medium ${calc.id === 'personalloan' ? 'text-teal-600' : 'text-gray-700'
+                        }`}>
                         {calc.label}
                       </span>
                       <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
@@ -886,7 +882,7 @@ const PersonalLoanCalculatorStandalone: React.FC = () => {
 
       {/* Calculator Content */}
       <PersonalLoanCalculatorContent />
-      
+
       {/* Font Awesome */}
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     </div>

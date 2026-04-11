@@ -5,7 +5,6 @@ import BondCard from "./BondCard";
 
 import { motion } from "framer-motion";
 
-import Link from "next/link";
 
 interface Props {
     onInvest: (id: number) => void;

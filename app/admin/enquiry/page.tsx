@@ -10,17 +10,14 @@ import {
   RefreshCw,
   Download,
   X,
-  Phone,
-  Mail,
   User,
   FileText,
   Clock,
   CheckCircle,
-  XCircle,
-  ChevronDown,
   ChevronsUpDown
 } from 'lucide-react';
 import { AdminService } from '@/app/services/adminService';
+import toast from 'react-hot-toast';
 
 interface Enquiry {
   id: number;
@@ -96,7 +93,8 @@ const EnquiryAdminPage: React.FC = () => {
         setError('Failed to fetch enquiries from server');
       }
     } catch (err: any) {
-      console.error('Error fetching enquiries:', err);
+      // console.error('Error fetching enquiries:', err);
+      toast.error("Error fetching enquiries. Please try again.");
       setError(err?.message || 'Failed to fetch enquiries. Please try again.');
     } finally {
       setLoading(false);
@@ -175,7 +173,7 @@ const EnquiryAdminPage: React.FC = () => {
       setIsExporting(true);
       const dataToExport = filteredEnquiries;
       if (dataToExport.length === 0) {
-        alert('No data to export!');
+        toast.error("No data to export!");
         setIsExporting(false);
         return;
       }
@@ -231,10 +229,9 @@ const EnquiryAdminPage: React.FC = () => {
         throw new Error(res?.message || 'Update failed on server');
       }
     } catch (err: any) {
-      console.error('Status update failed', err);
+      toast.error(err?.message || 'Failed to update status. Please try again.');
       // rollback
       setEnquiries(prev => prev.map(e => (e.id === id ? { ...e, status: original } : e)));
-      alert(err?.message || 'Failed to update status. Please try again.');
     } finally {
       setUpdatingStatus(null);
     }
@@ -414,7 +411,7 @@ const EnquiryAdminPage: React.FC = () => {
                 <div>
                   Showing <span className="font-bold">{filteredEnquiries.length}</span> of <span className="font-bold">{enquiries.length}</span>
                 </div>
-                {searchTerm && <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">"{searchTerm}"</div>}
+                {searchTerm && <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">{searchTerm}</div>}
                 {activeTab !== 'All' && <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Filtered: <span className="font-medium">{activeTab}</span></div>}
               </div>
             </div>

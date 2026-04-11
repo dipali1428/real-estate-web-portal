@@ -3,9 +3,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-    IconBuildingBank, IconBuildingCommunity, IconBuildingStore, 
-    IconCheck, IconInfoCircle, IconArrowRight, IconBolt, 
-    IconPercentage, IconShieldCheck, IconFilter, IconX, IconArrowLeft
+    IconCheck, IconInfoCircle, 
+    IconPercentage, IconShieldCheck, IconX, IconArrowLeft
 } from '@tabler/icons-react';
 import { marketPlans,  MarketPlan } from '../data/MarketPlansData';
 
@@ -149,7 +148,7 @@ export default function MarketComparison({ onApplyClick }: { onApplyClick?: () =
                                                 <p className="text-[9px] font-black text-[#2076C7] uppercase tracking-widest mb-2 flex items-center gap-1.5">
                                                     <IconCheck size={12} strokeWidth={3} /> Core Advantage (USP)
                                                 </p>
-                                                <p className="text-sm font-bold text-slate-600 leading-relaxed italic">"{selectedBank.usp}"</p>
+                                                <p className="text-sm font-bold text-slate-600 leading-relaxed italic">{selectedBank.usp}</p>
                                             </div>
                                             {selectedBank.extra && (
                                                 <div className="flex items-center gap-3 px-4 py-3 bg-amber-50 rounded-2xl border border-amber-100">

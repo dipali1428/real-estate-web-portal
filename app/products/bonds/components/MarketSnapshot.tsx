@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingUp, ArrowUpRight, Activity, DollarSign, BarChart3, Globe, Landmark, Euro, PoundSterling, TrendingDown, Gauge, IndianRupee } from "lucide-react";
+import { TrendingUp, ArrowUpRight, Activity, BarChart3, Globe, Landmark, TrendingDown, Gauge, IndianRupee } from "lucide-react";
 
 // Data from HR Snapshot + New Additions
 const data = [

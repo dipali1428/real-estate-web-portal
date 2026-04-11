@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { IndianRupee, ArrowRight, Plus, Shield, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
+import { IndianRupee, ArrowRight, Plus, Shield, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface PremiumCalculatorProps {

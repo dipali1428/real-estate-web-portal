@@ -2,8 +2,6 @@
 
 import React, { useState } from 'react';
 import CalculatorSlider from './CalculatorSlider';
-import ResultCard from './ResultCard';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, TrendingUp, Landmark, ShieldCheck } from 'lucide-react';
 
 export default function RetirementCalculator() {

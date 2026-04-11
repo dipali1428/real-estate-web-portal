@@ -7,28 +7,21 @@ import {
   Briefcase,
   TrendingUp,
   ShoppingCart,
-  Trash2,
   ArrowRight,
   Gem,
-  CheckCircle,
   Bookmark,
   BookmarkCheck,
   Calendar,
   FileText,
   Clock,
   Video,
-  MessageCircle,
-  Phone,
-  Building2,
   Info,
-  LayoutGrid,
   MessageSquare,
   ArrowUpRight,
   Check,
   Layers
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 
 interface CartItem {
   id: string;

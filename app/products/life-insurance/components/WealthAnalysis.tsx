@@ -4,14 +4,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, AreaChart, Area,
-  BarChart, Bar, Legend
+  Tooltip, ResponsiveContainer, AreaChart, Area, Legend
 } from 'recharts';
 import {
-  TrendingUp, AlertCircle, Clock,
-  ShieldCheck, ArrowRight, Zap,
-  Calculator, Info, X, FileText,
-  CheckCircle2, Star, Shield, Target
+  TrendingUp, AlertCircle
 } from "lucide-react";
 
 const premiumData = [
@@ -61,7 +57,7 @@ const WealthAnalysis = () => {
               </h2>
 
               <p className="font-sans text-gray-500 text-lg md:text-xl font-light leading-relaxed max-w-xl mx-auto lg:mx-0">
-                Don't just take our word for it. Analyze the numbers and see how time
+                Don&apos;t just take our word for it. Analyze the numbers and see how time
                 affects your premium costs and long-term wealth growth.
               </p>
             </div>

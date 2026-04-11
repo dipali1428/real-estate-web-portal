@@ -2,15 +2,14 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, lazy, Suspense, useRef, cloneElement } from 'react';
-import { 
-  CheckCircle, Clock, ShieldCheck, FileText, Users, 
-  TrendingUp, ArrowLeft, Home, IndianRupee, Briefcase, 
-  Factory, Car, Landmark, GraduationCap, Building, 
-  Globe, Heart, Shield, Banknote, Award, Zap, Star, Plane, PieChart, X,
-  ArrowRight, User, Mail, Smartphone, Wallet, CreditCard, Ship, Anchor,
-  Flame, HardHat, Building2, Trees, Gem, Landmark as Bank, Key, ShoppingBag, 
+import {
+  CheckCircle, Clock, ShieldCheck, FileText, Users,
+  TrendingUp, ArrowLeft, Home, IndianRupee, Briefcase,
+  Factory, Car, Landmark, GraduationCap, Building,
+  Globe, Heart, Shield, Banknote, Award, Zap, Star, Plane, PieChart, X, User, Mail, Smartphone, Wallet, Ship, Anchor,
+  Flame, HardHat, Building2, Trees, Gem, Landmark as Bank, Key, ShoppingBag,
   Stethoscope, Activity, Truck, MapPin, Search, Warehouse, Coins, BadgePercent,
-  PiggyBank, BarChart3, Receipt, Scale, UserCheck
+  PiggyBank, BarChart3, Receipt, Scale
 } from 'lucide-react';
 
 // Import services and data
@@ -84,7 +83,7 @@ const ComprehensiveHeroGraphic = ({ slug }: { slug: string }) => {
   };
 
   const config = getGraphicConfig();
-  
+
   const themeColors: any = {
     blue: "from-blue-500 to-blue-700", sky: "from-sky-400 to-sky-600",
     indigo: "from-indigo-500 to-indigo-700", slate: "from-slate-500 to-slate-700",
@@ -144,7 +143,7 @@ const ComprehensiveHeroGraphic = ({ slug }: { slug: string }) => {
             {cloneElement(config.main as React.ReactElement, { size: 80, strokeWidth: 1.5 } as any)}
           </div>
         </div>
-        
+
         {/* Dynamic Accessory Circle with Unique Colors per case */}
         <div className={`absolute -bottom-4 -right-4 md:-bottom-8 md:-right-8 w-20 h-20 md:w-28 md:h-28 bg-linear-to-br ${accColors[config.accColor] || accColors.blue} rounded-full border-4 md:border-8 border-white shadow-xl flex items-center justify-center animate-bounce`}>
           {cloneElement(config.accessory as React.ReactElement, { className: "text-white", size: 40 } as any)}
@@ -253,7 +252,7 @@ export default function OfferDetailPage() {
   const [verifiedUserData, setVerifiedUserData] = useState({ name: "", email: "", mobile: "" });
 
   const foundOffer = getOfferByKey(name);
-  
+
   const offer = foundOffer || {
     title: name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
     category: 'General',
@@ -271,7 +270,7 @@ export default function OfferDetailPage() {
     const title = `${offer.title} - ${offer.category} | Financial Services`;
     document.title = title;
     const description = offer.description || `Explore ${offer.title} - ${offer.overview?.substring(0, 150)}...`;
-    
+
     let metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute('content', description);
@@ -323,7 +322,7 @@ export default function OfferDetailPage() {
   const handleApply = () => setIsVerifying(true);
 
   const handleVerificationSuccess = (userData: { name: string, email: string, mobile: string }) => {
-    setVerifiedUserData(userData); 
+    setVerifiedUserData(userData);
     setIsVerifying(false);
     setIsFormOpen(true);
   };
@@ -331,9 +330,9 @@ export default function OfferDetailPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbStructuredData) }} />
-      
+
       <div className="min-h-screen bg-linear-to-br from-gray-50 to-white">
-        
+
         {/* FIXED BACK BUTTON */}
         <div className="fixed z-50 top-17 left-1 md:top-23 md:left-4">
           <button onClick={handleBackToOffers} aria-label="Back to Offers" className="md:hidden group flex items-center gap-2 p-2 text-gray-500">
@@ -355,46 +354,46 @@ export default function OfferDetailPage() {
 
         {/* --- MAIN HEADER SECTION (RE-DESIGNED TO MATCH IMAGE) --- */}
         <header className="relative w-full overflow-hidden pt-24 md:pt-32 pb-16 bg-linear-to-b from-[#e1f0ff] via-[#f7faff] to-white">
-            <div className="container mx-auto px-6 relative z-10">
-                
-                {/* Custom Breadcrumb matching reference image style */}
-                <div className="flex items-center gap-2 text-sm font-medium mb-8">
-                    <span className="text-gray-500">Home</span>
-                    <span className="text-gray-400">&gt;</span>
-                    <span className="text-[#1CADA3]">{offer.title}</span>
-                </div>
+          <div className="container mx-auto px-6 relative z-10">
 
-                <div className="flex flex-col lg:flex-row items-center gap-12">
-                    {/* Left Column: Text & CTA */}
-                    <div className="w-full lg:w-1/2 text-left space-y-8">
-                        <h1 className="text-5xl md:text-7xl font-bold text-gray-700 leading-[1.1]">
-                            Get Closer to Your Goals with a <span className="text-[#2076C7]">Instant {offer.title}</span>
-                        </h1>
-                        
-                        <p className="text-xl md:text-2xl text-gray-600 max-w-xl leading-relaxed">
-                            {offer.description || `Explore flexible ${offer.title} options tailored to meet your unique financial needs.`}
-                        </p>
-                        
-                        <div className="flex flex-wrap gap-5 pt-4">
-                           <button onClick={handleApply} className="flex items-center gap-3 px-6 py-3 md:px-8 md:py-4 text-sm md:text-base font-bold text-white bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full md:rounded-lg shadow-lg hover:opacity-90 active:scale-95 transition-all">
-                            Apply Now 
-                          </button>
-                        </div>
-                    </div>
-
-                    {/* Right Column: Visual Graphic (The floating character/icon logic) */}
-                    <div className="w-full lg:w-1/2">
-                        <ComprehensiveHeroGraphic slug={name} />
-                    </div>
-                </div>
+            {/* Custom Breadcrumb matching reference image style */}
+            <div className="flex items-center gap-2 text-sm font-medium mb-8">
+              <span className="text-gray-500">Home</span>
+              <span className="text-gray-400">&gt;</span>
+              <span className="text-[#1CADA3]">{offer.title}</span>
             </div>
 
-            {/* Bottom Wave Transition Shape */}
-            <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
-                <svg className="relative block w-full h-[80px]" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#FFFFFF"></path>
-                </svg>
+            <div className="flex flex-col lg:flex-row items-center gap-12">
+              {/* Left Column: Text & CTA */}
+              <div className="w-full lg:w-1/2 text-left space-y-8">
+                <h1 className="text-5xl md:text-7xl font-bold text-gray-700 leading-[1.1]">
+                  Get Closer to Your Goals with a <span className="text-[#2076C7]">Instant {offer.title}</span>
+                </h1>
+
+                <p className="text-xl md:text-2xl text-gray-600 max-w-xl leading-relaxed">
+                  {offer.description || `Explore flexible ${offer.title} options tailored to meet your unique financial needs.`}
+                </p>
+
+                <div className="flex flex-wrap gap-5 pt-4">
+                  <button onClick={handleApply} className="flex items-center gap-3 px-6 py-3 md:px-8 md:py-4 text-sm md:text-base font-bold text-white bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full md:rounded-lg shadow-lg hover:opacity-90 active:scale-95 transition-all">
+                    Apply Now
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Column: Visual Graphic (The floating character/icon logic) */}
+              <div className="w-full lg:w-1/2">
+                <ComprehensiveHeroGraphic slug={name} />
+              </div>
             </div>
+          </div>
+
+          {/* Bottom Wave Transition Shape */}
+          <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
+            <svg className="relative block w-full h-[80px]" viewBox="0 0 1200 120" preserveAspectRatio="none">
+              <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#FFFFFF"></path>
+            </svg>
+          </div>
         </header>
 
         <main className="container mx-auto px-4 py-4 pt-12">
@@ -543,7 +542,7 @@ export default function OfferDetailPage() {
 
         {/* VERIFICATION MODAL */}
         {isVerifying && (
-          <VerificationPopup 
+          <VerificationPopup
             offerTitle={offer.title}
             onSuccess={handleVerificationSuccess}
             onCancel={() => setIsVerifying(false)}
@@ -561,9 +560,9 @@ export default function OfferDetailPage() {
                 </button>
                 {FormComponent ? (
                   <Suspense fallback={<div className="flex justify-center items-center py-12">Loading form...</div>}>
-                    <FormComponent 
-                        onClose={() => setIsFormOpen(false)} 
-                        prefilledData={verifiedUserData} 
+                    <FormComponent
+                      onClose={() => setIsFormOpen(false)}
+                      prefilledData={verifiedUserData}
                     />
                   </Suspense>
                 ) : (
@@ -586,7 +585,7 @@ export default function OfferDetailPage() {
 function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
   const [step, setStep] = useState<"details" | "otp">("details");
   const [formData, setFormData] = useState({ name: "", email: "", mobile: "" });
-  
+
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -623,13 +622,13 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
     if (!formData.name || !formData.email || formData.mobile.length !== 10) {
       return setError("Please fill all details correctly.");
     }
-    
+
     setIsLoading(true);
     setError("");
     try {
       await AuthService.sendLoginOtp({ identifier: formData.mobile });
       setStep("otp");
-      setTimer(30); 
+      setTimer(30);
     } catch (err) {
       setError("Failed to send OTP. Please try again.");
     } finally {
@@ -640,12 +639,12 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
   const handleVerifyOtp = async () => {
     const otpString = otp.join("");
     if (otpString.length < 6) return setError("Enter the 6-digit OTP code.");
-    
+
     setIsLoading(true);
     setError("");
     try {
       await AuthService.verifyLoginOtp({ identifier: formData.mobile, otp: otpString });
-      onSuccess(formData); 
+      onSuccess(formData);
     } catch (err) {
       setError("Invalid OTP code. Please try again.");
     } finally {
@@ -656,9 +655,9 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
   return (
     <div className="fixed inset-0 z-[1100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in duration-200">
-        
+
         <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-6 text-center text-white relative">
-          <button onClick={onCancel} className="absolute right-4 top-4 hover:bg-white/20 rounded-full p-1 transition-colors"><X size={20}/></button>
+          <button onClick={onCancel} className="absolute right-4 top-4 hover:bg-white/20 rounded-full p-1 transition-colors"><X size={20} /></button>
           <div className="bg-white/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-white/30">
             <ShieldCheck size={32} />
           </div>
@@ -672,33 +671,33 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
               <div className="space-y-3">
                 <div className="relative">
                   <User className="absolute left-3 top-3 text-gray-400" size={18} />
-                  <input 
-                    required type="text" placeholder="Full Name" 
+                  <input
+                    required type="text" placeholder="Full Name"
                     className="w-full border-gray-200 border rounded-xl p-2.5 pl-10 focus:ring-2 focus:ring-[#1CADA3] outline-none text-gray-700"
-                    value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})}
+                    value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 text-gray-400" size={18} />
-                  <input 
-                    required type="email" placeholder="Email Address" 
+                  <input
+                    required type="email" placeholder="Email Address"
                     className="w-full border-gray-200 border rounded-xl p-2.5 pl-10 focus:ring-2 focus:ring-[#1CADA3] outline-none text-gray-700"
-                    value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
+                    value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })}
                   />
                 </div>
                 <div className="relative">
                   <Smartphone className="absolute left-3 top-3 text-gray-400" size={18} />
-                  <input 
-                    required type="tel" maxLength={10} placeholder="10-digit Mobile Number" 
+                  <input
+                    required type="tel" maxLength={10} placeholder="10-digit Mobile Number"
                     className="w-full border-gray-200 border rounded-xl p-2.5 pl-10 focus:ring-2 focus:ring-[#1CADA3] outline-none text-gray-700"
-                    value={formData.mobile} onChange={e => setFormData({...formData, mobile: e.target.value.replace(/\D/g, "")})}
+                    value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, "") })}
                   />
                 </div>
               </div>
-              
+
               {error && <p className="text-red-500 text-xs text-center font-medium bg-red-50 p-2 rounded-lg">{error}</p>}
-              
-              <button 
+
+              <button
                 type="submit" disabled={isLoading}
                 className="w-full bg-[#1CADA3] text-white py-3.5 rounded-xl font-bold hover:bg-[#178e86] shadow-lg disabled:opacity-50 transition-all active:scale-95"
               >
@@ -708,7 +707,7 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
           ) : (
             <div className="space-y-6 text-center animate-in slide-in-from-bottom-4 duration-300">
               <div>
-                <p className="text-sm text-gray-500 mb-6">Enter the code sent to <br/> <span className="text-gray-800 font-medium tracking-wide">{formData.mobile}</span></p>
+                <p className="text-sm text-gray-500 mb-6">Enter the code sent to <br /> <span className="text-gray-800 font-medium tracking-wide">{formData.mobile}</span></p>
                 <div className="flex justify-between gap-2 mb-2">
                   {otp.map((digit, index) => (
                     <input
@@ -728,7 +727,7 @@ function VerificationPopup({ offerTitle, onSuccess, onCancel }: any) {
               {error && <p className="text-red-500 text-xs font-medium bg-red-50 p-2 rounded-lg">{error}</p>}
 
               <div className="space-y-3">
-                <button 
+                <button
                   onClick={handleVerifyOtp} disabled={isLoading}
                   className="w-full bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-3.5 rounded-xl font-bold shadow-lg"
                 >

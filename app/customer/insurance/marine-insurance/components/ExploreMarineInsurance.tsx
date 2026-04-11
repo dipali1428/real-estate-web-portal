@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Search, Anchor, Info, X, FileText, Landmark } from 'lucide-react';
+import { Search, Anchor, Info, X } from 'lucide-react';
 import MarineInsurancePlanCard from './MarineInsurancePlanCard';
 import { marinePlansData } from '../marineInsuranceConstants';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export default function ExploreMarineInsurance({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
     const [searchQuery, setSearchQuery] = useState('');

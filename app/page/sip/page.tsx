@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TrendingUp, PieChart, Calculator, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { useRouter } from "next/navigation";
 
 // Calculator options for dropdown
 const CALCULATOR_OPTIONS = [
@@ -20,24 +21,24 @@ const CALCULATOR_OPTIONS = [
 // =============================================
 export const SIPCalculatorContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'sip' | 'lumpsum'>('sip');
-  
+
   // SIP Calculator State
   const [sipAmount, setSipAmount] = useState(5000);
   const [sipDuration, setSipDuration] = useState(10);
   const [sipReturn, setSipReturn] = useState(12);
-  
+
   // Lumpsum Calculator State
   const [lumpsumAmount, setLumpsumAmount] = useState(100000);
   const [lumpsumDuration, setLumpsumDuration] = useState(10);
   const [lumpsumReturn, setLumpsumReturn] = useState(12);
-  
+
   // Results State
   const [sipResults, setSipResults] = useState({
     totalInvestment: 600000,
     estimatedReturns: 461384,
     totalValue: 1061384
   });
-  
+
   const [lumpsumResults, setLumpsumResults] = useState({
     totalInvestment: 100000,
     estimatedReturns: 210585,
@@ -60,14 +61,14 @@ export const SIPCalculatorContent: React.FC = () => {
   const calculateSIP = useCallback((monthlyInvestment: number, years: number, annualReturn: number) => {
     const months = years * 12;
     const monthlyRate = annualReturn / 100 / 12;
-    
-    const futureValue = monthlyInvestment * 
-      ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * 
+
+    const futureValue = monthlyInvestment *
+      ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) *
       (1 + monthlyRate);
-    
+
     const totalInvestment = monthlyInvestment * months;
     const estimatedReturns = futureValue - totalInvestment;
-    
+
     return {
       totalInvestment,
       estimatedReturns,
@@ -80,7 +81,7 @@ export const SIPCalculatorContent: React.FC = () => {
     const rate = annualReturn / 100;
     const futureValue = investment * Math.pow(1 + rate, years);
     const estimatedReturns = futureValue - investment;
-    
+
     return {
       totalInvestment: investment,
       estimatedReturns,
@@ -114,15 +115,14 @@ export const SIPCalculatorContent: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
         <div className="p-6 lg:p-8 font-sans">
-          
+
           {/* Tabs */}
           <div className="flex bg-gray-100 rounded-xl p-1 mb-8 max-w-md mx-auto">
             <button
-              className={`flex-1 py-3 px-5 text-center cursor-pointer rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-                activeTab === 'sip' 
-                  ? 'bg-[#1CADA3] text-white shadow-md' 
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
+              className={`flex-1 py-3 px-5 text-center cursor-pointer rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${activeTab === 'sip'
+                ? 'bg-[#1CADA3] text-white shadow-md'
+                : 'text-gray-600 hover:text-gray-800'
+                }`}
               onClick={() => setActiveTab('sip')}
             >
               <i className="fas fa-chart-line text-sm"></i>
@@ -130,11 +130,10 @@ export const SIPCalculatorContent: React.FC = () => {
             </button>
 
             <button
-              className={`flex-1 py-3 px-5 text-center cursor-pointer rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-                activeTab === 'lumpsum' 
-                  ? 'bg-[#1CADA3] text-white shadow-md' 
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
+              className={`flex-1 py-3 px-5 text-center cursor-pointer rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${activeTab === 'lumpsum'
+                ? 'bg-[#1CADA3] text-white shadow-md'
+                : 'text-gray-600 hover:text-gray-800'
+                }`}
               onClick={() => setActiveTab('lumpsum')}
             >
               <i className="fas fa-coins text-sm"></i>
@@ -146,7 +145,7 @@ export const SIPCalculatorContent: React.FC = () => {
           {activeTab === 'sip' && (
             <div className="animate-fade-in">
               <div className="flex flex-col lg:flex-row gap-8">
-                
+
                 {/* Input Card */}
                 <div className="flex-1 bg-white rounded-xl border border-gray-200 p-6">
                   <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
@@ -251,7 +250,7 @@ export const SIPCalculatorContent: React.FC = () => {
           {activeTab === 'lumpsum' && (
             <div className="animate-fade-in">
               <div className="flex flex-col lg:flex-row gap-8">
-                
+
                 {/* Input Card */}
                 <div className="flex-1 bg-white rounded-xl border border-gray-200 p-6">
                   <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
@@ -361,7 +360,7 @@ export const SIPCalculatorContent: React.FC = () => {
             <div className="flex items-end justify-center gap-16 py-6">
               {/* SIP Bar */}
               <div className="flex flex-col items-center">
-                <div 
+                <div
                   className="w-16 bg-gradient-to-t from-[#1CADA3] to-[#1CADA3] rounded-t-lg relative shadow-sm"
                   style={{ height: `${sipBarHeight}px` }}
                 >
@@ -377,7 +376,7 @@ export const SIPCalculatorContent: React.FC = () => {
 
               {/* Lumpsum Bar */}
               <div className="flex flex-col items-center">
-                <div 
+                <div
                   className="w-16 bg-gradient-to-t from-[#2076C7] to-[#2076C7] rounded-t-lg relative shadow-sm"
                   style={{ height: `${lumpsumBarHeight}px` }}
                 >
@@ -404,7 +403,7 @@ export const SIPCalculatorContent: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Metric Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 mt-8 ">
             <div className="bg-white rounded-xl border shadow-md p-4 text-center hover:shadow-lg transition-shadow">
@@ -487,16 +486,16 @@ export const SIPCalculatorContent: React.FC = () => {
                   </span>
                 </li>
               </ul>
-              
+
               <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-xs text-yellow-800 flex items-start gap-2">
                   <span><strong>Pro Tip:</strong> Start early to maximize the power of compounding. Even small amounts invested regularly can grow into substantial wealth over time.</span>
                 </p>
               </div>
-              
+
               <p className="text-[11px] text-gray-500 mt-2 flex items-start gap-1">
-          
-        
+
+
                 <span><strong>Note:</strong> Past performance doesn't guarantee future returns. These calculations are for illustration purposes only. Actual returns may vary based on market conditions.</span>
               </p>
             </div>
@@ -507,7 +506,7 @@ export const SIPCalculatorContent: React.FC = () => {
 
       {/* Font Awesome */}
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-      
+
       {/* Fade Animation */}
       <style>{`
         @keyframes fadeIn {
@@ -527,11 +526,12 @@ export const SIPCalculatorContent: React.FC = () => {
 // =============================================
 const SIPLumpsumCalculatorStandalone: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
+
   const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'sip') || CALCULATOR_OPTIONS[0];
+  const router = useRouter();
 
   const handleCalculatorChange = (path: string) => {
-    window.location.href = path;
+    router.push(path);
   };
 
   return (
@@ -548,7 +548,7 @@ const SIPLumpsumCalculatorStandalone: React.FC = () => {
       {/* Dropdown */}
       <div className="container mx-auto px-4 py-4 max-w-md">
         <div className="relative">
-          <button 
+          <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
           >
@@ -563,7 +563,7 @@ const SIPLumpsumCalculatorStandalone: React.FC = () => {
 
           <AnimatePresence>
             {isDropdownOpen && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -576,21 +576,18 @@ const SIPLumpsumCalculatorStandalone: React.FC = () => {
                       handleCalculatorChange(calc.path);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
-                      calc.id === 'sip' ? 'bg-teal-500/5' : ''
-                    }`}
+                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${calc.id === 'sip' ? 'bg-teal-500/5' : ''
+                      }`}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      calc.id === 'sip' 
-                        ? 'bg-teal-500 text-white' 
-                        : 'bg-gray-100 text-gray-500'
-                    }`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${calc.id === 'sip'
+                      ? 'bg-teal-500 text-white'
+                      : 'bg-gray-100 text-gray-500'
+                      }`}>
                       <calc.icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1">
-                      <span className={`font-medium ${
-                        calc.id === 'sip' ? 'text-teal-600' : 'text-gray-700'
-                      }`}>
+                      <span className={`font-medium ${calc.id === 'sip' ? 'text-teal-600' : 'text-gray-700'
+                        }`}>
                         {calc.label}
                       </span>
                       <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>

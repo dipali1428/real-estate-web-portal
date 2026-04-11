@@ -1,18 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
-  IconCalculator,
   IconShieldCheck,
   IconInfoCircle,
-  IconTrendingUp,
   IconPlus,
   IconMinus,
   IconFlame,
   IconShield,
   IconScale,
-  IconUsers,
 } from "@tabler/icons-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
@@ -82,9 +78,9 @@ export default function CorporateCalculator() {
         { name: "Support Add-ons", value: basePremium * 0.2 },
       ];
     } else {
-      let fire = covers.fire ? assetValue * businessType.riskRate : 0;
-      let burglary = covers.burglary ? assetValue * 0.001 : 0;
-      let liability = covers.liability ? turnover.premium : 0;
+      const fire = covers.fire ? assetValue * businessType.riskRate : 0;
+      const burglary = covers.burglary ? assetValue * 0.001 : 0;
+      const liability = covers.liability ? turnover.premium : 0;
       basePremium = Math.round(fire + burglary + liability);
       items = [
         { name: "Fire Cover", value: fire },

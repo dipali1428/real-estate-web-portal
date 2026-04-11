@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { X, ShieldCheck, User, Mail, Smartphone, Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { X, ShieldCheck, User, Mail, Smartphone } from 'lucide-react';
 import { AuthService } from "@/app/services/authService";
 
 interface VerificationPopupProps {

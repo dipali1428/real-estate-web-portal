@@ -1,16 +1,13 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { 
-    Briefcase,
+import {
     TrendingUp,
     FileText,
     Download,
     Eye,
     EyeOff,
     Building2,
-    Calendar,
-    ArrowRight,
     Wallet,
     BarChart3,
     ShieldCheck

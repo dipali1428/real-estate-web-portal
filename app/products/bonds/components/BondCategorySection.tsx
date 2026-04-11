@@ -1,6 +1,6 @@
 "use client";
 
-import { bondsData, Bond } from "../data/bondsData";
+import { bondsData } from "../data/bondsData";
 import BondCard from "./BondCard";
 import { motion } from "framer-motion";
 

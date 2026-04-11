@@ -8,14 +8,9 @@ import {
   ShieldCheck,
   TrendingUp,
   Landmark,
-  IndianRupee,
-  Calendar,
-  Clock,
   ArrowRight,
-  ChevronRight,
   Zap,
   Calculator,
-  Percent,
   CheckCircle2,
   AlertCircle
 } from "lucide-react";

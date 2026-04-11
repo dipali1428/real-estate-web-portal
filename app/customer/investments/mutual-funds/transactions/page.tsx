@@ -2,14 +2,11 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { 
-  ArrowUpRight, ArrowDownRight, 
-  Filter, Search, Calendar, 
+  ArrowUpRight, ArrowDownRight, Search, 
   Download, History, Clock, 
-  CheckCircle2, XCircle, AlertCircle,
-  IndianRupee, SlidersHorizontal
+  CheckCircle2, XCircle, AlertCircle, SlidersHorizontal
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import toast from "react-hot-toast";
 
 interface Transaction {
   id: string;
