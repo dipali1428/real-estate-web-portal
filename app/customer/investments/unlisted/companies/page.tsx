@@ -136,7 +136,8 @@ export default function CompaniesPage() {
   const [priceRange, setPriceRange] = useState<PriceRangeOption>('ALL');
   const [sortBy, setSortBy] = useState<SortOption>('name-asc');
   const [showFilters, setShowFilters] = useState(false);
-  const [wishlistItems, setWishlistItems] = useState<Map<number, number>>(new Map());
+  const [wishlistMap, setWishlistMap] = useState<Map<number, number>>(new Map());
+  const [wishlistLoading, setWishlistLoading] = useState(false);
   
   // View More State
   const [visibleCount, setVisibleCount] = useState(12);
@@ -170,7 +171,11 @@ export default function CompaniesPage() {
       try {
         const response = await fetchDashboardData();
         if (response?.success && response?.graph) setGraphData(response.graph);
-      } catch (error) {} finally { setIsGraphLoading(false); }
+      } catch (error) {
+        console.error('Error fetching market data:', error);
+      } finally { 
+        setIsGraphLoading(false); 
+      }
     };
     fetchIndexData();
   }, []);
@@ -182,12 +187,57 @@ export default function CompaniesPage() {
     });
   }, [graphData]);
 
+  // --- WISHLIST FETCH WITH PROPER HANDLING ---
+  const loadWishlist = useCallback(async () => {
+    const token = getTokenFromCookie();
+    if (!token) {
+      setWishlistMap(new Map());
+      return;
+    }
+
+    try {
+      const response = await customerService.getMyWishlist();
+      
+      // PROPER RESPONSE HANDLING
+      if (!response || !response.success) {
+        setWishlistMap(new Map());
+        return;
+      }
+
+      // SAFE DATA EXTRACTION
+      let dataArray: any[] = [];
+      
+      if (response.data && Array.isArray(response.data)) {
+        dataArray = response.data;
+      } else if (response.data && !Array.isArray(response.data)) {
+        dataArray = [response.data];
+      } else {
+        dataArray = [];
+      }
+
+      const newMap = new Map<number, number>();
+      dataArray.forEach((item: WishlistItem) => {
+        if (item && item.product_type === 'unlisted_share' && item.product_id) {
+          newMap.set(item.product_id, item.id);
+        }
+      });
+      
+      setWishlistMap(newMap);
+    } catch (error) {
+      console.error('Error loading wishlist:', error);
+      setWishlistMap(new Map());
+    }
+  }, []);
+
   // --- MAIN DATA FETCH ---
   const fetchCompanies = async () => {
     setLoading(true);
     try {
       const token = getTokenFromCookie();
-      if (!token) { router.push('/'); return; }
+      if (!token) { 
+        router.push('/'); 
+        return; 
+      }
       
       const response = await customerService.getAllCompanies();
       const rawData = response?.data || response || [];
@@ -200,41 +250,108 @@ export default function CompaniesPage() {
       setCompanies(companiesData);
       setFilteredCompanies(companiesData);
       
-      const wishRes = await customerService.getMyWishlist();
-      if (wishRes.success && Array.isArray(wishRes.data)) {
-        const wishlistMap = new Map();
-        wishRes.data.forEach((item: WishlistItem) => {
-          if (item.product_type === 'unlisted_share') wishlistMap.set(item.product_id, item.id);
-        });
-        setWishlistItems(wishlistMap);
-      }
-
-    } catch (err) {} finally { setLoading(false); }
+      // Load wishlist after companies are loaded
+      await loadWishlist();
+    } catch (err) {
+      console.error('Error fetching companies:', err);
+      toast.error('Failed to load companies');
+    } finally { 
+      setLoading(false); 
+    }
   };
 
-  useEffect(() => { fetchCompanies(); }, []);
+  useEffect(() => { 
+    fetchCompanies(); 
+  }, []);
 
-  // --- WISHLIST LOGIC ---
+  // Auto-refresh wishlist every 30 seconds
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      loadWishlist();
+    }, 30000);
+    
+    // Refresh when page becomes visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadWishlist();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Listen for wishlist updates from other components
+    const handleWishlistUpdate = () => {
+      loadWishlist();
+    };
+    window.addEventListener('wishlistUpdated', handleWishlistUpdate);
+    
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('wishlistUpdated', handleWishlistUpdate);
+    };
+  }, [loadWishlist]);
+
+  // --- WISHLIST TOGGLE ---
   const toggleWishlist = async (company: Company) => {
-    const wishlistId = wishlistItems.get(company.id);
+    const token = getTokenFromCookie();
+    if (!token) {
+      toast.error('Session expired. Please login again.');
+      return;
+    }
+    
+    const wishlistId = wishlistMap.get(company.id);
+    setWishlistLoading(true);
+    
     try {
       if (wishlistId) {
+        // Remove from wishlist
         const res = await customerService.removeFromWishlist(wishlistId);
         if (res.success) {
-          setWishlistItems(prev => { const n = new Map(prev); n.delete(company.id); return n; });
+          setWishlistMap(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(company.id);
+            return newMap;
+          });
           toast.success('Removed from wishlist');
+          
+          // Dispatch event for other components
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('wishlistUpdated', { 
+              detail: { action: 'remove', productId: company.id } 
+            }));
+          }
+        } else {
+          toast.error(res.message || 'Failed to remove from wishlist');
         }
       } else {
+        // Add to wishlist
         const res = await customerService.addToWishlist({
-          product_type: 'unlisted_share', product_id: company.id, product_name: company.shares_name
+          product_type: 'unlisted_share', 
+          product_id: company.id, 
+          product_name: company.shares_name
         });
+        
         if (res.success && res.data) {
           const newId = Array.isArray(res.data) ? res.data[0].id : res.data.id;
-          setWishlistItems(prev => new Map(prev).set(company.id, newId));
+          setWishlistMap(prev => new Map(prev).set(company.id, newId));
           toast.success('Saved to wishlist');
+          
+          // Dispatch event for other components
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('wishlistUpdated', { 
+              detail: { action: 'add', productId: company.id } 
+            }));
+          }
+        } else {
+          toast.error(res.message || 'Failed to add to wishlist');
         }
       }
-    } catch (error) { toast.error('Action failed'); }
+    } catch (error) {
+      console.error('Wishlist action failed:', error);
+      toast.error('Action failed. Please try again.');
+    } finally {
+      setWishlistLoading(false);
+    }
   };
 
   // --- FILTERING & SORTING ---
@@ -262,11 +379,16 @@ export default function CompaniesPage() {
     setVisibleCount(12);
   }, [companies, searchTerm, priceRange, sortBy]);
 
-  const clearFilters = () => { setSearchTerm(''); setPriceRange('ALL'); setSortBy('name-asc'); };
+  const clearFilters = () => { 
+    setSearchTerm(''); 
+    setPriceRange('ALL'); 
+    setSortBy('name-asc'); 
+  };
 
   // --- BUY NOW HANDLER ---
   const handleBuyNow = (company: Company) => {
     sessionStorage.setItem('pendingBuyCompany', JSON.stringify(company));
+    router.push('/customer/checkout');
   };
 
   // --- MODAL GRAPH DATA FETCH ---
@@ -292,7 +414,8 @@ export default function CompaniesPage() {
             setModalGraphData(formattedData);
           }
         }
-      } catch {
+      } catch (error) {
+        console.error('Error loading graph data:', error);
         setModalGraphData([]);
       } finally {
         setIsModalGraphLoading(false);
@@ -461,10 +584,17 @@ export default function CompaniesPage() {
     }
   };
 
-  if (loading) return <div className="w-full py-20 text-center text-gray-500">Loading companies...</div>;
+  if (loading) {
+    return (
+      <div className="w-full py-20 text-center text-gray-500">
+        <div className="w-10 h-10 border-4 border-[#2076C7] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p>Loading companies...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full font-sans bg-gradient-to-br from-gray-50 to-white">
+    <div className="w-full font-sans bg-gradient-to-br from-gray-50 to-white min-h-screen p-6">
       
       {/* TOAST CONTAINER */}
       <div className="fixed top-20 right-5 z-[5000] flex flex-col gap-3">
@@ -513,7 +643,7 @@ export default function CompaniesPage() {
              <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600"><ShoppingCart size={18} /></div>
              Wishlist
           </div>
-          <p className="text-2xl font-bold text-gray-900">{wishlistItems.size}</p>
+          <p className="text-2xl font-bold text-gray-900">{wishlistMap.size}</p>
         </div>
       </div>
 
@@ -544,16 +674,16 @@ export default function CompaniesPage() {
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Price Range</label>
-              <select className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm" value={priceRange} onChange={(e) => setPriceRange(e.target.value as PriceRangeOption)}>
+              <label className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Price Range</label>
+              <select className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm" value={priceRange} onChange={(e) => setPriceRange(e.target.value as PriceRangeOption)}>
                 {PRICE_RANGES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Sort By</label>
-              <select className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm" value={sortBy} onChange={(e) => setSortBy(e.target.value as SortOption)}>
+              <label className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Sort By</label>
+              <select className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm" value={sortBy} onChange={(e) => setSortBy(e.target.value as SortOption)}>
                 {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
+              </select> 
             </div>
             <div className="flex items-end">
                <button onClick={clearFilters} className="text-sm text-red-500 font-bold hover:underline flex items-center gap-1"><X size={14}/> Reset</button>
@@ -565,7 +695,7 @@ export default function CompaniesPage() {
       {/* Companies Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
         {filteredCompanies.slice(0, visibleCount).map((company) => {
-          const isSaved = wishlistItems.has(company.id);
+          const isSaved = wishlistMap.has(company.id);
           const minInv = calculateMinInvestment(company.price, company.min_lot_size);
 
           return (
@@ -574,7 +704,12 @@ export default function CompaniesPage() {
               {/* Wishlist Button - Floating */}
               <button 
                 onClick={() => toggleWishlist(company)}
-                className={`absolute top-4 right-4 p-2 rounded-full transition-all ${isSaved ? 'bg-blue-50 text-[#2076C7]' : 'bg-gray-50 text-gray-400 hover:text-[#2076C7]'}`}
+                disabled={wishlistLoading}
+                className={`absolute top-4 right-4 p-2 rounded-full transition-all ${
+                  isSaved 
+                    ? 'bg-blue-50 text-[#2076C7]' 
+                    : 'bg-gray-50 text-gray-400 hover:text-[#2076C7]'
+                } disabled:opacity-50`}
               >
                 {isSaved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
               </button>

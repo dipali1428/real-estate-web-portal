@@ -370,71 +370,73 @@ const LiveTrends: React.FC = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
             <main className="container mx-auto px-4 py-4 pt-4 md:pt-8">
-                {/* Back Button */}
-                <div className="sticky top-[72px] z-40 mb-8 bg-gradient-to-br from-gray-50 to-white pt-2 pb-2">
-                    <div className="container mx-auto px-4">
-                        <a 
-                            href="/products/unlisted" 
-                            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-[0_4px_16px_rgba(32,118,199,0.1)] hover:bg-white hover:border-[#2076C7]/40 active:scale-95 transition-all group cursor-pointer"
-                        >
-                            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                            <span className="font-semibold">Back</span>
-                        </a>
+                {/* Back Button - Fixed to only cover the button area */}
+                <div className="sticky top-[72px] z-40 mb-6 md:mb-8 pointer-events-none">
+                    <div className="container mx-auto">
+                        <span className="inline-block pointer-events-auto">
+                            <a 
+                                href="/products/unlisted" 
+                                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-lg hover:bg-white hover:border-[#2076C7]/40 active:scale-95 transition-all group cursor-pointer"
+                            >
+                                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                                <span className="font-semibold">Back</span>
+                            </a>
+                        </span>
                     </div>
                 </div>
 
                 {/* Icon Section */}
-                <header className="mb-12 text-center">
-                    <div className="inline-flex items-center justify-center p-4 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 mb-6">
-                        <div className="p-4 rounded-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg">
-                            <Activity className="w-8 h-8" />
+                <header className="mb-8 md:mb-12 text-center">
+                    <div className="inline-flex items-center justify-center p-3 md:p-4 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 mb-4 md:mb-6">
+                        <div className="p-3 md:p-4 rounded-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg">
+                            <Activity className="w-6 h-6 md:w-8 md:h-8" />
                         </div>
                     </div>
                 
                     {/* Main Heading with Gradient Text */}
-                    <h1 className="text-4xl md:text-5xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
+                    <h1 className="text-3xl md:text-5xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm px-2">
                         Live Market Trends
                     </h1>
                     
                     {/* Gradient Divider Line */}
-                    <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-6"></div>
+                    <div className="w-20 md:w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4 md:mb-6"></div>
                     
                     {/* Subtitle / Description */}
-                    <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
+                    <p className="text-base md:text-xl text-gray-600 max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed px-4">
                         Real-time performance of 155 unlisted companies
                     </p>
                 </header>
 
                 {/* Main Index Card */}
-                <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-8 mb-8">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                        <div>
-                            <div className="text-sm font-bold text-[#2076C7] uppercase tracking-wider mb-1">
+                <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl border border-gray-100 p-5 md:p-8 mb-8">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-6">
+                        <div className="w-full md:w-auto">
+                            <div className="text-xs md:text-sm font-bold text-[#2076C7] uppercase tracking-wider mb-1">
                                 Unlisted Shares overview
                             </div>
-                            <div className="flex items-baseline gap-3">
-                                <span className="text-5xl font-black text-gray-900">₹{currentIndex}</span>
+                            <div className="flex items-baseline flex-wrap gap-2 md:gap-3">
+                                <span className="text-3xl md:text-5xl font-black text-gray-900">₹{currentIndex}</span>
                                 {graphData.length > 1 && (
-                                    <span className={`text-lg font-bold flex items-center ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                                        {isPositive ? <TrendingUp className="w-5 h-5 mr-1" /> : <TrendingDown className="w-5 h-5 mr-1" />}
+                                    <span className={`text-base md:text-lg font-bold flex items-center ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                                        {isPositive ? <TrendingUp className="w-4 h-4 md:w-5 md:h-5 mr-1" /> : <TrendingDown className="w-4 h-4 md:w-5 md:h-5 mr-1" />}
                                         {todayChange}%
                                     </span>
                                 )}
                             </div>
                             {summary?.totalSharesListed && (
-                                <div className="text-sm text-gray-500 mt-2">
-                                    Based on weighted average of {summary.totalSharesListed} active scrips
+                                <div className="text-xs md:text-sm text-gray-500 mt-2">
+                                    Based on weighted average of {summary.totalSharesListed} scrips
                                 </div>
                             )}
                         </div>
 
                         {/* Period Switcher */}
-                        <div className="flex bg-gray-100 p-1.5 rounded-2xl w-full md:w-auto">
+                        <div className="flex bg-gray-100 p-1 rounded-xl md:rounded-2xl w-full md:w-auto">
                             {['daily', 'weekly', 'monthly'].map((p) => (
                                 <button
                                     key={p}
                                     onClick={() => setPeriod(p as any)}
-                                    className={`flex-1 md:flex-none px-6 py-2 rounded-xl text-sm font-bold capitalize transition-all ${
+                                    className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-bold capitalize transition-all ${
                                         period === p 
                                             ? 'bg-white text-[#2076C7] shadow-md' 
                                             : 'text-gray-500 hover:text-gray-700'
@@ -446,8 +448,8 @@ const LiveTrends: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Chart */}
-                    <div className="h-[400px] w-full relative">
+                    {/* Chart Container */}
+                    <div className="h-[280px] md:h-[400px] w-full relative">
                         {isGraphLoading ? (
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
@@ -474,67 +476,67 @@ const LiveTrends: React.FC = () => {
 
                 {/* Market Stats */}
                 {summary && (
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                            <div className="text-green-600 mb-3">
-                                <IndianRupee size={24} />
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8">
+                        <div className="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                            <div className="text-green-600 mb-2 md:mb-3">
+                                <IndianRupee size={20} className="md:w-6 md:h-6" />
                             </div>
-                            <div className="text-2xl font-black text-gray-900">
+                            <div className="text-lg md:text-2xl font-black text-gray-900">
                                 {formatLargeNumber(summary.totalSharesListed * 100000)}
                             </div>
-                            <div className="text-sm font-medium text-gray-500">Total Volume</div>
+                            <div className="text-xs md:text-sm font-medium text-gray-500">Total Volume</div>
                         </div>
                         
-                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                            <div className="text-blue-600 mb-3">
-                                <Users size={24} />
+                        <div className="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                            <div className="text-blue-600 mb-2 md:mb-3">
+                                <Users size={20} className="md:w-6 md:h-6" />
                             </div>
-                            <div className="text-2xl font-black text-gray-900">
+                            <div className="text-lg md:text-2xl font-black text-gray-900">
                                 {formatInvestorCount(summary.totalInvestors)}
                             </div>
-                            <div className="text-sm font-medium text-gray-500">Investors</div>
+                            <div className="text-xs md:text-sm font-medium text-gray-500">Investors</div>
                         </div>
                         
-                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                            <div className="text-purple-600 mb-3">
-                                <BarChart3 size={24} />
+                        <div className="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                            <div className="text-purple-600 mb-2 md:mb-3">
+                                <BarChart3 size={20} className="md:w-6 md:h-6" />
                             </div>
-                            <div className="text-2xl font-black text-gray-900">
+                            <div className="text-lg md:text-2xl font-black text-gray-900">
                                 {summary.totalSharesListed}
                             </div>
-                            <div className="text-sm font-medium text-gray-500">Active Companies</div>
+                            <div className="text-xs md:text-sm font-medium text-gray-500">Active Companies</div>
                         </div>
                         
-                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                            <div className="text-orange-600 mb-3 flex items-center gap-1">
-                                <Activity size={24} />
-                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">
+                        <div className="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                            <div className="text-orange-600 mb-2 md:mb-3 flex items-center gap-1">
+                                <Activity size={20} className="md:w-6 md:h-6" />
+                                <span className="text-[10px] md:text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-bold">
                                     +{summary.marketGainPercent}%
                                 </span>
                             </div>
-                            <div className="text-2xl font-black text-gray-900">
-                                ₹{((summary.totalSharesListed || 155) * 150000).toLocaleString()} Cr
+                            <div className="text-lg md:text-2xl font-black text-gray-900">
+                                ₹{((summary.totalSharesListed || 155) * 150).toLocaleString()} Cr
                             </div>
-                            <div className="text-sm font-medium text-gray-500">Market Cap</div>
+                            <div className="text-xs md:text-sm font-medium text-gray-500">Market Cap</div>
                         </div>
                     </div>
                 )}
 
                 {/* Top Gainers & Losers */}
                 <section className="mb-12">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                        <Users className="w-6 h-6 text-[#2076C7]" />
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 flex items-center gap-3">
+                        <Users className="w-5 h-5 md:w-6 md:h-6 text-[#2076C7]" />
                         Top Companies
                     </h2>
                     
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Top Gainers */}
-                        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 md:p-6">
                             <div className="flex items-center gap-2 mb-4">
                                 <div className="p-2 rounded-lg bg-green-100">
-                                    <TrendingUp className="w-5 h-5 text-green-600" />
+                                    <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
                                 </div>
-                                <h4 className="text-lg font-bold text-gray-900">Top Gainers Today</h4>
+                                <h4 className="text-base md:text-lg font-bold text-gray-900">Top Gainers Today</h4>
                             </div>
                             
                             {isMoversLoading ? (
@@ -550,9 +552,9 @@ const LiveTrends: React.FC = () => {
                                     {gainers.map((gainer) => {
                                         const change = parseFloat(gainer.percentage_change);
                                         return (
-                                            <div key={gainer.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-all">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
+                                            <div key={gainer.id} className="flex items-center justify-between p-2 md:p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
                                                         {gainer.logo_url ? (
                                                             <img 
                                                                 src={gainer.logo_url} 
@@ -562,21 +564,21 @@ const LiveTrends: React.FC = () => {
                                                                     const target = e.target as HTMLImageElement;
                                                                     target.style.display = 'none';
                                                                     if (target.parentElement) {
-                                                                        target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xs">${getCompanyInitials(gainer.shares_name)}</div>`;
+                                                                        target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-[10px]">${getCompanyInitials(gainer.shares_name)}</div>`;
                                                                     }
                                                                 }}
                                                             />
                                                         ) : (
-                                                            <div className="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xs">
+                                                            <div className="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-[10px]">
                                                                 {getCompanyInitials(gainer.shares_name)}
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="font-medium text-gray-900">{gainer.shares_name}</div>
+                                                    <div className="font-medium text-gray-900 text-sm md:text-base truncate">{gainer.shares_name}</div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <div className="font-bold text-gray-900">{formatPrice(gainer.latest_price)}</div>
-                                                    <div className="text-green-500 font-bold text-sm">
+                                                <div className="text-right flex-shrink-0">
+                                                    <div className="font-bold text-gray-900 text-sm md:text-base">{formatPrice(gainer.latest_price)}</div>
+                                                    <div className="text-green-500 font-bold text-xs md:text-sm">
                                                         +{change.toFixed(1)}%
                                                     </div>
                                                 </div>
@@ -588,12 +590,12 @@ const LiveTrends: React.FC = () => {
                         </div>
 
                         {/* Top Losers */}
-                        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 md:p-6">
                             <div className="flex items-center gap-2 mb-4">
                                 <div className="p-2 rounded-lg bg-red-100">
-                                    <TrendingDown className="w-5 h-5 text-red-600" />
+                                    <TrendingDown className="w-4 h-4 md:w-5 md:h-5 text-red-600" />
                                 </div>
-                                <h4 className="text-lg font-bold text-gray-900">Top Losers Today</h4>
+                                <h4 className="text-base md:text-lg font-bold text-gray-900">Top Losers Today</h4>
                             </div>
                             
                             {isMoversLoading ? (
@@ -609,9 +611,9 @@ const LiveTrends: React.FC = () => {
                                     {losers.map((loser) => {
                                         const change = parseFloat(loser.percentage_change);
                                         return (
-                                            <div key={loser.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-all">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
+                                            <div key={loser.id} className="flex items-center justify-between p-2 md:p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
                                                         {loser.logo_url ? (
                                                             <img 
                                                                 src={loser.logo_url} 
@@ -621,21 +623,21 @@ const LiveTrends: React.FC = () => {
                                                                     const target = e.target as HTMLImageElement;
                                                                     target.style.display = 'none';
                                                                     if (target.parentElement) {
-                                                                        target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xs">${getCompanyInitials(loser.shares_name)}</div>`;
+                                                                        target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-[10px]">${getCompanyInitials(loser.shares_name)}</div>`;
                                                                     }
                                                                 }}
                                                             />
                                                         ) : (
-                                                            <div className="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xs">
+                                                            <div className="w-full h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-[10px]">
                                                                 {getCompanyInitials(loser.shares_name)}
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="font-medium text-gray-900">{loser.shares_name}</div>
+                                                    <div className="font-medium text-gray-900 text-sm md:text-base truncate">{loser.shares_name}</div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <div className="font-bold text-gray-900">{formatPrice(loser.latest_price)}</div>
-                                                    <div className="text-red-500 font-bold text-sm">
+                                                <div className="text-right flex-shrink-0">
+                                                    <div className="font-bold text-gray-900 text-sm md:text-base">{formatPrice(loser.latest_price)}</div>
+                                                    <div className="text-red-500 font-bold text-xs md:text-sm">
                                                         {change.toFixed(1)}%
                                                     </div>
                                                 </div>
@@ -648,116 +650,115 @@ const LiveTrends: React.FC = () => {
                     </div>
                 </section>
 
-                {/* Companies Table - Using /shares API data */}
+                {/* Companies Table Section */}
                 <section className="mb-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                    <BarChart3 className="w-6 h-6 text-[#2076C7]" />
-                    Shares List
-                </h2>
-                
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-                    {/* Header - Fixed */}
-                    <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
-                    <div className="grid grid-cols-5 gap-4">
-                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">COMPANY</div>
-                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">PRICE</div>
-                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">TODAY</div>
-                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">WEEK</div>
-                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">VOLUME</div>
-                    </div>
-                    </div>
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 flex items-center gap-3">
+                        <BarChart3 className="w-5 h-5 md:w-6 md:h-6 text-[#2076C7]" />
+                        Shares List
+                    </h2>
                     
-                    {/* Scrollable Body - Height set to show exactly 10 rows, then scroll */}
-                    <div className="overflow-y-auto" style={{ maxHeight: '560px' }}>
-                    {isSharesLoading ? (
-                        <div className="flex justify-center items-center py-12">
-                        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                        </div>
-                    ) : shares.length === 0 ? (
-                        <div className="text-center py-12 text-gray-500">
-                        No shares data available
-                        </div>
-                    ) : (
-                        <div className="divide-y divide-gray-200">
-                        {shares.map((share) => {
-                            const price = parseFloat(share.price);
-                            const todayChange = (Math.random() * 8 - 2).toFixed(2);
-                            const weekChange = (Math.random() * 12 - 4).toFixed(2);
-                            const volume = Math.floor(Math.random() * 20000) + 5000;
-                            const category = getCategoryFromName(share.shares_name);
-                            
-                            return (
-                            <div key={share.id} className="grid grid-cols-5 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
-                                {/* Company Column */}
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-md bg-white border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
-                                        {share.logo_url ? (
-                                            <img 
-                                                src={share.logo_url} 
-                                                alt={share.shares_name} 
-                                                className="w-full h-full object-contain p-1"
-                                                onError={(e) => {
-                                                    const target = e.target as HTMLImageElement;
-                                                    target.style.display = 'none';
-                                                    if (target.parentElement) {
-                                                        target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 flex items-center justify-center text-[#2076C7] font-bold text-xs">${getCompanyInitials(share.shares_name)}</div>`;
-                                                    }
-                                                }}
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 flex items-center justify-center text-[#2076C7] font-bold text-xs">
-                                                {getCompanyInitials(share.shares_name)}
-                                            </div>
-                                        )}
+                    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <div className="min-w-[700px]">
+                                {/* Header - Fixed */}
+                                <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+                                    <div className="grid grid-cols-5 gap-4">
+                                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">COMPANY</div>
+                                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">PRICE</div>
+                                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">TODAY</div>
+                                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">WEEK</div>
+                                        <div className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">VOLUME</div>
                                     </div>
-                                <div className="min-w-0">
-                                    <div className="font-medium text-gray-900 truncate max-w-[250px]">{share.shares_name}</div>
-                                    <div className="text-xs text-gray-500 truncate">{category}</div>
-                                </div>
                                 </div>
                                 
-                                {/* Price Column */}
-                                <div className="flex items-center">
-                                <div className="text-lg font-bold text-gray-900">
-                                    ₹{price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </div>
-                                </div>
-                                
-                                {/* Today Change Column */}
-                                <div className="flex items-center">
-                                <span className={`px-3 py-1.5 rounded-full text-sm font-bold ${
-                                    parseFloat(todayChange) >= 0 
-                                    ? 'bg-green-100 text-green-800' 
-                                    : 'bg-red-100 text-red-800'
-                                }`}>
-                                    {parseFloat(todayChange) >= 0 ? '+' : ''}{todayChange}%
-                                </span>
-                                </div>
-                                
-                                {/* Week Change Column */}
-                                <div className="flex items-center">
-                                <span className={`px-3 py-1.5 rounded-full text-sm font-bold ${
-                                    parseFloat(weekChange) >= 0 
-                                    ? 'bg-green-100 text-green-800' 
-                                    : 'bg-red-100 text-red-800'
-                                }`}>
-                                    {parseFloat(weekChange) >= 0 ? '+' : ''}{weekChange}%
-                                </span>
-                                </div>
-                                
-                                {/* Volume Column */}
-                                <div className="flex items-center">
-                                <div className="text-sm text-gray-600">
-                                    {volume.toLocaleString('en-IN')} shares
-                                </div>
+                                {/* Scrollable Body */}
+                                <div className="overflow-y-auto" style={{ maxHeight: '560px' }}>
+                                    {isSharesLoading ? (
+                                        <div className="flex justify-center items-center py-12">
+                                            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                                        </div>
+                                    ) : shares.length === 0 ? (
+                                        <div className="text-center py-12 text-gray-500">
+                                            No shares data available
+                                        </div>
+                                    ) : (
+                                        <div className="divide-y divide-gray-200">
+                                            {shares.map((share) => {
+                                                const price = parseFloat(share.price);
+                                                const todayChangeValue = (Math.random() * 8 - 2).toFixed(2);
+                                                const weekChangeValue = (Math.random() * 12 - 4).toFixed(2);
+                                                const volume = Math.floor(Math.random() * 20000) + 5000;
+                                                const category = getCategoryFromName(share.shares_name);
+                                                
+                                                return (
+                                                    <div key={share.id} className="grid grid-cols-5 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 rounded-md bg-white border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+                                                                {share.logo_url ? (
+                                                                    <img 
+                                                                        src={share.logo_url} 
+                                                                        alt={share.shares_name} 
+                                                                        className="w-full h-full object-contain p-1"
+                                                                        onError={(e) => {
+                                                                            const target = e.target as HTMLImageElement;
+                                                                            target.style.display = 'none';
+                                                                            if (target.parentElement) {
+                                                                                target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 flex items-center justify-center text-[#2076C7] font-bold text-xs">${getCompanyInitials(share.shares_name)}</div>`;
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-full h-full bg-gradient-to-r from-[#2076C7]/20 to-[#1CADA3]/20 flex items-center justify-center text-[#2076C7] font-bold text-xs">
+                                                                        {getCompanyInitials(share.shares_name)}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className="min-w-0">
+                                                                <div className="font-medium text-gray-900 truncate max-w-[180px]">{share.shares_name}</div>
+                                                                <div className="text-[10px] text-gray-500 truncate">{category}</div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div className="flex items-center">
+                                                            <div className="text-base md:text-lg font-bold text-gray-900">
+                                                                ₹{price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div className="flex items-center">
+                                                            <span className={`px-3 py-1.5 rounded-full text-xs md:text-sm font-bold ${
+                                                                parseFloat(todayChangeValue) >= 0 
+                                                                ? 'bg-green-100 text-green-800' 
+                                                                : 'bg-red-100 text-red-800'
+                                                            }`}>
+                                                                {parseFloat(todayChangeValue) >= 0 ? '+' : ''}{todayChangeValue}%
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        <div className="flex items-center">
+                                                            <span className={`px-3 py-1.5 rounded-full text-xs md:text-sm font-bold ${
+                                                                parseFloat(weekChangeValue) >= 0 
+                                                                ? 'bg-green-100 text-green-800' 
+                                                                : 'bg-red-100 text-red-800'
+                                                            }`}>
+                                                                {parseFloat(weekChangeValue) >= 0 ? '+' : ''}{weekChangeValue}%
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        <div className="flex items-center">
+                                                            <div className="text-xs md:text-sm text-gray-600">
+                                                                {volume.toLocaleString('en-IN')} shares
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                            );
-                        })}
                         </div>
-                    )}
                     </div>
-                </div>
                 </section>
             </main>
         </div>

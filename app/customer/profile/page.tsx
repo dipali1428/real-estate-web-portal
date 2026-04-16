@@ -252,16 +252,6 @@ export default function ProfilePage() {
     } catch (error: any) { toast.error(error?.response?.data?.message || "Failed to update password"); } finally { setUpdatingPassword(false); }
   };
 
-  const handleDeleteAccount = async () => {
-    try {
-      setDeleting(true);
-      await customerService.deleteAccount();
-      toast.success("Account deleted successfully");
-      removeTokenCookie();
-      router.push('/login');
-    } catch (error: any) { toast.error(error?.response?.data?.message || "Failed to delete account"); } finally { setDeleting(false); setShowDeleteModal(false); }
-  };
-
   const displayAddress = useMemo(() => aadhaarAddress || profile?.address || profile?.current_address || '', [aadhaarAddress, profile]);
 
   if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin text-[#1CADA3]" /></div>;
@@ -345,12 +335,12 @@ export default function ProfilePage() {
         onCloseDeleteModal={() => setShowDeleteModal(false)}
         onPasswordChange={setPasswordData}
         onPasswordUpdate={handlePasswordUpdate}
-        onDeleteAccount={handleDeleteAccount}
         onToggleCurrentPassword={() => setShowCurrentPassword(!showCurrentPassword)}
         onToggleNewPassword={() => setShowNewPassword(!showNewPassword)}
         onToggleConfirmPassword={() => setShowConfirmPassword(!showConfirmPassword)}
         getPasswordStrengthColor={getPasswordStrengthColor}
         getPasswordStrengthText={getPasswordStrengthText}
+        onDeleteAccount={() => {}}
       />
     </main>
   );

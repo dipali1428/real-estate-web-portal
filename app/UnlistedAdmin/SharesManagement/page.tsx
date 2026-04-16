@@ -33,10 +33,14 @@ const ShareManagement: React.FC = () => {
     try {
       const response = await AdminService.getShares();
       if (Array.isArray(response)) {
-        setShares(response);
+        // --- LOGIC: Sort by ID numerically to ensure 1, 2, 3 sequence ---
+        const sortedData = [...response].sort((a, b) => {
+          return (Number(a.id) || 0) - (Number(b.id) || 0);
+        });
+        setShares(sortedData);
       }
     } catch (error) {
-      toast.error('Error fetching shares:');
+      toast.error('Error fetching shares');
     } finally {
       setLoading(false);
     }
@@ -47,13 +51,13 @@ const ShareManagement: React.FC = () => {
   }, []);
 
   // Pagination
-  const totalPages = Math.ceil(shares.length / itemsPerPage);
   const filteredShares = shares.filter(share => 
     share.shares_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     share.clean_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     share.id?.toString().includes(searchTerm)
   );
 
+  const totalPages = Math.ceil(filteredShares.length / itemsPerPage);
   const paginatedShares = filteredShares.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -62,17 +66,14 @@ const ShareManagement: React.FC = () => {
   const openModal = (type: 'add' | 'edit', share?: Share) => {
     setModalType(type);
     if (type === 'add') {
-      // For add, DON'T include ID - let backend generate it
       setSelectedShare({ 
         shares_name: '', 
         price: '', 
         depository_applicable: 'NSDL & CDSL',
         min_lot_size: 100,
         logo_url: ''
-        // No ID field!
       });
     } else {
-      // For edit, use the existing share (which has an ID)
       setSelectedShare(share || null);
     }
     setIsModalOpen(true);
@@ -89,44 +90,33 @@ const ShareManagement: React.FC = () => {
 
     try {
       if (modalType === 'add') {
-        // For ADD: DO NOT send ID - let backend generate it
         const addPayload: any = {
           shares_name: selectedShare?.shares_name || '',
           price: selectedShare?.price || '0',
           depository_applicable: selectedShare?.depository_applicable || 'NSDL & CDSL',
           min_lot_size: selectedShare?.min_lot_size || 100,
         };
-
-        // Only add logo_url if it exists
-        if (selectedShare?.logo_url) {
-          addPayload.logo_url = selectedShare.logo_url;
-        }
+        if (selectedShare?.logo_url) addPayload.logo_url = selectedShare.logo_url;
         
-        //  DO NOT send these fields for add:
-        // - id (let backend generate)
-        // - clean_name
-        // - is_active
-        // - status
-        
-        const response = await AdminService.addShare(addPayload);  
+        await AdminService.addShare(addPayload);  
         toast.success("Share added successfully!");
-        
       } else {
-        // For EDIT: Send update payload with ID in URL, not in body
         if (selectedShare?.id) {
+          // --- TS FIX: Payload sanitization to avoid null/string type errors ---
           const updatePayload: any = {};
-
           if (selectedShare.shares_name) updatePayload.shares_name = selectedShare.shares_name;
           if (selectedShare.price) updatePayload.price = selectedShare.price;
           if (selectedShare.depository_applicable) updatePayload.depository_applicable = selectedShare.depository_applicable;
           if (selectedShare.min_lot_size) updatePayload.min_lot_size = selectedShare.min_lot_size;
           if (selectedShare.clean_name) updatePayload.clean_name = selectedShare.clean_name;
-          if (selectedShare.logo_url) updatePayload.logo_url = selectedShare.logo_url;
+          
+          // Fix for the logo_url error: Convert null to undefined
+          updatePayload.logo_url = selectedShare.logo_url === null ? undefined : selectedShare.logo_url;
+          
           if (selectedShare.is_active !== undefined) updatePayload.is_active = selectedShare.is_active;
           if (selectedShare.status) updatePayload.status = selectedShare.status;
-          
-          const response = await AdminService.updateShare(selectedShare.id, updatePayload);
-          
+
+          await AdminService.updateShare(selectedShare.id, updatePayload);
           toast.success("Share updated successfully!");
         }
       }
@@ -134,10 +124,7 @@ const ShareManagement: React.FC = () => {
       setIsModalOpen(false);
       fetchShares();
     } catch (error: any) {
-      toast.error("Submit error:", error);
-      toast.error("Error response:", error.response?.data);
-      const serverMessage = error.response?.data?.message || error.response?.data?.error || "Check all fields";
-      toast.error(`Failed: ${serverMessage}`);
+      toast.error("Submit error");
     } finally {
       setSubmitLoading(false);
     }
@@ -145,7 +132,6 @@ const ShareManagement: React.FC = () => {
 
   const handleDelete = async () => {
     if (!shareToDelete) return;
-    
     setDeleteLoading(true);
     try {
       await AdminService.deleteShare(shareToDelete.id);
@@ -154,8 +140,7 @@ const ShareManagement: React.FC = () => {
       setShareToDelete(null);
       fetchShares();
     } catch (error: any) {
-      toast.error("Delete error:", error);
-      toast.error(`Delete failed: ${error.response?.data?.message || error.message}`);
+      toast.error("Delete failed");
     } finally {
       setDeleteLoading(false);
     }
@@ -165,7 +150,6 @@ const ShareManagement: React.FC = () => {
     if (is_active === false) {
       return <span className="px-2 py-1 rounded-md text-[10px] font-black uppercase border bg-gray-50 text-gray-500 border-gray-200"><XCircle className="w-3 h-3 inline mr-1" /> Inactive</span>;
     }
-    
     switch(status) {
       case 'APPROVED':
         return <span className="px-2 py-1 rounded-md text-[10px] font-black uppercase border bg-green-50 text-green-600 border-green-100"><CheckCircle className="w-3 h-3 inline mr-1" /> Approved</span>;
@@ -240,13 +224,12 @@ const ShareManagement: React.FC = () => {
                 <th className="px-6 py-4">Lot Size</th>
                 <th className="px-6 py-4">Depository</th>
                 <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Last Updated</th>
                 <th className="px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {loading ? (
-                <tr><td colSpan={8} className="py-20 text-center animate-pulse text-gray-400 font-bold uppercase text-xs">Loading...</td></tr>
+                <tr><td colSpan={7} className="py-20 text-center animate-pulse text-gray-400 font-bold uppercase text-xs">Loading...</td></tr>
               ) : paginatedShares.length > 0 ? (
                 paginatedShares.map((share) => (
                   <tr key={share.id} className="hover:bg-gray-50/50 transition-colors group">
@@ -287,9 +270,6 @@ const ShareManagement: React.FC = () => {
                     <td className="px-6 py-4">
                       {getStatusBadge(share.status, share.is_active)}
                     </td>
-                    <td className="px-6 py-4 text-gray-500 text-sm">
-                      {share.updated_at ? new Date(share.updated_at).toLocaleDateString('en-IN') : '—'}
-                    </td>
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-2">
                         <button 
@@ -312,7 +292,7 @@ const ShareManagement: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="py-20 text-center text-gray-400">
+                  <td colSpan={7} className="py-20 text-center text-gray-400">
                     <Package className="w-12 h-12 mx-auto mb-3 opacity-20" />
                     <p className="text-sm font-medium">No shares found</p>
                   </td>
@@ -366,7 +346,6 @@ const ShareManagement: React.FC = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                {/* Company Name */}
                 <div>
                   <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
                     Company Name <span className="text-red-500">*</span>
@@ -376,11 +355,9 @@ const ShareManagement: React.FC = () => {
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                     value={selectedShare?.shares_name || ''}
                     onChange={e => setSelectedShare({...selectedShare, shares_name: e.target.value})}
-                    placeholder="e.g., ABC Technologies Limited Unlisted Shares"
                   />
                 </div>
 
-                {/* Logo URL */}
                 <div>
                   <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
                     Logo URL (Optional)
@@ -389,11 +366,9 @@ const ShareManagement: React.FC = () => {
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                     value={selectedShare?.logo_url || ''}
                     onChange={e => setSelectedShare({...selectedShare, logo_url: e.target.value})}
-                    placeholder="https://example.com/logo.jpg"
                   />
                 </div>
 
-                {/* Price and Lot Size */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
@@ -406,7 +381,6 @@ const ShareManagement: React.FC = () => {
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                       value={selectedShare?.price || ''}
                       onChange={e => setSelectedShare({...selectedShare, price: e.target.value})}
-                      placeholder="475.00"
                     />
                   </div>
                   <div>
@@ -419,12 +393,10 @@ const ShareManagement: React.FC = () => {
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
                       value={selectedShare?.min_lot_size || 100}
                       onChange={e => setSelectedShare({...selectedShare, min_lot_size: parseInt(e.target.value)})}
-                      placeholder="100"
                     />
                   </div>
                 </div>
 
-                {/* Depository */}
                 <div>
                   <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
                     Depository Applicable <span className="text-red-500">*</span>
@@ -441,68 +413,39 @@ const ShareManagement: React.FC = () => {
                   </select>
                 </div>
 
-                {/* EDIT-ONLY FIELDS - Only show when editing */}
                 {modalType === 'edit' && (
-                  <>
-                    {/* Clean Name */}
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[10px] font-black uppercase text-gray-400 mb-1 block">
-                        Clean Name (Optional)
-                      </label>
-                      <input 
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-gray-700 text-sm"
-                        value={selectedShare?.clean_name || ''}
-                        onChange={e => setSelectedShare({...selectedShare, clean_name: e.target.value})}
-                        placeholder="Display name without 'Unlisted Shares'"
-                      />
+                      <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">Status</label>
+                      <select
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm bg-white"
+                        value={selectedShare?.status || 'APPROVED'}
+                        onChange={e => setSelectedShare({...selectedShare, status: e.target.value})}
+                      >
+                        <option value="APPROVED">APPROVED</option>
+                        <option value="PENDING">PENDING</option>
+                      </select>
                     </div>
-
-                    {/* Status and Active */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
-                          Status
-                        </label>
-                        <select
-                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm bg-white"
-                          value={selectedShare?.status || 'APPROVED'}
-                          onChange={e => setSelectedShare({...selectedShare, status: e.target.value})}
-                        >
-                          <option value="APPROVED">APPROVED</option>
-                          <option value="PENDING">PENDING</option>
-                          <option value="REJECTED">REJECTED</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">
-                          Active Status
-                        </label>
-                        <select
-                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm bg-white"
-                          value={selectedShare?.is_active ? 'true' : 'false'}
-                          onChange={e => setSelectedShare({...selectedShare, is_active: e.target.value === 'true'})}
-                        >
-                          <option value="true">Active</option>
-                          <option value="false">Inactive</option>
-                        </select>
-                      </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-gray-700 mb-1 block">Active Status</label>
+                      <select
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-[#1CADA3] text-sm bg-white"
+                        value={selectedShare?.is_active ? 'true' : 'false'}
+                        onChange={e => setSelectedShare({...selectedShare, is_active: e.target.value === 'true'})}
+                      >
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                      </select>
                     </div>
-                  </>
+                  </div>
                 )}
 
                 <button 
                   type="submit"
                   disabled={submitLoading}
-                  className="w-full py-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-100 mt-4 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg mt-4 disabled:opacity-50"
                 >
-                  {submitLoading ? (
-                    <>
-                      <RotateCw className="w-4 h-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    modalType === 'add' ? 'Add Share' : 'Update Share'
-                  )}
+                  {submitLoading ? 'Processing...' : (modalType === 'add' ? 'Add Share' : 'Update Share')}
                 </button>
               </form>
             </motion.div>
@@ -514,54 +457,14 @@ const ShareManagement: React.FC = () => {
       <AnimatePresence>
         {deleteModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden"
-            >
-              <div className="bg-red-50 px-6 py-4 border-b border-red-100 flex justify-between items-center">
-                <h3 className="font-bold text-red-600">Confirm Delete</h3>
-                <button onClick={() => setDeleteModalOpen(false)}>
-                  <X className="w-5 h-5 text-red-400" />
+            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6">
+              <h3 className="font-bold text-red-600 text-lg mb-2">Delete Share?</h3>
+              <p className="text-gray-600 text-sm mb-6">Are you sure you want to delete <span className="font-bold">{shareToDelete?.shares_name}</span>?</p>
+              <div className="flex gap-3">
+                <button onClick={() => setDeleteModalOpen(false)} className="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-sm">Cancel</button>
+                <button onClick={handleDelete} disabled={deleteLoading} className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold text-sm disabled:opacity-50">
+                  {deleteLoading ? 'Deleting...' : 'Delete Now'}
                 </button>
-              </div>
-
-              <div className="p-6">
-                <p className="text-gray-600 mb-2">
-                  Are you sure you want to delete:
-                </p>
-                <p className="font-bold text-gray-800 mb-4">
-                  {shareToDelete?.shares_name}
-                </p>
-                <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg mb-6">
-                  This action cannot be undone. All data associated with this share will be permanently removed.
-                </p>
-
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setDeleteModalOpen(false)}
-                    className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
-                    disabled={deleteLoading}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleDelete}
-                    disabled={deleteLoading}
-                    className="flex-1 py-3 px-4 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {deleteLoading ? (
-                      <>
-                        <RotateCw className="w-4 h-4 animate-spin" />
-                        Deleting...
-                      </>
-                    ) : (
-                      'Delete'
-                    )}
-                  </button>
-                </div>
               </div>
             </motion.div>
           </div>
