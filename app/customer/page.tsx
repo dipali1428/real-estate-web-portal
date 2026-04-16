@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { PieChart, Pie, Cell, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'; // Added ResponsiveContainer
 import { fetchAllShares } from "../services/unlistedservices"; 
 import customerService from "../services/customerService";
 import { 
@@ -176,7 +176,7 @@ export default function CustomerDashboard() {
                     transition={{ duration: 0.4 }}
                     className="relative bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white"
                 >
-                    <h2 className="text-xl sm:text-2xl font-bold mb-2 pr-20">
+                    <h2 className="text-xl sm:text-2xl font-bold mb-2 pr-10 sm:pr-20">
                         {loading ? "Loading..." : `Welcome back, ${customer?.name || "Investor"}!`}
                     </h2>
                     <p className="text-sm sm:text-base text-white/80">
@@ -224,7 +224,7 @@ export default function CustomerDashboard() {
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+                    className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100"
                 >
                     <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">
                         <svg className="w-5 h-5 text-blue-500 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,25 +237,19 @@ export default function CustomerDashboard() {
                         Breakdown of your investment portfolio by asset class
                     </p>
 
-                    <div className="flex flex-col md:flex-row items-center gap-8">
+                    <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
                         {/* Chart Area */}
                         <div className="w-full md:w-1/2">
-                            <div style={{ 
-                                width: '100%', 
-                                height: '350px', 
-                                position: 'relative',
-                                borderRadius: '1rem',
-                                overflow: 'hidden'
-                            }}>
+                            <div className="w-full h-[300px] sm:h-[350px] relative rounded-2xl overflow-hidden">
                                 {chartReady ? (
-                                    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                                        <PieChart width={500} height={350} style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)' }}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
                                             <Pie
                                                 data={chartData}
                                                 cx="50%"
                                                 cy="50%"
-                                                innerRadius={80}
-                                                outerRadius={120}
+                                                innerRadius={60}
+                                                outerRadius={100}
                                                 paddingAngle={5}
                                                 dataKey="value"
                                                 isAnimationActive={true}
@@ -274,7 +268,7 @@ export default function CustomerDashboard() {
                                                 }}
                                             />
                                         </PieChart>
-                                    </div>
+                                    </ResponsiveContainer>
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center">
                                         <p className="text-gray-400">Loading analysis...</p>
@@ -284,21 +278,20 @@ export default function CustomerDashboard() {
                         </div>
 
                         {/* Details/Legend Area */}
-                        <div className="w-full md:w-1/2 space-y-4">
-                            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Asset Breakdown</h4>
+                        <div className="w-full md:w-1/2 space-y-3 sm:space-y-4">
+                            <h4 className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Asset Breakdown</h4>
                             {chartData.map((item, idx) => (
                                 <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100 transition-all hover:bg-white hover:shadow-sm">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                                        <span className="text-sm font-medium text-gray-700">{item.name}</span>
+                                        <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: item.color }}></div>
+                                        <span className="text-xs sm:text-sm font-medium text-gray-700">{item.name}</span>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <span className="text-sm font-semibold text-gray-900">{item.value}</span>
-                                        <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                        <span className="text-xs sm:text-sm font-semibold text-gray-900">{item.value}</span>
+                                        <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
                                     </div>
                                 </div>
                             ))}
-
                         </div>
                     </div>
                 </motion.div>

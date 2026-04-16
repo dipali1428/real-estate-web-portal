@@ -55,43 +55,34 @@ const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 
 
 interface ModalsProps {
   showPasswordModal: boolean;
-  showDeleteModal: boolean;
   passwordData: PasswordData;
   updatingPassword: boolean;
-  deleting: boolean;
   passwordStrength: number;
   showCurrentPassword: boolean;
   showNewPassword: boolean;
   showConfirmPassword: boolean;
   onClosePasswordModal: () => void;
-  onCloseDeleteModal: () => void;
   onPasswordChange: (data: PasswordData) => void;
   onPasswordUpdate: (e: React.FormEvent) => void;
-  onDeleteAccount: () => void;
   onToggleCurrentPassword: () => void;
   onToggleNewPassword: () => void;
   onToggleConfirmPassword: () => void;
   getPasswordStrengthColor: () => string;
   getPasswordStrengthText: () => string;
-  // Add these props for toast notifications
   showToast?: (message: string, type: 'success' | 'error' | 'info' | 'warning') => void;
 }
 
 export const Modals: React.FC<ModalsProps> = ({
   showPasswordModal,
-  showDeleteModal,
   passwordData,
   updatingPassword,
-  deleting,
   passwordStrength,
   showCurrentPassword,
   showNewPassword,
   showConfirmPassword,
   onClosePasswordModal,
-  onCloseDeleteModal,
   onPasswordChange,
   onPasswordUpdate,
-  onDeleteAccount,
   onToggleCurrentPassword,
   onToggleNewPassword,
   onToggleConfirmPassword,
@@ -127,17 +118,6 @@ export const Modals: React.FC<ModalsProps> = ({
       handleShowToast(error.message || 'Failed to update password', 'error');
     }
   };
-
-  const handleDeleteAccountWithToast = async () => {
-    try {
-      await onDeleteAccount();
-      // Success will be shown by parent component
-    } catch (error: any) {
-      handleShowToast(error.message || 'Failed to delete account', 'error');
-    }
-  };
-
-  if (!showPasswordModal && !showDeleteModal) return null;
 
   return (
     <>
