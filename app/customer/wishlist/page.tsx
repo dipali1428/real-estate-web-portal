@@ -100,7 +100,7 @@ export default function Wishlist() {
             
             // PROPER API RESPONSE HANDLING
             if (!response || !response.success) {
-                console.warn('Wishlist API returned unsuccessful:', response);
+                toast('Wishlist API returned unsuccessful:');
                 setWishlistItems([]);
                 updateCategoryCounts([]);
                 if (showRefreshToast) {
@@ -142,7 +142,7 @@ export default function Wishlist() {
                 toast('Your wishlist is empty', { icon: '📋' });
             }
         } catch (error) {
-            console.error('Error loading wishlist:', error);
+            toast.error('Error loading wishlist:');
             setWishlistItems([]);
             updateCategoryCounts([]);
             if (showRefreshToast) {
@@ -205,7 +205,6 @@ export default function Wishlist() {
                 loadWishlist(false);
             }
         } catch (error) {
-            console.error('Error removing item:', error);
             toast.error('Failed to remove item');
         }
     };

@@ -97,7 +97,6 @@ export default function ProfilePage() {
   const [updating, setUpdating] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [passwordData, setPasswordData] = useState<PasswordData>({ 
     currentPassword: '', 
     newPassword: '', 
@@ -106,7 +105,6 @@ export default function ProfilePage() {
 
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [updatingPassword, setUpdatingPassword] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -305,7 +303,6 @@ export default function ProfilePage() {
         onImageChange={handleImageChange}
         onProfileUpdate={handleProfileUpdate}
         onShowPasswordModal={() => setShowPasswordModal(true)}
-        onShowDeleteModal={() => setShowDeleteModal(true)}
         onCameraCapture={handleCameraCapture}
         refreshProfile={refreshProfileData}
         imageTimestamp={imageTimestamp}
@@ -323,16 +320,13 @@ export default function ProfilePage() {
 
       <Modals
         showPasswordModal={showPasswordModal}
-        showDeleteModal={showDeleteModal}
         passwordData={passwordData}
         updatingPassword={updatingPassword}
-        deleting={deleting}
         passwordStrength={passwordStrength}
         showCurrentPassword={showCurrentPassword}
         showNewPassword={showNewPassword}
         showConfirmPassword={showConfirmPassword}
         onClosePasswordModal={() => setShowPasswordModal(false)}
-        onCloseDeleteModal={() => setShowDeleteModal(false)}
         onPasswordChange={setPasswordData}
         onPasswordUpdate={handlePasswordUpdate}
         onToggleCurrentPassword={() => setShowCurrentPassword(!showCurrentPassword)}
@@ -340,7 +334,6 @@ export default function ProfilePage() {
         onToggleConfirmPassword={() => setShowConfirmPassword(!showConfirmPassword)}
         getPasswordStrengthColor={getPasswordStrengthColor}
         getPasswordStrengthText={getPasswordStrengthText}
-        onDeleteAccount={() => {}}
       />
     </main>
   );

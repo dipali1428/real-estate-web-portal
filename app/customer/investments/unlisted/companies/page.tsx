@@ -172,7 +172,7 @@ export default function CompaniesPage() {
         const response = await fetchDashboardData();
         if (response?.success && response?.graph) setGraphData(response.graph);
       } catch (error) {
-        console.error('Error fetching market data:', error);
+        toast.error('Error fetching market data:');
       } finally { 
         setIsGraphLoading(false); 
       }
@@ -224,7 +224,7 @@ export default function CompaniesPage() {
       
       setWishlistMap(newMap);
     } catch (error) {
-      console.error('Error loading wishlist:', error);
+      toast.error('Error loading wishlist:');
       setWishlistMap(new Map());
     }
   }, []);
@@ -253,7 +253,6 @@ export default function CompaniesPage() {
       // Load wishlist after companies are loaded
       await loadWishlist();
     } catch (err) {
-      console.error('Error fetching companies:', err);
       toast.error('Failed to load companies');
     } finally { 
       setLoading(false); 
@@ -347,7 +346,6 @@ export default function CompaniesPage() {
         }
       }
     } catch (error) {
-      console.error('Wishlist action failed:', error);
       toast.error('Action failed. Please try again.');
     } finally {
       setWishlistLoading(false);
@@ -415,7 +413,7 @@ export default function CompaniesPage() {
           }
         }
       } catch (error) {
-        console.error('Error loading graph data:', error);
+        toast.error('Error loading graph data:');
         setModalGraphData([]);
       } finally {
         setIsModalGraphLoading(false);
