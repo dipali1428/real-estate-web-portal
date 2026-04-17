@@ -594,6 +594,8 @@ export default function LeadDashboard() {
                 <Image
                   src={previewUrl || ''}
                   alt="Document"
+                  width={800}
+                  height={360}
                   className="max-w-full max-h-full object-contain shadow-lg"
                 />
               )}

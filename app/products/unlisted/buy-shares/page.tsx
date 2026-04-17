@@ -450,6 +450,8 @@ const BuyShares: FC = () => {
                 {company.logo ? (
                   <Image
                     src={company.logo} 
+                    width={200}
+                    height={120}
                     className="w-full h-full object-contain p-3" 
                     alt={company.name} 
                     onError={(e) => {
@@ -513,7 +515,7 @@ const BuyShares: FC = () => {
             <div className="bg-white border-b border-gray-100 p-6 flex items-start justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-20 h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
-                  {detailCompany.logo ? <Image src={detailCompany.logo} className="w-full h-full object-contain p-2" alt={detailCompany.name} /> : <span className="text-2xl font-bold text-[#2076C7]">{detailCompany.name.charAt(0)}</span>}
+                  {detailCompany.logo ? <Image src={detailCompany.logo} width={200} height={120} className="w-full h-full object-contain p-2" alt={detailCompany.name} /> : <span className="text-2xl font-bold text-[#2076C7]">{detailCompany.name.charAt(0)}</span>}
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1"><span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full">{detailCompany.category}</span></div>

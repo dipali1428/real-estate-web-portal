@@ -551,6 +551,8 @@ const LiveTrends: React.FC = () => {
                                                             <Image 
                                                                 src={gainer.logo_url} 
                                                                 alt={gainer.shares_name} 
+                                                                width={200}
+                                                                height={120}
                                                                 className="w-full h-full object-contain p-1"
                                                                 onError={(e) => {
                                                                     const target = e.target as HTMLImageElement;
@@ -610,6 +612,8 @@ const LiveTrends: React.FC = () => {
                                                             <Image
                                                                 src={loser.logo_url} 
                                                                 alt={loser.shares_name} 
+                                                                width={200}
+                                                                height={120}
                                                                 className="w-full h-full object-contain p-1"
                                                                 onError={(e) => {
                                                                     const target = e.target as HTMLImageElement;
@@ -690,6 +694,8 @@ const LiveTrends: React.FC = () => {
                                                                     <Image 
                                                                         src={share.logo_url} 
                                                                         alt={share.shares_name} 
+                                                                        width={200}
+                                                                        height={120}
                                                                         className="w-full h-full object-contain p-1"
                                                                         onError={(e) => {
                                                                             const target = e.target as HTMLImageElement;

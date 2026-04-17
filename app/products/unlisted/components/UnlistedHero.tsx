@@ -261,7 +261,13 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                                 className="relative z-10 w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] lg:w-[450px] lg:h-[450px] bg-white rounded-full shadow-[0_20px_60px_-15px_rgba(32,118,199,0.3)] border-8 border-white overflow-hidden"
                             >
-                                <Image src="/unlistedshares/unlisted_shares.png" className="w-full h-full object-cover" alt="Hero" />
+                                <Image
+                                    src="/unlistedshares/unlisted_shares.png"
+                                    alt="Hero"
+                                    width={800}
+                                    height={360}
+                                    className="object-cover"
+                                />
                             </motion.div>
                             
                             <motion.div animate={{ y: [0, -15, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute -top-4 right-0 md:right-4 bg-white p-4 rounded-2xl shadow-2xl border border-blue-50 flex items-center gap-3 z-20">
