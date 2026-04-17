@@ -2,11 +2,14 @@
 
 import { useState, useEffect, useMemo } from "react";
 import {
-  Search, X, TrendingUp, Shield, Activity, IndianRupee, ChevronRight
+  Search, X, TrendingUp, Shield, Activity, IndianRupee, ChevronRight, Bookmark
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useModal } from "@/app/context/ModalContext";
-import mutualFundService from "../../../../services/mutualfundservice";
+import mutualFundService, { AmfiFund, NavEntry } from "../../../../services/mutualfundservice";
+import toast from "react-hot-toast";
+import customerService from "../../../../services/customerService";
+
 import { TOP_PICKS } from "@/app/products/mutual-funds/components/TopPicks";
 import TopPicksSection from "@/app/products/mutual-funds/components/TopPicksSection";
 import OrderPlacementModal from "./OrderPlacementModal";
@@ -35,30 +38,125 @@ interface Fund {
   category?: string;
   risk?: string;
 }
+
+interface ChartPoint {
+  date: string;
+  nav: number;
+}
+
+type RangeKey = "1Y" | "3Y" | "5Y";
+
+const getAuthToken = () =>
+  typeof document !== "undefined"
+    ? document.cookie.match(/authToken=([^;]+)/)?.[1] || null
+    : null;
+
 export default function ExploreFunds() {
   const { openLogin } = useModal();
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<AmfiFund[]>([]);
   const [loading, setLoading] = useState(true);
   const [categorizedFunds, setCategorizedFunds] = useState<Record<string, Fund[]>>({});
   const [isSearching, setIsSearching] = useState(false);
 
   // --- Detail Modal & Chart State ---
   const [selectedFund, setSelectedFund] = useState<Fund | null>(null);
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [isChartLoading, setIsChartLoading] = useState(false);
-  const [timeRange, setTimeRange] = useState<"1Y" | "3Y" | "5Y">("1Y");
-  const [calcAmount, setCalcAmount] = useState<number>(10000);
-  const [calcPeriod, setCalcPeriod] = useState<string>("3Y");
+  const [timeRange, setTimeRange] = useState<RangeKey>("1Y");
+  const [calcAmount, setCalcAmount] = useState<number>(10000); // Changed default from 0 to 10000
+  const [calcPeriod, setCalcPeriod] = useState<RangeKey>("3Y");
 
   // --- Order Placement State ---
   const [orderFund, setOrderFund] = useState<Fund | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
 
+  // --- Wishlist State ---
+  const [wishlistIds, setWishlistIds] = useState<Set<number>>(new Set());
+  const [wishlistLoading, setWishlistLoading] = useState<Set<number>>(new Set());
+
+  // Load existing wishlist on mount
+  useEffect(() => {
+    const loadWishlist = async () => {
+      try {
+        const token = getAuthToken();
+        if (!token) return;
+        const response = await customerService.getMyWishlist();
+        if (response.success && response.data) {
+          const items = Array.isArray(response.data) ? response.data : [response.data];
+          const mfIds = new Set(
+            items
+              .filter((item: { product_type: string }) => item.product_type === 'mutual_fund')
+              .map((item: { product_id: number }) => item.product_id)
+          );
+          setWishlistIds(mfIds);
+        }
+      } catch {
+        // Silently fail — wishlist is non-critical
+      }
+    };
+    loadWishlist();
+  }, []);
+
+  const toggleWishlist = async (fund: Fund) => {
+    const token = getAuthToken();
+    if (!token) {
+      openLogin();
+      return;
+    }
+
+    if (wishlistLoading.has(fund.code)) return;
+    setWishlistLoading((prev) => new Set(prev).add(fund.code));
+
+    try {
+      if (wishlistIds.has(fund.code)) {
+        // Find the wishlist item ID so we can remove it
+        const response = await customerService.getMyWishlist();
+        if (response.success && response.data) {
+          const items = Array.isArray(response.data) ? response.data : [response.data];
+          const match = items.find(
+            (item: { product_type: string; product_id: number }) =>
+              item.product_type === 'mutual_fund' && item.product_id === fund.code
+          );
+          if (match) {
+            await customerService.removeFromWishlist((match as { id: number }).id);
+            setWishlistIds((prev) => {
+              const next = new Set(prev);
+              next.delete(fund.code);
+              return next;
+            });
+            toast.success('Removed from wishlist');
+          }
+        }
+      } else {
+        console.log("Adding to wishlist - Product ID (Scheme Code):", fund.code);
+        await customerService.addToWishlist({
+          product_type: 'mutual_fund',
+          product_id: Number(fund.code),
+          product_name: fund.name,
+          nav: fund.nav,
+          risk: fund.risk,
+        });
+        setWishlistIds((prev) => new Set(prev).add(fund.code));
+        toast.success('Added to wishlist');
+      }
+    } catch {
+      toast.error('Wishlist update failed');
+    } finally {
+      setWishlistLoading((prev) => {
+        const next = new Set(prev);
+        next.delete(fund.code);
+        return next;
+      });
+    }
+  };
+
   const handleOpenOrder = (fund: Fund) => {
     setOrderFund(fund);
     setShowOrderModal(true);
   };
+
+
 
   // --- Calculation Helpers ---
   const parseDateString = (dateStr?: string) => {
@@ -69,8 +167,8 @@ export default function ExploreFunds() {
 
   const formatINR = (num: number) => num.toLocaleString("en-IN");
 
-  const getFilteredByDate = (data: any[], range: string) => {
-    const yearsMap: Record<string, number> = { "1Y": 1, "3Y": 3, "5Y": 5 };
+  const getFilteredByDate = (data: ChartPoint[], range: RangeKey) => {
+    const yearsMap: Record<RangeKey, number> = { "1Y": 1, "3Y": 3, "5Y": 5 };
     const years = yearsMap[range] || 1;
     const today = new Date();
     const pastDate = new Date();
@@ -82,14 +180,14 @@ export default function ExploreFunds() {
     });
   };
 
-  const calculateReturn = (data: any[]) => {
+  const calculateReturn = (data: ChartPoint[]) => {
     if (data.length < 2) return "--";
     const start = data[0].nav;
     const end = data[data.length - 1].nav;
     return (((end - start) / start) * 100).toFixed(2) + "%";
   };
 
-  const calculateCAGR = (data: any[]) => {
+  const calculateCAGR = (data: ChartPoint[]) => {
     if (data.length < 2) return "--";
     const start = data[0].nav;
     const end = data[data.length - 1].nav;
@@ -115,7 +213,7 @@ export default function ExploreFunds() {
     const latestDate = parseDateString(sortedChartData[sortedChartData.length - 1].date);
     const oldestDate = parseDateString(sortedChartData[0].date);
     const diffYears = (latestDate.getTime() - oldestDate.getTime()) / (1000 * 3600 * 24 * 365.25);
-    const periods = [];
+    const periods: RangeKey[] = [];
     if (diffYears >= 1) periods.push("1Y");
     if (diffYears >= 3) periods.push("3Y");
     if (diffYears >= 5) periods.push("5Y");
@@ -126,7 +224,8 @@ export default function ExploreFunds() {
     if (sortedChartData.length === 0 || !availableCalcPeriods.includes(calcPeriod)) return null;
     const latestValidNav = sortedChartData[sortedChartData.length - 1].nav;
     const latestDate = parseDateString(sortedChartData[sortedChartData.length - 1].date);
-    const years = ({ "1Y": 1, "3Y": 3, "5Y": 5 } as any)[calcPeriod] || 1;
+    const yearsMap: Record<RangeKey, number> = { "1Y": 1, "3Y": 3, "5Y": 5 };
+    const years = yearsMap[calcPeriod] || 1;
     const targetPastDate = new Date(latestDate);
     targetPastDate.setFullYear(targetPastDate.getFullYear() - years);
 
@@ -166,14 +265,14 @@ export default function ExploreFunds() {
           )
         );
         const merged = allResults.flat();
-        const uniqueFunds = Array.from(new Map(merged.map((f: any) => [f.schemeCode, f])).values());
+        const uniqueFunds = Array.from(new Map(merged.map((fund) => [fund.schemeCode, fund])).values());
         const groups: Record<string, Fund[]> = {};
         Object.entries(TOP_PICKS).forEach(([category, names]) => {
           groups[category] = uniqueFunds
-            .filter((fund: any) =>
+            .filter((fund) =>
               names.some((p) => fund.name.toLowerCase().includes(p.toLowerCase()))
             )
-            .map((fund: any) => ({
+            .map((fund) => ({
               code: Number(fund.schemeCode),
               name: fund.name,
               nav: Number(fund.nav).toFixed(2),
@@ -183,8 +282,7 @@ export default function ExploreFunds() {
             }));
         });
         setCategorizedFunds(groups);
-      } catch (error) {
-        console.error("Error loading funds:", error);
+      } catch {
       } finally {
         setLoading(false);
       }
@@ -192,17 +290,17 @@ export default function ExploreFunds() {
     initData();
   }, []);
 
+
   // --- Search Logic ---
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (searchQuery.length >= 3) {
         setIsSearching(true);
         try {
-          const res = await mutualFundService.searchFunds(searchQuery);
-          const data = Array.isArray(res) ? res : (res as any)?.data || [];
-          const filteredData = data.filter((f: any) => !f.name.toLowerCase().includes('direct'));
+          const data = await mutualFundService.searchFunds(searchQuery);
+          const filteredData = data.filter((fund) => !fund.name.toLowerCase().includes('direct'));
           setSearchResults(filteredData.slice(0, 10));
-        } catch (error) {
+        } catch {
           setSearchResults([]);
         } finally {
           setIsSearching(false);
@@ -214,6 +312,7 @@ export default function ExploreFunds() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+
   const handleViewDetails = async (fund: Fund) => {
     setSelectedFund(fund);
     setIsChartLoading(true);
@@ -222,19 +321,20 @@ export default function ExploreFunds() {
       const details = await mutualFundService.getFundDetails(fund.code);
       if (details?.data) {
         const history = details.data
-          .map((d: any) => {
-            const [dd, mm, yyyy] = d.date.split("-");
-            return { date: `${dd}/${mm}/${yyyy}`, nav: Number(d.nav) };
+          .map((entry: NavEntry) => {
+            const [dd, mm, yyyy] = entry.date.split("-");
+            return { date: `${dd}/${mm}/${yyyy}`, nav: Number(entry.nav) };
           })
           .reverse();
         setChartData(history);
       }
-    } catch (e) {
-      console.error("Error fetching fund details:", e);
+    } catch {
     } finally {
       setIsChartLoading(false);
     }
   };
+
+
 
   const [showAllCategories, setShowAllCategories] = useState(false);
 
@@ -252,9 +352,14 @@ export default function ExploreFunds() {
             className="w-full pl-14 pr-14 py-5 rounded-2xl border border-gray-200 bg-white text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-[#2076C7]/10 focus:border-[#2076C7] shadow-sm transition-all"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery("")} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1">
-              <X size={20} />
-            </button>
+          <button
+  type="button"
+  aria-label="Clear search"
+  onClick={() => setSearchQuery("")}
+  className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+>
+  <X size={20} />
+</button>
           )}
         </div>
 
@@ -265,21 +370,32 @@ export default function ExploreFunds() {
               {isSearching ? (
                 <div className="p-10 text-center text-gray-500 font-medium italic">Searching...</div>
               ) : searchResults.length === 0 ? (
-                <div className="p-10 text-center text-gray-500 font-medium">No funds found matching "{searchQuery}"</div>
+                <div className="p-10 text-center text-gray-500 font-medium">No funds found matching &quot;{searchQuery}&quot;</div>
               ) : (
                 <div className="divide-y divide-gray-50">
                   {searchResults.map((fund) => {
+                    const normalizedFund: Fund = {
+                      code: Number(fund.schemeCode),
+                      name: fund.name,
+                      nav: String(fund.nav || "0"),
+                      date: fund.date || "",
+                      category: fund.category,
+                      risk: fund.risk,
+                    };
+
                     return (
                       <div
                         key={fund.schemeCode}
                         className="p-5 hover:bg-gray-50 cursor-pointer flex items-center justify-between group/row transition-colors"
-                        onClick={() => handleViewDetails({ code: fund.schemeCode, name: fund.name, nav: fund.nav || "0", date: fund.date || "" })}
+                        onClick={() => handleViewDetails(normalizedFund)}
                       >
                         <div className="flex-1 flex flex-col gap-1 pr-4">
                           <p className="font-semibold text-gray-800 group-hover/row:text-[#2076C7] transition-colors leading-snug">{fund.name}</p>
                           <span className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Code: {fund.schemeCode}</span>
                         </div>
-                        <ChevronRight size={20} className="text-gray-300 group-hover/row:translate-x-1 transition-transform" />
+                        <div className="flex items-center gap-2">
+                          <ChevronRight size={20} className="text-gray-300 group-hover/row:translate-x-1 transition-transform" />
+                        </div>
                       </div>
                     );
                   })}
@@ -306,11 +422,14 @@ export default function ExploreFunds() {
                 key={cat}
                 title={cat.charAt(0).toUpperCase() + cat.slice(1).replace(/cap$/, " Cap") + " Funds"}
                 funds={funds}
-                renderItem={(fund: any) => (
+                renderItem={(fund: Fund) => (
                   <FundCard
                     fund={fund}
                     onViewDetails={() => handleViewDetails(fund)}
                     onInvest={() => handleOpenOrder(fund)}
+                    isWishlisted={wishlistIds.has(fund.code)}
+                    isWishlistLoading={wishlistLoading.has(fund.code)}
+                    onToggleWishlist={() => toggleWishlist(fund)}
                   />
                 )}
               />
@@ -321,7 +440,7 @@ export default function ExploreFunds() {
               <div className="flex justify-center -mt-8">
                 <button
                   onClick={() => setShowAllCategories(true)}
-                  className="group flex items-center gap-3 px-10 py-4 bg-[#2076C7] text-white rounded-full font-bold shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95"
+                  className="group flex items-center gap-3 px-6 py-3 sm:px-10 sm:py-4 bg-[#2076C7] text-white rounded-full text-sm sm:text-base font-bold shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95"
                 >
                   Explore All Fund Categories
                   <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -333,7 +452,7 @@ export default function ExploreFunds() {
               <div className="flex justify-center -mt-8">
                 <button
                   onClick={() => setShowAllCategories(false)}
-                  className="group flex items-center gap-3 px-10 py-4 bg-white border-2 border-[#2076C7] text-[#2076C7] rounded-full font-bold hover:bg-blue-50 transition-all active:scale-95 shadow-md"
+                  className="group flex items-center gap-3 px-6 py-3 sm:px-10 sm:py-4 bg-white border-2 border-[#2076C7] text-[#2076C7] rounded-full text-sm sm:text-base font-bold hover:bg-blue-50 transition-all active:scale-95 shadow-md"
                 >
                   Show Less
                 </button>
@@ -364,21 +483,42 @@ export default function ExploreFunds() {
                     <span className="text-xs font-bold text-[#1CADA3] tracking-[0.2em] uppercase">SCHEME CODE: {selectedFund.code}</span>
                   </div>
                 </div>
-                <button onClick={() => setSelectedFund(null)} className="p-3 bg-gray-50 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-900 transition-all"><X size={24} /></button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => selectedFund && toggleWishlist(selectedFund)}
+                    className={`p-3 rounded-full transition-all ${
+                      selectedFund && wishlistIds.has(selectedFund.code)
+                        ? 'bg-[#2076C7] text-white hover:bg-blue-700'
+                        : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-[#2076C7]'
+                    }`}
+                    title={selectedFund && wishlistIds.has(selectedFund.code) ? 'Remove from wishlist' : 'Add to wishlist'}
+                  >
+                    <Bookmark size={20} className={selectedFund && wishlistIds.has(selectedFund.code) ? 'fill-current' : ''} />
+                  </button>
+                  <button onClick={() => setSelectedFund(null)} 
+                  aria-label="Close details modal"
+                  className="p-3 bg-gray-50 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-900 transition-all"><X size={24} /></button>
+                </div>
               </div>
 
               <div className="flex-1 overflow-y-auto p-8 bg-gray-50/40 custom-scrollbar">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                   <div className="lg:col-span-8 space-y-8">
                     <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm relative">
-                      <div className="flex items-center justify-between mb-8">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
                         <div>
                           <h3 className="text-xl font-bold text-gray-900">Historical Performance</h3>
                           <p className="text-sm text-gray-400 font-semibold">NAV Tracking</p>
                         </div>
-                        <div className="flex gap-2 bg-gray-100/80 p-1.5 rounded-2xl">
-                          {["1Y", "3Y", "5Y"].map((r) => (
-                            <button key={r} onClick={() => setTimeRange(r as any)} className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${timeRange === r ? "bg-[#2076C7] text-white shadow-lg" : "text-gray-400 hover:text-gray-600"}`}>{r}</button>
+                        <div className="flex flex-wrap justify-end gap-2 bg-gray-100/80 p-2 rounded-2xl">
+                          {(["1Y", "3Y", "5Y"] as RangeKey[]).map((r) => (
+                            <button
+                              key={r}
+                              onClick={() => setTimeRange(r as RangeKey)}
+                              className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all ${timeRange === r ? "bg-[#2076C7] text-white shadow-lg" : "text-gray-400 hover:text-gray-600"}`}
+                            >
+                              {r}
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -406,12 +546,14 @@ export default function ExploreFunds() {
                           <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">If You Invested:</span>
                           <div className="flex items-center gap-2">
                             <span className="font-black text-xl text-gray-400">₹</span>
-                            <input type="number" value={calcAmount} onChange={(e) => setCalcAmount(Number(e.target.value))} className="bg-transparent border-none outline-none font-black text-2xl w-full text-gray-900 focus:text-[#2076C7]" />
+                            <input type="number" value={calcAmount} onChange={(e) => setCalcAmount(Number(e.target.value))} 
+                            aria-label="Enter investment amount"
+                            className="bg-transparent border-none outline-none font-black text-2xl w-full text-gray-900 focus:text-[#2076C7]" />
                           </div>
                         </div>
                         <div className="flex bg-gray-100 p-1.5 rounded-xl">
-                          {["1Y", "3Y", "5Y"].map(p => availableCalcPeriods.includes(p) && (
-                            <button key={p} onClick={() => setCalcPeriod(p)} className={`flex-1 py-2 rounded-lg text-xs font-black transition-all ${calcPeriod === p ? "bg-white text-[#2076C7] shadow-sm scale-105" : "text-gray-400"}`}>{p}</button>
+                          {(["1Y", "3Y", "5Y"] as RangeKey[]).map((period) => availableCalcPeriods.includes(period) && (
+                            <button key={period} onClick={() => setCalcPeriod(period)} className={`flex-1 py-2 rounded-lg text-xs font-black transition-all ${calcPeriod === period ? "bg-white text-[#2076C7] shadow-sm scale-105" : "text-gray-400"}`}>{period}</button>
                           ))}
                         </div>
                         <div className="pt-6 border-t border-gray-100">
@@ -440,7 +582,15 @@ export default function ExploreFunds() {
   );
 }
 
-function StatItem({ icon: Icon, label, value, color, bg }: any) {
+interface StatItemProps {
+  icon: typeof Activity;
+  label: string;
+  value: string;
+  color: string;
+  bg: string;
+}
+
+function StatItem({ icon: Icon, label, value, color, bg }: StatItemProps) {
   return (
     <div className="bg-white p-5 rounded-[2rem] border border-gray-100 shadow-sm text-center flex flex-col items-center justify-center group hover:border-blue-100 transition-colors">
       <div className={`w-12 h-12 ${bg} ${color} rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
@@ -452,32 +602,58 @@ function StatItem({ icon: Icon, label, value, color, bg }: any) {
   );
 }
 
-function FundCard({ fund, onViewDetails, onInvest }: any) {
+interface FundCardProps {
+  fund: Fund;
+  onViewDetails: () => void;
+  onInvest: () => void;
+  isWishlisted?: boolean;
+  isWishlistLoading?: boolean;
+  onToggleWishlist?: () => void;
+}
+
+function FundCard({ fund, onViewDetails, onInvest, isWishlisted, isWishlistLoading, onToggleWishlist }: FundCardProps) {
   return (
-    <motion.div className="bg-white rounded-[2rem] shadow-md border border-gray-100 hover:border-[#2076C7] hover:shadow-xl transition-all p-6 flex flex-col h-full group w-full relative">
-      <div className="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center mb-6 mx-auto group-hover:scale-105 transition-transform shadow-inner">
-        <span className="text-3xl font-bold text-[#2076C7]">{fund.name.charAt(0)}</span>
+    <motion.div className="bg-white rounded-[1.75rem] shadow-md border border-gray-100 hover:border-[#2076C7] hover:shadow-xl transition-all p-4 sm:p-6 flex flex-col h-full group w-full relative">
+
+      {/* Wishlist Bookmark Button */}
+      {onToggleWishlist && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleWishlist(); }}
+          disabled={isWishlistLoading}
+          className={`absolute top-3 right-3 p-2 rounded-xl transition-all z-10 ${
+            isWishlisted
+              ? 'bg-[#2076C7] text-white shadow-lg hover:bg-blue-700'
+              : 'bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-[#2076C7]'
+          } ${isWishlistLoading ? 'opacity-50 cursor-wait' : ''}`}
+          title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+        >
+          <Bookmark size={18} className={isWishlisted ? 'fill-current' : ''} />
+        </button>
+      )}
+
+      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[1.5rem] bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center mb-5 sm:mb-6 mx-auto group-hover:scale-105 transition-transform shadow-inner">
+        <span className="text-2xl sm:text-3xl font-bold text-[#2076C7]">{fund.name.charAt(0)}</span>
       </div>
 
-      <div className="h-14 mb-4">
-        <h3 className="text-base font-bold text-center text-gray-900 line-clamp-2 leading-tight">{fund.name}</h3>
+      <div className="min-h-[3.5rem] mb-3 sm:mb-4">
+        <h3 className="text-sm sm:text-base font-bold text-center text-gray-900 line-clamp-2 leading-tight">{fund.name}</h3>
       </div>
 
-      <div className="flex flex-col items-center py-4 bg-gray-50 rounded-2xl mb-6 group-hover:bg-blue-50/50 transition-colors">
-        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Current NAV</span>
-        <span className="text-2xl font-bold text-[#2076C7]">₹{fund.nav}</span>
+      <div className="flex flex-col items-center py-3 sm:py-4 bg-gray-50 rounded-2xl mb-5 sm:mb-6 group-hover:bg-blue-50/50 transition-colors">
+        <span className="text-[9px] sm:text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Current NAV</span>
+        <span className="text-xl sm:text-2xl font-bold text-[#2076C7]">₹{fund.nav}</span>
       </div>
 
       <div className="space-y-3 mt-auto">
         <button
           onClick={(e) => { e.stopPropagation(); onInvest(); }}
-          className="w-full py-3 bg-white border-2 border-[#1CADA3] text-[#1CADA3] text-xs font-bold rounded-lg hover:bg-teal-50 transition-all tracking-wider uppercase flex items-center justify-center gap-2"
+          className="w-full py-2.5 sm:py-3 bg-white border-2 border-[#1CADA3] text-[#1CADA3] text-[11px] sm:text-xs font-bold rounded-lg hover:bg-teal-50 transition-all tracking-wider uppercase flex items-center justify-center gap-2"
         >
           <TrendingUp size={16} /> Invest Now
         </button>
         <button
           onClick={onViewDetails}
-          className="w-full py-4 border-2 border-[#2076C7]/10 text-[#2076C7] text-xs font-bold rounded-xl hover:bg-blue-50 hover:border-[#2076C7] transition-all tracking-widest uppercase"
+          className="w-full py-2.5 sm:py-3 border-2 border-[#2076C7]/10 text-[#2076C7] text-[11px] sm:text-xs font-bold rounded-xl hover:bg-blue-50 hover:border-[#2076C7] transition-all tracking-widest uppercase"
         >
           View Details
         </button>

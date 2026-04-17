@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Landmark, FileText } from "lucide-react";
 import ExploreMarineInsurance from "./components/ExploreMarineInsurance";
 import MyMarineInsurance from "./components/MyMarineInsurance";
 

@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Search, Anchor, Info, X } from 'lucide-react';
+import { Search, Anchor, Info, X, FileText, Landmark } from 'lucide-react';
 import MarineInsurancePlanCard from './MarineInsurancePlanCard';
 import { marinePlansData } from '../marineInsuranceConstants';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ExploreMarineInsurance({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -53,27 +53,37 @@ export default function ExploreMarineInsurance({ activeTab, setActiveTab }: { ac
                         </div>
                     </div>
 
-                    <div className="flex bg-gray-200/50 p-1.5 rounded-xl w-full sm:w-fit self-center sm:self-end md:self-center flex-wrap justify-center sm:justify-start">
-                        <button
-                            onClick={() => setActiveTab("explore")}
-                            className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                                activeTab === "explore"
-                                    ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-200"
-                                    : "text-gray-500 hover:bg-gray-200"
-                            }`}
-                        >
-                            Explore Offers
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("applications")}
-                            className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                                activeTab === "applications"
-                                    ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-teal-200"
-                                    : "text-gray-500 hover:bg-gray-200"
-                            }`}
-                        >
-                            My Policies
-                        </button>
+                    <div className="flex pb-2 md:pb-0 w-full sm:w-auto mt-2 sm:mt-0 overflow-x-auto hide-scrollbar sm:overflow-visible">
+                        <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                            <button
+                                onClick={() => setActiveTab('explore')}
+                                className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'explore' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                {activeTab === 'explore' && (
+                                    <motion.div
+                                        layoutId="activeTabExplore"
+                                        className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+                                <Anchor size={14} />
+                                <span>Offers</span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('applications')}
+                                className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'applications' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                {activeTab === 'applications' && (
+                                    <motion.div
+                                        layoutId="activeTabExplore"
+                                        className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+                                <FileText size={14} />
+                                <span>Policies</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </motion.div>
