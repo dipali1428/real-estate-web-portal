@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Building2, Download, CheckCircle, XCircle, Clock, 
-  ArrowUpRight, Filter, IndianRupee, RefreshCw, AlertCircle,
+  Download, CheckCircle, XCircle, Clock, 
+ Filter, IndianRupee, RefreshCw, 
   FileText, Activity, X, Search, SlidersHorizontal, Calendar,
-  Ship, Anchor, Box, Truck, Info
+  Ship, Anchor, Box
 } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 

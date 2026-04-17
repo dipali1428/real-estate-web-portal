@@ -76,27 +76,32 @@ export default function ExploreFunds() {
   const [wishlistLoading, setWishlistLoading] = useState<Set<number>>(new Set());
 
   // Load existing wishlist on mount
-  useEffect(() => {
-    const loadWishlist = async () => {
-      try {
-        const token = getAuthToken();
-        if (!token) return;
-        const response = await customerService.getMyWishlist();
-        if (response.success && response.data) {
-          const items = Array.isArray(response.data) ? response.data : [response.data];
-          const mfIds = new Set(
-            items
-              .filter((item: { product_type: string }) => item.product_type === 'mutual_fund')
-              .map((item: { product_id: number }) => item.product_id)
-          );
-          setWishlistIds(mfIds);
-        }
-      } catch {
-        // Silently fail — wishlist is non-critical
+ useEffect(() => {
+  const loadWishlist = async () => {
+    try {
+      const token = getAuthToken();
+      if (!token) return;
+
+      const response = await customerService.getMyWishlist();
+
+      if (response.success && response.data) {
+        const items = Array.isArray(response.data) ? response.data : [response.data];
+
+        const mfIds = new Set(
+          items
+            .filter((item: { product_type: string }) => item.product_type === 'mutual_fund')
+            .map((item: { product_id: number }) => item.product_id)
+        );
+
+        setWishlistIds(mfIds);
       }
-    };
-    loadWishlist();
-  }, []);
+    } catch (error) {
+      toast.error("Failed to load wishlist");
+    }
+  };
+
+  loadWishlist();
+}, []);
 
   const toggleWishlist = async (fund: Fund) => {
     const token = getAuthToken();

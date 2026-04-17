@@ -15,7 +15,6 @@ import {
     Building2,
     Trash2,
     PlusCircle,
-    Info,
     RefreshCw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
