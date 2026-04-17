@@ -1,3 +1,4 @@
+import Image from 'next/image';
 
 const AboutSection = () => {
     const leaders = [
@@ -121,7 +122,7 @@ const AboutSection = () => {
                                         key={index}
                                         className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
                                         <div className="w-full aspect-square overflow-hidden">
-                                            <img
+                                            <Image
                                                 src={leader.image}
                                                 alt={leader.name}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -143,7 +144,7 @@ const AboutSection = () => {
                                         key={index + 5}
                                         className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
                                         <div className="w-full aspect-square overflow-hidden">
-                                            <img
+                                            <Image
                                                 src={leader.image}
                                                 alt={leader.name}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -173,7 +174,7 @@ const AboutSection = () => {
                                         key={index + 8}
                                         className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
                                         <div className="w-full aspect-[4/5] overflow-hidden">
-                                            <img
+                                            <Image
                                                 src={leader.image}
                                                 alt={leader.name}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -241,7 +242,7 @@ const AboutSection = () => {
 
                         {/* Right Side: Image */}
                         <div className="rounded-4xl overflow-hidden shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-500 bg-white">
-                            <img
+                            <Image
                                 src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/ET-Business-Award/ET-Business-Award.jpeg`}
                                 alt="Team collaboration at Infinity Arthviksha"
                                 className="w-full h-90 object-cover"

@@ -11,6 +11,7 @@ import {
   HandCoins, AlertTriangle
 } from 'lucide-react';
 import { useModal } from '../../../context/ModalContext';
+import Image from 'next/image';
 
 // --- INTERFACES ---
 interface Toast {
@@ -447,7 +448,7 @@ const BuyShares: FC = () => {
             <div key={company.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-6 flex flex-col items-center text-center h-full">
               <div className="w-full h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100 shadow-sm overflow-hidden">
                 {company.logo ? (
-                  <img 
+                  <Image
                     src={company.logo} 
                     className="w-full h-full object-contain p-3" 
                     alt={company.name} 
@@ -512,7 +513,7 @@ const BuyShares: FC = () => {
             <div className="bg-white border-b border-gray-100 p-6 flex items-start justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-20 h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
-                  {detailCompany.logo ? <img src={detailCompany.logo} className="w-full h-full object-contain p-2" alt={detailCompany.name} /> : <span className="text-2xl font-bold text-[#2076C7]">{detailCompany.name.charAt(0)}</span>}
+                  {detailCompany.logo ? <Image src={detailCompany.logo} className="w-full h-full object-contain p-2" alt={detailCompany.name} /> : <span className="text-2xl font-bold text-[#2076C7]">{detailCompany.name.charAt(0)}</span>}
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1"><span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full">{detailCompany.category}</span></div>

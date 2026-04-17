@@ -21,21 +21,13 @@ import {
     Users,
     Loader2
 } from 'lucide-react';
-import {
-    Chart,
-    LineController,
-    LineElement,
-    PointElement,
-    LinearScale,
-    Title,
-    CategoryScale,
-    Filler,
-    Tooltip,
-    Legend,
+import { Chart, LineController, LineElement, PointElement,
+    LinearScale, Title, CategoryScale, Filler, Tooltip, Legend,
     ChartConfiguration
 } from 'chart.js';
 
 Chart.register(LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Filler, Tooltip, Legend);
+import Image from 'next/image';
 
 // Interface for shares data
 interface ShareItem {
@@ -556,7 +548,7 @@ const LiveTrends: React.FC = () => {
                                                 <div className="flex items-center gap-3 min-w-0">
                                                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
                                                         {gainer.logo_url ? (
-                                                            <img 
+                                                            <Image 
                                                                 src={gainer.logo_url} 
                                                                 alt={gainer.shares_name} 
                                                                 className="w-full h-full object-contain p-1"
@@ -615,7 +607,7 @@ const LiveTrends: React.FC = () => {
                                                 <div className="flex items-center gap-3 min-w-0">
                                                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
                                                         {loser.logo_url ? (
-                                                            <img 
+                                                            <Image
                                                                 src={loser.logo_url} 
                                                                 alt={loser.shares_name} 
                                                                 className="w-full h-full object-contain p-1"
@@ -695,7 +687,7 @@ const LiveTrends: React.FC = () => {
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-10 h-10 rounded-md bg-white border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
                                                                 {share.logo_url ? (
-                                                                    <img 
+                                                                    <Image 
                                                                         src={share.logo_url} 
                                                                         alt={share.shares_name} 
                                                                         className="w-full h-full object-contain p-1"
