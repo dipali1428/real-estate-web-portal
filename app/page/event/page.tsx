@@ -6,6 +6,7 @@ import { eventsByYear, Event } from "../../data/events";
 import { successContests } from "../../data/contests";
 import { getEventImages } from "../../data/eventImages";
 import { featuredVideos } from "../../data/youtubeVideos";
+import Image from 'next/image';
 
 // ... (Helper components: LazyLoad, LazyImageCarousel, YouTubeVideo, LazyYouTubeVideo remain exactly the same)
 
@@ -326,7 +327,7 @@ function StatItem({ value, label }: { value: string, label: string }) {
 function GalleryImage({ src, alt }: { src: string, alt: string }) {
   return (
     <div className="h-64 rounded-lg overflow-hidden group shadow-md">
-      <img src={src} alt={alt} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+      <Image src={src} alt={alt} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
     </div>
   );
 }

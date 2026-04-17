@@ -19,6 +19,7 @@ import {
   XCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 // --- Status Styles from Second Code ---
 const statusStyles: Record<string, string> = {
@@ -590,7 +591,7 @@ export default function LeadDashboard() {
             {/* Content Area */}
             <div className="flex-1 bg-gray-100 overflow-auto flex items-center justify-center p-4">
               {previewType === 'image' && (
-                <img
+                <Image
                   src={previewUrl || ''}
                   alt="Document"
                   className="max-w-full max-h-full object-contain shadow-lg"

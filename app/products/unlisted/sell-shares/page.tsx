@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft, Search, HandCoins, Building, FileSignature,
   Calculator, ChartLine, CheckCircle, ChevronDown, ChevronUp,
-  Check, X, HelpCircle, Clock, Send, Package, Filter,
-  AlertCircle, IndianRupee, Info
+  Check, X, HelpCircle, Send, Package, Filter, AlertCircle, Info
 } from 'lucide-react';
 import { fetchAllShares } from '../../../services/unlistedservices';
 import { useModal } from '../../../context/ModalContext';
+import Image from 'next/image';
 
 // --- INTERFACES ---
 interface Toast {
@@ -309,8 +309,20 @@ const SellShares: FC = () => {
                   isSelected ? 'border-[#2076C7] bg-blue-50/30 ring-2 ring-[#2076C7]/10' : 'border-gray-100 hover:border-[#2076C7]'
                 }`}
               >
-                <div className="w-full h-28 md:h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100 shadow-sm overflow-hidden transition-transform group-hover:scale-[1.02]">
-                  {company.logo_url ? <img src={company.logo_url} className="w-full h-full object-contain p-3" alt="" /> : <span className="text-3xl font-bold text-[#2076C7]">{company.shares_name.charAt(0)}</span>}
+                <div className="w-full h-28 md:h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100 shadow-sm overflow-hidden transition-transform group-hover:scale-[1.02] relative">
+                  {company.logo_url ? (
+                    <Image
+                      src={company.logo_url}
+                      alt={company.shares_name}
+                      fill
+                      className="object-contain p-3"
+                      sizes="(max-width: 768px) 100vw, 200px"
+                    />
+                  ) : (
+                    <span className="text-3xl font-bold text-[#2076C7]">
+                      {company.shares_name.charAt(0)}
+                    </span>
+                  )}
                 </div>
                 <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 line-clamp-1">{company.shares_name}</h3>
                 <div className="mb-2"><span className="text-xl md:text-2xl font-bold text-[#2076C7]">₹{sellPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span></div>
