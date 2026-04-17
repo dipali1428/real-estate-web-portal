@@ -100,7 +100,7 @@ const AboutSection = () => {
                             we believe that your financial success is our true achievement. We are a one-stop financial advisory firm offering end-to-end solutions in loans, investments, insurance, and wealth management. With a strong foundation of trust, expertise, and innovation, we strive to simplify finance and empower individuals and businesses to achieve their goals with confidence.
                         </p>
                         <p className="text-gray-700 max-w-3xl mx-auto text-lg leading-relaxed mt-4">
-                            At Infinity Arthvishva, we don’t just manage finances — we build lasting relationships and craft infinite possibilities for your financial future.
+                            At Infinity Arthvishva, we don&apos;t just manage finances — we build lasting relationships and craft infinite possibilities for your financial future.
                         </p>
 
                         {/* Leadership Team Section */}
@@ -125,6 +125,8 @@ const AboutSection = () => {
                                             <Image
                                                 src={leader.image}
                                                 alt={leader.name}
+                                                width={800}
+                                                height={360}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             />
                                         </div>
@@ -147,6 +149,8 @@ const AboutSection = () => {
                                             <Image
                                                 src={leader.image}
                                                 alt={leader.name}
+                                                width={800}
+                                                height={360}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             />
                                         </div>
@@ -177,6 +181,8 @@ const AboutSection = () => {
                                             <Image
                                                 src={leader.image}
                                                 alt={leader.name}
+                                                width={800}
+                                                height={360}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             />
                                         </div>
@@ -246,6 +252,8 @@ const AboutSection = () => {
                                 src={`${process.env.NEXT_PUBLIC_TEMPLATE_URL}/public/ET-Business-Award/ET-Business-Award.jpeg`}
                                 alt="Team collaboration at Infinity Arthviksha"
                                 className="w-full h-90 object-cover"
+                                width={800}
+                                height={360}
                             />
                             <div className="p-4 text-center">
                                 <p className="text-lg font-bold text-gray-800">
