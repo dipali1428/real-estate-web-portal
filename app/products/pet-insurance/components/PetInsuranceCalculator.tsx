@@ -66,16 +66,11 @@ export default function PetInsuranceCalculator({
     const [ageGroup, setAgeGroup] = useState(AGE_GROUPS[1]);
     const [sumInsured, setSumInsured] = useState(SUM_INSURED_OPTIONS[0]);
     const [hasOPD, setHasOPD] = useState(false);
-    const [totalPremium, setTotalPremium] = useState(0);
     const [showPlans, setShowPlans] = useState(false);
 
-    // Premium Calculation Logic
-    useEffect(() => {
-        let calculatedPremium = petType.baseRate * ageGroup.multiplier * sumInsured.factor;
-        if (hasOPD) calculatedPremium *= 1.3; // 30% loading for OPD
-        const withGst = calculatedPremium * 1.18;
-        setTotalPremium(Math.round(withGst));
-    }, [petType, ageGroup, sumInsured, hasOPD]);
+    const baseCalculated = petType.baseRate * ageGroup.multiplier * sumInsured.factor;
+    const premiumWithAddons = hasOPD ? baseCalculated * 1.3 : baseCalculated;
+    const totalPremium = Math.round(premiumWithAddons * 1.18);
 
     const nextStep = () => setStep(s => Math.min(3, s + 1));
     const prevStep = () => setStep(s => Math.max(1, s - 1));

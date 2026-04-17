@@ -38,20 +38,27 @@ export default function PMS_Live_Performance() {
 
     const fetchRealBenchmarks = useCallback(async () => {
         try {
-            setError(null);
-            const data = await FinancialDataService.getNifty50LiveData();
-            setBenchmarkData(data);
-
-            const sectors = await FinancialDataService.getSectorPerformance();
+            // Fetch both data points in parallel
+            const [niftyData, sectors] = await Promise.all([
+                FinancialDataService.getNifty50LiveData(),
+                FinancialDataService.getSectorPerformance()
+            ]);
+    
+            setBenchmarkData(niftyData);
             setSectorData(sectors);
+            
+            // Move error clearing here (after the await) so it's asynchronous
+            setError(null); 
         } catch (err) {
-            // console.error('Error fetching real benchmarks:', err);
             setError('Real-time market feed currently unavailable. Displaying historical benchmarks.');
         }
     }, []);
 
     useEffect(() => {
-        fetchRealBenchmarks();
+        const initializeBenchmarks = async () => {
+            await fetchRealBenchmarks();
+        };
+        initializeBenchmarks();
         const interval = setInterval(fetchRealBenchmarks, 300000); // Every 5 mins
         return () => clearInterval(interval);
     }, [fetchRealBenchmarks]);
