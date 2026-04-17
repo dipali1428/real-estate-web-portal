@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Download, CheckCircle, XCircle, Clock, Filter, IndianRupee, RefreshCw,
+import { 
+  Download, CheckCircle, XCircle, Clock, 
+ Filter, IndianRupee, RefreshCw, 
   FileText, Activity, X, Search, SlidersHorizontal, Calendar,
   Ship, Anchor, Box
 } from 'lucide-react';
@@ -19,40 +21,12 @@ interface MarineApplication {
   createdat: string;
 }
 
-const mockApplications: MarineApplication[] = [
-  {
-    id: 20456,
-    provider_name: 'ICICI Lombard',
-    policy_type: 'Cargo Insurance',
-    sum_insured: 'CIF + 10%',
-    premium: '₹4,500/transit',
-    status: 'APPROVED',
-    createdat: '2024-03-20T11:20:00Z'
-  },
-  {
-    id: 20512,
-    provider_name: 'Tata AIG',
-    policy_type: 'Hull Insurance',
-    sum_insured: '₹50 Lakh',
-    premium: '₹12,400/yr',
-    status: 'PENDING',
-    createdat: '2024-03-25T15:30:00Z'
-  },
-  {
-    id: 20389,
-    provider_name: 'HDFC Ergo',
-    policy_type: 'Transit Insurance',
-    sum_insured: '₹20 Lakh',
-    premium: '₹2,800/transit',
-    status: 'REJECTED',
-    createdat: '2024-02-15T10:10:00Z'
-  }
-];
+const mockApplications: MarineApplication[] = [];
 
 // ==================== MAIN COMPONENT ====================
 
 export default function MyMarineInsurance({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
-  const [applications, setApplications] = useState<MarineApplication[]>(mockApplications);
+  const [applications, setApplications] = useState<MarineApplication[]>([]);
   const [filteredApplications, setFilteredApplications] = useState<MarineApplication[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string>('');
@@ -180,27 +154,37 @@ export default function MyMarineInsurance({ activeTab, setActiveTab }: { activeT
             </div>
           </div>
 
-          <div className="flex bg-gray-200/50 p-1.5 rounded-xl w-full sm:w-fit self-center sm:self-end md:self-center flex-wrap justify-center sm:justify-start">
-            <button
-              onClick={() => setActiveTab("explore")}
-              className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                activeTab === "explore"
-                  ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-200"
-                  : "text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              Explore Offers
-            </button>
-            <button
-              onClick={() => setActiveTab("applications")}
-              className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                activeTab === "applications"
-                  ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-teal-200"
-                  : "text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              My Policies
-            </button>
+          <div className="flex pb-2 md:pb-0 w-full sm:w-auto mt-2 sm:mt-0 overflow-x-auto hide-scrollbar sm:overflow-visible">
+              <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                  <button
+                      onClick={() => setActiveTab('explore')}
+                      className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'explore' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                      {activeTab === 'explore' && (
+                          <motion.div
+                              layoutId="activeTabExplore"
+                              className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                              transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                          />
+                      )}
+                      <Anchor size={14} />
+                      <span>Offers</span>
+                  </button>
+                  <button
+                      onClick={() => setActiveTab('applications')}
+                      className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'applications' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                      {activeTab === 'applications' && (
+                          <motion.div
+                              layoutId="activeTabExplore"
+                              className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                              transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                          />
+                      )}
+                      <FileText size={14} />
+                      <span>Policies</span>
+                  </button>
+              </div>
           </div>
         </div>
       </motion.div>
@@ -331,21 +315,28 @@ export default function MyMarineInsurance({ activeTab, setActiveTab }: { activeT
         </div>
       </div>
 
-      {/* Applications View */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-              <tr>
-                <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Policy Start</th>
-                <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Provider</th>
-                <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Policy Type</th>
-                <th className="py-4 px-6 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Insured Value</th>
-                <th className="py-4 px-6 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Premium</th>
-                <th className="py-4 px-6 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
+      {/* Results Summary */}
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-gray-600">
+          Showing <span className="font-bold text-[#2076C7]">{filteredApplications.length}</span> applications
+        </p>
+      </div>      {/* Applications List - Mobile Card View / Desktop Table View */}
+      <div className="space-y-4">
+        {/* Desktop Table View */}
+        <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                <tr>
+                  <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Policy Start</th>
+                  <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Provider</th>
+                  <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Policy Type</th>
+                  <th className="py-4 px-6 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Insured Value</th>
+                  <th className="py-4 px-6 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Premium</th>
+                  <th className="py-4 px-6 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
               {filteredApplications.length > 0 ? (
                 filteredApplications.map((app) => (
                   <React.Fragment key={app.id}>
@@ -464,6 +455,95 @@ export default function MyMarineInsurance({ activeTab, setActiveTab }: { activeT
           </table>
         </div>
       </div>
+
+      {/* Mobile / Tablet Card View */}
+      <div className="lg:hidden space-y-4">
+        {filteredApplications.length > 0 ? (
+          filteredApplications.map((app) => (
+            <div 
+              key={app.id}
+              className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden"
+            >
+              <div 
+                className="p-4 cursor-pointer"
+                onClick={() => toggleRow(app.id)}
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex flex-col gap-1">
+                    <div className="text-xs font-bold text-gray-500 flex items-center gap-1.5 uppercase tracking-wider">
+                      <Calendar size={12} className="text-[#2076C7]" />
+                      {formatDate(app.createdat)}
+                    </div>
+                    <div className="text-lg font-bold text-gray-900 uppercase tracking-tighter">{app.provider_name}</div>
+                  </div>
+                  <StatusBadge status={app.status} />
+                </div>
+
+                <div className="flex justify-between items-end">
+                  <div className="space-y-1">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Insured Value</div>
+                    <div className="text-xl font-black text-[#2076C7]">{app.sum_insured}</div>
+                  </div>
+                  <div className="text-right">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#2076C7] border border-blue-200 rounded-full text-[10px] font-bold uppercase mb-1">
+                      {getPolicyIcon(app.policy_type)}
+                      {app.policy_type}
+                    </span>
+                    <div className="text-xs font-medium text-gray-500">
+                      {app.premium}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <AnimatePresence>
+                {expandedRow === app.id && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden bg-gray-50 border-t border-gray-100"
+                  >
+                    <div className="px-4 pb-4 pt-2">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1"><FileText size={10} /> App ID</div>
+                          <div className="text-xs font-mono font-bold text-gray-800">#{app.id}</div>
+                        </div>
+                        <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1"><Clock size={10} /> Applied</div>
+                          <div className="text-xs font-bold text-gray-800">{formatTime(app.createdat)}</div>
+                        </div>
+                        <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm col-span-2">
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1"><Ship size={10} /> Status Context</div>
+                          <div className="text-xs font-bold text-gray-800">
+                            {app.status === 'APPROVED' ? 'Your vessel is covered' : 
+                             app.status === 'PENDING' ? 'Under maritime survey' : 
+                             'Policy rejected'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))
+        ) : (
+          <div className="bg-white rounded-2xl border border-gray-200 py-12 text-center text-gray-500 px-4">
+            <FileText className="w-12 h-12 text-gray-300 mb-4 mx-auto" />
+            <p className="text-lg font-medium text-gray-700">No applications found</p>
+            <p className="text-sm text-gray-400 mt-2">Try adjusting your filters.</p>
+            <button 
+              onClick={clearFilters}
+              className="px-4 py-2 mt-4 bg-[#2076C7] text-white text-sm rounded-lg hover:bg-[#1CADA3] transition-colors inline-block"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
 
       <style jsx>{`
         @keyframes fadeIn {

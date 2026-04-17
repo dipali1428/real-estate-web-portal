@@ -28,6 +28,8 @@ const ModalContext = createContext({
     isContactOpen: false,
     openContact: (productName?: string) => { },
     closeContact: () => { },
+    isLoanModalOpen: false, // Added for Loan Header hiding
+    setLoanModalOpen: (isOpen: boolean) => { }, // Added
     closeAll: () => { },
 });
 
@@ -43,7 +45,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
     const [isContactOpen, setIsContactOpen] = useState(false);
     const [appliedProduct, setAppliedProduct] = useState<string | undefined>(undefined);
     const [isDashboardFlow, setIsDashboardFlow] = useState(false);
-
+const [isLoanModalOpen, setIsLoanModalOpen] = useState(false); // Loan Modal State
     const closeAll = () => {
         setIsLoginOpen(false);
         setIsPartnerOpen(false);
@@ -97,7 +99,9 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                     setIsContactOpen(true);
                 },
                 closeContact: () => setIsContactOpen(false),
-
+// closeQuote: () => setIsQuoteOpen(false),
+                isLoanModalOpen,
+                setLoanModalOpen: (isOpen: boolean) => setIsLoanModalOpen(isOpen),
                 closeAll,
             }}>
             {children}

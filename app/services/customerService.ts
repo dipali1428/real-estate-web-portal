@@ -128,6 +128,8 @@ export interface AddToWishlistParams {
     product_type: string;
     product_id: number;
     product_name: string;
+       nav?: string | number;
+    risk?: string;
 }
 
 export interface WishlistItem {
@@ -353,7 +355,9 @@ const CustomerService = {
         const response = await api.post("/api/customer/add-wishlist", {
             product_type: wishlistData.product_type,
             product_id: wishlistData.product_id,
-            product_name: wishlistData.product_name
+            product_name: wishlistData.product_name,
+            nav: wishlistData.nav,
+            risk: wishlistData.risk
         });
         return response.data;
     },

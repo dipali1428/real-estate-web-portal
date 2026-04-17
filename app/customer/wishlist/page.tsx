@@ -15,7 +15,6 @@ import {
     Building2,
     Trash2,
     PlusCircle,
-    Info,
     RefreshCw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -35,6 +34,10 @@ interface ApiWishlistItem {
         logo_url: string;
         min_lot_size: number;
         depository_applicable: string;
+          nav?: string | number;
+           nav_date?: string;
+             risk?: string;
+               scheme_name?: string;
     };
 }
 
@@ -122,16 +125,24 @@ export default function Wishlist() {
                 dataArray = [];
             }
 
-            // Transform data safely
-            const transformed: WishlistItem[] = dataArray
-                .filter(item => item && item.product_data) // Only include items with product data
-                .map((item: ApiWishlistItem) => ({
-                    ...item,
-                    price: Number(item.product_data?.price || 0),
-                    min_lot: item.product_data?.min_lot_size || 0,
-                    depository: item.product_data?.depository_applicable?.replace(/&amp;/g, '&') || '-',
-                    logo_url: item.product_data?.logo_url || '',
-                }));
+              const transformed: WishlistItem[] = dataArray.map((item: ApiWishlistItem) => {
+    const isMF = item.product_type === 'mutual_fund';
+
+    return {
+        ...item,
+        price: isMF
+            ? Number(item.product_data?.nav || 0)
+            : Number(item.product_data?.price || 0),
+
+        min_lot: isMF ? 0 : item.product_data?.min_lot_size || 0,
+
+        depository: isMF
+            ? item.product_data?.risk || 'Moderate'
+            : item.product_data?.depository_applicable?.replace(/&amp;/g, '&') || '-',
+
+        logo_url: item.product_data?.logo_url || '',
+    };
+});
 
             setWishlistItems(transformed);
             updateCategoryCounts(transformed);
@@ -371,7 +382,7 @@ export default function Wishlist() {
                                 <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Price</th>
                                 <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Min Lot</th>
                                 <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Min Investment</th>
-                                <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Depository</th>
+                                <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider"> {selectedCategory === 'mutual-funds' ? 'Risk' : 'Depository'}</th>
                                 <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
@@ -398,14 +409,35 @@ export default function Wishlist() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-center font-bold text-[#2076C7]">₹{item.price.toFixed(2)}</td>
-                                        <td className="px-6 py-4 text-center text-gray-800 font-medium">{item.min_lot}</td>
-                                        <td className="px-6 py-4 text-center text-gray-800 font-semibold">₹{(item.price * item.min_lot).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                                        <td className="px-6 py-4 text-center"><span className="px-3 py-1 rounded-md bg-purple-50 text-purple-600 text-[10px] font-bold uppercase border border-purple-100">{item.depository}</span></td>
+                                        <td className="px-6 py-4 text-center font-bold text-[#2076C7]">
+                                        {item.product_type === 'mutual_fund'
+    ? `₹${item.price.toFixed(2)}`
+    : `₹${item.price.toFixed(2)}`
+}
+                                        </td>
+                                        <td className="px-6 py-4 text-center text-gray-800 font-medium">
+                                           {item.product_type === 'mutual_fund' ? '-' : item.min_lot}
+                                        </td>
+                                        <td className="px-6 py-4 text-center text-gray-800 font-semibold">
+                                          {item.product_type === 'mutual_fund'
+    ? '-'
+    : `₹${(item.price * item.min_lot).toLocaleString('en-IN', {
+          minimumFractionDigits: 2,
+      })}`
+}
+                                        </td>
                                         <td className="px-6 py-4 text-center">
-                                            <button 
-                                                onClick={() => handleRemoveItem(item.id)} 
-                                                className="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                                            <span className="px-3 py-1 rounded-md bg-purple-50 text-purple-600 text-[10px] font-bold uppercase border border-purple-100">
+                                               {item.product_type === 'mutual_fund'
+    ? item.depository   // now holds risk
+    : item.depository}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-center">
+                                            <button
+                                                onClick={() => handleRemoveItem(item.id)}
+                                                className="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-[#2076C7] text-white hover:bg-red-500 transition-all shadow-sm"
+                                                title="Remove from wishlist"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
