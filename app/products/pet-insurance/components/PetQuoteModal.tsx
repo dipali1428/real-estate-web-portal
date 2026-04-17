@@ -51,20 +51,27 @@ export default function PetQuoteModal({ isOpen, onClose }: PetQuoteModalProps) {
     // Reset form state when modal opens
     useEffect(() => {
         if (isOpen) {
-            setStep(1);
-            setPetType(null);
-            setSelectedCondition(null);
-            setShowErrors(false);
-            setShowStep2Error(false);
-            setFormData({
-                ownerName: '',
-                petName: '',
-                petBreed: '',
-                petAge: '',
-                email: '',
-                mobile: '',
-                city: '',
-            });
+            // Use setTimeout to move the state updates to the next tick of the event loop.
+            // This prevents the "cascading renders" error by ensuring the updates 
+            // happen after the initial render of the open modal.
+            const timer = setTimeout(() => {
+                setStep(1);
+                setPetType(null);
+                setSelectedCondition(null);
+                setShowErrors(false);
+                setShowStep2Error(false);
+                setFormData({
+                    ownerName: '',
+                    petName: '',
+                    petBreed: '',
+                    petAge: '',
+                    email: '',
+                    mobile: '',
+                    city: '',
+                });
+            }, 0);
+
+            return () => clearTimeout(timer);
         }
     }, [isOpen]);
 

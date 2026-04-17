@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
@@ -57,7 +57,7 @@ export default function CalculatorAndProcess({ isDashboard = false, onShowPlans 
     const [travelers, setTravelers] = useState([{ id: 1, ageGroup: AGE_GROUPS[1] }]);
     const [hasMedicalCondition, setHasMedicalCondition] = useState(false);
     const [sumInsured, setSumInsured] = useState(SUM_INSURED_OPTIONS[1]);
-    const [totalPremium, setTotalPremium] = useState(0);
+    // const [totalPremium, setTotalPremium] = useState(0);
 
     // useEffect(() => {
     //     if (startDate && endDate) {
@@ -85,9 +85,11 @@ export default function CalculatorAndProcess({ isDashboard = false, onShowPlans 
         return 7;
     }, [startDate, endDate]);
 
-    useEffect(() => {
-        const premium = travelers.reduce((acc, t) => acc + (destination.baseRate * t.ageGroup.multiplier * duration * (sumInsured.factor || 1) * (hasMedicalCondition ? 1.4 : 1)), 0);
-        setTotalPremium(Math.round(premium * 1.18));
+    const totalPremium = useMemo(() => {
+    const premium = travelers.reduce((acc, t) => 
+        acc + (destination.baseRate * t.ageGroup.multiplier * duration * (sumInsured.factor || 1) * (hasMedicalCondition ? 1.4 : 1)), 
+    0);
+    return Math.round(premium * 1.18);
     }, [destination, duration, travelers, hasMedicalCondition, sumInsured]);
 
     const isStepValid = () => step === 1 ? startDate && endDate : step === 2 ? travelers.length > 0 : true;

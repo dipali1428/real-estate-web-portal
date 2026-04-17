@@ -114,7 +114,7 @@ const TicketDetailsModal = ({
   };
 
   const getGridClasses = () => {
-    return "grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6";
+    return "grid grid-cols-1 lg:grid-cols-12 gap-y-6 lg:gap-x-8";
   };
 
   if (!isMounted) {
@@ -163,10 +163,9 @@ const TicketDetailsModal = ({
             {expandedSections.dsaInfo && (
               <div className="px-4 sm:px-6 pb-4 sm:pb-6">
                 <div className={getGridClasses()}>
-                  {/* DSA Info */}
-                  <div className="space-y-3 lg:space-y-4">
+                  <div className="space-y-3 lg:space-y-4 lg:col-span-5">
                     <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 flex-shrink-0" />
+                      <User className="w-6 h-4 sm:w-5 sm:h-5 text-gray-600 flex-shrink-0" />
                       <h4 className="font-medium text-gray-900 text-sm sm:text-base">DSA Information</h4>
                     </div>
                     <div className="space-y-2 sm:space-y-3">
@@ -197,7 +196,7 @@ const TicketDetailsModal = ({
                   </div>
 
                   {/* Ticket Details */}
-                  <div className="space-y-3 lg:space-y-4">
+                  <div className="space-y-3 lg:space-y-4 lg:col-span-4">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 flex-shrink-0" />
                       <h4 className="font-medium text-gray-900 text-sm sm:text-base">Ticket Details</h4>
@@ -235,7 +234,7 @@ const TicketDetailsModal = ({
                   </div>
 
                   {/* Actions */}
-                  <div className="space-y-3 lg:space-y-4">
+                  <div className="space-y-3 lg:space-y-4 lg:col-span-3">
                     <h4 className="font-medium text-gray-900 text-sm sm:text-base">Update Status</h4>
                     <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row flex-wrap gap-2">
                       {/* {['Resolved', 'Closed'].map((status) => ( */}

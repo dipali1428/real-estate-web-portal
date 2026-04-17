@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useState } from "react";
 import { useModal } from "../../context/ModalContext";
 import Link from "next/link";
@@ -285,10 +286,13 @@ export default function MutualFundsLandingPage() {
 
             {/* RIGHT HERO IMAGE */}
             <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl">
-              <img
+              <Image
                 src="/MF/mf.jpeg"
                 alt="Mutual Funds Investment"
-                className="w-full h-auto object-contain"
+                width={600}
+                height={400}
+                className="w-full h-auto object-contain rounded-3xl"
+                priority
               />
             </div>
           </div>

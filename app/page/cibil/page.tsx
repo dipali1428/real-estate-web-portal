@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { PublicService } from "../../services/publicService";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 // Temporary Mock Response based on your actual API structure
 // const MOCK_RESPONSE = {
@@ -387,7 +388,6 @@ const CreditScorePage: React.FC = () => {
             // --- NEW MAPPING LOGIC END ---
 
         } catch (err: any) {
-            console.error("API Error:", err);
             setError(err?.response?.data?.message || "Something went wrong while retrieving your score.");
         } finally {
             setLoading(false);
@@ -408,7 +408,6 @@ const CreditScorePage: React.FC = () => {
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
         } catch (err) {
-            console.error("Error downloading report:", err);
             setError("Failed to download the report. Please try again later.");
         } finally {
             setIsDownloading(false);
@@ -485,10 +484,10 @@ const CreditScorePage: React.FC = () => {
 
                         <div className="flex flex-col items-center mb-6">
                             <span className="text-[10px] font-bold text-gray-400 uppercase mb-1 tracking-wider">Powered by</span>
-                            <img src="/cibil-logo.svg" alt="Logo" className="h-8" />
+                            <Image src="/cibil-logo.svg" alt="Logo" width={100} height={32} className="h-8 w-auto" />
                         </div>
                         <h4 className="text-2xl font-bold text-center text-gray-800 mb-2">Verify Mobile</h4>
-                        <p className="text-center text-gray-500 mb-8">We'll send a 6-digit code to verify your identity.</p>
+                        <p className="text-center text-gray-500 mb-8">We&apos;ll send a 6-digit code to verify your identity.</p>
 
                         <div className="space-y-6">
                             <div className="relative">
@@ -685,7 +684,7 @@ const CreditScorePage: React.FC = () => {
                                     <div><p className="text-[9px] font-bold text-gray-400 uppercase">Checked Date</p><p className="font-bold text-gray-700 text-sm">{reportSummary.lastChecked}</p></div>
                                     <div className="text-left">
                                         <span className="text-[9px] font-bold text-gray-300 uppercase block mb-1">Powered by</span>
-                                        <img src="/cibil-logo.svg" alt="CIBIL" className="h-10 ml-auto" />
+                                        <Image src="/cibil-logo.svg" alt="CIBIL" width={120} height={40} className="h-10 w-auto ml-auto" />
                                     </div>
                                 </div>
                             </div>
@@ -695,7 +694,7 @@ const CreditScorePage: React.FC = () => {
                             {/* SVG Logo from public folder at Top Left */}
                             <div className="absolute top-6 left-8">
                                 <span className="text-[10px] font-bold text-gray-400 uppercase block mb-1 tracking-wider">Powered by</span>
-                                <img src="/cibil-logo.svg" alt="Logo" className="h-8 md:h-10 opacity-80" />
+                                <Image src="/cibil-logo.svg" alt="Logo" width={120} height={40} className="h-8 md:h-10 w-auto opacity-80" />
                             </div>
 
                             <h4 className="text-2xl font-bold text-center text-gray-800 mb-8 mt-12 md:mt-0">Complete Your Details</h4>
@@ -838,10 +837,10 @@ const CreditScorePage: React.FC = () => {
                             <section>
                                 <h4 className="text-lg font-bold text-gray-900 mb-4 uppercase">AGREEMENT TO OUR LEGAL TERMS</h4>
                                 <p className="mb-4">
-                                    We are <strong>Infinity Arthvishva</strong> ("Company," "we," "us," "our"), a company registered in India at 1001 & 1201, 7 Business Square by Naiknavare, Ganeshkhind Rd, Near Datta Mandir, Model Colony, Shivajinagar, Pune, Maharashtra 411016.
+                                    We are <strong>Infinity Arthvishva</strong> (&quot;Company,&quot; &quot;we,&quot; &quot;us,&quot; &quot;our&quot;), a company registered in India at 1001 & 1201, 7 Business Square by Naiknavare, Ganeshkhind Rd, Near Datta Mandir, Model Colony, Shivajinagar, Pune, Maharashtra 411016.
                                 </p>
                                 <p className="mb-4">
-                                    We operate the website <a href="https://www.infinityarthvishva.com" className="text-[#1CADA3] underline">https://www.infinityarthvishva.com</a>, as well as any other related products and services that refer or link to these legal terms (the "Legal Terms").
+                                    We operate the website <a href="https://www.infinityarthvishva.com" className="text-[#1CADA3] underline">https://www.infinityarthvishva.com</a>, as well as any other related products and services that refer or link to these legal terms (the &quot;Legal Terms&quot;).
                                 </p>
                                 <div className="bg-white p-5 border-l-4 border-[#1CADA3] shadow-sm italic text-gray-600">
                                     These Legal Terms constitute a legally binding agreement. By accessing the Services, you have read, understood, and agreed to be bound by all of these Legal Terms. IF YOU DO NOT AGREE, YOU MUST DISCONTINUE USE IMMEDIATELY.

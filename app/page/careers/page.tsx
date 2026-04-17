@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
   Target,
   TrendingUp,
@@ -81,6 +82,7 @@ export default function CareersContent() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Input States
   const [formData, setFormData] = useState({
@@ -113,6 +115,7 @@ export default function CareersContent() {
     setSelectedJob(job);
     setIsModalOpen(true);
     setIsSuccess(false);
+    setErrorMessage(null);
     // Reset form when opening
     setFormData({
       full_name: '',
@@ -137,6 +140,7 @@ export default function CareersContent() {
     };
 
     try {
+      setErrorMessage(null);
       await PublicService.submitCareerApplication(payload);
       setIsSuccess(true);
       setTimeout(() => {
@@ -144,8 +148,7 @@ export default function CareersContent() {
         setIsSuccess(false);
       }, 3000);
     } catch (error) {
-      console.error("Submission failed", error);
-      alert("Something went wrong. Please try again.");
+      setErrorMessage("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -165,7 +168,7 @@ export default function CareersContent() {
             Build Your Career.<br /> Empower Financial Future.
           </h1>
           <p className="text-lg md:text-xl text-[#666666] max-w-3xl mx-auto mb-10 leading-relaxed">
-            Join Infinity Arthvishva—where your growth fuels the prosperity of families and businesses across India. Be part of a trusted team that's simplifying finance.
+            Join Infinity Arthvishva—where your growth fuels the prosperity of families and businesses across India. Be part of a trusted team that&apos;s simplifying finance.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 transition-opacity duration-1000 delay-300">
@@ -214,7 +217,7 @@ export default function CareersContent() {
             <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
               Employee Benefits & Growth
             </h2>
-            <p className="text-[#666666]">We invest in our team's well-being and professional development.</p>
+            <p className="text-[#666666]">We invest in our team&apos;s well-being and professional development.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -325,6 +328,11 @@ export default function CareersContent() {
                 </div>
               ) : (
                 <form onSubmit={handleFormSubmit} className="space-y-6">
+                  {errorMessage && (
+                    <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
+                      {errorMessage}
+                    </div>
+                  )}
                   {/* Basic Info Group */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -419,7 +427,7 @@ export default function CareersContent() {
             <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
               Life at Infinity Arthvishva
             </h2>
-            <p className="text-[#666666]">Join a growing network that's empowering financial futures across India.</p>
+            <p className="text-[#666666]">Join a growing network that&apos;s empowering financial futures across India.</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 font-sans text-center mb-16">
@@ -495,7 +503,13 @@ function StatItem({ value, label }: { value: string, label: string }) {
 function GalleryImage({ src, alt }: { src: string, alt: string }) {
   return (
     <div className="h-64 rounded-lg overflow-hidden group">
-      <img src={src} alt={alt} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+      <Image 
+        src={src} 
+        alt={alt} 
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        className="object-cover transition-transform duration-500 group-hover:scale-110" 
+      />
     </div>
   );
 }

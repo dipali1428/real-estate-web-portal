@@ -782,7 +782,7 @@ export const FDCalculatorContent: React.FC = () => {
                           <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
                             {formatCurrency(realReturn)}
                           </span>{' '}
-                          (in today's money value)
+                          (in today&apos;s money value)
                         </li>
                       );
                     }

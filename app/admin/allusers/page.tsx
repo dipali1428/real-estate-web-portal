@@ -110,7 +110,7 @@ export default function AllUsersPage() {
     const headers = [
       "id", "adv_id", "name", "email", "mobile", "pan", "city", "head",
       "category", "password", "date_joined", "updated_at", "role",
-      "department", "sub_category", "referral_code", "referred_by_rm","pan_verified","state"
+      "department", "sub_category", "referral_code", "referred_by_rm","pan_verified","state","entity_type","email_verified"
     ];
 
     const csvRows = users.map(user => {
