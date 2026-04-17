@@ -230,7 +230,6 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
       }
       
       if (aadhaarAddress && onAddressUpdate) {
-        toast.success("Address extracted successfully");
         onAddressUpdate(aadhaarAddress);
         toast.success("Aadhaar Verified! Address fetched successfully.");
       } else {
@@ -346,47 +345,47 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 px-0 sm:px-2">
       {/* STEP 2: IDENTITY VERIFICATION (PAN & AADHAAR) */}
-      <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm relative">
+      <div className="bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-slate-100 shadow-sm relative overflow-hidden">
         {!isStep1Complete && (
-          <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[2px] rounded-3xl flex items-center justify-center">
-            <div className="bg-white px-6 py-3 rounded-2xl shadow-xl border font-bold text-slate-600 flex items-center gap-2">
+          <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[2px] rounded-3xl flex items-center justify-center p-4">
+            <div className="bg-white px-4 md:px-6 py-3 rounded-2xl shadow-xl border font-bold text-slate-600 flex items-center gap-2 text-xs md:text-sm text-center">
               <Lock size={16} /> Complete Step 1 to Unlock KYC
             </div>
           </div>
         )}
         
-        <div className="flex justify-between items-center mb-8">
-          <h3 className="text-xl text-gray-700 font-bold flex items-center gap-3">
-            <span className="bg-[#2076C7] text-white text-[10px] px-2 py-1 rounded-lg uppercase">Step 2</span>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
+          <h3 className="text-lg md:text-xl text-gray-700 font-bold flex items-center gap-3">
+            <span className="bg-[#2076C7] text-white text-[9px] md:text-[10px] px-2 py-1 rounded-lg uppercase shrink-0">Step 2</span>
             Identity Verification
           </h3>
           {profile?.pan_verified && profile?.aadhaar_verified && (
-            <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black flex items-center gap-1">
+            <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black flex items-center gap-1 shrink-0">
               <CheckCircle2 size={12} /> ID VERIFIED
             </span>
           )}
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {/* PAN SECTION */}
-          <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+          <div className="p-4 md:p-6 bg-slate-50 rounded-2xl border border-slate-100">
             <div className="flex justify-between items-center mb-4">
-              <p className="text-[10px] font-black text-gray-700 uppercase tracking-wider">PAN Details</p>
+              <p className="text-[9px] md:text-[10px] font-black text-gray-700 uppercase tracking-wider">PAN Details</p>
               {profile?.pan_verified && (
-                <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black flex items-center gap-1">
+                <span className="text-[8px] md:text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black flex items-center gap-1">
                   <CheckCircle2 size={10} /> VERIFIED
                 </span>
               )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
               <input
                 disabled={profile?.pan_verified}
                 placeholder="PAN Number"
                 value={getPanDisplayValue()}
                 onChange={(e) => setPanDetails({ ...panDetails, pan: e.target.value.toUpperCase() })}
-                className="px-4 py-2 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold uppercase focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold uppercase focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                 maxLength={10}
               />
               <input
@@ -394,9 +393,9 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
                 placeholder="Name on PAN"
                 value={panDetails.name_as_per_pan || ""}
                 onChange={(e) => setPanDetails({ ...panDetails, name_as_per_pan: e.target.value.toUpperCase() })}
-                className="px-4 py-2 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
               />
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   inputMode="numeric"
@@ -408,13 +407,13 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
                     const formatted = formatDOBInput(e.target.value);
                     setPanDetails({ ...panDetails, date_of_birth: formatted });
                   }}
-                  className="flex-1 px-3 py-2 rounded-xl font-bold text-slate-700 border border-slate-200 text-sm outline-none focus:border-[#1CADA3] disabled:bg-slate-100 disabled:text-slate-500"
+                  className="flex-1 px-4 py-2.5 rounded-xl font-bold text-slate-700 border border-slate-200 text-sm outline-none focus:border-[#1CADA3] disabled:bg-slate-100 disabled:text-slate-500"
                 />
                 {!profile?.pan_verified && (
                   <button 
                     onClick={handlePanVerify} 
                     disabled={loadingSec === 'pan'}
-                    className="bg-[#1CADA3] text-white px-6 rounded-xl text-xs font-bold hover:bg-[#158f87] transition-all disabled:opacity-50 flex items-center gap-2"
+                    className="bg-[#1CADA3] text-white px-6 py-2.5 rounded-xl text-xs font-bold hover:bg-[#158f87] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {loadingSec === 'pan' ? <Loader2 className="animate-spin w-4 h-4" /> : "Verify"}
                   </button>
@@ -424,29 +423,29 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
           </div>
 
           {/* AADHAAR SECTION */}
-          <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+          <div className="p-4 md:p-6 bg-slate-50 rounded-2xl border border-slate-100">
             <div className="flex justify-between items-center mb-4">
-              <p className="text-[10px] font-black text-gray-700 uppercase tracking-wider">Aadhaar Details</p>
+              <p className="text-[9px] md:text-[10px] font-black text-gray-700 uppercase tracking-wider">Aadhaar Details</p>
               {profile?.aadhaar_verified && (
-                <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black flex items-center gap-1">
+                <span className="text-[8px] md:text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black flex items-center gap-1">
                   <CheckCircle2 size={10} /> VERIFIED
                 </span>
               )}
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
               <input
                 disabled={profile?.aadhaar_verified}
                 placeholder="12 Digit Aadhaar Number"
                 value={getAadhaarDisplayValue()}
                 onChange={(e) => setAadhaarNum(e.target.value.replace(/\D/g, '').slice(0, 12))}
-                className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
+                className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                 maxLength={14}
               />
               {!profile?.aadhaar_verified && !otpSent && (
                 <button 
                   onClick={handleAadhaarSend} 
                   disabled={loadingSec === 'a-otp' || !aadhaarNum || aadhaarNum.length !== 12}
-                  className="bg-[#1CADA3] text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-[#158f87] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="bg-[#1CADA3] text-white px-6 py-2.5 rounded-xl text-xs font-bold hover:bg-[#158f87] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loadingSec === 'a-otp' ? <Loader2 className="animate-spin w-4 h-4" /> : "Get OTP"}
                 </button>
@@ -454,18 +453,18 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
             </div>
             
             {otpSent && !profile?.aadhaar_verified && (
-              <div className="mt-4 flex gap-4 animate-in slide-in-from-top-2">
+              <div className="mt-4 flex flex-col sm:flex-row gap-3 md:gap-4 animate-in slide-in-from-top-2">
                 <input
                   placeholder="Enter 6-digit OTP"
                   value={aadhaarOtp || ""}
                   onChange={(e) => setAadhaarOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none"
+                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none"
                   maxLength={6}
                 />
                 <button 
                   onClick={handleAadhaarVerify} 
                   disabled={loadingSec === 'a-ver' || !aadhaarOtp}
-                  className="bg-emerald-600 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 transition-all disabled:opacity-50 flex items-center gap-2"
+                  className="bg-emerald-600 text-white px-6 py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loadingSec === 'a-ver' ? <Loader2 className="animate-spin w-4 h-4" /> : "Verify OTP"}
                 </button>
@@ -475,22 +474,22 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
 
           {/* PAN-AADHAAR LINK CHECK */}
           {profile?.pan_verified && profile?.aadhaar_verified && (
-            <div className="mt-4">
+            <div className="mt-2 md:mt-4">
               {panAadhaarLinked === true ? (
-                <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-[11px] font-bold">
-                  <CheckCircle2 size={14} /> PAN and Aadhaar are successfully linked
+                <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-[10px] md:text-[11px] font-bold">
+                  <CheckCircle2 size={14} className="shrink-0" /> PAN and Aadhaar are successfully linked
                 </div>
               ) : (
                 <div className="space-y-3">
                   <button
                     onClick={handleCheckLink}
                     disabled={loadingSec === 'link'}
-                    className="w-full py-3 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 border-2 border-slate-200 text-slate-600 hover:border-[#1CADA3] transition-all disabled:opacity-50"
+                    className="w-full py-3 md:py-3.5 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-widest flex items-center justify-center gap-2 border-2 border-slate-200 text-slate-600 hover:border-[#1CADA3] transition-all disabled:opacity-50"
                   >
                     {loadingSec === 'link' ? <Loader2 className="animate-spin" size={16} /> : <ShieldCheck size={16} />}
                     Check PAN-Aadhaar Link Status
                   </button>
-                  <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-700 text-[11px] font-bold">
+                  <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-700 text-[10px] md:text-[11px] font-bold">
                     <AlertCircle size={12} className="shrink-0 mt-0.5" />
                     <span>Note: Payout requires linked PAN-Aadhaar as per government regulations</span>
                   </div>
@@ -502,56 +501,56 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
       </div>
 
       {/* STEP 3: BANK PAYOUT SETUP */}
-      <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm relative">
+      <div className="bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-slate-100 shadow-sm relative overflow-hidden">
         {!isStep2Complete && (
-          <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[2px] rounded-3xl flex items-center justify-center">
-            <div className="bg-white px-6 py-3 rounded-2xl shadow-xl border font-bold text-slate-600 flex items-center gap-2">
+          <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[2px] rounded-3xl flex items-center justify-center p-4">
+            <div className="bg-white px-4 md:px-6 py-3 rounded-2xl shadow-xl border font-bold text-slate-600 flex items-center gap-2 text-xs md:text-sm text-center">
               <Lock size={16} /> Complete Step 2 to Unlock Banking
             </div>
           </div>
         )}
         
-        <div className="flex justify-between items-center mb-8">
-          <h3 className="text-xl text-gray-700 font-bold flex items-center gap-3">
-            <span className="bg-[#2076C7] text-white text-[10px] px-2 py-1 rounded-lg uppercase">Step 3</span>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
+          <h3 className="text-lg md:text-xl text-gray-700 font-bold flex items-center gap-3">
+            <span className="bg-[#2076C7] text-white text-[9px] md:text-[10px] px-2 py-1 rounded-lg uppercase shrink-0">Step 3</span>
             Bank Account Verification
           </h3>
           {profile?.bank_verified && (
-            <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black flex items-center gap-1">
+            <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black flex items-center gap-1 shrink-0">
               <CheckCircle2 size={12} /> BANK VERIFIED
             </span>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-700 uppercase tracking-wider">Bank Name</label>
+            <label className="text-[9px] md:text-[10px] font-black text-slate-700 uppercase tracking-wider">Bank Name</label>
             <input 
               disabled={profile?.bank_verified} 
               value={bankDetails.bank_name} 
               onChange={(e) => setBankDetails({...bankDetails, bank_name: e.target.value.toUpperCase()})} 
-              className="w-full px-4 py-2 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
               placeholder="Enter bank name"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-700 uppercase tracking-wider">Account Number</label>
+            <label className="text-[9px] md:text-[10px] font-black text-slate-700 uppercase tracking-wider">Account Number</label>
             <input 
               disabled={profile?.bank_verified} 
               value={getBankAccountDisplayValue()} 
               onChange={(e) => setBankDetails({...bankDetails, bank_account_number: e.target.value.replace(/\D/g, '')})} 
-              className="w-full px-4 py-2 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
               placeholder="Enter account number"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-700 uppercase tracking-wider">IFSC Code</label>
-            <div className="flex gap-2">
+            <label className="text-[9px] md:text-[10px] font-black text-slate-700 uppercase tracking-wider">IFSC Code</label>
+            <div className="flex flex-col sm:flex-row gap-2">
               <input 
                 disabled={profile?.bank_verified} 
                 value={getIFSCDisplayValue()} 
                 onChange={(e) => setBankDetails({...bankDetails, ifsc_code: e.target.value.toUpperCase()})} 
-                className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
+                className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-gray-700 text-sm font-bold focus:border-[#1CADA3] focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                 placeholder="Enter IFSC code"
                 maxLength={11}
               />
@@ -559,7 +558,7 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
                 <button 
                   onClick={handleBankVerify} 
                   disabled={loadingSec === 'bank'}
-                  className="bg-emerald-500 text-white px-6 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all disabled:opacity-50 flex items-center gap-2"
+                  className="bg-emerald-500 text-white px-6 py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loadingSec === 'bank' ? <Loader2 className="animate-spin w-4 h-4" /> : "Verify"}
                 </button>
@@ -571,7 +570,7 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
         {!profile?.bank_verified && (
           <div className="mt-4 flex items-start gap-2 p-3 bg-blue-50 rounded-xl border border-blue-100">
             <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-            <p className="text-[11px] text-blue-700 font-medium">
+            <p className="text-[10px] md:text-[11px] text-blue-700 font-medium">
               A penny drop verification will be performed to validate your bank account details.
             </p>
           </div>
@@ -579,28 +578,28 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
       </div>
 
       {/* OPTIONAL DEMAT SECTION */}
-      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0">
-              <Database className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" />
+      <div className="bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0">
+              <Database className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2 sm:gap-3 mb-1 flex-wrap">
-                <span className="px-1.5 sm:px-2.5 py-0.5 sm:py-1 bg-indigo-50 text-indigo-600 text-[8px] sm:text-[10px] font-black uppercase tracking-widest rounded-md border border-indigo-100">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[8px] md:text-[9px] font-black uppercase tracking-widest rounded-md border border-indigo-100">
                   Optional
                 </span>
                 {dematAdded && (
-                  <span className="flex items-center gap-1 text-[8px] sm:text-[10px] font-black uppercase px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-emerald-600 bg-emerald-50 border border-emerald-100">
-                    <CheckCircle2 size={8} className="sm:w-3 sm:h-3" />
+                  <span className="flex items-center gap-1 text-[8px] md:text-[9px] font-black uppercase px-2 py-0.5 rounded-full text-emerald-600 bg-emerald-50 border border-emerald-100">
+                    <CheckCircle2 size={10} className="shrink-0" />
                     Added
                   </span>
                 )}
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 truncate">
-                Demat Account <span className="text-slate-400 text-xs sm:text-sm font-normal"></span>
+              <h3 className="text-base md:text-lg font-bold text-slate-900 truncate">
+                Demat Account
               </h3>
-              <p className="text-[10px] sm:text-xs text-slate-500 truncate">
+              <p className="text-[10px] md:text-xs text-slate-500 truncate">
                 Link your Demat account for seamless trading experience
               </p>
             </div>
@@ -608,76 +607,76 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
         </div>
 
         {dematAdded ? (
-          <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-emerald-50 rounded-lg sm:rounded-xl border border-emerald-100">
-            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
-              <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-600" />
+          <div className="flex items-center gap-3 md:gap-4 p-4 md:p-6 bg-emerald-50 rounded-xl border border-emerald-100">
+            <div className="w-8 h-8 md:w-12 md:h-12 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+              <CheckCircle2 className="w-4 h-4 md:w-6 md:h-6 text-emerald-600" />
             </div>
             <div className="min-w-0">
-              <h4 className="text-sm sm:text-base font-bold text-emerald-800 truncate">
+              <h4 className="text-sm md:text-base font-bold text-emerald-800 truncate">
                 Demat Account Added Successfully!
               </h4>
-              <p className="text-xs sm:text-sm text-emerald-600 truncate">
+              <p className="text-xs md:text-sm text-emerald-600 truncate">
                 Your demat account has been linked to your profile.
               </p>
             </div>
           </div>
         ) : (
-          <div className="space-y-4 sm:space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-4 md:space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
                   DP ID
                 </label>
                 <input
                   type="text"
                   value={dematDetails.dp_id}
                   onChange={(e) => setDematDetails({...dematDetails, dp_id: e.target.value.toUpperCase()})}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  className="w-full px-4 py-2.5 rounded-xl text-xs md:text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   placeholder="Enter DP ID"
                 />
               </div>
               <div>
-                <label className="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
                   Client ID
                 </label>
                 <input
                   type="text"
                   value={dematDetails.client_id}
                   onChange={(e) => setDematDetails({...dematDetails, client_id: e.target.value.toUpperCase()})}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  className="w-full px-4 py-2.5 rounded-xl text-xs md:text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   placeholder="Enter Client ID"
                 />
               </div>
               <div>
-                <label className="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
                   Depository
                 </label>
                 <select
                   value={dematDetails.depository}
                   onChange={(e) => setDematDetails({...dematDetails, depository: e.target.value})}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  className="w-full px-4 py-2.5 rounded-xl text-xs md:text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 >
                   <option value="NSDL">NSDL</option>
                   <option value="CDSL">CDSL</option>
                 </select>
               </div>
               <div>
-                <label className="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
                   Name on Demat
                 </label>
                 <input
                   type="text"
                   value={dematDetails.demat_name}
                   onChange={(e) => setDematDetails({...dematDetails, demat_name: e.target.value.toUpperCase()})}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  className="w-full px-4 py-2.5 rounded-xl text-xs md:text-sm font-medium text-slate-700 bg-white border border-slate-200 focus:border-[#1CADA3] focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   placeholder="Name as per Account"
                 />
               </div>
             </div>
 
-            <div className="flex items-start gap-2 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-100">
-              <Info className="text-blue-600 w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 mt-0.5" />
-              <p className="text-[10px] sm:text-xs font-medium text-blue-700">
+            <div className="flex items-start gap-2 p-3 md:p-4 bg-blue-50 rounded-xl border border-blue-100">
+              <Info className="text-blue-600 w-4 h-4 flex-shrink-0 mt-0.5" />
+              <p className="text-[10px] md:text-[11px] font-medium text-blue-700">
                 Ensure details match your official demat statement exactly for successful verification.
               </p>
             </div>
@@ -686,7 +685,7 @@ export const KYCSection = ({ profile, onRefresh, isStep1Complete, isStep2Complet
               <button
                 onClick={handleAddDemat}
                 disabled={savingDemat}
-                className="w-full sm:w-auto px-6 py-2.5 bg-[#1CADA3] text-white rounded-lg font-bold text-xs sm:text-sm hover:bg-[#158f87] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 bg-[#1CADA3] text-white rounded-xl font-bold text-xs md:text-sm hover:bg-[#158f87] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {savingDemat ? (
                   <>

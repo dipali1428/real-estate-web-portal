@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import customerService from '../../services/customerService';
 import { 
     Send, X, User, Headset, Eye, CheckCircle2,
-    ArrowLeft, ShieldCheck, Loader2, Bookmark, Search
+    ArrowLeft, ShieldCheck, Loader2, Plus, Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -237,42 +237,51 @@ export default function HelpSupport() {
                 </div>
             )}
 
-            {/* Header - Padding adjusted to p-6 */}
+            {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white shadow-lg"
-            >   
-                <div className="flex items-center gap-2 mb-2">
-                    <Bookmark className="w-5 h-8 text-white" />
-                    <h2 className="text-2xl font-bold">Wishlist</h2>
+                className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 text-white shadow-lg"
+            >
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                    <div>
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-2">
+                            <ShieldCheck className="opacity-80 w-5 h-5 sm:w-6 sm:h-6" /> Help & Support
+                        </h2>
+                        <p className="text-xs sm:text-sm opacity-80 mt-1">Track your requests or get expert assistance</p>
+                    </div>
+                    {view === 'list' && (
+                        <button 
+                            onClick={() => setView('create')}
+                            className="bg-white text-[#2076C7] hover:bg-gray-100 px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95"
+                        >
+                            <Plus size={16} strokeWidth={3} /> Raise Ticket
+                        </button>
+                    )}
                 </div>
-                <p className="text-sm opacity-80">
-                    Track and manage your potential investments
-                </p>
             </motion.div>
 
             {/* VIEW 1: DASHBOARD TABLE */}
             {view === 'list' && (
                 <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    {/* Tabs - Horizontal Scroll on Mobile */}
+                    {/* Tabs - Stacked on mobile, horizontal on desktop */}
                     <div className="w-full mb-6">
-                        <div className="flex justify-center overflow-x-auto pb-2 scrollbar-hide">
-                            <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                        <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-1">
+                            <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-xl sm:rounded-full flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 sm:gap-1 relative shadow-inner border border-slate-200/50">
                                 {filterTabs.map((tab) => (
                                     <button
                                         key={tab.id}
                                         onClick={() => setSelectedFilter(tab.id)}
-                                        className={`relative px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-2 shrink-0 ${
+                                        className={`relative px-4 sm:px-5 py-2.5 rounded-lg sm:rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center justify-center gap-2 w-full sm:w-auto ${
                                             selectedFilter === tab.id
                                                 ? 'text-white'
-                                                : 'text-slate-500 hover:text-slate-700'
+                                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                                         }`}
                                     >
                                         {selectedFilter === tab.id && (
                                             <motion.div
                                                 layoutId="activeSupportTab"
-                                                className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                                                className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-lg sm:rounded-full -z-10 shadow-sm"
                                                 transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                                             />
                                         )}
@@ -292,7 +301,7 @@ export default function HelpSupport() {
                         </div>
                     </div>
 
-                    {/* Search Bar - Positioned below items per request */}
+                    {/* Search Bar */}
                     <div className="mb-6 flex justify-start">
                         <div className="relative w-full max-w-md">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />

@@ -84,15 +84,23 @@ export default function LeadsDashboard() {
   const [activeSubId, setActiveSubId] = useState<string | null>(null);
   const [allLeads, setAllLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     const fetchAllData = async () => {
-      try {
-        setLoading(true);
-        const [resDetail, resReferral] = await Promise.all([
-          AdminService.getAllDetailLeads({ limit: 1000 }),
-          AdminService.getAllReferralLeads()
-        ]);
+     try {
+    setLoading(true);
+    const [resDetail, resReferral] = await Promise.all([
+      AdminService.getAllDetailLeads({ limit: 1000 }),
+      AdminService.getAllReferralLeads()
+    ]);
+
+    // EXTRACT TOTAL COUNT HERE
+    const detailCount = resDetail.total_count || 0; 
+    // If referral leads also has a total_count property, use it; otherwise use array length
+    const referralCount = resReferral.total_count || (resReferral.referral_leads || resReferral.data || []).length;
+    
+    setTotalCount(detailCount + referralCount);
 
         // Tag sources to differentiate
         const dLeads = (resDetail.detail_leads || []).map((l: any) => ({ ...l, sourceType: 'detailed' }));
@@ -176,7 +184,7 @@ export default function LeadsDashboard() {
             {DEPARTMENTS.map((dept) => {
               const dData = counts.dept[dept.id] || { total: 0, detailed: 0, referral: 0 };
               return (
-                <div key={dept.id} onClick={() => setActiveDeptId(dept.id)} className="group cursor-pointer border border-slate-200 rounded-xl p-6 transition-all hover:shadow-md bg-white">
+                <div key={dept.id} onClick={() => { setActiveDeptId(dept.id); setActiveSubId(dept.subcategories[0].id);}} className="group cursor-pointer border border-slate-200 rounded-xl p-6 transition-all hover:shadow-md bg-white">
                   <div className="flex justify-between items-start">
                     <div className="p-2.5 rounded-lg bg-[#2076C7] text-white"><dept.icon size={20} /></div>
                     <ChevronRight size={18} className="text-slate-300 group-hover:text-slate-700" />

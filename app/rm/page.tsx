@@ -77,6 +77,8 @@ export default function Dashboard() {
       } else {
         toast.error("Failed to fetch dashboard data.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,9 +86,9 @@ export default function Dashboard() {
     if (!hasFetched.current) {
       hasFetched.current = true;
       // setLoading(true);
-      fetchDashboardData().finally(() => setLoading(false));
+      fetchDashboardData()
     }
-  }, []);
+  }, [fetchDashboardData]);
 
   if (loading) {
     return <div className="p-6 text-center text-lg">Loading Dashboard...</div>;
