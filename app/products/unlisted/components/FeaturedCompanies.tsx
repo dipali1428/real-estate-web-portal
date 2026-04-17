@@ -152,14 +152,13 @@ export default function FeaturedCompanies({ companies, loading, onEnquire }: any
                                     >
                                         {/* RECTANGULAR IMAGE CONTAINER - Exact same as BuyShares */}
                                         <div className="w-full h-32 bg-gray-50 rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden">
-                                            <Image 
-                                                src={c.logo_url || `https://placehold.co/200x150/2076C7/white?text=${c.name.charAt(0)}`}
-                                                alt={c.name}
-                                                className="w-full h-full object-contain p-3 transition-all duration-700 group-hover:scale-110"
-                                                onError={(e) => {
-                                                    (e.target as HTMLImageElement).src = `https://placehold.co/200x150/2076C7/white?text=${c.name.charAt(0)}`;
-                                                }}
-                                            />
+                                        <Image
+                                            src={c.logo_url || `https://placehold.co/200x150/2076C7/white?text=${c.name?.charAt(0) || 'C'}`}
+                                            alt={c.name ? `${c.name} logo` : 'Company logo'}
+                                            width={200}
+                                            height={150}
+                                            className="w-full h-full object-contain p-3 transition-all duration-700 group-hover:scale-110"
+                                        />
                                         </div>
 
                                         {/* Company Details - Same padding and styling as BuyShares */}
