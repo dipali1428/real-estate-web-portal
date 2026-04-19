@@ -260,8 +260,8 @@ export default function CareersContent() {
                 key={f}
                 onClick={() => setActiveFilter(f)}
                 className={`px-6 py-2 rounded-full font-semibold border transition-all text-sm ${activeFilter === f
-                    ? "bg-[#2076C7] text-white border-[#2076C7]"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-[#2076C7] hover:text-[#2076C7]"
+                  ? "bg-[#2076C7] text-white border-[#2076C7]"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-[#2076C7] hover:text-[#2076C7]"
                   }`}
               >
                 {f.charAt(0).toUpperCase() + f.slice(1)} {f === 'all' ? 'Positions' : ''}
@@ -500,15 +500,15 @@ function StatItem({ value, label }: { value: string, label: string }) {
   );
 }
 
-function GalleryImage({ src, alt }: { src: string, alt: string }) {
+function GalleryImage({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="h-64 rounded-lg overflow-hidden group">
-      <Image 
-        src={src} 
-        alt={alt} 
+    <div className="relative h-64 w-full rounded-lg overflow-hidden group">
+      <Image
+        src={src}
+        alt={alt}
         fill
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className="object-cover transition-transform duration-500 group-hover:scale-110" 
+        className="object-cover transition-transform duration-500 group-hover:scale-110"
       />
     </div>
   );
