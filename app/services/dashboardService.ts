@@ -203,10 +203,24 @@ export const DashboardService = {
         const response = await api.get("/api/dashboard/profile/kyc-status");
         return response.data;
     },
-    
+
     // 🔹 Get Referral Users (Co-Partners)
     getReferralUsers: async () => {
         const response = await api.get("/api/dashboard/profile/get-referral-user");
+        return response.data;
+    },
+
+    // 🔹 Get Campaigns
+    getCampaigns: async () => {
+        const response = await api.get("/api/dashboard/campaigns");
+        return response.data;
+    },
+
+    // 🔹 Download Campaign Image (Returns a Blob)
+    downloadCampaign: async (id: string | number) => {
+        const response = await api.get(`/api/dashboard/campaigns/download/${id}`, {
+            responseType: 'blob'
+        });
         return response.data;
     },
 };
