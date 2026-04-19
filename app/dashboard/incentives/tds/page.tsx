@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useMemo, useEffect } from 'react';
-import { 
-  Download, 
-  FileText, 
-  Loader2, 
-  X, 
-  User, 
-  Building2, 
+import {
+  Download,
+  FileText,
+  Loader2,
+  X,
+  User,
+  Building2,
   Clock,
   CheckCircle2,
   ExternalLink,
@@ -37,18 +37,17 @@ export default function TDSManagement() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPdf, setSelectedPdf] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalDeductions, setTotalDeductions] = useState<string>("0"); 
-  const itemsPerPage = 6; 
+  const [totalDeductions, setTotalDeductions] = useState<string>("0");
+  const itemsPerPage = 6;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch TDS Records and Totals from the same API
         const res = await DashboardService.getTdsDetails();
-        console.log("Fetched TDS Data:", res);
-        
+
         // 1. Set Records
         const safeData = Array.isArray(res?.tds) ? res.tds : res?.tds ? [res.tds] : [];
         setRecords(safeData);
@@ -140,7 +139,7 @@ export default function TDSManagement() {
           ))}
         </div>
 
-       
+
         {/* Full-Width Records */}
         <div className="space-y-6">
           {isLoading ? (
@@ -181,15 +180,14 @@ export default function TDSManagement() {
                   {[1, 2, 3].map((q) => {
                     const url = record[`q${q}_pdf_url` as keyof TDS] as string;
                     const isAvailable = !!url;
-                    
+
                     return (
-                      <div 
-                        key={q} 
-                        className={`p-6 rounded-[1.5rem] border transition-all flex flex-col justify-between min-h-[220px] ${
-                          isAvailable 
-                          ? 'bg-white border-slate-100 hover:border-[#2076C7]/20 shadow-sm' 
-                          : 'bg-slate-50 border-dashed border-slate-200 opacity-60'
-                        }`}
+                      <div
+                        key={q}
+                        className={`p-6 rounded-[1.5rem] border transition-all flex flex-col justify-between min-h-[220px] ${isAvailable
+                            ? 'bg-white border-slate-100 hover:border-[#2076C7]/20 shadow-sm'
+                            : 'bg-slate-50 border-dashed border-slate-200 opacity-60'
+                          }`}
                       >
                         <div>
                           <div className="flex justify-between items-start mb-4">
@@ -209,7 +207,7 @@ export default function TDSManagement() {
                           <h4 className="text-base font-semibold text-slate-800">Quarter 0{q}</h4>
                           <p className="text-[11px] text-gray-500 font-medium">TDS Certificate Form 16A</p>
                         </div>
-                        
+
                         {isAvailable ? (
                           <div className="grid grid-cols-2 gap-2 mt-6">
                             <button
@@ -265,9 +263,9 @@ export default function TDSManagement() {
                 <iframe src={`${selectedPdf}#toolbar=0`} className="w-full h-full rounded-xl border border-slate-200 bg-white" title="TDS Preview" />
               </div>
               <div className="px-6 py-4 bg-white border-t flex justify-end gap-3">
-                <button 
-                   onClick={() => handleDownloadPdf(selectedPdf, 'TDS_Document.pdf')}
-                   className="px-6 py-2.5 bg-[#2076C7] text-white rounded-xl font-bold text-[11px] uppercase tracking-tight hover:bg-[#1a62a5] transition-all shadow-md shadow-blue-500/10"
+                <button
+                  onClick={() => handleDownloadPdf(selectedPdf, 'TDS_Document.pdf')}
+                  className="px-6 py-2.5 bg-[#2076C7] text-white rounded-xl font-bold text-[11px] uppercase tracking-tight hover:bg-[#1a62a5] transition-all shadow-md shadow-blue-500/10"
                 >
                   Download Certificate
                 </button>
