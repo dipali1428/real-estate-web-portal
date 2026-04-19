@@ -329,5 +329,43 @@ export const AdminService = {
     const response = await api.get(`/api/admin/assigned-dsas`, { params });
     return response.data;
   },
+
+  prefillLogs: async () => {
+    const response = await api.get("/api/admin/get-prefill-logs");
+    return response.data;
+  },
+
+  uploadCampaign: async (payload: { 
+    templateName: string; 
+    category: string; 
+    subCategory: string; 
+    description: string; 
+    image: File 
+  }) => {
+    const formData = new FormData();
+    formData.append("templateName", payload.templateName);
+    formData.append("category", payload.category);
+    formData.append("subCategory", payload.subCategory);
+    formData.append("description", payload.description);
+    formData.append("image", payload.image);
+
+    const res = await api.post("/api/admin/upload-campaign", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  },
+
+  getCampaigns: async () => {
+    const response = await api.get("/api/admin/campaigns");
+    return response.data;
+  },
+
+  async deleteCampaign(id: string) {
+    const response = await api.delete(`/api/admin/campaigns/${id}`);
+    return response.data;
+  }
+
 };
 

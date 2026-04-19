@@ -44,6 +44,7 @@ import {
     Notebook,
     ShieldPlus,
     Contact,
+    LayoutTemplate,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -200,6 +201,7 @@ export const sidebarLinks = {
             ],
 
         },
+        { label: "Marketing", href: "/admin/marketing", icon: <LayoutTemplate className="h-5 w-5 text-neutral-700" />, },
     ],
 
     GM: [],
