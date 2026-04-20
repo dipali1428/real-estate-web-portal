@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
+import {
   TrendingUp, Wallet, Briefcase, PieChart as PieChartIcon, AlertCircle, Building,
   ArrowUpRight, FolderOpen, Banknote, Shield
 } from 'lucide-react';
@@ -27,6 +27,21 @@ interface UnlistedShares {
   holdings: PortfolioHolding[];
 }
 
+interface MutualFundHolding {
+  fund_name: string;
+  units: number;
+  nav: number;
+  invested_value: number;
+  current_value: number;
+}
+
+interface MutualFunds {
+  totalInvestment: number;
+  currentValue: number;
+  returns: number;
+  holdings: MutualFundHolding[];
+}
+
 interface PortfolioData {
   success: boolean;
   message: string;
@@ -38,7 +53,7 @@ interface PortfolioData {
     };
     portfolio: {
       unlisted_shares: UnlistedShares;
-      mutual_funds: any;
+      mutual_funds: MutualFunds;
       loans: any;
       insurance: any;
     };
@@ -83,13 +98,17 @@ interface CategoryCardProps {
   data: any;
   isUnlisted?: boolean;
   unlistedData?: UnlistedShares;
+  mutualFundData?: MutualFunds;
+  isMutualFund?: boolean;
 }
 
-const CategoryCard = ({ title, icon, color, data, isUnlisted, unlistedData }: CategoryCardProps) => {
+const CategoryCard = ({ title, icon, color, data, isUnlisted, isMutualFund, unlistedData, mutualFundData }: CategoryCardProps) => {
   const hasData = data !== null;
   const holdings = unlistedData?.holdings || [];
   const hasHoldings = holdings.length > 0;
-  
+  const mfHoldings = mutualFundData?.holdings || [];
+  // const hasMfHoldings = mfHoldings.length > 0;
+
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all">
       <div className="flex items-center gap-3 mb-4">
@@ -98,7 +117,7 @@ const CategoryCard = ({ title, icon, color, data, isUnlisted, unlistedData }: Ca
         </div>
         <h3 className="font-semibold text-gray-800 text-lg">{title}</h3>
       </div>
-      
+
       {hasData ? (
         <>
           {isUnlisted && (
@@ -119,7 +138,44 @@ const CategoryCard = ({ title, icon, color, data, isUnlisted, unlistedData }: Ca
               </div>
             </div>
           )}
-          
+
+          {isMutualFund && (
+            <div className="space-y-3 mb-4">
+              <div className="flex justify-between">
+                <span className="text-gray-500 text-sm">Investment</span>
+                <span className="font-semibold">
+                  {formatCurrency(mutualFundData?.totalInvestment || 0)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500 text-sm">Current Value</span>
+                <span className="font-semibold">
+                  {formatCurrency(mutualFundData?.currentValue || 0)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500 text-sm">Returns</span>
+                <span className="{font-semibold ${(mutualFundData?.returns || 0) >= 0 ? 'text-green-600' : 'text-red-600'}}">
+                  {formatCurrency(mutualFundData?.returns || 0)}
+                </span>
+              </div>
+            </div>
+          )}
+          {/* {hasMfHoldings && (
+  <div className="mt-4 pt-4 border-t">
+    <p className="text-xs text-gray-500 mb-2">
+      Holdings: {mfHoldings.length}
+    </p>
+
+    {mfHoldings.slice(0, 3).map((fund, i) => (
+      <div key={i} className="flex justify-between text-sm">
+        <span className="truncate">{fund.fund_name}</span>
+        <span>{formatCurrency(fund.current_value)}</span>
+      </div>
+    ))}
+  </div>
+)} */}
+
           {hasHoldings && (
             <div className="mt-4 pt-4 border-t border-gray-100">
               <p className="text-xs text-gray-500 mb-2">Holdings: {holdings.length}</p>
@@ -133,6 +189,19 @@ const CategoryCard = ({ title, icon, color, data, isUnlisted, unlistedData }: Ca
                 {holdings.length > 3 && (
                   <p className="text-xs text-blue-500 mt-1">+{holdings.length - 3} more</p>
                 )}
+              </div>
+
+              <div className="mt-4 pt-4 border-t">
+                <p className="text-xs text-gray-500 mb-2">
+                  Holdings: {mfHoldings.length}
+                </p>
+
+                {mfHoldings.slice(0, 3).map((fund, i) => (
+                  <div key={i} className="flex justify-between text-sm">
+                    <span className="truncate">{fund.fund_name}</span>
+                    <span>{formatCurrency(fund.current_value)}</span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -164,9 +233,9 @@ export default function PortfolioPage() {
         router.push("/");
         return;
       }
-      
+
       const response = await customerService.getPortfolio();
-      
+
       if (response.success && response.data) {
         setPortfolioData(response);
         setLastUpdated(new Date().toLocaleTimeString('en-IN', {
@@ -224,29 +293,29 @@ export default function PortfolioPage() {
     currentValue: 0,
     totalReturns: 0
   };
-  
+
   const unlistedShares = portfolioData?.data?.portfolio?.unlisted_shares || {
     totalInvestment: 0,
     currentValue: 0,
     returns: 0,
     holdings: []
   };
-  
+
   const mutualFunds = portfolioData?.data?.portfolio?.mutual_funds;
   const loans = portfolioData?.data?.portfolio?.loans;
   const insurance = portfolioData?.data?.portfolio?.insurance;
-  
+
   const holdings = unlistedShares.holdings || [];
   const holdingsCount = holdings.length;
-  const absoluteReturn = summary.totalInvestment > 0 
-    ? ((summary.currentValue - summary.totalInvestment) / summary.totalInvestment) * 100 
+  const absoluteReturn = summary.totalInvestment > 0
+    ? ((summary.currentValue - summary.totalInvestment) / summary.totalInvestment) * 100
     : 0;
 
   // Check if portfolio is completely empty
-  const isPortfolioEmpty = summary.totalInvestment === 0 && 
-                          summary.currentValue === 0 && 
-                          summary.totalReturns === 0 && 
-                          holdingsCount === 0;
+  const isPortfolioEmpty = summary.totalInvestment === 0 &&
+    summary.currentValue === 0 &&
+    summary.totalReturns === 0 &&
+    holdingsCount === 0;
 
   // Loading state
   if (loading) {
@@ -275,8 +344,7 @@ export default function PortfolioPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="relative bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white"
-        >
+          className="relative bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white">
           <div className="flex justify-between items-start flex-wrap gap-4">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold mb-2 flex items-center gap-2">
@@ -287,7 +355,7 @@ export default function PortfolioPage() {
                 Track and manage your investment portfolio
               </p>
             </div>
-            <div className="flex gap-2">          
+            <div className="flex gap-2">
             </div>
           </div>
         </motion.div>
@@ -300,19 +368,19 @@ export default function PortfolioPage() {
         >
           {/* 1️⃣ Top Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <KpiCard 
+            <KpiCard
               icon={<Wallet className="w-6 h-6" />}
               color="from-[#2076C7] to-[#1CADA3]"
               value={formatLargeNumber(summary.totalInvestment)}
               label="Total Investment"
             />
-            <KpiCard 
+            <KpiCard
               icon={<TrendingUp className="w-6 h-6" />}
               color="from-[#2076C7] to-[#1CADA3]"
               value={formatLargeNumber(summary.currentValue)}
               label="Current Value"
             />
-            <KpiCard 
+            <KpiCard
               icon={<ArrowUpRight className="w-6 h-6" />}
               color="from-[#2076C7] to-[#1CADA3]"
               value={formatLargeNumber(Math.abs(summary.totalReturns))}
@@ -330,7 +398,7 @@ export default function PortfolioPage() {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Unlisted Shares Card */}
-              <CategoryCard 
+              <CategoryCard
                 title="Unlisted Shares"
                 icon={<Building className="w-5 h-5" />}
                 color="from-[#2076C7] to-[#1CADA3]"
@@ -340,15 +408,17 @@ export default function PortfolioPage() {
               />
 
               {/* Mutual Funds Card */}
-              <CategoryCard 
+              {/* Mutual Funds Card */}
+              <CategoryCard
                 title="Mutual Funds"
                 icon={<PieChartIcon className="w-5 h-5" />}
                 color="from-[#2076C7] to-[#1CADA3]"
                 data={mutualFunds}
+                isMutualFund={true}
+                mutualFundData={mutualFunds}
               />
-
               {/* Loans Card */}
-              <CategoryCard 
+              <CategoryCard
                 title="Loans"
                 icon={<Banknote className="w-5 h-5" />}
                 color="from-[#2076C7] to-[#1CADA3]"
@@ -356,7 +426,7 @@ export default function PortfolioPage() {
               />
 
               {/* Insurance Card */}
-              <CategoryCard 
+              <CategoryCard
                 title="Insurance"
                 icon={<Shield className="w-5 h-5" />}
                 color="from-[#2076C7] to-[#1CADA3]"
@@ -365,7 +435,7 @@ export default function PortfolioPage() {
             </div>
           </div>
 
-       </motion.div>
+        </motion.div>
       </section>
 
       <style jsx>{`
