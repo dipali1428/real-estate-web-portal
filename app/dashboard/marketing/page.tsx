@@ -78,7 +78,13 @@ export default function ImageTemplates() {
       try {
         // 1. Fetch the image directly from the S3 Signed URL
         // We use fetch() to get a Blob to bypass Canvas CORS 'tainting'
-        const response = await fetch(template.imageUrl);
+        const cacheBustedUrl = `${template.imageUrl}${template.imageUrl.includes('?') ? '&' : '?'}_=${Date.now()}`;
+        const response = await fetch(cacheBustedUrl, {
+          mode: 'cors',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
 
         if (!response.ok) {
           throw new Error(`Failed to fetch image from S3. Status: ${response.status}`);
