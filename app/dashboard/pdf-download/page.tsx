@@ -7,7 +7,6 @@ interface DownloadItem {
   id: string;
   name: string;
   type: 'pdf' | 'doc' | 'xlsx';
-  size: string;
   uploadDate: string;
   category: 'payout' | 'brochures' | 'forms';
   month?: string;
@@ -34,241 +33,35 @@ export default function Downloads() {
   const downloadData: DownloadItem[] = [
 
     // Insurance - Motor Insurance
+
     {
-      id: '1',
-      name: 'MAHARASHTRA_DSA_PAYOUT_GRID_MARCH_2026.pdf',
+      id: '48',
+      name: 'DSA_GOA_GRID_MOTOR_INSURANCES_APRIL_2026.pdf',
       type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-3-8',
+      uploadDate: '2026-4-20',
       category: 'payout',
-      month: 'march-2026',
+      month: 'april-2026',
       year: '2026',
       subCategory: 'motor-insurance',
-      filePath: '/pdfs/motorinsurancepdf/MAHARASHTRA_DSA_GRID_MARCH_2026.pdf'
+      filePath: '/pdfs/motorinsurancepdf/DSA_GOA_GRID_MOTOR_INSURANCES_APRIL_2026.pdf'
     },
     {
-      id: '2',
-      name: 'DSA_GUJARAT_PAYOUT_GRID_MARCH_2026.pdf',
+      id: '49',
+      name: 'DSA_WEST_BENGAL_GRID_MOTOR_APRIL_2026.pdf',
       type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-3-8',
+      uploadDate: '2026-4-20',
       category: 'payout',
-      month: 'march-2026',
+      month: 'april-2026',
       year: '2026',
       subCategory: 'motor-insurance',
-      filePath: '/pdfs/motorinsurancepdf/DSA_GUJARAT_DD_&_DN_HO_GRID_MARCH_2026.pdf'
+      filePath: '/pdfs/motorinsurancepdf/DSA_WEST_BENGAL_GRID_MOTOR_APRIL_2026.pdf'
     },
-    {
-      id: '3',
-      name: 'DSA_RAJASTHAN_GRID_MARCH_2026.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-3-8',
-      category: 'payout',
-      month: 'march-2026',
-      year: '2026',
-      subCategory: 'motor-insurance',
-      filePath: '/pdfs/motorinsurancepdf/DSA_RAJASTHAN_GRID_MARCH_2026.pdf'
-    },
-    {
-      id: '4',
-      name: 'DSA_WEST_BENGAL_GRID_MARCH_2026.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-3-8',
-      category: 'payout',
-      month: 'march-2026',
-      year: '2026',
-      subCategory: 'motor-insurance',
-      filePath: '/pdfs/motorinsurancepdf/DSA_WEST_BENGAL_GRID_MARCH_2026.pdf'
-    },
-    
-    // Insurance - Life Insurance
-    {
-      id: '5',
-      name: 'Axis_max_LI_Feb_2026.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-2-10',
-      category: 'payout',
-      month: 'february-2026',
-      year: '2026',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/Axis_max_LI_Feb_2026.pdf'
-    },
-    {
-      id: '6',
-      name: 'HDFC_LIFE_FEB_26.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-2-10',
-      category: 'payout',
-      month: 'february-2026',
-      year: '2026',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE_FEB_26.pdf'
-    },
-    {
-      id: '7',
-      name: 'ICICI_PRUDENTIAL_LIFE_FEB_26.pd',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-2-10',
-      category: 'payout',
-      month: 'february-2026',
-      year: '2026',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/ICICI_PRUDENTIAL_LIFE_FEB_26.pdf'
-    },
-    {
-      id: '8',
-      name: 'DIGIT_LIFE_FEB_26.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-2-10',
-      category: 'payout',
-      month: 'february-2026',
-      year: '2026',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/DIGIT_LIFE_FEB_26.pdf'
-    },
-    {
-      id: '9',
-      name: 'BAJAJ_ALLIANZ_LIFE_FEB_26.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-2-10',
-      category: 'payout',
-      month: 'february-2026',
-      year: '2026',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/BAJAJ_ALLIANZ_LIFE_FEB_26.pdf'
-    },
-    {
-      id: '10',
-      name: 'TATA_LIFE_FEB_26.pd',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-2-10',
-      category: 'payout',
-      month: 'february-2026',
-      year: '2026',
-      subCategory: 'life-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/TATA_LIFE_FEB_26.pdf'
-    },
-    // {
-    //   id: '9',
-    //   name: 'HDFC_LIFE_GRID_50 %.pdf',
-    //   type: 'pdf',
-    //   size: '2.4 MB',
-    //   uploadDate: '2026-1-14',
-    //   category: 'payout',
-    //   month: 'january-2026',
-    //   year: '2026',
-    //   subCategory: 'life-insurance',
-    //   filePath: '/pdfs/lifeinsurancepdf/HDFC_LIFE_GRID_50 %.pdf'
-    // },
-    // {
-    //   id: '10',
-    //   name: 'ICICI_LIFE.pdf',
-    //   type: 'pdf',
-    //   size: '2.4 MB',
-    //   uploadDate: '2026-1-14',
-    //   category: 'payout',
-    //   month: 'january-2026',
-    //   year: '2026',
-    //   subCategory: 'life-insurance',
-    //   filePath: '/pdfs/lifeinsurancepdf/ICICI_LIFE.pdf'
-    // },
-    // {
-    //   id: '11',
-    //   name: 'ICICI_LIFE_GRID_50%.pdf',
-    //   type: 'pdf',
-    //   size: '2.4 MB',
-    //   uploadDate: '2026-1-14',
-    //   category: 'payout',
-    //   month: 'january-2026',
-    //   year: '2026',
-    //   subCategory: 'life-insurance',
-    //   filePath: '/pdfs/lifeinsurancepdf/ICICI_LIFE_GRID_50%.pdf'
-    // },
-    // {
-    //   id: '12',
-    //   name: 'TATA_AIA_GRID.pdf',
-    //   type: 'pdf',
-    //   size: '2.4 MB',
-    //   uploadDate: '2026-1-14',
-    //   category: 'payout',
-    //   month: 'january-2026',
-    //   year: '2026',
-    //   subCategory: 'life-insurance',
-    //   filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_GRID.pdf'
-    // },
-    // {
-    //   id: '13',
-    //   name: 'TATA_AIA_GRID_50 %.pdf',
-    //   type: 'pdf',
-    //   size: '2.4 MB',
-    //   uploadDate: '2026-1-14',
-    //   category: 'payout',
-    //   month: 'january-2026',
-    //   year: '2026',
-    //   subCategory: 'life-insurance',
-    //   filePath: '/pdfs/lifeinsurancepdf/TATA_AIA_GRID_50 %.pdf'
-    // },
-    // Insurance - Health Insurance
-     {
-      id: '14',
-      name: 'HEALTH_GRID_MARCH_2026_PDF.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      uploadDate: '2026-3-8',
-      category: 'payout',
-      month: 'march-2026',
-      year: '2026',
-      subCategory: 'health-insurance',
-      filePath: '/pdfs/lifeinsurancepdf/HEALTH_GRID_MARCH_2026_PDF.pdf'
-    },
-    // {
-    //   id: '15',
-    //   name: 'HEALTH_GRID_MONTH_OF_JANUARY_80%.pdf',
-    //   type: 'pdf',
-    //   size: '2.4 MB',
-    //   uploadDate: '2026-1-14',
-    //   category: 'payout',
-    //   month: 'january-2026',
-    //   year: '2026',
-    //   subCategory: 'health-insurance',
-    //   filePath: '/pdfs/lifeinsurancepdf/HEALTH_GRID_MONTH_OF_JANUARY_80%.pdf'
-    // },
-    // // Loan - Home Loan
-    // {
-    //   id: '16',
-    //   name: 'IA_Jan_Payout_Structure.pdf',
-    //   type: 'pdf',
-    //   size: '2.4 MB',
-    //   uploadDate: '2026-1-14',
-    //   category: 'payout',
-    //   month: 'january-2026',
-    //   year: '2026',
-    //   subCategory: 'home-loan',
-    //   filePath: '/pdfs/homeloan/IA_Jan_Payout_Structure.pdf'
-    // },
-    // Loan - Business Loan
-
-
-    // Loan - LAP Loan
-
-
-    // Loan - Personal Loan
-
-
+  
     // Product Brochures
     {
       id: '29',
       name: 'HDFC_Life_Sanchay_Plus_V24_.pdf',
       type: 'pdf',
-      size: '4.2 MB',
       uploadDate: '2025-11-01',
       category: 'brochures',
       subCategory: 'life-insurance',
@@ -278,7 +71,6 @@ export default function Downloads() {
       id: '30',
       name: 'HDFC_Life_Click.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'life-insurance',
@@ -288,7 +80,6 @@ export default function Downloads() {
       id: '31',
       name: 'Bajaj-Allianz-Term-Insurance-Brochure_.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'life-insurance',
@@ -298,7 +89,6 @@ export default function Downloads() {
       id: '32',
       name: 'Bajaj_Etouch_Brochure.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'life-insurance',
@@ -308,7 +98,6 @@ export default function Downloads() {
       id: '33',
       name: 'ACE_Variants_One.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'life-insurance',
@@ -318,7 +107,6 @@ export default function Downloads() {
       id: '34',
       name: 'HDFC_Life-_Systematic_Pension_Plan.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'life-insurance',
@@ -328,7 +116,6 @@ export default function Downloads() {
       id: '35',
       name: 'Health_insurance_Medicare_Select_One_Pager.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
@@ -338,7 +125,6 @@ export default function Downloads() {
       id: '36',
       name: 'Health_Insurance_Creative_Brief_MediCare_Select_Launch.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
@@ -348,7 +134,6 @@ export default function Downloads() {
       id: '37',
       name: 'Elevate_One_Page.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
@@ -358,7 +143,6 @@ export default function Downloads() {
       id: '38',
       name: 'Broc_New_Elevate.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
@@ -368,7 +152,6 @@ export default function Downloads() {
       id: '39',
       name: 'Fabing_One_Pager_MAX_Sept2023.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
@@ -378,7 +161,6 @@ export default function Downloads() {
       id: '40',
       name: 'Star_Flexi_One Pager_Preferred_R10.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
@@ -388,7 +170,6 @@ export default function Downloads() {
       id: '41',
       name: 'One_pager_Super_Star_Classic_R10.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
@@ -398,7 +179,6 @@ export default function Downloads() {
       id: '42',
       name: 'Star_Health_Assure_One_pager_Version_1.0.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
@@ -408,7 +188,6 @@ export default function Downloads() {
       id: '43',
       name: 'Star_Women_Care_One_Pager_version_1.0.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
@@ -418,7 +197,6 @@ export default function Downloads() {
       id: '44',
       name: 'SBI_General_Health_Alpha_Leaflet_Alpha_Select_Alpha_Ultimate.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
@@ -428,7 +206,6 @@ export default function Downloads() {
       id: '45',
       name: 'SBI_General_Health_Alpha_Brochure.pdf',
       type: 'pdf',
-      size: '3.8 MB',
       uploadDate: '2025-10-15',
       category: 'brochures',
       subCategory: 'health-insurance',
@@ -439,7 +216,6 @@ export default function Downloads() {
       id: '46',
       name: 'New Client Application Form.pdf',
       type: 'pdf',
-      size: '1.5 MB',
       uploadDate: '2025-11-05',
       category: 'forms',
       filePath: '/pdfs/forms/New_Client_Application_Form.pdf'
@@ -448,7 +224,6 @@ export default function Downloads() {
       id: '47',
       name: 'Policy Renewal Form.docx',
       type: 'doc',
-      size: '0.8 MB',
       uploadDate: '2025-10-25',
       category: 'forms',
       filePath: '/pdfs/forms/Policy_Renewal_Form.docx'
@@ -860,8 +635,6 @@ export default function Downloads() {
 
                             {/* Details */}
                             <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 mt-1 text-[11px] sm:text-xs text-slate-500">
-                              <span>{file.size}</span>
-                              <span className="hidden sm:inline">•</span>
                               <span>Uploaded {file.uploadDate}</span>
 
                               {file.subCategory && (
@@ -1072,12 +845,8 @@ export default function Downloads() {
                           <div className="min-w-0 flex-1">
                             <h4 className="text-sm font-medium text-slate-900 wrap-break-word">{file.name}</h4>
                             <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 mt-1 text-xs text-slate-500">
-                              <span>{file.size}</span>
-                              <span className="hidden sm:inline">•</span>
-                              <span>Uploaded {file.uploadDate}</span>
                               {file.subCategory && (
                                 <>
-                                  <span className="hidden sm:inline">•</span>
                                   <span className="bg-slate-100 text-slate-700 px-2 py-1 rounded-md text-xs">
                                     {getSubCategoryDisplayName(file.subCategory)}
                                   </span>
@@ -1133,8 +902,6 @@ export default function Downloads() {
                           <div className="min-w-0 flex-1">
                             <h4 className="text-sm font-medium text-slate-900 wrap-break-word">{file.name}</h4>
                             <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 mt-1 text-xs text-slate-500">
-                              <span>{file.size}</span>
-                              <span className="hidden sm:inline">•</span>
                               <span>Uploaded {file.uploadDate}</span>
                             </div>
                           </div>
