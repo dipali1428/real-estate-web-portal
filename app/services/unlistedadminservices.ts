@@ -303,4 +303,35 @@ export const AdminService = {
     });
     return response.data; // Returns { success, message, mode, applySoftDelete, rowsProcessed, rowsSkipped }
   },
+  /**
+     * Upload PMS Funds (Excel)
+     * POST → /api/unlisted/admin/pms/upload
+     */
+  uploadPMSFunds: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post("/api/unlisted/admin/pms/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data; // Returns { success, message, processed, skipped }
+  },
+
+  /**
+   * Get all PMS Funds (Admin)
+   * GET → /api/unlisted/admin/pms/funds
+   */
+  getPMSFunds: async () => {
+    const response = await api.get("/api/unlisted/admin/pms/funds");
+    return response.data;
+  },
+
+  /**
+   * Delete a PMS Fund
+   * DELETE → /api/unlisted/admin/pms/:id
+   */
+  deletePMSFund: async (id: number) => {
+    const response = await api.delete(`/api/unlisted/admin/pms/${id}`);
+    return response.data;
+  },
 };
+

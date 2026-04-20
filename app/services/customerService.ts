@@ -91,8 +91,8 @@ export interface KycStatusResponse {
 }
 
 export interface UpdateProfilePayload {
-  name: string;
-  mobile: string;
+    name: string;
+    mobile: string;
 }
 
 export interface DematDetailsParams {
@@ -114,21 +114,21 @@ export interface DematDetailsResponse {
 }
 
 interface Company {
-  id: number;
-  shares_name: string;
-  logo_url: string | null;  
-  price: string;
-  min_lot_size: number | null; 
-  depository_applicable: string | null;
+    id: number;
+    shares_name: string;
+    logo_url: string | null;
+    price: string;
+    min_lot_size: number | null;
+    depository_applicable: string | null;
 }
 
 // ==================== WISHLIST TYPES ====================
 
 export interface AddToWishlistParams {
     product_type: string;
-    product_id: number;
+    product_id: string | number;
     product_name: string;
-       nav?: string | number;
+    nav?: string | number;
     risk?: string;
 }
 
@@ -210,16 +210,16 @@ const CustomerService = {
     //    * Update current user profile
     //    * PUT → /api/unlisted/user/updateprofile
     //    */
-        updateProfile: async (profileData: UpdateProfilePayload) => {
-            const response = await api.put(
-                "/api/unlisted/user/updateprofile", 
-                {
-                    name: profileData.name,
-                    mobile: profileData.mobile
-                }
-            );
-            return response.data;
-        },
+    updateProfile: async (profileData: UpdateProfilePayload) => {
+        const response = await api.put(
+            "/api/unlisted/user/updateprofile",
+            {
+                name: profileData.name,
+                mobile: profileData.mobile
+            }
+        );
+        return response.data;
+    },
 
     /**
      * Update Profile Image
@@ -227,7 +227,7 @@ const CustomerService = {
      */
     updateProfileImage: async (formData: FormData) => {
         const response = await api.put("/api/dashboard/profile/image", formData, {
-            headers: { 
+            headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
@@ -398,7 +398,7 @@ const CustomerService = {
         return response.data;
     },
 
-      createTicket: async (ticketData: {
+    createTicket: async (ticketData: {
         category: string;
         product_type: string;
         reference_id: string;
@@ -487,17 +487,39 @@ const CustomerService = {
      */
 
     getrmcustomer: async () => {
-    const response = await api.get('/api/customer/rm/assigned-rm');
-    return response.data;
+        const response = await api.get('/api/customer/rm/assigned-rm');
+        return response.data;
     },
 
-      /**
-     * Get assigned relationship manager
-     * POST → /api/unlisted/user/logout
-     */
+    /**
+   * Get assigned relationship manager
+   * POST → /api/unlisted/user/logout
+   */
 
     logout: async () => {
         const response = await api.post("/api/unlisted/user/logout");
+        return response.data;
+    },
+
+    schedulePMSMeeting: async (meetingData: any, userId?: number) => {
+        const response = await api.post("/api/products/investments/pms-funds/meetings/schedule", {
+            ...meetingData,
+            user_id: userId
+        });
+        return response.data;
+    },
+
+    /**
+     * Get PMS meeting status
+     * GET → /api/products/investments/pms/meetings/status/:id
+     */
+    getPMSMeetingStatus: async (meetingId: number) => {
+        const response = await api.get(`/api/products/investments/meetings/status/${meetingId}`);
+        return response.data;
+    },
+
+    getPMSFundsList: async () => {
+        const response = await api.get("/api/products/investments/pms-funds/funds");
         return response.data;
     },
 
