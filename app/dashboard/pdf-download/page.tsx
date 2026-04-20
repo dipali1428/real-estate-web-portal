@@ -47,14 +47,14 @@ export default function Downloads() {
     },
     {
       id: '49',
-      name: 'DSA WEST BENGAL GRID MOTOR APRIL 2026.pdf',
+      name: 'DSA_WEST_BENGAL_GRID_MOTOR_APRIL_2026.pdf',
       type: 'pdf',
       uploadDate: '2026-4-20',
       category: 'payout',
       month: 'april-2026',
       year: '2026',
       subCategory: 'motor-insurance',
-      filePath: '/pdfs/motorinsurancepdf/DSA WEST BENGAL GRID MOTOR APRIL 2026.pdf'
+      filePath: '/pdfs/motorinsurancepdf/DSA_WEST_BENGAL_GRID_MOTOR_APRIL_2026.pdf'
     },
   
     // Product Brochures
