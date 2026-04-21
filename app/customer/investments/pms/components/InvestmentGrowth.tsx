@@ -10,34 +10,109 @@ import {
     Building2,
     Wallet,
     BarChart3,
-    ShieldCheck
+    ShieldCheck,
 } from 'lucide-react';
-import { 
-    AreaChart, 
-    Area, 
-    XAxis, 
-    YAxis, 
-    CartesianGrid, 
-    Tooltip, 
+import {
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
     ResponsiveContainer
 } from 'recharts';
-import { pmsProducts } from '../data/pmsData';
+import customerService from '../../../../services/customerService';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 // --- TYPES ---
 interface Investment {
     id: number;
-    fundName: string; // Changed from propertyId to be more explicit for PMS
+    fundName: string;
     amount: number;
     date: string;
-    units: number; // Renamed from factionTockens
+    units: number;
+}
+
+export interface PMSProduct {
+    id: number | string;
+    name: string;
+    desc: string;
+    link: string;
+    risk: string;
+    horizon: string;
+    color: string;
+    category: string;
+    returns: string;
+    minInvestment: string;
+    strategyDetails?: string;
+    holdings?: { name: string; weight: string }[];
+    benchmark?: string;
+    inceptionDate?: string;
+    investmentStyle?: string;
+    portfolioSize?: string;
+    performance?: { period: string; strategy: number; benchmark: number }[];
+    marketCap?: { label: string; value: number }[];
+    sectorAllocation?: { name: string; value: number }[];
+    strategyType?: string;
+    bestSuitedFor?: string;
 }
 
 export default function InvestmentGrowth() {
     const [isDemoMode, setIsDemoMode] = useState(false);
-    
+
     // Real Data (Empty for now)
-    const [realInvestments] = useState<Investment[]>([]); 
+    const [realInvestments, setRealInvestments] = useState<Investment[]>([]);
+    const [dynamicProducts, setDynamicProducts] = useState<PMSProduct[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [userId, setUserId] = useState<number | null>(null);
+
+    // Load real investments (Placeholder integration)
+    React.useEffect(() => {
+        const fetchUserAndPortfolio = async () => {
+            try {
+                const profile = await customerService.getProfile();
+                if (profile && profile.user) {
+                    setUserId(profile.user.id);
+                }
+
+                // Fetch dynamic pool of PMS funds so the UI can construct mapping even if activeInvestments is empty or demo
+                const funds = await customerService.getPMSFundsList();
+                const colors = ["#2076C7", "#1CADA3", "#8B5CF6", "#f59e0b", "#10b981", "#ef4444"];
+                const mappedProducts: PMSProduct[] = funds.map((f: any, idx: number) => ({
+                    id: f.id,
+                    name: f.fund_name || "Unknown Strategy",
+                    desc: f.description || "No description available.",
+                    link: `/products/pms/${f.id}`,
+                    risk: f.risk_level || "Moderate",
+                    horizon: "3-5 Years",
+                    color: colors[idx % colors.length],
+                    category: f.category || "Multi-Cap",
+                    returns: f.return_3y ? `${(f.return_3y * 100).toFixed(1)}%` : f.return_1y ? `${(f.return_1y * 100).toFixed(1)}%` : "15%",
+                    minInvestment: f.min_investment ? `₹${f.min_investment}` : "₹50L",
+                    strategyDetails: f.description,
+                    benchmark: f.benchmark,
+                    inceptionDate: f.inception_date ? new Date(f.inception_date).toLocaleDateString() : undefined,
+                    investmentStyle: f.portfolio_style,
+                    portfolioSize: f.aum ? `₹${f.aum}` : "N/A",
+                    strategyType: f.strategy_type,
+                    bestSuitedFor: f.notes,
+                    sectorAllocation: f.sector_exposure ? Object.entries(f.sector_exposure).map(([k, v]) => ({ name: k, value: Number(v) })) : undefined,
+                    marketCap: f.market_allocation ? Object.entries(f.market_allocation).map(([k, v]) => ({ label: k + ' Cap', value: Number(v) })) : undefined,
+                    holdings: f.top_holdings ? f.top_holdings.split(',').map((h: string) => ({ name: h.trim(), weight: 'N/A' })) : undefined
+                }));
+
+                setDynamicProducts(mappedProducts);
+
+                setRealInvestments([]);
+            } catch (error) {
+                toast.error("Failed to fetch PMS portfolio or funds")
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchUserAndPortfolio();
+    }, []);
 
     // Demo Data
     const demoInvestments: Investment[] = [
@@ -50,13 +125,14 @@ export default function InvestmentGrowth() {
     // Derived Funds Data
     const investedFunds = useMemo(() => {
         return activeInvestments.map(inv => {
-            const fund = pmsProducts.find((p: any) => p.name === inv.fundName);
+            // Match against mapping from dynamic definitions
+            const fund = dynamicProducts.find((p: PMSProduct) => p.name === inv.fundName);
             return {
                 ...inv,
-                fund: fund
+                fund: fund || { name: inv.fundName, category: 'N/A', returns: '15%' } // Fallback for demo investments when API doesn't load matched items or while loading
             };
         });
-    }, [activeInvestments]);
+    }, [activeInvestments, dynamicProducts]);
 
     // Format Helpers
     const formatCurrency = (val: number) => {
@@ -73,7 +149,7 @@ export default function InvestmentGrowth() {
     const totalInvested = activeInvestments.reduce((sum, inv) => sum + inv.amount, 0);
     let totalCurrentValue = 0;
     let weightedIRRSum = 0;
-    
+
     investedFunds.forEach(inv => {
         if (!inv.fund) {
             totalCurrentValue += inv.amount * 1.05;
@@ -84,14 +160,14 @@ export default function InvestmentGrowth() {
         const irrText = inv.fund.returns || "15%";
         const irrMatch = irrText.match(/[\d.]+/);
         const irr = irrMatch ? parseFloat(irrMatch[0]) : 15;
-        
+
         // Capital appreciation (Compound interest)
         const invDate = new Date(inv.date);
         const today = new Date();
         const yearsHeld = Math.max(0, (today.getTime() - invDate.getTime()) / (1000 * 3600 * 24 * 365));
-        
+
         const currentValue = inv.amount * Math.pow(1 + irr / 100, yearsHeld);
-        
+
         totalCurrentValue += currentValue;
         weightedIRRSum += irr * inv.amount;
     });
@@ -104,8 +180,8 @@ export default function InvestmentGrowth() {
     // --- WEALTH PROJECTION CHART DATA ---
     const growthChartData = useMemo(() => {
         const data = [];
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan","Feb", "Mar", "Apr","May", "Jun","Jul"];
-        
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
+
         for (let i = 0; i <= 11; i++) {
             let monthTotalValue = 0;
             let monthTotalInvested = 0;
@@ -121,7 +197,7 @@ export default function InvestmentGrowth() {
                 // Future value from original investment date + i months from NOW
                 const yearsHeldNow = Math.max(0, (new Date().getTime() - new Date(inv.date).getTime()) / (1000 * 3600 * 24 * 365));
                 const totalYears = yearsHeldNow + (i / 12);
-                
+
                 const projectedVal = inv.amount * Math.pow(1 + irr / 100, totalYears);
                 monthTotalValue += projectedVal;
                 monthTotalInvested += inv.amount;
@@ -140,7 +216,7 @@ export default function InvestmentGrowth() {
     return (
         <div className="flex-1 p-6 sm:p-10 bg-slate-50 min-h-screen font-sans">
             <div className="max-w-7xl mx-auto">
-                
+
                 {/* 1. HEADER SECTION */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-slate-200 pb-5">
                     <div>
@@ -148,17 +224,15 @@ export default function InvestmentGrowth() {
                         <p className="text-slate-500 text-sm mt-1">Track the performance and valuation of your PMS portfolio assets.</p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <button 
+                        <button
                             onClick={() => setIsDemoMode(!isDemoMode)}
-                            className="flex items-center gap-2 px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
-                        >
+                            className="flex items-center gap-2 px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">
                             {isDemoMode ? <EyeOff size={16} /> : <Eye size={16} />}
                             {isDemoMode ? 'Exit Demo' : 'View Demo'}
                         </button>
-                        <Link 
+                        <Link
                             href="/customer/pms"
-                            className="flex items-center gap-2 px-4 py-2 bg-[#2076C7] text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                        >
+                            className="flex items-center gap-2 px-4 py-2 bg-[#2076C7] text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
                             Invest More
                         </Link>
                     </div>
@@ -213,22 +287,22 @@ export default function InvestmentGrowth() {
                             <AreaChart data={growthChartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#2076C7" stopOpacity={0.3}/>
-                                        <stop offset="95%" stopColor="#2076C7" stopOpacity={0}/>
+                                        <stop offset="5%" stopColor="#2076C7" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#2076C7" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                <XAxis 
-                                    dataKey="month" 
-                                    axisLine={false} 
-                                    tickLine={false} 
+                                <XAxis
+                                    dataKey="month"
+                                    axisLine={false}
+                                    tickLine={false}
                                     tick={{ fill: '#64748b', fontSize: 12 }}
                                     dy={10}
                                 />
-                                <YAxis 
+                                <YAxis
                                     domain={[0, 'auto']}
-                                    axisLine={false} 
-                                    tickLine={false} 
+                                    axisLine={false}
+                                    tickLine={false}
                                     tick={{ fill: '#64748b', fontSize: 12 }}
                                     tickFormatter={(val) => {
                                         if (val >= 10000000) return `₹${(val / 10000000).toFixed(1)}Cr`;
@@ -237,28 +311,28 @@ export default function InvestmentGrowth() {
                                     }}
                                     dx={-10}
                                 />
-                                <Tooltip 
+                                <Tooltip
                                     cursor={{ stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '3 3', fill: 'transparent' }}
                                     contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                     labelStyle={{ color: '#475569', fontWeight: 600, fontSize: '13px', marginBottom: '8px' }}
                                     itemStyle={{ fontSize: '13px', fontWeight: 500 }}
                                     formatter={(value: any) => [formatCurrency(value || 0), undefined]}
                                 />
-                                <Area 
-                                    type="monotone" 
-                                    dataKey="ProjectedValue" 
+                                <Area
+                                    type="monotone"
+                                    dataKey="ProjectedValue"
                                     name="Est. Value"
-                                    stroke="#2076C7" 
+                                    stroke="#2076C7"
                                     strokeWidth={3}
-                                    fillOpacity={1} 
-                                    fill="url(#colorBlue)" 
+                                    fillOpacity={1}
+                                    fill="url(#colorBlue)"
                                     activeDot={{ r: 6, strokeWidth: 0, fill: '#2076C7' }}
                                 />
-                                <Area 
-                                    type="step" 
-                                    dataKey="InvestedCapital" 
+                                <Area
+                                    type="step"
+                                    dataKey="InvestedCapital"
                                     name="Invested Capital"
-                                    stroke="#94a3b8" 
+                                    stroke="#94a3b8"
                                     strokeWidth={1}
                                     strokeDasharray="4 4"
                                     fill="none"
@@ -300,10 +374,10 @@ export default function InvestmentGrowth() {
                                         const irrText = inv.fund?.returns || "15%";
                                         const irrMatch = irrText.match(/[\d.]+/);
                                         const irr = irrMatch ? parseFloat(irrMatch[0]) : 15;
-                                        
+
                                         const yearsHeld = Math.max(0, (new Date().getTime() - new Date(inv.date).getTime()) / (1000 * 3600 * 24 * 365));
                                         const currentVal = inv.amount * Math.pow(1 + irr / 100, yearsHeld);
-                                        
+
                                         return (
                                             <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
                                                 <td className="px-6 py-4">
@@ -364,7 +438,7 @@ export default function InvestmentGrowth() {
                                         </span>
                                     </div>
                                 </div>
-                                
+
                                 <div className="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors cursor-pointer group">
                                     <div className="p-2.5 bg-slate-100 text-slate-500 rounded-lg group-hover:bg-[#2076C7] group-hover:text-white transition-colors">
                                         <FileText size={20} />

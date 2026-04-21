@@ -1,13 +1,11 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
-  Search,
   X,
   Briefcase,
   TrendingUp,
   ShoppingCart,
-  ArrowRight,
   Gem,
   Bookmark,
   BookmarkCheck,
@@ -19,9 +17,12 @@ import {
   MessageSquare,
   ArrowUpRight,
   Check,
-  Layers
+  Layers,
+  Loader2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import customerService from "../../../../services/customerService";
+import toast from "react-hot-toast";
 
 interface CartItem {
   id: string;
@@ -29,7 +30,38 @@ interface CartItem {
   amount: number;
 }
 
-import { PMSProduct, pmsProducts, MIN_INVESTMENT } from "../data/pmsData";
+// Tracks backend wishlist item for PMS products
+interface WishlistEntry {
+  backendId: number;       // The `id` from the backend wishlist table
+  productName: string;     // The product_name stored in backend
+}
+
+export interface PMSProduct {
+  id: number | string;
+  name: string;
+  desc: string;
+  link: string;
+  risk: string;
+  horizon: string;
+  color: string;
+  category: string;
+  returns: string;
+  minInvestment: string;
+  strategyDetails?: string;
+  holdings?: { name: string; weight: string }[];
+  benchmark?: string;
+  inceptionDate?: string;
+  investmentStyle?: string;
+  portfolioSize?: string;
+  performance?: { period: string; strategy: number; benchmark: number }[];
+  marketCap?: { label: string; value: number }[];
+  sectorAllocation?: { name: string; value: number }[];
+  strategyType?: string;
+  bestSuitedFor?: string;
+}
+
+const MIN_INVESTMENT = 5000000;
+
 
 export default function ExplorePMS() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,28 +69,110 @@ export default function ExplorePMS() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<PMSProduct | null>(null);
   const [activeCategory, setActiveCategory] = useState("All");
-  const [wishlist, setWishlist] = useState<any[]>([]);
-  const [showAllFunds, setShowAllFunds] = useState(false);
+  // Backend-synced wishlist: maps PMS product name -> backend wishlist entry
+  const [wishlistMap, setWishlistMap] = useState<Map<string, WishlistEntry>>(new Map());
+  const [wishlistLoading, setWishlistLoading] = useState<Set<string>>(new Set());
+
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [schedulingProduct, setSchedulingProduct] = useState<PMSProduct | null>(null);
   const [meetingDate, setMeetingDate] = useState("");
   const [meetingTime, setMeetingTime] = useState("");
-  const [meetLink, setMeetLink] = useState("https://meet.google.com/pms-consultation");
+  // const [meetLink, setMeetLink] = useState();
+  const meetLink = "https://meet.google.com/oio-bdwb-cxy"
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Notification States
   const [notifyWhatsApp, setNotifyWhatsApp] = useState(true);
   const [notifyEmail, setNotifyEmail] = useState(true);
-  const [whatsappNumber, setWhatsappNumber] = useState("+91 95952 47614");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [userId, setUserId] = useState<number | null>(null);
 
-  const handleScheduleClick = (product: PMSProduct) => {
+  const [dynamicProducts, setDynamicProducts] = useState<PMSProduct[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    const fetchFunds = async () => {
+      try {
+        const funds = await customerService.getPMSFundsList();
+
+        const colors = ["#2076C7", "#1CADA3", "#8B5CF6", "#f59e0b", "#10b981", "#ef4444"];
+
+        const mappedProducts: PMSProduct[] = funds.map((f: any, idx: number) => {
+          return {
+            id: f.id,
+            name: f.fund_name || "Unknown Strategy",
+            desc: f.description || "No description available.",
+            link: `/products/pms/${f.id}`,
+            risk: f.risk_level || "Moderate",
+            horizon: "3-5 Years",
+            color: colors[idx % colors.length],
+            category: f.category || "Multi-Cap",
+            returns: f.return_3y ? `${(f.return_3y * 100).toFixed(1)}%` : f.return_1y ? `${(f.return_1y * 100).toFixed(1)}%` : "N/A",
+            minInvestment: f.min_investment ? `₹${f.min_investment}` : "₹50L",
+            strategyDetails: f.description,
+            benchmark: f.benchmark,
+            inceptionDate: f.inception_date ? new Date(f.inception_date).toLocaleDateString() : undefined,
+            investmentStyle: f.portfolio_style,
+            portfolioSize: f.aum ? `₹${f.aum}` : "N/A",
+            strategyType: f.strategy_type,
+            bestSuitedFor: f.notes,
+            sectorAllocation: f.sector_exposure ? Object.entries(f.sector_exposure).map(([k, v]) => ({ name: k, value: Number(v) })) : undefined,
+            marketCap: f.market_allocation ? Object.entries(f.market_allocation).map(([k, v]) => ({ label: k + ' Cap', value: Number(v) })) : undefined,
+            holdings: f.top_holdings ? f.top_holdings.split(',').map((h: string) => ({ name: h.trim(), weight: 'N/A' })) : undefined
+          };
+        });
+        setDynamicProducts(mappedProducts);
+      } catch (err) {
+        toast.error("Failed to load PMS Funds")
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+    fetchFunds();
+  }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await customerService.getProfile();
+        if (response && response.user) {
+          setUserId(response.user.id);
+          const userMobile = response.user.mobile || response.user.phone || response.user.mobile_number;
+          if (userMobile) {
+            setWhatsappNumber(userMobile);
+          }
+        }
+      } catch (error) {
+        toast.error("Failed to fetch user profile");
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const handleScheduleClick = async (product: PMSProduct) => {
     setSchedulingProduct(product);
     setIsScheduleModalOpen(true);
+
+    // If whatsappNumber is empty, try fetching again
+    if (!whatsappNumber) {
+      try {
+        const response = await customerService.getProfile();
+        if (response && response.user) {
+          setUserId(response.user.id);
+          const userMobile = response.user.mobile || response.user.phone || response.user.mobile_number;
+          if (userMobile) {
+            setWhatsappNumber(userMobile);
+          }
+        }
+      } catch (error) {
+        toast.error("Failed to re-fetch user profile:");
+      }
+    }
   };
 
-  const handleConfirmSchedule = () => {
+  const handleConfirmSchedule = async () => {
     if (!meetingDate || !meetingTime) {
       setToastMessage("Please select both date and time");
       setShowToast(true);
@@ -66,89 +180,143 @@ export default function ExplorePMS() {
       return;
     }
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsScheduleModalOpen(false);
-      setToastMessage("Confirmation sent to your WhatsApp and Email!");
-      setShowToast(true);
+    try {
+      // Use customerService to schedule meeting
+      const response = await customerService.schedulePMSMeeting({
+        pms_fund_id: schedulingProduct?.name.toLowerCase().replace(/ /g, "-"),
+        pms_fund_name: schedulingProduct?.name,
+        meeting_time: `${meetingDate}T${meetingTime}:00`,
+        user_details: {
+          whatsapp: whatsappNumber,
+          notifyWhatsApp,
+          notifyEmail,
+          meetLink
+        }
+      }, userId || undefined);
 
-      setMeetingDate("");
-      setMeetingTime("");
-      setTimeout(() => setShowToast(false), 3000);
-    }, 1500);
+      if (response.message === "Meeting scheduled successfully") {
+        setToastMessage("Meeting scheduled successfully!");
+        setShowToast(true);
+
+        // Reset states
+        setIsScheduleModalOpen(false);
+        setMeetingDate("");
+        setMeetingTime("");
+        setSchedulingProduct(null);
+      }
+    } catch (error: any) {
+      setToastMessage(error.response?.data?.error || "Failed to schedule meeting. Please try again.");
+      setShowToast(true);
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => setShowToast(false), 4000);
+    }
   };
 
-  // Persistence
+  // Load wishlist from backend on mount
+  const loadWishlist = useCallback(async () => {
+    if (!userId) return;
+    try {
+      const response = await customerService.getMyWishlist();
+      if (response.success && response.data) {
+        const items = Array.isArray(response.data) ? response.data : [response.data];
+        const map = new Map<string, WishlistEntry>();
+        items.forEach((item: any) => {
+          if (item.product_type === "pms") {
+            map.set(item.product_name, {
+              backendId: item.id,
+              productName: item.product_name,
+            });
+          }
+        });
+        setWishlistMap(map);
+      }
+    } catch (error) {
+      toast.error("Failed to load wishlist");
+    }
+  }, [userId]);
+
   useEffect(() => {
     const savedCart = localStorage.getItem("pms_cart");
     if (savedCart) setCart(JSON.parse(savedCart));
-
-    const savedWishlist = localStorage.getItem("user_wishlist");
-    if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
-  }, []);
+    loadWishlist();
+  }, [loadWishlist]);
 
   useEffect(() => {
     localStorage.setItem("pms_cart", JSON.stringify(cart));
   }, [cart]);
 
-  useEffect(() => {
-    localStorage.setItem("user_wishlist", JSON.stringify(wishlist));
-  }, [wishlist]);
-
   // Filtering
   const filteredProducts = useMemo(() => {
-    return pmsProducts.filter(p => {
+    return dynamicProducts.filter(p => {
       const matchesSearch =
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.desc.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = activeCategory === "All" || p.category === activeCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, activeCategory]);
+  }, [searchQuery, activeCategory, dynamicProducts]);
 
-  // Cart Actions
-  const handleAddToCart = (product: PMSProduct) => {
-    if (cart.find(item => item.id === product.name)) {
-      setIsCartOpen(true);
-      return;
-    }
-    const newItem: CartItem = { id: product.name, name: product.name, amount: MIN_INVESTMENT };
-    setCart([...cart, newItem]);
-    setIsCartOpen(true);
-  };
+  const toggleWishlist = async (product: PMSProduct) => {
+    const productName = product.name;
+    const entry = wishlistMap.get(productName);
 
-  const removeFromCart = (id: string) => setCart(cart.filter(item => item.id !== id));
-  const updateCartAmount = (id: string, amount: number) =>
-    setCart(cart.map(item => (item.id === id ? { ...item, amount } : item)));
-  const formatINR = (num: number) => num.toLocaleString("en-IN");
+    // Prevent double-clicking while loading
+    if (wishlistLoading.has(productName)) return;
+    setWishlistLoading(prev => new Set(prev).add(productName));
 
-  const toggleWishlist = (product: PMSProduct) => {
-    const isPresent = wishlist.some(item => item.id === product.name && item.category === "pms");
-    if (isPresent) {
-      setWishlist(wishlist.filter(item => !(item.id === product.name && item.category === "pms")));
-    } else {
-      const wishlistItem = {
-        id: product.name,
-        category: "pms",
-        name: product.name,
-        logo: "🏦",
-        keyMetrics: {
-          returns: { "1Y": 0, "3Y": 0, "5Y": 0 },
-          benchmark: product.benchmark || "NIFTY 500",
-          minInvestment: parseInt(product.minInvestment.replace(/[^\d]/g, "")) || 5000000,
-          lockIn: "3 Years",
-          risk: product.risk.replace(" Risk", ""),
-        },
-        addedDate: new Date().toLocaleDateString(),
-      };
-      setWishlist([...wishlist, wishlistItem]);
-      setToastMessage(`"${product.name}" added to wishlist!`);
+    try {
+      if (entry) {
+        // Remove from wishlist
+        const response = await customerService.removeFromWishlist(entry.backendId);
+        if (response.success) {
+          setWishlistMap(prev => {
+            const updated = new Map(prev);
+            updated.delete(productName);
+            return updated;
+          });
+          setToastMessage(`"${productName}" removed from wishlist`);
+          setShowToast(true);
+          setTimeout(() => setShowToast(false), 3000);
+        }
+      } else {
+        // Add to wishlist  
+        const response = await customerService.addToWishlist({
+          product_type: "pms",
+          product_id: product.id,
+          product_name: productName
+        });
+        if (response.success && response.data) {
+          const newItem = Array.isArray(response.data) ? response.data[0] : response.data;
+          setWishlistMap(prev => {
+            const updated = new Map(prev);
+            updated.set(productName, {
+              backendId: newItem.id,
+              productName: productName,
+            });
+            return updated;
+          });
+          setToastMessage(`"${productName}" added to wishlist!`);
+          setShowToast(true);
+          setTimeout(() => setShowToast(false), 3000);
+        }
+      }
+    } catch (error: any) {
+      toast.error("Failed to update wishlist");
+      const msg = error.response?.data?.message || "Failed to update wishlist";
+      setToastMessage(msg);
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
+    } finally {
+      setWishlistLoading(prev => {
+        const updated = new Set(prev);
+        updated.delete(productName);
+        return updated;
+      });
     }
   };
 
-  const visibleProducts = showAllFunds ? filteredProducts : filteredProducts.slice(0, 4);
+  const visibleProducts = filteredProducts;
 
   return (
     <div className="space-y-6 relative">
@@ -160,8 +328,7 @@ export default function ExplorePMS() {
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: -20, x: 20 }}
             className="fixed top-6 right-6 z-[9999] flex items-center gap-3 px-5 py-3 rounded-2xl shadow-2xl text-white text-sm font-bold"
-            style={{ background: "linear-gradient(135deg, #2076C7, #1CADA3)" }}
-          >
+            style={{ background: "linear-gradient(135deg, #2076C7, #1CADA3)" }}>
             <BookmarkCheck size={18} />
             {toastMessage}
           </motion.div>
@@ -173,8 +340,7 @@ export default function ExplorePMS() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative bg-white rounded-2xl p-6 mb-2 shadow-sm border border-slate-100/60"
-      >
+        className="relative bg-white rounded-2xl p-6 mb-2 shadow-sm border border-slate-100/60">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
@@ -200,133 +366,92 @@ export default function ExplorePMS() {
         </div>
       </motion.div>
 
-      {/* Filters Sticky Bar */}
-      <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-gray-100 shadow-sm sticky top-0 z-40 space-y-6">
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search PMS strategies..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-12 py-4 rounded-xl border border-gray-200 bg-white text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1CADA3]/50 shadow-sm transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                <X size={20} />
-              </button>
-            )}
-          </div>
-          <div className="flex bg-gray-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto no-scrollbar">
-            {["All", "Multi-Cap", "Mid & Small-Cap", "Ethical"].map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                  activeCategory === cat
-                    ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-200"
-                    : "text-gray-500 hover:bg-gray-200"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {visibleProducts.map((product, index) => (
-          <motion.div
-            key={index}
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-3xl shadow-md border border-gray-100 hover:border-[#2076C7] transition-all p-6 flex flex-col h-full group w-full relative"
-          >
-            {/* Bookmark */}
-            <button
-              onClick={e => { e.stopPropagation(); toggleWishlist(product); }}
-              className="absolute top-4 right-4 p-1.5 rounded-lg bg-white border border-gray-100 shadow-sm text-gray-400 hover:text-[#2076C7] transition-colors z-10"
+      {loadingProducts ? (
+        <div className="flex justify-center py-20">
+          <Loader2 size={48} className="animate-spin text-[#2076C7]" />
+        </div>
+      ) : visibleProducts.length === 0 ? (
+        <div className="text-center py-20 text-gray-500">
+          No strategies found matching your criteria.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {visibleProducts.map((product, index) => (
+            <motion.div
+              key={index}
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-3xl shadow-md border border-gray-100 hover:border-[#2076C7] transition-all p-6 flex flex-col h-full group w-full relative"
             >
-              {wishlist.some(item => item.id === product.name && item.category === "pms") ? (
-                <BookmarkCheck size={16} className="text-[#2076C7]" fill="#2076C7" />
-              ) : (
-                <Bookmark size={16} />
-              )}
-            </button>
-
-            {/* Icon */}
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center mb-4 mx-auto group-hover:scale-105 transition-transform relative shrink-0">
-              <Gem className="w-8 h-8" style={{ color: product.color }} />
-              <div className="absolute -top-2 -right-2 px-2 py-0.5 rounded bg-white border border-gray-100 shadow-sm text-[8px] font-black text-gray-500 uppercase tracking-widest">
-                {product.risk.replace(" Risk", "")}
-              </div>
-            </div>
-
-            {/* Name */}
-            <h3 className="text-base font-black text-center text-gray-900 line-clamp-2 mb-1 leading-tight min-h-[40px]">
-              {product.name}
-            </h3>
-
-            {/* Category badge */}
-            <div className="flex justify-center mb-3">
-              <span className="text-[9px] font-black text-[#2076C7] bg-blue-50 px-2 py-0.5 rounded uppercase tracking-widest">
-                {product.category}
-              </span>
-            </div>
-
-            {/* Key Stats */}
-            <div className="space-y-1.5 mb-4">
-              <div className="flex items-center justify-between px-3 py-2 bg-blue-50 rounded-xl">
-                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest shrink-0">Returns</span>
-                <span className="text-[11px] font-black text-[#2076C7] text-right ml-2 leading-tight">{product.returns}</span>
-              </div>
-              <div className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-xl">
-                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest shrink-0">Min. Invest</span>
-                <span className="text-[11px] font-black text-gray-700 text-right ml-2 leading-tight">{product.minInvestment}</span>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex flex-col items-center gap-2 mt-auto pt-4 border-t border-gray-50">
+              {/* Bookmark */}
               <button
-                onClick={e => { e.stopPropagation(); setSelectedProduct(product); }}
-                className="w-full py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white hover:opacity-90 cursor-pointer"
+                onClick={e => { e.stopPropagation(); toggleWishlist(product); }}
+                className={`absolute top-4 right-4 p-1.5 rounded-lg bg-white border border-gray-100 shadow-sm transition-colors z-10 ${wishlistLoading.has(product.name) ? "opacity-50 cursor-wait" : "hover:text-[#2076C7] text-gray-400"
+                  }`}
+                disabled={wishlistLoading.has(product.name)}
               >
-                <FileText size={16} /> Details
+                {wishlistLoading.has(product.name) ? (
+                  <Loader2 size={16} className="animate-spin text-[#2076C7]" />
+                ) : wishlistMap.has(product.name) ? (
+                  <BookmarkCheck size={16} className="text-[#2076C7]" fill="#2076C7" />
+                ) : (
+                  <Bookmark size={16} />
+                )}
               </button>
-              <button
-                onClick={e => { e.stopPropagation(); handleScheduleClick(product); }}
-                className="w-full py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 bg-white text-[#2076C7] border-2 border-[#2076C7]/10 hover:border-[#2076C7]/30 hover:bg-blue-50/50 cursor-pointer"
-              >
-                <Calendar size={16} /> Schedule Meeting
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </div>
 
-      {/* View More / View Less */}
-      {filteredProducts.length > 4 && (
-        <div className="flex justify-center pt-2">
-          <button
-            onClick={() => setShowAllFunds(prev => !prev)}
-            className="px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center gap-2"
-          >
-            {showAllFunds
-              ? "View Less Funds"
-              : `View More Funds (${filteredProducts.length - 4} more)`}
-            <ArrowRight
-              size={16}
-              className={`transition-transform ${showAllFunds ? "rotate-[270deg]" : "rotate-90"}`}
-            />
-          </button>
+              {/* Icon */}
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center mb-4 mx-auto group-hover:scale-105 transition-transform relative shrink-0">
+                <Gem className="w-8 h-8" style={{ color: product.color }} />
+                <div className="absolute -top-2 -right-2 px-2 py-0.5 rounded bg-white border border-gray-100 shadow-sm text-[8px] font-black text-gray-500 uppercase tracking-widest">
+                  {product.risk.replace(" Risk", "")}
+                </div>
+              </div>
+
+              {/* Name */}
+              <h3 className="text-base font-black text-center text-gray-900 line-clamp-2 mb-1 leading-tight min-h-[40px]">
+                {product.name}
+              </h3>
+
+              {/* Category badge */}
+              <div className="flex justify-center mb-3">
+                <span className="text-[9px] font-black text-[#2076C7] bg-blue-50 px-2 py-0.5 rounded uppercase tracking-widest">
+                  {product.category}
+                </span>
+              </div>
+
+              {/* Key Stats */}
+              <div className="space-y-1.5 mb-4">
+                <div className="flex items-center justify-between px-3 py-2 bg-blue-50 rounded-xl">
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest shrink-0">Returns</span>
+                  <span className="text-[11px] font-black text-[#2076C7] text-right ml-2 leading-tight">{product.returns}</span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-xl">
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest shrink-0">Min. Invest</span>
+                  <span className="text-[11px] font-black text-gray-700 text-right ml-2 leading-tight">{product.minInvestment}</span>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col items-center gap-2 mt-auto pt-4 border-t border-gray-50">
+                <button
+                  onClick={e => { e.stopPropagation(); setSelectedProduct(product); }}
+                  className="w-full py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white hover:opacity-90 cursor-pointer"
+                >
+                  <FileText size={16} /> Details
+                </button>
+                <button
+                  onClick={e => { e.stopPropagation(); handleScheduleClick(product); }}
+                  className="w-full py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 bg-white text-[#2076C7] border-2 border-[#2076C7]/10 hover:border-[#2076C7]/30 hover:bg-blue-50/50 cursor-pointer"
+                >
+                  <Calendar size={16} /> Schedule Meeting
+                </button>
+              </div>
+            </motion.div>
+          ))}
         </div>
       )}
 
@@ -360,8 +485,8 @@ export default function ExplorePMS() {
                 </button>
               </div>
               <div className="flex-1 p-8 flex flex-col items-center justify-center text-gray-400">
-                 <ShoppingCart size={48} className="mb-4 opacity-20" />
-                 <p className="font-bold text-sm">Cart functionality is coming soon.</p>
+                <ShoppingCart size={48} className="mb-4 opacity-20" />
+                <p className="font-bold text-sm">Cart functionality is coming soon.</p>
               </div>
             </motion.div>
           </>
@@ -417,81 +542,81 @@ export default function ExplorePMS() {
 
               <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                   <div className="lg:col-span-2 space-y-10">
-                     <section>
-                       <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Investment Strategy</h4>
-                       <div className="bg-[#F8FAFC] p-8 rounded-3xl border border-gray-100 leading-relaxed text-gray-700 text-sm">
-                         {selectedProduct.strategyDetails || selectedProduct.desc}
-                       </div>
-                     </section>
-                     
-                     <section>
-                        <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Key Parameters</h4>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                          {[
-                            { label: "Benchmark", value: selectedProduct.benchmark || "NIFTY 500" },
-                            { label: "Inception", value: selectedProduct.inceptionDate || "N/A" },
-                            { label: "Portfolio Size", value: selectedProduct.portfolioSize || "N/A" },
-                            { label: "Style", value: selectedProduct.investmentStyle || "Growth" },
-                            { label: "Risk", value: selectedProduct.risk },
-                            { label: "Min. Investment", value: selectedProduct.minInvestment },
-                          ].map((item, i) => (
-                            <div key={i} className="p-4 bg-gray-50 rounded-2xl text-center">
-                              <p className="text-[9px] font-bold text-gray-400 uppercase mb-1">{item.label}</p>
-                              <p className="text-sm font-black text-gray-900">{item.value}</p>
+                  <div className="lg:col-span-2 space-y-10">
+                    <section>
+                      <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Investment Strategy</h4>
+                      <div className="bg-[#F8FAFC] p-8 rounded-3xl border border-gray-100 leading-relaxed text-gray-700 text-sm">
+                        {selectedProduct.strategyDetails || selectedProduct.desc}
+                      </div>
+                    </section>
+
+                    <section>
+                      <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Key Parameters</h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        {[
+                          { label: "Benchmark", value: selectedProduct.benchmark || "NIFTY 500" },
+                          { label: "Inception", value: selectedProduct.inceptionDate || "N/A" },
+                          { label: "Portfolio Size", value: selectedProduct.portfolioSize || "N/A" },
+                          { label: "Style", value: selectedProduct.investmentStyle || "Growth" },
+                          { label: "Risk", value: selectedProduct.risk },
+                          { label: "Min. Investment", value: selectedProduct.minInvestment },
+                        ].map((item, i) => (
+                          <div key={i} className="p-4 bg-gray-50 rounded-2xl text-center">
+                            <p className="text-[9px] font-bold text-gray-400 uppercase mb-1">{item.label}</p>
+                            <p className="text-sm font-black text-gray-900">{item.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+
+                    {selectedProduct.sectorAllocation && (
+                      <section>
+                        <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6">Sector Exposure</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                          {selectedProduct.sectorAllocation.map((sector, i) => (
+                            <div key={i} className="space-y-2">
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="font-bold text-gray-600 uppercase tracking-tight">{sector.name}</span>
+                                <span className="font-black text-[#2076C7]">{sector.value}%</span>
+                              </div>
+                              <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full"
+                                  style={{ width: `${sector.value}%` }}
+                                />
+                              </div>
                             </div>
                           ))}
                         </div>
-                     </section>
+                      </section>
+                    )}
+                  </div>
 
-                     {selectedProduct.sectorAllocation && (
-                       <section>
-                         <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6">Sector Exposure</h4>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                           {selectedProduct.sectorAllocation.map((sector, i) => (
-                             <div key={i} className="space-y-2">
-                               <div className="flex justify-between items-center text-xs">
-                                 <span className="font-bold text-gray-600 uppercase tracking-tight">{sector.name}</span>
-                                 <span className="font-black text-[#2076C7]">{sector.value}%</span>
-                               </div>
-                               <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                                 <div
-                                   className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full"
-                                   style={{ width: `${sector.value}%` }}
-                                 />
-                               </div>
-                             </div>
-                           ))}
-                         </div>
-                       </section>
-                     )}
-                   </div>
-
-                   <div className="space-y-6">
-                     <div className="bg-gradient-to-br from-[#2076C7] to-[#1CADA3] p-8 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden h-fit">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white blur-[80px] opacity-20" />
-                        <h3 className="text-lg font-bold mb-6 relative z-10">Projection</h3>
-                        <div className="space-y-6 relative z-10">
-                           <div className="flex justify-between items-end border-b border-white/20 pb-4">
-                              <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Target IRR</span>
-                              <span className="text-3xl font-black">{selectedProduct.returns}</span>
-                           </div>
-                           <div className="flex justify-between items-end border-b border-white/20 pb-4">
-                              <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Min Horizon</span>
-                              <span className="text-xl font-black">{selectedProduct.horizon}</span>
-                           </div>
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-br from-[#2076C7] to-[#1CADA3] p-8 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden h-fit">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-white blur-[80px] opacity-20" />
+                      <h3 className="text-lg font-bold mb-6 relative z-10">Projection</h3>
+                      <div className="space-y-6 relative z-10">
+                        <div className="flex justify-between items-end border-b border-white/20 pb-4">
+                          <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Target IRR</span>
+                          <span className="text-3xl font-black">{selectedProduct.returns}</span>
                         </div>
-                        <p className="text-[9px] text-white/60 mt-8 italic text-center">
-                           *Past performance is not indicative of future results.
-                        </p>
-                     </div>
-                     <button
-                        onClick={() => handleScheduleClick(selectedProduct)}
-                        className="w-full py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-[1.5rem] font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all"
-                      >
-                        <Calendar size={18} /> Schedule Meeting
-                      </button>
-                   </div>
+                        <div className="flex justify-between items-end border-b border-white/20 pb-4">
+                          <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Min Horizon</span>
+                          <span className="text-xl font-black">{selectedProduct.horizon}</span>
+                        </div>
+                      </div>
+                      <p className="text-[9px] text-white/60 mt-8 italic text-center">
+                        *Past performance is not indicative of future results.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleScheduleClick(selectedProduct)}
+                      className="w-full py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-[1.5rem] font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all"
+                    >
+                      <Calendar size={18} /> Schedule Meeting
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -568,15 +693,15 @@ export default function ExplorePMS() {
                     <input
                       type="text"
                       value={meetLink}
-                      onChange={e => setMeetLink(e.target.value)}
-                      className="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-transparent group-hover:bg-white group-hover:border-[#2076C7]/20 focus:bg-white focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/10 outline-none transition-all font-bold text-gray-700 text-sm"
+                      readOnly
+                      className="w-full px-5 py-4 rounded-2xl bg-gray-100 border-2 border-transparent outline-none transition-all font-bold text-gray-500 text-sm cursor-not-allowed"
                     />
                   </div>
                 </div>
 
                 {/* WhatsApp Number & Notifications */}
                 <div className="bg-gray-50/50 rounded-[2rem] p-6 border border-gray-100 space-y-6">
-                   <div className="space-y-2">
+                  <div className="space-y-2">
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
                       <MessageSquare size={14} className="text-[#2076C7]" /> Confirm WhatsApp Number
                     </label>
@@ -592,11 +717,10 @@ export default function ExplorePMS() {
                   <div className="flex flex-col sm:flex-row gap-4 pt-2">
                     <button
                       onClick={() => setNotifyWhatsApp(!notifyWhatsApp)}
-                      className={`flex-1 flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all ${
-                        notifyWhatsApp
-                          ? "bg-emerald-50 border-emerald-500 text-emerald-700"
-                          : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
-                      }`}
+                      className={`flex-1 flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all ${notifyWhatsApp
+                        ? "bg-emerald-50 border-emerald-500 text-emerald-700"
+                        : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
+                        }`}
                     >
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 transition-all ${notifyWhatsApp ? "bg-emerald-500 border-emerald-500 text-white" : "border-gray-200"}`}>
                         {notifyWhatsApp && <Check size={12} />}
@@ -605,11 +729,10 @@ export default function ExplorePMS() {
                     </button>
                     <button
                       onClick={() => setNotifyEmail(!notifyEmail)}
-                      className={`flex-1 flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all ${
-                        notifyEmail
-                          ? "bg-blue-50 border-blue-500 text-blue-700"
-                          : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
-                      }`}
+                      className={`flex-1 flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all ${notifyEmail
+                        ? "bg-blue-50 border-blue-500 text-blue-700"
+                        : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
+                        }`}
                     >
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 transition-all ${notifyEmail ? "bg-blue-500 border-blue-500 text-white" : "border-gray-200"}`}>
                         {notifyEmail && <Check size={12} />}
@@ -620,7 +743,7 @@ export default function ExplorePMS() {
                 </div>
 
                 <div className="flex gap-4">
-                   <button
+                  <button
                     onClick={handleConfirmSchedule}
                     className="flex-1 py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:translate-y-[-2px] transition-all"
                   >
@@ -635,10 +758,10 @@ export default function ExplorePMS() {
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-300 blur-[100px] opacity-20 -ml-32 -mb-32" />
 
                 <div className="relative z-10 flex justify-between items-start">
-                   <div className="w-16 h-16 rounded-[2rem] bg-white/10 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20">
-                     <Layers size={32} />
-                   </div>
-                   <button
+                  <div className="w-16 h-16 rounded-[2rem] bg-white/10 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20">
+                    <Layers size={32} />
+                  </div>
+                  <button
                     onClick={() => setIsScheduleModalOpen(false)}
                     className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-colors text-white"
                   >
@@ -653,48 +776,48 @@ export default function ExplorePMS() {
                   </div>
 
                   <div className="space-y-8">
-                     <div className="flex items-center gap-4">
-                       <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-sm">
-                         <Calendar className="text-white/80" size={20} />
-                       </div>
-                       <div>
-                         <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-0.5">Scheduled Date</p>
-                         <p className="font-bold text-sm tracking-wide">{meetingDate ? new Date(meetingDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : "--"}</p>
-                       </div>
-                     </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-sm">
+                        <Calendar className="text-white/80" size={20} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-0.5">Scheduled Date</p>
+                        <p className="font-bold text-sm tracking-wide">{meetingDate ? new Date(meetingDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : "--"}</p>
+                      </div>
+                    </div>
 
-                     <div className="flex items-center gap-4">
-                       <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-sm">
-                         <Clock className="text-white/80" size={20} />
-                       </div>
-                       <div>
-                         <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-0.5">Scheduled Time</p>
-                         <p className="font-bold text-sm tracking-wide">{meetingTime || "--"}</p>
-                       </div>
-                     </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-sm">
+                        <Clock className="text-white/80" size={20} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-0.5">Scheduled Time</p>
+                        <p className="font-bold text-sm tracking-wide">{meetingTime || "--"}</p>
+                      </div>
+                    </div>
 
-                     <div className="flex items-center gap-4">
-                       <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-sm">
-                         <Video className="text-white/80" size={20} />
-                       </div>
-                       <div>
-                         <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-0.5">Meet Platform</p>
-                         <p className="font-bold text-sm tracking-wide">Google Meet</p>
-                       </div>
-                     </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-sm">
+                        <Video className="text-white/80" size={20} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-0.5">Meet Platform</p>
+                        <p className="font-bold text-sm tracking-wide">Google Meet</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 <div className="relative z-10 pt-10 border-t border-white/10">
-                   <div className="flex items-center gap-3">
-                     <div className="w-10 h-10 rounded-full border-2 border-white/20 p-1">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=white&color=2076C7" className="w-full h-full rounded-full border border-white/20" alt="Icon" />
-                     </div>
-                     <div>
-                        <p className="text-[10px] font-black text-white/60 uppercase tracking-widest">Organizer</p>
-                        <p className="text-xs font-bold">Wealth Manager</p>
-                     </div>
-                   </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full border-2 border-white/20 p-1">
+                      <img src="https://ui-avatars.com/api/?name=Admin&background=white&color=2076C7" className="w-full h-full rounded-full border border-white/20" alt="Icon" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-white/60 uppercase tracking-widest">Organizer</p>
+                      <p className="text-xs font-bold">Wealth Manager</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
