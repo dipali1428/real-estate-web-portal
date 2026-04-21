@@ -13,9 +13,7 @@ import {
     BarChart3, 
     Home, 
     Building2,
-    Trash2,
-    PlusCircle,
-    RefreshCw
+    Trash2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -274,40 +272,39 @@ export default function Wishlist() {
                             </div>
                             <p className="text-sm opacity-80">Track and manage your potential investments</p>
                         </div>
-                        <button 
-                            onClick={handleManualRefresh}
-                            disabled={refreshing}
-                            className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-all disabled:opacity-50"
-                        >
-                            <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
-                        </button>
                     </div>
                 </motion.div>
             </div>
 
             {/* MOBILE HEADER */}
-            <div className="md:hidden flex flex-col items-center pt-2 pb-4 px-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-[#2076C7] to-[#1CADA3] rounded-2xl flex items-center justify-center shadow-lg mb-3">
-                    <Bookmark className="text-white w-7 h-7" />
-                </div>
-                <h1 className="text-xl font-bold text-slate-800">Wishlist</h1>
-                <div className="mt-1 bg-emerald-100 text-emerald-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
-                    {filteredItems.length} Items Active
-                </div>
+            <div className="md:hidden">
+                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-5 mb-6 text-white shadow-lg">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <Bookmark className="w-5 h-5 text-white" />
+                                <h2 className="text-xl font-bold">Wishlist</h2>
+                            </div>
+                            <p className="text-xs opacity-80">Track and manage your potential investments</p>
+                        </div>
+                    </div>
+                </motion.div>
             </div>
 
-            {/* DASHBOARD GRID (REDUCED SIZE VERSION) */}
+            {/* MOBILE CATEGORY GRID - 2 COLUMNS, ALL BUTTONS VISIBLE */}
             <div className="md:hidden mb-6">
-                <div className="bg-slate-100/60 backdrop-blur-sm rounded-3xl p-1.5 border border-slate-200/50 shadow-inner">
-                    <div className="grid grid-cols-2 gap-1">
+                <div className="bg-slate-100/60 backdrop-blur-sm rounded-2xl p-1.5 border border-slate-200/50 shadow-inner">
+                    <div className="grid grid-cols-2 gap-1.5">
                         {categories.map((cat) => {
                             const isActive = selectedCategory === cat.id;
                             const Icon = cat.icon;
+                            const hasItems = cat.count > 0;
+                            
                             return (
                                 <button
                                     key={cat.id}
                                     onClick={() => setSelectedCategory(cat.id)}
-                                    className={`relative flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl transition-all duration-300 z-10 active:scale-95 ${
+                                    className={`relative flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl transition-all duration-300 z-10 active:scale-95 ${
                                         isActive 
                                         ? "text-white shadow-sm" 
                                         : "text-slate-400 hover:text-slate-500"
@@ -320,15 +317,21 @@ export default function Wishlist() {
                                             transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} 
                                         />
                                     )}
-                                    <Icon size={16} strokeWidth={isActive ? 2.5 : 2} />
-                                    <span className="text-[9px] font-black uppercase tracking-tight leading-none text-center truncate w-full px-1">
-                                        {cat.name.split(' ')[0]}
-                                    </span>
-                                    {cat.count > 0 && !isActive && (
-                                        <div className="absolute top-1 right-1 w-3.5 h-3.5 bg-[#1CADA3] text-white text-[7px] flex items-center justify-center rounded-full font-black">
-                                            {cat.count}
-                                        </div>
-                                    )}
+                                    <Icon size={18} strokeWidth={isActive ? 2.5 : 1.5} />
+                                    <div className="flex items-center gap-1">
+                                        <span className="text-[10px] font-bold uppercase tracking-tight leading-none">
+                                            {cat.name === 'All Items' ? 'All' : cat.name.split(' ')[0]}
+                                        </span>
+                                        {hasItems && (
+                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                                                isActive 
+                                                    ? 'bg-white/20 text-white' 
+                                                    : 'bg-slate-200 text-slate-600'
+                                            }`}>
+                                                {cat.count}
+                                            </span>
+                                        )}
+                                    </div>
                                 </button>
                             );
                         })}
@@ -411,20 +414,20 @@ export default function Wishlist() {
                                         </td>
                                         <td className="px-6 py-4 text-center font-bold text-[#2076C7]">
                                         {item.product_type === 'mutual_fund'
-    ? `₹${item.price.toFixed(2)}`
-    : `₹${item.price.toFixed(2)}`
-}
+                                            ? `₹${item.price.toFixed(2)}`
+                                            : `₹${item.price.toFixed(2)}`
+                                        }
                                         </td>
                                         <td className="px-6 py-4 text-center text-gray-800 font-medium">
                                            {item.product_type === 'mutual_fund' ? '-' : item.min_lot}
                                         </td>
                                         <td className="px-6 py-4 text-center text-gray-800 font-semibold">
                                           {item.product_type === 'mutual_fund'
-    ? '-'
-    : `₹${(item.price * item.min_lot).toLocaleString('en-IN', {
-          minimumFractionDigits: 2,
-      })}`
-}
+                                            ? '-'
+                                            : `₹${(item.price * item.min_lot).toLocaleString('en-IN', {
+                                                minimumFractionDigits: 2,
+                                            })}`
+                                        }
                                         </td>
                                         <td className="px-6 py-4 text-center">
                                             <span className="px-3 py-1 rounded-md bg-purple-50 text-purple-600 text-[10px] font-bold uppercase border border-purple-100">
@@ -449,7 +452,7 @@ export default function Wishlist() {
                     </table>
                 </div>
 
-                {/* Mobile Card View */}
+                {/* Mobile Card View - NO HORIZONTAL LINES */}
                 <div className="md:hidden grid grid-cols-1 gap-4">
                     <AnimatePresence>
                         {filteredItems.length === 0 ? (
@@ -465,42 +468,53 @@ export default function Wishlist() {
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
-                                    className="bg-white rounded-[2rem] p-5 shadow-sm border border-slate-100"
+                                    className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100"
                                 >
                                     <div className="flex items-start justify-between mb-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-14 h-14 rounded-2xl border border-slate-100 bg-white flex items-center justify-center overflow-hidden">
-                                                {item.logo_url ? <img src={item.logo_url} className="w-full h-full object-contain" alt="" /> : <Building2 className="text-[#2076C7] w-6 h-6" />}
+                                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                                            <div className="w-14 h-14 rounded-2xl border border-slate-100 bg-white flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
+                                                {item.logo_url ? (
+                                                    <img src={item.logo_url} className="w-full h-full object-contain p-1.5" alt={item.product_name} />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10">
+                                                        <Building2 className="text-[#2076C7] w-7 h-7" strokeWidth={1.5} />
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div>
-                                                <h3 className="font-bold text-slate-800 text-lg leading-tight">{item.product_name}</h3>
-                                                <span className="text-[10px] font-bold text-[#1CADA3] bg-emerald-50 px-2 py-0.5 rounded uppercase">{item.product_type.replace('_', ' ')}</span>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-bold text-slate-800 text-base leading-tight truncate">{item.product_name}</h3>
+                                                <span className="text-[9px] font-bold text-[#1CADA3] bg-emerald-50 px-2 py-0.5 rounded-full uppercase inline-block mt-1">
+                                                    {item.product_type.replace('_', ' ')}
+                                                </span>
                                             </div>
                                         </div>
-                                        <button onClick={() => handleRemoveItem(item.id)} className="text-slate-300 hover:text-red-500 p-1">
-                                            <Trash2 size={20} />
+                                        <button onClick={() => handleRemoveItem(item.id)} className="text-slate-300 hover:text-red-500 p-1 transition-colors flex-shrink-0 ml-2">
+                                            <Trash2 size={18} />
                                         </button>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4 py-4 border-y border-slate-50">
+                                    <div className="grid grid-cols-2 gap-4 py-3">
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Price</span>
-                                            <span className="text-sm font-bold text-slate-800">₹{item.price.toFixed(2)}</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Price</span>
+                                            <span className="text-base font-bold text-[#2076C7]">₹{item.price.toFixed(2)}</span>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lot Size</span>
-                                            <span className="text-sm font-bold text-slate-800">{item.min_lot} Units</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Lot Size</span>
+                                            <span className="text-base font-bold text-slate-800">
+                                                {item.min_lot === 0 ? '-' : `${item.min_lot} Units`}
+                                            </span>
                                         </div>
                                     </div>
 
-                                    <div className="mt-4 flex items-center justify-between">
+                                    <div className="mt-2 flex items-center justify-between pt-2">
                                         <div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Min. Invest</span>
-                                            <span className="text-lg font-black text-[#2076C7]">₹{(item.price * item.min_lot).toLocaleString('en-IN')}</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Min. Invest</span>
+                                            <span className="text-base font-black text-[#2076C7]">
+                                                {item.product_type === 'mutual_fund' 
+                                                    ? '-' 
+                                                    : `₹${(item.price * item.min_lot).toLocaleString('en-IN')}`}
+                                            </span>
                                         </div>
-                                        <button className="bg-slate-100 p-2 rounded-xl text-slate-600 hover:bg-[#2076C7] hover:text-white transition-all">
-                                            <PlusCircle size={20} />
-                                        </button>
                                     </div>
                                 </motion.div>
                             ))

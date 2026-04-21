@@ -10,14 +10,10 @@ import {
   RefreshCw,
   Download,
   X,
-  Phone,
-  Mail,
   User,
   FileText,
   Clock,
   CheckCircle,
-  XCircle,
-  ChevronDown,
   ChevronsUpDown
 } from 'lucide-react';
 import { AdminService } from '@/app/services/adminService';

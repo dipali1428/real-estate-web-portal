@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, User, Calendar, Clock, MessageCircle, Phone, ChevronDown, ChevronUp } from 'lucide-react';
+import { MessageSquare, Calendar, Clock, MessageCircle, Phone, ChevronDown, ChevronUp } from 'lucide-react';
 import TicketDetailsModal from '../supportticket/ticketdetail';
 
 const TicketAdminCard = ({ 

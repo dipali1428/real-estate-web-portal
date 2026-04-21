@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend, LineController, LineElement, PointElement, LinearScale, CategoryScale } from 'chart.js';
 import { TrendingUp, PieChart, Calculator, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Register Chart.js components
 Chart.register(
@@ -30,24 +31,15 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
   const [principal, setPrincipal] = useState<number>(100000);
   const [interestRate, setInterestRate] = useState<number>(7.5);
   const [tenureValue, setTenureValue] = useState<number>(12);
-  const [tenureUnit, setTenureUnit] = useState<string>('years'); // 'months' or 'years'
+  const [tenureUnit, setTenureUnit] = useState<string>('years');
   const [frequency, setFrequency] = useState<string>('yearly');
-
-  // State for calculated values
-  const [finalAmount, setFinalAmount] = useState<number>(0);
-  const [totalInterest, setTotalInterest] = useState<number>(0);
-  const [yearlyData, setYearlyData] = useState<Array<{
-    year: string;
-    amount: number;
-    interest: number;
-    principal: number;
-  }>>([]);
 
   // Chart references
   const doughnutChartRef = useRef<Chart<'doughnut'> | null>(null);
   const lineChartRef = useRef<Chart<'line'> | null>(null);
   const doughnutCanvasRef = useRef<HTMLCanvasElement>(null);
   const lineCanvasRef = useRef<HTMLCanvasElement>(null);
+  const chartsInitialized = useRef(false);
 
   // Frequency mapping
   const frequencyMap: Record<string, number> = {
@@ -58,7 +50,7 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
   };
 
   // Format currency for display
-  const formatCurrency = (value: number): string => {
+  const formatCurrency = useCallback((value: number): string => {
     if (value === 0) return '₹0';
     if (value >= 10000000) {
       return '₹' + (value / 10000000).toFixed(2) + ' Cr';
@@ -67,10 +59,63 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
       return '₹' + (value / 100000).toFixed(2) + ' L';
     }
     return '₹' + value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
+  }, []);
+
+  // Calculate derived values directly during render (no useEffect needed!)
+  const calculateDerivedValues = useCallback(() => {
+    const p = Number(principal) || 0;
+    const r = Number(interestRate) / 100 || 0;
+    const years = tenureUnit === 'years' ? (Number(tenureValue) || 0) : (Number(tenureValue) || 0) / 12;
+    const n = frequencyMap[frequency] || 1;
+
+    // Validation
+    if (p <= 1000 || r <= 0 || years < 1) {
+      return {
+        finalAmount: p,
+        totalInterest: 0,
+        yearlyData: []
+      };
+    }
+
+    const finalAmountValue = p * Math.pow(1 + r / n, n * years);
+    const totalInterestValue = finalAmountValue - p;
+
+    // Generate yearly data for the chart
+    const yearlyDataCalc = [];
+    const totalYears = Math.max(1, Math.ceil(years));
+    
+    for (let year = 1; year <= totalYears; year++) {
+      const t = Math.min(year, years);
+      const amount = p * Math.pow(1 + r / n, n * t);
+      yearlyDataCalc.push({
+        year: `Year ${year}`,
+        amount: Math.round(amount),
+        interest: Math.round(amount - p),
+        principal: Math.round(p)
+      });
+    }
+    
+    // Add final period if needed
+    if (years < totalYears) {
+      yearlyDataCalc.push({
+        year: `${(years * 12).toFixed(0)} months`,
+        amount: Math.round(finalAmountValue),
+        interest: Math.round(totalInterestValue),
+        principal: Math.round(p)
+      });
+    }
+
+    return {
+      finalAmount: finalAmountValue,
+      totalInterest: totalInterestValue,
+      yearlyData: yearlyDataCalc,
+    };
+  }, [principal, interestRate, tenureValue, tenureUnit, frequency, frequencyMap]);
+
+  const { finalAmount, totalInterest, yearlyData } = calculateDerivedValues();
 
   // Handle input changes with proper type safety
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = useCallback((field: string, value: string) => {
     if (value === '') {
       switch (field) {
         case 'principal':
@@ -108,108 +153,13 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
           break;
       }
     }
-  };
+  }, [tenureUnit]);
 
-  // Calculate compound interest with proper validation
-  const calculateCompoundInterest = () => {
-    const principalNum = Number(principal) || 0;
-    const interestRateNum = Number(interestRate) || 0;
-    const tenureValueNum = Number(tenureValue) || 0;
-    
-    if (principalNum <= 1000 || principalNum === 0) {
-      setFinalAmount(principalNum);
-      setTotalInterest(0);
-      updateCharts(principalNum, 0);
-      return;
-    }
-
-    if (interestRateNum <= 0) {
-      setFinalAmount(principalNum);
-      setTotalInterest(0);
-      updateCharts(principalNum, 0);
-      return;
-    }
-
-    if (tenureValueNum < 1) {
-      setFinalAmount(principalNum);
-      setTotalInterest(0);
-      updateCharts(principalNum, 0);
-      return;
-    }
-
-    const years = tenureUnit === 'years' ? tenureValueNum : tenureValueNum / 12;
-    const n = frequencyMap[frequency] || 1;
-    const r = interestRateNum / 100;
-    
-    const finalAmountValue = principalNum * Math.pow(1 + r / n, n * years);
-    const totalInterestValue = finalAmountValue - principalNum;
-
-    const finalAmountNum = isNaN(finalAmountValue) ? principalNum : finalAmountValue;
-    const totalInterestNum = isNaN(totalInterestValue) ? 0 : totalInterestValue;
-
-    setFinalAmount(finalAmountNum);
-    setTotalInterest(totalInterestNum);
-
-    generateYearlyData(principalNum, r, n, years, finalAmountNum);
-    updateCharts(principalNum, totalInterestNum);
-  };
-
-  // Generate yearly data for line chart
-  const generateYearlyData = (
-    principalNum: number, 
-    rate: number, 
-    n: number, 
-    years: number, 
-    finalAmountNum: number
-  ) => {
-    const data = [];
-    const totalYears = Math.max(1, Math.ceil(years));
-    
-    for (let year = 1; year <= totalYears; year++) {
-      const t = Math.min(year, years);
-      const amount = principalNum * Math.pow(1 + rate / n, n * t);
-      const interest = amount - principalNum;
-      
-      data.push({
-        year: `Year ${year}`,
-        amount: Math.round(isNaN(amount) ? principalNum : amount),
-        interest: Math.round(isNaN(interest) ? 0 : interest),
-        principal: Math.round(principalNum)
-      });
-    }
-    
-    if (years < totalYears) {
-      data.push({
-        year: `${(years * 12).toFixed(0)} months`,
-        amount: Math.round(isNaN(finalAmountNum) ? principalNum : finalAmountNum),
-        interest: Math.round(isNaN(finalAmountNum - principalNum) ? 0 : finalAmountNum - principalNum),
-        principal: Math.round(principalNum)
-      });
-    }
-    
-    setYearlyData(data);
-  };
-
-  // Update charts with type safety
-  const updateCharts = (principalNum: number, interestNum: number) => {
-    const principalValue = isNaN(principalNum) ? 0 : principalNum;
-    const interestValue = isNaN(interestNum) ? 0 : interestNum;
-
-    if (doughnutChartRef.current) {
-      doughnutChartRef.current.data.datasets[0].data = [principalValue, interestValue];
-      doughnutChartRef.current.update();
-    }
-
-    if (lineChartRef.current && yearlyData.length > 0) {
-      lineChartRef.current.data.labels = yearlyData.map(d => d.year);
-      lineChartRef.current.data.datasets[0].data = yearlyData.map(d => d.amount);
-      lineChartRef.current.update();
-    }
-  };
-
-  // Initialize charts
+  // Initialize charts only once
   useEffect(() => {
-    if (doughnutCanvasRef.current) {
+    if (chartsInitialized.current) return;
+    
+    if (doughnutCanvasRef.current && !doughnutChartRef.current) {
       const ctx = doughnutCanvasRef.current.getContext('2d');
       if (ctx) {
         doughnutChartRef.current = new Chart(ctx, {
@@ -235,7 +185,7 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
       }
     }
 
-    if (lineCanvasRef.current) {
+    if (lineCanvasRef.current && !lineChartRef.current && yearlyData.length > 0) {
       const ctx = lineCanvasRef.current.getContext('2d');
       if (ctx) {
         lineChartRef.current = new Chart(ctx, {
@@ -279,38 +229,51 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
             }
           }
         });
+        chartsInitialized.current = true;
       }
     }
 
     return () => {
       if (doughnutChartRef.current) {
         doughnutChartRef.current.destroy();
+        doughnutChartRef.current = null;
       }
       if (lineChartRef.current) {
         lineChartRef.current.destroy();
+        lineChartRef.current = null;
       }
+      chartsInitialized.current = false;
     };
-  }, []);
+  }, [formatCurrency, principal, totalInterest, yearlyData]);
 
-  // Calculate when parameters change
+  // Update doughnut chart when values change
   useEffect(() => {
-    calculateCompoundInterest();
-  }, [principal, interestRate, tenureValue, tenureUnit, frequency]);
+    if (doughnutChartRef.current) {
+      doughnutChartRef.current.data.datasets[0].data = [principal, totalInterest];
+      doughnutChartRef.current.update();
+    }
+  }, [principal, totalInterest]);
+
+  // Update line chart when yearlyData changes
+  useEffect(() => {
+    if (lineChartRef.current && yearlyData.length > 0) {
+      lineChartRef.current.data.labels = yearlyData.map(d => d.year);
+      lineChartRef.current.data.datasets[0].data = yearlyData.map(d => d.amount);
+      lineChartRef.current.update();
+    }
+  }, [yearlyData]);
 
   // Handle slider changes
   const handlePrincipalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    setPrincipal(isNaN(value) ? 0 : value);
+    setPrincipal(Number(e.target.value));
   };
 
   const handleInterestRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    setInterestRate(isNaN(value) ? 0 : value);
+    setInterestRate(Number(e.target.value));
   };
 
   const handleTenureValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    setTenureValue(isNaN(value) ? 0 : value);
+    setTenureValue(Number(e.target.value));
   };
 
   // Input change handlers
@@ -326,32 +289,14 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
     handleInputChange('tenureValue', e.target.value);
   };
 
-  // Get display values with type safety
-  const getPrincipalDisplayValue = (): string => {
-    return principal === 0 ? '' : principal.toString();
-  };
-
-  const getInterestRateDisplayValue = (): string => {
-    return interestRate === 0 ? '' : interestRate.toString();
-  };
-
-  const getTenureValueDisplayValue = (): string => {
-    return tenureValue === 0 ? '' : tenureValue.toString();
-  };
+  // Get display values
+  const getPrincipalDisplayValue = () => principal === 0 ? '' : principal.toString();
+  const getInterestRateDisplayValue = () => interestRate === 0 ? '' : interestRate.toString();
+  const getTenureValueDisplayValue = () => tenureValue === 0 ? '' : tenureValue.toString();
 
   // Get max values based on unit
-  const getTenureMax = (): number => {
-    return tenureUnit === 'years' ? 50 : 600;
-  };
-
-  const getTenureStep = (): number => {
-    return tenureUnit === 'years' ? 1 : 1;
-  };
-
-  // Get appropriate tenure label
-  const getTenureLabel = (): string => {
-    return tenureUnit === 'years' ? 'Years' : 'Months';
-  };
+  const getTenureMax = () => tenureUnit === 'years' ? 50 : 600;
+  const getTenureLabel = () => tenureUnit === 'years' ? 'Years' : 'Months';
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -440,7 +385,7 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
                   id="tenureValue"
                   min="1"
                   max={getTenureMax()}
-                  step={getTenureStep()}
+                  step="1"
                   value={tenureValue}
                   onChange={handleTenureValueChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
@@ -558,7 +503,7 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
               </div>
             </div>
 
-            {/* Insights Section - Smaller font and reduced spacing */}
+            {/* Insights Section */}
             <div className="bg-white rounded-xl border shadow-md p-5">
               <h2 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
                 Key Insights
@@ -644,7 +589,7 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
                         principal * (interestRate / 100) * (tenureUnit === 'years' ? tenureValue : tenureValue / 12)
                       )}
                     </span>{' '}
-                    - that's{' '}
+                    - that&apos;s{' '}
                     <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
                       {formatCurrency(
                         totalInterest - (principal * (interestRate / 100) * (tenureUnit === 'years' ? tenureValue : tenureValue / 12))
@@ -662,7 +607,7 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
                 </div>
                 
                 <p className="text-[11px] text-gray-500 mt-2">
-                  <strong>Note:</strong> This calculation assumes consistent returns and doesn't account for inflation or taxes. 
+                  <strong>Note:</strong> This calculation assumes consistent returns and doesn&apos;t account for inflation or taxes. 
                   Actual returns may vary based on market conditions.
                 </p>
               </div>
@@ -679,10 +624,11 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
 // =============================================
 const CompoundInterestCalculatorStandalone: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const router = useRouter();
   const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'compoundinterest') || CALCULATOR_OPTIONS[0];
 
   const handleCalculatorChange = (path: string) => {
-    window.location.href = path;
+    router.push(path);
   };
 
   return (

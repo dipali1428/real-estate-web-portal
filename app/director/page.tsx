@@ -4,21 +4,18 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { AdminService } from "../services/adminService";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 import { getToken, isTokenExpired } from "../lib/auth-token";
 
 import {
-  Users, Mail, Clock, CheckCircle, LineChart as LineChartIcon,
-  FolderOpen, ArrowUpRight, Plus, Download, Filter,
-  Target, MoreHorizontal, ShieldCheck, Layers, TableProperties,
-  Ticket, UserCheck, UserPlus, FileText, MessageSquare, Zap
+  Users, Clock, CheckCircle, LineChart as LineChartIcon,
+  FolderOpen,
+  Ticket, UserCheck, UserPlus, MessageSquare
 } from "lucide-react";
 
 import {
   ResponsiveContainer, BarChart, Bar, PieChart, Pie,
-  Legend, ComposedChart, Line, RadialBarChart, RadialBar,
-  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Cell,
+  Legend,
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, XAxis, YAxis, Tooltip, Cell,
 } from 'recharts';
 
 import StatsCard from "../component/DashboardStatsCard";

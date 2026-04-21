@@ -2,9 +2,9 @@
 import React, { useState, useMemo, useEffect, useCallback, FC } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  ArrowLeft, Search, HandCoins, Building, FileSignature,
-  Calculator, ChartLine, CheckCircle, ChevronDown, ChevronUp,
-  Check, X, HelpCircle, Send, Package, Filter, AlertCircle, Info
+  ArrowLeft, Search, HandCoins, FileSignature,
+  ChartLine, CheckCircle, ChevronDown, ChevronUp,
+  Check, X, HelpCircle, Send, Filter, AlertCircle, Info
 } from 'lucide-react';
 import { fetchAllShares } from '../../../services/unlistedservices';
 import { useModal } from '../../../context/ModalContext';
@@ -51,7 +51,22 @@ const SellShares: FC = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
-  const [visibleCount, setVisibleCount] = useState(12);
+  
+  // --- RESPONSIVE VISIBILITY LOGIC (20 Desktop, 4 Mobile) ---
+  const [visibleCount, setVisibleCount] = useState(20);
+
+  useEffect(() => {
+    const handleInitialCount = () => {
+        if (window.innerWidth < 768) {
+            setVisibleCount(4); // Mobile: 4 cards total
+        } else {
+            setVisibleCount(20); // Desktop: 5 horizontal x 4 vertical
+        }
+    };
+    handleInitialCount();
+    window.addEventListener('resize', handleInitialCount);
+    return () => window.removeEventListener('resize', handleInitialCount);
+  }, []);
 
   // --- SELL FORM STATES ---
   const [selectedCompany, setSelectedCompany] = useState<ApiCompany | null>(null);
@@ -112,7 +127,8 @@ const SellShares: FC = () => {
 
   // RESET PAGINATION ON FILTER
   useEffect(() => {
-    setVisibleCount(12);
+    if (window.innerWidth < 768) setVisibleCount(4);
+    else setVisibleCount(20);
   }, [debouncedSearch, selectedCategory, sortBy]);
 
   // FILTERING LOGIC
@@ -155,6 +171,10 @@ const SellShares: FC = () => {
       setQtyToSell('');
       setCalcResult(null);
       showToast(`Selected ${company.shares_name} for selling`, 'success');
+      setTimeout(() => {
+        const element = document.getElementById('detailsSection');
+        if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
     }
   };
 
@@ -166,10 +186,6 @@ const SellShares: FC = () => {
     const reducedPrice = getSellPrice(Number(selectedCompany.price));
     setCalcResult({ price: reducedPrice, total: reducedPrice * parseInt(qtyToSell) });
     showToast(`Price calculated: ₹${reducedPrice.toLocaleString()} per share`, 'success');
-    setTimeout(() => {
-        const element = document.getElementById('resultsSection');
-        if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
   };
 
   const handleSellNow = () => {
@@ -192,7 +208,6 @@ const SellShares: FC = () => {
     return `${(Math.abs(Math.sin(seed) * 100) + 20).toFixed(1)}K`;
   };
 
-  // TOAST UI HELPERS
   const getToastIcon = (type: Toast['type']) => {
     switch (type) {
       case 'success': return <CheckCircle className="w-4 h-4 text-green-600" />;
@@ -201,6 +216,7 @@ const SellShares: FC = () => {
       default: return <Info className="w-4 h-4 text-blue-600" />;
     }
   };
+
   const getToastBg = (type: Toast['type']) => {
     switch (type) {
       case 'success': return 'bg-green-100 border-green-200 text-green-800';
@@ -222,7 +238,7 @@ const SellShares: FC = () => {
   return (
     <div className="min-h-screen font-sans bg-gradient-to-br from-gray-50 to-white">
       {/* TOAST CONTAINER */}
-      <div className="fixed top-16 md:top-20 right-4 md:right-5 z-[5000] flex flex-col gap-3 w-[calc(100%-32px)] md:w-auto">
+      <div className="fixed top-20 right-5 z-[5000] flex flex-col gap-3">
         {toasts.map(toast => (
           <div key={toast.id} onClick={() => removeToast(toast.id)} className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 border ${getToastBg(toast.type)} animate-in slide-in-from-right-5 cursor-pointer`}>
             {getToastIcon(toast.type)}
@@ -231,9 +247,9 @@ const SellShares: FC = () => {
         ))}
       </div>
 
-      <main className="container mx-auto px-4 py-4 md:py-8 min-h-screen">
+      <main className="container mx-auto px-4 py-4 pt-4 md:pt-8 min-h-screen">
         {/* BACK BUTTON */}
-        <div className="sticky top-[72px] z-40 mb-6 md:mb-8 bg-gradient-to-br from-gray-50 to-white pt-2 pb-2">
+        <div className="sticky top-[72px] z-40 mb-8 bg-gradient-to-br from-gray-50 to-white pt-2 pb-2">
           <a href="/products/unlisted" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-sm hover:bg-white transition-all group">
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="font-semibold">Back</span>
@@ -241,63 +257,55 @@ const SellShares: FC = () => {
         </div>
 
         {/* HEADER */}
-        <header className="mb-8 md:mb-12 text-center">
-          <div className="inline-flex items-center justify-center p-3 md:p-4 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 mb-4 md:mb-6">
-            <div className="p-3 md:p-4 rounded-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg">
-              <HandCoins className="w-6 h-6 md:w-8 md:h-8" />
+        <header className="mb-12 text-center">
+          <div className="inline-flex items-center justify-center p-4 rounded-full bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 mb-6">
+            <div className="p-4 rounded-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg">
+              <HandCoins className="w-8 h-8" />
             </div>
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm px-2">
-            Sell Unlisted Shares
-          </h1>
-          <div className="w-16 md:w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4 md:mb-6"></div>
-          <p className="text-base md:text-xl text-gray-600 max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed px-4">
-            Get competitive pricing and fast settlement for your unlisted shareholdings.
-          </p>
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">Sell Unlisted Shares</h1>
+          <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-6"></div>
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">Get competitive pricing and fast settlement for your unlisted shareholdings.</p>
         </header>
 
         {/* SEARCH & FILTERS */}
-        <section className="mb-6 md:mb-8">
-          <div className="mb-4 md:mb-6">
+        <section className="mb-8">
+          <div className="mb-6">
             <div className="relative max-w-2xl mx-auto">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
-              </div>
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
               <input 
                 type="text" 
                 placeholder="Search companies to sell..." 
                 value={searchTerm} 
                 onChange={(e) => setSearchTerm(e.target.value)} 
                 onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
-                className="block w-full pl-12 pr-4 py-3 md:py-4 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 outline-none transition-all shadow-sm hover:shadow-md text-gray-900 placeholder-gray-500" 
+                className="block w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-[#2076C7] outline-none shadow-sm hover:shadow-md text-gray-900" 
               />
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-1">
-              <select className="w-full md:w-auto px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] transition-all text-gray-900 text-sm" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+          <div className="flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex flex-wrap gap-3 flex-1">
+              <select className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] text-gray-900 text-sm" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
                 <option value="">All Categories</option>
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
-              <select className="w-full md:w-auto px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] transition-all text-gray-900 text-sm" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <select className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] text-gray-900 text-sm" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                 <option value="name-asc">Name: A to Z</option>
-                <option value="name-desc">Name: Z to A</option>
                 <option value="price-high">Price: High to Low</option>
-                <option value="price-low">Price: Low to High</option>
               </select>
-              <div className="flex items-center justify-center md:justify-start px-4 py-2 bg-blue-50 rounded-lg">
-                <span className="text-xs md:text-sm text-[#2076C7] font-semibold whitespace-nowrap">{filteredCompanies.length} companies</span>
+              <div className="flex items-center px-4 py-2 bg-blue-50 rounded-lg">
+                <span className="text-sm text-[#2076C7] font-semibold">{filteredCompanies.length} companies</span>
               </div>
             </div>
-            <button onClick={handleApplyFilters} className="w-full md:w-auto px-6 py-2.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-md whitespace-nowrap">
+            <button onClick={handleApplyFilters} className="px-6 py-2.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold hover:opacity-90 flex items-center gap-2 shadow-md">
               <Filter className="w-4 h-4" /> Apply Filters
             </button>
           </div>
         </section>
 
-        {/* COMPANIES GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
+        {/* --- GRID LAYOUT: 5 COLUMNS ON DESKTOP --- */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-12">
           {filteredCompanies.slice(0, visibleCount).map(company => {
             const isSelected = selectedCompany?.id === company.id;
             const sellPrice = getSellPrice(Number(company.price));
@@ -305,96 +313,117 @@ const SellShares: FC = () => {
               <div
                 key={company.id}
                 onClick={() => handleSelectToSell(company)}
-                className={`bg-white rounded-2xl shadow-lg border transition-all duration-300 hover:shadow-xl p-5 md:p-6 flex flex-col items-center text-center h-full cursor-pointer group ${
-                  isSelected ? 'border-[#2076C7] bg-blue-50/30 ring-2 ring-[#2076C7]/10' : 'border-gray-100 hover:border-[#2076C7]'
+                className={`bg-white rounded-2xl shadow-lg border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full group cursor-pointer ${
+                  isSelected ? 'border-[#2076C7] ring-2 ring-[#2076C7]/10' : 'border-gray-100 hover:border-[#2076C7]'
                 }`}
               >
-                <div className="w-full h-28 md:h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100 shadow-sm overflow-hidden transition-transform group-hover:scale-[1.02] relative">
-                  {company.logo_url ? (
-                    <Image
-                      src={company.logo_url}
-                      alt={company.shares_name}
-                      fill
-                      className="object-contain p-3"
-                      sizes="(max-width: 768px) 100vw, 200px"
-                    />
-                  ) : (
-                    <span className="text-3xl font-bold text-[#2076C7]">
-                      {company.shares_name.charAt(0)}
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 line-clamp-1">{company.shares_name}</h3>
-                <div className="mb-2"><span className="text-xl md:text-2xl font-bold text-[#2076C7]">₹{sellPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span></div>
-                <div className="text-xs md:text-sm text-gray-500 mb-4">{company.depository_applicable || 'Unlisted Share'}</div>
-                
-                <div className="grid grid-cols-2 gap-x-3 md:gap-x-6 gap-y-3 w-full mb-6">
-                  <div className="text-center"><div className="text-[10px] md:text-xs text-gray-500 mb-0.5">Lot Size</div><div className="text-xs md:text-sm font-bold text-gray-900">{company.min_lot_size}</div></div>
-                  <div className="text-center"><div className="text-[10px] md:text-xs text-gray-500 mb-0.5">Depository</div><div className="text-xs md:text-sm font-bold text-gray-900">{company.depository_applicable?.split(' ')[0] || 'NSDL'}</div></div>
-                  <div className="text-center"><div className="text-[10px] md:text-xs text-gray-500 mb-0.5">Min. Value</div><div className="text-xs md:text-sm font-bold text-gray-900">₹{(sellPrice * company.min_lot_size).toLocaleString('en-IN')}</div></div>
-                  <div className="text-center"><div className="text-[10px] md:text-xs text-gray-500 mb-0.5">Demand</div><div className="text-xs md:text-sm font-bold text-gray-900">{getAvailableVolume(company.id)}</div></div>
+                {/* RECTANGULAR IMAGE CONTAINER */}
+                <div className="w-full h-32 bg-gray-50 rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden">
+                    {company.logo_url ? (
+                        <Image
+                            src={company.logo_url} 
+                            width={200}
+                            height={150}
+                            className="w-full h-full object-contain p-3 transition-transform duration-700 group-hover:scale-110" 
+                            alt={company.shares_name} 
+                        />
+                    ) : (
+                        <span className="text-3xl font-bold text-[#2076C7]">{company.shares_name.charAt(0)}</span>
+                    )}
                 </div>
 
-                <div className="w-full mt-auto">
-                   <button className={`w-full py-3 md:py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 ${
-                    isSelected ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md' : 'border-2 border-[#2076C7] text-[#2076C7] hover:bg-blue-50'
-                  }`}>
-                    {isSelected ? <Check size={16} /> : <HandCoins size={16} />} {isSelected ? 'Selected' : 'Select to Sell'}
-                  </button>
+                {/* Company Details */}
+                <div className="p-5 flex flex-col flex-grow">
+                    <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-1 group-hover:text-[#2076C7] transition-colors">
+                        {company.shares_name}
+                    </h4>
+                    
+                    {/* Price Display */}
+                    <div className="mb-4 text-center">
+                        <span className="text-2xl font-bold text-[#2076C7]">
+                            ₹{sellPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        </span>
+                    </div>
+                    
+                    <div className="text-sm text-gray-500 text-center mb-4 uppercase font-bold tracking-tighter">
+                        {company.depository_applicable || 'Unlisted Share'}
+                    </div>
+
+                    {/* Info Grid */}
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
+                        <div className="text-center">
+                            <div className="text-[10px] text-gray-400 uppercase font-bold">Lot Size</div>
+                            <div className="text-sm font-bold text-gray-900">{company.min_lot_size}</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-[10px] text-gray-400 uppercase font-bold">Depository</div>
+                            <div className="text-sm font-bold text-gray-900">{company.depository_applicable?.split(' ')[0] || 'NSDL'}</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-[10px] text-gray-400 uppercase font-bold">Min. Value</div>
+                            <div className="text-sm font-bold text-gray-900">₹{(sellPrice * company.min_lot_size).toLocaleString()}</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-[10px] text-gray-400 uppercase font-bold">Demand</div>
+                            <div className="text-sm font-bold text-gray-900">{getAvailableVolume(company.id)}</div>
+                        </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="mt-auto">
+                        <button className={`w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+                            isSelected ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md' : 'border-2 border-[#2076C7] text-[#2076C7] hover:bg-blue-50'
+                        }`}>
+                            {isSelected ? <Check size={16} /> : <HandCoins size={16} />} 
+                            {isSelected ? 'Selected' : 'Select to Sell'}
+                        </button>
+                    </div>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* VIEW MORE BUTTON */}
+        {/* SHOW MORE BUTTON LOGIC (4 for Mobile, 20 for Desktop) */}
         {visibleCount < filteredCompanies.length && (
-          <div className="flex justify-center pb-8 md:pb-12">
-            <button onClick={() => setVisibleCount(prev => prev + 12)} className="flex items-center gap-2 px-6 md:px-8 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm hover:shadow-md active:scale-95">
-              View More Companies <ChevronDown size={20} />
+          <div className="flex justify-center pb-12">
+            <button 
+                onClick={() => setVisibleCount(prev => prev + (window.innerWidth < 768 ? 4 : 20))} 
+                className="flex items-center gap-2 px-10 py-4 bg-white border-2 border-gray-200 rounded-2xl font-black text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-md"
+            >
+                View More Companies <ChevronDown size={20} />
             </button>
           </div>
         )}
 
         {/* SELL CALCULATOR SECTION */}
-        <section className="mb-8 md:mb-12 mt-4 md:mt-8">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 flex items-center gap-3 px-1">
-            <FileSignature className="w-5 h-5 md:w-6 md:h-6 text-[#2076C7]" /> Sell Share Details
+        <section id="detailsSection" className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3 px-1">
+            <FileSignature className="w-6 h-6 text-[#2076C7]" /> Sell Details
           </h2>
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 md:p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <Building className="w-4 h-4 text-[#2076C7]" /> Company Name
-                </label>
-                <div className="w-full p-3 md:p-4 bg-gray-50 border border-gray-200 rounded-lg font-bold text-gray-900 text-sm md:text-base">
+                <label className="block text-sm font-bold text-gray-500 mb-2 uppercase">Company</label>
+                <div className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-900">
                   {selectedCompany?.shares_name || "Select a company from the grid above"}
                 </div>
-                {selectedCompany && (
-                   <p className="text-[10px] md:text-xs text-gray-500 mt-2">
-                     Market Price: <span className="text-red-500 line-through">₹{Number(selectedCompany.price).toLocaleString()}</span>
-                     <span className="mx-2">|</span>
-                     Your Sell Price: <span className="text-emerald-600 font-bold">₹{getSellPrice(Number(selectedCompany.price)).toLocaleString()}</span>
-                   </p>
-                )}
               </div>
               <div>
-                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <Package className="w-4 h-4 text-[#2076C7]" /> Quantity
-                </label>
+                <label className="block text-sm font-bold text-gray-500 mb-2 uppercase">Quantity</label>
                 <input 
                   type="number" 
                   placeholder="Enter quantity" 
                   value={qtyToSell} 
                   onChange={(e) => setQtyToSell(e.target.value)} 
-                  className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:border-[#2076C7] outline-none font-bold text-gray-700 text-sm md:text-base" 
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-[#2076C7] outline-none font-bold" 
                 />
               </div>
               <button 
                 onClick={handleCalculate} 
-                className="md:col-span-2 py-3 md:py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold flex items-center justify-center gap-3 shadow-md hover:opacity-95 transition-all active:scale-[0.98]"
+                className="md:col-span-2 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold shadow-md hover:opacity-95 transition-all"
               >
-                <Calculator size={18} /> Calculate Estimated Value
+                Calculate Estimated Value
               </button>
             </div>
           </div>
@@ -402,28 +431,28 @@ const SellShares: FC = () => {
 
         {/* RESULTS SECTION */}
         {calcResult && (
-          <section id="resultsSection" className="mb-8 md:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 scroll-mt-24">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 flex items-center gap-3 px-1">
-              <ChartLine className="w-5 h-5 md:w-6 md:h-6 text-[#1CADA3]" /> Estimated Value
+          <section className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3 px-1">
+              <ChartLine className="w-6 h-6 text-[#1CADA3]" /> Estimated Value
             </h2>
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 md:p-8">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10">
-                <div className="p-4 md:p-6 bg-gray-50 rounded-xl border text-center">
-                  <div className="text-xl md:text-2xl font-bold text-gray-700">₹{calcResult.price.toLocaleString()}</div>
-                  <div className="text-[10px] md:text-xs text-gray-500 font-bold uppercase mt-1">Sell Price / Share</div>
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div className="p-6 bg-gray-50 rounded-xl border text-center">
+                  <div className="text-2xl font-black text-gray-700">₹{calcResult.price.toLocaleString()}</div>
+                  <div className="text-xs font-bold text-gray-400 uppercase mt-1">Sell Price / Share</div>
                 </div>
-                <div className="p-4 md:p-6 bg-gray-50 rounded-xl border text-center">
-                  <div className="text-xl md:text-2xl font-bold text-gray-700">₹{calcResult.total.toLocaleString()}</div>
-                  <div className="text-[10px] md:text-xs text-gray-500 font-bold uppercase mt-1">Total Value</div>
+                <div className="p-6 bg-gray-50 rounded-xl border text-center">
+                  <div className="text-3xl font-black text-[#2076C7]">₹{calcResult.total.toLocaleString()}</div>
+                  <div className="text-xs font-bold text-gray-400 uppercase mt-1">Total Value</div>
                 </div>
-                <div className="p-4 md:p-6 bg-gray-50 rounded-xl border text-center">
-                  <div className="text-xl md:text-2xl font-bold text-gray-700">7-10 Days</div>
-                  <div className="text-[10px] md:text-xs text-gray-500 font-bold uppercase mt-1">Settlement Time</div>
+                <div className="p-6 bg-gray-50 rounded-xl border text-center">
+                  <div className="text-2xl font-black text-gray-700">7-10 Days</div>
+                  <div className="text-xs font-bold text-gray-400 uppercase mt-1">Settlement Time</div>
                 </div>
               </div>
               <button 
                 onClick={handleSellNow} 
-                className="w-full sm:w-auto px-10 md:px-12 py-3 md:py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-base md:text-lg shadow-xl flex items-center justify-center gap-3 mx-auto transition-all active:scale-95"
+                className="w-full sm:w-auto px-12 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-lg shadow-xl flex items-center justify-center gap-3 mx-auto transition-all"
               >
                 <Send size={18} /> Sell Now
               </button>
@@ -432,16 +461,16 @@ const SellShares: FC = () => {
         )}
 
         {/* FAQ SECTION */}
-        <section className="mb-12 mt-8 md:mt-12">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 flex items-center gap-3 px-1">
-            <HelpCircle className="w-5 h-5 md:w-6 md:h-6 text-[#2076C7]" /> Frequently Asked Questions
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3 px-1">
+            <HelpCircle className="w-6 h-6 text-[#2076C7]" /> Frequently Asked Questions
           </h2>
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 md:p-8 space-y-3 md:space-y-4">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-4">
             {FAQ_ITEMS.map((item, idx) => (
               <div key={idx} className="border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 transition-all">
                 <div className="p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-all" onClick={() => setActiveFaqs(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx])}>
-                  <h3 className="font-bold text-sm md:text-base text-gray-900 pr-4">{item.q}</h3>
-                  {activeFaqs.includes(idx) ? <ChevronUp className="w-5 h-5 text-gray-500 shrink-0" /> : <ChevronDown className="w-5 h-5 text-gray-500 shrink-0" />}
+                  <h3 className="font-bold text-gray-900">{item.q}</h3>
+                  {activeFaqs.includes(idx) ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
                 </div>
                 {activeFaqs.includes(idx) && (
                   <div className="p-4 bg-white text-sm text-gray-600 border-t border-gray-100 leading-relaxed">
@@ -454,7 +483,6 @@ const SellShares: FC = () => {
         </section>
       </main>
 
-      {/* Animation Styles */}
       <style jsx>{`
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-fadeIn { animation: fadeIn 0.2s ease-out; }

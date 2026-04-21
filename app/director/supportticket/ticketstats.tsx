@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Inbox, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Inbox, XCircle, AlertCircle } from 'lucide-react';
 
 const AdminTicketStats = ({ stats }: { stats: any }) => {
   const statCards = [

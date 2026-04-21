@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TrendingUp, PieChart, Calculator, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Calculator options for dropdown
 const CALCULATOR_OPTIONS = [
@@ -154,7 +155,7 @@ export const LoanTenureCalculatorContent: React.FC = () => {
     }
   };
 
-  // Calculate impact
+  // Calculate impact - now only called from button click, NOT from useEffect
   const calculateImpact = useCallback(() => {
     const { loanAmount, interestRate, sipReturn, shorterTenure } = parameters;
 
@@ -287,12 +288,18 @@ export const LoanTenureCalculatorContent: React.FC = () => {
       sipReturn: 12,
       shorterTenure: 20,
     });
+    // Also reset results to default values
+    setResults({
+      emi20: 43391,
+      emi30: 38452,
+      emiDifference: 4939,
+      sipValue: 14284258,
+      totalInterest20: 5413840,
+      totalInterest30: 8842720,
+    });
+    setYearlyBreakdown([]);
     showNotification('Form reset successfully!', 'success');
   };
-
-  useEffect(() => {
-    // calculateImpact();
-  }, [calculateImpact]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -531,12 +538,13 @@ export const LoanTenureCalculatorContent: React.FC = () => {
 // =============================================
 const LoanTenureCalculatorStandalone: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const router = useRouter();
 
   const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'sipVsEmi') || CALCULATOR_OPTIONS[0];
 
-  const handleCalculatorChange = (path: string) => {
-    window.location.href = path;
-  };
+  const handleCalculatorChange = useCallback((path: string) => {
+    router.push(path);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gray-50">
