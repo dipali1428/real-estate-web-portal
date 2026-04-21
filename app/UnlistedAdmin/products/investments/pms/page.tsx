@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { AdminService } from '../../../../services/unlistedadminservices';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -19,9 +18,6 @@ import {
 } from "lucide-react";
 
 const PMSImportAdmin: React.FC = () => {
-  const router = useRouter();
-
-  // States
   const [file, setFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [progress, setProgress] = useState({ percent: 0, status: 'Waiting...' });
@@ -104,8 +100,7 @@ const PMSImportAdmin: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white shadow-md flex justify-between items-center"
-      >
+        className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white shadow-md flex justify-between items-center">
         <div className="flex items-center gap-3">
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -123,14 +118,12 @@ const PMSImportAdmin: React.FC = () => {
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className={`fixed top-24 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${
-              toast.type === 'success'
+            className={`fixed top-24 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${toast.type === 'success'
                 ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                 : toast.type === 'error'
-                ? 'bg-red-50 border-red-200 text-red-700'
-                : 'bg-blue-50 border-blue-200 text-blue-700'
-            }`}
-          >
+                  ? 'bg-red-50 border-red-200 text-red-700'
+                  : 'bg-blue-50 border-blue-200 text-blue-700'
+              }`}>
             {toast.type === 'success' ? (
               <CheckCircle className="w-5 h-5" />
             ) : toast.type === 'error' ? (
@@ -141,8 +134,7 @@ const PMSImportAdmin: React.FC = () => {
             <span className="text-sm font-medium">{toast.message}</span>
             <button
               onClick={() => setToast(null)}
-              className="p-1 hover:bg-black/5 rounded-lg transition-colors"
-            >
+              className="p-1 hover:bg-black/5 rounded-lg transition-colors">
               <X className="w-4 h-4" />
             </button>
           </motion.div>
@@ -157,8 +149,7 @@ const PMSImportAdmin: React.FC = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
-        >
+          className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-blue-100">
             <h3 className="font-bold text-gray-800 flex items-center gap-2">
               <Upload className="w-5 h-5 text-[#2076C7]" />
@@ -171,8 +162,7 @@ const PMSImportAdmin: React.FC = () => {
             {!file ? (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center cursor-pointer hover:border-[#1CADA3] transition-all group"
-              >
+                className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center cursor-pointer hover:border-[#1CADA3] transition-all group">
                 <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-400 group-hover:scale-110 transition-transform group-hover:text-[#2076C7]">
                   <FileSpreadsheet className="w-8 h-8" />
                 </div>
@@ -200,8 +190,7 @@ const PMSImportAdmin: React.FC = () => {
                 <button
                   onClick={() => setFile(null)}
                   className="p-1.5 hover:bg-emerald-200 rounded-lg transition-colors"
-                  disabled={isImporting}
-                >
+                  disabled={isImporting}>
                   <X className="w-4 h-4 text-emerald-600" />
                 </button>
               </div>
@@ -228,8 +217,7 @@ const PMSImportAdmin: React.FC = () => {
             <button
               onClick={startImport}
               disabled={!file || isImporting}
-              className="w-full py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black uppercase text-xs tracking-widest rounded-xl disabled:opacity-50 flex items-center justify-center gap-3 shadow-lg shadow-blue-100"
-            >
+              className="w-full py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black uppercase text-xs tracking-widest rounded-xl disabled:opacity-50 flex items-center justify-center gap-3 shadow-lg shadow-blue-100">
               {isImporting ? (
                 <>
                   <Loader2 className="animate-spin w-4 h-4" />
@@ -250,8 +238,7 @@ const PMSImportAdmin: React.FC = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
-        >
+          className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           <div className="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 border-b border-emerald-100">
             <h3 className="font-bold text-gray-800 flex items-center gap-2">
               <Gem className="w-5 h-5 text-emerald-600" />

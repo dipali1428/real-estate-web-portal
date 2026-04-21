@@ -22,16 +22,16 @@ import {
     ResponsiveContainer
 } from 'recharts';
 import customerService from '../../../../services/customerService';
-// import removed, dynamic fetching used instead
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 // --- TYPES ---
 interface Investment {
     id: number;
-    fundName: string; // Changed from propertyId to be more explicit for PMS
+    fundName: string;
     amount: number;
     date: string;
-    units: number; // Renamed from factionTockens
+    units: number;
 }
 
 export interface PMSProduct {
@@ -78,7 +78,6 @@ export default function InvestmentGrowth() {
 
                 // Fetch dynamic pool of PMS funds so the UI can construct mapping even if activeInvestments is empty or demo
                 const funds = await customerService.getPMSFundsList();
-                console.log("Raw PMS Funds Data:", funds);
                 const colors = ["#2076C7", "#1CADA3", "#8B5CF6", "#f59e0b", "#10b981", "#ef4444"];
                 const mappedProducts: PMSProduct[] = funds.map((f: any, idx: number) => ({
                     id: f.id,
@@ -104,13 +103,10 @@ export default function InvestmentGrowth() {
                 }));
 
                 setDynamicProducts(mappedProducts);
-                //console.log("Fetched PMS Funds for Dynamic Mapping:", mappedProducts);
 
-                // Since a specific PMS portfolio API is pending, we'll keep it empty
-                // but setting up the structure for future integration
                 setRealInvestments([]);
             } catch (error) {
-                console.error("Failed to fetch PMS portfolio or funds:", error);
+                toast.error("Failed to fetch PMS portfolio or funds")
             } finally {
                 setIsLoading(false);
             }
@@ -230,15 +226,13 @@ export default function InvestmentGrowth() {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setIsDemoMode(!isDemoMode)}
-                            className="flex items-center gap-2 px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
-                        >
+                            className="flex items-center gap-2 px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">
                             {isDemoMode ? <EyeOff size={16} /> : <Eye size={16} />}
                             {isDemoMode ? 'Exit Demo' : 'View Demo'}
                         </button>
                         <Link
                             href="/customer/pms"
-                            className="flex items-center gap-2 px-4 py-2 bg-[#2076C7] text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                        >
+                            className="flex items-center gap-2 px-4 py-2 bg-[#2076C7] text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
                             Invest More
                         </Link>
                     </div>

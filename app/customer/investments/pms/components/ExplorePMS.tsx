@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import customerService from "../../../../services/customerService";
+import toast from "react-hot-toast";
 
 interface CartItem {
   id: string;
@@ -95,7 +96,6 @@ export default function ExplorePMS() {
     const fetchFunds = async () => {
       try {
         const funds = await customerService.getPMSFundsList();
-        console.log("Raw PMS Funds Data:", funds);
 
         const colors = ["#2076C7", "#1CADA3", "#8B5CF6", "#f59e0b", "#10b981", "#ef4444"];
 
@@ -124,9 +124,8 @@ export default function ExplorePMS() {
           };
         });
         setDynamicProducts(mappedProducts);
-        console.log("Mapped PMS Products:", dynamicProducts);
       } catch (err) {
-        console.error("Failed to load PMS funds", err);
+        toast.error("Failed to load PMS Funds")
       } finally {
         setLoadingProducts(false);
       }
@@ -146,7 +145,7 @@ export default function ExplorePMS() {
           }
         }
       } catch (error) {
-        console.error("Failed to fetch user profile:", error);
+        toast.error("Failed to fetch user profile");
       }
     };
     fetchUser();
@@ -168,7 +167,7 @@ export default function ExplorePMS() {
           }
         }
       } catch (error) {
-        console.error("Failed to re-fetch user profile:", error);
+        toast.error("Failed to re-fetch user profile:");
       }
     }
   };
@@ -206,7 +205,6 @@ export default function ExplorePMS() {
         setSchedulingProduct(null);
       }
     } catch (error: any) {
-      console.error("Scheduling Error:", error);
       setToastMessage(error.response?.data?.error || "Failed to schedule meeting. Please try again.");
       setShowToast(true);
     } finally {
@@ -234,7 +232,7 @@ export default function ExplorePMS() {
         setWishlistMap(map);
       }
     } catch (error) {
-      console.error("Failed to load wishlist:", error);
+      toast.error("Failed to load wishlist");
     }
   }, [userId]);
 
@@ -258,22 +256,6 @@ export default function ExplorePMS() {
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, activeCategory, dynamicProducts]);
-
-  // Cart Actions
-  const handleAddToCart = (product: PMSProduct) => {
-    if (cart.find(item => item.id === product.name)) {
-      setIsCartOpen(true);
-      return;
-    }
-    const newItem: CartItem = { id: product.name, name: product.name, amount: MIN_INVESTMENT };
-    setCart([...cart, newItem]);
-    setIsCartOpen(true);
-  };
-
-  const removeFromCart = (id: string) => setCart(cart.filter(item => item.id !== id));
-  const updateCartAmount = (id: string, amount: number) =>
-    setCart(cart.map(item => (item.id === id ? { ...item, amount } : item)));
-  const formatINR = (num: number) => num.toLocaleString("en-IN");
 
   const toggleWishlist = async (product: PMSProduct) => {
     const productName = product.name;
@@ -320,7 +302,7 @@ export default function ExplorePMS() {
         }
       }
     } catch (error: any) {
-      console.error("Wishlist toggle error:", error);
+      toast.error("Failed to update wishlist");
       const msg = error.response?.data?.message || "Failed to update wishlist";
       setToastMessage(msg);
       setShowToast(true);
@@ -346,8 +328,7 @@ export default function ExplorePMS() {
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: -20, x: 20 }}
             className="fixed top-6 right-6 z-[9999] flex items-center gap-3 px-5 py-3 rounded-2xl shadow-2xl text-white text-sm font-bold"
-            style={{ background: "linear-gradient(135deg, #2076C7, #1CADA3)" }}
-          >
+            style={{ background: "linear-gradient(135deg, #2076C7, #1CADA3)" }}>
             <BookmarkCheck size={18} />
             {toastMessage}
           </motion.div>
@@ -359,8 +340,7 @@ export default function ExplorePMS() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative bg-white rounded-2xl p-6 mb-2 shadow-sm border border-slate-100/60"
-      >
+        className="relative bg-white rounded-2xl p-6 mb-2 shadow-sm border border-slate-100/60">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
