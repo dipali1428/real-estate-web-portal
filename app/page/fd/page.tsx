@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
 import { TrendingUp, PieChart, Calculator, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
@@ -31,132 +31,34 @@ export const FDCalculatorContent: React.FC = () => {
   const [tenure, setTenure] = useState<number>(5);
   const [tenureType, setTenureType] = useState<'years' | 'months'>('years');
   const [compoundingFrequency, setCompoundingFrequency] = useState<'monthly' | 'quarterly' | 'annually'>('quarterly');
-  const [isCalculating, setIsCalculating] = useState<boolean>(false);
-
-  // State for calculated values
-  const [maturityAmount, setMaturityAmount] = useState<number>(0);
-  const [totalInterest, setTotalInterest] = useState<number>(0);
-  const [estimatedReturns, setEstimatedReturns] = useState<number>(0);
-
-  // State for validation errors
-  const [errors, setErrors] = useState<{
-    principalAmount: string;
-    interestRate: string;
-    tenure: string;
-  }>({
-    principalAmount: '',
-    interestRate: '',
-    tenure: ''
-  });
 
   // Chart reference
   const chartRef = useRef<Chart<'doughnut'> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chartsInitialized = useRef(false);
 
   // Format currency for display
-  const formatCurrency = (value: number): string => {
-    if (value === 0) return '₹0';
+  const formatCurrency = useCallback((value: number): string => {
+    if (value === 0 || isNaN(value)) return '₹0';
     return '₹' + value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
+  }, []);
 
-  // Validate inputs
-  const validateInputs = () => {
-    const newErrors = {
-      principalAmount: '',
-      interestRate: '',
-      tenure: ''
-    };
+  // Calculate derived values directly during render (NO STATE, NO EFFECT!)
+  const calculateDerivedValues = useCallback(() => {
+    const principal = Number(principalAmount) || 0;
+    const rate = Number(interestRate) || 0;
+    const tenureValue = Number(tenure) || 0;
 
-    if (!principalAmount || principalAmount < 10000) {
-      newErrors.principalAmount = 'Minimum deposit amount is ₹10,000';
-    } else if (principalAmount > 100000000) {
-      newErrors.principalAmount = 'Maximum deposit amount is ₹10,00,00,000';
+    // Validation
+    if (principal < 10000 || rate < 1 || tenureValue <= 0) {
+      return {
+        maturityAmount: 0,
+        totalInterest: 0,
+        estimatedReturns: 0
+      };
     }
 
-    if (!interestRate || interestRate < 1) {
-      newErrors.interestRate = 'Minimum interest rate is 1%';
-    } else if (interestRate > 15) {
-      newErrors.interestRate = 'Maximum interest rate is 15%';
-    }
-
-    if (!tenure || tenure <= 0) {
-      newErrors.tenure = tenureType === 'years' ? 'Minimum tenure is 1 years' : 'Minimum tenure is 1 month';
-    } else if (tenureType === 'years' && tenure > 30) {
-      newErrors.tenure = 'Maximum tenure is 30 years';
-    } else if (tenureType === 'months' && tenure > 360) {
-      newErrors.tenure = 'Maximum tenure is 360 months';
-    }
-
-    setErrors(newErrors);
-    return !newErrors.principalAmount && !newErrors.interestRate && !newErrors.tenure;
-  };
-
-  // Handle input changes with validation
-  const handleInputChange = (field: string, value: string) => {
-    if (value === '') {
-      switch (field) {
-        case 'principalAmount':
-          setPrincipalAmount(0);
-          setErrors(prev => ({ ...prev, principalAmount: 'Please enter deposit amount' }));
-          break;
-        case 'interestRate':
-          setInterestRate(0);
-          setErrors(prev => ({ ...prev, interestRate: 'Please enter interest rate' }));
-          break;
-        case 'tenure':
-          setTenure(0);
-          setErrors(prev => ({ ...prev, tenure: `Please enter tenure in ${tenureType}` }));
-          break;
-      }
-      return;
-    }
-
-    const cleanValue = value.replace(/[^\d.]/g, '');
-    const parts = cleanValue.split('.');
-    if (parts.length > 2) return;
-
-    const numValue = parseFloat(cleanValue);
-    if (!isNaN(numValue)) {
-      switch (field) {
-        case 'principalAmount':
-          setPrincipalAmount(numValue);
-          if (numValue >= 10000 && numValue <= 100000000) {
-            setErrors(prev => ({ ...prev, principalAmount: '' }));
-          }
-          break;
-        case 'interestRate':
-          const roundedRate = Math.round(numValue * 10) / 10;
-          setInterestRate(roundedRate);
-          if (roundedRate >= 1 && roundedRate <= 15) {
-            setErrors(prev => ({ ...prev, interestRate: '' }));
-          }
-          break;
-        case 'tenure':
-          const roundedTenure = tenureType === 'years'
-            ? Math.round(numValue * 10) / 10
-            : Math.round(numValue);
-          setTenure(roundedTenure);
-          if (roundedTenure > 0) {
-            setErrors(prev => ({ ...prev, tenure: '' }));
-          }
-          break;
-      }
-    }
-  };
-
-  // Calculate FD returns with compounding frequency
-  const calculateFDReturns = () => {
-    if (!validateInputs()) {
-      setMaturityAmount(0);
-      setTotalInterest(0);
-      setEstimatedReturns(0);
-      updateChart(0, 0);
-      return;
-    }
-
-    setIsCalculating(true);
-
-    const tenureInYears = tenureType === 'months' ? tenure / 12 : tenure;
+    const tenureInYears = tenureType === 'months' ? tenureValue / 12 : tenureValue;
 
     let periodsPerYear: number;
     switch (compoundingFrequency) {
@@ -173,34 +75,104 @@ export const FDCalculatorContent: React.FC = () => {
         periodsPerYear = 4;
     }
 
-    const ratePerPeriod = interestRate / (100 * periodsPerYear);
+    const ratePerPeriod = rate / (100 * periodsPerYear);
     const totalPeriods = periodsPerYear * tenureInYears;
-    const amount = principalAmount * Math.pow(1 + ratePerPeriod, totalPeriods);
-    const totalInterestEarned = amount - principalAmount;
+    const amount = principal * Math.pow(1 + ratePerPeriod, totalPeriods);
+    const totalInterestEarned = amount - principal;
 
     const roundedAmount = Math.round(amount * 100) / 100;
     const roundedInterest = Math.round(totalInterestEarned * 100) / 100;
 
-    setMaturityAmount(roundedAmount);
-    setTotalInterest(roundedInterest);
-    setEstimatedReturns(roundedInterest);
+    return {
+      maturityAmount: roundedAmount,
+      totalInterest: roundedInterest,
+      estimatedReturns: roundedInterest
+    };
+  }, [principalAmount, interestRate, tenure, tenureType, compoundingFrequency]);
 
-    updateChart(principalAmount, roundedInterest);
+  // Get derived values directly - these are what we use for rendering
+  const { maturityAmount, totalInterest, estimatedReturns } = calculateDerivedValues();
 
-    setIsCalculating(false);
-  };
+  // Calculate validation errors directly during render (NO useEffect!)
+  const getValidationErrors = useCallback(() => {
+    const errors = {
+      principalAmount: '',
+      interestRate: '',
+      tenure: ''
+    };
 
-  // Update the chart with new data
-  const updateChart = (principal: number, interest: number) => {
-    if (chartRef.current) {
-      chartRef.current.data.datasets[0].data = [principal, interest];
-      chartRef.current.update();
+    if (!principalAmount || principalAmount < 10000) {
+      errors.principalAmount = 'Minimum deposit amount is ₹10,000';
+    } else if (principalAmount > 100000000) {
+      errors.principalAmount = 'Maximum deposit amount is ₹10,00,00,000';
     }
-  };
 
-  // Initialize chart
+    if (!interestRate || interestRate < 1) {
+      errors.interestRate = 'Minimum interest rate is 1%';
+    } else if (interestRate > 15) {
+      errors.interestRate = 'Maximum interest rate is 15%';
+    }
+
+    if (!tenure || tenure <= 0) {
+      errors.tenure = tenureType === 'years' ? 'Minimum tenure is 1 years' : 'Minimum tenure is 1 month';
+    } else if (tenureType === 'years' && tenure > 30) {
+      errors.tenure = 'Maximum tenure is 30 years';
+    } else if (tenureType === 'months' && tenure > 360) {
+      errors.tenure = 'Maximum tenure is 360 months';
+    }
+
+    return errors;
+  }, [principalAmount, interestRate, tenure, tenureType]);
+
+  // Get validation errors directly during render
+  const errors = getValidationErrors();
+
+  // Handle input changes with validation
+  const handleInputChange = useCallback((field: string, value: string) => {
+    if (value === '') {
+      switch (field) {
+        case 'principalAmount':
+          setPrincipalAmount(0);
+          break;
+        case 'interestRate':
+          setInterestRate(0);
+          break;
+        case 'tenure':
+          setTenure(0);
+          break;
+      }
+      return;
+    }
+
+    const cleanValue = value.replace(/[^\d.]/g, '');
+    const parts = cleanValue.split('.');
+    if (parts.length > 2) return;
+
+    const numValue = parseFloat(cleanValue);
+    if (!isNaN(numValue)) {
+      switch (field) {
+        case 'principalAmount':
+          setPrincipalAmount(numValue);
+          break;
+        case 'interestRate':
+          const roundedRate = Math.round(numValue * 10) / 10;
+          setInterestRate(roundedRate);
+          break;
+        case 'tenure':
+          const roundedTenure = tenureType === 'years'
+            ? Math.round(numValue * 10) / 10
+            : Math.round(numValue);
+          setTenure(roundedTenure);
+          break;
+      }
+    }
+  }, [tenureType]);
+
+  // Initialize chart only once
   useEffect(() => {
-    if (canvasRef.current) {
+    if (chartsInitialized.current) return;
+
+    if (canvasRef.current && !chartRef.current) {
       const ctx = canvasRef.current.getContext('2d');
       if (ctx) {
         chartRef.current = new Chart(ctx, {
@@ -237,73 +209,60 @@ export const FDCalculatorContent: React.FC = () => {
             }
           }
         });
+        chartsInitialized.current = true;
       }
     }
 
     return () => {
       if (chartRef.current) {
         chartRef.current.destroy();
+        chartRef.current = null;
       }
+      chartsInitialized.current = false;
     };
-  }, []);
+  }, []); // Empty dependency array - only run once
 
-  // Update chart when data changes
+  // Update chart when values change
   useEffect(() => {
-    if (chartRef.current && principalAmount > 0 && totalInterest >= 0) {
-      updateChart(principalAmount, totalInterest);
+    if (chartRef.current) {
+      chartRef.current.data.datasets[0].data = [principalAmount, totalInterest];
+      chartRef.current.update();
     }
   }, [principalAmount, totalInterest]);
 
-  // Calculate FD returns when parameters change
-  useEffect(() => {
-    calculateFDReturns();
-  }, [principalAmount, interestRate, tenure, tenureType, compoundingFrequency]);
-
   // Handle slider changes
-  const handlePrincipalAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    setPrincipalAmount(value);
-    if (value >= 10000 && value <= 10000000) {
-      setErrors(prev => ({ ...prev, principalAmount: '' }));
-    }
-  };
+  const handlePrincipalAmountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setPrincipalAmount(Number(e.target.value));
+  }, []);
 
-  const handleInterestRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    setInterestRate(value);
-    if (value >= 1 && value <= 15) {
-      setErrors(prev => ({ ...prev, interestRate: '' }));
-    }
-  };
+  const handleInterestRateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInterestRate(Number(e.target.value));
+  }, []);
 
-  const handleTenureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    setTenure(value);
-    if (value > 0) {
-      setErrors(prev => ({ ...prev, tenure: '' }));
-    }
-  };
+  const handleTenureChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setTenure(Number(e.target.value));
+  }, []);
 
   // Input change handlers
-  const handlePrincipalAmountInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePrincipalAmountInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange('principalAmount', e.target.value);
-  };
+  }, [handleInputChange]);
 
-  const handleInterestRateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInterestRateInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange('interestRate', e.target.value);
-  };
+  }, [handleInputChange]);
 
-  const handleTenureInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTenureInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange('tenure', e.target.value);
-  };
+  }, [handleInputChange]);
 
   // Format principal amount for display
-  const getPrincipalAmountDisplayValue = () => {
+  const getPrincipalAmountDisplayValue = useCallback(() => {
     return principalAmount === 0 ? '' : principalAmount.toString();
-  };
+  }, [principalAmount]);
 
   // Handle tenure type toggle with auto-conversion
-  const handleTenureTypeToggle = (type: 'years' | 'months') => {
+  const handleTenureTypeToggle = useCallback((type: 'years' | 'months') => {
     if (type === tenureType) return;
 
     let convertedValue = tenure;
@@ -320,45 +279,39 @@ export const FDCalculatorContent: React.FC = () => {
 
     setTenure(convertedValue);
     setTenureType(type);
-    setErrors(prev => ({ ...prev, tenure: '' }));
-  };
+  }, [tenureType, tenure]);
 
   // Prevent wheel event from changing input values
-  const handleWheelPrevent = (e: React.WheelEvent<HTMLInputElement>) => {
+  const handleWheelPrevent = useCallback((e: React.WheelEvent<HTMLInputElement>) => {
     e.currentTarget.blur();
-  };
+  }, []);
 
-  const handleNumberInputWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+  const handleNumberInputWheel = useCallback((e: React.WheelEvent<HTMLInputElement>) => {
     e.currentTarget.blur();
     e.stopPropagation();
-  };
+  }, []);
 
   // Reset to default values
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setPrincipalAmount(100000);
     setInterestRate(7.5);
     setTenure(5);
     setTenureType('years');
     setCompoundingFrequency('quarterly');
-    setErrors({
-      principalAmount: '',
-      interestRate: '',
-      tenure: ''
-    });
-  };
+  }, []);
 
   // Get minimum and maximum values for tenure
-  const getTenureMinMax = () => {
+  const getTenureMinMax = useCallback(() => {
     return {
       min: tenureType === 'years' ? '1' : '1',
       max: tenureType === 'years' ? '30' : '360'
     };
-  };
+  }, [tenureType]);
 
   const tenureLimits = getTenureMinMax();
 
   // Calculate insights data
-  const calculateInsights = () => {
+  const calculateInsights = useCallback(() => {
     const insights = {
       interestPercentageOfPrincipal: principalAmount > 0 ? ((totalInterest / principalAmount) * 100).toFixed(1) : '0',
       averageAnnualInterest: principalAmount > 0
@@ -371,12 +324,12 @@ export const FDCalculatorContent: React.FC = () => {
     };
 
     return insights;
-  };
+  }, [principalAmount, totalInterest, tenure, tenureType, interestRate]);
 
   const insights = calculateInsights();
 
   // Get compounding frequency description
-  const getCompoundingDescription = () => {
+  const getCompoundingDescription = useCallback(() => {
     switch (compoundingFrequency) {
       case 'monthly':
         return 'Compounded monthly (12 times a year)';
@@ -387,7 +340,7 @@ export const FDCalculatorContent: React.FC = () => {
       default:
         return 'Compounded quarterly';
     }
-  };
+  }, [compoundingFrequency]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -512,7 +465,7 @@ export const FDCalculatorContent: React.FC = () => {
                   id="tenure"
                   min={tenureLimits.min}
                   max={tenureLimits.max}
-                  step={tenureType === 'years' ? '1' : '1'}
+                  step="1"
                   value={tenure}
                   onChange={handleTenureChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
@@ -528,7 +481,7 @@ export const FDCalculatorContent: React.FC = () => {
                   id="tenureInput"
                   min={tenureLimits.min}
                   max={tenureLimits.max}
-                  step={tenureType === 'years' ? '1' : '1'}
+                  step="1"
                   value={tenure === 0 ? '' : tenure}
                   onChange={handleTenureInputChange}
                   onWheel={handleNumberInputWheel}
@@ -595,23 +548,19 @@ export const FDCalculatorContent: React.FC = () => {
               <div className="text-center mb-6">
                 <div className="text-sm text-[#2076C7] font-medium mb-1">Maturity Amount</div>
                 <div className="text-3xl font-bold text-[#1CADA3] font-sans">
-                  {isCalculating ? (
-                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"></div>
-                  ) : (
-                    maturityAmount > 0 ? formatCurrency(maturityAmount) : '₹0'
-                  )}
+                  {maturityAmount > 0 ? formatCurrency(maturityAmount) : '₹0'}
                 </div>
               </div>
               <div className="flex justify-between">
                 <div className="text-center flex-1 px-4">
                   <div className="text-lg font-medium font-sans text-[#1CADA3]">
-                    {isCalculating ? '-' : totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                    {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                   </div>
                   <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
                 </div>
                 <div className="text-center flex-1 px-4">
                   <div className="text-lg font-medium font-sans text-[#1CADA3]">
-                    {isCalculating ? '-' : estimatedReturns > 0 ? formatCurrency(estimatedReturns) : '₹0'}
+                    {estimatedReturns > 0 ? formatCurrency(estimatedReturns) : '₹0'}
                   </div>
                   <div className="text-sm text-[#1CADA3] mt-1">Estimated Returns</div>
                 </div>
@@ -655,7 +604,7 @@ export const FDCalculatorContent: React.FC = () => {
                 <div className="flex justify-between pt-2">
                   <span className="text-gray-600 font-semibold">Total Interest Earned</span>
                   <span className="font-bold font-sans text-[#1CADA3]">
-                    {isCalculating ? '-' : totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
+                    {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                   </span>
                 </div>
               </div>
@@ -835,9 +784,9 @@ const FDCalculatorStandalone: React.FC = () => {
   const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'fd') || CALCULATOR_OPTIONS[0];
   const router = useRouter();
 
-  const handleCalculatorChange = (path: string) => {
+  const handleCalculatorChange = useCallback((path: string) => {
     router.push(path);
-  };
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gray-50">

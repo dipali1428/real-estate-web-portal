@@ -248,22 +248,14 @@ export default function UnlistedSharesForm({ onClose }: { onClose: () => void })
         notes: notes.trim()
       };
 
-      // Log the payload for debugging
-      // console.log("Sending payload:", payload);
-
       const result = await DashboardService.createReferralLead(payload);
-      // console.log("API Response:", result);
       
-      // Check if the response indicates success
       if (!result.success) {
         throw new Error(result.message || "Failed to create lead");
       }
       
-      // Since the API doesn't return an ID, generate a temporary ID
-      // or fetch the lead ID from another endpoint
       const tempId = `TEMP_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      // Store the lead data in localStorage to retrieve later
       const pendingLeads = JSON.parse(localStorage.getItem('pending_leads') || '{}');
       pendingLeads[tempId] = {
         ...form,
@@ -275,16 +267,8 @@ export default function UnlistedSharesForm({ onClose }: { onClose: () => void })
       setLeadId(tempId);
       setStep(2);
     } catch (err: any) {
-      console.error("API Error Details:", {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
-        statusText: err.response?.statusText
-      });
-      
       let errorMessage = "Failed to create application.";
       
-      // Parse different error response formats
       if (err.response?.data) {
         if (typeof err.response.data === 'string') {
           errorMessage = err.response.data;
@@ -300,8 +284,6 @@ export default function UnlistedSharesForm({ onClose }: { onClose: () => void })
       }
       
       setStatusMsg(errorMessage);
-      // Show error alert for better visibility
-      // alert(`Error: ${errorMessage}`);
       toast.error(`Error: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);

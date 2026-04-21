@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import { toast } from "react-hot-toast";
 
 export default function RealEstateForm({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
@@ -82,7 +83,7 @@ export default function RealEstateForm({ onClose }: { onClose: () => void }) {
       await DashboardService.createLead(payload);
       setSuccess(true);
     } catch (err) {
-      console.error("Submission error:", err);
+      toast.error("Submission error:");
       setError(true);
     }
   };

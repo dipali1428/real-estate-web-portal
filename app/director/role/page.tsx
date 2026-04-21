@@ -2,10 +2,8 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import {
-  SquarePen,
   X,
   Plus,
-  Users,
   Search,
   Clock,
   ShieldCheck,

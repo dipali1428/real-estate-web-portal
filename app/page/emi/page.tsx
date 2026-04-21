@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
 import { motion, AnimatePresence } from 'motion/react';
 import { TrendingUp, PieChart, Calculator, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Register Chart.js components
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
@@ -22,23 +23,56 @@ const CALCULATOR_OPTIONS = [
 
 // Main Calculator Component (without any header/dropdown)
 const EMICalculatorContent: React.FC = () => {
-  // All your existing calculator logic and state remains EXACTLY the same
+  // Only store input state
   const [loanAmount, setLoanAmount] = useState<number>(1000000);
   const [interestRate, setInterestRate] = useState<number>(8.5);
   const [loanTenure, setLoanTenure] = useState<number>(20);
 
-  const [emi, setEmi] = useState<number>(0);
-  const [totalPayment, setTotalPayment] = useState<number>(0);
-  const [totalInterest, setTotalInterest] = useState<number>(0);
-
   const chartRef = useRef<Chart<'doughnut'> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chartsInitialized = useRef(false);
 
-  const formatCurrency = (value: number): string => {
+  const formatCurrency = useCallback((value: number): string => {
+    if (value === 0 || isNaN(value)) return '₹0';
     return '₹' + value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
+  }, []);
 
-  const handleInputChange = (field: string, value: string) => {
+  // Calculate derived values directly during render (NO STATE, NO EFFECT!)
+  const calculateDerivedValues = useCallback(() => {
+    const loanAmountNum = Number(loanAmount) || 0;
+    const interestRateNum = Number(interestRate) || 0;
+    const loanTenureNum = Number(loanTenure) || 0;
+
+    // Validation
+    if (loanAmountNum < 100000 || interestRateNum < 7 || loanTenureNum < 1) {
+      return {
+        emi: 0,
+        totalPayment: 0,
+        totalInterest: 0
+      };
+    }
+
+    const monthlyInterestRate = interestRateNum / 12 / 100;
+    const tenureMonths = loanTenureNum * 12;
+
+    const emiValue = loanAmountNum * monthlyInterestRate *
+      Math.pow(1 + monthlyInterestRate, tenureMonths) /
+      (Math.pow(1 + monthlyInterestRate, tenureMonths) - 1);
+
+    const totalPaymentValue = emiValue * tenureMonths;
+    const totalInterestValue = totalPaymentValue - loanAmountNum;
+
+    return {
+      emi: emiValue,
+      totalPayment: totalPaymentValue,
+      totalInterest: totalInterestValue
+    };
+  }, [loanAmount, interestRate, loanTenure]);
+
+  // Get derived values directly - these are what we use for rendering
+  const { emi, totalPayment, totalInterest } = calculateDerivedValues();
+
+  const handleInputChange = useCallback((field: string, value: string) => {
     if (value === '') {
       switch (field) {
         case 'loanAmount':
@@ -72,47 +106,13 @@ const EMICalculatorContent: React.FC = () => {
           break;
       }
     }
-  };
+  }, []);
 
-  const calculateEMI = () => {
-    if (!loanAmount || loanAmount < 100000 || loanAmount === 0) {
-      return;
-    }
-
-    if (!interestRate || interestRate < 7 || interestRate === 0) {
-      return;
-    }
-
-    if (!loanTenure || loanTenure < 1 || loanTenure === 0) {
-      return;
-    }
-
-    const monthlyInterestRate = interestRate / 12 / 100;
-    const tenureMonths = loanTenure * 12;
-
-    const emiValue = loanAmount * monthlyInterestRate *
-      Math.pow(1 + monthlyInterestRate, tenureMonths) /
-      (Math.pow(1 + monthlyInterestRate, tenureMonths) - 1);
-
-    const totalPaymentValue = emiValue * tenureMonths;
-    const totalInterestValue = totalPaymentValue - loanAmount;
-
-    setEmi(emiValue);
-    setTotalPayment(totalPaymentValue);
-    setTotalInterest(totalInterestValue);
-
-    updateChart(loanAmount, totalInterestValue);
-  };
-
-  const updateChart = (principal: number, interest: number) => {
-    if (chartRef.current) {
-      chartRef.current.data.datasets[0].data = [principal, interest];
-      chartRef.current.update();
-    }
-  };
-
+  // Initialize chart only once
   useEffect(() => {
-    if (canvasRef.current) {
+    if (chartsInitialized.current) return;
+
+    if (canvasRef.current && !chartRef.current) {
       const ctx = canvasRef.current.getContext('2d');
       if (ctx) {
         chartRef.current = new Chart(ctx, {
@@ -135,47 +135,62 @@ const EMICalculatorContent: React.FC = () => {
             }
           }
         });
+        chartsInitialized.current = true;
       }
     }
 
     return () => {
       if (chartRef.current) {
         chartRef.current.destroy();
+        chartRef.current = null;
       }
+      chartsInitialized.current = false;
     };
+  }, []); // Empty dependency array - only run once
+
+  // Update chart when values change
+  useEffect(() => {
+    if (chartRef.current) {
+      chartRef.current.data.datasets[0].data = [loanAmount, totalInterest];
+      chartRef.current.update();
+    }
+  }, [loanAmount, totalInterest]);
+
+  const handleLoanAmountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoanAmount(Number(e.target.value));
   }, []);
 
-  useEffect(() => {
-    calculateEMI();
-  }, [loanAmount, interestRate, loanTenure]);
-
-  const handleLoanAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoanAmount(Number(e.target.value));
-  };
-
-  const handleInterestRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInterestRateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInterestRate(Number(e.target.value));
-  };
+  }, []);
 
-  const handleLoanTenureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLoanTenureChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setLoanTenure(Number(e.target.value));
-  };
+  }, []);
 
-  const handleLoanAmountInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLoanAmountInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange('loanAmount', e.target.value);
-  };
+  }, [handleInputChange]);
 
-  const handleInterestRateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInterestRateInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange('interestRate', e.target.value);
-  };
+  }, [handleInputChange]);
 
-  const handleLoanTenureInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLoanTenureInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange('loanTenure', e.target.value);
-  };
+  }, [handleInputChange]);
 
-  const getLoanAmountDisplayValue = () => {
+  const getLoanAmountDisplayValue = useCallback(() => {
     return loanAmount === 0 ? '' : loanAmount.toString();
-  };
+  }, [loanAmount]);
+
+  const getInterestRateDisplayValue = useCallback(() => {
+    return interestRate === 0 ? '' : interestRate.toString();
+  }, [interestRate]);
+
+  const getLoanTenureDisplayValue = useCallback(() => {
+    return loanTenure === 0 ? '' : loanTenure.toString();
+  }, [loanTenure]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -245,7 +260,7 @@ const EMICalculatorContent: React.FC = () => {
                   min="7"
                   max="50"
                   step="0.1"
-                  value={interestRate === 0 ? '' : interestRate}
+                  value={getInterestRateDisplayValue()}
                   onChange={handleInterestRateInputChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
                 />
@@ -280,7 +295,7 @@ const EMICalculatorContent: React.FC = () => {
                   id="loanTenureInput"
                   min="1"
                   max="30"
-                  value={loanTenure === 0 ? '' : loanTenure}
+                  value={getLoanTenureDisplayValue()}
                   onChange={handleLoanTenureInputChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-20 text-gray-800 placeholder:text-gray-500"
                 />
@@ -340,10 +355,9 @@ const EMICalculatorContent: React.FC = () => {
               </div>
             </div>
 
-            {/* Insights Section - Smaller font and reduced spacing */}
+            {/* Insights Section */}
             <div className="bg-white rounded-xl border shadow-md p-5">
               <h2 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                
                 Key Insights
               </h2>
 
@@ -440,7 +454,7 @@ const EMICalculatorContent: React.FC = () => {
                 </div>
                 
                 <p className="text-[11px] text-gray-500 mt-2">
-                  <strong>Note:</strong> This calculation doesn't account for processing fees, insurance, or any other charges. 
+                  <strong>Note:</strong> This calculation doesn&apos;t account for processing fees, insurance, or any other charges. 
                   Actual EMI may vary based on lender policies.
                 </p>
               </div>
@@ -455,11 +469,12 @@ const EMICalculatorContent: React.FC = () => {
 // Standalone version with header and dropdown (for direct access)
 const EMICalculatorStandalone: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const router = useRouter();
   const activeData = CALCULATOR_OPTIONS.find(c => c.id === 'emi') || CALCULATOR_OPTIONS[0];
 
-  const handleCalculatorChange = (path: string) => {
-    window.location.href = path;
-  };
+  const handleCalculatorChange = useCallback((path: string) => {
+    router.push(path);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gray-50">

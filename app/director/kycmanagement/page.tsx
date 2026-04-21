@@ -189,7 +189,7 @@ export default function KycStatusPage() {
 
               <div className="hidden md:flex items-center gap-1">
                  {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                    let pageNum = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
+                    const pageNum = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
                     if (pageNum > totalPages) return null;
                     if (pageNum <= 0) return null;
                     

@@ -47,7 +47,7 @@ interface ExtendedCompany {
   volume: string;
 }
 
-// --- CONSTANTS ---
+// --- CONSTANTS (Preserved exactly from your original) ---
 const PROCESS_STEPS = [
   { icon: FileSignature, num: 1, title: 'Select Company', desc: 'Browse and select from our verified unlisted companies with live pricing.' },
   { icon: Calculator, num: 2, title: 'Calculate Investment', desc: 'Determine your investment amount based on current market price and lot size.' },
@@ -130,10 +130,25 @@ const BuyShares: FC = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
-  const [visibleCount, setVisibleCount] = useState(12);
+  
+  // --- VISIBILITY LOGIC (5x4 Desktop, 4 Mobile) ---
+  const [visibleCount, setVisibleCount] = useState(20); 
   const [detailCompany, setDetailCompany] = useState<ExtendedCompany | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [activeFaqs, setActiveFaqs] = useState<number[]>([]);
+
+  useEffect(() => {
+    const handleInitialCount = () => {
+        if (window.innerWidth < 768) {
+            setVisibleCount(4); // Mobile: Show only 4 initially
+        } else {
+            setVisibleCount(20); // Desktop: 5 horizontal x 4 vertical
+        }
+    };
+    handleInitialCount();
+    window.addEventListener('resize', handleInitialCount);
+    return () => window.removeEventListener('resize', handleInitialCount);
+  }, []);
 
   // TOAST HANDLER
   const showToast = useCallback((message: string, type: Toast['type'] = 'info', duration: number = 4000) => {
@@ -211,8 +226,10 @@ const BuyShares: FC = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // Reset visibility count when filters change
   useEffect(() => {
-    setVisibleCount(12);
+    if (window.innerWidth < 768) setVisibleCount(4);
+    else setVisibleCount(20);
   }, [debouncedSearch, selectedCategory, sortBy]);
 
   // CHART INITIALIZATION
@@ -443,52 +460,110 @@ const BuyShares: FC = () => {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        {/* --- GRID: 5 COLUMNS HORIZONTALLY ON DESKTOP --- */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8 mb-8">
           {filteredCompanies.slice(0, visibleCount).map(company => (
-            <div key={company.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-6 flex flex-col items-center text-center h-full">
-              <div className="w-full h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100 shadow-sm overflow-hidden">
-                {company.logo ? (
-                  <Image
-                    src={company.logo} 
-                    width={200}
-                    height={120}
-                    className="w-full h-full object-contain p-3" 
-                    alt={company.name} 
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                      const parent = (e.target as HTMLImageElement).parentElement;
-                      if (parent) {
-                        const span = document.createElement('span');
-                        span.className = 'text-3xl font-bold text-[#2076C7]';
-                        span.textContent = company.name.charAt(0);
-                        parent.appendChild(span);
-                      }
-                    }}
-                  />
-                ) : (
-                  <span className="text-3xl font-bold text-[#2076C7]">{company.name.charAt(0)}</span>
-                )}
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-1">{company.name}</h3>
-              <div className="mb-4"><span className="text-2xl font-bold text-[#2076C7]">₹{company.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
-              <div className="text-sm text-gray-500 mb-4">{company.category}</div>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
-                <div className="text-center"><div className="text-xs text-gray-500 mb-0.5">Lot Size</div><div className="text-sm font-bold text-gray-900">{company.lotSize.toLocaleString()} shares</div></div>
-                <div className="text-center"><div className="text-xs text-gray-500 mb-0.5">Depository</div><div className="text-sm font-bold text-gray-900">{company.depository?.split(' ')[0] || 'NSDL'}</div></div>
-                <div className="text-center"><div className="text-xs text-gray-500 mb-0.5">Min. Invest</div><div className="text-sm font-bold text-gray-900">{calculateMinInvestment(company.price, company.lotSize)}</div></div>
-                <div className="text-center"><div className="text-xs text-gray-500 mb-0.5">Available</div><div className="text-sm font-bold text-gray-900">{company.volume || '120K'}</div></div>
-              </div>
-              <div className="flex gap-3 w-full mt-auto">
-                <button onClick={() => handleBuyNowClick(company)} className="flex-1 py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2">Buy Now</button>
-                <button onClick={() => setDetailCompany(company)} className="flex-1 py-3.5 border-2 border-[#2076C7] text-[#2076C7] text-sm font-bold rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-2">Details</button>
-              </div>
+            <div 
+                key={company.id} 
+                className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full group"
+            >
+                {/* RECTANGULAR IMAGE CONTAINER */}
+                <div className="w-full h-32 bg-gray-50 rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden">
+                    {company.logo ? (
+                        <Image
+                            src={company.logo} 
+                            width={200}
+                            height={150}
+                            className="w-full h-full object-contain p-3 transition-all duration-700 group-hover:scale-110" 
+                            alt={company.name} 
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                const parent = (e.target as HTMLImageElement).parentElement;
+                                if (parent) {
+                                    const span = document.createElement('span');
+                                    span.className = 'text-3xl font-bold text-[#2076C7]';
+                                    span.textContent = company.name.charAt(0);
+                                    parent.appendChild(span);
+                                }
+                            }}
+                        />
+                    ) : (
+                        <span className="text-3xl font-bold text-[#2076C7]">{company.name.charAt(0)}</span>
+                    )}
+                </div>
+
+                {/* Company Details */}
+                <div className="p-5 flex flex-col flex-grow">
+                    <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-1 group-hover:text-[#2076C7] transition-colors duration-300">
+                        {company.name}
+                    </h4>
+                    
+                    {/* Price Display */}
+                    <div className="mb-4 text-center">
+                        <span className="text-2xl font-bold text-[#2076C7]">
+                            ₹{company.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                    </div>
+                    
+                    <div className="text-sm text-gray-500 text-center mb-4">{company.category}</div>
+
+                    {/* Info Grid */}
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
+                        <div className="text-center">
+                            <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
+                            <div className="text-sm font-bold text-gray-900">
+                                {company.lotSize.toLocaleString()} shares
+                            </div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-xs text-gray-500 mb-0.5">Depository</div>
+                            <div className="text-sm font-bold text-gray-900">
+                                {company.depository?.split(' ')[0] || 'NSDL'}
+                            </div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-xs text-gray-500 mb-0.5">Min. Invest</div>
+                            <div className="text-sm font-bold text-gray-900">
+                                {calculateMinInvestment(company.price, company.lotSize)}
+                            </div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-xs text-gray-500 mb-0.5">Available</div>
+                            <div className="text-sm font-bold text-gray-900">
+                                {company.volume || '120K'}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col gap-2 mt-auto">
+                        <button
+                            onClick={() => handleBuyNowClick(company)}
+                            className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                        >
+                            Buy Now
+                        </button>
+                        <button 
+                            onClick={() => setDetailCompany(company)}
+                            className="w-full py-2.5 border-2 border-[#2076C7]/20 text-[#2076C7] text-xs font-bold rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+                        >
+                            Details
+                        </button>
+                    </div>
+                </div>
             </div>
           ))}
         </div>
 
+        {/* SHOW MORE BUTTON LOGIC (4 for Mobile, 20 for Desktop) */}
         {visibleCount < filteredCompanies.length && (
           <div className="flex justify-center pb-12">
-            <button onClick={() => setVisibleCount(prev => prev + 12)} className="flex items-center gap-2 px-8 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm hover:shadow-md">View More Companies <ChevronDown size={20} /></button>
+            <button 
+                onClick={() => setVisibleCount(prev => prev + (window.innerWidth < 768 ? 4 : 20))} 
+                className="flex items-center gap-2 px-8 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm hover:shadow-md"
+            >
+                View More Companies <ChevronDown size={20} />
+            </button>
           </div>
         )}
 
@@ -508,7 +583,7 @@ const BuyShares: FC = () => {
         </section>
       </main>
 
-      {/* DETAIL MODAL */}
+      {/* DETAIL MODAL (FULL ORIGINAL LOGIC PRESERVED) */}
       {detailCompany && (
         <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
           <div className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 animate-fadeIn overflow-hidden flex flex-col border border-gray-100">
@@ -571,7 +646,7 @@ const BuyShares: FC = () => {
                   <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
                     <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2"><Info className="text-[#1CADA3]" size={20} /> About the Company</h3>
                     <p className="text-gray-600 leading-relaxed text-sm">
-                      {detailCompany.description || `${detailCompany.name} is a leading player in the ${detailCompany.category} sector with strong growth potential and a proven track record of innovation.`}
+                      {detailCompany.description || `${detailCompany.name} is a leading player in the ${detailCompany.category} sector with strong growth potential and a proven track record of innovation. The company has shown consistent performance and is poised for significant expansion in the coming years.`}
                     </p>
                     
                     <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
@@ -605,8 +680,8 @@ const BuyShares: FC = () => {
                     </div>
                   </div>
                   <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                    <h4 className="text-sm font-bold text-gray-900 mb-3">Ready to Invest?</h4>
-                    <p className="text-xs text-gray-500 mb-6">Min investment: {calculateMinInvestment(detailCompany.price, detailCompany.lotSize)}</p>
+                    <h4 className="text-sm font-bold text-gray-900 mb-3 text-center">Ready to Invest?</h4>
+                    <p className="text-xs text-gray-500 mb-6 text-center font-bold">Min investment: {calculateMinInvestment(detailCompany.price, detailCompany.lotSize)}</p>
                     <button onClick={() => { setDetailCompany(null); handleBuyNowClick(detailCompany); }} className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all">Buy Now</button>
                   </div>
                                     {/* Valuation Progress Bars */}
@@ -626,7 +701,7 @@ const BuyShares: FC = () => {
                           <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full" 
-                              style={{ width: metric.percent }}
+                              style={{ width: `${metric.percent}%` }}
                             />
                           </div>
                         </div>

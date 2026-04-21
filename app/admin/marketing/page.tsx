@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Upload, ImageIcon, X, LayoutGrid, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Upload, X, LayoutGrid, Loader2 } from 'lucide-react';
 import { AdminService } from '@/app/services/adminService';
 import toast from 'react-hot-toast';
 
