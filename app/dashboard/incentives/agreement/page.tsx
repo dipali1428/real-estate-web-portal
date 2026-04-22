@@ -13,13 +13,16 @@ export default function DSAAgreement() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
   const [paymentType, setPaymentType] = useState<'PAY_DIRECTLY' | 'USE_COUPON' | null>(null);
+  const [couponCode, setCouponCode] = useState<string>('');
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState<boolean>(false);
+  const [couponApplied, setCouponApplied] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         const response = await DashboardService.checkKycStatus();
         setProfile(response);
-      } catch (error : any) {
+      } catch (error: any) {
         toast.error("Error fetching profile data. Please try again later.", error);
       } finally {
         setLoading(false);
@@ -27,6 +30,60 @@ export default function DSAAgreement() {
     };
     fetchProfileData();
   }, []);
+
+  const RazorpayPaymentButton = () => {
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      // 1. Clear any existing content inside the container to prevent duplicates
+      if (containerRef.current) {
+        containerRef.current.innerHTML = "";
+      }
+
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/payment-button.js";
+      script.dataset.payment_button_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID; // replace with your actual ID
+      script.async = true;
+
+      const form = document.createElement("form");
+      form.appendChild(script);
+
+      if (containerRef.current) {
+        containerRef.current.appendChild(form);
+      }
+
+      // 2. Cleanup function: removes the form when the component unmounts
+      return () => {
+        if (containerRef.current) {
+          containerRef.current.innerHTML = "";
+        }
+      };
+    }, []);
+
+    return <div ref={containerRef} className="w-full flex justify-center" />;
+  };
+
+  const handleValidateCoupon = async () => {
+    if (!couponCode.trim()) {
+      toast.error("Please enter a coupon code");
+      return;
+    }
+
+    try {
+      setIsValidatingCoupon(true);
+      const response = await DashboardService.validateCoupon(couponCode);
+
+      // Assuming success if the request doesn't throw
+      setCouponApplied(true);
+      toast.success(response?.message || "Coupon applied successfully!");
+    } catch (error: any) {
+      setCouponApplied(false);
+      const errorMsg = error.response?.data?.message || "Invalid coupon code";
+      toast.error(errorMsg);
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
 
   const handleSubmit = async (paymentChoice: 'PAY_DIRECTLY' | 'USE_COUPON') => {
     // e.preventDefault();
@@ -38,7 +95,8 @@ export default function DSAAgreement() {
 
       const response = await DashboardService.createAgreement({
         // signed_name: nameToSubmit,
-        payment_method: paymentChoice // Pass the choice to your backend
+        payment_method: paymentChoice,
+        coupon_code: paymentChoice === 'USE_COUPON' ? couponCode : null
       });
 
       // 2. Show success toast with message from response
@@ -185,7 +243,7 @@ export default function DSAAgreement() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in duration-200 relative">
             <button
-              onClick={() => setShowPaymentModal(false)}
+              onClick={() => { setShowPaymentModal(false); setCouponApplied(false); setCouponCode(''); setPaymentType(null); }}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
             >
               <X size={22} />
@@ -216,22 +274,62 @@ export default function DSAAgreement() {
                 <p className="font-bold text-gray-800">Use Token (Deduct from Payout)</p>
                 <p className="text-sm text-gray-500">Amount will be deducted from your first commission</p>
               </button>
+
+              {/* Find the paymentType === 'USE_COUPON' block in your modal */}
+              {paymentType === 'USE_COUPON' && (
+                <div className="mt-2 px-1 animate-in slide-in-from-top-2 duration-200">
+                  <label className="text-xs font-semibold text-gray-600 uppercase">Enter Coupon/Token Code</label>
+                  <div className="flex gap-2 mt-1">
+                    <input
+                      type="text"
+                      disabled={couponApplied}
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      placeholder="e.g. SAVE100"
+                      className={`flex-1 p-2 border ${couponApplied ? 'bg-green-50 border-green-500' : 'border-gray-300'} text-gray-800 rounded-md focus:ring-2 focus:ring-[#2076C7] focus:outline-none text-sm`}
+                    />
+                    <button
+                      type="button"
+                      disabled={isValidatingCoupon || !couponCode.trim() || couponApplied}
+                      onClick={handleValidateCoupon}
+                      className={`px-4 py-2 rounded-md text-sm font-bold transition-colors ${couponApplied
+                          ? 'bg-green-500 text-white'
+                          : 'bg-gray-800 text-white hover:bg-black disabled:opacity-50'
+                        }`}
+                    >
+                      {isValidatingCoupon ? "..." : couponApplied ? "Applied" : "Apply"}
+                    </button>
+                  </div>
+                  {couponApplied && (
+                    <p className="text-[10px] text-green-600 mt-1 font-medium flex items-center gap-1">
+                      <CheckCircle size={10} /> Coupon code verified
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 mt-8">
               <button
-                onClick={() => setShowPaymentModal(false)}
+                onClick={() => { setShowPaymentModal(false); setCouponApplied(false); setCouponCode(''); setPaymentType(null); }}
                 className="flex-1 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
               >
                 Cancel
               </button>
-              <button
-                disabled={!paymentType || isSubmitting}
-                onClick={() => paymentType && handleSubmit(paymentType)}
-                className="flex-1 py-2 bg-[#2076C7] text-white font-bold rounded-lg disabled:opacity-50 hover:bg-[#1a5fa1] transition-colors"
-              >
-                {isSubmitting ? "Processing..." : "Proceed To Sign"}
-              </button>
+              {paymentType === 'PAY_DIRECTLY' ? (
+                <div className="flex-1">
+                  <RazorpayPaymentButton />
+                </div>
+              ) : (
+                <button
+                  // Only allow proceeding if coupon is applied (when USE_COUPON is selected)
+                  disabled={!paymentType || isSubmitting || (paymentType === 'USE_COUPON' && !couponApplied)}
+                  onClick={() => paymentType && handleSubmit(paymentType)} // Uncommented this line
+                  className="flex-1 py-2 bg-[#2076C7] text-white font-bold rounded-lg disabled:opacity-50 hover:bg-[#1a5fa1] transition-colors"
+                >
+                  {isSubmitting ? "Processing..." : "Proceed To E-Sign"}
+                </button>
+              )}
             </div>
           </div>
         </div>

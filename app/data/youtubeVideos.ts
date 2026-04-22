@@ -7,6 +7,11 @@ export interface YouTubeVideo {
 
 export const featuredVideos: YouTubeVideo[] = [
   {
+    videoId: "lllV88GypxM",
+    title: "Empowering Dreams, Enabling Investments – Infinity Arthvishva at Sakal Vastu Expo",
+    description: "Expert investment guidance and financial empowerment for future homeowners at Sakal Vastu Expo."
+  },
+  {
     videoId: "GYC5b8OoK3I",
     title: "The wait is over! 🎧 Success Talk with Rajesh Parkhi & Rahul Kangane — out now!🔥",
     description: "Don’t forget to Like, Share & Subscribe for more inspiring stories!"

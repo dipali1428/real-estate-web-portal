@@ -194,7 +194,7 @@ export const DashboardService = {
         return response.data;
     },
 
-    createAgreement: async (payload: { payment_method: string }) => {
+    createAgreement: async (payload: { payment_method: string; coupon_code: any }) => {
         const response = await api.post("/api/dashboard/profile/create-agreement", payload);
         return response.data;
     },
@@ -221,6 +221,11 @@ export const DashboardService = {
         const response = await api.get(`/api/dashboard/campaigns/download/${id}`, {
             responseType: 'blob'
         });
+        return response.data;
+    },
+    // 🔹 Validate Coupon
+    validateCoupon: async (coupon_code: string) => {
+        const response = await api.post("/api/dashboard/profile/validate-coupon", { coupon_code });
         return response.data;
     },
 };
