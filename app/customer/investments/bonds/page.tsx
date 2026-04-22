@@ -59,7 +59,9 @@ export default function CustomerBondsDashboard() {
                     setBonds(applyMap(data.data));
                 }
             })
-            .catch(err => console.error("Failed to fetch bonds:", err));
+            .catch(err => {
+                toast.error("Failed to fetch bonds. Please check your connection.");
+            });
     }, []);
 
     // Fetch existing wishlist to mark already wishlisted bonds

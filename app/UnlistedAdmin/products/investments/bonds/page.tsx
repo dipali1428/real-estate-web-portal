@@ -9,15 +9,11 @@ import{
   X,
   Zap,
   Loader2,
-  Database,
-  Download,
   CheckCircle,
   AlertCircle,
   RefreshCw,
   Search,
-  Hash,
   Layers3,
-  IndianRupee,
   Clock,
   Briefcase,
   Pencil,
@@ -52,8 +48,12 @@ const BondsAdmin: React.FC = () => {
       } else {
         setBonds([]);
       }
-    } catch (error) {
-      console.error('Error fetching bonds:', error);
+    } catch (error: any) {
+      setToast({ 
+        message: `Failed to load bonds: ${error.message || 'Server Error'}`, 
+        type: 'error' 
+      });
+      setTimeout(() => setToast(null), 4000); // Clear toast after 4s
       setBonds([]);
     } finally {
       setLoading(false);
@@ -118,6 +118,7 @@ const BondsAdmin: React.FC = () => {
       fetchBonds();
     } catch (error) {
       setToast({ message: 'Failed to delete bond', type: 'error' });
+      setTimeout(() => setToast(null), 4000); 
     }
   };
 
@@ -136,6 +137,7 @@ const BondsAdmin: React.FC = () => {
       fetchBonds();
     } catch (error) {
       setToast({ message: 'Failed to update bond', type: 'error' });
+      setTimeout(() => setToast(null), 4000);
     }
   };
 
