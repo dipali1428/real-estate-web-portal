@@ -320,7 +320,7 @@ export default function Downloads() {
   const handleDownload = async (file: DownloadItem) => {
     try {
       if (!file.filePath) {
-       
+       toast.error('File path not available for download');
         return;
       }
 

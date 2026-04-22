@@ -7,6 +7,7 @@ import {
   ShieldCheck, Loader2, ChevronLeft, ChevronRight,
   Edit, X, CheckCircle2, Clock
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function KycStatusPage() {
   const [activeTab, setActiveTab] = useState<'kyc' | 'agreement'>('kyc');
@@ -49,7 +50,7 @@ export default function KycStatusPage() {
         setTotalPages(Math.ceil((response.total_requests || 0) / limit));
       }
     } catch (err) {
-      console.error("Fetch Error:", err);
+      toast.error("Fetch Error:");
       setData([]);
     } finally {
       setLoading(false);
