@@ -333,5 +333,29 @@ export const AdminService = {
     const response = await api.delete(`/api/unlisted/admin/pms/${id}`);
     return response.data;
   },
+
+  // Upload bonds data via CSV
+  uploadBonds: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post(`/api/admin/bonds/upload`, formData);
+    return response.data;
+  },
+
+  // Fetch all bonds
+  getBonds: async () => {
+    const response = await api.get("/api/bonds/all");
+    return response.data;
+  },
+
+  deleteBond: async (id: number) => {
+    const response = await api.delete(`/api/admin/bonds/${id}`);
+    return response.data;
+  },
+  
+  updateBond: async (id: number, data: any) => {
+    const response = await api.put(`/api/admin/bonds/${id}`, data);
+    return response.data;
+  },
 };
 
