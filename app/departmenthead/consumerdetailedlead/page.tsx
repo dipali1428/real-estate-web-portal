@@ -3,6 +3,7 @@ import React, { FC, useState, useMemo, useEffect, ChangeEvent } from "react";
 // Switched to DepartmentHeadService
 import { DepartmentHeadService } from "../../services/departmentHeadService";
 import { Search, FileUp, Loader2 } from 'lucide-react';
+import toast from "react-hot-toast";
 
 // Interface matching the reference design structure
 export interface Lead {
@@ -62,7 +63,7 @@ const ConsumerDetailedLeads: FC = () => {
         setData(mappedLeads);
       }
     } catch (error) {
-      console.error("Failed to fetch consumer leads:", error);
+      toast.error("Failed to fetch consumer leads:");
     } finally {
       setLoading(false);
     }
@@ -83,7 +84,7 @@ const ConsumerDetailedLeads: FC = () => {
         });
       }
     } catch (error) {
-      console.error("Error fetching documents:", error);
+      toast.error("Error fetching documents:");
     } finally {
       setFetchingDocs(false);
     }
@@ -102,11 +103,9 @@ const ConsumerDetailedLeads: FC = () => {
 
     // Simulate UI feedback without calling the API
     setUploadingKey(documentKey);
-    console.log(`File selected for ${documentKey}:`, file.name);
     
     setTimeout(() => {
       setUploadingKey(null);
-      alert("Selection captured (Upload API disabled)");
     }, 1000);
   };
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 // Types
 interface DownloadItem {
@@ -56,7 +57,17 @@ export default function Downloads() {
       subCategory: 'motor-insurance',
       filePath: '/pdfs/motorinsurancepdf/DSA_WEST_BENGAL_GRID_MOTOR_APRIL_2026.pdf'
     },
-  
+    {
+      id: '50',
+      name: 'DSA_MAHARASHTRA_GRID_MOTOR_APRIL_2026.pdf',
+      type: 'pdf',
+      uploadDate: '2026-4-20',
+      category: 'payout',
+      month: 'april-2026',
+      year: '2026',
+      subCategory: 'motor-insurance',
+      filePath: '/pdfs/motorinsurancepdf/DSA_MAHARASHTRA_GRID_MOTOR_APRIL_2026.pdf'
+    },
     // Product Brochures
     {
       id: '29',
@@ -309,7 +320,7 @@ export default function Downloads() {
   const handleDownload = async (file: DownloadItem) => {
     try {
       if (!file.filePath) {
-        alert('File path not available');
+       
         return;
       }
 
@@ -322,8 +333,8 @@ export default function Downloads() {
       document.body.removeChild(link);
 
     } catch (error) {
-      console.error('Download error:', error);
-      alert('Error downloading file. Please try again.');
+      toast.error('Download error:');
+     
     }
   };
 

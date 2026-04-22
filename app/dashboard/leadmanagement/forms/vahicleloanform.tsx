@@ -4,6 +4,7 @@ import {
   X, CheckCircle, UploadCloud, Trash2, ChevronDown, 
   Loader2, ArrowRight, ArrowLeft, AlertCircle 
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 import { DashboardService } from "../../../services/dashboardService";
 
 // --- Constants & Styles ---
@@ -113,7 +114,7 @@ export default function VehicleLoanForm({ onClose }: { onClose: () => void }) {
       setLeadId(result.detail_lead_id);
       setStep(2);
     } catch (err) {
-      console.error(err);
+      toast.error("Failed to create application.");
       setStatusMsg("Failed to create application.");
     } finally {
       setIsSubmitting(false);

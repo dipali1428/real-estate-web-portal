@@ -1,8 +1,8 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
-import { 
-  X, CheckCircle, UploadCloud, Trash2, ChevronDown, 
-  ShieldCheck, Loader2, ArrowRight, ArrowLeft, AlertCircle 
+import {
+  X, CheckCircle, UploadCloud, Trash2, ChevronDown,
+  ShieldCheck, Loader2, ArrowRight, ArrowLeft, AlertCircle
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
 import toast from "react-hot-toast";
@@ -52,10 +52,10 @@ const LOAN_TYPES = ["Balance Transfer", "Fresh Home Loan", "Home Equity Loan", "
 
 // --- Types ---
 type QueuedFile = {
-    file: File;
-    docKey: string;
-    label: string;
-    status: "pending" | "uploading" | "success" | "error";
+  file: File;
+  docKey: string;
+  label: string;
+  status: "pending" | "uploading" | "success" | "error";
 };
 
 // --- Helper Sub-Components ---
@@ -103,20 +103,20 @@ function Field({ label, value, onChange, type = "text", options, required, place
 /**
  * FILE SELECTION CARD
  */
-function FileSelectionCard({ 
-    label, 
-    docKey, 
-    allowMultiple, 
-    selectedFiles, 
-    onAdd, 
-    onRemove 
-}: { 
-    label: string; 
-    docKey: string; 
-    allowMultiple: boolean; 
-    selectedFiles: QueuedFile[];
-    onAdd: (files: File[]) => void;
-    onRemove: (name: string) => void;
+function FileSelectionCard({
+  label,
+  docKey,
+  allowMultiple,
+  selectedFiles,
+  onAdd,
+  onRemove
+}: {
+  label: string;
+  docKey: string;
+  allowMultiple: boolean;
+  selectedFiles: QueuedFile[];
+  onAdd: (files: File[]) => void;
+  onRemove: (name: string) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -125,7 +125,7 @@ function FileSelectionCard({
     const validFiles = allowMultiple ? files : [files[0]];
 
     if (validFiles.length > 0) {
-        onAdd(validFiles);
+      onAdd(validFiles);
     }
     if (inputRef.current) inputRef.current.value = "";
   };
@@ -134,11 +134,11 @@ function FileSelectionCard({
     <div className="flex flex-col bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
       <label className="text-xs font-bold text-gray-500 uppercase mb-2 truncate">{label}</label>
       <input type="file" ref={inputRef} multiple={allowMultiple} onChange={handleFileChange} className="hidden" accept="image/*,application/pdf" />
-      
+
       <div className="space-y-2">
-        <button 
+        <button
           type="button"
-          onClick={() => inputRef.current?.click()} 
+          onClick={() => inputRef.current?.click()}
           className="w-full border border-dashed rounded-md py-2 flex flex-col items-center justify-center bg-gray-50 hover:bg-[#1CADA3]/5 border-gray-300 hover:border-[#1CADA3] group transition-colors"
         >
           <div className="flex items-center gap-2">
@@ -153,14 +153,14 @@ function FileSelectionCard({
           <div key={idx} className={`flex items-center justify-between border px-2 py-1.5 rounded-md text-xs ${f.status === 'error' ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'}`}>
             <div className="flex items-center truncate gap-2 max-w-[80%]">
               {/* Added shrink-0 to all status indicators below */}
-              {f.status === "uploading" ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-500 shrink-0" /> : 
-               f.status === "success" ? <CheckCircle className="w-3.5 h-3.5 text-[#1CADA3] shrink-0" /> : 
-               f.status === "error" ? <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" /> : 
-               <div className="w-3.5 h-3.5 rounded-full border border-gray-300 shrink-0" />}
+              {f.status === "uploading" ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-500 shrink-0" /> :
+                f.status === "success" ? <CheckCircle className="w-3.5 h-3.5 text-[#1CADA3] shrink-0" /> :
+                  f.status === "error" ? <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" /> :
+                    <div className="w-3.5 h-3.5 rounded-full border border-gray-300 shrink-0" />}
               <span className="truncate text-gray-700">{f.file.name}</span>
             </div>
             {f.status === "pending" && (
-                <button onClick={() => onRemove(f.file.name)} className="text-gray-400 hover:text-red-500 shrink-0"><Trash2 size={14}/></button>
+              <button onClick={() => onRemove(f.file.name)} className="text-gray-400 hover:text-red-500 shrink-0"><Trash2 size={14} /></button>
             )}
           </div>
         ))}
@@ -197,7 +197,7 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  
+
   // File Queue State
   const [fileQueue, setFileQueue] = useState<QueuedFile[]>([]);
 
@@ -213,10 +213,10 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
 
   const handleInputChange = (field: string, value: string) => {
     // Automatically convert email inputs to lowercase
-    const processedValue = (field === "email" || field === "rmEmail") 
-      ? value.toLowerCase() 
+    const processedValue = (field === "email" || field === "rmEmail")
+      ? value.toLowerCase()
       : value;
-  
+
     setForm(prev => ({ ...prev, [field]: processedValue }));
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
   };
@@ -257,10 +257,10 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
         department: "Loan",
         product_type: "Home Loan",
         sub_category: "Home Loan",
-        client: { 
-            name: form.clientName, 
-            mobile: isSelfLoginActive ? form.rmContact : form.phone, 
-            email: isSelfLoginActive ? form.rmEmail : form.email 
+        client: {
+          name: form.clientName,
+          mobile: isSelfLoginActive ? form.rmContact : form.phone,
+          email: isSelfLoginActive ? form.rmEmail : form.email
         },
         meta: { is_self_login: isSelfLoginActive },
         form_data: isSelfLoginActive ? {
@@ -270,8 +270,6 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
           hasOtherLoan: form.hasOtherLoan, otherLoanAmount: form.otherLoanAmount, otherIncome: form.otherIncome || "N/A", otherIncomeAmount: form.otherIncomeAmount || "0"
         }
       };
-
-      // console.log(">>> API CALL: DashboardService.createLead", payload);
 
       const result = await DashboardService.createLead(payload);
       
@@ -299,23 +297,23 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
   // --- Sequential Upload Logic ---
   const handleFinalSubmission = async () => {
     if (fileQueue.length === 0) {
-        setShowSuccess(true);
-        return;
+      setShowSuccess(true);
+      return;
     }
 
     setIsSubmitting(true);
-    
+
     for (let i = 0; i < fileQueue.length; i++) {
-        const currentItem = fileQueue[i];
-        setStatusMsg(`Uploading ${i + 1}/${fileQueue.length}: ${currentItem.label}`);
+      const currentItem = fileQueue[i];
+      setStatusMsg(`Uploading ${i + 1}/${fileQueue.length}: ${currentItem.label}`);
 
-        // Set status to uploading in UI
-        setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "uploading" } : item));
+      // Set status to uploading in UI
+      setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "uploading" } : item));
 
-        const formData = new FormData();
-        formData.append("leadDbId", leadId!);
-        formData.append("documents", currentItem.file);
-        formData.append("metadata", JSON.stringify([{ key: currentItem.docKey, label: currentItem.label }]));
+      const formData = new FormData();
+      formData.append("leadDbId", leadId!);
+      formData.append("documents", currentItem.file);
+      formData.append("metadata", JSON.stringify([{ key: currentItem.docKey, label: currentItem.label }]));
 
         try {
             await DashboardService.uploadLeadDocument(leadId!, formData);
@@ -343,7 +341,7 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4 text-gray-700">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-auto h-[95vh] sm:h-[90vh] flex flex-col relative overflow-hidden">
-        
+
         {/* Header */}
         <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0 bg-white">
           <div>
@@ -357,13 +355,13 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50/30">
           {step === 1 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-               <div className="col-span-1 md:col-span-2 bg-[#1CADA3]/5 border-l-4 border-[#1CADA3] p-4 rounded-r-lg shadow-sm mb-2">
+              {/* <div className="col-span-1 md:col-span-2 bg-[#1CADA3]/5 border-l-4 border-[#1CADA3] p-4 rounded-r-lg shadow-sm mb-2">
                 <div className="flex items-center gap-2 mb-2">
                     <ShieldCheck className="text-[#1CADA3]" size={20} />
                     <span className="text-sm font-bold text-[#1CADA3] uppercase tracking-wide">Submission Mode</span>
                 </div>
                 <Field label="Self Login to Bank?" type="select" options={["No", "Yes"]} {...fieldProps("isSelfLogin")} required />
-               </div>
+               </div> */}
 
               {isSelfLoginActive ? (
                 <>
@@ -400,40 +398,40 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
             </div>
           ) : (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg flex items-start gap-3">
-                    <CheckCircle className="text-blue-500 mt-1 shrink-0" size={18} />
-                    <div>
-                        <p className="text-sm font-semibold text-blue-900">Application Created Successfully!</p>
-                        <p className="text-xs text-blue-700">Lead ID: <span className="font-mono font-bold">{leadId}</span>. Select documents and click Submit to upload.</p>
-                    </div>
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg flex items-start gap-3">
+                <CheckCircle className="text-blue-500 mt-1 shrink-0" size={18} />
+                <div>
+                  <p className="text-sm font-semibold text-blue-900">Application Created Successfully!</p>
+                  <p className="text-xs text-blue-700">Lead ID: <span className="font-mono font-bold">{leadId}</span>. Select documents and click Submit to upload.</p>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {requiredDocsList.map(doc => (
-                      <FileSelectionCard 
-                        key={doc.key} 
-                        docKey={doc.key}
-                        label={doc.label} 
-                        allowMultiple={doc.multiple}
-                        selectedFiles={fileQueue.filter(f => f.docKey === doc.key)}
-                        onAdd={(files) => {
-                            const newEntries: QueuedFile[] = files.map(f => ({ file: f, docKey: doc.key, label: doc.label, status: "pending" }));
-                            setFileQueue(prev => [...prev.filter(f => !(f.docKey === doc.key && !doc.multiple)), ...newEntries]);
-                        }}
-                        onRemove={(name) => setFileQueue(prev => prev.filter(f => f.file.name !== name))}
-                      />
-                    ))}
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {requiredDocsList.map(doc => (
+                  <FileSelectionCard
+                    key={doc.key}
+                    docKey={doc.key}
+                    label={doc.label}
+                    allowMultiple={doc.multiple}
+                    selectedFiles={fileQueue.filter(f => f.docKey === doc.key)}
+                    onAdd={(files) => {
+                      const newEntries: QueuedFile[] = files.map(f => ({ file: f, docKey: doc.key, label: doc.label, status: "pending" }));
+                      setFileQueue(prev => [...prev.filter(f => !(f.docKey === doc.key && !doc.multiple)), ...newEntries]);
+                    }}
+                    onRemove={(name) => setFileQueue(prev => prev.filter(f => f.file.name !== name))}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </div>
 
         {/* Footer */}
         <div className="border-t p-4 sm:px-6 flex items-center justify-between bg-white rounded-b-xl">
-           {step === 2 && !isSubmitting && (
-             <button onClick={() => setStep(1)} className={STYLES.secondaryBtn}><ArrowLeft size={18} /> Back</button>
-           )}
-           <div className="flex-1" />
+          {step === 2 && !isSubmitting && (
+            <button onClick={() => setStep(1)} className={STYLES.secondaryBtn}><ArrowLeft size={18} /> Back</button>
+          )}
+          <div className="flex-1" />
           <button
             onClick={step === 1 ? handleCreateLead : handleFinalSubmission}
             disabled={isSubmitting}

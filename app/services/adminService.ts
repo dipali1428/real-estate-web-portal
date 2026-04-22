@@ -335,12 +335,12 @@ export const AdminService = {
     return response.data;
   },
 
-  uploadCampaign: async (payload: { 
-    templateName: string; 
-    category: string; 
-    subCategory: string; 
-    description: string; 
-    image: File 
+  uploadCampaign: async (payload: {
+    templateName: string;
+    category: string;
+    subCategory: string;
+    description: string;
+    image: File
   }) => {
     const formData = new FormData();
     formData.append("templateName", payload.templateName);
@@ -385,5 +385,9 @@ export const AdminService = {
     return response.data;
   },
 
+  getAgreementRequests: async (params?: { limit?: number; offset?: number; search?: string }) => {
+    const response = await api.get("/api/admin/get-agreement-requests", { params });
+    return response.data;
+  },
 };
 

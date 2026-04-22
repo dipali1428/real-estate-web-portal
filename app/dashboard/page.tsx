@@ -8,6 +8,7 @@ import PortfolioChart from './components/PortfolioChart';
 import toast from "react-hot-toast";
 import { getToken, isTokenExpired } from "../lib/auth-token";
 
+
 interface UserProfile {
     id: number;
     adv_id: string;
@@ -97,7 +98,7 @@ export default function Dashboard() {
                     const detailedCount = (detailedRes?.success && Array.isArray(detailedRes.data)) ? detailedRes.data.length : 0;
                     setTotalLeadsCount(referralCount + detailedCount);
                 } catch (err) {
-                    console.error("Leads count fetch error:", err);
+                    toast.error("Leads count fetch error:");
                 }
 
                 // Fetch earnings
@@ -147,11 +148,11 @@ export default function Dashboard() {
                         }
                     }
                 } catch (err) {
-                    console.error("Earnings fetch error:", err);
+                    toast.error("Earnings fetch error:");
                 }
 
             } catch (error: any) {
-                console.error("Profile fetch error:", error);
+                toast.error("Profile fetch error:");
                 if (error?.response?.status === 401) {
                     toast.error("Login session expired! Please login again.", { duration: 2000 });
                     document.cookie = `authToken=; path=/; expires=${new Date(0).toUTCString()}`;
@@ -207,7 +208,7 @@ export default function Dashboard() {
                         {loading ? "Loading..." : `Welcome back, ${user?.name || "Partner"}!`}
                     </h2>
                     <p className="text-sm sm:text-base">
-                        Here's a snapshot of your business performance.
+                        Here&apos;s a snapshot of your business performance.
                     </p>
                 </motion.div>
 

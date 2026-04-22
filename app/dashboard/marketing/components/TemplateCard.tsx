@@ -49,7 +49,6 @@ export default function TemplateCard({ template, onQuickDownload, onShareToWhats
       const imageBlob = await generatePersonalizedImage(template);
       onShareToWhatsApp(template, imageBlob);
     } catch (error) {
-      alert('Error generating image. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -60,7 +59,6 @@ export default function TemplateCard({ template, onQuickDownload, onShareToWhats
     try {
       await onQuickDownload(template);
     } catch (error) {
-      alert('Error downloading image. Please try again.');
     } finally {
       setIsGenerating(false);
     }

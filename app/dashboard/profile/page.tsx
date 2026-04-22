@@ -372,7 +372,7 @@ export default function ProfileSection() {
                 throw new Error("Link not found in response");
             }
         } catch (e) {
-            console.error("Referral Error:", e);
+            toast.error("Referral Error:");
             triggerPopup("Failed to generate link", "error");
         } finally {
             setIsGeneratingLink(false);
@@ -393,7 +393,6 @@ export default function ProfileSection() {
                 setReferralCode(res.referral_code);
             }
         } catch (e) {
-            // console.error("Referral Error:", e);
             // toast.error("Failed to prepare referral link. Please try again.");
             triggerPopup("Failed to prepare referral link", "error");
             return;
@@ -479,7 +478,7 @@ export default function ProfileSection() {
                 setShowAgreementModal(true);
             }
         } catch (error) {
-            // console.error("Refresh failed:", error);
+        
             toast.error("Failed to load profile data. Please refresh the page.");
         }
     };
@@ -512,7 +511,7 @@ export default function ProfileSection() {
                 triggerPopup(res.message || "PAN and Aadhaar are successfully linked!", "success", popupId);
 
                 // Refresh data in background without affecting the popup
-                refreshProfileData().catch(e => console.error("Refresh failed", e));
+                refreshProfileData().catch(e => toast.error("Refresh failed"));
             } else {
                 setPanAadhaarLinked(false);
                 triggerPopup(res.message || "PAN and Aadhaar link not found.", "error", popupId);
