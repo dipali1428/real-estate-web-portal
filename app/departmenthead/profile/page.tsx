@@ -32,7 +32,6 @@ export default function ProfileSection() {
             // Handle cases where API returns { user: ... } or just the object
             setProfile(res.user || res);
         } catch (err: any) {
-            console.error("Profile load error", err);
             toast.error("Failed to fetch profile.");
         } finally {
             setLoading(false);
@@ -75,8 +74,6 @@ export default function ProfileSection() {
                 payload.password = profile.password.trim();
             }
 
-            console.log("Submitting Payload:", payload);
-
             // 3. Call the API
             await DepartmentHeadService.updateDepartmentProfile(payload);
 
@@ -92,7 +89,7 @@ export default function ProfileSection() {
             setPasswordStrength("");
 
         } catch (err: any) {
-            console.error("Update error detail:", err.response?.data);
+            toast.error("Update error detail:", err.response?.data);
 
             // Check if the backend sent a specific reason for the crash
             const errorMessage = err?.response?.data?.message || "Server error: Password might not meet requirements.";

@@ -2,6 +2,7 @@
 import { FC, useState, useMemo, useEffect } from "react";
 import { DepartmentHeadService } from "../../services/departmentHeadService";
 import { X, Eye, FileText, Download, Loader2, AlertCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 // --- Interfaces ---
 export interface RM {
@@ -314,7 +315,6 @@ const LeadTable: FC = () => {
       let mappedData: Lead[] = [];
       if (activeTab === 'detailed') {
         leadsResponse = await DepartmentHeadService.getDetailedLeadsPaged(currentPage, pageSize);
-        console.log("Detailed Leads Response:", leadsResponse);
         setServerTotalCount(leadsResponse.pagination?.totalRecords || leadsResponse.count || 0);
         mappedData = (leadsResponse.leads || []).map(mapDetailedLead);
       } else {
@@ -325,7 +325,7 @@ const LeadTable: FC = () => {
       setLeads(mappedData);
       setRms(rmsResponse.rms || []);
     } catch (error) {
-      console.error("Failed to fetch leads:", error);
+      toast.error("Failed to fetch leads:");
     } finally {
       setLoading(false);
     }
@@ -367,7 +367,7 @@ const LeadTable: FC = () => {
       const response = await DepartmentHeadService.getEligibleRMs(lead.id);
       setEligibleRms(response.rms || []);
     } catch (error) {
-      console.error("Failed to fetch eligible RMs", error);
+      toast.error("Failed to fetch eligible RMs");
     } finally {
       setFetchingRms(false);
     }
@@ -381,10 +381,8 @@ const LeadTable: FC = () => {
       await DepartmentHeadService.reassignLead(selectedLead.id, selectedRmId);
       setIsAssignModalOpen(false);
       fetchData(); // Refresh the table to show the new RM
-      alert("Lead reassigned successfully!");
     } catch (error) {
-      console.error("Reassignment failed", error);
-      alert("Failed to reassign lead.");
+      toast.error("Reassignment failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -655,7 +653,7 @@ const LeadTable: FC = () => {
                   </div>
                   <div>
                     <h4 className="text-red-800 font-bold text-sm">RM DEADLINE BREACHED</h4>
-                    <p className="text-red-600 text-xs font-medium">RM haven't accepted this lead before the deadline.</p>
+                    <p className="text-red-600 text-xs font-medium">RM haven&apos;t accepted this lead before the deadline.</p>
                   </div>
                 </div>
               )}

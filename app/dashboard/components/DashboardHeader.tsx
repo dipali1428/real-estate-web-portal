@@ -9,6 +9,8 @@ import { getSidebarLinks } from "@/app/utils/getSidebarLinks";
 import type { Role } from "../../utils/getSidebarLinks";
 // import { NotificationPanel } from "./NotificationPanel";
 import { DashboardService } from "@/app/services/dashboardService";
+import toast from "react-hot-toast";
+
 
 
 export default function DashboardHeader({ role }: { role: Role }) {
@@ -34,7 +36,7 @@ export default function DashboardHeader({ role }: { role: Role }) {
                         setProfileImage(`${res.kycDetails.profile_image_url}?t=${Date.now()}`);
                     }
                 } catch (error) {
-                    console.error("Failed to load header profile data", error);
+                    toast.error("Failed to load header profile data");
                 }
             };
             fetchImageData();

@@ -36,7 +36,6 @@ const CIBILPage = () => {
       const requests = response.cibil || [];
       setAllRequests(requests);
     } catch (error: any) {
-      console.error('Error fetching CIBIL requests:', error);
       toast.error('Failed to fetch CIBIL requests');
     } finally {
       setLoading(false);

@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { DashboardService } from '../../services/dashboardService';
+import toast from 'react-hot-toast';
 
 // Types
 interface RelationshipManager {
@@ -56,7 +57,7 @@ const RelationshipManager: React.FC = () => {
           });
         }
       } catch (error) {
-        console.error("Error fetching RM data:", error);
+        toast.error("Error fetching RM data:");
       }
     };
     fetchRM();

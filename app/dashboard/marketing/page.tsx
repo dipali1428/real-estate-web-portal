@@ -151,7 +151,7 @@ export default function ImageTemplates() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (e: any) {
-      alert(e.message);
+      toast.error(e.message);
     }
   };
 

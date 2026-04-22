@@ -52,19 +52,25 @@ export default function Dashboard() {
       });
 
     } catch (error: any) {
-      console.error("Dashboard Fetch Error:", error);
       toast.error("Failed to fetch dashboard data.");
     }
   };
 
   useEffect(() => {
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      setLoading(true);
-      fetchDashboardData().then(() => setLoading(false));
-    }
-  }, []);
+    if (hasFetched.current) return;
 
+    hasFetched.current = true;
+
+    const loadData = async () => {
+      try {
+        await fetchDashboardData();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',

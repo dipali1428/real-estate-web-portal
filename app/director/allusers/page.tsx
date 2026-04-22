@@ -71,7 +71,6 @@ export default function AllUsersPage() {
       setLoading(true);
       setError(null);
       const res = await AdminService.getAllUsers();
-      console.log("Fetched users:", res);
       const rawList: AllUserApiItem[] =
         (Array.isArray(res?.dsalist) && res.dsalist) ||
         (Array.isArray(res) && res) ||
@@ -93,7 +92,7 @@ export default function AllUsersPage() {
       });
       setUsers(mapped);
     } catch (err: any) {
-      console.error("Failed to load users:", err);
+      toast.error("Failed to load users:");
       setError("Failed to load users. Please try again.");
       toast.error(err?.response?.data?.message || err?.message || "Failed to load users.");
     } finally {
@@ -151,7 +150,6 @@ export default function AllUsersPage() {
       toast.success("Users imported successfully", { id: loadId });
       fetchAllUsers(); // Refresh list
     } catch (err: any) {
-      console.error("Upload error:", err);
       toast.error(err?.response?.data?.message || "Failed to upload CSV", { id: loadId });
     } finally {
       e.target.value = ""; // Reset input

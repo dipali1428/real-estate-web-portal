@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface TemplateItem {
   id: string;
@@ -49,7 +50,7 @@ export default function TemplateCard({ template, onQuickDownload, onShareToWhats
       const imageBlob = await generatePersonalizedImage(template);
       onShareToWhatsApp(template, imageBlob);
     } catch (error) {
-      alert('Error generating image. Please try again.');
+      toast.error("Share Error:");
     } finally {
       setIsGenerating(false);
     }
@@ -60,7 +61,7 @@ export default function TemplateCard({ template, onQuickDownload, onShareToWhats
     try {
       await onQuickDownload(template);
     } catch (error) {
-      alert('Error downloading image. Please try again.');
+      toast.error("Download Error:");
     } finally {
       setIsGenerating(false);
     }

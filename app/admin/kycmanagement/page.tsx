@@ -4,11 +4,12 @@ import { AdminService } from '@/app/services/adminService';
 import {
   Search, RefreshCcw,
   ShieldCheck, Loader2, ChevronLeft, ChevronRight,
-  Edit, X
+  Edit, X, CheckCircle2, Clock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function KycStatusPage() {
+  const [activeTab, setActiveTab] = useState<"kyc" | "agreement">("kyc");
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,17 +25,31 @@ export default function KycStatusPage() {
   const [totalRecords, setTotalRecords] = useState(0);
   const limit = 10;
 
-  const fetchData = useCallback(async (page: number, search: string) => {
+  const fetchData = useCallback(async (page: number, search: string, tab: string) => {
     setLoading(true);
     try {
-      const response = await AdminService.getDSAKycStatus({ page, limit, search });
-      if (response.success) {
-        setData(response.data || []);
-        setTotalPages(response.totalPages || 1);
-        setTotalRecords(response.total || 0);
+      if (tab === "kyc") {
+        const response = await AdminService.getDSAKycStatus({ page, limit, search });
+        if (response.success) {
+          setData(response.data || []);
+          setTotalPages(response.totalPages || 1);
+          setTotalRecords(response.total || 0);
+        }
+      } else {
+        // Agreement API uses offset
+        const offset = (page - 1) * limit;
+        const response = await AdminService.getAgreementRequests({ limit, offset, search });
+        
+        // Merge completed and in_progress into one list for the table
+        const combined = [
+          ...(response.completed || []),
+          ...(response.in_progress || [])
+        ];
+        setData(combined);
+        setTotalRecords(response.total_requests || 0);
+        setTotalPages(Math.ceil((response.total_requests || 0) / limit));
       }
     } catch (err) {
-      // console.error("Fetch Error:", err);
       toast.error("Failed to fetch data. Please try again.");
       setData([]);
     } finally {
@@ -43,13 +58,20 @@ export default function KycStatusPage() {
   }, []);
 
   useEffect(() => {
-    fetchData(currentPage, searchTerm);
-  }, [currentPage, searchTerm, fetchData]);
+    fetchData(currentPage, searchTerm, activeTab);
+  }, [currentPage, searchTerm, activeTab, fetchData]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchData(1, searchTerm);
+    fetchData(1, searchTerm, activeTab);
+  };
+
+  const handleTabChange = (tab: "kyc" | "agreement") => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+    setSearchTerm("");
+    setData([]);
   };
 
   const handleOpenEdit = (item: any) => {
@@ -95,9 +117,7 @@ export default function KycStatusPage() {
         toast.error(res.message || "Update failed");
       }
     } catch (error) {
-      // console.error("Update Error:", error);
       toast.error("An error occurred while saving. Please try again.");
-      // alert("An error occurred during save.");
     } finally {
       setSaveLoading(false);
     }
@@ -108,13 +128,9 @@ export default function KycStatusPage() {
     return (
       <div className="flex justify-center">
         {isVerified ? (
-          <div className="flex items-center gap-1 text-emerald-600 text-[13px] font-bold">
-            Verified
-          </div>
+          <div className="flex items-center gap-1 text-emerald-600 text-[13px] font-bold">Verified</div>
         ) : (
-          <div className="flex items-center gap-1 text-rose-500 text-[13px] font-bold">
-            Not Verified
-          </div>
+          <div className="flex items-center gap-1 text-rose-500 text-[13px] font-bold">Not Verified</div>
         )}
       </div>
     );
@@ -127,8 +143,8 @@ export default function KycStatusPage() {
         {/* Header & Search */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">KYC Status Management</h1>
-            <p className="text-gray-500 text-sm">Verify documentation status for {totalRecords} DSAs</p>
+            <h1 className="text-2xl font-bold text-gray-900">Compliance Management</h1>
+            <p className="text-gray-500 text-sm">Manage Documentation and Agreements for {totalRecords} DSAs</p>
           </div>
 
           <form onSubmit={handleSearch} className="flex items-center gap-2">
@@ -136,7 +152,7 @@ export default function KycStatusPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
-                placeholder="Search By Name or ADV_ID..."
+                placeholder={activeTab === "kyc" ? "Search By Name or ADV_ID..." : "Search Name, Email or Mobile..."}
                 className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg outline-none text-gray-600 focus:ring-2 focus:ring-gray-100 w-64 text-sm bg-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -147,7 +163,7 @@ export default function KycStatusPage() {
             </button>
             <button
               type="button"
-              onClick={() => { setSearchTerm(""); setCurrentPage(1); fetchData(1, ""); }}
+              onClick={() => { setSearchTerm(""); setCurrentPage(1); fetchData(1, "", activeTab); }}
               className="p-2 bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50"
             >
               <RefreshCcw size={18} className={loading ? "animate-spin" : ""} />
@@ -155,76 +171,141 @@ export default function KycStatusPage() {
           </form>
         </div>
 
+        {/* Tabs */}
+        <div className="flex border-b border-gray-200 mb-6 gap-6">
+          <button
+            onClick={() => handleTabChange("kyc")}
+            className={`pb-3 text-sm font-bold transition-all px-2 ${activeTab === "kyc" ? "border-b-2 border-[#2076C7] text-[#2076C7]" : "text-gray-400 hover:text-gray-600"}`}
+          >
+            KYC Status
+          </button>
+          <button
+            onClick={() => handleTabChange("agreement")}
+            className={`pb-3 text-sm font-bold transition-all px-2 ${activeTab === "agreement" ? "border-b-2 border-[#2076C7] text-[#2076C7]" : "text-gray-400 hover:text-gray-600"}`}
+          >
+            Agreement Status
+          </button>
+        </div>
+
         {/* Table Container */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50/50 border-b border-gray-200">
-                  <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">DSA Details</th>
-                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">PAN Verified</th>
-                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Aadhaar Verified</th>
-                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">PAN-Aadhaar Link</th>
-                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Email Verified</th>
-                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Phone Verified</th>
-                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Bank Verified</th>
-                  <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">GST Verified</th>
-                  <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center bg-blue-50/30">KYC Completed</th>
-                  <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {loading ? (
-                  <tr>
-                    <td colSpan={11} className="py-24 text-center">
-                      <Loader2 className="animate-spin text-blue-500 mx-auto mb-2" size={32} />
-                      <span className="text-gray-400 text-sm">Loading records...</span>
-                    </td>
+            {activeTab === "kyc" ? (
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50/50 border-b border-gray-200">
+                    <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">ID</th>
+                    <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">DSA Details</th>
+                    <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">PAN Verified</th>
+                    <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Aadhaar Verified</th>
+                    <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">PAN-Aadhaar Link</th>
+                    <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Email Verified</th>
+                    <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Phone Verified</th>
+                    <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Bank Verified</th>
+                    <th className="px-2 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">GST Verified</th>
+                    <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center bg-blue-50/30">KYC Completed</th>
+                    <th className="px-4 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-right">Action</th>
                   </tr>
-                ) : data.length > 0 ? (
-                  data.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50/80 transition-colors">
-                      <td className="px-4 py-4 text-[12px] font-sans text-gray-700">{item.id}</td>
-                      <td className="px-4 py-4">
-                        <div className="text-sm font-bold text-gray-900 leading-tight">{item.name}</div>
-                        <div className="text-xs text-gray-500 leading-tight">{item.adv_id}</div>
-                      </td>
-                      <td className="px-2 py-4"><StatusIndicator verified={item.pan_verified} /></td>
-                      <td className="px-2 py-4"><StatusIndicator verified={item.aadhaar_verified} /></td>
-                      <td className="px-2 py-4"><StatusIndicator verified={item.pan_aadhaar_linked} /></td>
-                      <td className="px-2 py-4"><StatusIndicator verified={item.email_verified} /></td>
-                      <td className="px-2 py-4"><StatusIndicator verified={item.phone_verified} /></td>
-                      <td className="px-2 py-4"><StatusIndicator verified={item.bank_verified} /></td>
-                      <td className="px-2 py-4"><StatusIndicator verified={item.gst_verified} /></td>
-                      <td className="px-4 py-4 bg-blue-50/10">
-                        <div className="flex justify-center">
-                          {item.kyc_completed ? (
-                            <span className="bg-[#1CADA3] text-white text-[12px] font-bold px-2 py-1 rounded flex items-center gap-1">
-                              <ShieldCheck size={14} /> COMPLETE
-                            </span>
-                          ) : (
-                            <span className="bg-gray-200 text-gray-500 text-[12px] font-black px-2 py-1 rounded">INCOMPLETE</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-right">
-                        <button
-                          onClick={() => handleOpenEdit(item)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#2076C7] text-white rounded text-[11px] font-bold hover:bg-[#1a65ad] transition-all active:scale-95"
-                        >
-                          <Edit size={12} /> View & Update
-                        </button>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {loading ? (
+                    <tr>
+                      <td colSpan={11} className="py-24 text-center">
+                        <Loader2 className="animate-spin text-blue-500 mx-auto mb-2" size={32} />
+                        <span className="text-gray-400 text-sm">Loading records...</span>
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={11} className="py-20 text-center text-gray-400 text-sm">No records found.</td>
+                  ) : data.length > 0 ? (
+                    data.map((item) => (
+                      <tr key={item.id} className="hover:bg-gray-50/80 transition-colors">
+                        <td className="px-4 py-4 text-[12px] font-sans text-gray-700">{item.id}</td>
+                        <td className="px-4 py-4">
+                          <div className="text-sm font-bold text-gray-900 leading-tight">{item.name}</div>
+                          <div className="text-xs text-gray-500 leading-tight">{item.adv_id}</div>
+                        </td>
+                        <td className="px-2 py-4"><StatusIndicator verified={item.pan_verified} /></td>
+                        <td className="px-2 py-4"><StatusIndicator verified={item.aadhaar_verified} /></td>
+                        <td className="px-2 py-4"><StatusIndicator verified={item.pan_aadhaar_linked} /></td>
+                        <td className="px-2 py-4"><StatusIndicator verified={item.email_verified} /></td>
+                        <td className="px-2 py-4"><StatusIndicator verified={item.phone_verified} /></td>
+                        <td className="px-2 py-4"><StatusIndicator verified={item.bank_verified} /></td>
+                        <td className="px-2 py-4"><StatusIndicator verified={item.gst_verified} /></td>
+                        <td className="px-4 py-4 bg-blue-50/10">
+                          <div className="flex justify-center">
+                            {item.kyc_completed ? (
+                              <span className="bg-[#1CADA3] text-white text-[12px] font-bold px-2 py-1 rounded flex items-center gap-1">
+                                <ShieldCheck size={14} /> COMPLETE
+                              </span>
+                            ) : (
+                              <span className="bg-gray-200 text-gray-500 text-[12px] font-black px-2 py-1 rounded">INCOMPLETE</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 text-right">
+                          <button
+                            onClick={() => handleOpenEdit(item)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#2076C7] text-white rounded text-[11px] font-bold hover:bg-[#1a65ad] transition-all active:scale-95"
+                          >
+                            <Edit size={12} /> View & Update
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={11} className="py-20 text-center text-gray-400 text-sm">No records found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              /* Agreement Table */
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50/50 border-b border-gray-200">
+                    <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Email</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Mobile</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Status</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {loading ? (
+                    <tr>
+                      <td colSpan={4} className="py-24 text-center">
+                        <Loader2 className="animate-spin text-blue-500 mx-auto mb-2" size={32} />
+                        <span className="text-gray-400 text-sm">Loading agreements...</span>
+                      </td>
+                    </tr>
+                  ) : data.length > 0 ? (
+                    data.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-gray-50/80 transition-colors">
+                        <td className="px-6 py-4 text-sm font-bold text-gray-900">{item.name}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{item.email}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{item.phone_number}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex justify-center">
+                            {item.status === "Completed" ? (
+                              <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-emerald-100">
+                                <CheckCircle2 size={14} /> Completed
+                              </span>
+                            ) : (
+                              <span className="bg-amber-50 text-amber-600 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-amber-100">
+                                <Clock size={14} /> In-Progress
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="py-20 text-center text-gray-400 text-sm">No records found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
 
           {/* Pagination Footer */}
@@ -242,23 +323,6 @@ export default function KycStatusPage() {
               >
                 <ChevronLeft size={16} /> Previous
               </button>
-
-              <div className="hidden md:flex items-center gap-1">
-                {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                  const pageNum = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
-                  if (pageNum > totalPages || pageNum <= 0) return null;
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => setCurrentPage(pageNum)}
-                      className={`w-8 h-8 rounded-md text-xs font-bold transition-all ${currentPage === pageNum ? 'bg-[#2076C7] text-white' : 'bg-white border border-gray-300 text-gray-600 hover:border-blue-500'}`}
-                    >
-                      {pageNum}
-                    </button>
-                  )
-                })}
-              </div>
-
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages || loading}
@@ -271,7 +335,7 @@ export default function KycStatusPage() {
         </div>
       </div>
 
-      {/* Modal - Newly Added Component Remains Untouched */}
+      {/* Modal - Remains same as original */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col scale-in-center">
