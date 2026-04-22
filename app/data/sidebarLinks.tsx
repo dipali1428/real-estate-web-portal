@@ -30,13 +30,6 @@ import {
     Wallet,
     BookUp,
     WalletCards,
-    // PieChart,
-    // BadgeIndianRupee,
-    // Layers3,
-    // BriefcaseBusiness,
-    // FileBarChart,
-    // LifeBuoy,
-    // Bookmark
     FileBarChart,
     Bookmark,
     LifeBuoy,
@@ -45,6 +38,8 @@ import {
     Contact,
     LayoutTemplate,
     Gem,
+    TicketCheck,
+    // FileUp,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -122,6 +117,8 @@ export const sidebarLinks = {
                 ],
         },
         { label: "Marketing", href: "/admin/marketing", icon: <LayoutTemplate className="h-5 w-5 text-neutral-700" /> },
+        // { label: "Upload Payout", href: "/admin/uploadpayout", icon: <FileUp className="h-5 w-5 text-neutral-700" /> },
+        { label: "Generate Coupons", href: "/admin/generatecoupons", icon: <TicketCheck className="h-5 w-5 text-neutral-700" /> },
     ],
 
     GM: [],

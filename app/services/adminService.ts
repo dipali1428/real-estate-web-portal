@@ -365,7 +365,25 @@ export const AdminService = {
   async deleteCampaign(id: string) {
     const response = await api.delete(`/api/admin/campaigns/${id}`);
     return response.data;
-  }
+  },
+
+  // Generate Bypass Tokens/Coupons
+  generateCoupons: async (payload: { count: number; prefix: string; batch_label: string }) => {
+    const res = await api.post("/api/admin/generate-coupons", payload);
+    return res.data;
+  },
+
+  getCouponsDetails: async (params?: { 
+    status?: string; 
+    coupon_code?: string; 
+    page?: number; 
+    limit?: number; 
+    from_date?: string; 
+    to_date?: string 
+  }) => {
+    const response = await api.get("/api/admin/get-coupons-details", { params });
+    return response.data;
+  },
 
 };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bookmark } from 'lucide-react';
 import { Bond } from '../../../../products/bonds/data/bondsData';
@@ -10,9 +10,31 @@ interface BondCardProps {
     idx: number;
     onView: (bond: Bond) => void;
     onBuy: (bond: Bond) => void;
+    onWishlist?: (bond: Bond) => Promise<boolean>;
+    isWishlisted?: boolean;
 }
 
-export default function BondCard({ bond, idx, onView, onBuy }: BondCardProps) {
+export default function BondCard({ bond, idx, onView, onBuy, onWishlist, isWishlisted: initialWishlisted = false }: BondCardProps) {
+    const [wishlisted, setWishlisted] = useState(initialWishlisted);
+    const [wishlistLoading, setWishlistLoading] = useState(false);
+
+    // Sync state with props when parent state updates or on reload
+    React.useEffect(() => {
+        setWishlisted(initialWishlisted);
+    }, [initialWishlisted]);
+
+    const handleWishlistClick = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!onWishlist || wishlistLoading) return;
+        setWishlistLoading(true);
+        try {
+            const success = await onWishlist(bond);
+            if (success) setWishlisted(prev => !prev);
+        } finally {
+            setWishlistLoading(false);
+        }
+    };
+
     return (
         <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
@@ -24,9 +46,18 @@ export default function BondCard({ bond, idx, onView, onBuy }: BondCardProps) {
                 <span className="bg-[#1CADA3]/10 text-[#1CADA3] text-[9px] font-black px-2.5 py-1.5 rounded-lg uppercase tracking-wider">
                     {bond.category}
                 </span>
-                <span className="text-slate-300">
-                    <Bookmark className="w-5 h-5" fill="none" color="currentColor" />
-                </span>
+                <button 
+                    onClick={handleWishlistClick}
+                    disabled={wishlistLoading}
+                    title={wishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+                    className={`p-1.5 rounded-lg transition-all duration-200 ${
+                        wishlisted 
+                            ? 'text-[#2076C7] hover:bg-blue-50' 
+                            : 'text-slate-300 hover:text-[#2076C7] hover:bg-slate-50'
+                    } ${wishlistLoading ? 'opacity-50 cursor-wait' : 'cursor-pointer active:scale-90'}`}
+                >
+                    <Bookmark className="w-5 h-5" fill={wishlisted ? "currentColor" : "none"} color="currentColor" />
+                </button>
             </div>
             
             <h3 className="font-black text-slate-800 text-base mb-4 line-clamp-2 min-h-[48px] leading-tight">

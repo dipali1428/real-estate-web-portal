@@ -326,8 +326,13 @@ function StatItem({ value, label }: { value: string, label: string }) {
 
 function GalleryImage({ src, alt }: { src: string, alt: string }) {
   return (
-    <div className="h-64 rounded-lg overflow-hidden group shadow-md">
-      <Image src={src} alt={alt} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+    <div className="relative h-64 rounded-lg overflow-hidden group shadow-md">
+      <Image
+        src={src}
+        alt={alt}
+        fill /* 2. Add the fill property */
+        className="object-cover transition-transform duration-500 group-hover:scale-110"
+      />
     </div>
   );
 }
