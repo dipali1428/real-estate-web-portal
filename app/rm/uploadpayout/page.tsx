@@ -2,19 +2,18 @@
 
 import { RmService } from '@/app/services/rmService'; 
 import { useState, useEffect } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import { 
     FileText, 
     UploadCloud, 
     Trash2, 
     FilePlus, 
     Layers, 
-    Briefcase,
     Search,
     FileIcon,
     AlertCircle
 } from 'lucide-react';
 
-// Interfaces (Unchanged)
 interface DownloadItem {
     id: string;
     name: string;
@@ -67,7 +66,7 @@ export default function AdminDownloads() {
             }));
             setFiles(formattedData);
         } catch (error) {
-            console.error("Failed to fetch documents:", error);
+            toast.error("Failed to load documents");
         }
     };
 
@@ -97,7 +96,7 @@ export default function AdminDownloads() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.file) return alert("Please select a file");
+        if (!formData.file) return toast.error("Please select a file");
         setIsUploading(true);
         try {
             const response = await RmService.uploadPayoutGrid({
@@ -119,9 +118,9 @@ export default function AdminDownloads() {
             };
             setFiles([newFile, ...files]);
             setFormData({ ...formData, file: null, name: '' });
-            alert("File uploaded successfully");
+            toast.success("File uploaded successfully");
         } catch (error: any) {
-            alert(error.response?.data?.message || "Failed to upload document");
+            toast.error(error.response?.data?.message || "Failed to upload document");
         } finally {
             setIsUploading(false);
         }
@@ -132,15 +131,16 @@ export default function AdminDownloads() {
             try {
                 await RmService.deletePayoutGrid(id);
                 setFiles(files.filter(f => f.id !== id));
-                alert("Deleted successfully");
+                toast.success("Deleted successfully");
             } catch (error) {
-                alert("Failed to delete file");
+                toast.error("Failed to delete file");
             }
         }
     };
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] p-6 md:p-10 text-slate-900 font-sans">
+            <Toaster position="top-right" />
             <div className="max-w-6xl mx-auto space-y-8">
                 
                 {/* Header Section */}
