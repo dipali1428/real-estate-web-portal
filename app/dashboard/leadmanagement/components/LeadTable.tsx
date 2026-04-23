@@ -237,7 +237,7 @@ useEffect(() => {
         loadDocuments(activeLead.id);
       }
     } catch (error) {
-      console.error("Upload failed:", error);
+      setToast({ message: "Upload failed:", type: "error" });
     } finally {
       setUploadingKey(null);
     }
