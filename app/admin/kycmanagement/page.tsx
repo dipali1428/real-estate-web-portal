@@ -4,7 +4,7 @@ import { AdminService } from '@/app/services/adminService';
 import {
   Search, RefreshCcw,
   ShieldCheck, Loader2, ChevronLeft, ChevronRight,
-  Edit, X, CheckCircle2, Clock
+  Edit, X, CheckCircle2, Clock, Download
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -18,6 +18,7 @@ export default function KycStatusPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDsa, setEditingDsa] = useState<any>(null);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,11 +37,8 @@ export default function KycStatusPage() {
           setTotalRecords(response.total || 0);
         }
       } else {
-        // Agreement API uses offset
         const offset = (page - 1) * limit;
         const response = await AdminService.getAgreementRequests({ limit, offset, search });
-        
-        // Merge completed and in_progress into one list for the table
         const combined = [
           ...(response.completed || []),
           ...(response.in_progress || [])
@@ -81,6 +79,31 @@ export default function KycStatusPage() {
 
   const handleInputChange = (field: string, value: any) => {
     setEditingDsa((prev: any) => ({ ...prev, [field]: value }));
+  };
+
+  const handleDownload = async (uuid: string, name: string) => {
+    if (!uuid) {
+      toast.error("Invalid request ID");
+      return;
+    }
+    setDownloadingId(uuid);
+    try {
+      // The service now returns the blob directly
+      const response = await AdminService.downloadAgreement(uuid);
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${name.replace(/\s+/g, '_')}_Agreement.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success("Download started");
+    } catch (error) {
+      toast.error("Failed to download agreement");
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   const handleSave = async () => {
@@ -267,12 +290,13 @@ export default function KycStatusPage() {
                     <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Email</th>
                     <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Mobile</th>
                     <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Status</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Download</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {loading ? (
                     <tr>
-                      <td colSpan={4} className="py-24 text-center">
+                      <td colSpan={5} className="py-24 text-center">
                         <Loader2 className="animate-spin text-blue-500 mx-auto mb-2" size={32} />
                         <span className="text-gray-400 text-sm">Loading agreements...</span>
                       </td>
@@ -296,11 +320,36 @@ export default function KycStatusPage() {
                             )}
                           </div>
                         </td>
+                        <td className="px-6 py-4">
+                          <div className="flex justify-center">
+                            {item.status === "Completed" && item.request_uuid ? (
+                              <button
+                                onClick={() => handleDownload(item.request_uuid, item.name)}
+                                disabled={downloadingId === item.request_uuid}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#2076C7] text-white rounded text-[11px] font-bold hover:bg-[#1a65ad] transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                              >
+                                {downloadingId === item.request_uuid ? (
+                                  <>
+                                    <Loader2 size={12} className="animate-spin" />
+                                    <span>Downloading...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Download size={12} strokeWidth={2.5} />
+                                    <span>Download</span>
+                                  </>
+                                )}
+                              </button>
+                            ) : (
+                              <span className="text-gray-300"><Download size={18} /></span>
+                            )}
+                          </div>
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className="py-20 text-center text-gray-400 text-sm">No records found.</td>
+                      <td colSpan={5} className="py-20 text-center text-gray-400 text-sm">No records found.</td>
                     </tr>
                   )}
                 </tbody>
@@ -335,7 +384,7 @@ export default function KycStatusPage() {
         </div>
       </div>
 
-      {/* Modal - Remains same as original */}
+      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col scale-in-center">

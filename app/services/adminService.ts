@@ -389,5 +389,11 @@ export const AdminService = {
     const response = await api.get("/api/admin/get-agreement-requests", { params });
     return response.data;
   },
+
+  downloadAgreement: async (request_uuid: string) => {
+    return await api.get(`/api/admin/get-completed-agreements/${request_uuid}`, {
+      responseType: "blob",
+    });
+  },
 };
 
