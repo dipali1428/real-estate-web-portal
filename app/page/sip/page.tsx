@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TrendingUp, PieChart, Calculator, Home, User, Building2, LineChart, Timer, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { useRouter } from "next/navigation";
@@ -89,17 +89,26 @@ export const SIPCalculatorContent: React.FC = () => {
     };
   }, []);
 
-  // Update SIP calculations
-  useEffect(() => {
-    const results = calculateSIP(sipAmount, sipDuration, sipReturn);
-    setSipResults(results);
-  }, [sipAmount, sipDuration, sipReturn, calculateSIP]);
+  // Update SIP calculations - using useMemo instead of useEffect
+  const computedSipResults = React.useMemo(() => 
+    calculateSIP(sipAmount, sipDuration, sipReturn),
+    [sipAmount, sipDuration, sipReturn, calculateSIP]
+  );
 
-  // Update Lumpsum calculations
-  useEffect(() => {
-    const results = calculateLumpsum(lumpsumAmount, lumpsumDuration, lumpsumReturn);
-    setLumpsumResults(results);
-  }, [lumpsumAmount, lumpsumDuration, lumpsumReturn, calculateLumpsum]);
+  // Update Lumpsum calculations - using useMemo instead of useEffect
+  const computedLumpsumResults = React.useMemo(() => 
+    calculateLumpsum(lumpsumAmount, lumpsumDuration, lumpsumReturn),
+    [lumpsumAmount, lumpsumDuration, lumpsumReturn, calculateLumpsum]
+  );
+
+  // Sync computed results to state
+  React.useEffect(() => {
+    setSipResults(computedSipResults);
+  }, [computedSipResults]);
+
+  React.useEffect(() => {
+    setLumpsumResults(computedLumpsumResults);
+  }, [computedLumpsumResults]);
 
   // Calculate bar heights
   const getBarHeight = (value: number, maxValue: number): number => {
@@ -107,9 +116,9 @@ export const SIPCalculatorContent: React.FC = () => {
     return (value / maxValue) * chartHeight;
   };
 
-  const maxChartValue = Math.max(sipResults.totalValue, lumpsumResults.totalValue);
-  const sipBarHeight = getBarHeight(sipResults.totalValue, maxChartValue);
-  const lumpsumBarHeight = getBarHeight(lumpsumResults.totalValue, maxChartValue);
+  const maxChartValue = Math.max(computedSipResults.totalValue, computedLumpsumResults.totalValue);
+  const sipBarHeight = getBarHeight(computedSipResults.totalValue, maxChartValue);
+  const lumpsumBarHeight = getBarHeight(computedLumpsumResults.totalValue, maxChartValue);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -230,15 +239,15 @@ export const SIPCalculatorContent: React.FC = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between pb-3 border-b border-gray-200">
                       <span className="text-gray-600">Total Investment</span>
-                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(sipResults.totalInvestment)}</span>
+                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(computedSipResults.totalInvestment)}</span>
                     </div>
                     <div className="flex justify-between pb-3 border-b border-gray-200">
                       <span className="text-gray-600">Est. Returns</span>
-                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(sipResults.estimatedReturns)}</span>
+                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(computedSipResults.estimatedReturns)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Total Value</span>
-                      <span className="font-medium font-sans text-[#1CADA3] text-lg">{formatCurrency(sipResults.totalValue)}</span>
+                      <span className="font-medium font-sans text-[#1CADA3] text-lg">{formatCurrency(computedSipResults.totalValue)}</span>
                     </div>
                   </div>
                 </div>
@@ -335,15 +344,15 @@ export const SIPCalculatorContent: React.FC = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between pb-3 border-b border-gray-200">
                       <span className="text-gray-600">Total Investment</span>
-                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(lumpsumResults.totalInvestment)}</span>
+                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(computedLumpsumResults.totalInvestment)}</span>
                     </div>
                     <div className="flex justify-between pb-3 border-b border-gray-200">
                       <span className="text-gray-600">Est. Returns</span>
-                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(lumpsumResults.estimatedReturns)}</span>
+                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(computedLumpsumResults.estimatedReturns)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Total Value</span>
-                      <span className="font-medium font-sans text-[#1CADA3] text-lg">{formatCurrency(lumpsumResults.totalValue)}</span>
+                      <span className="font-medium font-sans text-[#1CADA3] text-lg">{formatCurrency(computedLumpsumResults.totalValue)}</span>
                     </div>
                   </div>
                 </div>
@@ -365,7 +374,7 @@ export const SIPCalculatorContent: React.FC = () => {
                   style={{ height: `${sipBarHeight}px` }}
                 >
                   <div className="absolute -top-8 left-0 w-full text-center font-bold font-sans text-gray-800 text-sm">
-                    {formatCurrency(sipResults.totalValue)}
+                    {formatCurrency(computedSipResults.totalValue)}
                   </div>
                 </div>
                 <div className="mt-3 text-sm font-semibold text-gray-700 flex items-center gap-1">
@@ -381,7 +390,7 @@ export const SIPCalculatorContent: React.FC = () => {
                   style={{ height: `${lumpsumBarHeight}px` }}
                 >
                   <div className="absolute -top-8 left-0 w-full text-center font-bold font-sans text-gray-800 text-sm">
-                    {formatCurrency(lumpsumResults.totalValue)}
+                    {formatCurrency(computedLumpsumResults.totalValue)}
                   </div>
                 </div>
                 <div className="mt-3 text-sm font-semibold text-gray-700 flex items-center gap-1">
@@ -412,7 +421,7 @@ export const SIPCalculatorContent: React.FC = () => {
               </div>
               <div className="text-xs text-gray-600 mb-1">Wealth Gain</div>
               <div className="font-bold text-lg font-sans text-[#1CADA3]">
-                {formatCurrency(activeTab === 'sip' ? sipResults.estimatedReturns : lumpsumResults.estimatedReturns)}
+                {formatCurrency(activeTab === 'sip' ? computedSipResults.estimatedReturns : computedLumpsumResults.estimatedReturns)}
               </div>
             </div>
 
@@ -448,14 +457,14 @@ export const SIPCalculatorContent: React.FC = () => {
                 <li>
                   <span className="font-medium">Total Investment</span> - Your total investment amount is{' '}
                   <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
-                    {formatCurrency(activeTab === 'sip' ? sipResults.totalInvestment : lumpsumResults.totalInvestment)}
+                    {formatCurrency(activeTab === 'sip' ? computedSipResults.totalInvestment : computedLumpsumResults.totalInvestment)}
                   </span>
                 </li>
 
                 <li>
                   <span className="font-medium">Estimated Returns</span> - You can expect to earn{' '}
                   <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
-                    {formatCurrency(activeTab === 'sip' ? sipResults.estimatedReturns : lumpsumResults.estimatedReturns)}
+                    {formatCurrency(activeTab === 'sip' ? computedSipResults.estimatedReturns : computedLumpsumResults.estimatedReturns)}
                   </span>{' '}
                   in returns
                 </li>
@@ -463,7 +472,7 @@ export const SIPCalculatorContent: React.FC = () => {
                 <li>
                   <span className="font-medium">Future Value</span> - Your investment will grow to{' '}
                   <span className="bg-blue-50 px-1.5 py-0.5 rounded font-medium font-sans text-xs">
-                    {formatCurrency(activeTab === 'sip' ? sipResults.totalValue : lumpsumResults.totalValue)}
+                    {formatCurrency(activeTab === 'sip' ? computedSipResults.totalValue : computedLumpsumResults.totalValue)}
                   </span>
                 </li>
 
@@ -494,9 +503,7 @@ export const SIPCalculatorContent: React.FC = () => {
               </div>
 
               <p className="text-[11px] text-gray-500 mt-2 flex items-start gap-1">
-
-
-                <span><strong>Note:</strong> Past performance doesn't guarantee future returns. These calculations are for illustration purposes only. Actual returns may vary based on market conditions.</span>
+                <span><strong>Note:</strong> Past performance doesn&apos;t guarantee future returns. These calculations are for illustration purposes only. Actual returns may vary based on market conditions.</span>
               </p>
             </div>
           </div>

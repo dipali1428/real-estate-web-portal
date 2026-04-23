@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { RefreshCw, Columns } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { toast } from "react-hot-toast";
 import { AdminService } from "@/app/services/adminService";
 

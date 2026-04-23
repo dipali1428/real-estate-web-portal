@@ -2,6 +2,7 @@
 
 import { taxGuideData } from "../../../utils/TaxGuideData";
 import { ShieldCheck, Receipt, Percent, Info } from 'lucide-react';
+import Image from "next/image";
 
 const TaxGuideContent = () => {
     return (
@@ -9,10 +10,12 @@ const TaxGuideContent = () => {
             {/* Header with Logo */}
             <div className="flex justify-between items-start mb-12 border-b-4 border-[#1CADA3] pb-8">
                 <div>
-                    <img
+                    <Image
                         src={taxGuideData.logoUrl}
                         alt="Infinity Arthvishva Logo"
-                        className="h-20 w-auto mb-6"
+                        width={80}
+                        height={80}
+                        className="mb-6"
                     />
                     <h1 className="text-4xl font-black text-[#2076C7] uppercase tracking-tighter font-sans">
                         {taxGuideData.title}

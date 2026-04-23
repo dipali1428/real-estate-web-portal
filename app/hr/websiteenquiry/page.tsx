@@ -232,7 +232,7 @@ const EnquiryAdminPage: React.FC = () => {
       toast('Failed to update status. Please try again.');
       // rollback
       setEnquiries(prev => prev.map(e => (e.id === id ? { ...e, status: original } : e)));
-      alert(err?.message || 'Failed to update status. Please try again.');
+      toast.error(err?.message || 'Failed to update status. Please try again.');
     } finally {
       setUpdatingStatus(null);
     }

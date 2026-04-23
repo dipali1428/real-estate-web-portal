@@ -180,7 +180,7 @@ export default function CustomerDashboard() {
                         {loading ? "Loading..." : `Welcome back, ${customer?.name || "Investor"}!`}
                     </h2>
                     <p className="text-sm sm:text-base text-white/80">
-                        Here's a snapshot of your investment portfolio performance.
+                        Here&apos;s a snapshot of your investment portfolio performance.
                     </p>
                 </motion.div>
 

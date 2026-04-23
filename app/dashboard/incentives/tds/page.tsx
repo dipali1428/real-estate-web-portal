@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { DashboardService } from '@/app/services/dashboardService';
+import { toast } from 'react-hot-toast';
 
 interface TDS {
   id: number;
@@ -59,7 +60,7 @@ export default function TDSManagement() {
         }
 
       } catch (error) {
-        console.error("Failed to fetch dashboard data", error);
+        toast.error("Failed to fetch dashboard data");
         setRecords([]);
       } finally {
         setIsLoading(false);

@@ -128,7 +128,7 @@ export default function MyMortgageLoans({ activeTab, setActiveTab }: { activeTab
       <div className="relative bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-100/60 mt-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-linear-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
                       <FileText size={24} />
                   </div>
                   <div>
@@ -154,7 +154,7 @@ export default function MyMortgageLoans({ activeTab, setActiveTab }: { activeTab
                           className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'explore' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
                       >
                           {activeTab === 'explore' && (
-                              <div className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm" />
+                              <div className="absolute inset-0 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm" />
                           )}
                           <Home size={14} />
                           <span>Offers</span>
@@ -164,7 +164,7 @@ export default function MyMortgageLoans({ activeTab, setActiveTab }: { activeTab
                           className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'applications' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
                       >
                           {activeTab === 'applications' && (
-                              <div className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm" />
+                              <div className="absolute inset-0 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm" />
                           )}
                           <FileText size={14} />
                           <span>Applications</span>
@@ -315,7 +315,7 @@ export default function MyMortgageLoans({ activeTab, setActiveTab }: { activeTab
         <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+              <thead className="bg-linear-to-r from-gray-50 to-gray-100">
                 <tr>
                   <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Date & Time</th>
                   <th className="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Type</th>
@@ -367,7 +367,7 @@ export default function MyMortgageLoans({ activeTab, setActiveTab }: { activeTab
                       </tr>
 
                       {expandedRow === app.id && (
-                        <tr className="bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
+                        <tr className="bg-linear-to-r from-blue-50/50 to-indigo-50/50">
                           <td colSpan={7} className="p-6">
                             <div className="grid grid-cols-4 gap-6">
                               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-blue-100">

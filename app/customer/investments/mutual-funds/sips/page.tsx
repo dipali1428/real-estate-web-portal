@@ -45,14 +45,33 @@ export default function SIPManagementPage() {
   };
 
   const handleCancel = (id: string) => {
-    if (confirm("Are you sure you want to cancel this SIP?")) {
-      setSips((prev) =>
-        prev.map((sip) =>
-          sip.id === id ? { ...sip, status: "CANCELLED" as any } : sip
-        )
-      );
-      toast.success("SIP Cancelled!");
-    }
+    toast((t) => (
+      <div className="flex flex-col gap-3">
+        <p className="text-sm">Cancel this SIP?</p>
+        <div className="flex gap-2 justify-end">
+          <button
+            className="px-3 py-1 text-xs bg-slate-200 rounded"
+            onClick={() => toast.dismiss(t.id)}
+          >
+            No
+          </button>
+          <button
+            className="px-3 py-1 text-xs bg-red-500 text-white rounded"
+            onClick={() => {
+              setSips((prev) =>
+                prev.map((sip) =>
+                  sip.id === id ? { ...sip, status: "CANCELLED" as any } : sip
+                )
+              );
+              toast.dismiss(t.id);
+              toast.success("SIP Cancelled!");
+            }}
+          >
+            Yes
+          </button>
+        </div>
+      </div>
+    ));
   };
 
   const activeSips = sips.filter((s) => s.status !== "CANCELLED");

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowLeft, ChevronRight, Lock, ShieldCheck } from "lucide-react";
 import { useModal } from "../../../context/ModalContext";
+import Image from 'next/image';
 
 export function Hero() {
   const { openLogin } = useModal();
@@ -106,9 +107,11 @@ export function Hero() {
             {/* Glow matching the Mutual Funds card depth */}
             <div className="absolute inset-0 bg-gradient-to-r from-[#2076C7]/10 to-[#1CADA3]/10 blur-[100px] rounded-full scale-90"></div>
 
-            <img
+            <Image
               src="/insurance/loan-protector.jpeg"
               alt="Loan Protector Insurance"
+              width={500}
+              height={300}
               className="relative z-10 w-full max-w-[500px] lg:max-w-none object-contain drop-shadow-[0_30px_50px_rgba(32,118,199,0.2)]"
             />
           </motion.div>

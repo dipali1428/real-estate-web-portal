@@ -16,6 +16,8 @@ import {
     IconFeather,
     IconPaw
 } from '@tabler/icons-react';
+import Image from 'next/image';
+
 
 const BREED_OPTIONS: Record<string, string[]> = {
     dog: ['Labrador Retriever', 'German Shepherd', 'Golden Retriever', 'Pug', 'Beagle', 'Rottweiler', 'Rajapalayam', 'Mudhol Hound', 'Indian Spitz', 'Doberman', 'Mixed Breed', 'Other'],
@@ -381,9 +383,10 @@ export default function PetQuoteModal({ isOpen, onClose }: PetQuoteModalProps) {
                                         className="flex flex-col items-center justify-center py-12 text-center space-y-6"
                                     >
                                         <div className="w-full max-w-[240px] aspect-video rounded-3xl overflow-hidden relative mb-4">
-                                            <img
+                                            <Image
                                                 src="https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?q=80&w=1974&auto=format&fit=crop"
                                                 alt="Success Illustration"
+                                                fill
                                                 className="w-full h-full object-cover"
                                             />
                                             <div className="absolute inset-0 bg-teal-500/10 flex items-center justify-center">

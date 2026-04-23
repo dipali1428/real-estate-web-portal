@@ -346,7 +346,7 @@ export default function PetInsuranceSection({ isDashboard = false }: { isDashboa
                                                     </div>
                                                     <h3 className="text-2xl font-black text-slate-800 mb-3 tracking-tight leading-none uppercase">Claim Activity</h3>
                                                     <p className="text-slate-400 font-medium max-w-xs leading-relaxed text-sm mb-8 text-center">
-                                                        No medical claims have been recorded yet. Your pet's treatment history will be visualized here graphically.
+                                                        No medical claims have been recorded yet. Your pet&apos;s treatment history will be visualized here graphically.
                                                     </p>
                                                     <div className="flex gap-4">
                                                         <span className="w-3 h-3 rounded-full bg-blue-100 animate-pulse" />

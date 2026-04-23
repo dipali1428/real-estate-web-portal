@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
 
 // Register Chart.js components
@@ -24,6 +24,14 @@ interface PaymentScheduleEntry {
     principal: number;
     interest: number;
     balance: number;
+}
+
+interface LoanCalculationResult {
+    paymentAmount: number;
+    totalInterest: number;
+    totalPayment: number;
+    effectiveAnnualRate: number;
+    fullSchedule: PaymentScheduleEntry[];
 }
 
 const frequencyMap: Record<PaymentFrequency, number> = {
@@ -63,133 +71,15 @@ export default function LoanCalculator() {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [itemsPerPage, setItemsPerPage] = useState<number>(12);
 
-    // State for calculated values
-    const [paymentAmount, setPaymentAmount] = useState<number>(0);
-    const [totalInterest, setTotalInterest] = useState<number>(0);
-    const [totalPayment, setTotalPayment] = useState<number>(0);
-    const [effectiveAnnualRate, setEffectiveAnnualRate] = useState<number>(0);
-    const [amortizationSchedule, setAmortizationSchedule] = useState<PaymentScheduleEntry[]>([]);
-    const [fullAmortizationSchedule, setFullAmortizationSchedule] = useState<PaymentScheduleEntry[]>([]);
-
     // Chart reference
     const chartRef = useRef<Chart<'doughnut'> | null>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    // Format currency for display
-    const formatCurrency = (value: number): string => {
-        if (isNaN(value) || value === 0) return '₹0';
-        return '₹' + value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    };
-
-    const formatCurrencyWithDecimals = (value: number): string => {
-        if (isNaN(value) || value === 0) return '₹0.00';
-        return '₹' + value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    };
-
-    const formatLoanTerm = (months: number) => {
-        if (months === 0) return '0 months';
-
-        const years = Math.floor(months / 12);
-        const remainingMonths = months % 12;
-
-        if (years > 0) {
-            return `${years} year${years !== 1 ? 's' : ''}${remainingMonths > 0 ? `, ${remainingMonths} month${remainingMonths !== 1 ? 's' : ''}` : ''}`;
-        }
-        return `${months} month${months !== 1 ? 's' : ''}`;
-    };
-
-    // Calculate total number of payments
-    const calculateTotalPayments = () => {
-        if (paymentFrequency === 'continuous') {
-            return 1;
-        }
-        const paymentsPerYear = frequencyMap[paymentFrequency];
-        const loanTermYears = loanTermMonths / 12;
-        return Math.ceil(loanTermYears * paymentsPerYear);
-    };
-
-    // Calculate loan payments
-    const calculateLoanPayments = () => {
-        if (!loanAmount || loanAmount < 10000 || loanAmount === 0) {
-            return;
-        }
-
-        if (!annualInterestRate || annualInterestRate < 0.1 || annualInterestRate === 0) {
-            return;
-        }
-
-        if (!loanTermMonths || loanTermMonths < 1 || loanTermMonths === 0) {
-            return;
-        }
-
-        const paymentsPerYear = frequencyMap[paymentFrequency];
-        const annualRateDecimal = annualInterestRate / 100;
-        const loanTermYears = loanTermMonths / 12;
-
-        let calculatedPaymentAmount: number;
-        let calculatedTotalPayment: number;
-        let calculatedTotalInterest: number;
-        let calculatedEffectiveAnnualRate: number;
-        let totalPayments: number;
-
-        if (paymentFrequency === 'continuous') {
-            // Continuously compounded interest
-            calculatedTotalPayment = loanAmount * Math.exp(annualRateDecimal * loanTermYears);
-            calculatedTotalInterest = calculatedTotalPayment - loanAmount;
-            calculatedPaymentAmount = calculatedTotalPayment;
-            calculatedEffectiveAnnualRate = (Math.exp(annualRateDecimal) - 1) * 100;
-            totalPayments = 1;
-        } else {
-            // Standard periodic payments
-            totalPayments = Math.ceil(loanTermYears * paymentsPerYear);
-            const periodicInterestRate = annualRateDecimal / paymentsPerYear;
-
-            if (periodicInterestRate === 0) {
-                calculatedPaymentAmount = loanAmount / totalPayments;
-            } else {
-                const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
-                calculatedPaymentAmount = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
-            }
-
-            calculatedTotalPayment = calculatedPaymentAmount * totalPayments;
-            calculatedTotalInterest = calculatedTotalPayment - loanAmount;
-            calculatedEffectiveAnnualRate = (Math.pow(1 + periodicInterestRate, paymentsPerYear) - 1) * 100;
-        }
-
-        // Generate FULL amortization schedule (all periods)
-        const fullSchedule = generateFullAmortizationSchedule(
-            loanAmount,
-            calculatedPaymentAmount,
-            annualRateDecimal,
-            totalPayments,
-            paymentsPerYear,
-            paymentFrequency
-        );
-
-        // Set full schedule
-        setFullAmortizationSchedule(fullSchedule);
-
-        // Set initial display schedule (first page)
-        const initialDisplaySchedule = fullSchedule.slice(0, itemsPerPage);
-        setAmortizationSchedule(initialDisplaySchedule);
-
-        setPaymentAmount(calculatedPaymentAmount);
-        setTotalInterest(calculatedTotalInterest);
-        setTotalPayment(calculatedTotalPayment);
-        setEffectiveAnnualRate(calculatedEffectiveAnnualRate);
-
-        // Update chart
-        updateChart(loanAmount, calculatedTotalInterest);
-
-        // Reset to first page
-        setCurrentPage(1);
-    };
-
-    // Generate FULL amortization schedule
-    const generateFullAmortizationSchedule = (
+    // Pure schedule generation function (no need for useCallback as it has no dependencies)
+    const generateSchedule = (
         initialLoanAmount: number,
         monthlyPayment: number,
-        annualInterestRate: number,
+        annualRateDecimal: number,
         totalPayments: number,
         paymentsPerYear: number,
         frequency: PaymentFrequency
@@ -203,18 +93,17 @@ export default function LoanCalculator() {
 
             if (frequency === 'continuous') {
                 if (period === 1) {
-                    interestPayment = balance * (Math.exp(annualInterestRate * (totalPayments / 12)) - 1);
+                    interestPayment = balance * (Math.exp(annualRateDecimal * (totalPayments / 12)) - 1);
                     principalPayment = initialLoanAmount;
                     balance = 0;
                 } else {
                     break;
                 }
             } else {
-                const periodicInterestRate = annualInterestRate / paymentsPerYear;
+                const periodicInterestRate = annualRateDecimal / paymentsPerYear;
                 interestPayment = balance * periodicInterestRate;
                 principalPayment = monthlyPayment - interestPayment;
 
-                // Adjust last payment
                 if (balance - principalPayment < 0) {
                     principalPayment = balance;
                     interestPayment = monthlyPayment - principalPayment;
@@ -242,15 +131,115 @@ export default function LoanCalculator() {
         return schedule;
     };
 
-    // Update the chart with new data
-    const updateChart = (principal: number, interest: number) => {
-        if (chartRef.current) {
-            chartRef.current.data.datasets[0].data = [principal, interest];
-            chartRef.current.update();
+    // Pure calculation function
+    const calculateLoanDetails = useCallback((
+        amount: number,
+        rate: number,
+        termMonths: number,
+        frequency: PaymentFrequency
+    ): LoanCalculationResult => {
+        // Validate inputs
+        if (amount < 10000 || rate < 0.1 || termMonths < 1) {
+            return {
+                paymentAmount: 0,
+                totalInterest: 0,
+                totalPayment: 0,
+                effectiveAnnualRate: 0,
+                fullSchedule: []
+            };
         }
-    };
 
-    // Initialize chart
+        const paymentsPerYear = frequencyMap[frequency];
+        const annualRateDecimal = rate / 100;
+        const loanTermYears = termMonths / 12;
+
+        let paymentAmount: number;
+        let totalPayment: number;
+        let totalInterest: number;
+        let effectiveAnnualRate: number;
+        let totalPayments: number;
+
+        if (frequency === 'continuous') {
+            totalPayment = amount * Math.exp(annualRateDecimal * loanTermYears);
+            totalInterest = totalPayment - amount;
+            paymentAmount = totalPayment;
+            effectiveAnnualRate = (Math.exp(annualRateDecimal) - 1) * 100;
+            totalPayments = 1;
+        } else {
+            totalPayments = Math.ceil(loanTermYears * paymentsPerYear);
+            const periodicInterestRate = annualRateDecimal / paymentsPerYear;
+
+            if (periodicInterestRate === 0) {
+                paymentAmount = amount / totalPayments;
+            } else {
+                const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
+                paymentAmount = (amount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+            }
+
+            totalPayment = paymentAmount * totalPayments;
+            totalInterest = totalPayment - amount;
+            effectiveAnnualRate = (Math.pow(1 + periodicInterestRate, paymentsPerYear) - 1) * 100;
+        }
+
+        // Generate amortization schedule
+        const fullSchedule = generateSchedule(
+            amount,
+            paymentAmount,
+            annualRateDecimal,
+            totalPayments,
+            paymentsPerYear,
+            frequency
+        );
+
+        return {
+            paymentAmount,
+            totalInterest,
+            totalPayment,
+            effectiveAnnualRate,
+            fullSchedule
+        };
+    }, []);
+
+    // Calculate all derived values during rendering
+    const calculationResult = useMemo(
+        () => calculateLoanDetails(loanAmount, annualInterestRate, loanTermMonths, paymentFrequency),
+        [loanAmount, annualInterestRate, loanTermMonths, paymentFrequency, calculateLoanDetails]
+    );
+
+    const { paymentAmount, totalInterest, totalPayment, effectiveAnnualRate, fullSchedule } = calculationResult;
+
+    // Get paginated schedule (derived during rendering)
+    const paginatedSchedule = useMemo(() => {
+        if (fullSchedule.length === 0) return [];
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return fullSchedule.slice(startIndex, endIndex);
+    }, [fullSchedule, currentPage, itemsPerPage]);
+
+    // Format currency for display
+    const formatCurrency = useCallback((value: number): string => {
+        if (isNaN(value) || value === 0) return '₹0';
+        return '₹' + value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }, []);
+
+    const formatLoanTerm = useCallback((months: number) => {
+        if (months === 0) return '0 months';
+        const years = Math.floor(months / 12);
+        const remainingMonths = months % 12;
+        if (years > 0) {
+            return `${years} year${years !== 1 ? 's' : ''}${remainingMonths > 0 ? `, ${remainingMonths} month${remainingMonths !== 1 ? 's' : ''}` : ''}`;
+        }
+        return `${months} month${months !== 1 ? 's' : ''}`;
+    }, []);
+
+    const calculateTotalPayments = useCallback(() => {
+        if (paymentFrequency === 'continuous') return 1;
+        const paymentsPerYear = frequencyMap[paymentFrequency];
+        const loanTermYears = loanTermMonths / 12;
+        return Math.ceil(loanTermYears * paymentsPerYear);
+    }, [paymentFrequency, loanTermMonths]);
+
+    // Initialize chart (only runs once)
     useEffect(() => {
         if (canvasRef.current) {
             const ctx = canvasRef.current.getContext('2d');
@@ -269,20 +258,13 @@ export default function LoanCalculator() {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: {
-                                position: 'bottom' as const
-                            },
+                            legend: { position: 'bottom' as const },
                             tooltip: {
                                 callbacks: {
-                                    label: function (context) {
-                                        let label = context.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        if (context.parsed !== null) {
-                                            label += formatCurrency(context.parsed);
-                                        }
-                                        return label;
+                                    label: (context) => {
+                                        const label = context.label || '';
+                                        const value = context.parsed;
+                                        return `${label}: ${formatCurrency(value)}`;
                                     }
                                 }
                             }
@@ -297,123 +279,98 @@ export default function LoanCalculator() {
                 chartRef.current.destroy();
             }
         };
-    }, []);
+    }, []); // Empty dependency array - only run once
 
-    // Calculate loan payments when parameters change
+    // Update chart when data changes (synchronizing with external system)
     useEffect(() => {
-        calculateLoanPayments();
-    }, [loanAmount, annualInterestRate, loanTermMonths, paymentFrequency]);
-
-    // Update displayed schedule when page or items per page changes
-    useEffect(() => {
-        if (fullAmortizationSchedule.length > 0) {
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const currentSchedule = fullAmortizationSchedule.slice(startIndex, endIndex);
-            setAmortizationSchedule(currentSchedule);
+        if (chartRef.current && loanAmount > 0 && totalInterest > 0) {
+            chartRef.current.data.datasets[0].data = [loanAmount, totalInterest];
+            chartRef.current.update();
         }
-    }, [currentPage, itemsPerPage, fullAmortizationSchedule]);
+    }, [loanAmount, totalInterest]);
+
+    // Track previous calculation to reset page when it changes (no Effect needed!)
+    const [prevCalculation, setPrevCalculation] = useState(calculationResult);
+    
+    // Reset to first page during render if calculation changed
+    if (calculationResult !== prevCalculation) {
+        setPrevCalculation(calculationResult);
+        setCurrentPage(1);
+    }
 
     // Pagination controls
-    const totalPages = Math.ceil(fullAmortizationSchedule.length / itemsPerPage);
+    const totalPages = Math.ceil(fullSchedule.length / itemsPerPage);
 
-    const handlePageChange = (newPage: number) => {
+    const handlePageChange = useCallback((newPage: number) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setCurrentPage(newPage);
         }
-    };
+    }, [totalPages]);
 
-    const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newItemsPerPage = parseInt(e.target.value);
-        setItemsPerPage(newItemsPerPage);
-        setCurrentPage(1); // Reset to first page when changing items per page
-    };
-
-    // Handle slider changes
-    const handleLoanAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleLoanAmountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setLoanAmount(Number(e.target.value));
-    };
+    }, []);
 
-    const handleInterestRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInterestRateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setAnnualInterestRate(Number(e.target.value));
-    };
+    }, []);
 
-    const handleTenureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleTenureChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setLoanTermMonths(Number(e.target.value));
-    };
+    }, []);
 
-    // Handle input changes
-    const handleInputChange = (field: string, value: string) => {
+    const handleInputChange = useCallback((field: string, value: string) => {
         if (value === '') {
             switch (field) {
-                case 'loanAmount':
-                    setLoanAmount(0);
-                    break;
-                case 'annualInterestRate':
-                    setAnnualInterestRate(0);
-                    break;
-                case 'loanTermMonths':
-                    setLoanTermMonths(0);
-                    break;
+                case 'loanAmount': setLoanAmount(0); break;
+                case 'annualInterestRate': setAnnualInterestRate(0); break;
+                case 'loanTermMonths': setLoanTermMonths(0); break;
             }
             return;
         }
-
         const cleanValue = value.replace(/[^\d.]/g, '');
-        const parts = cleanValue.split('.');
-        if (parts.length > 2) return;
-
         const numValue = parseFloat(cleanValue);
         if (!isNaN(numValue)) {
             switch (field) {
-                case 'loanAmount':
-                    setLoanAmount(numValue);
-                    break;
-                case 'annualInterestRate':
-                    setAnnualInterestRate(numValue);
-                    break;
-                case 'loanTermMonths':
-                    setLoanTermMonths(numValue);
-                    break;
+                case 'loanAmount': setLoanAmount(numValue); break;
+                case 'annualInterestRate': setAnnualInterestRate(numValue); break;
+                case 'loanTermMonths': setLoanTermMonths(numValue); break;
             }
         }
-    };
+    }, []);
 
-    // Handle input changes with proper typing
-    const handleLoanAmountInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleLoanAmountInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         handleInputChange('loanAmount', e.target.value);
-    };
+    }, [handleInputChange]);
 
-    const handleInterestRateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInterestRateInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         handleInputChange('annualInterestRate', e.target.value);
-    };
+    }, [handleInputChange]);
 
-    const handleTenureInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleTenureInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         handleInputChange('loanTermMonths', e.target.value);
-    };
+    }, [handleInputChange]);
 
-    // Get display value for inputs
-    const getLoanAmountDisplayValue = () => {
-        return loanAmount === 0 ? '' : loanAmount.toString();
-    };
-
-    const getInterestRateDisplayValue = () => {
-        return annualInterestRate === 0 ? '' : annualInterestRate.toString();
-    };
-
-    const getTenureDisplayValue = () => {
-        return loanTermMonths === 0 ? '' : loanTermMonths.toString();
-    };
-
-    // Prevent wheel event from changing input values
-    const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    const handleWheel = useCallback((e: React.WheelEvent<HTMLInputElement>) => {
         e.currentTarget.blur();
-    };
+    }, []);
 
-    const handleNumberInputWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    const handleNumberInputWheel = useCallback((e: React.WheelEvent<HTMLInputElement>) => {
         e.currentTarget.blur();
         e.stopPropagation();
-    };
+    }, []);
+
+    const getLoanAmountDisplayValue = useCallback(() => {
+        return loanAmount === 0 ? '' : loanAmount.toString();
+    }, [loanAmount]);
+
+    const getInterestRateDisplayValue = useCallback(() => {
+        return annualInterestRate === 0 ? '' : annualInterestRate.toString();
+    }, [annualInterestRate]);
+
+    const getTenureDisplayValue = useCallback(() => {
+        return loanTermMonths === 0 ? '' : loanTermMonths.toString();
+    }, [loanTermMonths]);
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans" style={{ fontFamily: 'var(--font-geist-sans)' }}>
@@ -428,7 +385,6 @@ export default function LoanCalculator() {
                     <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
                         {/* Input Section */}
                         <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
-
                             {/* Loan Amount */}
                             <div className="mb-6">
                                 <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-2">
@@ -563,8 +519,6 @@ export default function LoanCalculator() {
                                     ))}
                                 </div>
                             </div>
-
-                            {/* Moved closing brackets for col1 to here */}
                         </div>
 
                         {/* Visualization Section */}
@@ -573,7 +527,7 @@ export default function LoanCalculator() {
                                 <canvas ref={canvasRef}></canvas>
                             </div>
 
-                            {/* Results Section - Moved to Right Column */}
+                            {/* Results Section */}
                             <div className="bg-[#f8fcff] p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3] mb-6">
                                 <div className="text-center mb-6">
                                     <div className="text-sm text-[#2076C7] font-medium mb-1">Monthly Payment (EMI)</div>
@@ -644,19 +598,15 @@ export default function LoanCalculator() {
                                     </div>
                                 </div>
                             </div>
-                            {/* Closing Viz Col (571) */}
                         </div>
-                        {/* Closing Flex Container (428) */}
                     </div>
 
-                    {/* KEY INSIGHTS - Refined Layout */}
+                    {/* KEY INSIGHTS Section */}
                     <div className="bg-gray-50/50 border-t border-gray-100 p-6 lg:p-10 font-sans">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                             <div className="flex items-center gap-2">
                                 <h2 className="text-2xl font-bold text-gray-800">Key Insights</h2>
                             </div>
-
-                            {/* Featured Row - Top 2 Points */}
                             <div className="flex-1 max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="bg-white p-4 rounded-xl border border-teal-100 shadow-sm flex items-start gap-3">
                                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1CADA3] shrink-0"></div>
@@ -681,9 +631,7 @@ export default function LoanCalculator() {
                             </div>
                         </div>
 
-                        {/* Remaining 6 Points in Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                            {/* Point 3 */}
                             <div className="flex items-start gap-3">
                                 <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></div>
                                 <p className="text-gray-700 leading-relaxed font-semibold">
@@ -695,71 +643,21 @@ export default function LoanCalculator() {
                                 </p>
                             </div>
 
-                            {/* Point 4 - Conditional */}
-                            {(() => {
-                                if (loanTermMonths > 0 && loanAmount > 0 && annualInterestRate > 0) {
-                                    const extendedTenure = loanTermMonths + 12;
-                                    const extendedPayments = Math.ceil(extendedTenure / 12 * frequencyMap[paymentFrequency]);
-                                    const periodicInterestRate = (annualInterestRate / 100) / frequencyMap[paymentFrequency];
-                                    const rateFactor = Math.pow(1 + periodicInterestRate, extendedPayments);
-                                    const extendedEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
-                                    const emiReduction = paymentAmount - extendedEMI;
-
-                                    if (emiReduction > 0) {
-                                        return (
-                                            <div className="flex items-start gap-3">
-                                                <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></div>
-                                                <p className="text-gray-700 leading-relaxed font-semibold">
-                                                    Extending tenure by 1 yr reduces EMI by{' '}
-                                                    <span className="text-[#2076C7] font-extrabold mx-1">
-                                                        {formatCurrency(emiReduction)}
-                                                    </span>
-                                                </p>
-                                            </div>
-                                        );
-                                    }
-                                }
-                                return null;
-                            })()}
-
-                            {/* Point 5 - Conditional */}
-                            {(() => {
-                                if (annualInterestRate > 1 && loanAmount > 0 && loanTermMonths > 0) {
-                                    const lowerRate = annualInterestRate - 1;
-                                    if (lowerRate > 0) {
-                                        const periodicInterestRate = (lowerRate / 100) / frequencyMap[paymentFrequency];
-                                        const totalPayments = calculateTotalPayments();
-                                        const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
-                                        const lowerEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
-                                        const totalSavings = (paymentAmount - lowerEMI) * totalPayments;
-
-                                        return (
-                                            <div className="flex items-start gap-3">
-                                                <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></div>
-                                                <p className="text-gray-700 leading-relaxed font-semibold">
-                                                    A 1% lower rate would save you{' '}
-                                                    <span className="text-[#2076C7] font-extrabold mx-1">
-                                                        {formatCurrency(totalSavings)}
-                                                    </span>
-                                                </p>
-                                            </div>
-                                        );
-                                    }
-                                }
-                                return null;
-                            })()}
-
-                            {/* Point 6 - Conditional */}
-                            {(() => {
-                                if (totalInterest > 0) {
-                                    const earlyRepaymentSavings = totalInterest * 0.2;
+                            {loanTermMonths > 0 && loanAmount > 0 && annualInterestRate > 0 && (() => {
+                                const extendedTenure = loanTermMonths + 12;
+                                const extendedPayments = Math.ceil(extendedTenure / 12 * frequencyMap[paymentFrequency]);
+                                const periodicInterestRate = (annualInterestRate / 100) / frequencyMap[paymentFrequency];
+                                const rateFactor = Math.pow(1 + periodicInterestRate, extendedPayments);
+                                const extendedEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+                                const emiReduction = paymentAmount - extendedEMI;
+                                if (emiReduction > 0) {
                                     return (
                                         <div className="flex items-start gap-3">
                                             <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></div>
                                             <p className="text-gray-700 leading-relaxed font-semibold">
-                                                Early repayment could save approximately{' '}
+                                                Extending tenure by 1 yr reduces EMI by{' '}
                                                 <span className="text-[#2076C7] font-extrabold mx-1">
-                                                    {formatCurrency(earlyRepaymentSavings)}
+                                                    {formatCurrency(emiReduction)}
                                                 </span>
                                             </p>
                                         </div>
@@ -768,7 +666,44 @@ export default function LoanCalculator() {
                                 return null;
                             })()}
 
-                            {/* Point 7 */}
+                            {annualInterestRate > 1 && loanAmount > 0 && loanTermMonths > 0 && (() => {
+                                const lowerRate = annualInterestRate - 1;
+                                if (lowerRate > 0) {
+                                    const periodicInterestRate = (lowerRate / 100) / frequencyMap[paymentFrequency];
+                                    const totalPaymentsCount = calculateTotalPayments();
+                                    const rateFactor = Math.pow(1 + periodicInterestRate, totalPaymentsCount);
+                                    const lowerEMI = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+                                    const totalSavings = (paymentAmount - lowerEMI) * totalPaymentsCount;
+                                    return (
+                                        <div className="flex items-start gap-3">
+                                            <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></div>
+                                            <p className="text-gray-700 leading-relaxed font-semibold">
+                                                A 1% lower rate would save you{' '}
+                                                <span className="text-[#2076C7] font-extrabold mx-1">
+                                                    {formatCurrency(totalSavings)}
+                                                </span>
+                                            </p>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })()}
+
+                            {totalInterest > 0 && (() => {
+                                const earlyRepaymentSavings = totalInterest * 0.2;
+                                return (
+                                    <div className="flex items-start gap-3">
+                                        <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></div>
+                                        <p className="text-gray-700 leading-relaxed font-semibold">
+                                            Early repayment could save approximately{' '}
+                                            <span className="text-[#2076C7] font-extrabold mx-1">
+                                                {formatCurrency(earlyRepaymentSavings)}
+                                            </span>
+                                        </p>
+                                    </div>
+                                );
+                            })()}
+
                             <div className="flex items-start gap-3">
                                 <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></div>
                                 <p className="text-gray-700 leading-relaxed font-semibold">
@@ -779,7 +714,6 @@ export default function LoanCalculator() {
                                 </p>
                             </div>
 
-                            {/* Point 8 */}
                             <div className="flex items-start gap-3">
                                 <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></div>
                                 <p className="text-gray-700 leading-relaxed font-semibold">

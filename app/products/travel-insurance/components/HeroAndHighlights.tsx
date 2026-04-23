@@ -7,6 +7,7 @@ import {
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useModal } from '../../../context/ModalContext';
+import Image from 'next/image';
 
 export default function HeroAndHighlights() {
     const containerRef = useRef(null);
@@ -102,9 +103,10 @@ export default function HeroAndHighlights() {
                                     {/* Subtle Gradient Inner Glow */}
                                     <div className="absolute inset-0 bg-gradient-to-tr from-[#2076C7]/5 to-[#1CADA3]/5" />
 
-                                    <img
+                                    <Image
                                         src="/travel insurance/travel_hero_illustration.png"
                                         alt="Travel Protection Illustration"
+                                        fill
                                         className="w-full h-full object-cover drop-shadow-lg group-hover:scale-105 transition-transform duration-700"
                                     />
                                 </motion.div>

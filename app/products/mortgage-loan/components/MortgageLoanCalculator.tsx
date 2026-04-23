@@ -1,7 +1,6 @@
-// app/offers/loans/mortgage-loan/components/MortgageLoanCalculator.tsx
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
 
 // Register Chart.js components
@@ -17,6 +16,13 @@ interface PaymentScheduleEntry {
     balance: number;
 }
 
+interface LoanCalculationResult {
+    paymentAmount: number;
+    totalInterest: number;
+    totalPayment: number;
+    fullSchedule: PaymentScheduleEntry[];
+}
+
 const frequencyMap: Record<PaymentFrequency, number> = {
     monthly: 12,
     quarterly: 4,
@@ -29,49 +35,113 @@ export default function MortgageLoanCalculator() {
     const [loanTermMonths, setLoanTermMonths] = useState<number>(120); // 10 years default
     const [paymentFrequency, setPaymentFrequency] = useState<PaymentFrequency>('monthly');
 
-    const [paymentAmount, setPaymentAmount] = useState<number>(0);
-    const [totalInterest, setTotalInterest] = useState<number>(0);
-    const [totalPayment, setTotalPayment] = useState<number>(0);
-    const [amortizationSchedule, setAmortizationSchedule] = useState<PaymentScheduleEntry[]>([]);
-
     const chartRef = useRef<Chart<'doughnut'> | null>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const formatCurrency = (value: number): string => {
+    const formatCurrency = useCallback((value: number): string => {
         if (isNaN(value) || value === 0) return '₹0';
         return '₹' + value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    };
+    }, []);
 
-    const calculateLoanPayments = () => {
-        if (!loanAmount || loanAmount < 10000 || !annualInterestRate || !loanTermMonths) return;
+    // Pure schedule generation function (MOVE THIS BEFORE calculateLoanDetails)
+    const generateSchedule = useCallback((
+        initialLoanAmount: number,
+        monthlyPayment: number,
+        annualRateDecimal: number,
+        totalPayments: number,
+        paymentsPerYear: number,
+        frequency: PaymentFrequency
+    ): PaymentScheduleEntry[] => {
+        const schedule: PaymentScheduleEntry[] = [];
+        let balance = initialLoanAmount;
 
-        const paymentsPerYear = frequencyMap[paymentFrequency];
-        const annualRateDecimal = annualInterestRate / 100;
-        const loanTermYears = loanTermMonths / 12;
+        for (let period = 1; period <= totalPayments; period++) {
+            const periodicInterestRate = annualRateDecimal / paymentsPerYear;
+            const interestPayment = balance * periodicInterestRate;
+            let principalPayment = monthlyPayment - interestPayment;
+
+            // Adjust last payment
+            if (balance - principalPayment < 0) {
+                principalPayment = balance;
+            }
+
+            balance -= principalPayment;
+
+            schedule.push({
+                period,
+                payment: monthlyPayment,
+                principal: principalPayment,
+                interest: interestPayment,
+                balance: Math.max(0, balance)
+            });
+
+            if (balance <= 0) break;
+        }
+
+        return schedule;
+    }, []);
+
+    // Pure calculation function (now can access generateSchedule)
+    const calculateLoanDetails = useCallback((
+        amount: number,
+        rate: number,
+        termMonths: number,
+        frequency: PaymentFrequency
+    ): LoanCalculationResult => {
+        // Validate inputs
+        if (amount < 10000 || rate < 0.1 || termMonths < 1) {
+            return {
+                paymentAmount: 0,
+                totalInterest: 0,
+                totalPayment: 0,
+                fullSchedule: []
+            };
+        }
+
+        const paymentsPerYear = frequencyMap[frequency];
+        const annualRateDecimal = rate / 100;
+        const loanTermYears = termMonths / 12;
         const totalPayments = Math.ceil(loanTermYears * paymentsPerYear);
         const periodicInterestRate = annualRateDecimal / paymentsPerYear;
 
-        let calculatedPaymentAmount: number;
+        let paymentAmount: number;
         if (periodicInterestRate === 0) {
-            calculatedPaymentAmount = loanAmount / totalPayments;
+            paymentAmount = amount / totalPayments;
         } else {
             const rateFactor = Math.pow(1 + periodicInterestRate, totalPayments);
-            calculatedPaymentAmount = (loanAmount * periodicInterestRate * rateFactor) / (rateFactor - 1);
+            paymentAmount = (amount * periodicInterestRate * rateFactor) / (rateFactor - 1);
         }
 
-        const calculatedTotalPayment = calculatedPaymentAmount * totalPayments;
-        const calculatedTotalInterest = calculatedTotalPayment - loanAmount;
+        const totalPayment = paymentAmount * totalPayments;
+        const totalInterest = totalPayment - amount;
 
-        setPaymentAmount(calculatedPaymentAmount);
-        setTotalInterest(calculatedTotalInterest);
-        setTotalPayment(calculatedTotalPayment);
+        // Generate amortization schedule (generateSchedule is now defined above)
+        const fullSchedule = generateSchedule(
+            amount,
+            paymentAmount,
+            annualRateDecimal,
+            totalPayments,
+            paymentsPerYear,
+            frequency
+        );
 
-        if (chartRef.current) {
-            chartRef.current.data.datasets[0].data = [loanAmount, calculatedTotalInterest];
-            chartRef.current.update();
-        }
-    };
+        return {
+            paymentAmount,
+            totalInterest,
+            totalPayment,
+            fullSchedule
+        };
+    }, [generateSchedule]);
 
+    // Calculate all derived values during rendering (no Effect needed!)
+    const calculationResult = useMemo(
+        () => calculateLoanDetails(loanAmount, annualInterestRate, loanTermMonths, paymentFrequency),
+        [loanAmount, annualInterestRate, loanTermMonths, paymentFrequency, calculateLoanDetails]
+    );
+
+    const { paymentAmount, totalInterest, totalPayment, fullSchedule } = calculationResult;
+
+    // Initialize chart (only runs once - external system)
     useEffect(() => {
         if (canvasRef.current) {
             const ctx = canvasRef.current.getContext('2d');
@@ -90,10 +160,14 @@ export default function MortgageLoanCalculator() {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { position: 'bottom' },
+                            legend: { position: 'bottom' as const },
                             tooltip: {
                                 callbacks: {
-                                    label: (context) => `${context.label}: ${formatCurrency(context.parsed)}`
+                                    label: (context) => {
+                                        const label = context.label || '';
+                                        const value = context.parsed;
+                                        return `${label}: ${formatCurrency(value)}`;
+                                    }
                                 }
                             }
                         }
@@ -101,12 +175,38 @@ export default function MortgageLoanCalculator() {
                 });
             }
         }
-        return () => chartRef.current?.destroy();
+
+        return () => {
+            if (chartRef.current) {
+                chartRef.current.destroy();
+            }
+        };
+    }, []); // Empty dependency array - only run once
+
+    // Update chart when data changes (synchronizing with external system)
+    useEffect(() => {
+        if (chartRef.current && loanAmount > 0 && totalInterest > 0) {
+            chartRef.current.data.datasets[0].data = [loanAmount, totalInterest];
+            chartRef.current.update();
+        }
+    }, [loanAmount, totalInterest]);
+
+    // Handlers
+    const handleLoanAmountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setLoanAmount(Number(e.target.value));
     }, []);
 
-    useEffect(() => {
-        calculateLoanPayments();
-    }, [loanAmount, annualInterestRate, loanTermMonths, paymentFrequency]);
+    const handleInterestRateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setAnnualInterestRate(Number(e.target.value));
+    }, []);
+
+    const handleTenureChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setLoanTermMonths(Number(e.target.value));
+    }, []);
+
+    const handleFrequencyChange = useCallback((frequency: PaymentFrequency) => {
+        setPaymentFrequency(frequency);
+    }, []);
 
     return (
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto border border-gray-100">
@@ -116,6 +216,28 @@ export default function MortgageLoanCalculator() {
 
             <div className="flex flex-col lg:flex-row p-6 lg:p-8">
                 <div className="flex-1 lg:pr-8 lg:border-r border-gray-100 space-y-8">
+                    {/* Payment Frequency Selector */}
+                    <div>
+                        <label className="text-[#2076C7] font-bold text-sm uppercase block mb-3">
+                            Payment Frequency
+                        </label>
+                        <div className="flex gap-3">
+                            {(['monthly', 'quarterly', 'annually'] as PaymentFrequency[]).map((freq) => (
+                                <button
+                                    key={freq}
+                                    onClick={() => handleFrequencyChange(freq)}
+                                    className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                                        paymentFrequency === freq
+                                            ? 'bg-[#1CADA3] text-white'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    {freq.charAt(0).toUpperCase() + freq.slice(1)}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     {/* Loan Amount */}
                     <div>
                         <div className="flex justify-between items-center mb-4">
@@ -123,13 +245,17 @@ export default function MortgageLoanCalculator() {
                             <input
                                 type="number"
                                 value={loanAmount}
-                                onChange={(e) => setLoanAmount(Number(e.target.value))}
+                                onChange={handleLoanAmountChange}
                                 className="w-32 px-3 py-1 bg-neutral-50 border border-gray-200 rounded-lg text-right font-bold text-[#1CADA3] outline-none"
                             />
                         </div>
                         <input
-                            type="range" min="100000" max="100000000" step="50000"
-                            value={loanAmount} onChange={(e) => setLoanAmount(Number(e.target.value))}
+                            type="range" 
+                            min="100000" 
+                            max="100000000" 
+                            step="50000"
+                            value={loanAmount} 
+                            onChange={handleLoanAmountChange}
                             className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#1CADA3]"
                         />
                         <div className="flex justify-between text-[10px] text-gray-400 mt-2 font-bold">
@@ -143,15 +269,20 @@ export default function MortgageLoanCalculator() {
                         <div className="flex justify-between items-center mb-4">
                             <label className="text-[#2076C7] font-bold text-sm uppercase">Interest Rate (% p.a.)</label>
                             <input
-                                type="number" step="0.05"
+                                type="number" 
+                                step="0.05"
                                 value={annualInterestRate}
-                                onChange={(e) => setAnnualInterestRate(Number(e.target.value))}
+                                onChange={handleInterestRateChange}
                                 className="w-24 px-3 py-1 bg-neutral-50 border border-gray-200 rounded-lg text-right font-bold text-[#1CADA3] outline-none"
                             />
                         </div>
                         <input
-                            type="range" min="5" max="20" step="0.05"
-                            value={annualInterestRate} onChange={(e) => setAnnualInterestRate(Number(e.target.value))}
+                            type="range" 
+                            min="5" 
+                            max="20" 
+                            step="0.05"
+                            value={annualInterestRate} 
+                            onChange={handleInterestRateChange}
                             className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#1CADA3]"
                         />
                         <div className="flex justify-between text-[10px] text-gray-400 mt-2 font-bold">
@@ -167,13 +298,17 @@ export default function MortgageLoanCalculator() {
                             <input
                                 type="number"
                                 value={loanTermMonths}
-                                onChange={(e) => setLoanTermMonths(Number(e.target.value))}
+                                onChange={handleTenureChange}
                                 className="w-24 px-3 py-1 bg-neutral-50 border border-gray-200 rounded-lg text-right font-bold text-[#1CADA3] outline-none"
                             />
                         </div>
                         <input
-                            type="range" min="12" max="240" step="12"
-                            value={loanTermMonths} onChange={(e) => setLoanTermMonths(Number(e.target.value))}
+                            type="range" 
+                            min="12" 
+                            max="240" 
+                            step="12"
+                            value={loanTermMonths} 
+                            onChange={handleTenureChange}
                             className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#1CADA3]"
                         />
                         <div className="flex justify-between text-[10px] text-gray-400 mt-2 font-bold">
@@ -190,7 +325,9 @@ export default function MortgageLoanCalculator() {
 
                     <div className="grid grid-cols-2 gap-6 w-full text-center">
                         <div className="bg-neutral-50 p-4 rounded-2xl border border-gray-100">
-                            <div className="text-[10px] font-bold text-gray-400 uppercase mb-1">Monthly EMI</div>
+                            <div className="text-[10px] font-bold text-gray-400 uppercase mb-1">
+                                {paymentFrequency === 'monthly' ? 'Monthly' : paymentFrequency === 'quarterly' ? 'Quarterly' : 'Annual'} Payment
+                            </div>
                             <div className="text-xl font-bold text-[#2076C7]">{formatCurrency(paymentAmount)}</div>
                         </div>
                         <div className="bg-neutral-50 p-4 rounded-2xl border border-gray-100">

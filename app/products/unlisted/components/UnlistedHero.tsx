@@ -193,17 +193,26 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                 ))}
             </div>
 
-            {/* Back to Home Button */}
-            <div className="absolute z-50 top-8 left-4 md:top-12 md:left-12">
+            <div className="fixed z-50 top-20 left-4 md:top-24 md:left-8">
+                {/* Mobile: icon only */}
                 <button
                     onClick={handleBackHome}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-[0_4px_16px_rgba(32,118,199,0.1)] hover:bg-white hover:border-[#2076C7]/40 active:scale-95 transition-all group cursor-pointer"
+                    aria-label="Back to Home"
+                    className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
                 >
-                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2.5} />
+                    <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+                        <ArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+                    </div>
+                </button>
+                {/* Desktop: full text button */}
+                <button
+                    onClick={handleBackHome}
+                    className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group"
+                >
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
                     Back to Home
                 </button>
             </div>
-
             {/* Main Hero Content */}
             <div className="max-w-[1440px] mx-auto px-6 w-full flex-grow flex items-center">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
@@ -261,13 +270,13 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                                 className="relative z-10 w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] lg:w-[450px] lg:h-[450px] bg-white rounded-full shadow-[0_20px_60px_-15px_rgba(32,118,199,0.3)] border-8 border-white overflow-hidden"
                             >
-                                <Image
-                                    src="/unlistedshares/unlisted_shares.png"
-                                    alt="Hero"
-                                    width={800}
-                                    height={360}
-                                    className="object-cover"
-                                />
+                            <Image
+                                src="/unlistedshares/unlisted_shares.png"
+                                alt="Hero"
+                                width={450}
+                                height={450}
+                                className="w-full h-full object-cover rounded-full"
+                            />
                             </motion.div>
                             
                             <motion.div animate={{ y: [0, -15, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute -top-4 right-0 md:right-4 bg-white p-4 rounded-2xl shadow-2xl border border-blue-50 flex items-center gap-3 z-20">

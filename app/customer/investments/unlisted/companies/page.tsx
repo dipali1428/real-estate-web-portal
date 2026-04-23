@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import customerService, { WishlistItem } from '../../../../services/customerService';
 import { motion, AnimatePresence } from 'framer-motion';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
+import Image from "next/image";
 
 // ==================== TYPES ====================
 
@@ -715,7 +716,7 @@ export default function CompaniesPage() {
               {/* Rectangular Logo Container */}
               <div className="w-full h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100 shadow-sm overflow-hidden">
                 {company.logo_url ? (
-                  <img src={company.logo_url} className="w-full h-full object-contain p-3" alt={company.shares_name} />
+                  <Image src={company.logo_url} width={128} height={128} className="w-full h-full object-contain p-3" alt={company.shares_name} />
                 ) : (
                   <span className="text-3xl font-bold text-[#2076C7]">{company.shares_name.charAt(0)}</span>
                 )}
@@ -815,7 +816,7 @@ export default function CompaniesPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
                       {enriched.logo_url ? (
-                        <img src={enriched.logo_url} className="w-full h-full object-contain p-1" alt={enriched.shares_name} />
+                        <Image src={enriched.logo_url} width={48} height={48} className="w-full h-full object-contain p-1" alt={enriched.shares_name} />
                       ) : (
                         <span className="text-xl font-bold text-[#2076C7]">{enriched.shares_name.charAt(0)}</span>
                       )}

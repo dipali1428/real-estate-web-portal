@@ -5,6 +5,7 @@ import { Search, ArrowRight, ShieldPlus, Info } from 'lucide-react';
 import HealthInsurancePlanCard from './HealthInsurancePlanCard';
 import { healthInsurancePlans } from '../healthInsuranceConstants';
 import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 
 export default function ExploreHealthInsurance({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -140,7 +141,7 @@ export default function ExploreHealthInsurance({ activeTab, setActiveTab }: { ac
                     <HealthInsurancePlanCard 
                         key={idx} 
                         {...plan} 
-                        onApply={(name) => console.log(`Applying for ${name}`)} 
+                        onApply={(name) => toast.success(`Applying for ${name}`)} 
                     />
                 ))}
             </div>

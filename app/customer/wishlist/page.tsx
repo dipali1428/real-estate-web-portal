@@ -16,6 +16,7 @@ import {
     Trash2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Image from "next/image";
 
 /* ---------------- TYPES ---------------- */
 
@@ -61,10 +62,13 @@ const initialCategories = [
     { id: 'all', name: 'All Items', icon: Layers },
     { id: 'unlisted', name: 'Unlisted', icon: Building2 },
     { id: 'mutual-funds', name: 'Mutual Funds', icon: TrendingUp },
-    { id: 'loans', name: 'Loans', icon: Wallet },
-    { id: 'insurance', name: 'Insurance', icon: ShieldCheck },
-    { id: 'investments', name: 'Investments', icon: BarChart3 },
+    { id: 'pms', name: 'PMS', icon: BarChart3 },
+    { id: 'fixed-deposit', name: 'Fixed Deposit', icon: Wallet },
+    { id: 'bonds', name: 'Bonds', icon: ShieldCheck },
+    { id: 'aif', name: 'AIF', icon: BarChart3 },
     { id: 'real-estate', name: 'Real Estate', icon: Home },
+    { id: 'ncd', name: 'NCD', icon: Layers },
+    {id: 'nps', name: 'NPS', icon: Wallet}
 ];
 
 // Helper to get token
@@ -404,7 +408,7 @@ export default function Wishlist() {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center space-x-4">
                                                 <div className="w-10 h-10 rounded-lg border overflow-hidden bg-white shadow-sm flex-shrink-0">
-                                                    {item.logo_url ? <img src={item.logo_url} alt="" className="w-full h-full object-contain" /> : <div className="w-full h-full flex items-center justify-center text-xs font-bold text-[#2076C7] bg-blue-50">{item.product_name.substring(0, 2)}</div>}
+                                                    {item.logo_url ? <Image src={item.logo_url} width={40} height={40} alt="" className="w-full h-full object-contain" /> : <div className="w-full h-full flex items-center justify-center text-xs font-bold text-[#2076C7] bg-blue-50">{item.product_name.substring(0, 2)}</div>}
                                                 </div>
                                                 <div className="min-w-0">
                                                     <div className="text-sm font-semibold text-gray-800 truncate">{item.product_name}</div>
@@ -474,7 +478,7 @@ export default function Wishlist() {
                                         <div className="flex items-center gap-4 flex-1 min-w-0">
                                             <div className="w-14 h-14 rounded-2xl border border-slate-100 bg-white flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
                                                 {item.logo_url ? (
-                                                    <img src={item.logo_url} className="w-full h-full object-contain p-1.5" alt={item.product_name} />
+                                                    <Image src={item.logo_url} width={56} height={56} className="w-full h-full object-contain p-1.5" alt={item.product_name} />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10">
                                                         <Building2 className="text-[#2076C7] w-7 h-7" strokeWidth={1.5} />

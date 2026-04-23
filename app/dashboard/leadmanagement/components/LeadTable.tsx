@@ -2,6 +2,7 @@
 import { FC, useState, useMemo, useEffect, ChangeEvent } from "react";
 import { DashboardService } from "@/app/services/dashboardService";
 import { Check, Clock, FileText, X } from "lucide-react";
+import Image from "next/image";
 
 const statusStyles: Record<string, string> = {
   completed: "bg-green-50 text-green-700 border-green-100",
@@ -179,7 +180,7 @@ useEffect(() => {
         setCache(newCache);
         setData(newCache[activeTab]);
       } catch (error) {
-        console.error(`Failed to fetch leads:`, error);
+        setToast({ message: `Failed to fetch leads:`, type: "error" });
       } finally {
         setLoading(false);
       }
@@ -200,7 +201,7 @@ useEffect(() => {
         setDocuments({ uploaded: response.uploaded || [], pending: response.pending || [] });
       }
     } catch (error) {
-      console.error("Error fetching documents:", error);
+      setToast({ message: "Error fetching documents:", type: "error" });
     } finally {
       setFetchingDocs(false);
     }
@@ -236,7 +237,7 @@ useEffect(() => {
         loadDocuments(activeLead.id);
       }
     } catch (error) {
-      console.error("Upload failed:", error);
+      setToast({ message: "Upload failed:", type: "error" });
     } finally {
       setUploadingKey(null);
     }
@@ -620,7 +621,7 @@ useEffect(() => {
             </div>
             <div className="grow bg-gray-100 flex items-center justify-center overflow-hidden">
               {isImage(previewUrl) ? (
-                <img src={previewUrl} alt="Preview" className="max-w-full max-h-full object-contain" />
+                <Image src={previewUrl} width={640} height={480} alt="Preview" className="max-w-full max-h-full object-contain" />
               ) : (
                 <iframe src={`${previewUrl}#toolbar=0`} className="w-full h-full border-none" title="PDF Preview" />
               )}
