@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
     Calculator,
@@ -21,18 +21,17 @@ export default function TermCalculator() {
     const [age, setAge] = useState<number>(18);
     const [coverage, setCoverage] = useState<number>(10000000); // 1 Crore
     const [coverTillAge, setCoverTillAge] = useState<number>(28);
-    const [premium, setPremium] = useState<number>(0);
 
-    useEffect(() => {
-        // Ensure coverTillAge is always at least age + 2 or 28
-        const minCoverAge = Math.max(28, age + 2);
-        if (coverTillAge < minCoverAge) {
-            setCoverTillAge(minCoverAge);
-        }
-    }, [age]);
+    // Calculate the minimum allowed cover till age based on current age
+    const minCoverTillAge = useMemo(() => Math.max(28, age + 2), [age]);
 
-    // Higher accuracy calculation logic
-    useEffect(() => {
+    // Ensure coverTillAge is always at least minCoverTillAge
+    const effectiveCoverTillAge = useMemo(() => {
+        return Math.max(coverTillAge, minCoverTillAge);
+    }, [coverTillAge, minCoverTillAge]);
+
+    // Calculate premium using useMemo instead of useEffect
+    const premium = useMemo(() => {
         // Base monthly for 18yr female, non-smoker, 1Cr
         // Market baseline is roughly ₹350-400 for these criteria
         const baseMonthly = 370;
@@ -62,14 +61,14 @@ export default function TermCalculator() {
         }
 
         // 5. Term factor: Longer terms increase the risk pool duration
-        const term = coverTillAge - age;
+        const term = effectiveCoverTillAge - age;
         const termEffect = 1 + (term > 50 ? 0.25 : term > 35 ? 0.15 : 0);
 
         const totalPremium = Math.round(baseMonthly * ageEffect * genderEffect * smokerEffect * coverageEffect * termEffect);
 
         // Final sanity check: Minimum premium in market is usually around ₹350
-        setPremium(Math.max(350, totalPremium));
-    }, [gender, isSmoker, age, coverage, coverTillAge]);
+        return Math.max(350, totalPremium);
+    }, [gender, isSmoker, age, coverage, effectiveCoverTillAge]);
 
     const formatCurrency = (num: number) => {
         return new Intl.NumberFormat('en-IN', {
@@ -90,6 +89,20 @@ export default function TermCalculator() {
         }
         return options;
     })();
+
+    // Handle coverTillAge change with validation
+    const handleCoverTillAgeChange = (value: number) => {
+        setCoverTillAge(Math.max(value, minCoverTillAge));
+    };
+
+    // Generate options for cover till age dropdown
+    const coverTillAgeOptions = useMemo(() => {
+        const options = [];
+        for (let i = minCoverTillAge; i <= 100; i++) {
+            options.push(i);
+        }
+        return options;
+    }, [minCoverTillAge]);
 
     return (
         <section className="py-16 md:py-24 bg-white relative overflow-hidden font-sans" id="calculator">
@@ -212,7 +225,15 @@ export default function TermCalculator() {
                                     <div className="relative min-w-[140px]">
                                         <select
                                             value={age}
-                                            onChange={(e) => setAge(parseInt(e.target.value))}
+                                            onChange={(e) => {
+                                                const newAge = parseInt(e.target.value);
+                                                setAge(newAge);
+                                                // Reset coverTillAge if it becomes invalid
+                                                const newMinCoverAge = Math.max(28, newAge + 2);
+                                                if (coverTillAge < newMinCoverAge) {
+                                                    setCoverTillAge(newMinCoverAge);
+                                                }
+                                            }}
                                             className="w-full font-sans bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:border-[#2076C7] transition-all cursor-pointer"
                                         >
                                             {[...Array(48)].map((_, i) => (
@@ -261,20 +282,13 @@ export default function TermCalculator() {
                                     </div>
                                     <div className="relative min-w-[140px]">
                                         <select
-                                            value={coverTillAge}
-                                            onChange={(e) => setCoverTillAge(parseInt(e.target.value))}
+                                            value={effectiveCoverTillAge}
+                                            onChange={(e) => handleCoverTillAgeChange(parseInt(e.target.value))}
                                             className="w-full font-sans bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:border-[#2076C7] transition-all cursor-pointer"
                                         >
-                                            {(() => {
-                                                const min = Math.max(28, age + 2);
-                                                const options = [];
-                                                for (let i = min; i <= 100; i++) {
-                                                    options.push(i);
-                                                }
-                                                return options.map(val => (
-                                                    <option key={val} value={val}>{val} Years</option>
-                                                ));
-                                            })()}
+                                            {coverTillAgeOptions.map(val => (
+                                                <option key={val} value={val}>{val} Years</option>
+                                            ))}
                                         </select>
                                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                     </div>
@@ -341,8 +355,8 @@ export default function TermCalculator() {
 
                             <div className="absolute bottom-8 left-8 right-8 p-4 bg-white/40 backdrop-blur-md rounded-2xl border border-white/20">
                                 <p className="text-[9px] text-slate-500 font-bold leading-relaxed">
-                                    Final quote may vary based on medical results & insurer's final underwriting.
-                                    Subject to T&C.
+                                    Final quote may vary based on medical results & insurer&apos;s final underwriting.
+                                    Subject to T&amp;C.
                                 </p>
                             </div>
                         </div>

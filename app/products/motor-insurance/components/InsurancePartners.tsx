@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import Image from 'next/image';
 
 const partners = [
     { name: "Royal Sundaram", logo: "/motor-insurance/Royal_Sundaram.png" },
@@ -56,10 +57,12 @@ const InsurancePartners = ({ scrollingSpeed = 20 }: InsurancePartnersProps) => {
                                 <div
                                     key={`${partner.name}-r1-${index}`}
                                     className="bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center min-w-[200px] h-28 p-4 group border-b-4 hover:border-b-[#1CADA3] shadow-sm hover:shadow-md transition-all duration-300"
-                                >
-                                    <img
+                                >   
+                                    <Image
                                         src={partner.logo}
                                         alt={partner.name}
+                                        width={160}
+                                        height={64}
                                         className="max-h-16 w-full object-contain group-hover:scale-110 transition-transform duration-500"
                                     />
                                 </div>
@@ -88,11 +91,13 @@ const InsurancePartners = ({ scrollingSpeed = 20 }: InsurancePartnersProps) => {
                                     key={`${partner.name}-r2-${index}`}
                                     className="bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center min-w-[200px] h-28 p-4 group border-b-4 hover:border-b-[#1CADA3] shadow-sm hover:shadow-md transition-all duration-200"
                                 >
-                                    <img
-                                        src={partner.logo}
-                                        alt={partner.name}
-                                        className="max-h-16 w-full object-contain group-hover:scale-110 transition-transform duration-400"
-                                    />
+                                <Image
+                                src={partner.logo}
+                                alt={partner.name}
+                                width={100}
+                                height={40}
+                                className="h-10 w-auto object-contain"
+                                />
                                 </div>
                             ))}
                         </motion.div>

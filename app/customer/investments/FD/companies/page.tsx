@@ -16,8 +16,7 @@ import {
   Percent
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { bankData } from '../../../../products/FD/data/mockData';
-import type { Bank } from '../../../../products/FD/data/mockData';
+import { Bank, bankData } from '../../../../products/FD/data/mockData';
 
 // ==================== TYPES ====================
 

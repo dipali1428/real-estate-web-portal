@@ -7,6 +7,7 @@ import {
   IconShieldCheck,
 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import Image from 'next/image';
 interface LASHeroProps {
   openLogin: () => void;
 }
@@ -119,9 +120,11 @@ export const LASHero: React.FC<LASHeroProps> = ({ openLogin }) => {
               {" "}
               {/* Decorative background glow to frame the image */}{" "}
 
-              <img
+              <Image
                 src="/loan/las.jpeg"
                 alt="LAS Illustration"
+                width={540}
+                height={400}
                 className="w-full h-auto object-contain lg:scale-[0.95] translate-y-12"
               />{" "}
             </div>{" "}

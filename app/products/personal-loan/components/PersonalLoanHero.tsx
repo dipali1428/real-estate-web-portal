@@ -2,7 +2,7 @@
 import React from 'react';
 import { ShieldCheck, Clock, Percent, Zap, TrendingUp, ArrowRight } from 'lucide-react';
 import { useModal } from '@/app/context/ModalContext';
-
+import Image from 'next/image';
 
 // interface PersonalLoanHeroProps {
 // }
@@ -77,9 +77,11 @@ export default function PersonalLoanHero() {
                     <div className="w-full lg:w-1/2 relative order-2 lg:order-2 px-4 md:px-0">
                         {/* Main Image Base */}
                         <div className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-xl md:shadow-2xl bg-white border border-gray-100 z-10 w-full h-[280px] sm:h-[350px] md:h-[500px]">
-                            <img
+                            <Image
                                 src="/loan/personal-loan-hero.png"
                                 alt="Personal finance and loan calculation"
+                                width={500}
+                                height={400}
                                 className="w-full h-full object-cover object-center"
                             />
                         </div>

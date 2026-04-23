@@ -112,7 +112,7 @@ const NPSDashboard: React.FC = () => {
                 <ArrowUpRight size={16} />
               </div>
               <p className="text-[10px] text-[#2076C7] font-medium leading-tight">
-                You've maxed out your additional ₹50k tax benefit for this year!
+                You&apos;ve maxed out your additional ₹50k tax benefit for this year!
               </p>
             </div>
           </div>

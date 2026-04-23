@@ -134,7 +134,6 @@ export default function ExploreFunds() {
           }
         }
       } else {
-        console.log("Adding to wishlist - Product ID (Scheme Code):", fund.code);
         await customerService.addToWishlist({
           product_type: 'mutual_fund',
           product_id: Number(fund.code),

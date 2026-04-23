@@ -9,6 +9,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useModal } from '@/app/context/ModalContext';
+import Image from 'next/image';
 
 export default function HeroSection() {
   const router = useRouter();
@@ -122,9 +123,11 @@ export default function HeroSection() {
                 {/* Subtle Gradient Inner Glow */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-[#2076C7]/5 to-[#1CADA3]/5" />
 
-                <img
+                <Image
                   src="/insurance/pet.jpeg"
                   alt="Pet Protection Illustration"
+                  width={400}
+                  height={400}
                   className="w-full h-full object-cover"
                 />
               </motion.div>

@@ -363,19 +363,30 @@ const LiveTrends: React.FC = () => {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
             <main className="container mx-auto px-4 py-4 pt-4 md:pt-8">
                 {/* Back Button - Fixed to only cover the button area */}
-                <div className="sticky top-[72px] z-40 mb-6 md:mb-8 pointer-events-none">
-                    <div className="container mx-auto">
-                        <span className="inline-block pointer-events-auto">
-                            <a 
-                                href="/products/unlisted" 
-                                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-lg hover:bg-white hover:border-[#2076C7]/40 active:scale-95 transition-all group cursor-pointer"
-                            >
-                                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                                <span className="font-semibold">Back</span>
-                            </a>
-                        </span>
+                <div className="fixed z-50 top-20 left-4 md:top-24 md:left-8">
+                    
+                    {/* Mobile: icon only */}
+                    <button
+                    onClick={() => window.location.href = "/products/unlisted"}
+                    aria-label="Back to Unlisted"
+                    className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+                    >
+                    <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+                        <ArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
                     </div>
+                    </button>
+
+                    {/* Desktop: full text button */}
+                    <button
+                    onClick={() => window.location.href = "/products/unlisted"}
+                    className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group"
+                    >
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+                    Back
+                    </button>
+
                 </div>
+
 
                 {/* Icon Section */}
                 <header className="mb-8 md:mb-12 text-center">

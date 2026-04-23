@@ -3,8 +3,9 @@ import React from "react";
 import FAQSection from "./components/FAQSection";
 import ScrollToTop from "../../component/ScrollToTop";
 import { useModal } from "../../context/ModalContext";
-import Chatbot from "../../component/chatbot/page";
 import CTASection from "../../component/CTASection";
+import { useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 // Refactored Components
 import { LASHero } from "./components/LASHero";
 import { LASProductGrid } from "./components/LASProductGrid";
@@ -17,10 +18,25 @@ import { LASLenderTypes } from "./components/LASLenderTypes";
 
 export default function LoanAgainstSecuritiesPage() {
   const { openLogin } = useModal();
+  const router = useRouter();
+  const handleBackHome = () => router.push('/');
 
   return (
     <main className="min-h-screen bg-white text-slate-800 font-sans scroll-smooth">
-      <Chatbot />
+
+      {/* Fixed Back to Home Button */}
+      <div className="fixed z-50 top-20 left-4 md:top-24 md:left-8">
+        {/* Mobile: icon only */}
+        <button
+          onClick={handleBackHome}
+          aria-label="Back to Home"
+          className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+        >
+          <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+            <ArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+          </div>
+        </button>
+      </div>
 
       {/* HERO SECTION */}
       <LASHero openLogin={openLogin} />

@@ -5,6 +5,7 @@ import { Search, Anchor, Info, X, FileText } from 'lucide-react';
 import MarineInsurancePlanCard from './MarineInsurancePlanCard';
 import { marinePlansData } from '../marineInsuranceConstants';
 import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 
 export default function ExploreMarineInsurance({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -147,7 +148,7 @@ export default function ExploreMarineInsurance({ activeTab, setActiveTab }: { ac
                     <MarineInsurancePlanCard 
                         key={idx} 
                         {...plan} 
-                        onApply={(name) => console.log(`Applying for ${name}`)} 
+                        onApply={(name) => toast.success(`Applying for ${name}`)} 
                     />
                 ))}
             </div>

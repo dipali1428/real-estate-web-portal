@@ -15,6 +15,7 @@ import {
 import { useRouter } from 'next/navigation';
 import customerService from '../../../../services/customerService';
 import AdvancedFDCalculator from '../../../../products/FD/components/AdvancedFDCalculator';
+import { toast } from 'react-hot-toast';
 
 // ==================== TYPES ====================
 
@@ -61,7 +62,7 @@ const FDDashboard: React.FC = () => {
         );
         setBookmarkedIds(ids);
       } catch (e) {
-        console.error('Error loading wishlist in dashboard', e);
+        toast.error('Error loading wishlist in dashboard');
       }
     }
     const token = getTokenFromCookie();
@@ -115,11 +116,11 @@ const FDDashboard: React.FC = () => {
             setUserName(fullName.split(' ')[0] || 'Investor');
           }
         } catch (profileErr) {
-          console.error('Profile fetch error:', profileErr);
+          toast.error('Error fetching profile data');
         }
 
       } catch (err: unknown) {
-        console.error('FD Dashboard error:', err);
+        toast.error('Error fetching FD dashboard data');
         const errObj = err as { response?: { status?: number, data?: { message?: string } }, message?: string };
 
         if (errObj.response?.status === 401 || errObj.message?.includes('401')) {
@@ -145,7 +146,7 @@ const FDDashboard: React.FC = () => {
     try {
       await customerService.logout();
     } catch (err) {
-      console.error('Logout error:', err);
+      toast.error('Error occurred while logging out');
     }
     removeTokenCookie();
     localStorage.removeItem('token');
@@ -281,7 +282,6 @@ const FDDashboard: React.FC = () => {
 
 
       {/* Custom animation */}
-      {/* @ts-ignore - styled-jsx is injected by Next.js */}
       <style jsx>{`
         @keyframes spin-slow {
           from { transform: rotate(0deg); }

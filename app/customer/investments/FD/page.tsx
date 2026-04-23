@@ -103,7 +103,6 @@ export default function UnifiedFDPage() {
         </motion.div>
       </AnimatePresence>
 
-      {/* @ts-ignore - styled-jsx is injected by Next.js */}
       <style jsx>{`
         .no-scrollbar::-webkit-scrollbar {
           display: none;

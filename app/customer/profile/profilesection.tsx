@@ -4,6 +4,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { User, Loader2, X, Key, Camera, CheckCircle2, AlertCircle } from 'lucide-react';
 import customerService from '../../services/customerService';
 import toast from 'react-hot-toast';
+import Image from "next/image";
 
 // --- Camera Modal Component ---
 const CameraCaptureModal = ({
@@ -206,10 +207,12 @@ export const ProfileSection = ({
                   {uploadingPhoto ? (
                     <Loader2 className="animate-spin text-[#1CADA3]" size={24} />
                   ) : imageUrl ? (
-                    <img 
-                      src={imageUrl} 
+                    <Image
+                      src={imageUrl}
                       key={imageKey} // Key helps React re-render when image updates
-                      className="w-full h-full object-cover" 
+                      width={96}
+                      height={96}
+                      className="w-full h-full object-cover"
                       alt="Profile"
                       onError={(e) => {
                         // If image fails to load, fallback to User icon

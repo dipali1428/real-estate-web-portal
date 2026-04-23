@@ -90,7 +90,7 @@ export default function FireInsuranceHoldings() {
                   </div>
                   <h4 className="text-lg font-black text-slate-800 mb-2">No Active Holdings Found</h4>
                   <p className="text-sm text-slate-400 max-w-sm mx-auto mb-8 font-medium">
-                    You haven't purchased any fire insurance policies yet. Your insured assets will appear here once your application is approved.
+                    You haven&apos;t purchased any fire insurance policies yet. Your insured assets will appear here once your application is approved.
                   </p>
                   <button className="px-8 py-3 bg-white border-2 border-[#2076C7] text-[#2076C7] font-black rounded-2xl hover:bg-[#2076C7] hover:text-white transition-all uppercase tracking-widest text-[10px]">
                     Browse Products

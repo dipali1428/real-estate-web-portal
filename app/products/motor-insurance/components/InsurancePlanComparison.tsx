@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, Filter } from "lucide-react";
 import React, { useState } from "react";
 import { companiesData, vehicleTypes, planTypes, bikeCCSegments, carCCSegments, commercialCCSegments, miscCCSegments, commercialGVWSegments } from "./insuranceData";
-
+import Image from 'next/image';
 
 interface InsurancePlanComparisonProps {
     activeVehicleType?: string;
@@ -355,9 +355,12 @@ export default function InsurancePlanComparison({
                                             <div className="flex items-center gap-4 pl-4 w-full sm:w-auto">
                                                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center shrink-0 p-2 overflow-hidden">
                                                     {company.logo ? (
-                                                        <img
+                                                        <Image
                                                             src={company.logo}
                                                             alt={company.name}
+                                                            width={64}
+                                                            height={64}
+
                                                             className="h-full w-full object-contain mix-blend-multiply"
                                                             onError={(e) => {
                                                                 (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${company.name}&background=f0f9ff&color=2076C7&bold=true`;

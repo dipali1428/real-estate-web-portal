@@ -143,38 +143,38 @@ const CategoryCard = ({ title, icon, color, data, isUnlisted, isMutualFund, unli
             <div className="space-y-3 mb-4">
               <div className="flex justify-between">
                 <span className="text-gray-500 text-sm">Investment</span>
-                <span className="font-semibold">
+                <span className="font-semibold text-gray-800 text-sm">
                   {formatCurrency(mutualFundData?.totalInvestment || 0)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500 text-sm">Current Value</span>
-                <span className="font-semibold">
+                <span className="font-semibold text-gray-800 text-sm">
                   {formatCurrency(mutualFundData?.currentValue || 0)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500 text-sm">Returns</span>
-                <span className="{font-semibold ${(mutualFundData?.returns || 0) >= 0 ? 'text-green-600' : 'text-red-600'}}">
+                <span className={`font-semibold ${(mutualFundData?.returns || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {formatCurrency(mutualFundData?.returns || 0)}
                 </span>
               </div>
             </div>
           )}
           {/* {hasMfHoldings && (
-  <div className="mt-4 pt-4 border-t">
-    <p className="text-xs text-gray-500 mb-2">
-      Holdings: {mfHoldings.length}
-    </p>
+            <div className="mt-4 pt-4 border-t">
+              <p className="text-xs text-gray-500 mb-2">
+                Holdings: {mfHoldings.length}
+              </p>
 
-    {mfHoldings.slice(0, 3).map((fund, i) => (
-      <div key={i} className="flex justify-between text-sm">
-        <span className="truncate">{fund.fund_name}</span>
-        <span>{formatCurrency(fund.current_value)}</span>
-      </div>
-    ))}
-  </div>
-)} */}
+              {mfHoldings.slice(0, 3).map((fund, i) => (
+                <div key={i} className="flex justify-between text-sm">
+                  <span className="truncate">{fund.fund_name}</span>
+                  <span>{formatCurrency(fund.current_value)}</span>
+                </div>
+              ))}
+            </div>
+          )} */}
 
           {hasHoldings && (
             <div className="mt-4 pt-4 border-t border-gray-100">

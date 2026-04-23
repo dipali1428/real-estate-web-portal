@@ -138,7 +138,7 @@ export default function FireInsuranceCategories() {
                       </span>
                       <h2 className="text-3xl font-black mb-4">{selected.title} Solutions</h2>
                       <p className="text-white/80 max-w-xl font-medium leading-relaxed text-sm">
-                        "{selected.fullDesc}"
+                        &quot;{selected.fullDesc}&quot;
                       </p>
                    </div>
 

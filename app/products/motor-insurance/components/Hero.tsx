@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ShieldCheck, ArrowRight, Check } from "lucide-react";
+import Image from 'next/image';
 
 export default function Hero() {
     return (
@@ -43,9 +44,11 @@ export default function Hero() {
                 </p>
 
                 <div className="relative w-full max-w-[220px] sm:max-w-xs md:max-w-sm h-40 sm:h-48 md:h-[240px] animate-float hidden lg:block translate-x-12 -translate-y-12">
-                    <img
+                    <Image
                         src="/motor-insurance/hero.jpg"
                         alt="Motor Insurance"
+                        width={400}
+                        height={240}
                         className="w-full h-full object-contain"
                     />
                 </div>

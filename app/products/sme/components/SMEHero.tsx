@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { IconBuildingBank, IconArrowRight, IconArrowLeft } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import Image from 'next/image';
 
 interface SMEHeroProps {
   openLogin: () => void;
@@ -134,12 +135,14 @@ export const SMEHero: React.FC<SMEHeroProps> = ({ openLogin }) => {
             transition={{ duration: 1, ease: "easeOut" }}
             className="relative flex justify-center lg:justify-end items-center"
           >
-<div className="relative w-full max-w-[620px] lg:max-w-[680px]">
-              <img
-  src="/loan/sme.jpeg"
-  alt="SME Loans illustration"
-  className="w-full h-auto object-contain"
-/>
+            <div className="relative w-full max-w-[620px] lg:max-w-[680px]">
+              <Image
+                src="/loan/sme.jpeg"
+                alt="SME Loans illustration"
+                width={600}
+                height={500}
+                className="object-contain"
+              />
             </div>
           </motion.div>
 

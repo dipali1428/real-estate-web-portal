@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2, FileText, CreditCard, UserCheck, Car } from "lucide-react";
+import Image from 'next/image';
 
 const requirements = [
     {
@@ -53,9 +54,11 @@ export default function Documents() {
                 <div className="flex flex-col lg:flex-row gap-12 items-center justify-center">
                     <div className="lg:w-[60%] w-full max-w-2xl mx-auto lg:mx-0 lg:-mt-22">
                         <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white aspect-video group">
-                            <img
+                            <Image
                                 src="/motor-insurance/documents.jpg"
                                 alt="Motor insurance documentation and registration"
+                                width={600}
+                                height={400}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                             />
                             <div className="absolute inset-0 bg-linear-to-tr from-[#2076C7]/20 to-transparent" />

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft as IconArrowLeft } from 'lucide-react';
 
@@ -26,11 +26,6 @@ export default function PersonalLoanPage() {
     const [showBankModal, setShowBankModal] = useState(false);
     const [selectedBank, setSelectedBank] = useState<string | undefined>(undefined);
     const [initialBankName, setInitialBankName] = useState<string | undefined>(undefined);
-    const [isMounted, setIsMounted] = useState(false);
-
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
 
     const openForm = (bankName?: string) => {
         setSelectedBank(bankName);
@@ -50,11 +45,6 @@ export default function PersonalLoanPage() {
     const handleBackHome = () => {
         router.push('/');
     };
-
-    // Prevent hydration mismatch
-    if (!isMounted) {
-        return <div className="min-h-screen bg-white" />;
-    }
 
     return (
         <div className="font-sans text-gray-900 bg-white">

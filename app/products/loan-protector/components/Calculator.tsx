@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Calculator,
@@ -41,90 +41,76 @@ export function LoanProtectorCalculator({
   const [coverType, setCoverType] = useState<"Reducing" | "Level">("Reducing");
   const [gender, setGender] = useState<"Male" | "Female">("Female");
   const [isSmoker, setIsSmoker] = useState(false);
-  const [premiums, setPremiums] = useState({
-    annual: 0,
-    monthly: 0,
-    totalSumAssured: 0,
-  });
-  const [isAnimating, setIsAnimating] = useState(false);
 
-  // Calculate Premium
-  useEffect(() => {
-    setIsAnimating(true);
-    const timer = setTimeout(() => {
-      // 1. Base Rate (based on age)
-      const effectiveAge =
-        planType === "Joint Loan Protection Plan"
-          ? Math.max(age, jointAge)
-          : age;
+  // Calculate Premium using useMemo
+  const premiums = useMemo(() => {
+    // 1. Base Rate (based on age)
+    const effectiveAge =
+      planType === "Joint Loan Protection Plan"
+        ? Math.max(age, jointAge)
+        : age;
 
-      const baseRateObj =
-        BASE_RATES.find((r) => effectiveAge <= r.maxAge) ||
-        BASE_RATES[BASE_RATES.length - 1];
+    const baseRateObj =
+      BASE_RATES.find((r) => effectiveAge <= r.maxAge) ||
+      BASE_RATES[BASE_RATES.length - 1];
 
-      const baseRate = baseRateObj.rate;
+    const baseRate = baseRateObj.rate;
 
-      // 2. Tenure Factor
-      const tenureFactorObj =
-        TENURE_FACTORS.find((t) => tenure <= t.maxTenure) ||
-        TENURE_FACTORS[TENURE_FACTORS.length - 1];
+    // 2. Tenure Factor
+    const tenureFactorObj =
+      TENURE_FACTORS.find((t) => tenure <= t.maxTenure) ||
+      TENURE_FACTORS[TENURE_FACTORS.length - 1];
 
-      const factorTenure = tenureFactorObj.factor;
+    const factorTenure = tenureFactorObj.factor;
 
-      // 3. Actuarial Factors
-      const genderFactor = gender === "Male" ? 1.05 : 1.0;
-      const smokerFactor = isSmoker ? 1.4 : 1.0;
-      const planFactor =
-        PLAN_TYPES.find((p) => p.title === planType)?.factor || 1.0;
+    // 3. Actuarial Factors
+    const genderFactor = gender === "Male" ? 1.05 : 1.0;
+    const smokerFactor = isSmoker ? 1.4 : 1.0;
+    const planFactor =
+      PLAN_TYPES.find((p) => p.title === planType)?.factor || 1.0;
 
-      // 4. Dynamic Cover Type Factor (Tenure-dependent for Reducing)
-      const coverTypeFactor =
-        coverType === "Reducing" ? 0.75 + (tenure / 30) * 0.1 : 1.0;
+    // 4. Dynamic Cover Type Factor (Tenure-dependent for Reducing)
+    const coverTypeFactor =
+      coverType === "Reducing" ? 0.75 + (tenure / 30) * 0.1 : 1.0;
 
-      // 5. Loan Type Factor
-      const loanTypeFactorMap: Record<string, number> = {
-        "Home Loan": 1.0,
-        "Personal Loan": 1.15,
-        "Car Loan": 1.1,
-        "Business Loan": 1.2,
-        "Education Loan": 0.95,
-      };
-      const loanTypeFactor = loanTypeFactorMap[loanType] || 1.0;
+    // 5. Loan Type Factor
+    const loanTypeFactorMap: Record<string, number> = {
+      "Home Loan": 1.0,
+      "Personal Loan": 1.15,
+      "Car Loan": 1.1,
+      "Business Loan": 1.2,
+      "Education Loan": 0.95,
+    };
+    const loanTypeFactor = loanTypeFactorMap[loanType] || 1.0;
 
-      // 6. Premium Mode Factor
-      const premiumModeFactor = premiumType === "Single" ? 8.5 : 1.0;
+    // 6. Premium Mode Factor
+    const premiumModeFactor = premiumType === "Single" ? 8.5 : 1.0;
 
-      // Base calculation
-      let annualPremium =
-        (loanAmount / 100000) *
-        baseRate *
-        factorTenure *
-        genderFactor *
-        smokerFactor *
-        planFactor *
-        coverTypeFactor *
-        loanTypeFactor *
-        premiumModeFactor;
+    // Base calculation
+    let annualPremium =
+      (loanAmount / 100000) *
+      baseRate *
+      factorTenure *
+      genderFactor *
+      smokerFactor *
+      planFactor *
+      coverTypeFactor *
+      loanTypeFactor *
+      premiumModeFactor;
 
-      // 7. Minimum Premium Floor
-      annualPremium = Math.max(annualPremium, 500);
+    // 7. Minimum Premium Floor
+    annualPremium = Math.max(annualPremium, 500);
 
-      setPremiums({
-        annual: Math.round(annualPremium),
-        monthly: premiumType === "Single" ? 0 : Math.round(annualPremium / 12),
-        totalSumAssured: loanAmount,
-      });
-
-      setIsAnimating(false);
-    }, 300);
-
-    return () => clearTimeout(timer);
+    return {
+      annual: Math.round(annualPremium),
+      monthly: premiumType === "Single" ? 0 : Math.round(annualPremium / 12),
+      totalSumAssured: loanAmount,
+    };
   }, [
     loanAmount,
     age,
     jointAge,
     tenure,
-    interestRate,
     coverType,
     gender,
     planType,
@@ -169,7 +155,6 @@ export function LoanProtectorCalculator({
                 </p>
 
                 <div className="space-y-6">
-                  {/* ... features list ... */}
                   <div className="flex items-start gap-4">
                     <div className="mt-1 bg-blue-50 p-2 rounded-xl shrink-0">
                       <ShieldCheck className="w-5 h-5 text-[#2076C7]" />
@@ -283,7 +268,11 @@ export function LoanProtectorCalculator({
                           <button
                             key={plan.title}
                             onClick={() => setPlanType(plan.title)}
-                            className={`py-2 px-3 text-xs font-bold rounded-xl border transition-all ${planType === plan.title ? "bg-blue-50 border-[#2076C7] text-[#2076C7] shadow-sm" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"} cursor-pointer flex items-center justify-center gap-2`}
+                            className={`py-2 px-3 text-xs font-bold rounded-xl border transition-all ${
+                              planType === plan.title
+                                ? "bg-blue-50 border-[#2076C7] text-[#2076C7] shadow-sm"
+                                : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                            } cursor-pointer flex items-center justify-center gap-2`}
                           >
                             <plan.icon size={14} />
                             {plan.title
@@ -448,7 +437,11 @@ export function LoanProtectorCalculator({
                             <button
                               key={g}
                               onClick={() => setGender(g)}
-                              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${gender === g ? "bg-white text-[#2076C7] shadow-sm" : "text-slate-500"} cursor-pointer`}
+                              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                                gender === g
+                                  ? "bg-white text-[#2076C7] shadow-sm"
+                                  : "text-slate-500"
+                              } cursor-pointer`}
                             >
                               {g}
                             </button>
@@ -464,13 +457,21 @@ export function LoanProtectorCalculator({
                         <div className="flex bg-slate-100 p-1 rounded-xl">
                           <button
                             onClick={() => setIsSmoker(false)}
-                            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${!isSmoker ? "bg-white text-[#2076C7] shadow-sm" : "text-slate-500"} cursor-pointer`}
+                            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                              !isSmoker
+                                ? "bg-white text-[#2076C7] shadow-sm"
+                                : "text-slate-500"
+                            } cursor-pointer`}
                           >
                             No
                           </button>
                           <button
                             onClick={() => setIsSmoker(true)}
-                            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${isSmoker ? "bg-white text-orange-600 shadow-sm" : "text-slate-500"} cursor-pointer`}
+                            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                              isSmoker
+                                ? "bg-white text-orange-600 shadow-sm"
+                                : "text-slate-500"
+                            } cursor-pointer`}
                           >
                             Yes
                           </button>
@@ -489,7 +490,11 @@ export function LoanProtectorCalculator({
                             <button
                               key={type}
                               onClick={() => setCoverType(type)}
-                              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${coverType === type ? "bg-white text-[#2076C7] shadow-sm" : "text-slate-500"} cursor-pointer`}
+                              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                                coverType === type
+                                  ? "bg-white text-[#2076C7] shadow-sm"
+                                  : "text-slate-500"
+                              } cursor-pointer`}
                             >
                               {type}
                             </button>
@@ -507,7 +512,11 @@ export function LoanProtectorCalculator({
                             <button
                               key={mode}
                               onClick={() => setPremiumType(mode)}
-                              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${premiumType === mode ? "bg-white text-[#2076C7] shadow-sm" : "text-slate-500"} cursor-pointer`}
+                              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                                premiumType === mode
+                                  ? "bg-white text-[#2076C7] shadow-sm"
+                                  : "text-slate-500"
+                              } cursor-pointer`}
                             >
                               {mode} Pay
                             </button>
@@ -527,37 +536,27 @@ export function LoanProtectorCalculator({
                             : "Estimated Monthly Premium"}
                         </p>
                         <div className="flex items-baseline gap-1">
-                          {isAnimating ? (
-                            <span className="text-2xl md:text-3xl font-bold text-slate-300 animate-pulse">
-                              Calculating...
-                            </span>
-                          ) : (
-                            <>
-                              <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                                {premiumType === "Single"
-                                  ? formatCurrency(premiums.annual)
-                                  : formatCurrency(premiums.monthly)}
-                              </h3>
-                              <span className="text-sm text-slate-500 font-semibold">
-                                + GST
-                              </span>
-                            </>
-                          )}
+                          <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                            {premiumType === "Single"
+                              ? formatCurrency(premiums.annual)
+                              : formatCurrency(premiums.monthly)}
+                          </h3>
+                          <span className="text-sm text-slate-500 font-semibold">
+                            + GST
+                          </span>
                         </div>
-                        {!isAnimating && (
-                          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-slate-500">
-                            <span className="flex items-center gap-1">
-                              <Shield className="w-3 h-3 text-[#2076C7]" />
-                              Sum Assured:{" "}
-                              {formatCurrency(premiums.totalSumAssured)}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Activity className="w-3 h-3 text-[#1CADA3]" />
-                              Mode:{" "}
-                              {premiumType === "Single" ? "One-Time" : "Annual"}
-                            </span>
-                          </div>
-                        )}
+                        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-slate-500">
+                          <span className="flex items-center gap-1">
+                            <Shield className="w-3 h-3 text-[#2076C7]" />
+                            Sum Assured:{" "}
+                            {formatCurrency(premiums.totalSumAssured)}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Activity className="w-3 h-3 text-[#1CADA3]" />
+                            Mode:{" "}
+                            {premiumType === "Single" ? "One-Time" : "Annual"}
+                          </span>
+                        </div>
                       </div>
 
                       <button
@@ -577,4 +576,3 @@ export function LoanProtectorCalculator({
     </section>
   );
 }
-

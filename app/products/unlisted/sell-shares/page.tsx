@@ -249,12 +249,30 @@ const SellShares: FC = () => {
 
       <main className="container mx-auto px-4 py-4 pt-4 md:pt-8 min-h-screen">
         {/* BACK BUTTON */}
-        <div className="sticky top-[72px] z-40 mb-8 bg-gradient-to-br from-gray-50 to-white pt-2 pb-2">
-          <a href="/products/unlisted" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-md rounded-lg border border-[#2076C7]/20 shadow-sm hover:bg-white transition-all group">
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-semibold">Back</span>
-          </a>
-        </div>
+        <div className="fixed z-50 top-20 left-4 md:top-24 md:left-8">
+            
+            {/* Mobile: icon only */}
+            <button
+              onClick={() => window.location.href = "/products/unlisted"}
+              aria-label="Back to Unlisted"
+              className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
+            >
+              <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
+                <ArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+              </div>
+            </button>
+
+            {/* Desktop: full text button */}
+            <button
+              onClick={() => window.location.href = "/products/unlisted"}
+              className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+              Back
+            </button>
+
+          </div>
+
 
         {/* HEADER */}
         <header className="mb-12 text-center">

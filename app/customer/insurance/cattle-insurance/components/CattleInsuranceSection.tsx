@@ -47,7 +47,7 @@ export default function CattleInsuranceSection({ isDashboard = false }: { isDash
                     >
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
+                                <div className="w-12 h-12 rounded-xl bg-linear-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
                                     {activeTab === 'calculator' ? (
                                         <IconCalculator size={24} />
                                     ) : activeTab === 'details' ? (
@@ -94,11 +94,11 @@ export default function CattleInsuranceSection({ isDashboard = false }: { isDash
                                             {activeTab === tab.id && (
                                                 <motion.div
                                                     layoutId="activeTabCattle"
-                                                    className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-xl sm:rounded-full -z-10 shadow-sm"
+                                                    className="absolute inset-0 bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-xl sm:rounded-full -z-10 shadow-sm"
                                                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                                 />
                                             )}
-                                            <tab.icon size={16} className="sm:size-[14px] transition-all duration-300" />
+                                            <tab.icon size={16} className="sm:size-14px transition-all duration-300" />
                                             <span className="leading-none">{tab.label}</span>
                                         </button>
                                     ))}
@@ -165,7 +165,7 @@ export default function CattleInsuranceSection({ isDashboard = false }: { isDash
                                     {/* --- DASHBOARD HERO SECTION --- */}
                                     <div className="mb-12">
                                         <div className="relative group cursor-pointer lg:min-h-[280px]">
-                                            <div className="absolute inset-0 bg-slate-100 rounded-[2rem] md:rounded-[3rem] blur-2xl opacity-10" />
+                                            <div className="absolute inset-0 bg-slate-100 rounded-2rem md:rounded-[3rem] blur-2xl opacity-10" />
                                             <div className={`relative rounded-[2rem] md:rounded-[3rem] p-6 sm:p-8 md:p-10 text-white shadow-2xl overflow-hidden transition-all duration-700 h-full ${hasActivePolicy ? 'bg-gradient-to-br from-[#2076C7] via-[#1E90C0] to-[#1CADA3]' : 'bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400'}`}>
                                                 
                                                 {hasActivePolicy ? (
@@ -355,7 +355,7 @@ export default function CattleInsuranceSection({ isDashboard = false }: { isDash
                                                     </div>
                                                     <h3 className="text-xl md:text-2xl font-black text-slate-800 mb-3 tracking-tight leading-none uppercase">No Claim History</h3>
                                                     <p className="text-slate-400 font-medium max-w-xs leading-relaxed text-xs md:text-sm mb-6 md:mb-8">
-                                                        You haven't filed any claims yet. When you do, the graphical lifecycle of each claim will appear here in real-time.
+                                                        You haven&apos;t filed any claims yet. When you do, the graphical lifecycle of each claim will appear here in real-time.
                                                     </p>
                                                     <div className="flex gap-3 md:gap-4">
                                                         <span className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-slate-200 animate-pulse" />

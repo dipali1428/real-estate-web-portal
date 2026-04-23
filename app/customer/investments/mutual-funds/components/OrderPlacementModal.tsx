@@ -286,7 +286,7 @@ export default function OrderPlacementModal({ isOpen, onClose, fund }: OrderPlac
                 <div>
                   <h3 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">Process Paused</h3>
                   <p className="text-slate-500 font-bold max-w-sm mx-auto leading-relaxed">
-                    We've logged your intent to invest in <span className="text-[#2076C7]">{fund.name}</span>.
+                    We&apos;ve logged your intent to invest in <span className="text-[#2076C7]">{fund.name}</span>.
                     Due to missing payment gateway, the actual investment is currently <span className="text-rose-500">PAUSED</span>.
                   </p>
                 </div>
