@@ -373,13 +373,13 @@ export const AdminService = {
     return res.data;
   },
 
-  getCouponsDetails: async (params?: { 
-    status?: string; 
-    coupon_code?: string; 
-    page?: number; 
-    limit?: number; 
-    from_date?: string; 
-    to_date?: string 
+  getCouponsDetails: async (params?: {
+    status?: string;
+    coupon_code?: string;
+    page?: number;
+    limit?: number;
+    from_date?: string;
+    to_date?: string
   }) => {
     const response = await api.get("/api/admin/get-coupons-details", { params });
     return response.data;
@@ -395,5 +395,37 @@ export const AdminService = {
       responseType: "blob",
     });
   },
+
+  uploadPayoutGrid: async (payload: {
+    payoutGridName: string;
+    category: string;
+    mainCategory: string;
+    subCategory: string;
+    file: File;
+  }) => {
+    const formData = new FormData();
+    formData.append("payoutGridName", payload.payoutGridName);
+    formData.append("category", payload.category);
+    formData.append("mainCategory", payload.mainCategory);
+    formData.append("subCategory", payload.subCategory);
+    formData.append("file", payload.file);
+
+    const res = await api.post("/api/admin/upload-payout-grid", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  },
+
+  getPayoutGrids: async () => {
+    const response = await api.get("/api/admin/payout-grids");
+    return response.data;
+  },
+
+  deletePayoutGrid: async (id: string) => {
+    const response = await api.delete(`/api/admin/payout-grid/${id}`);
+    return response.data;
+},
 };
 

@@ -39,7 +39,7 @@ import {
     LayoutTemplate,
     Gem,
     TicketCheck,
-    // FileUp,
+    FileUp,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -117,7 +117,7 @@ export const sidebarLinks = {
                 ],
         },
         { label: "Marketing", href: "/admin/marketing", icon: <LayoutTemplate className="h-5 w-5 text-neutral-700" /> },
-        // { label: "Upload Payout", href: "/admin/uploadpayout", icon: <FileUp className="h-5 w-5 text-neutral-700" /> },
+        { label: "Upload Payout", href: "/admin/uploadpayout", icon: <FileUp className="h-5 w-5 text-neutral-700" /> },
         { label: "Generate Coupons", href: "/admin/generatecoupons", icon: <TicketCheck className="h-5 w-5 text-neutral-700" /> },
     ],
 
@@ -149,6 +149,7 @@ export const sidebarLinks = {
         { label: "Referral Leads", href: "/rm/referralleads", icon: <Share2 className="h-5 w-5 text-neutral-700" /> },
         { label: "Detailed Leads", href: "/rm/detailedleads", icon: <FileText className="h-5 w-5 text-neutral-700" /> },
         { label: "Consumer Leads", href: "/rm/consumerdetailedleads", icon: <UserCheck className="h-5 w-5 text-neutral-700" /> },
+        { label: "Upload Payout", href: "/rm/uploadpayout", icon: <FileUp className="h-5 w-5 text-neutral-700" /> },
     ],
 
     HR: [
