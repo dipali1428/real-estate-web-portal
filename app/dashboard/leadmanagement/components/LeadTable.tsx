@@ -180,7 +180,7 @@ useEffect(() => {
         setCache(newCache);
         setData(newCache[activeTab]);
       } catch (error) {
-        //console.error(`Failed to fetch leads:`, error);
+        setToast({ message: `Failed to fetch leads:`, type: "error" });
       } finally {
         setLoading(false);
       }
@@ -201,7 +201,7 @@ useEffect(() => {
         setDocuments({ uploaded: response.uploaded || [], pending: response.pending || [] });
       }
     } catch (error) {
-      //console.error("Error fetching documents:", error);
+      setToast({ message: "Error fetching documents:", type: "error" });
     } finally {
       setFetchingDocs(false);
     }
