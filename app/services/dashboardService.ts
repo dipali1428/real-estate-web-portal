@@ -228,4 +228,18 @@ export const DashboardService = {
         const response = await api.post("/api/dashboard/profile/validate-coupon", { coupon_code });
         return response.data;
     },
+   getDocuments: async () => {
+        // Add "dashboard" to the path to match your other working APIs
+        const response = await api.get("/api/dashboard/payout-grids");
+        return response.data;
+    },
+
+    downloadPayoutGrid: async (id: string, payload: any) => {
+        // Using POST because you mentioned req.body on the backend
+        const response = await api.get( `/api/dashboard/payout-grids/download/${id}`,{
+                params: payload, 
+                
+    });
+        return response.data;
+    },
 };
