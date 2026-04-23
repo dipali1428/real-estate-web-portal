@@ -94,7 +94,7 @@ export default function PlaybookBypassTokens() {
 
   useEffect(() => {
     fetchTokens();
-  }, [filters.status]);
+  }, [filters.status, filters.search]);
 
   const handleGenerate = async () => {
     if (!formData.batchLabel) return toast.error("Batch label is required");
@@ -127,7 +127,7 @@ export default function PlaybookBypassTokens() {
 
     // Client-side Batch Filter
     if (filters.batch !== "All") {
-      result = result.filter(t => t.batchCode === filters.batch);
+      result = result.filter(t => t.batchLabel === filters.batch);
     }
 
     // Sort Logic
@@ -139,15 +139,15 @@ export default function PlaybookBypassTokens() {
   }, [tokens, filters.sort, filters.batch]); // Added filters.batch here
 
   const batches = useMemo(() => {
-    const uniqueBatches = Array.from(new Set(tokens.map(t => String(t.batchCode || "N/A"))));
+    const uniqueBatches = Array.from(new Set(tokens.map(t => String(t.batchLabel || "N/A"))));
     return ["All", ...uniqueBatches];
   }, [tokens]);
-  const totalTokens = tokens.length;
-  const usedCount = tokens.filter(t => t.status === "Used").length;
-  const unusedCount = totalTokens - usedCount;
-  // const totalTokens = filteredData.length;
-  // const usedCount = filteredData.filter(t => t.status === "USED").length;
+  // const totalTokens = tokens.length;
+  // const usedCount = tokens.filter(t => t.status === "USED").length;
   // const unusedCount = totalTokens - usedCount;
+  const totalTokens = filteredData.length;
+  const usedCount = filteredData.filter(t => t.status === "USED").length;
+  const unusedCount = totalTokens - usedCount;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 font-sans text-gray-700">
@@ -249,7 +249,6 @@ export default function PlaybookBypassTokens() {
               placeholder="Press Enter to search..."
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              onKeyDown={(e) => e.key === 'Enter' && fetchTokens()} // Fetch on Enter
               className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm"
             />
           </div>
