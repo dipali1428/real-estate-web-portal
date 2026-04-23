@@ -59,7 +59,7 @@ export default function KycStatusPage() {
         setTotalPages(Math.ceil((response.total_requests || 0) / limit));
       }
     } catch (err) {
-      console.error("Fetch Error:", err);
+     toast.error("Fetch Error:");
       setData([]);
     } finally {
       setLoading(false);
@@ -344,13 +344,35 @@ export default function KycStatusPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
           {/* Modal Inner Content */}
           <div className="bg-white rounded-2xl w-full max-w-4xl p-6 relative">
-            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4"><X /></button>
-            <h2 className="text-xl font-bold mb-4">DSA Details</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 text-gray-600 right-4"><X /></button>
+            <h2 className="text-xl text-gray-600 font-bold mb-4">DSA Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
               <DataField label="Name" value={editingDsa?.name} />
+              <DataField label="DSA ID" value={editingDsa?.adv_id} />
+
               <DataField label="Email" value={editingDsa?.email} verified={editingDsa?.email_verified} />
+              <DataField label="Phone" value={editingDsa?.phone_number} verified={editingDsa?.phone_verified} />
+
               <DataField label="PAN" value={editingDsa?.pan} verified={editingDsa?.pan_verified} />
-              <DataField label="Aadhaar" value={editingDsa?.aadhaar_number} verified={editingDsa?.aadhaar_verified} />
+              <DataField label="Aadhaar Number" value={editingDsa?.aadhaar_number} verified={editingDsa?.aadhaar_verified} />
+
+              <DataField label="Bank Name" value={editingDsa?.bank_name} verified={editingDsa?.bank_verified} />
+              <DataField label="Account Number" value={editingDsa?.bank_account_number} />
+
+              <DataField label="IFSC Code" value={editingDsa?.ifsc_code} />
+
+              <DataField label="GST Number" value={editingDsa?.gst_number} verified={editingDsa?.gst_verified} />
+
+              <DataField
+                label="PAN-Aadhaar Linked"
+                value={editingDsa?.pan_aadhaar_linked ? "Yes" : "No"}
+              />
+
+              <DataField
+                label="KYC Status"
+                value={editingDsa?.kyc_completed ? "Completed" : "Pending"}
+              />
             </div>
             <button onClick={() => setIsModalOpen(false)} className="mt-6 w-full bg-gray-800 text-white py-2 rounded-lg">Close</button>
           </div>
