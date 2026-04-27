@@ -4,6 +4,7 @@ import { FileText, CheckCircle, X, AlertCircle, ArrowRight } from 'lucide-react'
 import Link from 'next/link';
 import { DashboardService } from "@/app/services/dashboardService";
 import toast, { Toaster } from 'react-hot-toast';
+import { load } from "@cashfreepayments/cashfree-js";
 
 export default function DSAAgreement() {
   const [profile, setProfile] = useState<any>(null);
@@ -22,8 +23,14 @@ export default function DSAAgreement() {
       try {
         const response = await DashboardService.checkKycStatus();
         setProfile(response);
+
+        // ✅ NEW: check agreement status
+        if (response?.agreementStatus === "created") {
+          setIsSubmitted(true);
+        }
+
       } catch (error: any) {
-        toast.error("Error fetching profile data. Please try again later.", error);
+        toast.error("Error fetching profile data. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -31,36 +38,84 @@ export default function DSAAgreement() {
     fetchProfileData();
   }, []);
 
-  const RazorpayPaymentButton = () => {
-    const containerRef = React.useRef<HTMLDivElement>(null);
+  // const RazorpayPaymentButton = () => {
+  //   const containerRef = React.useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-      // 1. Clear any existing content inside the container to prevent duplicates
-      if (containerRef.current) {
-        containerRef.current.innerHTML = "";
+  //   useEffect(() => {
+  //     // 1. Clear any existing content inside the container to prevent duplicates
+  //     if (containerRef.current) {
+  //       containerRef.current.innerHTML = "";
+  //     }
+
+  //     const script = document.createElement("script");
+  //     script.src = process.env.NEXT_PUBLIC_RAZORPAY_URL || "";
+  //     script.dataset.payment_button_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+  //     script.async = true;
+
+  //     const form = document.createElement("form");
+  //     form.appendChild(script);
+
+  //     if (containerRef.current) {
+  //       containerRef.current.appendChild(form);
+  //     }
+
+  //     // 2. Cleanup function: removes the form when the component unmounts
+  //     return () => {
+  //       if (containerRef.current) {
+  //         containerRef.current.innerHTML = "";
+  //       }
+  //     };
+  //   }, []);
+
+  //   return <div ref={containerRef} className="w-full flex justify-center" />;
+  // };
+
+  const handlePayment = async () => {
+    setIsSubmitting(true);
+    try {
+      const data = await DashboardService.createOrder();
+
+      const order_id = data.order_id;
+      const paymentSessionId = data.orderToken;
+
+
+      if (!paymentSessionId) {
+        toast.error("Payment session ID missing from server");
+        setIsSubmitting(false);
+        return;
       }
 
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/payment-button.js";
-      script.dataset.payment_button_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID; // replace with your actual ID
-      script.async = true;
+      // 🔹 3. Initialize SDK
+      const cashfree = await load({
+        mode: "production", // Change to "production" when going live
+      });
 
-      const form = document.createElement("form");
-      form.appendChild(script);
+      // 🔹 4. Open Checkout
+      const result = await cashfree.checkout({
+        paymentSessionId: paymentSessionId,
+        redirectTarget: "_modal", // This opens the popup
+      });
 
-      if (containerRef.current) {
-        containerRef.current.appendChild(form);
+      if (result.error) {
+        toast.error(result.error.message);
+        await DashboardService.markFailed(order_id);
       }
 
-      // 2. Cleanup function: removes the form when the component unmounts
-      return () => {
-        if (containerRef.current) {
-          containerRef.current.innerHTML = "";
+      if (result.paymentDetails) {
+        const verifyRes = await DashboardService.verifyPayment(order_id);
+
+        if (verifyRes?.success) {
+          await handleSubmit('PAY_DIRECTLY');
+        } else {
+          toast.error(verifyRes?.message || "Payment verification failed");
         }
-      };
-    }, []);
+      }
 
-    return <div ref={containerRef} className="w-full flex justify-center" />;
+    } catch (err: any) {
+      toast.error(err.response?.data?.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleValidateCoupon = async () => {
@@ -104,9 +159,6 @@ export default function DSAAgreement() {
       setIsSubmitted(true);
       setShowPaymentModal(false);
     } catch (error: any) {
-      console.error("Error signing agreement:", error);
-
-      // 3. Extract the error message from the backend response
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
@@ -233,8 +285,7 @@ export default function DSAAgreement() {
           <button
             type="button" // Change from "submit" to "button"
             onClick={() => setShowPaymentModal(true)} // Open the popup
-            className="w-full bg-[#1CADA3] text-white py-3 rounded-lg font-bold hover:bg-[#18968d] disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2"
-          >
+            className="w-full bg-[#1CADA3] text-white py-3 rounded-lg font-bold hover:bg-[#18968d] disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2">
             Sign & Accept Agreement
           </button>
         </div>
@@ -244,8 +295,7 @@ export default function DSAAgreement() {
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in duration-200 relative">
             <button
               onClick={() => { setShowPaymentModal(false); setCouponApplied(false); setCouponCode(''); setPaymentType(null); }}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-            >
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
               <X size={22} />
             </button>
             <h3 className="text-xl font-bold text-gray-900 mb-4">Payment Selection</h3>
@@ -260,8 +310,7 @@ export default function DSAAgreement() {
               {/* Option 1: Direct Payment */}
               <button
                 onClick={() => setPaymentType('PAY_DIRECTLY')}
-                className={`w-full p-4 border-2 rounded-lg text-left transition-all ${paymentType === 'PAY_DIRECTLY' ? 'border-[#2076C7] bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
-              >
+                className={`w-full p-4 border-2 rounded-lg text-left transition-all ${paymentType === 'PAY_DIRECTLY' ? 'border-[#2076C7] bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
                 <p className="font-bold text-gray-800">Pay Directly</p>
                 <p className="text-sm text-gray-500">Pay now using UPI, Card, or NetBanking</p>
               </button>
@@ -269,8 +318,7 @@ export default function DSAAgreement() {
               {/* Option 2: Payout Deduction */}
               <button
                 onClick={() => setPaymentType('USE_COUPON')}
-                className={`w-full p-4 border-2 rounded-lg text-left transition-all ${paymentType === 'USE_COUPON' ? 'border-[#2076C7] bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
-              >
+                className={`w-full p-4 border-2 rounded-lg text-left transition-all ${paymentType === 'USE_COUPON' ? 'border-[#2076C7] bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
                 <p className="font-bold text-gray-800">Use Token (Deduct from Payout)</p>
                 <p className="text-sm text-gray-500">Amount will be deducted from your first commission</p>
               </button>
@@ -293,10 +341,9 @@ export default function DSAAgreement() {
                       disabled={isValidatingCoupon || !couponCode.trim() || couponApplied}
                       onClick={handleValidateCoupon}
                       className={`px-4 py-2 rounded-md text-sm font-bold transition-colors ${couponApplied
-                          ? 'bg-green-500 text-white'
-                          : 'bg-gray-800 text-white hover:bg-black disabled:opacity-50'
-                        }`}
-                    >
+                        ? 'bg-green-500 text-white'
+                        : 'bg-gray-800 text-white hover:bg-black disabled:opacity-50'
+                        }`}>
                       {isValidatingCoupon ? "..." : couponApplied ? "Applied" : "Apply"}
                     </button>
                   </div>
@@ -312,21 +359,31 @@ export default function DSAAgreement() {
             <div className="flex gap-3 mt-8">
               <button
                 onClick={() => { setShowPaymentModal(false); setCouponApplied(false); setCouponCode(''); setPaymentType(null); }}
-                className="flex-1 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              >
+                className="flex-1 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">
                 Cancel
               </button>
               {paymentType === 'PAY_DIRECTLY' ? (
                 <div className="flex-1">
-                  <RazorpayPaymentButton />
+                  <button
+                    onClick={handlePayment}
+                    disabled={isSubmitting}
+                    className="w-full py-3 bg-[#2076C7] text-white font-semibold rounded-lg hover:bg-[#aedaac] disabled:bg-[#2076C7]/60 cursor-pointertransition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                        Processing...
+                      </>
+                    ) : (
+                      "Pay ₹590 & Continue"
+                    )}
+                  </button>
                 </div>
               ) : (
                 <button
-                  // Only allow proceeding if coupon is applied (when USE_COUPON is selected)
                   disabled={!paymentType || isSubmitting || (paymentType === 'USE_COUPON' && !couponApplied)}
-                  onClick={() => paymentType && handleSubmit(paymentType)} // Uncommented this line
-                  className="flex-1 py-2 bg-[#2076C7] text-white font-bold rounded-lg disabled:opacity-50 hover:bg-[#1a5fa1] transition-colors"
-                >
+                  onClick={() => paymentType && handleSubmit(paymentType)}
+                  className="flex-1 py-3 bg-[#2076C7] text-white font-bold rounded-lg disabled:opacity-50 hover:bg-[#1a5fa1] transition-colors">
                   {isSubmitting ? "Processing..." : "Proceed To E-Sign"}
                 </button>
               )}

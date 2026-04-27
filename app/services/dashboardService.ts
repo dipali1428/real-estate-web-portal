@@ -199,6 +199,21 @@ export const DashboardService = {
         return response.data;
     },
 
+    createOrder: async () => {
+        const response = await api.post("/api/dashboard/payment/create-payment-order");
+        return response.data;
+    },
+
+    verifyPayment: async (order_id: string) => {
+        const response = await api.get(`/api/dashboard/payment/verify-payment/${order_id}`);
+        return response.data;
+    },
+
+    markFailed: async (order_id: any) => {
+        const response = await api.post("/api/dashboard/payment/mark-payment-failed", { order_id });
+        return response.data;
+    },
+
     checkKycStatus: async () => {
         const response = await api.get("/api/dashboard/profile/kyc-status");
         return response.data;
