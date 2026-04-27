@@ -300,7 +300,7 @@ export default function AdminDownloads() {
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto scrollbar-x-thin">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-slate-50/80 text-slate-500 text-[11px] uppercase font-bold tracking-widest border-b border-slate-100">
