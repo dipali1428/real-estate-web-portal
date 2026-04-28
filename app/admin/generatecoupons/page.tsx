@@ -26,6 +26,7 @@ export default function PlaybookBypassTokens() {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
   const [formData, setFormData] = useState({
     count: 1,
@@ -66,7 +67,12 @@ export default function PlaybookBypassTokens() {
         // You can add page/limit here if you add pagination state later
       };
 
-      const response = await AdminService.getCouponsDetails({ ...params, page: currentPage });
+      const response = await AdminService.getCouponsDetails({
+        ...params,
+        page: currentPage,
+        limit: pageSize
+      });
+
       setTotalPages(response.pagination.total_pages);
 
       const dataArray = response.data || [];
@@ -94,7 +100,7 @@ export default function PlaybookBypassTokens() {
 
   useEffect(() => {
     fetchTokens();
-  }, [filters.status, filters.search]);
+  }, [filters.status, filters.search, currentPage, pageSize]);
 
   const handleGenerate = async () => {
     if (!formData.batchLabel) return toast.error("Batch label is required");
@@ -142,12 +148,12 @@ export default function PlaybookBypassTokens() {
     const uniqueBatches = Array.from(new Set(tokens.map(t => String(t.batchLabel || "N/A"))));
     return ["All", ...uniqueBatches];
   }, [tokens]);
-  // const totalTokens = tokens.length;
-  // const usedCount = tokens.filter(t => t.status === "USED").length;
-  // const unusedCount = totalTokens - usedCount;
-  const totalTokens = filteredData.length;
-  const usedCount = filteredData.filter(t => t.status === "USED").length;
+  const totalTokens = tokens.length;
+  const usedCount = tokens.filter(t => t.status === "USED").length;
   const unusedCount = totalTokens - usedCount;
+  // const totalTokens = filteredData.length;
+  // const usedCount = filteredData.filter(t => t.status === "USED").length;
+  // const unusedCount = totalTokens - usedCount;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 font-sans text-gray-700">
@@ -214,14 +220,18 @@ export default function PlaybookBypassTokens() {
 
       {/* Filter Section */}
       <div className="bg-white border border-gray-200 rounded-md p-6 mb-6 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
           <div className="flex flex-col gap-1">
             <label className="text-xs text-gray-500">Filter Batch</label>
             <select
-              value={filters.batch}
-              onChange={(e) => setFilters({ ...filters, batch: e.target.value })}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm"
-            >
+  value={filters.batch}
+  onChange={(e) => {
+    // FIX: Update the 'batch' property
+    setFilters({ ...filters, batch: e.target.value }); 
+    setCurrentPage(1);
+  }}
+  className="border border-gray-300 rounded px-3 py-1.5 text-sm"
+>
               {batches.map((b, index) => (
                 // Using a combined key of value + index is the safest way to prevent duplicates
                 <option key={`batch-opt-${b}-${index}`} value={b}>
@@ -248,7 +258,10 @@ export default function PlaybookBypassTokens() {
               type="text"
               placeholder="Press Enter to search..."
               value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              onChange={(e) => {
+                setFilters({ ...filters, search: e.target.value });
+                setCurrentPage(1); // Reset to first page
+              }}
               className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm"
             />
           </div>
@@ -263,6 +276,7 @@ export default function PlaybookBypassTokens() {
               <option value="Oldest First">Oldest First</option>
             </select>
           </div>
+
         </div>
         <div className="flex justify-end">
           <button
@@ -292,6 +306,26 @@ export default function PlaybookBypassTokens() {
 
       {/* Table Section */}
       <div className="bg-white border border-gray-200 rounded-md shadow-sm overflow-hidden">
+        <div className="flex justify-start space-x-4 items-center mb-2 mt-2 px-1">
+          <p className="text-xs text-gray-500 font-medium">
+            Showing {tokens.length} of {totalPages * pageSize} results
+          </p>
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500">Rows:</label>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="border border-gray-300 rounded px-2 py-0.5 text-xs bg-white focus:outline-none"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+        </div>
         <div className="overflow-x-auto scrollbar-x-thin">
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 text-gray-600 border-b border-gray-200">
@@ -338,6 +372,27 @@ export default function PlaybookBypassTokens() {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="flex items-center justify-between px-4 py-4 bg-white border-t border-gray-200">
+          <div className="flex text-sm text-gray-500">
+            Showing page {currentPage} of {totalPages}
+          </div>
+          <div className="flex gap-2">
+            <button
+              disabled={currentPage <= 1 || loading}
+              onClick={() => setCurrentPage(prev => prev - 1)}
+              className="px-3 py-1 border rounded text-sm disabled:opacity-50 hover:bg-gray-50"
+            >
+              Previous
+            </button>
+            <button
+              disabled={currentPage >= totalPages || loading}
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              className="px-3 py-1 border rounded text-sm disabled:opacity-50 hover:bg-gray-50"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
