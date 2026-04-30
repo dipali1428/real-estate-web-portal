@@ -262,7 +262,7 @@ export default function UnlistedSharesForm({ onClose }: { onClose: () => void })
         created_at: new Date().toISOString(),
         api_response: result
       };
-      localStorage.setItem('pending_leads', JSON.stringify(pendingLeads));
+      // localStorage.setItem('pending_leads', JSON.stringify(pendingLeads));
       
       setLeadId(tempId);
       setStep(2);
@@ -344,7 +344,7 @@ export default function UnlistedSharesForm({ onClose }: { onClose: () => void })
         submitted_at: new Date().toISOString(),
         documents_uploaded: fileQueue.map(f => f.label)
       });
-      localStorage.setItem('rm_unlisted_leads', JSON.stringify(rmLeads));
+      // localStorage.setItem('rm_unlisted_leads', JSON.stringify(rmLeads));
 
       setIsSubmitting(false);
       setShowSuccess(true);

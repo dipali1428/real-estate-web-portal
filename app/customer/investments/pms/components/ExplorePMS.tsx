@@ -23,6 +23,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import customerService from "../../../../services/customerService";
 import toast from "react-hot-toast";
+import Image from 'next/image';
 
 interface CartItem {
   id: string;
@@ -243,7 +244,7 @@ export default function ExplorePMS() {
   }, [loadWishlist]);
 
   useEffect(() => {
-    localStorage.setItem("pms_cart", JSON.stringify(cart));
+    // localStorage.setItem("pms_cart", JSON.stringify(cart));
   }, [cart]);
 
   // Filtering
@@ -811,7 +812,7 @@ export default function ExplorePMS() {
                 <div className="relative z-10 pt-10 border-t border-white/10">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full border-2 border-white/20 p-1">
-                      <img src="https://ui-avatars.com/api/?name=Admin&background=white&color=2076C7" className="w-full h-full rounded-full border border-white/20" alt="Icon" />
+                      <Image src="https://ui-avatars.com/api/?name=Admin&background=white&color=2076C7" className="w-full h-full rounded-full border border-white/20" height={40} width={40} alt="Icon" />
                     </div>
                     <div>
                       <p className="text-[10px] font-black text-white/60 uppercase tracking-widest">Organizer</p>

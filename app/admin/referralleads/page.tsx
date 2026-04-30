@@ -15,6 +15,7 @@ import {
     ShieldCheck,
     UserCog
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface ReferralLead {
     id: number;
@@ -46,10 +47,9 @@ export default function ReferralLeadDashboard() {
             setLoading(true);
             try {
                 const response = await AdminService.getAllReferralLeads();
-                console.log("API Response:", response);
                 if (response?.success) setLeads(response.referral_leads || []);
             } catch (error) {
-                console.error("Error:", error);
+                toast.error("Error fetching referral leads.");
             } finally {
                 setLoading(false);
             }

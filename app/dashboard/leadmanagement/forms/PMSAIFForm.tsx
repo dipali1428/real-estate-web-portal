@@ -44,7 +44,13 @@ export default function PMSAIFForm({ onClose }: { onClose: () => void }) {
   const navigateMonth = (direction: 'prev' | 'next') => {
     setCurrentMonth(prev => {
       const newDate = new Date(prev);
-      direction === 'prev' ? newDate.setMonth(prev.getMonth() - 1) : newDate.setMonth(prev.getMonth() + 1);
+
+      if (direction === 'prev') {
+        newDate.setMonth(prev.getMonth() - 1);
+      } else {
+        newDate.setMonth(prev.getMonth() + 1);
+      }
+
       return newDate;
     });
   };

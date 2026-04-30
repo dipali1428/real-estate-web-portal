@@ -51,7 +51,6 @@ export default function ProfileSection() {
             setProfile(MOCK_PROFILE);
             
         } catch (err: any) {
-            console.error("Profile load error", err);
             toast.error("Failed to fetch profile.");
         } finally {
             setLoading(false);
@@ -89,8 +88,6 @@ export default function ProfileSection() {
                 payload.password = profile.password.trim();
             }
 
-            console.log("Submitting Static Payload:", payload);
-
             // API CALL COMMENTED OUT
             /*
             await DepartmentHeadService.updateDepartmentProfile(payload);
@@ -106,9 +103,7 @@ export default function ProfileSection() {
             setPasswordStrength("");
 
         } catch (err: any) {
-            console.error("Update error detail:", err.response?.data);
-            const errorMessage = err?.response?.data?.message || "Server error: Password might not meet requirements.";
-            toast.error(errorMessage);
+            toast.error("Update error:");
         } finally {
             setSaving(false);
         }

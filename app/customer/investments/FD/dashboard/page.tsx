@@ -83,7 +83,7 @@ const FDDashboard: React.FC = () => {
       setError(null);
 
       try {
-        localStorage.setItem('token', token);
+        // localStorage.setItem('token', token);
 
         // Try to fetch FD-specific dashboard data
         // Falls back to default values if FD API isn't available yet

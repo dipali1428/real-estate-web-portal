@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from "motion/react";
 import { User as UserIcon, LogOut, UserCircle, ChevronDown } from "lucide-react";
 import { MobileSidebar, SidebarProvider } from "../../component/ui/sidebar";
 import { useRouter, usePathname } from "next/navigation";
-import { getSidebarLinks } from "@/app/utils/getSidebarLinks";
-import type { Role } from "../../utils/getSidebarLinks";
+import { getSidebarLinks, Role } from "@/app/utils/getSidebarLinks";
+
 // import { NotificationPanel } from "./NotificationPanel";
 import { DashboardService } from "@/app/services/dashboardService";
 import toast from "react-hot-toast";

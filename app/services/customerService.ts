@@ -526,7 +526,7 @@ const CustomerService = {
     // ==================== AUTH HELPERS ====================
     isAuthenticated: () => typeof window !== 'undefined' && !!localStorage.getItem('token'),
     getToken: () => typeof window !== 'undefined' ? localStorage.getItem('token') : null,
-    setToken: (token: string) => typeof window !== 'undefined' && localStorage.setItem('token', token),
+    // setToken: (token: string) => typeof window !== 'undefined' && localStorage.setItem('token', token),
     clearToken: () => typeof window !== 'undefined' && localStorage.removeItem('token'),
 };
 

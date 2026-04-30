@@ -47,7 +47,6 @@ export default function Dashboard() {
     //   });
 
     } catch (error: any) {
-      console.error("Dashboard Fetch Error:", error);
       toast.error("Failed to fetch dashboard data.");
     }
   };

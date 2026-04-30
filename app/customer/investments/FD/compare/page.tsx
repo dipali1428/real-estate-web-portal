@@ -32,7 +32,7 @@ export default function CompareFDPage() {
       router.push('/');
       return;
     }
-    localStorage.setItem('token', token);
+    // localStorage.setItem('token', token);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsAuthed(true);
   }, [router]);

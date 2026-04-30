@@ -129,7 +129,8 @@ const HelpSupportPage: React.FC = () => {
   }), [tickets]);
 
   const handleInputChange = (e: any) => {
-    let { name, value } = e.target;
+    const { name } = e.target;
+    let { value } = e.target;
     if (name === "subject") value = value.replace(/[0-9]/g, "").charAt(0).toUpperCase() + value.slice(1).toLowerCase();
     if (name === "description" && ticketData.description === "") value = value.charAt(0).toUpperCase() + value.slice(1);
     setTicketData(prev => ({ ...prev, [name]: value }));

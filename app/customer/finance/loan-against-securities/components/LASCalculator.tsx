@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import {
   IconBuildingBank,
   IconChartPie,
@@ -35,34 +35,48 @@ export const LASCalculator = () => {
   const [isInterestOnly, setIsInterestOnly] = useState(true);
   const [futurePortfolioValue, setFuturePortfolioValue] = useState(1200000);
 
-  // Derived Values
-  const [maxLoan, setMaxLoan] = useState(0);
-  const [monthlyPayment, setMonthlyPayment] = useState(0);
-  const [totalInterest, setTotalInterest] = useState(0);
-  const [totalPayment, setTotalPayment] = useState(0);
-  const [marginCallValue, setMarginCallValue] = useState(0);
-  const [topUpEligibility, setTopUpEligibility] = useState(0);
-
-  useEffect(() => {
+  // Derived Values using useMemo instead of useEffect
+  const calculatedValues = useMemo(() => {
     const loan = portfolioValue * (ltv / 100);
-    setMaxLoan(loan);
     const r = interestRate / 100 / 12;
     const n = tenure * 12;
 
+    let monthlyPayment = 0;
+    let totalInterest = 0;
+    let totalPayment = 0;
+
     if (isInterestOnly) {
-      const monthly = loan * r;
-      setMonthlyPayment(monthly);
-      setTotalInterest(monthly * n);
-      setTotalPayment(loan + monthly * n);
+      monthlyPayment = loan * r;
+      totalInterest = monthlyPayment * n;
+      totalPayment = loan + monthlyPayment * n;
     } else {
       const e = r === 0 ? loan / n : (loan * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-      setMonthlyPayment(e);
-      setTotalPayment(e * n);
-      setTotalInterest(e * n - loan);
+      monthlyPayment = e;
+      totalPayment = e * n;
+      totalInterest = e * n - loan;
     }
-    setMarginCallValue(loan / 0.75);
-    setTopUpEligibility(Math.max(0, (futurePortfolioValue * (ltv / 100)) - loan));
+
+    const marginCallValue = loan / 0.75;
+    const topUpEligibility = Math.max(0, (futurePortfolioValue * (ltv / 100)) - loan);
+
+    return {
+      maxLoan: loan,
+      monthlyPayment,
+      totalInterest,
+      totalPayment,
+      marginCallValue,
+      topUpEligibility,
+    };
   }, [portfolioValue, ltv, interestRate, tenure, isInterestOnly, futurePortfolioValue]);
+
+  const {
+    maxLoan,
+    monthlyPayment,
+    totalInterest,
+    totalPayment,
+    marginCallValue,
+    topUpEligibility,
+  } = calculatedValues;
 
   const riskLevel = ltv < 40 ? 'LOW' : ltv < 55 ? 'MODERATE' : 'HIGH';
   const riskColor = ltv < 40 ? 'text-[#1CADA3]' : ltv < 55 ? 'text-amber-500' : 'text-red-500';

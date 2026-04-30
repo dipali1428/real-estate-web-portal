@@ -4,6 +4,7 @@ import {
   Search, CheckCircle2, Banknote, 
   Building2, Inbox, Calculator,Upload
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 // --- Types ---
 type ReceivableStatus = 'Pending' | 'Approved' | 'Overdue' | 'Disputed';
@@ -104,7 +105,7 @@ export default function TDSManagementLedger() {
   input.onchange = (e) => {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (file) {
-      alert(`Uploading TDS Certificate for ID: ${id}\nFile: ${file.name}`);
+      toast.success(`Uploading TDS Certificate for ID: ${id}\nFile: ${file.name}`);
       // Here you would typically send the file to your backend
     }
   };

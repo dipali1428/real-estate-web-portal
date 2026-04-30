@@ -7,6 +7,7 @@ import {
   LucideIcon, Loader2
 } from 'lucide-react';
 import { AdminService } from '../../services/adminService';
+import { toast } from 'react-hot-toast';
 
 // --- Types ---
 interface Lead {
@@ -104,12 +105,11 @@ export default function LeadsDashboard() {
 
         // Tag sources to differentiate
         const dLeads = (resDetail.detail_leads || []).map((l: any) => ({ ...l, sourceType: 'detailed' }));
-        console.log("Detailed Leads Sample:", dLeads);
         const rLeads = (resReferral.referral_leads || resReferral.data || []).map((l: any) => ({ ...l, sourceType: 'referral' }));
 
         setAllLeads([...dLeads, ...rLeads]);
       } catch (error) {
-        console.error("Fetch error:", error);
+        toast.error("Fetch error:");
       } finally {
         setLoading(false);
       }

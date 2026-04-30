@@ -220,8 +220,7 @@ export const fetchCorporateActionsByShareId = async (shareId: number): Promise<C
     const response = await api.get(`/api/unlisted/public/corporate-actions/share/${shareId}`);
     return response.data;
   } catch (error: any) {
-    // console.error("DEBUG - Corporate Actions by Share URL called:", error.config?.url);
-    // console.error("DEBUG - Corporate Actions by Share Error:", error.response?.data);
+   
     throw error;
   }
 };
@@ -235,8 +234,7 @@ export const fetchCorporateActionsByType = async (type: string): Promise<Corpora
     const response = await api.get(`/api/unlisted/public/corporate-actions/type/${type}`);
     return response.data;
   } catch (error: any) {
-    // console.error("DEBUG - Corporate Actions by Type URL called:", error.config?.url);
-    // console.error("DEBUG - Corporate Actions by Type Error:", error.response?.data);
+
     throw error;
   }
 };

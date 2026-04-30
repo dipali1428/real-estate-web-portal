@@ -64,7 +64,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
 
         const timer = setTimeout(() => {
             setShowTabs(true);
-            localStorage.setItem("unlistedHeroVisited", "true");
+            // localStorage.setItem("unlistedHeroVisited", "true");
         }, 2000);
 
         return () => clearTimeout(timer);
@@ -74,6 +74,8 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
         const id = Date.now();
         setNotifications(prev => [...prev, { id, message, type }]);
         setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== id)), 4000);
+
+        
     };
 
     const handleInputChange = (field: string, value: string) => {

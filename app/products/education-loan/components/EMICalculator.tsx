@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
     IconArrowRight,
     IconChevronDown,
@@ -23,26 +23,30 @@ export default function EMICalculator({ onApplyClick, hidePartners = false, isDa
     const [loanAmount, setLoanAmount] = useState(1000000);
     const [interestRate, setInterestRate] = useState(8.5);
     const [tenure, setTenure] = useState(20);
-    const [emi, setEmi] = useState(0);
-    const [totalInterest, setTotalInterest] = useState(0);
-    const [totalPayment, setTotalPayment] = useState(0);
     const [showAllBanks, setShowAllBanks] = useState(false);
 
-    useEffect(() => {
-        const r = interestRate / 100 / 12;
-        const n = tenure * 12;
-        if (r === 0) {
-            setEmi(loanAmount / n);
-            setTotalPayment(loanAmount);
-            setTotalInterest(0);
-        } else {
-            const e = (loanAmount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-            setEmi(e);
-            setTotalPayment(e * n);
-            setTotalInterest(e * n - loanAmount);
-        }
-    }, [loanAmount, interestRate, tenure]);
+    const { emi, totalInterest, totalPayment } = useMemo(() => {
+    const r = interestRate / 100 / 12;
+    const n = tenure * 12;
 
+    if (r === 0) {
+        return {
+            emi: loanAmount / n,
+            totalPayment: loanAmount,
+            totalInterest: 0,
+        };
+    } else {
+        const e =
+            (loanAmount * r * Math.pow(1 + r, n)) /
+            (Math.pow(1 + r, n) - 1);
+
+        return {
+            emi: e,
+            totalPayment: e * n,
+            totalInterest: e * n - loanAmount,
+        };
+    }
+}, [loanAmount, interestRate, tenure]);
     const chartData = [
         { name: 'Principal', value: loanAmount },
         { name: 'Interest', value: totalInterest },
