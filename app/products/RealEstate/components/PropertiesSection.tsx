@@ -485,7 +485,89 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
                 )}
             </div>
 
-            {showFeedbackForm && (<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4" onClick={() => setShowFeedbackForm(false)}><div className="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl relative animate-fade-in" onClick={e => e.stopPropagation()}><button onClick={() => setShowFeedbackForm(false)} className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"><X size={20} /></button><h3 className="text-3xl font-extrabold mb-2 text-brand-gradient">Share Feedback</h3><p className="text-slate-500 mb-8">We value your input! Tell us about your investment experience.</p><form onSubmit={(e) => { e.preventDefault(); alert("Thank you for your valuable feedback! It will be listed after moderation."); setShowFeedbackForm(false); setNewFeedback({ name: '', role: '', text: '', rating: 5 }); }} className="space-y-6"><div><label className="block font-bold text-slate-800 mb-2">Full Name</label><input type="text" required placeholder="Enter your name" value={newFeedback.name} onChange={(e) => setNewFeedback({ ...newFeedback, name: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors" /></div><div><label className="block font-bold text-slate-800 mb-2">Professional Role</label><input type="text" required placeholder="e.g. Software Engineer" value={newFeedback.role} onChange={(e) => setNewFeedback({ ...newFeedback, role: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors" /></div><div><label className="block font-bold text-slate-800 mb-2">Rating</label><div className="flex gap-2">{[1, 2, 3, 4, 5].map((star) => (<button key={star} type="button" onClick={() => setNewFeedback({ ...newFeedback, rating: star })} className="focus:outline-none transition-transform hover:scale-110"><Star size={32} fill={star <= newFeedback.rating ? "#F59E0B" : "none"} color={star <= newFeedback.rating ? "#F59E0B" : "#cbd5e1"} /></button>))}</div></div><div><label className="block font-bold text-slate-800 mb-2">Your Review</label><textarea required rows={4} placeholder="Share your thoughts..." value={newFeedback.text} onChange={(e) => setNewFeedback({ ...newFeedback, text: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors resize-none"></textarea></div><button type="submit" className="btn-brand w-full py-4 rounded-xl text-base">Submit Feedback</button></form></div></div>)}
+            {/* Feedback Form Modal */}
+            {showFeedbackForm && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4" onClick={() => setShowFeedbackForm(false)}>
+                    <div className="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl relative animate-fade-in" onClick={e => e.stopPropagation()}>
+                        <button
+                            onClick={() => setShowFeedbackForm(false)}
+                            className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"
+                        >
+                            <X size={20} />
+                        </button>
+
+                        <h3 className="text-3xl font-extrabold mb-2 text-brand-gradient">Share Feedback</h3>
+                        <p className="text-slate-500 mb-8">We value your input! Tell us about your investment experience.</p>
+
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            alert("Thank you for your valuable feedback! It will be listed after moderation.");
+                            setShowFeedbackForm(false);
+                            setNewFeedback({ name: '', role: '', text: '', rating: 5 });
+                        }} className="space-y-6">
+                            <div>
+                                <label className="block font-bold text-slate-800 mb-2">Full Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="Enter your name"
+                                    value={newFeedback.name}
+                                    onChange={(e) => setNewFeedback({ ...newFeedback, name: e.target.value })}
+                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block font-bold text-slate-800 mb-2">Professional Role</label>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="e.g. Software Engineer"
+                                    value={newFeedback.role}
+                                    onChange={(e) => setNewFeedback({ ...newFeedback, role: e.target.value })}
+                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block font-bold text-slate-800 mb-2">Rating</label>
+                                <div className="flex gap-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            type="button"
+                                            onClick={() => setNewFeedback({ ...newFeedback, rating: star })}
+                                            className="focus:outline-none transition-transform hover:scale-110"
+                                        >
+                                            <Star
+                                                size={32}
+                                                fill={star <= newFeedback.rating ? "#F59E0B" : "none"}
+                                                color={star <= newFeedback.rating ? "#F59E0B" : "#cbd5e1"}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block font-bold text-slate-800 mb-2">Your Review</label>
+                                <textarea
+                                    required
+                                    rows={4}
+                                    placeholder="Share your thoughts..."
+                                    value={newFeedback.text}
+                                    onChange={(e) => setNewFeedback({ ...newFeedback, text: e.target.value })}
+                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors resize-none"
+                                ></textarea>
+                            </div>
+
+                            <button type="submit" className="btn-brand w-full py-4 rounded-xl text-base">
+                                Submit Feedback
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
