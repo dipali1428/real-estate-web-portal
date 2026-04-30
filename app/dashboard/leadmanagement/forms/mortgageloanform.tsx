@@ -5,6 +5,7 @@ import {
   ShieldCheck, Loader2, ArrowRight, ArrowLeft, AlertCircle 
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import { toast } from "react-hot-toast";
 
 // --- Constants & Styles ---
 const STYLES = {
@@ -158,8 +159,7 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
         setStep(2);
       }
     } catch (err) {
-      console.error(err);
-      setStatusMsg("Failed to create application.");
+      toast.error("Failed to create application.");
     } finally {
       setIsSubmitting(false);
     }

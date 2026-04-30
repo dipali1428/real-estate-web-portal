@@ -7,6 +7,7 @@ import {
   Inbox, Users, Coins
 } from 'lucide-react';
 import { DashboardService } from '@/app/services/dashboardService';
+import { toast } from 'react-hot-toast';
 
 // --- Types ---
 type TabType = 'payout-history' | 'commission-structure' | 'earnings-calculator';
@@ -141,7 +142,7 @@ export default function IncentivesPayouts() {
         setPayoutData(mapData(response));
         setReferralPayoutData(mapData(refResponse));
       } catch (error) {
-        console.error("Failed to fetch payouts", error);
+        toast.error("Failed to fetch payouts");
       } finally {
         setIsLoading(false);
       }

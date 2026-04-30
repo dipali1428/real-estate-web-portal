@@ -5,7 +5,7 @@ import {
     IconSchool, IconArrowRight, IconCheck, IconStar, IconArrowLeft
 } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
-
+import Image from "next/image";
 import heroIllustration from '../../../../public/loan/education_hero_illustration.png';
 
 
@@ -113,9 +113,11 @@ export default function HeroSection({ onApplyClick }: { onApplyClick: () => void
                                 {/* Subtle Gradient Inner Glow */}
                                 <div className="absolute inset-0 bg-gradient-to-tr from-[#2076C7]/5 to-[#1CADA3]/5" />
 
-                                <img
+                                <Image
                                     src={heroIllustration.src}
                                     alt="Education Loan illustration"
+                                    width={400}
+                                    height={400}
                                     className="w-full h-full object-cover drop-shadow-lg group-hover:scale-105 transition-transform duration-700"
                                 />
                             </motion.div>

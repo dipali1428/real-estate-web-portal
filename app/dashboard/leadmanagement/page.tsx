@@ -34,6 +34,7 @@ import LeadTable from "./components/LeadTable";
 import CorporateInsuranceForm from "./forms/corporateinsuranceform";
 import LoanProtectorForm from "./forms/loanprotectorform";
 import UnlistedSharesForm from "./forms/unlistedsharesform";
+import { toast } from "react-hot-toast";
 
 export default function LeadManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,7 +98,7 @@ export default function LeadManagementPage() {
       "Real Estate": () => setShowRealEstateForm(true),
       "Unlisted Shares": () => setShowUnlistedSharesForm(true),
     };
-    return handlerMap[title] || (() => console.log(`No handler for ${title}`));
+    return handlerMap[title] || (() => toast.error(`No handler for ${title}`));
   }
 
   const productCards = {
@@ -195,11 +196,15 @@ export default function LeadManagementPage() {
           </div>
 
           {/* Body Content */}
-          {viewMode === 'table' ? (
-            <LeadTable
-              onEdit={(lead) => console.log('Edit:', lead)}
-              onDelete={(lead) => console.log('Delete:', lead)}
-            />
+          <LeadTable
+            onEdit={(lead) => {
+              toast(`Opening ${lead.clientName}`, {
+              });
+            }}
+            onDelete={(lead) => {
+              toast.success(`${lead.clientName} deleted successfully`);
+            }}
+          />
           ) : (
             <div className="mt-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
               <div className="mb-6 flex flex-wrap gap-2">
@@ -239,7 +244,7 @@ export default function LeadManagementPage() {
                 ))}
               </div>
             </div>
-          )}
+          )
         </div>
       </section>
 

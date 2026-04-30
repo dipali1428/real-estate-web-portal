@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import Image from "next/image";
 
 interface TemplateItem {
   id: string;
@@ -70,9 +71,11 @@ export default function TemplateCard({ template, onQuickDownload, onShareToWhats
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-200 group flex flex-col">
       <div className="h-40 sm:h-48 relative overflow-hidden bg-slate-100 flex items-center justify-center">
-        <img 
+        <Image 
           src={template.imageUrl} 
           alt={template.name}
+          width={400}
+          height={400}
           className="max-w-full max-h-full object-contain"
           onError={(e) => {
             const target = e.target as HTMLImageElement;

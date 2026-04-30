@@ -5,7 +5,7 @@ import {
     IconCreditCard, IconArrowRight, IconArrowLeft
 } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
-
+import Image from "next/image";
 
 export default function HeroSection({ onApplyClick }: { onApplyClick: () => void }) {
     const router = useRouter();
@@ -106,10 +106,12 @@ export default function HeroSection({ onApplyClick }: { onApplyClick: () => void
                                 {/* Subtle Gradient Inner Glow */}
                                 <div className="absolute inset-0 bg-gradient-to-tr from-[#2076C7]/5 to-[#1CADA3]/5" />
 
-                                <img
+                                <Image
                                     src="/credit-card/credit-card-hero.png"
                                     alt="Credit Card illustration"
                                     className="w-full h-full object-cover drop-shadow-lg transition-transform duration-700"
+                                    width={400}
+                                    height={400}
                                 />
                             </motion.div>                       
                         </div>

@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Download, Wallet, Clock, FileText, Inbox, Eye, X
 } from 'lucide-react';
 import { DashboardService } from '@/app/services/dashboardService';
+import { toast } from 'react-hot-toast';
 
 interface PayoutRecord {
   Id: string;
@@ -62,7 +63,7 @@ export default function PayoutHistory() {
             gst: profileRes?.kycDetails?.gst_number || profileRes?.user?.gst_number || ''
           });
         } catch (err) {
-          console.error("Failed to fetch profile", err);
+          toast.error("Failed to fetch profile");
         }
 
         const response = await DashboardService.getCompletedDetailLeads();
@@ -93,7 +94,7 @@ export default function PayoutHistory() {
 
         setPayoutData(mappedData);
       } catch (error) {
-        console.error("Failed to fetch payouts", error);
+        toast.error("Failed to fetch payouts");
       } finally {
         setIsLoading(false);
       }

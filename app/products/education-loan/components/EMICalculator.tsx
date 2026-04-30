@@ -17,6 +17,7 @@ import {
     Tooltip,
     Legend
 } from 'recharts';
+import Image from "next/image";
 
 export default function EMICalculator({ onApplyClick, hidePartners = false, isDashboard = false }: { onApplyClick: () => void, hidePartners?: boolean, isDashboard?: boolean }) {
     const [loanAmount, setLoanAmount] = useState(1000000);
@@ -372,7 +373,7 @@ export default function EMICalculator({ onApplyClick, hidePartners = false, isDa
                                         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 via-transparent to-[#1CADA3]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                                         <div className="relative z-10 flex-shrink-0 w-14 h-14 rounded-2xl bg-white border border-slate-50 flex items-center justify-center p-2 shadow-sm transition-all duration-500 group-hover:scale-110">
-                                            <img src={bank.logo} alt={bank.name} className="w-full h-full object-contain" />
+                                            <Image src={bank.logo} alt={bank.name} className="w-full h-full object-contain" width={56} height={56} />
                                         </div>
                                         <span className="font-medium text-gray-600 text-xs md:text-sm leading-relaxed font-sans transition-colors duration-300">
                                             {bank.name}

@@ -5,6 +5,7 @@ import {
   Search, RefreshCcw, 
   ShieldCheck, Loader2, ChevronLeft, ChevronRight 
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 export default function KycStatusPage() {
   const [data, setData] = useState<any[]>([]);
@@ -32,7 +33,7 @@ export default function KycStatusPage() {
         setTotalRecords(response.total || 0);
       }
     } catch (err) {
-      console.error("Fetch Error:", err);
+      toast.error("Failed to fetch KYC status data");
       setData([]);
     } finally {
       setLoading(false);

@@ -47,7 +47,6 @@ export default function ProfileSection() {
                 const userData = res.user || res.data || res;
                 setProfile(userData);
             } catch (err) {
-                console.error(err);
                 toast.error("Failed to fetch profile.");
             } finally {
                 setLoading(false);

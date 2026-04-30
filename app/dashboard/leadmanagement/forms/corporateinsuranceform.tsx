@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, ChevronDown, Download, Info, AlertCircle, Loader2 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import { toast } from "react-hot-toast";
 
 // Mapping for API keys
 const DOC_KEYS: Record<string, { key: string; label: string }> = {
@@ -223,8 +224,7 @@ export default function InsurancePolicyForm({ onClose }: { onClose: () => void }
 
       setShowSuccess(true);
     } catch (err) {
-      console.error(err);
-      setStatusMsg("Submission failed. Please try again.");
+      toast.error("Submission failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

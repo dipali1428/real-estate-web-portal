@@ -9,7 +9,7 @@ const FireCTA = () => (
                 Ready to Secure Your Financial Future?
             </h2>
             <p className="text-lg mb-8 max-w-3xl mx-auto opacity-90">
-                Don't wait to achieve your dreams. Whether it is your home, growing your assets, or
+                Don&apos;t wait to achieve your dreams. Whether it is your home, growing your assets, or
                 protecting your family, we support are here to guide you. Get started on your financial success today.
             </p>
             <Link

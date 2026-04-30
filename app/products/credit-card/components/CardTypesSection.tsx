@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { useModal } from '@/app/context/ModalContext';
 import toast from 'react-hot-toast';
+import Image from "next/image";
 
 import CompareModal from './CompareModal';
 
@@ -653,9 +654,11 @@ export default function CardTypesSection({
                                                                 <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg shadow-sm z-20">Featured</div>
                                                             )}
                                                             {card.image ? (
-                                                                <img
+                                                                <Image
                                                                     src={card.image}
                                                                     alt={card.title}
+                                                                    width={400}
+                                                                    height={400}
                                                                     className="w-full h-full object-contain select-none group-hover:scale-105 transition-transform duration-500 drop-shadow-xl"
                                                                 />
                                                             ) : (
@@ -914,7 +917,13 @@ export default function CardTypesSection({
                                         return (
                                             <div key={id} className="relative group">
                                                 <div className="w-16 h-10 md:w-20 md:h-12 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex items-center justify-center p-1">
-                                                    <img src={card?.image} alt={card?.title} className="max-h-full object-contain" />
+                                                    <Image 
+                                                        src={card?.image || "/placeholder-image.png"} 
+                                                        alt={card?.title || "Card image"} 
+                                                        className="max-h-full object-contain" 
+                                                        width={400} 
+                                                        height={400} 
+                                                    />
                                                 </div>
                                                 <button
                                                     onClick={() => toggleCompare(id)}

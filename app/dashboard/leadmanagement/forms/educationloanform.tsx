@@ -5,6 +5,7 @@ import {
   Loader2, ArrowRight, ArrowLeft, AlertCircle 
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import { toast } from "react-hot-toast";
 
 const STYLES = {
   input: (err: boolean) => `w-full border rounded-md p-2 bg-white text-gray-700 outline-none text-sm sm:text-base transition-all placeholder-gray-400 appearance-none ${err ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#1CADA3] focus:border-[#1CADA3]"}`,
@@ -126,8 +127,7 @@ export default function EducationLoanForm({ onClose }: { onClose: () => void }) 
       setLeadId(result.detail_lead_id);
       setStep(2);
     } catch (err) {
-      console.error(err);
-      setStatusMsg("Failed to create lead.");
+      toast.error("Failed to create lead.");
     } finally {
       setIsSubmitting(false);
     }

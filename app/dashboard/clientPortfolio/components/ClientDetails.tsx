@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Pagination from './Pagination';
 import { Client } from '../types';
 import { DashboardService } from "@/app/services/dashboardService";
+import { toast } from 'react-hot-toast';
 
 interface ClientDetailsProps {
     clients: Client[];
@@ -46,7 +47,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                     setLeads(rawData.clients);
                 }
             } catch (error) {
-                console.error("Failed to fetch client details:", error);
+                toast.error("Failed to fetch client details:");
             } finally {
                 setLoading(false);
             }

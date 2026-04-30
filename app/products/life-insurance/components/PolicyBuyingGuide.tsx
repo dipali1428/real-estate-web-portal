@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calculator, Info, Target, Landmark, ChevronRight, ShieldCheck, Zap } from "lucide-react";
 import Magnetic from "./Magnetic";
@@ -29,12 +29,12 @@ const tips = [
 const PolicyBuyingGuide = () => {
     const [income, setIncome] = useState(10); // in Lakhs
     const [age, setAge] = useState(30);
-    const [recommendedCover, setRecommendedCover] = useState(1.5); // in Crores
     const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
 
-    useEffect(() => {
+    // Calculate recommended cover using useMemo instead of useEffect
+    const recommendedCover = useMemo(() => {
         const multiplier = age < 40 ? 15 : 10;
-        setRecommendedCover((income * multiplier) / 100);
+        return (income * multiplier) / 100;
     }, [income, age]);
 
     const [referenceId] = useState(() =>

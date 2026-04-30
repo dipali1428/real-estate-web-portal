@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconX, IconCheck } from '@tabler/icons-react';
+import Image from "next/image";
 
 interface Card {
     id: number;
@@ -101,7 +102,7 @@ export default function CompareModal({ isOpen, onClose, cards, onApply }: Compar
                                             {card ? (
                                                 <>
                                                     <div className="h-24 w-full flex items-center justify-center mb-4">
-                                                        <img src={card.image} alt={card.title} className="max-h-full object-contain drop-shadow-lg" />
+                                                        <Image src={card.image} alt={card.title} width={80} height={80} className="max-h-full object-contain drop-shadow-lg" />
                                                     </div>
                                                     <h3 className="text-sm font-black text-slate-800 mb-4 line-clamp-1">{card.title}</h3>
                                                     <button 
