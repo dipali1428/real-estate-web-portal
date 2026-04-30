@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { FileText, CheckCircle, X, AlertCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { DashboardService } from "@/app/services/dashboardService";
+import { AdminService } from "@/app/services/adminService";
 import toast, { Toaster } from 'react-hot-toast';
 import { load } from "@cashfreepayments/cashfree-js";
 
@@ -17,8 +18,19 @@ export default function DSAAgreement() {
   const [couponCode, setCouponCode] = useState<string>('');
   const [isValidatingCoupon, setIsValidatingCoupon] = useState<boolean>(false);
   const [couponApplied, setCouponApplied] = useState<boolean>(false);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  // ==========================================
+  // TOGGLE MAINTENANCE MODE HERE
+  // ==========================================
+  const IS_MAINTENANCE_MODE = true; // Set to true to show maintenance page, false to show normal page
+  // ==========================================
 
   useEffect(() => {
+    if (IS_MAINTENANCE_MODE) {
+      setLoading(false);
+      return;
+    }
     const fetchProfileData = async () => {
       try {
         const response = await DashboardService.checkKycStatus();
@@ -37,6 +49,35 @@ export default function DSAAgreement() {
     };
     fetchProfileData();
   }, []);
+
+  const handleDownload = async () => {
+    // We use the uuid from the profile state fetched during useEffect
+    const uuid = profile?.agreementUuid;
+    const name = profile?.name || "DSA";
+
+    if (!uuid) {
+      toast.error("Agreement ID not found");
+      return;
+    }
+
+    setDownloadingId(uuid);
+    try {
+      const response = await AdminService.downloadAgreement(uuid); // or AdminService
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${name.replace(/\s+/g, '_')}_Agreement.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success("Download started");
+    } catch (error) {
+      toast.error("Failed to download agreement");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   // const RazorpayPaymentButton = () => {
   //   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -180,6 +221,25 @@ export default function DSAAgreement() {
       </div>
     );
   }
+  if (!loading && IS_MAINTENANCE_MODE) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center border-t-4 border-yellow-500">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2 mt-6">Under Maintenance</h2>
+          <p className="text-gray-600 mb-8">
+            We are currently updating the agreement portal to serve you better. We'll be back shortly!
+          </p>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center justify-center px-6 py-3 bg-[#2076C7] text-white rounded-lg font-semibold hover:bg-[#1a5fa1] transition-colors"
+          >
+            Back to Dashboard
+          </Link>
+          <p className="mt-6 text-sm text-gray-400 italic">Expected uptime: Soon</p>
+        </div>
+      </div>
+    );
+  }
 
   const isKycComplete = profile?.kycStatus === true;
 
@@ -190,13 +250,31 @@ export default function DSAAgreement() {
           <div className="flex justify-center mb-4">
             <CheckCircle size={64} className="text-[#1CADA3]" />
           </div>
-          {/* EDIT THE LINE BELOW */}
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             Agreement Sent to <span className='text-blue-600 rounded-xl'>{profile?.email}</span> from CaseDocker for signing
           </h2>
           <p className="text-gray-600 mb-6">
             Thank you, <span className='font-bold'>{profile?.name}</span>. Please check your mail inbox to review and sign your DSA partnership agreement.
           </p>
+
+          {/* --- ADD THIS BUTTON SECTION --- */}
+          <div className="flex flex-col items-center gap-4">
+            <button
+              onClick={handleDownload}
+              disabled={downloadingId !== null}
+              className="flex items-center gap-2 px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors border border-gray-300"
+            >
+              {downloadingId ? (
+                <span className="animate-spin rounded-full h-4 w-4 border-2 border-gray-500 border-t-transparent"></span>
+              ) : (
+                <FileText size={18} />
+              )}
+              {downloadingId ? "Preparing PDF..." : "Download Agreement Copy"}
+            </button>
+            <p className="text-xs text-gray-400 font-medium italic">Sign via the link sent to your email to activate partnership.</p>
+          </div>
+          {/* ------------------------------ */}
+
         </div>
       </div>
     );
