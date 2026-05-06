@@ -243,7 +243,7 @@ export const DashboardService = {
         const response = await api.post("/api/dashboard/profile/validate-coupon", { coupon_code });
         return response.data;
     },
-   getDocuments: async () => {
+    getDocuments: async () => {
         // Add "dashboard" to the path to match your other working APIs
         const response = await api.get("/api/dashboard/payout-grids");
         return response.data;
@@ -251,10 +251,48 @@ export const DashboardService = {
 
     downloadPayoutGrid: async (id: string, payload: any) => {
         // Using POST because you mentioned req.body on the backend
-        const response = await api.get( `/api/dashboard/payout-grids/download/${id}`,{
-                params: payload, 
-                
-    });
+        const response = await api.get(`/api/dashboard/payout-grids/download/${id}`, {
+            params: payload,
+
+        });
+        return response.data;
+    },
+
+    // Non-Individual
+    verifyCompanyAndDirectors: async (payload: { company_id: string }) => {
+        const response = await api.post("/api/dashboard/verify-company-and-directors", payload);
+        return response.data;
+    },
+
+// Partners API's
+    addPartnersOfficeAddress: async (payload: { office_address: string }) => {
+        const response = await api.post("/api/dashboard/partnership/add-partners-office-address", payload);
+        return response.data;
+    },
+
+    verifyPanAndCreatePartner: async (payload: { pan: string; name_as_per_pan: string; date_of_birth: string }) => {
+        // Ensure this path matches your backend route registration
+        const response = await api.post("/api/dashboard/partnership/verify-pan-add-partnership", payload);
+        return response.data;
+    },
+    generateAadhaarOtpDirector: async (payload: { aadhaar_number: string }) => {
+        const response = await api.post("/api/dashboard/partnership/aadhaar/generate-otp", payload);
+        return response.data;
+    },
+    verifyAadhaarOtpDirector: async (payload: { partner_id: string; reference_id: string; otp: string; aadhaar_number: string }) => {
+        const response = await api.post("/api/dashboard/partnership/aadhaar/verify-otp", payload);
+        return response.data;
+    },
+    verifyDirectorPanAadhaarLink: async (payload: { partner_id:string; }) => {
+        // Replace with your actual backend route
+        const response = await api.post("/api/dashboard/partnership/verify-pan-aadhaar-link", payload);
+        return response.data;
+    },
+
+    
+    // 🔹 Delete a Director/Partner
+    deletePartner: async (partner_id: string) => {
+        const response = await api.delete(`/api/dashboard/partnership/delete-partner/${partner_id}`);
         return response.data;
     },
 };

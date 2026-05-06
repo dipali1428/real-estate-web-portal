@@ -37,6 +37,7 @@ export default function BecomePartnerForm() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     entity_type: "Individual", // New State Field
+    firm_type: "",
     role: "DSA",
     name: "",
     email: "",
@@ -49,6 +50,11 @@ export default function BecomePartnerForm() {
     agree: false,
   });
 
+  const COMPANY_TYPES = [
+    { label: "LLP", value: "LLP" },
+    { label: "Private Limited", value: "PVT_LTD" },
+    { label: "Partnership Firm", value: "PARTNERSHIP" },
+  ];
   const cities = useMemo(() => {
     return form.state ? STATES_CITIES[form.state] || [] : [];
   }, [form.state]);
@@ -159,7 +165,9 @@ export default function BecomePartnerForm() {
 
     if (!form.state) e.state = "Please select a state.";
     if (!form.city) e.city = "Please select a city.";
-
+    if (form.entity_type === "Non-Individual" && !form.firm_type) {
+      e.company_type = "Please select company type.";
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -179,6 +187,7 @@ export default function BecomePartnerForm() {
       setServerError(null);
       setStep(2);
     }
+
   };
 
   const handlePrevStep = () => {
@@ -247,6 +256,7 @@ export default function BecomePartnerForm() {
     try {
       const data = await AuthService.register({
         entity_type: form.entity_type, // Passing the new field
+        firm_type: form.firm_type,
         name: form.name,
         email: form.email,
         mobile: form.mobile,
@@ -326,11 +336,10 @@ export default function BecomePartnerForm() {
                       <button
                         type="button"
                         onClick={() => setField("entity_type", "Individual")}
-                        className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                          form.entity_type === "Individual" 
-                          ? "bg-white text-[#1CADA3] shadow-sm" 
+                        className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${form.entity_type === "Individual"
+                          ? "bg-white text-[#1CADA3] shadow-sm"
                           : "text-gray-500 hover:text-gray-700"
-                        }`}
+                          }`}
                       >
                         <User size={16} />
                         Individual
@@ -338,11 +347,10 @@ export default function BecomePartnerForm() {
                       <button
                         type="button"
                         onClick={() => setField("entity_type", "Non-Individual")}
-                        className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                          form.entity_type === "Non-Individual" 
-                          ? "bg-white text-[#1CADA3] shadow-sm" 
+                        className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${form.entity_type === "Non-Individual"
+                          ? "bg-white text-[#1CADA3] shadow-sm"
                           : "text-gray-500 hover:text-gray-700"
-                        }`}
+                          }`}
                       >
                         <Building2 size={16} />
                         Non-Individual
@@ -351,6 +359,24 @@ export default function BecomePartnerForm() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                    {form.entity_type === "Non-Individual" && (
+                      <div>
+                        <label className={labelClass}>Company Type</label>
+                        <select
+                          value={form.firm_type}
+                          onChange={(e) => setField("firm_type", e.target.value)}
+                          className={inputClass}
+                        >
+                          <option value="">Select Company Type</option>
+                          {COMPANY_TYPES.map((type) => (
+                            <option key={type.value} value={type.value}>
+                              {type.label}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.company_type && <p className={errorClass}>{errors.company_type}</p>}
+                      </div>
+                    )}
                     {/* Dynamic Label for Name */}
                     <div>
                       <label className={labelClass}>

@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useRef, useState, useCallback } from "react";
 import { DashboardService } from "@/app/services/dashboardService";
 import CardTemplateImage from "@/app/assets/visiting_card.png";
@@ -11,9 +10,29 @@ import toast from "react-hot-toast";
 
 // --- Types & Constants ---
 interface PopupMessage { id: string; message: string; type: "success" | "error" | "loading"; }
-interface Profile { address: string; current_address?: string; referral_code?: string; mobile_verified: boolean; adv_id: string; name: string; email: string; mobile: string; pan: string; aadhaar?: string; gst_number?: string; city: string; state: string; head: string; category: string; password: string; bank_name?: string; branch_name?: string; bank_account?: string; ifsc?: string; pan_verified: boolean; profile_photo?: any; name_as_per_pan?: string; date_of_birth?: string; }
+interface Profile {
+    firm_type: string; address: string; current_address?: string; referral_code?: string; mobile_verified: boolean; adv_id: string; name: string; email: string; mobile: string; pan: string; aadhaar?: string; gst_number?: string; city: string; state: string; head: string; category: string; password: string; bank_name?: string; branch_name?: string; bank_account?: string; ifsc?: string; pan_verified: boolean; profile_photo?: any; name_as_per_pan?: string; date_of_birth?: string; entity_type?: string; cin?: string; din?: string; director_name?: string; directors?: Director[]; pan_dob?: string;
+}
 interface KycDetails { current_address?: string; bank_name?: string; bank_account_number?: string; ifsc_code?: string; bank_verified: boolean; aadhaar_number?: string; aadhaar_verified: boolean; gst_number?: string; gst_verified: boolean; kyc_completed: boolean; profile_image_url?: string; phone_verified?: boolean; email_verified?: boolean; aadhaar_kyc_data?: { full_address?: string;[key: string]: any }; }
-
+interface Director {
+    id: string;
+    partner_id?: string;
+    full_name: string;
+    age: number | string;
+    office_address: string;
+    is_primary: boolean;
+    is_verified: boolean;
+    name: string;
+    pan: string;
+    name_as_per_pan: string;
+    date_of_birth: string;
+    dob?: string;
+    pan_verified: boolean;
+    aadhaar: string;
+    aadhaar_verified: boolean;
+    pan_aadhaar_linked: boolean;
+    din: string;
+}
 const CATEGORY_MAP: Record<string, string[]> = {
     Investment: ["Mutual Funds", "Wealth Management", "Pension Funds", "Stocks and Securities", "Portfolio Management Services", "Real Estate Investments", "Unlisted Shares"],
     Protection: ["Life Insurance", "Health Insurance", "Motor Insurance", "Travel Insurance", "Cattle Insurance", "Marine Insurance", "Corporate Insurance"],
@@ -63,9 +82,78 @@ export default function ProfileSection() {
     const [activeId, setActiveId] = useState<string>("step-1");
     const [isAddressSame, setIsAddressSame] = useState(false);
     const [showAgreementModal, setShowAgreementModal] = useState(false);
+    const [verifyingCin, setVerifyingCin] = useState(false);
+    const [cinVerified, setCinVerified] = useState(false); // Track if CIN is verified
 
+    // const [directors, setDirectors] = useState<Director[]>([]);
+    const [verifyingDirectorId, setVerifyingDirectorId] = useState<string | null>(null);
+    const [directors, setDirectors] = useState<Director[]>([
+        {
+            id: 'initial-director-' + Date.now(), // Use a temporary unique string
+            full_name: '', name: '', pan: '', age: '',
+            aadhaar: '', din: '', pan_verified: false, aadhaar_verified: false,
+            is_verified: false, is_primary: false, office_address: '',
+            name_as_per_pan: '', date_of_birth: '', pan_aadhaar_linked: false
+        }
+    ]);
+
+    const addDirector = () => {
+        setDirectors([
+            ...directors,
+            {
+                id: Date.now().toString(),
+                full_name: '', name: '', pan: '', age: '',
+                aadhaar: '', din: '', pan_verified: false, aadhaar_verified: false,
+                is_verified: false, is_primary: false, office_address: '',
+                name_as_per_pan: '', date_of_birth: '', pan_aadhaar_linked: false
+            }
+        ]);
+    };
+
+    const handleDeleteDirector = async (directorId: string) => {
+        // If the ID is a temporary local ID (e.g., from Date.now()), just remove it from state
+        if (directorId.startsWith('initial-director-') || directorId.length > 10) {
+            setDirectors(prev => prev.filter(d => String(d.id) !== String(directorId)));
+            return;
+        }
+
+        let popupId = "";
+        try {
+            popupId = triggerPopup("Deleting Director...", "loading");
+            await DashboardService.deletePartner(directorId);
+
+            // Remove from local state after successful API call
+            setDirectors(prev => prev.filter(d => String(d.id) !== String(directorId)));
+            triggerPopup("Director removed successfully", "success", popupId);
+        } catch (err: any) {
+            const msg = err.response?.data?.message || "Failed to delete director";
+            triggerPopup(msg, "error", popupId);
+        }
+    };
+
+    const updateDirector = (id: string | number, field: string, value: string) => {
+        setDirectors(prev => prev.map(d =>
+            // Using loose equality or String conversion to match numeric API IDs with string local IDs
+            String(d.id) === String(id) ? { ...d, [field]: value } : d
+        ));
+    };
     const isStep1Complete = mobileVerified && emailVerified;
-    const isStep2Complete = isStep1Complete && (profile?.pan_verified && aadhaarVerified && panAadhaarLinked);
+    const isStep2Complete = isStep1Complete && (
+        profile?.entity_type === "Non-Individual"
+            ? (
+                profile?.pan_verified &&
+                // Check if address exists and is not just whitespace
+                profile?.address && profile.address.trim().length > 5 &&
+                (profile?.firm_type === "PARTNERSHIP" || cinVerified) &&
+                directors.length > 0 &&
+                directors.every(d => d.pan_verified && d.aadhaar_verified && d.pan_aadhaar_linked && d.is_verified)
+            )
+            : (
+                profile?.pan_verified &&
+                aadhaarVerified &&
+                panAadhaarLinked
+            )
+    );
     const isStep3Complete = isStep2Complete && bankVerified;
 
     const [referralLink, setReferralLink] = useState<string>("");
@@ -435,21 +523,27 @@ export default function ProfileSection() {
     const refreshProfileData = async () => {
         try {
             const res = await DashboardService.getProfile();
-
             setPanAadhaarLinked(!!res.kycDetails?.pan_aadhaar_linked);
             // 1. Extract DOB from Aadhaar KYC data if available
             const aadhaarDob = res.kycDetails?.aadhaar_kyc_data?.date_of_birth; // "13-11-2001"
-            let finalDob = res.user.date_of_birth || "";
+            let finalDob = res.user.pan_dob || aadhaarDob;
 
             // 2. Format DD-MM-YYYY to YYYY-MM-DD for the input field
             if (aadhaarDob && aadhaarDob.includes("-")) {
                 const [day, month, year] = aadhaarDob.split("-");
                 finalDob = `${year}-${month}-${day}`;
             }
+            //  setDirectors(res.firmdata);
+
 
             setProfile({
                 ...res.user,
-                address: res.kycDetails?.current_address || "",
+                name_as_per_pan: res.user?.name,
+                entity_type: res.user.entity_type,
+                cin: res.kycDetails?.cin || "",
+                address: res.user.entity_type === "Non-Individual"
+                    ? (res.firmdata?.office_address || res.kycDetails?.current_address || "")
+                    : (res.kycDetails?.current_address || ""),
                 date_of_birth: finalDob,
                 aadhaar: res.kycDetails?.aadhaar_number || "",
                 gst_number: res.kycDetails?.gst_number || "",
@@ -477,8 +571,30 @@ export default function ProfileSection() {
             if (isFullyComplete && res.agreementStatus !== "created") {
                 setShowAgreementModal(true);
             }
+            const apiDirectors = Array.isArray(res.firmdata) ? res.firmdata : [];
+
+            // 2. Map the data: convert 'dob' to 'date_of_birth' and format for the input field
+            const mappedDirectors = apiDirectors.map((d: any) => ({
+                ...d,
+                id: String(d.id), // Ensure ID is a string for the state logic
+                // FIX: Map API 'dob' to Frontend 'date_of_birth' and slice to YYYY-MM-DD
+                date_of_birth: d.dob ? d.dob.split('T')[0] : (d.date_of_birth ? d.date_of_birth.split('T')[0] : ""),
+                full_name: d.full_name || d.name || ""
+            }));
+
+            if (mappedDirectors.length > 0) {
+                setDirectors(mappedDirectors);
+            } else if (res.user.entity_type === "Non-Individual") {
+                // Default empty row if no directors exist
+                setDirectors([{
+                    id: '', full_name: '', name: '', pan: '', age: '',
+                    aadhaar: '', din: '', pan_verified: false, aadhaar_verified: false,
+                    is_verified: false, is_primary: false, office_address: '',
+                    name_as_per_pan: '', date_of_birth: '', pan_aadhaar_linked: false
+                }]);
+            }
+
         } catch (error) {
-        
             toast.error("Failed to load profile data. Please refresh the page.");
         }
     };
@@ -561,6 +677,35 @@ export default function ProfileSection() {
             if (res.data.status === "valid" || res.code === 200) { await refreshProfileData(); triggerPopup("PAN verified!", "success", popupId); }
             else triggerPopup(res.message || "Failed", "error", popupId);
         } catch (err: any) { triggerPopup("Verification failed", "error"); } finally { setVerifyingPan(false); }
+    };
+    const handleVerifyCin = async () => {
+        if (!profile?.cin || profile.cin.length !== 21) {
+            return triggerPopup("Please enter a valid 21-digit CIN", "error");
+        }
+
+        let popupId: string = "";
+        try {
+            setVerifyingCin(true);
+            popupId = triggerPopup("Verifying Company Details...", "loading");
+
+            const res = await DashboardService.verifyCompanyAndDirectors({ company_id: profile.cin });
+
+            if (res.status === "success" || res.code === 200) {
+                setCinVerified(true);
+                // Optionally update directors list if the API returns them
+                if (res.data?.directors) {
+                    setDirectors(res.data.directors);
+                }
+                await refreshProfileData();
+                triggerPopup("Company Verified Successfully!", "success", popupId);
+            } else {
+                triggerPopup(res.message || "CIN verification failed", "error", popupId);
+            }
+        } catch (err: any) {
+            triggerPopup(err.response?.data?.message || "Verification failed", "error", popupId);
+        } finally {
+            setVerifyingCin(false);
+        }
     };
 
     const handleRequestAadhaarOtp = async () => {
@@ -788,6 +933,185 @@ export default function ProfileSection() {
     const selectedHeads = profile.head ? profile.head.split(",") : [];
     const selectedCats = profile.category ? profile.category.split(",") : [];
 
+    // const handleAddDirector = () => {
+    //     const newDirector: Director = {
+    //         id: Math.random().toString(36).substr(2, 9),
+    //         name: "", pan: "", pan_verified: false,
+    //         aadhaar: "", aadhaar_verified: false, din: ""
+    //     };
+    //     setDirectors([...directors, newDirector]);
+    // };
+
+    const handleVerifyDirectorPan = async (directorId: string) => {
+        const director = directors.find(d => String(d.id) === String(directorId));
+        if (!director?.pan || !director?.full_name || !director?.date_of_birth) {
+            return triggerPopup("Please enter PAN, Name, and DOB for the director", "error");
+        }
+
+        const [year, month, day] = director.date_of_birth.split("-");
+        const formattedDate = `${day}/${month}/${year}`;
+
+        let popupId: string = "";
+        try {
+            setVerifyingDirectorId(directorId);
+            popupId = triggerPopup(`Verifying Director PAN...`, "loading");
+
+            const res = await DashboardService.verifyPanAndCreatePartner({
+                pan: director.pan,
+                name_as_per_pan: director.full_name,
+                date_of_birth: formattedDate
+            });
+
+            // FIX: Check if res.data exists (based on your JSON snippet)
+            if (res.data?.id || res.code === 200 || res.status === "success") {
+
+                // Extract the real backend ID (which is '2' in your example)
+                const backendId = res.data?.id || res.data?.partner_id;
+
+                setDirectors(prev => prev.map(d =>
+                    String(d.id) === String(directorId)
+                        ? {
+                            ...d,
+                            id: String(backendId), // CRITICAL: This replaces the temp ID with "2"
+                            pan_verified: true,
+                            full_name: res.data.full_name || d.full_name
+                        }
+                        : d
+                ));
+                triggerPopup("Director PAN verified successfully!", "success", popupId);
+            } else {
+                triggerPopup(res.message || "Invalid PAN details", "error", popupId);
+            }
+        } catch (err: any) {
+            triggerPopup("Verification failed", "error", popupId);
+        } finally {
+            setVerifyingDirectorId(null);
+        }
+    };
+
+    const handleVerifyDirectorAadhaar = async (directorId: string) => {
+        // 1. Find the specific director
+        const director = directors.find(d => String(d.id) === String(directorId));
+
+        // 2. Validate Aadhaar Number
+        if (!director?.aadhaar || director.aadhaar.length !== 12) {
+            return triggerPopup("Enter 12-digit Aadhaar for the director", "error");
+        }
+
+        let popupId: string = "";
+        try {
+            // Start loading state for this specific director
+            setVerifyingDirectorId(String(directorId));
+            popupId = triggerPopup("Sending OTP to Director's mobile...", "loading");
+
+            // 3. API CALL
+            const res = await DashboardService.generateAadhaarOtpDirector({
+                aadhaar_number: director.aadhaar
+            });
+
+            // 4. Handle Success
+            if (res.status === "success" || res.reference_id || res.data?.reference_id) {
+                setAadhaarReferenceId(res.reference_id || res.data?.reference_id);
+                setAadhaarOtpSent(true); // This will trigger the OTP input field to show
+                triggerPopup("OTP sent successfully!", "success", popupId);
+            } else {
+                triggerPopup(res.message || "Failed to send OTP", "error", popupId);
+            }
+        } catch (err: any) {
+            triggerPopup("Error sending OTP. Please try again.", "error", popupId);
+        } finally {
+            setVerifyingDirectorId(null);
+        }
+    }
+    const handleConfirmDirectorAadhaarOtp = async (directorId: string) => {
+        // 1. Find the specific director to get their Aadhaar number
+        const director = directors.find(d => String(d.id) === String(directorId));
+
+        // 2. Validations
+        if (!director?.aadhaar) return triggerPopup("Aadhaar number not found", "error");
+        if (!aadhaarOtpInput) return triggerPopup("Please enter the OTP", "error");
+        if (!aadhaarReferenceId) return triggerPopup("Reference ID missing. Please resend OTP.", "error");
+
+        let popupId: string = "";
+
+        try {
+            setVerifyingDirectorId(String(directorId));
+            popupId = triggerPopup("Verifying Director Aadhaar...", "loading");
+
+            // 3. API CALL using your service structure
+            const res = await DashboardService.verifyAadhaarOtpDirector({
+                partner_id: directorId,
+                reference_id: aadhaarReferenceId,
+                otp: aadhaarOtpInput,
+                aadhaar_number: director.aadhaar // Payload uses aadhaar_number as requested
+            });
+
+            // 4. Success Handling
+            if (res.status === "success" || res.code === 200) {
+                setDirectors(prev => prev.map(d =>
+                    String(d.id) === String(directorId) ? { ...d, aadhaar_verified: true } : d
+                ));
+
+                // Clear OTP related states
+                setAadhaarOtpSent(false);
+                setAadhaarOtpInput("");
+                setAadhaarReferenceId("");
+
+                triggerPopup("Director Aadhaar Verified successfully!", "success", popupId);
+            } else {
+                triggerPopup(res.message || "Invalid OTP", "error", popupId);
+            }
+        } catch (err: any) {
+            const msg = err.response?.data?.message || "Aadhaar verification failed";
+            triggerPopup(msg, "error", popupId);
+        } finally {
+            setVerifyingDirectorId(null);
+        }
+    };
+    const handleVerifyPanAadhaarLink = async (directorId: string) => {
+        // 1. Find the director
+        const director = directors.find(d => String(d.id) === String(directorId));
+
+        // 2. Validation
+        if (!director?.pan || !director?.aadhaar) {
+            return triggerPopup("PAN and Aadhaar number are required for link verification", "error");
+        }
+        if (!director.pan_verified || !director.aadhaar_verified) {
+            return triggerPopup("Please verify PAN and Aadhaar individually first", "error");
+        }
+
+        let popupId: string = "";
+        try {
+            setVerifyingDirectorId(String(directorId));
+            popupId = triggerPopup("Checking PAN-Aadhaar link status...", "loading");
+
+            // 3. API Call
+            const res = await DashboardService.verifyDirectorPanAadhaarLink({
+                partner_id: directorId,
+
+            });
+
+            // 4. Handle Success (adjust logic based on your API response structure)
+            if (res.status === "success" || res.data?.pan_aadhaar_linked === true) {
+                setDirectors(prev => prev.map(d =>
+                    String(d.id) === String(directorId)
+                        ? { ...d, pan_aadhaar_linked: true }
+                        : d
+                ));
+                triggerPopup(res.message || "PAN and Aadhaar are successfully linked!", "success", popupId);
+
+                // Optional: Refresh all data to sync with backend
+                await refreshProfileData();
+            } else {
+                triggerPopup(res.message || "PAN and Aadhaar are not linked.", "error", popupId);
+            }
+        } catch (err: any) {
+            const msg = err.response?.data?.message || "Link verification failed";
+            triggerPopup(msg, "error", popupId);
+        } finally {
+            setVerifyingDirectorId(null);
+        }
+    };
     return (
         <main className="w-full px-4 md:px-8 md:pb-60 sm:pb-20 pb-15 bg-[#F8FAFC] min-h-screen relative font-sans">
 
@@ -1058,16 +1382,17 @@ export default function ProfileSection() {
                                             </div>
 
                                             <textarea
-                                                disabled={!isEditing || isAddressSame} // Disable if not editing OR if synced with Aadhaar
+                                                // 1. ADD THIS LINE:
+                                                disabled={!isEditing}
                                                 value={profile.address || ""}
                                                 onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                                                rows={1}
-                                                className={`w-full border rounded-xl px-4 py-2.5 text-[14px] font-bold outline-none transition-all resize-none 
-                                            ${(!isEditing || isAddressSame)
-                                                        ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed'
-                                                        : 'bg-white border-slate-300 text-slate-700 focus:border-[#2076C7] shadow-sm'
-                                                    }`}
-                                                placeholder={isAddressSame ? "Address synced from Aadhaar" : "Enter your full current address"}
+                                                rows={2}
+                                                className={`w-full text-gray-700 border rounded-lg px-3 py-2 text-sm font-bold outline-none transition-all resize-none 
+                                                ${(!profile.address || profile.address.trim() === "") ? 'border-amber-200' : 'border-slate-200'} 
+                                                focus:border-[#2076C7] 
+                                                // 2. ADD THESE CLASSES FOR VISUAL FEEDBACK:
+                                                ${!isEditing ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed' : 'bg-white'}`}
+                                                placeholder="Enter full registered office address"
                                             />
                                         </div>
                                         <div className="pt-3 border-t border-slate-100">
@@ -1226,45 +1551,433 @@ export default function ProfileSection() {
                         <div className="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 space-y-4">
 
                             {/* Aadhaar Block */}
-                            <div className="p-4 bg-white rounded-xl border border-slate-100">
-                                <div className="flex justify-between items-center mb-3">
-                                    <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Aadhaar Verification</h4>
-                                    {aadhaarVerified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
-                                </div>
-                                <div className="flex flex-col gap-3">
-                                    <div className="flex flex-col sm:flex-row gap-2">
-                                        <input
-                                            disabled={aadhaarVerified}
-                                            value={aadhaarVerified ? maskAadhaar(profile.aadhaar || "") : profile.aadhaar}
-                                            onChange={(e) => setProfile({ ...profile, aadhaar: e.target.value })}
-                                            className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
-                                            placeholder="12 Digit Aadhaar Number"
-                                            maxLength={12}
-                                        />
-                                        {!aadhaarVerified && (
-                                            <button onClick={handleRequestAadhaarOtp} className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs">
-                                                Get OTP
-                                            </button>
-                                        )}
+                            {profile?.entity_type !== "Non-Individual" ? (
+                                <div>
+                                    <div className="p-4 bg-white rounded-xl border border-slate-100">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Aadhaar Verification</h4>
+                                            {aadhaarVerified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
+                                        </div>
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex flex-col sm:flex-row gap-2">
+                                                <input
+                                                    disabled={aadhaarVerified}
+                                                    value={aadhaarVerified ? maskAadhaar(profile.aadhaar || "") : profile.aadhaar}
+                                                    onChange={(e) => setProfile({ ...profile, aadhaar: e.target.value })}
+                                                    className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
+                                                    placeholder="12 Digit Aadhaar Number"
+                                                    maxLength={12}
+                                                />
+                                                {!aadhaarVerified && (
+                                                    <button onClick={handleRequestAadhaarOtp} className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs">
+                                                        Get OTP
+                                                    </button>
+                                                )}
+                                            </div>
+                                            {aadhaarOtpSent && !aadhaarVerified && (
+                                                <div className="flex flex-col sm:flex-row gap-2 animate-in slide-in-from-top-2">
+                                                    <input
+                                                        placeholder="Enter Aadhaar OTP"
+                                                        value={aadhaarOtpInput}
+                                                        onChange={(e) => setAadhaarOtpInput(e.target.value)}
+                                                        className="flex-1 px-3 py-2 border border-[#1CADA3] text-slate-700 rounded-lg font-bold text-sm outline-none"
+                                                    />
+                                                    <button onClick={handleVerifyAadhaarOtp} className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-xs">
+                                                        Verify OTP
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                    {aadhaarOtpSent && !aadhaarVerified && (
-                                        <div className="flex flex-col sm:flex-row gap-2 animate-in slide-in-from-top-2">
+                                    {/* PAN Block */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-white rounded-xl border border-slate-100">
+                                        <div className="md:col-span-3 flex justify-between items-center">
+                                            <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Permanent Account Number (PAN)</h4>
+                                            {profile.pan_verified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
+                                        </div>
+
+                                        <input
+                                            disabled={profile.pan_verified}
+                                            value={profile.pan_verified ? maskPAN(profile.pan || "") : profile.pan || ""}
+                                            onChange={(e) => setProfile({ ...profile, pan: e.target.value.toUpperCase() })}
+                                            className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50"
+                                            placeholder="PAN Number"
+                                        />
+
+                                        <input
+                                            disabled={profile.pan_verified}
+                                            value={
+                                                profile.pan_verified
+                                                    ? (profile.name?.toUpperCase() || "")
+                                                    : (profile.name_as_per_pan || "")
+                                            }
+                                            onChange={(e) => setProfile({ ...profile, name_as_per_pan: e.target.value.toUpperCase() })}
+
+                                            className="px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 outline-none text-sm disabled:bg-slate-50 disabled:text-slate-600"
+                                            placeholder="Name as per PAN"
+                                        />
+
+                                        <div className="flex gap-2">
                                             <input
-                                                placeholder="Enter Aadhaar OTP"
-                                                value={aadhaarOtpInput}
-                                                onChange={(e) => setAadhaarOtpInput(e.target.value)}
-                                                className="flex-1 px-3 py-2 border border-[#1CADA3] text-slate-700 rounded-lg font-bold text-sm outline-none"
+                                                type="date"
+                                                disabled={profile.pan_verified}
+                                                // Changed: Always show the state value so the user can see what they are typing
+                                                value={profile.date_of_birth || ""}
+                                                onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
+                                                className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none disabled:bg-slate-50"
                                             />
-                                            <button onClick={handleVerifyAadhaarOtp} className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-xs">
-                                                Verify OTP
-                                            </button>
+                                            {!profile.pan_verified && (
+                                                <button
+                                                    onClick={handlePanVerification}
+                                                    className="bg-[#1CADA3] text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-[#158f87]"
+                                                >
+                                                    Verify
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {profile.pan_verified && aadhaarVerified && (
+                                        <div className="mt-2">
+                                            {panAadhaarLinked === true ? (
+                                                <div className="flex items-center gap-2 p-2 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-[11px] font-bold">
+                                                    <CheckCircle2 size={12} /> PAN Aadhaar is linked
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2 animate-pulse"> {/* Added animate-pulse here */}
+                                                    <button onClick={handleCheckPanAadhaarLink} className="w-full py-3 mt-5 mb-3 bg-[#1CADA3] border border-slate-200 text-white rounded-xl text-[14px] font-bold flex items-center justify-center gap-2">
+                                                        <ShieldCheck size={12} /> Check Aadhaar PAN link status
+                                                    </button>
+                                                    <div className="flex items-start gap-2 p-3 bg-amber-50 border mb-5 border-amber-100 rounded-xl text-amber-700 text-[12px] font-bold leading-tight">
+                                                        <AlertCircle size={12} className="shrink-0" />
+                                                        <span>Note: Payout requires linked PAN-Aadhaar</span>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            ) : (
+                                /* --- Corporate Block (Enhanced) --- */
+                                <div className="space-y-6">
+                                    <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-200 space-y-4">
+                                        <div className="flex justify-between items-center">
+                                            <h4 className="text-[11px] font-black uppercase text-[#2076C7] tracking-wider">Company Details</h4>
+                                            {cinVerified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
+                                        </div>
+                                        <>
+                                            {/* Partnership PAN & Formation Date */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                <div className="space-y-1">
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Partnership/Company PAN</label>
+                                                    <input
+                                                        disabled={profile.pan_verified}
+                                                        value={profile.pan || ""}
+                                                        onChange={(e) => setProfile({ ...profile, pan: e.target.value.toUpperCase() })}
+                                                        className="w-full px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
+                                                        placeholder="ABCDE1234F"
+                                                    />
+                                                </div>
+                                                {/* NEW: Company Name as per PAN */}
+                                                <div className="space-y-1">
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Company / Firm Name (As per PAN)</label>
+                                                    <input
+                                                        disabled={profile.pan_verified}
+                                                        value={profile.name_as_per_pan?.toUpperCase() || ""}
+                                                        onChange={(e) => setProfile({ ...profile, name_as_per_pan: e.target.value.toUpperCase() })}
+                                                        className="w-full px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
+                                                        placeholder="ENTER FULL REGISTERED COMPANY NAME"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Date of Formation</label>
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="date"
+                                                            disabled={profile.pan_verified}
+                                                            value={profile.date_of_birth || ""}
+                                                            onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
+                                                            className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
+                                                        />
+                                                        {!profile.pan_verified && (
+                                                            <button
+                                                                onClick={handlePanVerification}
+                                                                className="bg-[#2076C7] text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-[#1a5da1]"
+                                                            >
+                                                                Verify
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* NEW: Partnership Address */}
+                                            <div className="space-y-2 mt-4">
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase">
+                                                    Partnership Firm Address <span className="text-rose-500">*</span>
+                                                </label>
+                                                <div className="flex flex-col gap-2">
+                                                    <textarea
+                                                        value={profile.address || ""}
+                                                        onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                                                        rows={2}
+                                                        className="w-full text-gray-700 border rounded-lg px-3 py-2 text-sm font-bold outline-none transition-all resize-none border-slate-200 focus:border-[#2076C7]"
+                                                        placeholder="Enter full registered office address"
+                                                    />
+                                                    <div className="flex justify-end">
+                                                        <button
+                                                            disabled={saving}
+                                                            onClick={async () => {
+                                                                // Check if address is empty
+                                                                if (!profile.address || profile.address.trim().length < 5) {
+                                                                    return triggerPopup("Please enter a complete office address", "error");
+                                                                }
+
+                                                                setSaving(true);
+                                                                try {
+                                                                    await DashboardService.addPartnersOfficeAddress({
+                                                                        office_address: profile.address
+                                                                    });
+                                                                    triggerPopup("Address Saved!", "success");
+                                                                    // Refresh profile to sync the state
+                                                                    await refreshProfileData();
+                                                                } catch (e) {
+                                                                    triggerPopup("Failed to save address", "error");
+                                                                } finally {
+                                                                    setSaving(false);
+                                                                }
+                                                            }}
+                                                            className="px-4 py-2 bg-slate-800 text-white rounded-lg font-bold text-[10px] uppercase tracking-widest hover:bg-slate-700 transition-all flex items-center gap-2 shadow-sm"
+                                                        >
+                                                            {saving ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
+                                                            Save Address
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+
+                                        {profile.firm_type !== "PARTNERSHIP" && (
+                                            <div className="space-y-1">
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase">CIN (Corporate ID Number)</label>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        disabled={cinVerified}
+                                                        value={profile.cin || ""}
+                                                        onChange={(e) => setProfile({ ...profile, cin: e.target.value.toUpperCase() })}
+                                                        className="flex-1 px-3 py-2 rounded-lg font-bold text-slate-700 bg-white border border-slate-200 text-sm outline-none"
+                                                        placeholder="U12345AB2023PTC123456"
+                                                    />
+                                                    {!cinVerified && (
+                                                        <button
+                                                            onClick={handleVerifyCin}
+                                                            disabled={verifyingCin}
+                                                            className="bg-[#2076C7] text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-[#1a5da1] transition-colors disabled:opacity-50"
+                                                        >
+                                                            {verifyingCin ? <Loader2 className="animate-spin" size={14} /> : "Verify"}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex justify-between items-center px-1">
+                                        <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Directors / Authorized Signatories</h4>
+                                        <button
+                                            onClick={addDirector}
+                                            className="text-[10px] font-bold text-[#1CADA3] hover:underline"
+                                        >
+                                            + ADD ANOTHER DIRECTOR
+                                        </button>
+                                    </div>
+                                    <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl text-blue-700 text-[11px] font-bold leading-relaxed mb-4 animate-in fade-in slide-in-from-top-1">
+                                        <AlertCircle size={14} className="mt-0.5 shrink-0 text-blue-500" />
+                                        <span>
+                                            <span className="uppercase text-[9px] block mb-0.5 opacity-70">Agreement Note</span>
+                                            For the digital partner agreement, a minimum of 1 director is required, and a maximum of 2 directors will be displayed on the final document.
+                                        </span>
+                                    </div>
+
+
+                                    {directors.map((director, index) => (
+
+                                        <div key={director.id || index} className="p-4 pt-14 sm:pt-10 bg-white rounded-xl border border-slate-200 shadow-sm space-y-4 relative">
+
+                                            {/* Status Badge - Adjusted for mobile position */}
+                                            <div className="absolute top-4 left-4">
+                                                {director.is_verified ? (
+                                                    <span className="flex items-center gap-1 text-[9px] sm:text-[10px] bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-black uppercase">
+                                                        <CheckCircle2 size={10} /> KYC COMPLETE
+                                                    </span>
+                                                ) : (
+                                                    <span className="flex items-center gap-1 text-[9px] sm:text-[10px] bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-black uppercase">
+                                                        <AlertCircle size={10} /> KYC PENDING
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Delete Button */}
+                                            {index > 0 && (
+                                                <button
+                                                    onClick={() => handleDeleteDirector(director.id)}
+                                                    className="absolute top-2 right-2 text-rose-400 hover:text-rose-600 p-2"
+                                                >
+                                                    <X size={18} />
+                                                </button>
+                                            )}
+
+                                            {/* Input Grid - Changed to 1 col on mobile, 2 on md */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+
+                                                {/* 1. Name */}
+                                                <div className="space-y-1">
+                                                    <label className="text-[9px] font-bold text-slate-400 uppercase">Director Name (As per PAN)</label>
+                                                    <input
+                                                        value={director.full_name || ""}
+                                                        onChange={(e) => updateDirector(director.id, 'full_name', e.target.value.toUpperCase())}
+                                                        disabled={director.pan_verified}
+                                                        className="w-full px-3 py-2 rounded-lg font-bold text-slate-700 bg-slate-50 border border-slate-200 text-sm focus:border-[#2076C7] outline-none"
+                                                        placeholder="FULL NAME ON PAN CARD"
+                                                    />
+                                                </div>
+
+                                                {/* 2. DOB */}
+                                                <div className="space-y-1">
+                                                    <label className="text-[9px] font-bold text-slate-400 uppercase">Director Date of Birth</label>
+                                                    <input
+                                                        type="date"
+                                                        value={director.date_of_birth || ''}
+                                                        onChange={(e) => updateDirector(director.id, 'date_of_birth', e.target.value)}
+                                                        disabled={director.pan_verified}
+                                                        className="w-full px-3 py-2 rounded-lg font-bold text-slate-700 bg-slate-50 border border-slate-200 text-sm focus:border-[#2076C7] outline-none"
+                                                    />
+                                                </div>
+
+                                                {/* 3. PAN + Verify - Responsive Flex */}
+                                                <div className="space-y-1">
+                                                    <label className="text-[9px] font-bold text-slate-400 uppercase">Director PAN Number</label>
+                                                    <div className="flex flex-row gap-2">
+                                                        <input
+                                                            value={director.pan || ""}
+                                                            onChange={(e) => updateDirector(director.id, 'pan', e.target.value.toUpperCase())}
+                                                            disabled={director.pan_verified}
+                                                            className="flex-1 min-w-0 px-3 py-2 rounded-lg font-bold text-slate-700 bg-slate-50 border border-slate-200 text-sm uppercase outline-none"
+                                                            placeholder="ABCDE1234F"
+                                                        />
+                                                        {!director.pan_verified && (
+                                                            <button
+                                                                onClick={() => handleVerifyDirectorPan(director.id)}
+                                                                className="whitespace-nowrap px-3 sm:px-4 bg-slate-800 text-white rounded-lg text-[9px] font-bold uppercase hover:bg-slate-700 transition-colors"
+                                                            >
+                                                                Verify
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* 4. Aadhaar + Verify - Responsive Flex */}
+                                                <div className="space-y-1">
+                                                    <label className="text-[9px] font-bold text-slate-400 uppercase">Director Aadhaar</label>
+                                                    <div className="space-y-2">
+                                                        <div className="flex flex-row gap-2">
+                                                            <input
+                                                                value={director.aadhaar_verified ? maskAadhaar(director.aadhaar) : director.aadhaar || ""}
+                                                                onChange={(e) => updateDirector(director.id, 'aadhaar', e.target.value.replace(/\D/g, ""))}
+                                                                disabled={director.aadhaar_verified}
+                                                                className="flex-1 min-w-0 px-3 py-2 rounded-lg font-bold text-slate-700 bg-slate-50 border border-slate-200 text-sm outline-none"
+                                                                placeholder="12 Digit Aadhaar"
+                                                                maxLength={12}
+                                                            />
+
+                                                            {!director.aadhaar_verified && !aadhaarOtpSent && (
+                                                                <button
+                                                                    onClick={() => handleVerifyDirectorAadhaar(director.id)}
+                                                                    className="whitespace-nowrap px-3 sm:px-4 bg-[#1CADA3] text-white rounded-lg text-[9px] font-bold uppercase hover:bg-[#158f87]"
+                                                                >
+                                                                    Verify
+                                                                </button>
+                                                            )}
+
+                                                            {director.aadhaar_verified && (
+                                                                <div className="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 sm:px-3 py-2 rounded-lg border border-emerald-100">
+                                                                    <CheckCircle2 size={12} className="shrink-0" />
+                                                                    <span className="font-black text-[9px] uppercase hidden sm:inline">Verified</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* OTP UI - Full width on mobile */}
+                                                        {aadhaarOtpSent && !director.aadhaar_verified && (
+                                                            <div className="flex gap-2 animate-in slide-in-from-top-2 duration-300">
+                                                                <input
+                                                                    placeholder="6-digit OTP"
+                                                                    value={aadhaarOtpInput}
+                                                                    onChange={(e) => setAadhaarOtpInput(e.target.value.replace(/\D/g, ""))}
+                                                                    className="flex-1 min-w-0 px-3 py-2 border-2 border-[#1CADA3] text-slate-700 rounded-lg font-bold text-sm outline-none"
+                                                                    maxLength={6}
+                                                                />
+                                                                <button
+                                                                    disabled={verifyingDirectorId === String(director.id)}
+                                                                    onClick={() => handleConfirmDirectorAadhaarOtp(director.id)}
+                                                                    className="whitespace-nowrap px-3 bg-emerald-600 text-white font-bold rounded-lg text-[9px] uppercase hover:bg-emerald-700 flex items-center justify-center min-w-[90px]"
+                                                                >
+                                                                    {verifyingDirectorId === String(director.id) ? (
+                                                                        <Loader2 size={12} className="animate-spin" />
+                                                                    ) : (
+                                                                        "Confirm"
+                                                                    )}
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => { setAadhaarOtpSent(false); setAadhaarOtpInput(""); }}
+                                                                    className="p-1 text-slate-400"
+                                                                >
+                                                                    <X size={16} />
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* 5. Link Button - Spans full width */}
+                                                <div className="md:col-span-2 pt-2">
+                                                    {director.pan_aadhaar_linked ? (
+                                                        <div className="flex items-center justify-center gap-2 p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-700 text-[10px] font-bold">
+                                                            <CheckCircle2 size={14} />
+                                                            <span className="tracking-wide uppercase">PAN-AADHAAR LINKED</span>
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            disabled={verifyingDirectorId === String(director.id) || !director.pan_verified || !director.aadhaar_verified}
+                                                            onClick={() => handleVerifyPanAadhaarLink(director.id)}
+                                                            className="w-full px-4 py-2.5 bg-[#1CADA3] text-white rounded-lg text-[10px] font-bold uppercase hover:bg-[#158f87] transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                                                        >
+                                                            {verifyingDirectorId === String(director.id) ? (
+                                                                <Loader2 size={14} className="animate-spin" />
+                                                            ) : (
+                                                                <ShieldCheck size={14} />
+                                                            )}
+                                                            Verify PAN-Aadhaar Link
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={addDirector}
+                                        className="w-full py-4 mt-2 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:border-[#1CADA3] hover:text-[#1CADA3] hover:bg-emerald-50/30 transition-all group"
+                                    >
+                                        <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-[#1CADA3] group-hover:text-white transition-colors">
+                                            <span className="text-lg font-bold">+</span>
+                                        </div>
+                                        <span className="text-[11px] font-black uppercase tracking-widest">Add Another Director</span>
+                                    </button>
+                                </div>
+                            )}
 
                             {/* PAN Block */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-white rounded-xl border border-slate-100">
+                            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-white rounded-xl border border-slate-100">
                                 <div className="md:col-span-3 flex justify-between items-center">
                                     <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Permanent Account Number (PAN)</h4>
                                     {profile.pan_verified && <span className="text-[9px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black">VERIFIED</span>}
@@ -1309,27 +2022,9 @@ export default function ProfileSection() {
                                         </button>
                                     )}
                                 </div>
-                            </div>
+                            </div> */}
 
-                            {profile.pan_verified && aadhaarVerified && (
-                                <div className="mt-2">
-                                    {panAadhaarLinked === true ? (
-                                        <div className="flex items-center gap-2 p-2 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-[11px] font-bold">
-                                            <CheckCircle2 size={12} /> PAN Aadhaar is linked
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-2 animate-pulse"> {/* Added animate-pulse here */}
-                                            <button onClick={handleCheckPanAadhaarLink} className="w-full py-3 mt-5 mb-3 bg-[#1CADA3] border border-slate-200 text-white rounded-xl text-[14px] font-bold flex items-center justify-center gap-2">
-                                                <ShieldCheck size={12} /> Check Aadhaar PAN link status
-                                            </button>
-                                            <div className="flex items-start gap-2 p-3 bg-amber-50 border mb-5 border-amber-100 rounded-xl text-amber-700 text-[12px] font-bold leading-tight">
-                                                <AlertCircle size={12} className="shrink-0" />
-                                                <span>Note: Payout requires linked PAN-Aadhaar</span>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+
 
                             {/* GST Block */}
                             <div className="p-4 bg-white rounded-xl border border-slate-100">

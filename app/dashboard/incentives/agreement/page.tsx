@@ -23,7 +23,7 @@ export default function DSAAgreement() {
   // ==========================================
   // TOGGLE MAINTENANCE MODE HERE
   // ==========================================
-  const IS_MAINTENANCE_MODE = true; // Set to true to show maintenance page, false to show normal page
+  const IS_MAINTENANCE_MODE = false; // Set to true to show maintenance page, false to show normal page
   // ==========================================
 
   useEffect(() => {
@@ -78,38 +78,6 @@ export default function DSAAgreement() {
       setDownloadingId(null);
     }
   };
-
-  // const RazorpayPaymentButton = () => {
-  //   const containerRef = React.useRef<HTMLDivElement>(null);
-
-  //   useEffect(() => {
-  //     // 1. Clear any existing content inside the container to prevent duplicates
-  //     if (containerRef.current) {
-  //       containerRef.current.innerHTML = "";
-  //     }
-
-  //     const script = document.createElement("script");
-  //     script.src = process.env.NEXT_PUBLIC_RAZORPAY_URL || "";
-  //     script.dataset.payment_button_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-  //     script.async = true;
-
-  //     const form = document.createElement("form");
-  //     form.appendChild(script);
-
-  //     if (containerRef.current) {
-  //       containerRef.current.appendChild(form);
-  //     }
-
-  //     // 2. Cleanup function: removes the form when the component unmounts
-  //     return () => {
-  //       if (containerRef.current) {
-  //         containerRef.current.innerHTML = "";
-  //       }
-  //     };
-  //   }, []);
-
-  //   return <div ref={containerRef} className="w-full flex justify-center" />;
-  // };
 
   const handlePayment = async () => {
     setIsSubmitting(true);
@@ -258,7 +226,7 @@ export default function DSAAgreement() {
           </p>
 
           {/* --- ADD THIS BUTTON SECTION --- */}
-          <div className="flex flex-col items-center gap-4">
+          {/* <div className="flex flex-col items-center gap-4">
             <button
               onClick={handleDownload}
               disabled={downloadingId !== null}
@@ -272,7 +240,7 @@ export default function DSAAgreement() {
               {downloadingId ? "Preparing PDF..." : "Download Agreement Copy"}
             </button>
             <p className="text-xs text-gray-400 font-medium italic">Sign via the link sent to your email to activate partnership.</p>
-          </div>
+          </div> */}
           {/* ------------------------------ */}
 
         </div>
