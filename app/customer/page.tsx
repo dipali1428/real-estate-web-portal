@@ -23,7 +23,7 @@ interface CustomerProfile {
     category?: string;
     pan?: string;
     pan_verified?: boolean;
-    // Add other fields as per your API response
+
 }
 
 export default function CustomerDashboard() {

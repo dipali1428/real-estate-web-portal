@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   FileText,
@@ -18,6 +18,7 @@ import {
   Briefcase,
   CreditCard,
   User,
+  ChevronDown,
 } from "lucide-react";
 
 // ─── Plan Type Definitions ───
@@ -205,7 +206,7 @@ const NBFC_BANK_GROUP = [
 ];
 
 export function getPlansForBank(bankName: string): PlanInfo[] {
-  const basePlans = [TERM_LOAN, BALANCE_TRANSFER, TOP_UP];
+  let basePlans = [TERM_LOAN, BALANCE_TRANSFER, TOP_UP];
 
   if (FOUR_PLAN_BANKS.includes(bankName)) {
     basePlans.push(OVERDRAFT_FACILITY);
@@ -269,13 +270,13 @@ export default function PlanDetailDrawer({ plan, bankName, onClose, onApply }: P
         className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
       />
 
-      {/* Drawer */}
+      {/* Centered Modal */}
       <motion.div
-        initial={{ x: "100%" }}
-        animate={{ x: 0 }}
-        exit={{ x: "100%" }}
-        transition={{ type: "spring", damping: 30, stiffness: 300 }}
-        className="fixed right-0 top-0 bottom-0 w-full sm:w-[520px] bg-white z-50 shadow-2xl overflow-y-auto"
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] sm:w-[560px] max-h-[90vh] bg-white z-50 shadow-2xl rounded-[2.5rem] overflow-hidden flex flex-col"
       >
         {/* Header */}
         <div className="sticky top-0 bg-white z-10 border-b border-slate-100 p-6">
@@ -298,7 +299,7 @@ export default function PlanDetailDrawer({ plan, bankName, onClose, onApply }: P
           </div>
         </div>
 
-        <div className="p-6 space-y-8">
+        <div className="p-6 space-y-8 overflow-y-auto flex-1 custom-scrollbar">
 
           {/* Key Metrics Grid */}
           <div className="grid grid-cols-2 gap-3">

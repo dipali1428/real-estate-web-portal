@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   CheckCircle2,
+  Clock,
   FileText,
   IndianRupee,
   Calendar,
@@ -13,9 +14,11 @@ import {
   Download,
   CreditCard,
   Landmark,
+  AlertCircle,
   CheckCircle,
   Shield,
   RefreshCw,
+  Eye,
   ChevronDown,
   ChevronUp,
   TrendingUp,
@@ -151,13 +154,13 @@ export default function LoanTracker({ onClose }: LoanTrackerProps) {
         className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
       />
 
-      {/* Panel */}
+      {/* Centered Modal */}
       <motion.div
-        initial={{ x: "100%" }}
-        animate={{ x: 0 }}
-        exit={{ x: "100%" }}
-        transition={{ type: "spring", damping: 30, stiffness: 300 }}
-        className="fixed right-0 top-0 bottom-0 w-full sm:w-[600px] bg-slate-50 z-50 shadow-2xl overflow-y-auto"
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] sm:w-[600px] max-h-[90vh] bg-slate-50 z-50 shadow-2xl rounded-[2.5rem] overflow-hidden flex flex-col"
       >
         {/* Header */}
         <div className="sticky top-0 bg-white z-10 border-b border-slate-100 p-6">
@@ -180,7 +183,7 @@ export default function LoanTracker({ onClose }: LoanTrackerProps) {
           </div>
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
           {MOCK_APPLICATIONS.map((app) => {
             const isExpanded = expandedApp === app.id;
             const stepIndex = getStepIndex(app.status);

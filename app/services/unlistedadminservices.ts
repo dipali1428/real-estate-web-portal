@@ -315,7 +315,36 @@ export const AdminService = {
     });
     return response.data; // Returns { success, message, processed, skipped }
   },
+/**
+   * Upload properties (CSV)
+   * POST → /api/real-estate/upload-csv
+   */
+  uploadProperties: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
 
+    const response = await api.post(
+      "/api/unlisted/admin/real-estate",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return response.data;
+  },
+
+  updateRealEstate: async (id: number | string, data: any) => {
+    const response = await api.put(`/api/unlisted/admin/real-estate/${id}`, data);
+    return response.data;
+  },
+
+  deleteRealEstate: async (id: number | string) => {
+    const response = await api.delete(`/api/unlisted/admin/real-estate/${id}`);
+    return response.data;
+  },
   /**
    * Get all PMS Funds (Admin)
    * GET → /api/unlisted/admin/pms/funds
@@ -333,29 +362,39 @@ export const AdminService = {
     const response = await api.delete(`/api/unlisted/admin/pms/${id}`);
     return response.data;
   },
-
-  // Upload bonds data via CSV
+/**
+   * Upload bonds data via CSV
+   * POST → /api/admin/bonds/upload
+   * Body: form-data with file field
+   */
   uploadBonds: async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await api.post(`/api/admin/bonds/upload`, formData);
+
+    const response = await api.post("/api/unlisted/admin/bonds/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    
     return response.data;
   },
 
-  // Fetch all bonds
+ /**
+   * Fetch all bonds
+   * GET → /api/bonds/all
+   */
   getBonds: async () => {
-    const response = await api.get("/api/bonds/all");
+    const response = await api.get("/api/unlisted/admin/bonds/all");
     return response.data;
   },
-
-  deleteBond: async (id: number) => {
-    const response = await api.delete(`/api/admin/bonds/${id}`);
+  deleteBond: async (bond_id: number) => {
+    const response = await api.delete(`/api/unlisted/admin/bonds/delete/${bond_id}`);
     return response.data;
   },
-  
-  updateBond: async (id: number, data: any) => {
-    const response = await api.put(`/api/admin/bonds/${id}`, data);
+  updateBond: async (bond_id: number, data: any) => {
+    const response = await api.put(`/api/unlisted/admin/bonds/update/${bond_id}`, data);
     return response.data;
   },
 };
+
 

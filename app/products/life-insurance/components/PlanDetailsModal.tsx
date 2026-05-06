@@ -3,11 +3,12 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    X, CheckCircle2, ArrowRight,
-    Shield, Target, Award, Sparkles
+    X, CheckCircle2, Info, ArrowRight,
+    Shield, Target, Award, Sparkles,
+    Calendar, IndianRupee, Clock, ArrowUpRight
 } from "lucide-react";
 
-type Plan = {
+export type Plan = {
     id: number;
     name: string;
     insurer: string;
@@ -16,7 +17,7 @@ type Plan = {
     desc: string;
     features: string[];
     bestFor: string;
-    icon: React.ElementType;
+    icon: any;
     accentColor: string;
     badge: string;
     ctas?: string[];
@@ -26,9 +27,10 @@ type PlanDetailsModalProps = {
     plan: Plan | null;
     onClose: () => void;
     onGetQuote: (plan: Plan) => void;
+    isCustomer?: boolean;
 };
 
-export default function PlanDetailsModal({ plan, onClose, onGetQuote }: PlanDetailsModalProps) {
+export default function PlanDetailsModal({ plan, onClose, onGetQuote, isCustomer }: PlanDetailsModalProps) {
     useEffect(() => {
         if (plan) {
             document.body.style.overflow = "hidden";
@@ -164,7 +166,7 @@ export default function PlanDetailsModal({ plan, onClose, onGetQuote }: PlanDeta
                                 <div className="relative z-10">
                                     <h4 className="text-slate-800 font-black text-lg mb-2">Why choose {plan.insurer}?</h4>
                                     <p className="text-slate-500 text-xs font-medium leading-relaxed max-w-sm">
-                                        {plan.insurer} is among India&apos;s top life insurers with high Claim Settlement Ratio and digital-first support architecture.
+                                        {plan.insurer} is among India's top life insurers with high Claim Settlement Ratio and digital-first support architecture.
                                     </p>
                                     <div className="mt-6 flex items-center gap-6">
                                         <div className="flex flex-col">
@@ -191,14 +193,27 @@ export default function PlanDetailsModal({ plan, onClose, onGetQuote }: PlanDeta
                             </button>
                             <button
                                 onClick={() => {
-                                    onClose();
-                                    setTimeout(() => onGetQuote(plan), 300);
+                                    if (isCustomer) {
+                                        onGetQuote(plan);
+                                    } else {
+                                        onClose();
+                                        setTimeout(() => onGetQuote(plan), 300);
+                                    }
                                 }}
                                 className="font-sans flex-[1.5] py-4 px-8 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-white shadow-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-95"
                                 style={{ backgroundColor: plan.accentColor, boxShadow: `0 10px 30px ${plan.accentColor}40` }}
                             >
-                                Get Personalized Quote
-                                <ArrowRight className="w-4 h-4" />
+                                {isCustomer ? (
+                                    <>
+                                        Proceed to Digital Onboarding
+                                        <ArrowUpRight className="w-4 h-4" />
+                                    </>
+                                ) : (
+                                    <>
+                                        Get Personalized Quote
+                                        <ArrowRight className="w-4 h-4" />
+                                    </>
+                                )}
                             </button>
                         </div>
                     </motion.div>

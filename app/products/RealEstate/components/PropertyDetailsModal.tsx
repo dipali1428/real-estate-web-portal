@@ -1,16 +1,53 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { properties as staticProperties } from '../data/properties';
-import { MapPin, CheckCircle, Info, Shield, X, Share2, Download, Loader, Calculator, FileText } from 'lucide-react';
+import { realEstateAPI, RealEstateInvestment } from '../../../services/realestateAPI';
+import { MapPin, CheckCircle, Info, Layout, Shield, Dumbbell, Zap, Coffee, X, Share2, Download, Loader, Calculator, FileText } from 'lucide-react';
 import InvestmentCalculator, { calculateInvestmentData } from './InvestmentCalculator';
+import { properties as staticProperties } from '../data/properties';
 
 interface RealEstatePropertyDetailsModalProps {
     propertyId: string;
     onClose: () => void;
     onInvestNow: (propertyTitle: string) => void;
 }
+
+// Transform API property to match the expected format for Infographic
+const transformPropertyForInfographic = (property: RealEstateInvestment) => {
+    const minContribution = parseInt(property.min_investment) || 800000;
+    const totalValue = property.total_asset_value ? parseInt(property.total_asset_value) : minContribution * 10;
+    const area = property.total_area || 500;
+
+    return {
+        id: property.id,
+        title: property.project_name,
+        developer: property.developer_name,
+        type: property.project_type,
+        location: property.location,
+        price: totalValue,
+        min_contribution: minContribution,
+        yield_percentage: parseFloat(property.yield_percentage),
+        irr_percentage: property.irr_percentage ? parseFloat(property.irr_percentage) : parseFloat(property.yield_percentage) * 1.2,
+        holding_period: `${property.lockin_period_months || 12} MONTHS`,
+        area: area,
+        units: property.total_units || 1,
+        rera_reg_no: property.rera_id || 'RERA-Pending',
+        market_price: property.market_price ? parseInt(property.market_price) : totalValue * 1.8,
+        sanctions_obtained: property.sanctions ? 'YES' : 'PENDING',
+        litigations: property.litigations || 'NONE',
+        land_title: property.land_title || 'CLEAR',
+        other_due_diligence: property.due_diligence || 'CLEAR',
+        ownership_structure: property.ownership_structure || 'JOINT-OWNERSHIP THROUGH LLP',
+        trust_factor: property.trustee_name || 'Administered By MITCON CREDENTIA',
+        llp_name: property.llp_name || 'INFRA LLP',
+        completion_date: '30/06/2028',
+        map_url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3024.2219901290355!2d-74.00369368400567!3d40.71312937933085!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a316bb145f7%3A0x7d8c2b9b8c9b8c9b!2sNew%20York!5e0!3m2!1sen!2sus!4v1644262078186!5m2!1sen!2sus',
+        image: property.image_url || staticProperties.find(p => p.id === property.id)?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(property.project_name)}&size=800&background=2076C7&color=fff&bold=true`,
+        status: property.status === 'ACTIVE' ? 'live' : 'closed',
+        description: `${property.project_name} is a premium ${property.project_type} project located in ${property.location}. ${property.current_status || 'Well-positioned for high returns with RERA approval and clear titles.'}`
+    };
+};
 
 const PropertyInfographic = ({ property }: { property: any }) => {
     const calcData = calculateInvestmentData(
@@ -23,7 +60,6 @@ const PropertyInfographic = ({ property }: { property: any }) => {
     return (
         <div className="bg-white border-2 border-slate-200 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl w-full font-sans text-slate-800 mb-8 mx-auto">
             <div className="flex flex-col lg:flex-row">
-                {/* ... (points section unchanged) */}
                 {/* Left Side: Educational Points */}
                 <div className="w-full lg:w-[35%] bg-blue-50/30 p-6 sm:p-8 border-b-2 lg:border-b-0 lg:border-r-2 border-slate-100">
                     <div className="space-y-12">
@@ -87,25 +123,20 @@ const PropertyInfographic = ({ property }: { property: any }) => {
                             <h2 className="text-xl font-black text-blue-900 leading-none">{property.title?.split('-')[0].trim()}</h2>
                             <p className="text-[10px] font-bold tracking-widest text-slate-600 mt-1 uppercase">{property.location}</p>
                         </div>
-                        {/* <div className="ml-8">
-                             
-                            <div className="text-2xl font-black italic"><span className="text-blue-600">Quikr</span><span className="text-orange-500">PropX</span></div>
-                        </div> */}
                         <div className="ml-8">
                             <img src="/logo.png" alt="Infinity Arthvishwa" className="h-12 w-auto" />
                         </div>
                     </div>
 
                     <div className="flex flex-col sm:flex-row">
-
                         {/* Property Data Table */}
                         <div className="w-full p-2">
                             <div className="space-y-4 p-2">
                                 {[
                                     { label: 'NAME OF DEVELOPER', value: property.developer },
                                     { label: 'TYPE OF PROJECT', value: property.type?.toUpperCase().includes('PROJECT') ? property.type : (property.type || 'Residential') + ' PROJECT' },
-                                    { label: 'CURRENT STATUS', value: 'RCC & BRICK WORK COMPLETED, INTERNAL WORK GOING ON', highlight: true },
-                                    { label: 'RERA', value: 'YES' },
+                                    { label: 'CURRENT STATUS', value: property.current_status || 'RCC & BRICK WORK COMPLETED, INTERNAL WORK GOING ON', highlight: true },
+                                    { label: 'RERA', value: property.rera_reg_no === 'RERA-Pending' ? 'PENDING' : 'YES' },
                                     { label: 'SANCTIONS OBTAINED', value: property.sanctions_obtained || 'YES' },
                                     { label: 'LITIGATIONS', value: property.litigations || 'NONE' },
                                     { label: 'LAND TITLE', value: property.land_title || 'CLEAR' },
@@ -121,51 +152,135 @@ const PropertyInfographic = ({ property }: { property: any }) => {
                     </div>
 
                     {/* Financial Summary Table */}
-                        <div className="p-2 text-right">
-                            <div className="text-[11px] font-black underline text-blue-600 mb-2">Financial Summary</div>
-                            <div className="space-y-3 text-left">
-                                {[
-                                    { label: 'No. OF APARTMENTS ON OFFER', value: `${property.units || 1} APARTMENTS (COMBINED AREA ${property.area || 1000} SQ. FT.)` },
-                                    { label: 'MARKET PRICE (ALL INCL.)', value: `Rs. ${(property.market_price ? property.market_price / 10000000 : 1).toFixed(2)} CR. (Rs. ${(property.market_price && property.area ? Math.round(property.market_price / property.area) : 5500)} / SQ. FT.)` },
-                                    { label: 'DISCOUNTED PRICE (ALL INCL.)', value: `Rs. ${(property.price / 10000000).toFixed(2)} CR. (Rs. ${Math.round(property.price / (property.area || 1000))} / SQ. FT.)`, brand: true },
-                                    { label: 'BUY BACK DURATION', value: property.holding_period || '12 MONTHS' },
-                                    { label: 'BUY BACK PRICE (ALL INCL.)', value: `Rs. ${(calcData.buyBack / 10000000).toFixed(2)} CR. (Rs. ${Math.round(calcData.buyBack / (property.area || 1000))} / SQ. FT.)`, teal: true },
-                                    { label: 'MINIMUM CONTRIBUTION', value: `Rs. ${property.min_contribution?.toLocaleString('en-IN') || '8,00,000'}/-.\nYOU SHARE PROFITS PROPORTIONATE TO YOUR CONTRIBUTION`, blueText: true },
-                                    { label: 'OWNERSHIP STRUCTURE', value: property.ownership_structure || 'JOINT-OWNERSHIP THROUGH LLP' },
-                                    { label: 'TRUST FACTOR', value: property.trust_factor || 'Administered By MITCON CREDENTIA. Access All Due Diligence Documents Free.', highlightText: true },
-                                    { label: 'LLP Name', value: property.llp_name || 'REDEVPUNE 3 LLP' },
-                                ].map((row: any, i) => (
-                                    <div key={i} className={`border border-slate-200 rounded-lg overflow-hidden flex flex-col sm:flex-row text-[11px] ${row.brand ? 'border-[#2076C7]' : ''}`}>
-                                        <div className="p-2 font-black bg-slate-50 sm:border-r border-slate-200 sm:w-[35%] uppercase leading-tight">{row.label}</div>
-                                        <div className={`p-2 font-black grow ${row.brand ? 'bg-[#2076C7] text-white' : row.teal ? 'bg-teal-50 text-[#1CADA3]' : ''} whitespace-pre-line`}>
-                                            <span className={`${row.blueText ? 'text-[#2076C7]' : ''}`}>
-                                                {row.highlightText ? (
-                                                    <span className={`${row.brand ? 'text-white' : 'text-slate-700'}`}>All Payments Administered By A <span className="bg-blue-100 text-[#2076C7] px-1 rounded border border-blue-200">SEBI Registered</span> Debenture Trustee – <span className="bg-blue-100 text-[#2076C7] px-1 rounded border border-blue-200 font-black underline">MITCON CREDENTIA</span>.</span>
-                                                ) : row.value}
-                                            </span>
-                                        </div>
+                    <div className="p-2 text-right">
+                        <div className="text-[11px] font-black underline text-blue-600 mb-2">Financial Summary</div>
+                        <div className="space-y-3 text-left">
+                            {[
+                                { label: 'No. OF APARTMENTS ON OFFER', value: `${property.units || 1} APARTMENTS (COMBINED AREA ${property.area || 1000} SQ. FT.)` },
+                                { label: 'MARKET PRICE (ALL INCL.)', value: `Rs. ${(property.market_price ? property.market_price / 10000000 : 1).toFixed(2)} CR. (Rs. ${(property.market_price && property.area ? Math.round(property.market_price / property.area) : 5500)} / SQ. FT.)` },
+                                { label: 'DISCOUNTED PRICE (ALL INCL.)', value: `Rs. ${(property.price / 10000000).toFixed(2)} CR. (Rs. ${Math.round(property.price / (property.area || 1000))} / SQ. FT.)`, brand: true },
+                                { label: 'BUY BACK DURATION', value: property.holding_period || '12 MONTHS' },
+                                { label: 'BUY BACK PRICE (ALL INCL.)', value: `Rs. ${(calcData.buyBack / 10000000).toFixed(2)} CR. (Rs. ${Math.round(calcData.buyBack / (property.area || 1000))} / SQ. FT.)`, teal: true },
+                                { label: 'MINIMUM CONTRIBUTION', value: `Rs. ${property.min_contribution?.toLocaleString('en-IN') || '8,00,000'}/-.\nYOU SHARE PROFITS PROPORTIONATE TO YOUR CONTRIBUTION`, blueText: true },
+                                { label: 'OWNERSHIP STRUCTURE', value: property.ownership_structure || 'JOINT-OWNERSHIP THROUGH LLP' },
+                                { label: 'TRUST FACTOR', value: property.trust_factor || 'Administered By MITCON CREDENTIA. Access All Due Diligence Documents Free.', highlightText: true },
+                                { label: 'LLP Name', value: property.llp_name || 'REDEVPUNE 3 LLP' },
+                            ].map((row: any, i) => (
+                                <div key={i} className={`border border-slate-200 rounded-lg overflow-hidden flex flex-col sm:flex-row text-[11px] ${row.brand ? 'border-[#2076C7]' : ''}`}>
+                                    <div className="p-2 font-black bg-slate-50 sm:border-r border-slate-200 sm:w-[35%] uppercase leading-tight">{row.label}</div>
+                                    <div className={`p-2 font-black grow ${row.brand ? 'bg-[#2076C7] text-white' : row.teal ? 'bg-teal-50 text-[#1CADA3]' : ''} whitespace-pre-line`}>
+                                        <span className={`${row.blueText ? 'text-[#2076C7]' : ''}`}>
+                                            {row.highlightText ? (
+                                                <span className={`${row.brand ? 'text-white' : 'text-slate-700'}`}>All Payments Administered By A <span className="bg-blue-100 text-[#2076C7] px-1 rounded border border-blue-200">SEBI Registered</span> Debenture Trustee – <span className="bg-blue-100 text-[#2076C7] px-1 rounded border border-blue-200 font-black underline">MITCON CREDENTIA</span>.</span>
+                                            ) : row.value}
+                                        </span>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-
 const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: RealEstatePropertyDetailsModalProps) => {
     const router = useRouter();
-    // Find property directly from static data
-    const property = useMemo(() => {
-        return staticProperties.find(p => String(p.id) === String(propertyId));
+    const [property, setProperty] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Fetch property from API or fallback to static data
+    useEffect(() => {
+        const fetchProperty = async () => {
+            if (!propertyId) return;
+            try {
+                setLoading(true);
+                setError(null);
+                
+                const parsedId = parseInt(propertyId);
+                const staticProp = staticProperties.find(p => p.id === parsedId);
+
+                let transformedProperty;
+                try {
+                    // ✅ Updated to use getPropertyById instead of getInvestmentById
+                    const response = await realEstateAPI.getPropertyById(parsedId);
+                    if (response.data && response.data.project_name) {
+                        transformedProperty = transformPropertyForInfographic(response.data);
+                    } else {
+                        throw new Error("Empty API data");
+                    }
+                } catch (apiError) {
+                    // Fallback to static property entirely if API fails or is empty
+                    if (staticProp) {
+                        transformedProperty = {
+                            id: staticProp.id,
+                            title: staticProp.title,
+                            developer: staticProp.developer,
+                            type: staticProp.type,
+                            location: staticProp.location,
+                            price: staticProp.price,
+                            min_contribution: staticProp.min_contribution,
+                            yield_percentage: staticProp.yield_percentage,
+                            irr_percentage: staticProp.irr_percentage,
+                            holding_period: staticProp.holding_period,
+                            area: staticProp.area,
+                            units: staticProp.units,
+                            rera_reg_no: staticProp.rera_reg_no,
+                            market_price: staticProp.market_price || staticProp.price * 1.8,
+                            sanctions_obtained: staticProp.sanctions_obtained || 'PENDING',
+                            litigations: staticProp.litigations || 'NONE',
+                            land_title: staticProp.land_title || 'CLEAR',
+                            other_due_diligence: staticProp.other_due_diligence || 'CLEAR',
+                            ownership_structure: staticProp.ownership_structure || 'JOINT-OWNERSHIP THROUGH LLP',
+                            trust_factor: staticProp.trust_factor || 'Administered By MITCON CREDENTIA',
+                            llp_name: staticProp.llp_name || 'INFRA LLP',
+                            completion_date: staticProp.completion_date || '30/06/2028',
+                            map_url: staticProp.map_url || '',
+                            image: staticProp.image,
+                            status: staticProp.status,
+                            description: staticProp.description
+                        };
+                    } else {
+                        throw new Error("Property not found in API or static data");
+                    }
+                }
+                
+                setProperty(transformedProperty);
+            } catch (err) {
+                setError('Failed to load property details');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProperty();
     }, [propertyId]);
 
-    const loading = false; // Static data is always loaded
-
-    const handleDownloadGuide = () => {
+    const handleDownloadGuide = async () => {
         if (!property) return;
+        
+        let finalImageSrc = '';
+        if (property.image?.startsWith('http')) {
+            try {
+                // Fetch via robust CORS proxy and convert to base64 immediately
+                const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(property.image)}`);
+                if (res.ok) {
+                    const blob = await res.blob();
+                    finalImageSrc = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result as string);
+                        reader.readAsDataURL(blob);
+                    });
+                }
+            } catch (err) {
+            }
+        }
+        
+        if (!finalImageSrc) {
+            finalImageSrc = property.image?.startsWith('http') ? property.image : window.location.origin + property.image;
+        }
+
         const printWindow = window.open('', '_blank');
         if (!printWindow) return;
 
@@ -321,7 +436,7 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                     <div id="brochure-content">
                         <div class="header">
                             <div class="brand-logo">
-                                <span class="brand-quikr">INFINITY</span> ARTHVISHWA
+                                <img src="${window.location.origin}/logo.png" alt="Infinity Arthvishwa" style="height: 48px; object-fit: contain;" crossorigin="anonymous" />
                             </div>
                             <div class="report-meta">
                                 Institutional Grade Investment Summary<br>
@@ -334,7 +449,7 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                         <div class="property-id">Asset Node: ${property.llp_name || 'REDEVPUNE 3'}</div>
 
                         <div class="asset-card">
-                            <img src="${window.location.origin}${property.image}" class="asset-image" />
+                            <img src="${finalImageSrc}" class="asset-image" crossorigin="anonymous" />
                             <div class="data-grid">
                                 <div class="data-item">
                                     <div class="data-label">Developer</div>
@@ -419,9 +534,35 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                             };
                             
-                            setTimeout(() => {
+                            function generatePDF() {
                                 html2pdf().set(opt).from(element).save();
-                            }, 500);
+                            }
+
+                            // Wait for all images to fully load before capturing
+                            const images = Array.from(document.images);
+                            let loadedCount = 0;
+                            
+                            if (images.length === 0) {
+                                generatePDF();
+                            } else {
+                                images.forEach((img) => {
+                                    if (img.complete) {
+                                        loadedCount++;
+                                        if (loadedCount === images.length) generatePDF();
+                                    } else {
+                                        img.addEventListener('load', () => {
+                                            loadedCount++;
+                                            if (loadedCount === images.length) generatePDF();
+                                        });
+                                        img.addEventListener('error', () => {
+                                            loadedCount++;
+                                            if (loadedCount === images.length) generatePDF();
+                                        });
+                                    }
+                                });
+                                // Fallback timeout in case images hang
+                                setTimeout(generatePDF, 5000);
+                            }
                         }
                     </script>
                 </body>
@@ -449,9 +590,9 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                     <div className="min-h-[600px] flex items-center justify-center">
                         <Loader className="animate-spin text-blue-600" size={40} />
                     </div>
-                ) : !property ? (
+                ) : error || !property ? (
                     <div className="min-h-[400px] flex items-center justify-center text-slate-500">
-                        Property not found.
+                        {error || 'Property not found.'}
                     </div>
                 ) : (
                     <div className="pb-12">
@@ -478,7 +619,7 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                                 </div>
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                     <div className="flex gap-3">
-                                        <button 
+                                        <button
                                             onClick={() => document.getElementById('investment-calculator')?.scrollIntoView({ behavior: 'smooth' })}
                                             className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black text-xs uppercase tracking-widest hover:shadow-lg transition-all flex items-center gap-2 group"
                                         >
@@ -561,7 +702,7 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                                                     className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 font-bold text-slate-800"
                                                 />
                                             </div>
-                                            <button 
+                                            <button
                                                 onClick={() => onInvestNow(property.title || 'Fractional Real Estate')}
                                                 className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white w-full py-4 rounded-xl text-lg uppercase tracking-tight shadow-md hover:shadow-lg transition-all flex items-center justify-center font-bold"
                                             >

@@ -9,11 +9,15 @@ import{
   X,
   Zap,
   Loader2,
+  Database,
+  Download,
   CheckCircle,
   AlertCircle,
   RefreshCw,
   Search,
+  Hash,
   Layers3,
+  IndianRupee,
   Clock,
   Briefcase,
   Pencil,
@@ -48,12 +52,8 @@ const BondsAdmin: React.FC = () => {
       } else {
         setBonds([]);
       }
-    } catch (error: any) {
-      setToast({ 
-        message: `Failed to load bonds: ${error.message || 'Server Error'}`, 
-        type: 'error' 
-      });
-      setTimeout(() => setToast(null), 4000); // Clear toast after 4s
+    } catch (error) {
+      console.error('Error fetching bonds:', error);
       setBonds([]);
     } finally {
       setLoading(false);
@@ -118,7 +118,6 @@ const BondsAdmin: React.FC = () => {
       fetchBonds();
     } catch (error) {
       setToast({ message: 'Failed to delete bond', type: 'error' });
-      setTimeout(() => setToast(null), 4000); 
     }
   };
 
@@ -137,7 +136,6 @@ const BondsAdmin: React.FC = () => {
       fetchBonds();
     } catch (error) {
       setToast({ message: 'Failed to update bond', type: 'error' });
-      setTimeout(() => setToast(null), 4000);
     }
   };
 
@@ -468,66 +466,73 @@ const BondsAdmin: React.FC = () => {
 
               <div className="p-8 overflow-y-auto grid grid-cols-2 gap-6">
                 <div className="col-span-2">
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1.5 block tracking-widest">Company Name</label>
+                  <label className="text-[10px] font-black uppercase text-gray-600 mb-1.5 block tracking-widest font-sans">Company Name</label>
                   <input 
                     type="text" 
                     value={editingBond.company} 
                     onChange={e => setEditingBond({...editingBond, company: e.target.value})}
-                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-sm focus:border-[#2076C7] outline-none transition-all"
+                    placeholder="Enter company name"
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl font-sans font-bold text-sm text-gray-900 placeholder:text-gray-500 focus:border-[#2076C7] outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1.5 block tracking-widest">Category</label>
+                  <label className="text-[10px] font-black uppercase text-gray-600 mb-1.5 block tracking-widest font-sans">Category</label>
                   <input 
                     type="text" 
                     value={editingBond.category} 
                     onChange={e => setEditingBond({...editingBond, category: e.target.value})}
-                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-sm focus:border-[#2076C7] outline-none transition-all"
+                    placeholder="Enter category"
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl font-sans font-bold text-sm text-gray-900 placeholder:text-gray-500 focus:border-[#2076C7] outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1.5 block tracking-widest">ISIN</label>
+                  <label className="text-[10px] font-black uppercase text-gray-600 mb-1.5 block tracking-widest font-sans">ISIN</label>
                   <input 
                     type="text" 
                     value={editingBond.isin || ''} 
                     onChange={e => setEditingBond({...editingBond, isin: e.target.value})}
-                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-sm focus:border-[#2076C7] outline-none transition-all"
+                    placeholder="Enter ISIN"
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl font-sans font-bold text-sm text-gray-900 placeholder:text-gray-500 focus:border-[#2076C7] outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1.5 block tracking-widest">Yield</label>
+                  <label className="text-[10px] font-black uppercase text-gray-600 mb-1.5 block tracking-widest font-sans">Yield</label>
                   <input 
                     type="text" 
                     value={editingBond.yield || ''} 
                     onChange={e => setEditingBond({...editingBond, yield: e.target.value})}
-                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-sm focus:border-[#2076C7] outline-none transition-all text-[#1CADA3]"
+                    placeholder="e.g. 9.2%"
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl font-sans font-bold text-sm text-emerald-600 placeholder:text-gray-500 focus:border-[#2076C7] outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1.5 block tracking-widest">Coupon</label>
+                  <label className="text-[10px] font-black uppercase text-gray-600 mb-1.5 block tracking-widest font-sans">Coupon</label>
                   <input 
                     type="text" 
                     value={editingBond.coupon || ''} 
                     onChange={e => setEditingBond({...editingBond, coupon: e.target.value})}
-                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-sm focus:border-[#2076C7] outline-none transition-all text-[#2076C7]"
+                    placeholder="e.g. 9.5%"
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl font-sans font-bold text-sm text-blue-600 placeholder:text-gray-500 focus:border-[#2076C7] outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1.5 block tracking-widest">Min Investment</label>
+                  <label className="text-[10px] font-black uppercase text-gray-600 mb-1.5 block tracking-widest font-sans">Min Investment</label>
                   <input 
                     type="text" 
                     value={editingBond.minInvestment || ''} 
                     onChange={e => setEditingBond({...editingBond, minInvestment: e.target.value})}
-                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-sm focus:border-[#2076C7] outline-none transition-all"
+                    placeholder="e.g. ₹1,00,000"
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl font-sans font-bold text-sm text-gray-900 placeholder:text-gray-500 focus:border-[#2076C7] outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase text-gray-400 mb-1.5 block tracking-widest">Rating</label>
+                  <label className="text-[10px] font-black uppercase text-gray-600 mb-1.5 block tracking-widest font-sans">Rating</label>
                   <input 
                     type="text" 
                     value={editingBond.rating || ''} 
                     onChange={e => setEditingBond({...editingBond, rating: e.target.value})}
-                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-sm focus:border-[#2076C7] outline-none transition-all"
+                    placeholder="e.g. AAA"
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl font-sans font-bold text-sm text-gray-900 placeholder:text-gray-500 focus:border-[#2076C7] outline-none transition-all"
                   />
                 </div>
               </div>

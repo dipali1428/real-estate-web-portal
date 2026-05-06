@@ -130,6 +130,7 @@ export interface AddToWishlistParams {
     product_name: string;
     nav?: string | number;
     risk?: string;
+    product_data?: any;
 }
 
 export interface WishlistItem {
@@ -356,6 +357,7 @@ const CustomerService = {
             product_type: wishlistData.product_type,
             product_id: wishlistData.product_id,
             product_name: wishlistData.product_name,
+            product_data: wishlistData.product_data,
             nav: wishlistData.nav,
             risk: wishlistData.risk
         });
@@ -522,12 +524,14 @@ const CustomerService = {
         const response = await api.get("/api/products/investments/pms-funds/funds");
         return response.data;
     },
-
-    // ==================== AUTH HELPERS ====================
-    isAuthenticated: () => typeof window !== 'undefined' && !!localStorage.getItem('token'),
-    getToken: () => typeof window !== 'undefined' ? localStorage.getItem('token') : null,
-    setToken: (token: string) => typeof window !== 'undefined' && localStorage.setItem('token', token),
-    clearToken: () => typeof window !== 'undefined' && localStorage.removeItem('token'),
+isAuthenticated: async (): Promise<boolean> => {
+  try {
+    const res = await api.get("/api/dashboard/profile");
+    return res.data?.success === true;
+  } catch {
+    return false;
+  }
+},
 };
 
 export default CustomerService;

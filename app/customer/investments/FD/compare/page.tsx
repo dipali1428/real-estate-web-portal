@@ -1,12 +1,25 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, CheckCircle2, X, Landmark, Database, Star } from 'lucide-react';
-import { bankData, Bank } from '../../../../products/FD/data/mockData';
+import { ChevronDown, CheckCircle2, X, Landmark, Database, Star, CheckCircle } from 'lucide-react';
+
 import { useRouter } from 'next/navigation';
+import api from '@/app/services/api';
+// import { DashboardService } from '@/app/services/dashboardService';
+
+type Bank = {
+  company_name: string;
+  category: string;
+  one_year_rate: number;
+  two_year_rate: number;
+  three_year_rate: number;
+  five_year_rate: number;
+  best_rate: number;
+  senior_citizen_rate: number;
+  special_offer?: string;
+};
 
 // ==================== HELPER FUNCTIONS ====================
-
 const getTokenFromCookie = (): string | null => {
   if (typeof document === 'undefined') return null;
   const cookies = document.cookie.split('; ');
@@ -18,12 +31,29 @@ const getTokenFromCookie = (): string | null => {
 
 export default function CompareFDPage() {
   const router = useRouter();
-  const [activeTenure, setActiveTenure] = useState<keyof Bank['tenures']>('medium');
+  const [banks, setBanks] = useState<Bank[]>([]);
+  type TenureType = "short" | "medium" | "long" | "mega";
+
+  const [activeTenure, setActiveTenure] =
+    useState<TenureType>("medium");
+
+  const getRate = (bank: Bank): number => {
+    switch (activeTenure) {
+      case 'short': return bank.one_year_rate || 0;
+      case 'medium': return bank.two_year_rate || 0;
+      case 'long': return bank.three_year_rate || 0;
+      case 'mega': return bank.five_year_rate || 0;
+      default: return bank.two_year_rate || 0;
+    }
+  };
+
   const [selectedBanks, setSelectedBanks] = useState<(Bank | null)[]>([null, null, null]);
   const [investmentAmount, setInvestmentAmount] = useState<number>(100000);
   const [isAuthed, setIsAuthed] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  // const [isFormOpen, setIsFormOpen] = useState(false);
+  // const [selectedBankName, setSelectedBankName] = useState<string>("");
 
   // Auth check
   useEffect(() => {
@@ -48,7 +78,20 @@ export default function CompareFDPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const allBanks = bankData.flatMap(cat => cat.banks);
+  useEffect(() => {
+    const loadBanks = async () => {
+      try {
+        const res = await api.get("/api/products/investments/fd/plans");
+        setBanks(res.data.data || []);
+      } catch (error) {
+       
+      }
+    };
+
+    loadBanks();
+  }, []);
+
+  const allBanks = banks;
 
   const handleSelectBank = (index: number, bank: Bank | null) => {
     setSelectedBanks(prev => {
@@ -59,31 +102,33 @@ export default function CompareFDPage() {
     setOpenDropdownIndex(null);
   };
 
+  // const handleApply = (bankName: string) => {
+  //   // Action disabled as per user request
+  // };
+
   const selectedBanksCount = selectedBanks.filter(b => b !== null).length;
 
   // Calculate Maturity Details for comparison
-  const calculateFD = (rateStr: string, tenureKey: keyof Bank['tenures']) => {
-    if (!rateStr || rateStr === '-') return { maturity: '-', earned: '-' };
-    const rate = parseFloat(rateStr.replace('%', ''));
-    if (isNaN(rate)) return { maturity: '-', earned: '-' };
+  const calculateFD = (bank: Bank) => {
+    const rate = getRate(bank);
 
     let years = 1;
-    if (tenureKey === 'short') years = 0.5; // < 1 Year
-    if (tenureKey === 'medium') years = 2; // 1 - 3 Years
-    if (tenureKey === 'long') years = 4; // 3 - 5 Years
-    if (tenureKey === 'mega') years = 6; // 5+ Years
+    if (activeTenure === "short") years = 0.5;
+    if (activeTenure === "medium") years = 2;
+    if (activeTenure === "long") years = 4;
+    if (activeTenure === "mega") years = 6;
 
     const principal = investmentAmount;
-    const maturityAmount = principal * Math.pow((1 + (rate / 100) / 4), 4 * years);
+    const maturityAmount = principal * Math.pow(1 + rate / 100 / 4, 4 * years);
     const interestEarned = maturityAmount - principal;
 
     return {
-      maturity: `₹${Math.round(maturityAmount).toLocaleString('en-IN')}`,
-      earned: `₹${Math.round(interestEarned).toLocaleString('en-IN')}`
+      maturity: `₹${Math.round(maturityAmount).toLocaleString("en-IN")}`,
+      earned: `₹${Math.round(interestEarned).toLocaleString("en-IN")}`
     };
   };
 
-  const tenureBuckets: { id: keyof Bank['tenures']; label: string }[] = [
+  const tenureBuckets: { id: TenureType; label: string }[] = [
     { id: 'short', label: '< 1 Year' },
     { id: 'medium', label: '1 - 3 Years' },
     { id: 'long', label: '3 - 5 Years' },
@@ -108,9 +153,9 @@ export default function CompareFDPage() {
 
   return (
     <div className="w-full font-sans">
-      <div className="w-full bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden flex flex-col">
+      <div className="w-full bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden flex flex-col relative">
         {/* Filter Bar */}
-        <div className="px-6 md:px-10 py-6 bg-white flex flex-col items-center gap-6 border-b border-gray-50">
+        <div className="px-4 md:px-10 py-6 bg-white flex flex-col items-center gap-6 border-b border-gray-50">
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-sm md:text-base text-gray-600 font-medium">
             <div className="flex items-center gap-3">
               <span className="text-gray-400">Investment:</span>
@@ -133,7 +178,7 @@ export default function CompareFDPage() {
               <div className="relative">
                 <select
                   value={activeTenure}
-                  onChange={(e) => setActiveTenure(e.target.value as keyof Bank['tenures'])}
+                  onChange={(e) => setActiveTenure(e.target.value as TenureType)}
                   className="appearance-none bg-gray-50 border border-gray-100 rounded-lg pl-3 pr-10 py-1.5 font-bold text-[#1CADA3] outline-none cursor-pointer focus:ring-2 focus:ring-[#1CADA3]/20 transition-all"
                 >
                   {tenureBuckets.map((t) => (
@@ -145,22 +190,27 @@ export default function CompareFDPage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="hidden lg:flex items-center justify-center text-gray-300">
+              <div className="h-px w-8 bg-gray-100"></div>
+              <span className="text-[10px] font-bold uppercase tracking-widest px-3">Compare Plans</span>
+              <div className="h-px w-8 bg-gray-100"></div>
+            </div>
             {[0, 1, 2].map((idx) => (
               <div key={idx} className="relative" ref={idx === openDropdownIndex ? dropdownRef : null}>
                 <button
                   onClick={() => setOpenDropdownIndex(openDropdownIndex === idx ? null : idx)}
-                  className={`w-44 md:w-52 flex items-center justify-between px-4 py-2.5 rounded-xl transition-all shadow-sm border ${selectedBanks[idx] ? 'bg-white border-[#2076C7] text-[#2076C7] font-bold' : 'bg-gray-50 border-gray-200 text-gray-400 font-medium hover:border-gray-300'}`}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all shadow-sm border ${selectedBanks[idx] ? 'bg-white border-[#2076C7] text-[#2076C7] font-bold' : 'bg-gray-50 border-gray-200 text-gray-400 font-medium hover:border-gray-300'}`}
                 >
                   <div className="flex items-center gap-2 overflow-hidden">
                     <Landmark size={14} className="shrink-0" />
-                    <span className="truncate text-sm">{selectedBanks[idx]?.name || `Select Bank ${idx + 1}`}</span>
+                    <span className="truncate text-sm">{selectedBanks[idx]?.company_name || `Select Bank ${idx + 1}`}</span>
                   </div>
                   <ChevronDown size={14} className={`shrink-0 transition-transform ${openDropdownIndex === idx ? 'rotate-180' : ''}`} />
                 </button>
 
                 {openDropdownIndex === idx && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 max-h-80 overflow-y-auto py-2">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 max-h-80 overflow-y-auto py-2">
                     <button
                       onClick={() => handleSelectBank(idx, null)}
                       className="w-full px-4 py-3 flex items-center gap-2 hover:bg-red-50 text-red-500 transition-colors border-b border-gray-50 mb-1"
@@ -169,16 +219,16 @@ export default function CompareFDPage() {
                       <span className="font-bold text-xs uppercase tracking-wider">Clear Slot</span>
                     </button>
                     {allBanks.map((bank, i) => {
-                      const isSelectedSomewhere = selectedBanks.some(b => b?.name === bank.name);
+                      const isSelectedSomewhere = selectedBanks.some(b => b?.company_name === bank.company_name);
                       return (
                         <button
                           key={i}
                           onClick={() => handleSelectBank(idx, bank)}
-                          disabled={isSelectedSomewhere && selectedBanks[idx]?.name !== bank.name}
-                          className={`w-full px-4 py-2.5 flex items-center justify-between hover:bg-gray-50 transition-colors text-left ${selectedBanks[idx]?.name === bank.name ? 'bg-blue-50/50 text-[#2076C7]' : isSelectedSomewhere ? 'opacity-50 cursor-not-allowed' : 'text-gray-700'}`}
+                          disabled={isSelectedSomewhere && selectedBanks[idx]?.company_name !== bank.company_name}
+                          className={`w-full px-4 py-2.5 flex items-center justify-between hover:bg-gray-50 transition-colors text-left ${selectedBanks[idx]?.company_name === bank.company_name ? 'bg-blue-50/50 text-[#2076C7]' : isSelectedSomewhere ? 'opacity-50 cursor-not-allowed' : 'text-gray-700'}`}
                         >
-                          <span className="font-bold text-xs">{bank.name}</span>
-                          {selectedBanks[idx]?.name === bank.name && <CheckCircle2 size={14} className="text-[#2076C7]" />}
+                          <span className="font-bold text-xs">{bank.company_name}</span>
+                          {selectedBanks[idx]?.company_name === bank.company_name && <CheckCircle2 size={14} className="text-[#2076C7]" />}
                         </button>
                       );
                     })}
@@ -200,16 +250,15 @@ export default function CompareFDPage() {
               <p className="text-xs text-gray-500 max-w-xs mx-auto">Select banks from the dropdowns above to compare FD rates side by side.</p>
             </div>
           ) : (
-            <div className="min-w-[800px]">
-              <table className="w-full border-separate border-spacing-0">
+            <div className="min-w-[800px] w-full">
+              <table className="w-full border-separate border-spacing-0 table-fixed">
                 <thead>
                   <tr>
                     <th className="p-4 text-left text-gray-400 font-bold uppercase text-[10px] tracking-widest w-1/4 border-b border-gray-100">Institution</th>
                     {selectedBanks.map((bank, i) => (
                       <th
                         key={i}
-                        className={`p-4 text-center border-b border-gray-100 relative group ${i !== selectedBanks.length - 1 ? 'border-r' : ''}`}
-                        style={{ width: '25%' }}
+                        className={`p-4 text-center border-b border-gray-100 relative group w-1/4 ${i !== selectedBanks.length - 1 ? 'border-r' : ''}`}
                       >
                         {bank ? (
                           <>
@@ -219,7 +268,7 @@ export default function CompareFDPage() {
                             >
                               <X size={10} />
                             </button>
-                            <h4 className="text-base font-extrabold text-[#1CADA3] tracking-tight">{bank.name}</h4>
+                            <h4 className="text-base font-extrabold text-[#1CADA3] tracking-tight">{bank.company_name}</h4>
                           </>
                         ) : (
                           <div className="flex flex-col items-center gap-1 opacity-20">
@@ -237,7 +286,7 @@ export default function CompareFDPage() {
                     <td className="p-4 text-[10px] text-gray-400 font-bold border-r border-gray-50 uppercase tracking-widest">Interest Rate</td>
                     {selectedBanks.map((bank, i) => (
                       <td key={i} className={`p-4 text-center font-extrabold text-lg text-slate-700 ${i !== selectedBanks.length - 1 ? 'border-r border-gray-50' : ''}`}>
-                        {bank?.tenures?.[activeTenure]?.rate || '-'}
+                        {bank ? getRate(bank) + "%" : "-"}
                       </td>
                     ))}
                   </tr>
@@ -246,10 +295,10 @@ export default function CompareFDPage() {
                     <td className="p-4 text-[10px] text-gray-400 font-bold border-r border-gray-50 uppercase tracking-widest">Special Bonus</td>
                     {selectedBanks.map((bank, i) => (
                       <td key={i} className={`p-4 text-center ${i !== selectedBanks.length - 1 ? 'border-r border-gray-50' : ''}`}>
-                        {bank?.specialRate ? (
+                        {bank?.special_offer ? (
                           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-amber-50 text-amber-700 text-[10px] font-bold border border-amber-100 shadow-sm">
                             <Star size={10} className="fill-amber-400 text-amber-400" />
-                            {bank.specialRate}
+                            {bank.special_offer}
                           </span>
                         ) : (
                           <span className="text-gray-300">—</span>
@@ -261,7 +310,7 @@ export default function CompareFDPage() {
                   <tr>
                     <td className="p-4 text-[10px] text-gray-400 font-bold border-r border-gray-50 uppercase tracking-widest">Maturity*</td>
                     {selectedBanks.map((bank, i) => {
-                      const calc = bank ? calculateFD(bank.tenures?.[activeTenure]?.rate || '', activeTenure) : { maturity: '-', earned: '-' };
+                      const calc = bank ? calculateFD(bank) : { maturity: '-', earned: '-' };
                       return (
                         <td key={i} className={`p-4 text-center ${i !== selectedBanks.length - 1 ? 'border-r border-gray-50' : ''}`}>
                           <span className={`inline-block font-extrabold px-5 py-2 rounded-xl text-sm shadow-sm ${bank ? 'bg-[#E6F7F6] text-[#1CADA3]' : 'bg-gray-50 text-gray-200 shadow-none'}`}>
@@ -275,7 +324,7 @@ export default function CompareFDPage() {
                   <tr>
                     <td className="p-4 text-[10px] text-gray-400 font-bold border-r border-gray-50 uppercase tracking-widest">Gain*</td>
                     {selectedBanks.map((bank, i) => {
-                      const calc = bank ? calculateFD(bank.tenures?.[activeTenure]?.rate || '', activeTenure) : { maturity: '-', earned: '-' };
+                      const calc = bank ? calculateFD(bank) : { maturity: '-', earned: '-' };
                       return (
                         <td key={i} className={`p-4 text-center ${i !== selectedBanks.length - 1 ? 'border-r border-gray-50' : ''}`}>
                           <span className={`inline-block font-extrabold px-5 py-2 rounded-xl text-sm shadow-sm ${bank ? 'bg-[#E6F7F6] text-[#1CADA3]' : 'bg-gray-50 text-gray-200 shadow-none'}`}>
@@ -290,7 +339,7 @@ export default function CompareFDPage() {
                     <td className="p-4 text-[10px] text-gray-400 font-bold border-r border-gray-50 uppercase tracking-widest">Sr. Citizen</td>
                     {selectedBanks.map((bank, i) => (
                       <td key={i} className={`p-4 text-center font-extrabold text-lg text-slate-700 ${i !== selectedBanks.length - 1 ? 'border-r border-gray-50' : ''}`}>
-                        {bank?.tenures?.[activeTenure]?.senior || '-'}
+                        {bank ? bank.senior_citizen_rate + "%" : "-"}
                       </td>
                     ))}
                   </tr>
@@ -298,7 +347,7 @@ export default function CompareFDPage() {
                   <tr>
                     <td className="p-4 text-[10px] text-gray-400 font-bold border-r border-gray-50 uppercase tracking-widest">Payout</td>
                     {selectedBanks.map((bank, i) => {
-                      const isNBFC = bank ? bankData.find(c => c.category === "NBFCs")?.banks.some(b => b.name === bank.name) : false;
+                      const isNBFC = bank?.category === "NBFC" || bank?.category === "NBFCs";
                       return (
                         <td key={i} className={`p-4 text-center font-bold text-xs text-slate-500 ${i !== selectedBanks.length - 1 ? 'border-r border-gray-50' : ''}`}>
                           {bank ? (isNBFC ? 'Monthly' : 'Quarterly') : '-'}
@@ -310,7 +359,7 @@ export default function CompareFDPage() {
                   <tr>
                     <td className="p-4 text-[10px] text-gray-400 font-bold border-r border-gray-50 uppercase tracking-widest">A/c Required</td>
                     {selectedBanks.map((bank, i) => {
-                      const isNBFC = bank ? bankData.find(c => c.category === "NBFCs")?.banks.some(b => b.name === bank.name) : false;
+                      const isNBFC = bank?.category === "NBFC" || bank?.category === "NBFCs";
                       return (
                         <td key={i} className={`p-4 text-center font-bold text-sm text-slate-500 ${i !== selectedBanks.length - 1 ? 'border-r border-gray-50' : ''}`}>
                           {bank ? (isNBFC ? 'No' : 'Savings') : '-'}
@@ -326,7 +375,7 @@ export default function CompareFDPage() {
                         {bank && (
                           <div className="flex justify-center">
                             <button
-                              className="w-[140px] py-3 rounded-xl text-white text-xs font-bold tracking-wide transition-all hover:scale-105 active:scale-95 shadow-lg flex items-center justify-center gap-2"
+                              className="w-[140px] py-3 rounded-xl text-white text-xs font-bold tracking-wide transition-all hover:scale-105 active:scale-95 shadow-lg flex items-center justify-center gap-2 cursor-default"
                               style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
                             >
                               Apply Now
@@ -347,6 +396,11 @@ export default function CompareFDPage() {
           )}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fadeIn { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
+        .animate-fadeIn { animation: fadeIn 0.25s ease; }
+      `}</style>
     </div>
   );
 }

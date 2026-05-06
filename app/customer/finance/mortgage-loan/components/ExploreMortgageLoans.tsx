@@ -250,7 +250,7 @@ export default function ExploreMortgageLoans({ activeTab, setActiveTab }: { acti
             </p>
           </div>
 
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          {/* <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
               <Clock size={16} className="text-amber-600" />
               Last Updated
@@ -258,7 +258,7 @@ export default function ExploreMortgageLoans({ activeTab, setActiveTab }: { acti
             <p className="text-lg font-bold text-gray-900">
               {lastUpdated || 'Just now'}
             </p>
-          </div>
+          </div> */}
         </div>
 
         {/* Filter Panel */}
@@ -388,7 +388,7 @@ export default function ExploreMortgageLoans({ activeTab, setActiveTab }: { acti
                   {/* Action */}
                   <div className="mt-auto">
                     <button className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl text-sm font-bold shadow-sm hover:opacity-95 active:scale-95 transition-all flex items-center justify-center gap-2">
-                      Buy Now
+                      Apply Now
                     </button>
                   </div>
                 </motion.div>
