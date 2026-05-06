@@ -7,6 +7,7 @@ interface LoginPayload {
 
 interface RegisterPayload {
     entity_type: string;
+    firm_type: string;
     name: string;
     email: string;
     mobile: string;
@@ -125,5 +126,14 @@ export const AuthService = {
         return response.data;
     },
 
-
+    // 🔹 Register FCM Token for notifications
+    // Frontend implementation remaining
+    registerFcmToken: async (fcmToken: string, platform: string) => {
+        // Backend expects { fcmToken: string, platform: string }
+        const response = await api.post("/api/notifications/register-token", { 
+            fcmToken, 
+            platform 
+        });
+        return response.data;
+    },
 };

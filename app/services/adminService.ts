@@ -426,6 +426,39 @@ export const AdminService = {
   deletePayoutGrid: async (id: string) => {
     const response = await api.delete(`/api/admin/payout-grid/${id}`);
     return response.data;
-},
+  },
+
+  // 🔹 GET ALL
+  getBranches: async () => {
+    const response = await api.get("/api/admin/branches");
+    return response.data;
+  },
+
+  // 🔹 GET ONE
+  getBranchById: async (id: number) => {
+    const response = await api.get(`/api/admin/branches/${id}`);
+    return response.data;
+  },
+
+  // 🔹 CREATE
+  createBranch: async (data: { name: string; city: string; state: string }) => {
+    const response = await api.post("/api/admin/branches", data);
+    return response.data;
+  },
+
+  // 🔹 UPDATE
+  updateBranch: async (
+    id: number,
+    data: { name: string; city: string; state: string },
+  ) => {
+    const response = await api.put(`/api/admin/branches/${id}`, data);
+    return response.data;
+  },
+
+  // 🔹 DELETE
+  deleteBranch: async (id: number) => {
+    const response = await api.delete(`/api/admin/branches/${id}`);
+    return response.data;
+  },
 };
 
