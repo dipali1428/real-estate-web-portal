@@ -78,7 +78,7 @@ const FireInsuranceFAQ = () => {
           ></div>
 
           <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
-            Got questions about fire insurance? We've got answers.
+            Got questions about fire insurance? We&apos;ve got answers.
           </p>
         </div>
 

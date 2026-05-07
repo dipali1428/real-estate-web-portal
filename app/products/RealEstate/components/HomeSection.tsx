@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -89,7 +89,7 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
                                 Investments
                             </h1>
                             <p className="text-lg sm:text-xl mb-6 text-gray-600 leading-relaxed max-w-lg">
-                                Experience the next generation of property acquisition. Immersive high-yield assets await in India's prime growth corridors. Start investing from ₹5 Lakh.
+                                Experience the next generation of property acquisition. Immersive high-yield assets await in India&apos;s prime growth corridors. Start investing from ₹5 Lakh.
                             </p>
 
                             {/* CTAs */}
@@ -232,7 +232,7 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
                     {featuredProperties.map((property: any) => (
                         <div key={property.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group">
                             <div className="relative h-56 overflow-hidden">
-                                <img src={property.image} alt={property.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                <img src={property.image} alt={property.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"/>
                                 <div className="absolute top-4 right-4 px-3 py-1 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg border border-white/20 backdrop-blur-sm">
                                     {property.type.split(' ')[0]}
                                 </div>

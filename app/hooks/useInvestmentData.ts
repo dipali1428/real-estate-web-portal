@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { mutualFundService } from "../services/mutualfundservice";
 // import { fetchTopPerformingFunds } from '../products/mutualfunds/services/mfApi';
 import api from '../services/api';
+import { toast } from 'react-hot-toast';
 
 export const useDashboardData = () => {
     const [data, setData] = useState<any>(null);
@@ -15,7 +16,7 @@ export const useDashboardData = () => {
                 const dashboardData = await mutualFundService.getDashboardData();
                 setData(dashboardData);
             } catch (error) {
-                console.error("Failed to load dashboard data", error);
+                toast.error("Failed to load dashboard data");
             } finally {
                 setIsLoading(false);
             }
@@ -36,7 +37,7 @@ export const useMarketIndices = () => {
                 const response = await api.get('/api/public/indices');
                 setData(response.data || []);
             } catch (error) {
-                console.error("Failed to fetch market indices", error);
+                toast.error("Failed to fetch market indices");
                 // Fallback to mock data if API fails to avoid blank screen
                 setData([
                     { name: "Nifty 50", price: 24500, change: 120, changePercent: 0.5, trend: "up" },

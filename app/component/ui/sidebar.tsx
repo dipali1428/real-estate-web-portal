@@ -5,9 +5,8 @@ import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import router from "next/router";
-import { LogOut } from "lucide-react";
 // import { SidebarItem } from "../Sidebar";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, LogOut } from "lucide-react";
 
 interface Links {
     label: string;

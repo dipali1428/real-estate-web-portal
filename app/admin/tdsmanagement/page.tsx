@@ -54,7 +54,7 @@ export default function TDSManagement() {
         setTotalRecords(response.total);
       }
     } catch (error) {
-      console.error("Failed to fetch TDS records", error);
+      toast.error("Failed to fetch TDS records");
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +70,6 @@ export default function TDSManagement() {
         await AdminService.uploadTDS(file);
         fetchTDSData(); // Refresh list
       } catch (error) {
-        // console.error("Upload failed", error);
         toast.error("Failed to upload file. Please try again.");
       } finally {
         setIsUploading(false);
@@ -93,7 +92,7 @@ export default function TDSManagement() {
       link.parentNode?.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Export failed", error);
+      toast.error("Failed to export TDS records");
     } finally {
       setIsExporting(false);
     }

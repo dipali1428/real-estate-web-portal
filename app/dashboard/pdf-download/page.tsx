@@ -73,7 +73,7 @@ export default function Downloads() {
 
         setDocuments(formatted);
       } catch (error) {
-        console.error("Error fetching documents:", error);
+        toast.error("Error fetching documents:");
       } finally {
         setIsLoadingDocs(false);
       }
@@ -145,7 +145,6 @@ export default function Downloads() {
 
     toast.success('Download Success', { id: 'dl' });
   } catch (error) {
-    console.error(error);
     toast.error('Download error', { id: 'dl' });
   }
 };

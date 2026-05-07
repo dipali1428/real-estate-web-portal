@@ -222,7 +222,6 @@ const downloadExcel = async () => {
 
     toast.success("Export complete!", { id: loadId });
   } catch (err) {
-    // console.error(err);
     toast.error("Failed to export data", { id: loadId });
   }
 };

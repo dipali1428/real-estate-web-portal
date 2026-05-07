@@ -3,6 +3,7 @@ import { FC, useState, useMemo, useEffect } from "react";
 import { DepartmentHeadService } from "../../services/departmentHeadService";
 import { X, Eye, FileText, Download, Loader2, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 // --- Interfaces ---
 export interface RM {
@@ -548,7 +549,7 @@ const LeadTable: FC = () => {
             </div>
             <div className="flex-grow bg-gray-100 flex items-center justify-center overflow-hidden p-4">
               {isImage(previewUrl) ? (
-                <img src={previewUrl} alt="Preview" className="max-w-full max-h-full object-contain shadow-lg" />
+                <Image src={previewUrl} alt="Preview" width={800} height={600} className="max-w-full max-h-full object-contain shadow-lg" />
               ) : (
                 <iframe src={`${previewUrl}#toolbar=0`} className="w-full h-full border-none rounded-lg shadow-inner" title="PDF Preview" />
               )}

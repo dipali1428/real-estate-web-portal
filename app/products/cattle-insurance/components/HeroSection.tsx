@@ -7,6 +7,8 @@ import {
 } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { useModal } from '../../../context/ModalContext';
+import Link from 'next/link';
+import Image from 'next/image';
 
 export default function HeroSection() {
     const router = useRouter();
@@ -80,11 +82,11 @@ export default function HeroSection() {
                                 className="w-full sm:w-auto inline-flex justify-center items-center gap-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white px-10 py-4 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest hover:shadow-[0_20px_40px_-10px_rgba(32,118,199,0.3)] hover:-translate-y-1 transition-all duration-300 shadow-lg active:scale-95 whitespace-nowrap">
                                 Apply Now <IconArrowRight size={18} className="shrink-0" />
                             </button>
-                            <a
+                            <Link
                                 href="/#contact"
                                 className="w-full sm:w-auto inline-flex justify-center items-center gap-3 border-2 border-[#2076C7]/20 bg-white text-[#2076C7] px-10 py-4 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest hover:bg-slate-50 hover:-translate-y-1 transition-all duration-300 shadow-lg active:scale-95 whitespace-nowrap">
                                 <IconHeartHandshake size={18} className="shrink-0" /> Talk to an Expert
-                            </a>
+                            </Link>
                         </div>
                     </motion.div>
 
@@ -110,11 +112,12 @@ export default function HeroSection() {
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-tr from-[#2076C7]/5 to-[#1CADA3]/5" />
 
-      <img
+    <Image
         src="/insurance/cattle insurance.jpeg"
         alt="Cattle Protection Illustration"
-        className="w-full h-full object-cover object-center"
-      />
+        fill
+        className="object-cover object-center"
+    />
 
     </motion.div>
 

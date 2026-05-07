@@ -57,7 +57,7 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
                 })));
             }
         } catch (error) {
-            console.error("Failed to load wishlist:", error);
+              toast.error("Failed to load wishlist:");
         }
     };
 

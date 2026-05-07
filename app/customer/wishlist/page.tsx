@@ -57,6 +57,11 @@ interface ApiWishlistItem {
     rera_id?: string;
     total_asset_value?: string | number;
     developer_name?: string;
+
+    // FD Specific
+    best_rate?: string | number;
+    category?: string;
+    Special_Offer?: string;
   };
 }
 interface WishlistItem extends ApiWishlistItem {
@@ -75,7 +80,9 @@ interface WishlistItem extends ApiWishlistItem {
   rera_id?: string;
   total_asset_value?: number;
   
-  
+  // FD & Helpers
+  senior_rate?: string | number;
+  isFD?: boolean;
 }
 
 /* ---------------- CATEGORY MAPPING ---------------- */
@@ -88,7 +95,8 @@ const productTypeToCategoryId: Record<string, string> = {
   investments: "investments",
   bonds: "bonds",
   'real-estate': "real-estate",
-    real_estate: 'real-estate', // existing (keep)
+  real_estate: 'real-estate', // existing (keep)
+  fd: 'fd',
 };
 
 const initialCategories = [
@@ -96,7 +104,7 @@ const initialCategories = [
   { id: "unlisted", name: "Unlisted", icon: Building2 },
   { id: "mutual-funds", name: "Mutual Funds", icon: TrendingUp },
   { id: "pms", name: "PMS", icon: BarChart3 },
-  { id: "fixed-deposit", name: "Fixed Deposit", icon: Wallet },
+  { id: "fd", name: "Fixed Deposit", icon: Wallet },
   { id: "bonds", name: "Bonds", icon: ShieldCheck },
   { id: "aif", name: "AIF", icon: BarChart3 },
   { id: "real-estate", name: "Real Estate", icon: Home },
@@ -137,7 +145,6 @@ export default function Wishlist() {
 
     try {
       const response = await customerService.getMyWishlist();
-      console.log("Response :", response);
       // PROPER API RESPONSE HANDLING
       if (!response || !response.success) {
         toast("Wishlist API returned unsuccessful:");
@@ -169,6 +176,7 @@ export default function Wishlist() {
     const isMF = normalizedType === "mutual_fund";
     const isBond = item.product_type === "bonds";
     const isRealEstate = normalizedType === "real_estate";
+    const isFD = normalizedType === "fd";
 
     let productData = item.product_data;
 
@@ -180,11 +188,37 @@ export default function Wishlist() {
       }
     }
 
+    // FD Rate Logic
+    const oneYearRateRaw = (productData as any)?.best_rate ||
+        (productData as any)?.bestRate ||
+        (productData as any)?.one_year_rate ||
+        (productData as any)?.Short_Term ||
+        (productData as any)?.interest_rate ||
+        (productData as any)?.Interest_Rate ||
+        (productData as any)?.rate ||
+        (productData as any)?.Rate ||
+        (productData as any)?.total_rate || 0;
+    const oneYearRate = typeof oneYearRateRaw === 'string'
+        ? parseFloat(oneYearRateRaw.replace(/[₹%,]/g, ''))
+        : Number(oneYearRateRaw || 0);
+
+    const seniorRateRaw = (productData as any)?.senior_rate ||
+        (productData as any)?.seniorRate ||
+        (productData as any)?.bestSeniorRate ||
+        (productData as any)?.Senior_Citizen_Rate;
+    const seniorRate = isFD
+        ? (seniorRateRaw ? (typeof seniorRateRaw === 'string' ? parseFloat(seniorRateRaw.replace(/[₹%,]/g, '')) : seniorRateRaw) : (oneYearRate > 0 ? (oneYearRate + 0.5).toFixed(2) : 0))
+        : undefined;
+
     return {
       ...item,
+      isFD,
+      senior_rate: seniorRate,
 
       // ✅ FIX: bonds use min_investment as price
- price: isBond
+ price: isFD
+    ? (oneYearRate > 0 ? oneYearRate : Number((productData as any)?.best_rate || 0))
+    : isBond
   ? Number(productData?.min_investment || item.min_investment || productData?.price || 0)
         : isRealEstate
         ? Number(productData?.min_investment || productData?.price || 0)
@@ -193,9 +227,11 @@ export default function Wishlist() {
         : Number(productData?.price || 0),
 
       // ✅ FIX: bonds don't have lot → force 1
-      min_lot: isMF ? 0 : isBond ? 1 : productData?.min_lot_size || 0,
+      min_lot: isFD ? 0 : isMF ? 0 : isBond ? 1 : productData?.min_lot_size || 0,
 
-      depository: isMF
+      depository: isFD
+        ? (productData as any)?.category || 'Bank'
+        : isMF
         ? productData?.risk || "Moderate"
         : isBond
   ? item.rating || productData?.rating || "NR"
@@ -343,12 +379,7 @@ const filteredItems = wishlistItems.filter(item => {
 
   return matchesCategory && matchesSearch;
 });
-  /* ---------------- MANUAL REFRESH ---------------- */
 
-  const handleManualRefresh = () => {
-    setRefreshing(true);
-    loadWishlist(true);
-  };
 
   if (loading) {
     return (
@@ -358,6 +389,7 @@ const filteredItems = wishlistItems.filter(item => {
     );
   }
   const isRealEstateSelected = selectedCategory === "real-estate";
+  const isFDSelected = selectedCategory === "fd";
   return (
     <div className="flex-1 p-4 sm:p-6 bg-[#f8fafc] min-h-screen font-sans">
       {/* DESKTOP HEADER (Hidden on Mobile) */}
@@ -532,6 +564,13 @@ const filteredItems = wishlistItems.filter(item => {
                       Total Value
                     </th>
                   </>
+                ) : isFDSelected ? (
+                  <>
+                    <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Category</th>
+                    <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Interest Rate</th>
+                    <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Senior Rate</th>
+                    <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Special Offer</th>
+                  </>
                 ) : (
                   <>
                    <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase">{selectedCategory === 'bonds' ? 'Min Invest' : 'Price'}</th>
@@ -637,6 +676,27 @@ const filteredItems = wishlistItems.filter(item => {
                             ).toLocaleString("en-IN")}
                           </td>
                         </>
+                      ) : item.isFD ? (
+                          <>
+                              <td className="px-6 py-4 text-center">
+                                  <span className="px-3 py-1 rounded-md bg-purple-50 text-purple-600 text-[10px] font-bold uppercase border border-purple-100">
+                                      {item.depository}
+                                  </span>
+                              </td>
+                              <td className="px-6 py-4 text-center font-bold text-[#2076C7]">
+                                  {item.price > 0 ? `${Number(item.price).toFixed(2)}%` : 'N/A'}
+                              </td>
+                              <td className="px-6 py-4 text-center text-[#2076C7] font-bold">
+                                  {item.senior_rate ? `${item.senior_rate}%` : 'N/A'}
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                  <div className="inline-flex items-center px-2 py-1 bg-amber-50 border border-amber-200 rounded-lg">
+                                      <span className="text-[10px] text-amber-700 font-bold uppercase whitespace-nowrap">
+                                          {(item.product_data as any)?.Special_Offer ? `${(item.product_data as any).Special_Offer} 🎁` : '-'}
+                                      </span>
+                                  </div>
+                              </td>
+                          </>
                       ) : (
                         <>
                           <td className="px-6 py-4 text-center font-bold text-[#2076C7]">
@@ -720,10 +780,7 @@ const filteredItems = wishlistItems.filter(item => {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10">
-                            <Building2
-                              className="text-[#2076C7] w-7 h-7"
-                              strokeWidth={1.5}
-                            />
+                            {item.isFD ? <Wallet className="text-[#2076C7] w-7 h-7" strokeWidth={1.5} /> : <Building2 className="text-[#2076C7] w-7 h-7" strokeWidth={1.5} />}
                           </div>
                         )}
                       </div>
@@ -732,7 +789,7 @@ const filteredItems = wishlistItems.filter(item => {
                           {item.product_name}
                         </h3>
                         <span className="text-[9px] font-bold text-[#1CADA3] bg-emerald-50 px-2 py-0.5 rounded-full uppercase inline-block mt-1">
-                          {item.product_type.replace("_", " ")}
+                          {item.isFD ? "Fixed Deposit" : item.product_type.replace("_", " ")}
                         </span>
                       </div>
                     </div>
@@ -747,31 +804,40 @@ const filteredItems = wishlistItems.filter(item => {
                   <div className="grid grid-cols-2 gap-4 py-3">
                     <div className="flex flex-col">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                        Price
+                        {item.isFD ? 'Interest Rate' : 'Price'}
                       </span>
                       <span className="text-base font-bold text-[#2076C7]">
-                        {item.product_type === "bonds" ? `₹${item.price.toLocaleString("en-IN")}` : `₹${item.price.toFixed(2)}`}
+                        {item.isFD ? `${Number(item.price).toFixed(2)}%` : (item.product_type === "bonds" ? `₹${item.price.toLocaleString("en-IN")}` : `₹${item.price.toFixed(2)}`)}
                       </span>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                        Lot Size
+                        {item.isFD ? 'Senior Rate' : 'Lot Size'}
                       </span>
                       <span className="text-base font-bold text-slate-800">
-                        {item.min_lot === 0 ? "-" : `${item.min_lot} Units`}
+                        {item.isFD ? (item.senior_rate ? `${item.senior_rate}%` : 'N/A') : (item.min_lot === 0 ? "-" : `${item.min_lot} Units`)}
                       </span>
                     </div>
                   </div>
 
+                  {item.isFD && (item.product_data as any)?.Special_Offer && (
+                      <div className="mt-2 p-2 bg-orange-50 rounded-xl border border-orange-100">
+                          <div className="text-[8px] text-orange-400 uppercase font-bold mb-1">Special Offer</div>
+                          <div className="text-xs text-orange-600 font-bold italic truncate">🎁 {(item.product_data as any).Special_Offer}</div>
+                      </div>
+                  )}
+
                  <div className="mt-4 grid grid-cols-2 gap-4">
 
-  {/* Min Investment */}
+  {/* Min Investment / Tenure */}
   <div className="flex flex-col">
     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-      Min Invest
+      {item.isFD ? 'Tenure' : 'Min Invest'}
     </span>
     <span className="text-base font-black text-[#2076C7]">
-      {item.product_type === "mutual_fund"
+      {item.isFD 
+        ? `${(item.product_data as any)?.Short_Term || '-'} / ${(item.product_data as any)?.Mega_Term || '-'}`
+        : item.product_type === "mutual_fund"
         ? "-"
         : item.price && item.min_lot
         ? `₹${(item.price * item.min_lot).toLocaleString("en-IN")}`

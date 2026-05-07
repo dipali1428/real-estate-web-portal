@@ -22,6 +22,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import customerService from "../../../../services/customerService";
 import toast from "react-hot-toast";
+import Image from 'next/image';
 
 interface CartItem {
   id: string;
@@ -59,7 +60,7 @@ export interface PMSProduct {
   bestSuitedFor?: string;
 }
 
-const MIN_INVESTMENT = 5000000;
+// const MIN_INVESTMENT = 5000000;
 
 
 export default function ExplorePMS() {
@@ -76,7 +77,7 @@ export default function ExplorePMS() {
   const [schedulingProduct, setSchedulingProduct] = useState<PMSProduct | null>(null);
   const [meetingDate, setMeetingDate] = useState("");
   const [meetingTime, setMeetingTime] = useState("");
-  const [meetLink, setMeetLink] = useState("https://meet.google.com/oio-bdwb-cxy");
+  const meetLink = "https://meet.google.com/oio-bdwb-cxy";
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Notification States
@@ -121,7 +122,7 @@ export default function ExplorePMS() {
         });
         setDynamicProducts(mappedProducts);
       }
-     finally {
+      finally {
         setLoadingProducts(false);
       }
     };
@@ -230,7 +231,7 @@ export default function ExplorePMS() {
   }, [loadWishlist]);
 
   useEffect(() => {
-    localStorage.setItem("pms_cart", JSON.stringify(cart));
+    // localStorage.setItem("pms_cart", JSON.stringify(cart));
   }, [cart]);
 
   // Filtering
@@ -245,20 +246,6 @@ export default function ExplorePMS() {
   }, [searchQuery, activeCategory, dynamicProducts]);
 
   // Cart Actions
-  const handleAddToCart = (product: PMSProduct) => {
-    if (cart.find(item => item.id === product.name)) {
-      setIsCartOpen(true);
-      return;
-    }
-    const newItem: CartItem = { id: product.name, name: product.name, amount: MIN_INVESTMENT };
-    setCart([...cart, newItem]);
-    setIsCartOpen(true);
-  };
-
-  const removeFromCart = (id: string) => setCart(cart.filter(item => item.id !== id));
-  const updateCartAmount = (id: string, amount: number) =>
-    setCart(cart.map(item => (item.id === id ? { ...item, amount } : item)));
-  const formatINR = (num: number) => num.toLocaleString("en-IN");
 
   const toggleWishlist = async (product: PMSProduct) => {
     const productName = product.name;
@@ -777,8 +764,8 @@ export default function ExplorePMS() {
                     <button
                       onClick={() => setNotifyWhatsApp(!notifyWhatsApp)}
                       className={`flex-1 flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all ${notifyWhatsApp
-                          ? "bg-emerald-50 border-emerald-500 text-emerald-700"
-                          : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
+                        ? "bg-emerald-50 border-emerald-500 text-emerald-700"
+                        : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
                         }`}
                     >
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 transition-all ${notifyWhatsApp ? "bg-emerald-500 border-emerald-500 text-white" : "border-gray-200"}`}>
@@ -789,8 +776,8 @@ export default function ExplorePMS() {
                     <button
                       onClick={() => setNotifyEmail(!notifyEmail)}
                       className={`flex-1 flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all ${notifyEmail
-                          ? "bg-blue-50 border-blue-500 text-blue-700"
-                          : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
+                        ? "bg-blue-50 border-blue-500 text-blue-700"
+                        : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
                         }`}
                     >
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 transition-all ${notifyEmail ? "bg-blue-500 border-blue-500 text-white" : "border-gray-200"}`}>
@@ -870,7 +857,7 @@ export default function ExplorePMS() {
                 <div className="relative z-10 pt-10 border-t border-white/10">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full border-2 border-white/20 p-1">
-                      <img src="https://ui-avatars.com/api/?name=Admin&background=white&color=2076C7" className="w-full h-full rounded-full border border-white/20" alt="Icon" />
+                      <Image src="https://ui-avatars.com/api/?name=Admin&background=white&color=2076C7" className="w-full h-full rounded-full border border-white/20" height={40} width={40} alt="Icon" />
                     </div>
                     <div>
                       <p className="text-[10px] font-black text-white/60 uppercase tracking-widest">Organizer</p>

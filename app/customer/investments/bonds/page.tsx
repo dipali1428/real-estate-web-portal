@@ -38,28 +38,40 @@ export default function CustomerBondsDashboard() {
     const [bonds, setBonds] = useState<Bond[]>([]);
     const [wishlistedIds, setWishlistedIds] = useState<Set<number>>(new Set());
 
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/investments/bonds/all`)
-            .then(res => res.json())
-            .then(data => {
-                const categoryMapping: Record<string, string> = {
-                    'Private': 'Private Corporate',
-                    'TaxFree': 'Tax-Free Bonds',
-                    'StateGuaranteed': 'State Guaranteed',
-                    'GSec': 'G-Sec / SDL',
-                    'PSU': 'PSU Bonds',
-                    'Municipal': 'Municipal Bonds'
-                };
-                const applyMap = (raw: any[]) => raw.map(b => ({ ...b, category: categoryMapping[b.category] || b.category }));
+   useEffect(() => {
+    const fetchBonds = async () => {
+        try {
+            const data = await customerService.getAllBonds();
 
-                if (Array.isArray(data)) {
-                    setBonds(applyMap(data));
-                } else if (data.data && Array.isArray(data.data)) {
-                    setBonds(applyMap(data.data));
-                }
-            })
-            .catch(err => console.error("Failed to fetch bonds:", err));
-    }, []);
+            const categoryMapping: Record<string, string> = {
+                Private: "Private Corporate",
+                TaxFree: "Tax-Free Bonds",
+                StateGuaranteed: "State Guaranteed",
+                GSec: "G-Sec / SDL",
+                PSU: "PSU Bonds",
+                Municipal: "Municipal Bonds",
+            };
+
+            const applyMap = (raw: any[]) =>
+                raw.map((b) => ({
+                    ...b,
+                    category: categoryMapping[b.category] || b.category,
+                }));
+
+            if (Array.isArray(data)) {
+                setBonds(applyMap(data));
+            } else if (data?.data && Array.isArray(data.data)) {
+                setBonds(applyMap(data.data));
+            }
+        } catch (error: any) {
+            toast.error(
+                error?.response?.data?.message || "Failed to fetch bonds"
+            );
+        }
+    };
+
+    fetchBonds();
+}, []);
 
     // Fetch existing wishlist to mark already wishlisted bonds
     useEffect(() => {

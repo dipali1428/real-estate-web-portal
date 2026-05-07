@@ -1,10 +1,9 @@
 "use client";
 import React from 'react';
-import { Shield, Flame, Building2, CheckCircle2 } from 'lucide-react';
-import { ArrowLeft as IconArrowLeft, ArrowRight } from 'lucide-react';
+import { Shield, Flame, Building2, CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useModal } from '@/app/context/ModalContext';
 import { useRouter } from 'next/navigation';
-
+import Image from "next/image";
 
 export default function FireHero() {
   const { openLogin } = useModal();
@@ -30,14 +29,14 @@ export default function FireHero() {
           className="md:hidden group flex items-center gap-2 p-2 text-gray-500"
         >
           <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-lg border border-gray-200/50 active:scale-80 transition-all">
-            <IconArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
+            <ArrowLeft className="w-4 h-4 text-gray-700" strokeWidth={2} />
           </div>
         </button>
         <button
           onClick={handleBackHome}
           className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-300 hover:bg-white shadow-lg active:scale-95 transition-all group"
         >
-          <IconArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2} />
           Back to Home
         </button>
       </div>
@@ -65,7 +64,7 @@ export default function FireHero() {
 
             {/* Paragraph */}
             <p className="text-gray-600 text-sm sm:text-base md:text-xl font-medium mb-8 md:mb-10 max-w-xl leading-relaxed">
-              Protect your business, warehouse, and residential properties with India's most comprehensive Fire & Special Perils insurance. Instant quotes, 100% digital process.
+              Protect your business, warehouse, and residential properties with India&apos;s most comprehensive Fire & Special Perils insurance. Instant quotes, 100% digital process.
             </p>
 
             {/* Button */}
@@ -107,9 +106,11 @@ export default function FireHero() {
           <div className="relative w-full flex justify-center mt-12 lg:mt-0">
             <div className="relative bg-gradient-to-br from-white to-gray-50 rounded-[3rem] p-5 shadow-2xl border border-gray-100 max-w-lg w-full">
 
-              <img
+              <Image
                 src="/insurance/fire.webp"
                 alt="Modern Building"
+                width={600}
+                height={450}
                 className="rounded-[2.5rem] w-full h-[420px] xl:h-[500px] object-cover"
               />
 

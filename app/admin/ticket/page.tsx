@@ -6,6 +6,7 @@ import { Search, RefreshCw, Ticket, ChevronDown } from 'lucide-react';
 import TicketAdminCard from './TicketAdminCard';
 import AdminTicketStats from './AdminTicketStats';
 import { AdminService } from '@/app/services/adminService';
+import { toast } from 'react-hot-toast';
 
 // --- Static Constants (Moved outside to prevent re-renders) ---
 const ITEMS_PER_PAGE_OPTIONS = [5, 10, 20, 50, 100].map(v => ({ value: v, label: `${v} per page` }));
@@ -76,7 +77,7 @@ const AdminSupportTicketsPage = () => {
 
       setAllTickets(formatted);
     } catch (error) {
-      console.error('Error fetching tickets:', error);
+      toast.error('Error fetching tickets:');
     } finally {
       setLoading(false);
     }
@@ -141,7 +142,7 @@ const AdminSupportTicketsPage = () => {
         } : t));
       }
     } catch (error) {
-      alert('Failed to update ticket status');
+      toast.error('Failed to update ticket status');
     }
   };
 

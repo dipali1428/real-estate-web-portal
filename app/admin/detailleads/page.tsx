@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   Pencil,
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface Lead {
   assigned_rm_mobile: string;
@@ -100,7 +101,6 @@ export default function LeadDashboard() {
         limit: itemsPerPage,
         search: searchTerm
       });
-      console.log("Fetched Leads:", response);
       if (response && response.success) {
         setLeads(response.detail_leads || []);
         setTotalLeads(response.total_count || 0); // Assuming backend sends total_count
@@ -109,7 +109,7 @@ export default function LeadDashboard() {
         setTotalLeads(0);
       }
     } catch (error) {
-      console.error("Error fetching leads:", error);
+      toast.error("Error fetching leads:");
       setLeads([]);
       setTotalLeads(0);
     } finally {
@@ -151,14 +151,14 @@ export default function LeadDashboard() {
     try {
       const response = await AdminService.updateDetailLead(editingLead.id, editFormData);
       if (response.success) {
-        alert("Lead updated successfully!");
+        toast.success("Lead updated successfully!");
         setEditingLead(null);
         fetchLeads();
       } else {
-        alert(response.message || "Failed to update lead");
+        toast.error(response.message || "Failed to update lead");
       }
     } catch (error: any) {
-      alert(error.response?.data?.message || "Error updating lead");
+      toast.error(error.response?.data?.message || "Error updating lead");
     } finally {
       setUpdating(false);
     }
@@ -205,8 +205,7 @@ export default function LeadDashboard() {
     window.URL.revokeObjectURL(url);
 
   } catch (error) {
-    console.error("Error exporting leads:", error);
-    alert("Failed to export leads.");
+    toast.error("Error exporting leads:");
   }
 };
 
@@ -218,13 +217,13 @@ export default function LeadDashboard() {
     try {
       const response = await AdminService.uploadDetailLeadsCSV(file);
       if (response.success) {
-        alert("CSV uploaded and processed successfully!");
+        toast.success("CSV uploaded and processed successfully!");
         fetchLeads();
       } else {
-        alert(response.message || "Failed to upload CSV");
+        toast.error(response.message || "Failed to upload CSV");
       }
     } catch (error: any) {
-      alert(error.response?.data?.message || "Error uploading file");
+      toast.error(error.response?.data?.message || "Error uploading file");
     } finally {
       setUploading(false);
       event.target.value = '';

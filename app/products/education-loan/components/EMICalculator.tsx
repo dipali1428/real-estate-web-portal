@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
     IconArrowRight,
     IconChevronDown,
@@ -17,31 +17,36 @@ import {
     Tooltip,
     Legend
 } from 'recharts';
+import Image from "next/image";
 
 export default function EMICalculator({ onApplyClick, hidePartners = false, isDashboard = false }: { onApplyClick: () => void, hidePartners?: boolean, isDashboard?: boolean }) {
     const [loanAmount, setLoanAmount] = useState(1000000);
     const [interestRate, setInterestRate] = useState(8.5);
     const [tenure, setTenure] = useState(20);
-    const [emi, setEmi] = useState(0);
-    const [totalInterest, setTotalInterest] = useState(0);
-    const [totalPayment, setTotalPayment] = useState(0);
     const [showAllBanks, setShowAllBanks] = useState(false);
 
-    useEffect(() => {
-        const r = interestRate / 100 / 12;
-        const n = tenure * 12;
-        if (r === 0) {
-            setEmi(loanAmount / n);
-            setTotalPayment(loanAmount);
-            setTotalInterest(0);
-        } else {
-            const e = (loanAmount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-            setEmi(e);
-            setTotalPayment(e * n);
-            setTotalInterest(e * n - loanAmount);
-        }
-    }, [loanAmount, interestRate, tenure]);
+    const { emi, totalInterest, totalPayment } = useMemo(() => {
+    const r = interestRate / 100 / 12;
+    const n = tenure * 12;
 
+    if (r === 0) {
+        return {
+            emi: loanAmount / n,
+            totalPayment: loanAmount,
+            totalInterest: 0,
+        };
+    } else {
+        const e =
+            (loanAmount * r * Math.pow(1 + r, n)) /
+            (Math.pow(1 + r, n) - 1);
+
+        return {
+            emi: e,
+            totalPayment: e * n,
+            totalInterest: e * n - loanAmount,
+        };
+    }
+}, [loanAmount, interestRate, tenure]);
     const chartData = [
         { name: 'Principal', value: loanAmount },
         { name: 'Interest', value: totalInterest },
@@ -372,7 +377,7 @@ export default function EMICalculator({ onApplyClick, hidePartners = false, isDa
                                         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 via-transparent to-[#1CADA3]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                                         <div className="relative z-10 flex-shrink-0 w-14 h-14 rounded-2xl bg-white border border-slate-50 flex items-center justify-center p-2 shadow-sm transition-all duration-500 group-hover:scale-110">
-                                            <img src={bank.logo} alt={bank.name} className="w-full h-full object-contain" />
+                                            <Image src={bank.logo} alt={bank.name} className="w-full h-full object-contain" width={56} height={56} />
                                         </div>
                                         <span className="font-medium text-gray-600 text-xs md:text-sm leading-relaxed font-sans transition-colors duration-300">
                                             {bank.name}

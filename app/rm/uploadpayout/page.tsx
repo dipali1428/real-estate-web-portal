@@ -127,7 +127,7 @@ export default function AdminDownloads() {
     };
 
     const deleteFile = async (id: string) => {
-        if (confirm("Are you sure you want to delete this file?")) {
+        if (toast("Are you sure you want to delete this file?")) {
             try {
                 await RmService.deletePayoutGrid(id);
                 setFiles(files.filter(f => f.id !== id));

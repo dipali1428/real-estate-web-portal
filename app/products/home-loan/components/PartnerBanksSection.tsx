@@ -1,7 +1,7 @@
 "use client";
 
 import { Landmark as Bank, ArrowRight } from 'lucide-react';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { CATEGORIES } from '../loanConstants';
@@ -17,16 +17,65 @@ interface PartnerBanksSectionProps {
     filteredPartners: PartnerBank[];
 }
 
-export default function PartnerBanksSection({ activeCategory, setActiveCategory, filteredPartners }: PartnerBanksSectionProps) {
+// Inner component that will be reset when key changes
+function PartnerBanksGrid({ filteredPartners }: { filteredPartners: PartnerBank[] }) {
     const [showAll, setShowAll] = useState(false);
-
-    // Reset showAll when category changes
-    useEffect(() => {
-        setShowAll(false);
-    }, [activeCategory]);
-
     const visiblePartners = showAll ? filteredPartners : filteredPartners.slice(0, 4);
 
+    return (
+        <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 relative z-10">
+                <AnimatePresence mode="popLayout">
+                    {visiblePartners.length > 0 ? (
+                        visiblePartners.map((bank, index) => (
+                            <motion.div
+                                key={bank.name}
+                                layout
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                                className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center gap-4 hover:shadow-lg hover:shadow-gray-200/40 transition-all duration-300 group cursor-pointer h-full"
+                            >
+                                <div
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
+                                    style={{ backgroundColor: `${bank.color}10` }}
+                                >
+                                    <Bank className="w-6 h-6" style={{ color: bank.color }} />
+                                </div>
+                                <span className="text-[11px] font-bold font-sans text-gray-700 leading-tight group-hover:text-[#2076C7] transition-colors uppercase">
+                                    {bank.name}
+                                </span>
+                            </motion.div>
+                        ))
+                    ) : (
+                        <div className="col-span-full py-12 text-center text-gray-400 font-medium italic">
+                            Exploring tailored partners for this category...
+                        </div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* View More / View Less Button */}
+            {filteredPartners.length > 4 && (
+                <div className="flex justify-center mt-6 relative z-10">
+                    <button
+                        onClick={() => setShowAll(prev => !prev)}
+                        className="px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-white shadow-lg hover:shadow-[#2076C7]/20 active:scale-95 transition-all flex items-center gap-2"
+                    >
+                        {showAll ? "View Less Partners" : `View All Partners (${filteredPartners.length - 4} more)`}
+                        <ArrowRight
+                            size={16}
+                            className={`transition-transform duration-300 ${showAll ? "rotate-[270deg]" : "rotate-90"}`}
+                        />
+                    </button>
+                </div>
+            )}
+        </>
+    );
+}
+
+export default function PartnerBanksSection({ activeCategory, setActiveCategory, filteredPartners }: PartnerBanksSectionProps) {
     return (
         <section id="products-section" className="py-8 md:py-12 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,64 +96,23 @@ export default function PartnerBanksSection({ activeCategory, setActiveCategory,
                                 <button
                                     key={category}
                                     onClick={() => setActiveCategory(category)}
-                                    className={`px-4 md:px-6 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeCategory === category
-                                        ? 'bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-white shadow-md'
-                                        : 'text-gray-500 hover:bg-white hover:text-[#2076C7]'
-                                        }`}>
+                                    className={`px-4 md:px-6 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 whitespace-nowrap ${
+                                        activeCategory === category
+                                            ? 'bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-white shadow-md'
+                                            : 'text-gray-500 hover:bg-white hover:text-[#2076C7]'
+                                    }`}
+                                >
                                     {category}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 relative z-10">
-                        <AnimatePresence mode="popLayout">
-                            {visiblePartners.length > 0 ? (
-                                visiblePartners.map((bank, index) => (
-                                    <div key={bank.name}>
-                                        <motion.div
-                                            layout
-                                            initial={{ opacity: 0, scale: 0.9 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            exit={{ opacity: 0, scale: 0.9 }}
-                                            transition={{ duration: 0.3, delay: index * 0.05 }}
-                                            className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center gap-4 hover:shadow-lg hover:shadow-gray-200/40 transition-all duration-300 group cursor-pointer h-full"
-                                        >
-                                            <div
-                                                className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
-                                                style={{ backgroundColor: `${bank.color}10` }}
-                                            >
-                                                <Bank className="w-6 h-6" style={{ color: bank.color }} />
-                                            </div>
-                                            <span className="text-[11px] font-bold font-sans text-gray-700 leading-tight group-hover:text-[#2076C7] transition-colors uppercase">
-                                                {bank.name}
-                                            </span>
-                                        </motion.div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="col-span-full py-12 text-center text-gray-400 font-medium italic">
-                                    Exploring tailored partners for this category...
-                                </div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* View More / View Less Button */}
-                    {filteredPartners.length > 4 && (
-                        <div className="flex justify-center mt-6 relative z-10">
-                            <button
-                                onClick={() => setShowAll(prev => !prev)}
-                                className="px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest bg-linear-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] text-white shadow-lg hover:shadow-[#2076C7]/20 active:scale-95 transition-all flex items-center gap-2"
-                            >
-                                {showAll ? "View Less Partners" : `View All Partners (${filteredPartners.length - 4} more)`}
-                                <ArrowRight
-                                    size={16}
-                                    className={`transition-transform duration-300 ${showAll ? "rotate-[270deg]" : "rotate-90"}`}
-                                />
-                            </button>
-                        </div>
-                    )}
+                    {/* Use key prop to reset the grid when category changes */}
+                    <PartnerBanksGrid 
+                        key={activeCategory}
+                        filteredPartners={filteredPartners} 
+                    />
                 </div>
             </div>
         </section>

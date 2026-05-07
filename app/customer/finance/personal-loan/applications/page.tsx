@@ -4,8 +4,6 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft,
-  X,
   CheckCircle2,
   Clock,
   FileText,
@@ -20,12 +18,10 @@ import {
   CheckCircle,
   Shield,
   RefreshCw,
-  Eye,
   ChevronDown,
   ChevronUp,
   TrendingUp,
   Briefcase,
-  Search,
   Plus,
   Zap
 } from "lucide-react";

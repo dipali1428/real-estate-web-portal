@@ -1,18 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Search,
   Filter,
   Landmark,
   Percent,
-  Banknote,
   ArrowDownSquare,
   X,
   ShieldCheck,
-  ShoppingCart,
   Database,
-  Clock,
   Bookmark,
   BookmarkCheck,
   FileText
@@ -25,7 +22,6 @@ export default function ExploreHomeLoans({ activeTab, setActiveTab }: { activeTa
   const initialBanks = categorizedPlans["New Purchase"] || [];
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredBanks, setFilteredBanks] = useState(initialBanks);
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState("default");
 
@@ -35,18 +31,20 @@ export default function ExploreHomeLoans({ activeTab, setActiveTab }: { activeTa
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  useEffect(() => {
-    const savedWishlist = localStorage.getItem("user_wishlist");
-    if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
-  }, []);
+  // Load wishlist from localStorage on mount (commented out, but kept for when needed)
+  // useEffect(() => {
+  //   const savedWishlist = localStorage.getItem("user_wishlist");
+  //   if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+  // }, []);
 
-  useEffect(() => {
-    localStorage.setItem("user_wishlist", JSON.stringify(wishlist));
-  }, [wishlist]);
+  // Save wishlist to localStorage (commented out, but kept for when needed)
+  // useEffect(() => {
+  //   localStorage.setItem("user_wishlist", JSON.stringify(wishlist));
+  // }, [wishlist]);
 
 
-
-  useEffect(() => {
+  // Use useMemo instead of useEffect for filtering - Derived state
+  const filteredBanks = useMemo(() => {
     let filtered = [...initialBanks];
 
     // Apply search
@@ -65,7 +63,7 @@ export default function ExploreHomeLoans({ activeTab, setActiveTab }: { activeTa
       filtered.sort((a, b) => a.bank.localeCompare(b.bank));
     }
 
-    setFilteredBanks(filtered);
+    return filtered;
   }, [searchTerm, sortBy, initialBanks]);
 
   const clearFilters = () => {
@@ -78,6 +76,9 @@ export default function ExploreHomeLoans({ activeTab, setActiveTab }: { activeTa
     const isPresent = wishlist.some(item => item.id === plan.bank && item.category === "home-loan");
     if (isPresent) {
       setWishlist(wishlist.filter(item => !(item.id === plan.bank && item.category === "home-loan")));
+      setToastMessage(`"${plan.bank}" removed from wishlist!`);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     } else {
       const wishlistItem = {
         id: plan.bank,
@@ -133,8 +134,6 @@ export default function ExploreHomeLoans({ activeTab, setActiveTab }: { activeTa
           </motion.div>
         )}
       </AnimatePresence>
-
-
 
       {/* Main Content */}
   <main className="space-y-8 px-3 md:px-5 lg:px-6 xl:px-8 max-w-[1200px] mx-auto">

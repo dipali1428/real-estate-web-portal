@@ -35,7 +35,7 @@ const Header = () => {
     { label: "Home", href: "/" },
     { label: "About Us", href: "/page/about", component: AboutSection },
     { label: "Media Center", href: "/page/event", component: AboutSection },
-    { label: "Cibil Check", href: "/page/cibil", component: CibilSection, badge: "New" },
+    { label: "Cibil Check", href: "/page/cibil", component: CibilSection, badge: "Free" },
     { label: "Careers", href: "/page/careers" },
   ];
 
@@ -129,11 +129,11 @@ const Header = () => {
                 whileHover={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.35 }}
               />
-              <a
+              <Link
                 href={link.href}
                 className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
                 {link.label}
-              </a>
+              </Link>
               <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
             </motion.div>
           ))}
@@ -422,7 +422,7 @@ const Header = () => {
                 whileHover={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.35 }}
               />
-              <a
+              <Link
                 href={link.href}
                 className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
                 {link.label}
@@ -431,7 +431,7 @@ const Header = () => {
                     {link.badge}
                   </span>
                 )}
-              </a>
+              </Link>
               <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
             </motion.div>
           ))}
@@ -453,7 +453,7 @@ const Header = () => {
                 whileHover={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.35 }}
               />
-              <a
+              <Link
                 href="/page/emi"
                 className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] flex items-center space-x-1 text-sm xl:text-base"
               >
@@ -463,7 +463,7 @@ const Header = () => {
                   size={14}
                   className={`transition-transform duration-300 ${isCalculatorOpen ? "rotate-180" : ""}`}
                 /> */}
-              </a>
+              </Link>
               <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
             </motion.div>
 
@@ -476,13 +476,13 @@ const Header = () => {
                   transition={{ duration: 0.2 }}
                   className="absolute top-full left-0 mt-2 w-40 xl:w-54 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                   {calculatorOptions.map((option, index) => (
-                    <a
+                    <Link
                       key={index}
                       href={option.href}
                       className="block px-3 xl:px-4 py-2 text-gray-700 hover:bg-[#E8F6FA] hover:text-[#2076C7] transition-colors duration-200 text-sm xl:text-base"
                       onClick={() => setIsCalculatorOpen(false)}>
                       {option.label}
-                    </a>
+                    </Link>
                   ))}
                 </motion.div>
               )}
@@ -503,11 +503,11 @@ const Header = () => {
                 whileHover={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.35 }}
               />
-              <a
+              <Link
                 href={link.href}
                 className="relative z-10 px-2 xl:px-3 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
                 {link.label}
-              </a>
+              </Link>
               <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
             </motion.div>
           ))}
@@ -524,11 +524,11 @@ const Header = () => {
               whileHover={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.35 }}
             />
-            <a
+            <Link
               href="/#contact"
               className="relative z-10 px-1.5 2xl:px-2 py-2 text-gray-700 font-medium transition-colors duration-300 group-hover:text-[#2076C7] text-sm xl:text-base">
               Contact Us
-            </a>
+            </Link>
             <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-linear-to-r from-[#2076C7] to-[#1CADA3] transition-all duration-300 group-hover:w-full" />
           </motion.div>
 
@@ -586,13 +586,13 @@ const Header = () => {
 
               {/* Home & About */}
               {navLinks.slice(0, 2).map((link, i) => (
-                <a
+                <Link
                   key={i}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
                   className="text-gray-700 font-medium hover:text-[#1CADA3] transition text-base">
                   {link.label}
-                </a>
+                </Link>
               ))}
 
               {/* Mobile Product Dropdown */}
@@ -622,7 +622,7 @@ const Header = () => {
                       {isLoansOpen && (
                         <div className="mt-2 space-y-2 pl-4">
                           {loansOptions.map((option, index) => (
-                            <a
+                            <Link
                               key={index}
                               href={option.href}
                               onClick={() => {
@@ -632,7 +632,7 @@ const Header = () => {
                               }}
                               className="block text-gray-500 hover:text-[#1CADA3] transition text-sm">
                               {option.label}
-                            </a>
+                            </Link>
                           ))}
                         </div>
                       )}
@@ -652,7 +652,7 @@ const Header = () => {
                       {isInsuranceOpen && (
                         <div className="mt-2 space-y-2 pl-4">
                           {insuranceOptions.map((option, index) => (
-                            <a
+                            <Link
                               key={index}
                               href={option.href}
                               onClick={() => {
@@ -662,7 +662,7 @@ const Header = () => {
                               }}
                               className="block text-gray-500 hover:text-[#1CADA3] transition text-sm">
                               {option.label}
-                            </a>
+                            </Link>
                           ))}
                         </div>
                       )}
@@ -682,7 +682,7 @@ const Header = () => {
                       {isMutualFundOpen && (
                         <div className="mt-2 space-y-2 pl-4">
                           {mutualFundOptions.map((option, index) => (
-                            <a
+                            <Link
                               key={index}
                               href={option.href}
                               onClick={() => {
@@ -692,7 +692,7 @@ const Header = () => {
                               }}
                               className="block text-gray-500 hover:text-[#1CADA3] transition text-sm">
                               {option.label}
-                            </a>
+                            </Link>
                           ))}
                         </div>
                       )}
@@ -712,7 +712,7 @@ const Header = () => {
                       {isInvestmentOpen && (
                         <div className="mt-2 space-y-2 pl-4">
                           {investmentOptions.map((option, index) => (
-                            <a
+                            <Link
                               key={index}
                               href={option.href}
                               onClick={() => {
@@ -722,7 +722,7 @@ const Header = () => {
                               }}
                               className="block text-gray-500 hover:text-[#1CADA3] transition text-sm">
                               {option.label}
-                            </a>
+                            </Link>
                           ))}
                         </div>
                       )}
@@ -742,7 +742,7 @@ const Header = () => {
                       {isRealEstateOpen && (
                         <div className="mt-2 space-y-2 pl-4">
                           {realEstateOptions.map((option, index) => (
-                            <a
+                            <Link
                               key={index}
                               href={option.href}
                               onClick={() => {
@@ -752,7 +752,7 @@ const Header = () => {
                               }}
                               className="block text-gray-500 hover:text-[#1CADA3] transition text-sm">
                               {option.label}
-                            </a>
+                            </Link>
                           ))}
                         </div>
                       )}
@@ -772,7 +772,7 @@ const Header = () => {
                       {isUnlistedOpen && (
                         <div className="mt-2 space-y-2 pl-4">
                           {unlistedOptions.map((option, index) => (
-                            <a
+                            <Link
                               key={index}
                               href={option.href}
                               onClick={() => {
@@ -782,7 +782,7 @@ const Header = () => {
                               }}
                               className="block text-gray-500 hover:text-[#1CADA3] transition text-sm">
                               {option.label}
-                            </a>
+                            </Link>
                           ))}
                         </div>
                       )}
@@ -821,7 +821,7 @@ const Header = () => {
                 {isCalculatorOpen && (
                   <div className="mt-2 space-y-2">
                     {calculatorOptions.map((option, index) => (
-                      <a
+                      <Link
                         key={index}
                         href={option.href}
                         onClick={() => {
@@ -830,7 +830,7 @@ const Header = () => {
                         }}
                         className="block text-gray-600 hover:text-[#1CADA3] transition text-base">
                         {option.label}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 )}
@@ -848,12 +848,12 @@ const Header = () => {
               ))}
 
               {/* Contact Us */}
-              <a
+              <Link
                 href="/#contact"
                 onClick={() => setIsOpen(false)}
                 className="text-gray-700 font-medium hover:text-[#1CADA3] transition text-base">
                 Contact Us
-              </a>
+              </Link>
 
               {/* Mobile Buttons */}
               <div className="flex flex-col gap-3 pt-2 w-full justify-center items-center">

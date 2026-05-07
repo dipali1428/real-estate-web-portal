@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { 
   Activity, 
   FileText, 
-  Clock,
-  Plus, 
+  Clock, 
   Search,
-  Filter,
   PieChart as PieChartIcon,
   TrendingUp,
   AlertCircle
@@ -24,7 +22,6 @@ import {
   YAxis, 
   Tooltip
 } from "recharts";
-import LifeInsuranceHeader from "../components/LifeInsuranceHeader";
 
 
 export default function MyApplicationsPage() {

@@ -524,6 +524,19 @@ const CustomerService = {
         const response = await api.get("/api/products/investments/pms-funds/funds");
         return response.data;
     },
+
+  getAllBonds: async () => {
+    try {
+        const response = await api.get(
+            "/api/products/investments/bonds/all"
+        );
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+},
+
 isAuthenticated: async (): Promise<boolean> => {
   try {
     const res = await api.get("/api/dashboard/profile");

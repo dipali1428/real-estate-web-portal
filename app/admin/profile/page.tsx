@@ -32,7 +32,6 @@ export default function ProfileSection() {
                 const res = await AdminService.getAdminProfile();
                 setProfile(res.user);
             } catch (err) {
-                console.error("Profile load error", err);
                 toast.error("Failed to fetch profile.");
             } finally {
                 setLoading(false);

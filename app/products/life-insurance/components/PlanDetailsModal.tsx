@@ -3,9 +3,8 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    X, CheckCircle2, Info, ArrowRight,
-    Shield, Target, Award, Sparkles,
-    Calendar, IndianRupee, Clock, ArrowUpRight
+    X, CheckCircle2, ArrowRight,
+    Shield, Target, Award, Sparkles, ArrowUpRight
 } from "lucide-react";
 
 export type Plan = {

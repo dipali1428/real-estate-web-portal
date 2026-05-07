@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Inbox, Building2, Eye, X
 } from 'lucide-react';
 import { DashboardService } from '@/app/services/dashboardService';
+import { toast } from 'react-hot-toast';
 
 // Brand Colors
 const COLORS = {
@@ -55,7 +56,7 @@ export default function CreditNotePortal() {
       script.onload = () => {
         setIsLibReady(true);
       };
-      script.onerror = () => console.error("Failed to load html2canvas");
+      script.onerror = () => toast.error("Failed to load html2canvas");
       document.body.appendChild(script);
     }
   }, []);
@@ -109,7 +110,7 @@ export default function CreditNotePortal() {
           loanNumber: item.policy_number || item.form_data?.policy_number || 'N/A',
         })));
       } catch (error) {
-        console.error("Portal Data Error:", error);
+        toast.error("Error fetching credit note data");
       } finally {
         setIsLoading(false);
       }
@@ -260,7 +261,7 @@ export default function CreditNotePortal() {
     const captureTarget = element.querySelector('#cn-capture-area') as HTMLElement;
 
     if (!captureTarget) {
-      console.error("Capture Error: Target element not found");
+      toast.error("Capture Error: Target element not found");
       document.body.removeChild(element);
       return;
     }
@@ -279,7 +280,7 @@ export default function CreditNotePortal() {
         link.click();
         document.body.removeChild(element);
       }).catch((err: any) => {
-        console.error("Capture Error:", err);
+        toast.error("Capture Error: Failed to capture the image");
         if (document.body.contains(element)) document.body.removeChild(element);
       });
     }, 500);

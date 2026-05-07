@@ -5,6 +5,7 @@ import {
   Loader2, AlertCircle
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import { toast } from "react-hot-toast";
 
 // --- Constants & Styles ---
 const STYLES = {
@@ -122,7 +123,7 @@ export default function FireInsuranceForm({ onClose }: { onClose: () => void }) 
 
       setShowSuccess(true);
     } catch (err: any) {
-      console.error(err);
+      toast.error("Failed to submit application.");
       setIsSubmitting(false);
 
       // Check if server returned the specific "already exists" error

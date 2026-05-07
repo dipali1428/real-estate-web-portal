@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, CheckCircle2, X, Landmark, Database, Star, CheckCircle } from 'lucide-react';
+import { ChevronDown, CheckCircle2, X, Landmark, Database, Star } from 'lucide-react';
 
 import { useRouter } from 'next/navigation';
 import api from '@/app/services/api';
@@ -62,7 +62,7 @@ export default function CompareFDPage() {
       router.push('/');
       return;
     }
-    localStorage.setItem('token', token);
+    // localStorage.setItem('token', token);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsAuthed(true);
   }, [router]);

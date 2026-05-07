@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ShieldCheck, Zap, Heart, Coins,
-  GraduationCap, Anchor, Gem, ArrowRight,
-  TrendingUp, Shield, Star, Users,
-  Briefcase, UserPlus, Gift, Landmark, X, CheckCircle2, Info
+  ShieldCheck, Zap, Heart,
+  GraduationCap, Anchor, Gem, ArrowRight, Shield, Star,
+  Briefcase, Landmark, X, CheckCircle2, Info
 } from "lucide-react";
 
 import { useModal } from "../../../context/ModalContext";

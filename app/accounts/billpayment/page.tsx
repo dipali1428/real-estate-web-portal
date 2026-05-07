@@ -4,6 +4,7 @@ import {
   Search, Plus, Download, Clock, CheckCircle2, Inbox, X,
   User, ShieldCheck, Calculator, Send
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 // --- Types ---
 type BillStatus = 'Paid' | 'Pending' | 'Overdue';
@@ -342,7 +343,7 @@ export default function BillPaymentLedger() {
                     </button>
                     <button 
                         onClick={() => {
-                            alert(`Entry ${entryToForward?.leadId} forwarded to AM!`);
+                            toast.success(`Entry ${entryToForward?.leadId} forwarded to AM!`);
                             setIsForwardModalOpen(false);
                         }}
                         className="flex-1 py-3 bg-[#1CADA3] text-white rounded-xl font-bold hover:bg-[#15968d] transition-all"

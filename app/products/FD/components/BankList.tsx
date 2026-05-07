@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronUp, CheckCircle2, X, ArrowRight, ShieldCheck, TrendingUp, CheckCircle, ChevronDown } from "lucide-react";
+import { ChevronUp, CheckCircle2, X, ArrowRight, TrendingUp } from "lucide-react";
 import { useModal } from "@/app/context/ModalContext";
 import api from "@/app/services/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { DashboardService } from "@/app/services/dashboardService";
 
 // ================= TYPES =================
 interface Bank {

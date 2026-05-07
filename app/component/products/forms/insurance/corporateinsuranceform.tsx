@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { X, CheckCircle, UploadCloud, Trash2, ChevronDown, Download, Info, AlertCircle } from "lucide-react";
 import { AuthService } from "@/app/services/authService";
 import * as XLSX from "xlsx"; // Required: npm install xlsx
+import { toast } from "react-hot-toast";
 
 /**
  * CSS Fix to hide number input spinners globally
@@ -214,8 +215,7 @@ export default function InsurancePolicyForm({ onClose, prefilledData }: Insuranc
       await AuthService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
-      console.error("Submission error:", err);
-      alert("Something went wrong. Please try again.");
+      toast.error("Submission error");
     } finally {
       setIsSubmitting(false);
     }

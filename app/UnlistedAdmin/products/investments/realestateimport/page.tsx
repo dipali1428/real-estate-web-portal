@@ -15,7 +15,6 @@ import {
   RefreshCw,
   CheckCircle,
   AlertCircle,
-  History,
   Database,
   Search,
   MapPin,

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Building2, Download, CheckCircle, XCircle, Clock, Filter, IndianRupee, RefreshCw,
-  FileText, Activity, X, Search, SlidersHorizontal, Calendar 
+  Building2, Download, CheckCircle, XCircle, Clock, Filter, IndianRupee,
+  FileText, Activity, X, Search, SlidersHorizontal, Calendar, ShieldPlus 
 } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -56,7 +56,6 @@ export default function MyHealthInsurance({ activeTab, setActiveTab }: { activeT
   const [applications, setApplications] = useState<InsuranceApplication[]>([]);
   const [filteredApplications, setFilteredApplications] = useState<InsuranceApplication[]>([]);
   const [loading, setLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<string>('');
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   
   // Filter States
@@ -64,13 +63,7 @@ export default function MyHealthInsurance({ activeTab, setActiveTab }: { activeT
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [providerSearch, setProviderSearch] = useState<string>('');
 
-  useEffect(() => {
-    setLastUpdated(new Date().toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    }));
-  }, []);
+
 
   useEffect(() => {
     applyClientSideFilters();
@@ -174,27 +167,37 @@ export default function MyHealthInsurance({ activeTab, setActiveTab }: { activeT
             </div>
           </div>
 
-          <div className="flex bg-gray-200/50 p-1.5 rounded-xl w-full sm:w-fit self-center sm:self-end md:self-center flex-wrap justify-center sm:justify-start">
-            <button
-              onClick={() => setActiveTab("explore")}
-              className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                activeTab === "explore"
-                  ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-200"
-                  : "text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              Explore Offers
-            </button>
-            <button
-              onClick={() => setActiveTab("applications")}
-              className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                activeTab === "applications"
-                  ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-teal-200"
-                  : "text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              My Policies
-            </button>
+          <div className="flex pb-2 md:pb-0 w-full sm:w-auto mt-2 sm:mt-0 overflow-x-auto hide-scrollbar sm:overflow-visible">
+            <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+              <button
+                onClick={() => setActiveTab('explore')}
+                className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'explore' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                {activeTab === 'explore' && (
+                  <motion.div
+                    layoutId="activeTabHealthPolicies"
+                    className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <ShieldPlus size={14} />
+                <span>Offers</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('applications')}
+                className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'applications' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                {activeTab === 'applications' && (
+                  <motion.div
+                    layoutId="activeTabHealthPolicies"
+                    className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <FileText size={14} />
+                <span>Policies</span>
+              </button>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -202,9 +205,17 @@ export default function MyHealthInsurance({ activeTab, setActiveTab }: { activeT
       {/* Action Row */}
       <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-gray-100 shadow-sm sticky top-0 z-40 mb-8">
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="flex items-center gap-2 text-gray-600">
-            <RefreshCw size={16} className="text-[#2076C7] animate-spin-slow" />
-            <span className="text-sm font-medium">Last updated: {lastUpdated || 'Just now'}</span>
+          
+          {/* Search - Left Side */}
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search provider..."
+              value={providerSearch}
+              onChange={(e) => setProviderSearch(e.target.value)}
+              className="w-full h-12 pl-12 pr-4 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#2076C7]/10 transition-all font-medium text-gray-700 text-sm placeholder:text-gray-400 shadow-sm"
+            />
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
@@ -271,22 +282,6 @@ export default function MyHealthInsurance({ activeTab, setActiveTab }: { activeT
                   <option value="PENDING">Pending</option>
                   <option value="REJECTED">Rejected</option>
                 </select>
-              </div>
-              
-              <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-                  Provider Name
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                  <input
-                    type="text"
-                    placeholder="Search provider..."
-                    value={providerSearch}
-                    onChange={(e) => setProviderSearch(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 placeholder:text-gray-500 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                  />
-                </div>
               </div>
             </div>
           </motion.div>

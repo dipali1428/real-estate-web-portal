@@ -45,7 +45,7 @@ const FDDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [balanceVisible, setBalanceVisible] = useState(true);
-  const [userName, setUserName] = useState<string>('Investor');
+  // const [userName, setUserName] = useState<string>('Investor');
   const [greeting, setGreeting] = useState<string>('');
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<number>>(new Set());
 
@@ -82,7 +82,7 @@ const FDDashboard: React.FC = () => {
       setError(null);
 
       try {
-        localStorage.setItem('token', token);
+        // localStorage.setItem('token', token);
 
         // Try to fetch FD-specific dashboard data
         // Falls back to default values if FD API isn't available yet
@@ -112,7 +112,7 @@ const FDDashboard: React.FC = () => {
           const profileResponse = await customerService.getProfile();
           if (profileResponse?.success) {
             const fullName = profileResponse.data?.name || 'Investor';
-            setUserName(fullName.split(' ')[0] || 'Investor');
+            // setUserName(fullName.split(' ')[0] || 'Investor');
           }
         } catch (profileErr) {
       

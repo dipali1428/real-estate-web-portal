@@ -1,11 +1,10 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Landmark, TrendingUp, AlertCircle, RefreshCw, Database, Star, X, Percent, ChevronDown } from 'lucide-react';
+import { Search, Filter, Landmark, TrendingUp, AlertCircle, RefreshCw, Database, Star, Bookmark, X, Percent, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../../../../services/api';
 import { useRouter } from 'next/navigation';
-// import { useWishlist } from '@/app/context/WishlistContext';
-// import { DashboardService } from '@/app/services/dashboardService';
+import customerService from '@/app/services/customerService';
+import toast from 'react-hot-toast';
 
 interface FlattenedBank {
   id: number; name: string; logo: string; category: string;
@@ -82,7 +81,11 @@ export default function FDCompaniesPage() {
   const [sortBy, setSortBy] = useState<SortOpt>('rate-desc');
   const [showFilters, setShowFilters] = useState(false);
   const [imgErr, setImgErr] = useState<Set<number>>(new Set());
-  const [selectedBank, setSelectedBank] = useState<string | null>(null);
+  // wishlistedIds: maps company.id → wishlist-row-id (from DB) so we can delete by the right ID
+  const [wishlistedIds, setWishlistedIds] = useState<Record<number, number>>({});
+  const [wishlistLoading, setWishlistLoading] = useState<Set<number>>(new Set());
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   useEffect(() => {
     const token = getTokenFromCookie();
@@ -91,8 +94,18 @@ export default function FDCompaniesPage() {
     (async () => {
       try {
         setLoading(true);
+        // Load FD plans
         const res = await api.get('/api/products/investments/fd/plans');
         setCompanies(fmt2(res.data?.data || []));
+        // Load existing wishlist to pre-fill bookmark state
+        const wl = await customerService.getMyWishlist();
+        if (wl.success && Array.isArray(wl.data)) {
+          const map: Record<number, number> = {};
+          wl.data
+            .filter((item: any) => item.product_type === 'fd')
+            .forEach((item: any) => { map[item.product_id] = item.id; });
+          setWishlistedIds(map);
+        }
       } catch { setError('Failed to load FD plans.'); }
       finally { setLoading(false); }
     })();
@@ -113,21 +126,117 @@ export default function FDCompaniesPage() {
       return parseRate(b.bestRate) - parseRate(a.bestRate);
     });
     setFiltered(r);
+    setPage(1); // reset to page 1 whenever filters change
   }, [companies, search, rateRange, category, sortBy]);
 
-  // const handleBookmark = (c: FlattenedBank) => {
-  //   toggleWishlist({ id: c.id, category: 'fixed-income', name: c.name, logo: c.logo, addedDate: new Date().toISOString(), keyMetrics: { category: c.category, Short_Term: c.shortRate, Medium_Term: c.mediumRate, Long_Term: c.longRate, Mega_Term: c.megaRate, Special_Offer: c.specialRate, risk: 'Low' } });
-  // };
-
-  // const handleApply = (bankName: string) => {
-  //   // Action disabled as per user request
-  // };
+  // Toggle wishlist via API
+  const handleWishlistToggle = async (company: FlattenedBank) => {
+    const isBookmarked = wishlistedIds[company.id] !== undefined;
+    setWishlistLoading(prev => new Set(prev).add(company.id));
+    try {
+      if (isBookmarked) {
+        // Remove from wishlist
+        const rowId = wishlistedIds[company.id];
+        const res = await customerService.removeFromWishlist(rowId);
+        if (res.success) {
+          setWishlistedIds(prev => { const n = { ...prev }; delete n[company.id]; return n; });
+          toast.success(`${company.name} removed from wishlist`);
+        } else {
+          toast.error(res.message || 'Failed to remove from wishlist');
+        }
+      } else {
+        // Add to wishlist
+        const res = await customerService.addToWishlist({
+          product_type: 'fd',
+          product_id: company.id,
+          product_name: company.name,
+          category: company.category,
+          Short_Term: company.shortRate,
+          Medium_Term: company.mediumRate,
+          Long_Term: company.longRate,
+          Mega_Term: company.megaRate,
+          Special_Offer: company.specialRate,
+          best_rate: company.bestRate, // Added for UI display in wishlist
+          senior_rate: company.bestSeniorRate,
+          risk: 'Low',
+        } as any);
+        if (res.success && res.data && !Array.isArray(res.data)) {
+          setWishlistedIds(prev => ({ ...prev, [company.id]: (res.data as any).id }));
+          toast.success(`${company.name} added to wishlist! 🔖`);
+        } else if (res.success) {
+          // Fallback: Reload wishlist to get the correct row ID
+          const wl = await customerService.getMyWishlist();
+          if (wl.success && Array.isArray(wl.data)) {
+            const map: Record<number, number> = {};
+            wl.data.filter((i: any) => i.product_type === 'fd')
+              .forEach((i: any) => { map[i.product_id] = i.id; });
+            setWishlistedIds(map);
+          }
+          toast.success(`${company.name} added to wishlist! 🔖`);
+        } else {
+          toast.error(res.message || 'Failed to add to wishlist');
+        }
+      }
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || 'Wishlist update failed';
+      toast.error(msg);
+      console.error('Wishlist Error:', err);
+    } finally {
+      setWishlistLoading(prev => { const n = new Set(prev); n.delete(company.id); return n; });
+    }
+  };
 
   const clearFilters = () => { setSearch(''); setRateRange('ALL'); setCategory('ALL'); setSortBy('rate-desc'); setShowFilters(false); };
   const activeCnt = [search ? 1 : 0, rateRange !== 'ALL' ? 1 : 0, category !== 'ALL' ? 1 : 0, sortBy !== 'rate-desc' ? 1 : 0].reduce((a, b) => a + b, 0);
   const avgRate = companies.length ? companies.reduce((s, c) => s + parseRate(c.bestRate), 0) / companies.length : 0;
   const maxRate = companies.length ? Math.max(...companies.map(c => parseRate(c.bestRate))) : 0;
   const maxSenior = companies.length ? Math.max(...companies.map(c => parseRate(c.bestSeniorRate))) : 0;
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  // Pagination helper: show at most 5 page numbers
+  const getPageNumbers = () => {
+    const pages: number[] = [];
+    const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+    const end = Math.min(totalPages, start + 4);
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
+
+  const PaginationBar = () => (
+    totalPages > 1 ? (
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setPage(p => Math.max(1, p - 1))}
+          disabled={page === 1}
+          className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:border-[#2076C7] hover:text-[#2076C7] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+
+        {getPageNumbers().map(pg => (
+          <button
+            key={pg}
+            onClick={() => setPage(pg)}
+            className={`w-8 h-8 rounded-xl text-xs font-bold transition-all ${page === pg
+              ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-200'
+              : 'border border-slate-200 text-slate-500 hover:border-[#2076C7] hover:text-[#2076C7]'}`}
+          >
+            {pg}
+          </button>
+        ))}
+
+        <button
+          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+          disabled={page === totalPages}
+          className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:border-[#2076C7] hover:text-[#2076C7] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+    ) : null
+  );
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-[400px]">
@@ -225,7 +334,7 @@ export default function FDCompaniesPage() {
       )}
 
       {/* ── Category Tabs ── */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
         {CAT_OPTS.map(opt => {
           const meta = CATS[opt.value as keyof typeof CATS];
           const count = opt.value === 'ALL' ? companies.length : companies.filter(c => c.category === opt.value).length;
@@ -246,13 +355,13 @@ export default function FDCompaniesPage() {
       <div className="space-y-4">
         {/* Mobile Cards (Hidden on md+) */}
         <div className="grid grid-cols-1 gap-4 md:hidden">
-          {filtered.length === 0 ? (
+          {paginated.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center shadow-sm">
               <Database className="w-8 h-8 text-gray-200 mx-auto mb-3" />
               <p className="text-gray-400 font-bold text-sm">No plans found</p>
             </div>
           ) : (
-            filtered.map((company) => {
+            paginated.map((company) => {
               const meta = CATS[company.category] ?? { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-300', short: company.category.substring(0, 4) };
               // const bookmarked = isInWishlist(company.id);
               const best = parseRate(company.bestRate);
@@ -310,20 +419,40 @@ export default function FDCompaniesPage() {
                     </div>
                   )}
 
-                  <button
-                    className="w-full py-3.5 rounded-xl text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all cursor-default bg-linear-to-r from-[#2076C7] to-[#1CADA3] whitespace-nowrap"
-                  >
-                    Apply Now
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="flex-1 py-3.5 rounded-xl text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all cursor-default bg-linear-to-r from-[#2076C7] to-[#1CADA3] whitespace-nowrap"
+                    >
+                      Apply Now
+                    </button>
+                    <button
+                      onClick={() => handleWishlistToggle(company)}
+                      disabled={wishlistLoading.has(company.id)}
+                      className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center border transition-all ${wishlistedIds[company.id] !== undefined
+                        ? 'bg-[#2076C7]/10 border-[#2076C7]/30 text-[#2076C7]'
+                        : 'border-gray-200 text-gray-400 hover:border-[#2076C7]/40 hover:text-[#2076C7]'
+                        } disabled:opacity-50 disabled:cursor-wait`}
+                      title={wishlistedIds[company.id] !== undefined ? 'Remove from wishlist' : 'Add to wishlist'}
+                    >
+                      {wishlistLoading.has(company.id) ? (
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Bookmark
+                          size={17}
+                          strokeWidth={wishlistedIds[company.id] !== undefined ? 2.5 : 2}
+                          className={wishlistedIds[company.id] !== undefined ? 'fill-current' : ''}
+                        />
+                      )}
+                    </button>
+                  </div>
                 </div>
               );
             })
           )}
         </div>
 
-        {/* Desktop Table (Hidden on mobile) */}
         <div className="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100">
@@ -350,7 +479,7 @@ export default function FDCompaniesPage() {
                       <button onClick={clearFilters} className="text-[#2076C7] text-xs font-bold mt-2 hover:underline">Clear filters</button>
                     </td>
                   </tr>
-                ) : filtered.map((company, idx) => {
+                ) : paginated.map((company, idx) => {
                   const meta = CATS[company.category] ?? { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-300', short: company.category.substring(0, 4) };
                   // const bookmarked = isInWishlist(company.id);
                   const best = parseRate(company.bestRate);
@@ -413,11 +542,25 @@ export default function FDCompaniesPage() {
                         </button>
                       </td>
                       <td className="px-4 py-5">
-                        {/* <button onClick={e => { e.preventDefault(); e.stopPropagation(); handleBookmark(company); }}
-                          className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${bookmarked ? 'bg-[#2076C7]/10 text-[#2076C7]' : 'text-gray-400 hover:bg-gray-100 hover:text-[#2076C7]'}`}
-                          title="Save to wishlist">
-                          <Bookmark size={17} strokeWidth={bookmarked ? 2.5 : 2} className={bookmarked ? 'fill-current' : ''} />
-                        </button> */}
+                        <button
+                          onClick={e => { e.preventDefault(); e.stopPropagation(); handleWishlistToggle(company); }}
+                          disabled={wishlistLoading.has(company.id)}
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${wishlistedIds[company.id] !== undefined
+                            ? 'bg-[#2076C7]/10 text-[#2076C7]'
+                            : 'text-gray-400 hover:bg-gray-100 hover:text-[#2076C7]'
+                            } disabled:opacity-50 disabled:cursor-wait`}
+                          title={wishlistedIds[company.id] !== undefined ? 'Remove from wishlist' : 'Add to wishlist'}
+                        >
+                          {wishlistLoading.has(company.id) ? (
+                            <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Bookmark
+                              size={17}
+                              strokeWidth={wishlistedIds[company.id] !== undefined ? 2.5 : 2}
+                              className={wishlistedIds[company.id] !== undefined ? 'fill-current' : ''}
+                            />
+                          )}
+                        </button>
                       </td>
                     </tr>
                   );
@@ -426,17 +569,13 @@ export default function FDCompaniesPage() {
             </table>
           </div>
 
-          {/* Footer */}
+          {/* Footer with pagination — matches admin FD dashboard style */}
           {filtered.length > 0 && (
-            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <p className="text-xs text-gray-400">
-                Showing <span className="font-bold text-gray-600">{filtered.length}</span> of <span className="font-bold text-gray-600">{companies.length}</span> plans
+            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+              <p className="text-xs text-slate-400 font-medium">
+                Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
               </p>
-              {activeCnt > 0 && (
-                <button onClick={clearFilters} className="text-xs text-[#2076C7] font-bold hover:underline flex items-center gap-1">
-                  <X size={11} /> Clear filters
-                </button>
-              )}
+              <PaginationBar />
             </div>
           )}
         </div>
@@ -444,12 +583,11 @@ export default function FDCompaniesPage() {
 
 
       <style jsx>{`
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .scrollbar-hide::-webkit-scrollbar { display: none !important; }
+        .scrollbar-hide { -ms-overflow-style: none !important; scrollbar-width: none !important; }
         @keyframes fadeIn { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
         .animate-fadeIn { animation: fadeIn 0.25s ease; }
       `}</style>
     </div>
   );
 }
-

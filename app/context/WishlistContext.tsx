@@ -131,19 +131,19 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
 
-    useEffect(() => {
-        const savedWishlist = localStorage.getItem("infinity_wishlist");
-        if (savedWishlist) {
-            try {
-                setWishlist(JSON.parse(savedWishlist));
-            } catch (e) {
-                console.error("Failed to parse wishlist", e);
-            }
-        }
-    }, []);
+    // useEffect(() => {
+    //     const savedWishlist = localStorage.getItem("infinity_wishlist");
+    //     if (savedWishlist) {
+    //         try {
+    //             setWishlist(JSON.parse(savedWishlist));
+    //         } catch (e) {
+    //             console.error("Failed to parse wishlist", e);
+    //         }
+    //     }
+    // }, []);
 
     useEffect(() => {
-        localStorage.setItem("infinity_wishlist", JSON.stringify(wishlist));
+        // localStorage.setItem("infinity_wishlist", JSON.stringify(wishlist));
     }, [wishlist]);
 
     const toggleWishlist = (item: WishlistItem) => {

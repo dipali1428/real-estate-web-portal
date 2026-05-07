@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import {
     ChevronDown,
@@ -12,11 +11,10 @@ import {
     Target,
     Activity
 } from "lucide-react";
-import LifeInsuranceHeader from "../components/LifeInsuranceHeader";
+
 
 
 export default function CustomerTermCalculatorPage() {
-    const router = useRouter();
     const [gender, setGender] = useState<"male" | "female">("male");
     const [isSmoker, setIsSmoker] = useState<boolean>(false);
     const [age, setAge] = useState<number>(30);
@@ -32,7 +30,7 @@ export default function CustomerTermCalculatorPage() {
     }, [age]);
 
     useEffect(() => {
-        let baseMonthly = 370;
+        const baseMonthly = 370;
         const ageEffect = Math.pow(1.052, age - 18);
         const genderEffect = gender === "male" ? 1.15 : 1.0;
         const smokerEffect = isSmoker ? 1.60 : 1.0;

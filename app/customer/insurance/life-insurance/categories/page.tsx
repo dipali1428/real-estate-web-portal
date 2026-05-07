@@ -2,9 +2,8 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { 
-  Grid
-} from "lucide-react";
+
+
 import LifeProductGrid from "../../../../products/life-insurance/components/LifeProductGrid";
 // import LifeInsuranceHeader from "../components/LifeInsuranceHeader";
 

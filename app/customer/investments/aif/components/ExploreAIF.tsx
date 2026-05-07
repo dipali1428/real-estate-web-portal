@@ -1,5 +1,4 @@
-"use client";
-
+"use client";;
 import { useState, useEffect, useMemo } from "react";
 import {
   Search,
@@ -19,9 +18,11 @@ import {
   Video,
   MessageSquare,
   ArrowUpRight,
-  Check
+  Check,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import customerService from "../../../../services/customerService";
+import toast from "react-hot-toast";
 
 interface CartItem {
   id: string;
@@ -39,8 +40,6 @@ export default function ExploreAIF() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [wishlist, setWishlist] = useState<any[]>([]);
   const [showAllFunds, setShowAllFunds] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [schedulingProduct, setSchedulingProduct] = useState<AIFProduct | null>(null);
   const [meetingDate, setMeetingDate] = useState("");
@@ -49,35 +48,64 @@ export default function ExploreAIF() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notifyWhatsApp, setNotifyWhatsApp] = useState(true);
   const [notifyEmail, setNotifyEmail] = useState(true);
-  const [whatsappNumber, setWhatsappNumber] = useState("+91 95952 47614");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [userId, setUserId] = useState<number | null>(null);
 
-  const handleScheduleClick = (product: AIFProduct) => {
+  const handleScheduleClick = async (product: AIFProduct) => {
     setSchedulingProduct(product);
     setIsScheduleModalOpen(true);
+
+    // If whatsappNumber is empty, try fetching again
+    if (!whatsappNumber) {
+      try {
+        const response = await customerService.getProfile();
+        if (response && response.user) {
+          setUserId(response.user.id);
+          const userMobile = response.user.mobile || response.user.phone || response.user.mobile_number;
+          if (userMobile) {
+            setWhatsappNumber(userMobile);
+          }
+        }
+      } catch (error) {
+        toast.error("Failed to re-fetch user profile:");
+      }
+    }
   };
 
   const handleConfirmSchedule = () => {
     if (!meetingDate || !meetingTime) {
-      setToastMessage("Please select both date and time");
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      toast.error("Please select both date and time");
       return;
     }
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
       setIsScheduleModalOpen(false);
-      setToastMessage("Confirmation sent to your WhatsApp and Email!");
-      setShowToast(true);
+      toast.success("Confirmation sent to your WhatsApp and Email!");
 
       setMeetingDate("");
       setMeetingTime("");
-      setTimeout(() => setShowToast(false), 3000);
     }, 1500);
   };
 
   // Persistence
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await customerService.getProfile();
+        if (response && response.user) {
+          setUserId(response.user.id);
+          const userMobile = response.user.mobile || response.user.phone || response.user.mobile_number;
+          if (userMobile) {
+            setWhatsappNumber(userMobile);
+          }
+        }
+      } catch (error) {
+        toast.error("Failed to fetch user profile:");
+      }
+    };
+    fetchUser();
+
     const savedCart = localStorage.getItem("aif_cart");
     if (savedCart) setCart(JSON.parse(savedCart));
 
@@ -124,6 +152,7 @@ export default function ExploreAIF() {
     const isPresent = wishlist.some(item => item.id === product.name && item.category === "aif");
     if (isPresent) {
       setWishlist(wishlist.filter(item => !(item.id === product.name && item.category === "aif")));
+      toast.success(`${product.name} removed from wishlist`);
     } else {
       const wishlistItem = {
         id: product.name,
@@ -141,9 +170,7 @@ export default function ExploreAIF() {
         addedDate: new Date().toLocaleDateString(),
       };
       setWishlist([...wishlist, wishlistItem]);
-      setToastMessage(`"${product.name}" added to wishlist!`);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      toast.success(`${product.name} saved to wishlist`);
     }
   };
 
@@ -151,21 +178,6 @@ export default function ExploreAIF() {
 
   return (
     <div className="space-y-6 relative">
-      {/* Wishlist Toast – top-right */}
-      <AnimatePresence>
-        {showToast && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, x: 20 }}
-            animate={{ opacity: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, y: -20, x: 20 }}
-            className="fixed top-6 right-6 z-[9999] flex items-center gap-3 px-5 py-3 rounded-2xl shadow-2xl text-white text-sm font-bold"
-            style={{ background: "linear-gradient(135deg, #1CADA3, #2076C7)" }}
-          >
-            <BookmarkCheck size={18} />
-            {toastMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* --- NEW MODERN HEADER --- */}
       <motion.div
@@ -199,41 +211,35 @@ export default function ExploreAIF() {
         </div>
       </motion.div>
 
-      <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-gray-100 shadow-sm sticky top-0 z-40 space-y-6">
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search AIF funds..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-12 py-4 rounded-xl border border-gray-200 bg-white text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1CADA3]/50 shadow-sm transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                <X size={20} />
-              </button>
-            )}
-          </div>
-          <div className="flex bg-gray-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto no-scrollbar">
-            {["All", "Category I", "Category II", "Category III"].map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                  activeCategory === cat
-                    ? "bg-gradient-to-r from-[#1CADA3] to-[#2076C7] text-white shadow-md shadow-teal-200"
-                    : "text-gray-500 hover:bg-gray-200"
+      {/* Filter Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        {/* Category Filter - Left Side */}
+        <div className="flex flex-wrap gap-1.5">
+          {["All", "Category I", "Category II", "Category III"].map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-5 py-2 rounded-xl font-bold text-[11px] tracking-wide transition-all cursor-pointer whitespace-nowrap border ${activeCategory === cat
+                ? 'text-white border-transparent shadow-lg shadow-[#2076C7]/20'
+                : 'bg-white text-gray-500 border-gray-100 hover:border-gray-200 hover:bg-gray-50'
                 }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+              style={activeCategory === cat ? { background: 'linear-gradient(to right, #2076C7, #1CADA3)' } : {}}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Search - Right Side */}
+        <div className="relative w-full md:w-64">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+          <input
+            type="text"
+            placeholder="Search funds..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-11 pl-11 pr-4 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#2076C7]/10 transition-all font-medium text-gray-700 text-sm placeholder:text-gray-400 shadow-sm"
+          />
         </div>
       </div>
 

@@ -7,6 +7,7 @@ import { AuthService } from "@/app/services/authService";
 import { PublicService } from "@/app/services/publicService";
 import { useRouter } from "next/navigation";
 import { useModal } from "../../context/ModalContext";
+import { toast } from "react-hot-toast";
 
 // Animation Variants
 const containerVariants = {
@@ -80,7 +81,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                         setOtp(content.code);
                     }
                 })
-                .catch((err) => console.log("Web OTP API not triggered", err));
+                .catch((err) => toast.error("Web OTP API not triggered"));
             return () => ac.abort();
         }
     }, [otpSent, loginMethod, forgotStep]);
@@ -109,7 +110,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                     }
                 }
             } catch (err) {
-                console.error("FCM Registration failed:", err);
+                toast.error("FCM Registration failed:");
             } */
             redirectByRole(data.user.role);
             onClose();

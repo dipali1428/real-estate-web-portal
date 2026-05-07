@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
 
 // Register Chart.js components
@@ -326,13 +326,10 @@ export default function LoanCalculator() {
     }, [loanAmount, annualInterestRate, loanTermMonths, paymentFrequency]);
 
     // Update displayed schedule when page or items per page changes
-    useEffect(() => {
-        if (fullAmortizationSchedule.length > 0) {
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const currentSchedule = fullAmortizationSchedule.slice(startIndex, endIndex);
-            setAmortizationSchedule(currentSchedule);
-        }
+    const displayedAmortizationSchedule = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return fullAmortizationSchedule.slice(startIndex, endIndex);
     }, [currentPage, itemsPerPage, fullAmortizationSchedule]);
 
     // Pagination controls

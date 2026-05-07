@@ -9,6 +9,7 @@ import {
     Filter, Search, ChevronRight, TrendingUp, Shield, MapPin, X, Star, CheckCircle, Wallet,
     ChevronLeft, Layout, Zap, Info, Plus, Minus, IndianRupee
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 import InvestmentGrowth from '../../../customer/real-estate/components/InvestmentGrowth';
 

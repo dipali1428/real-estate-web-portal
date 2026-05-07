@@ -1,16 +1,20 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { Search, ArrowRight, ShieldPlus, Info } from 'lucide-react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { Search, ArrowRight, ShieldPlus, Info, FileText } from 'lucide-react';
 import HealthInsurancePlanCard from './HealthInsurancePlanCard';
 import { healthInsurancePlans } from '../healthInsuranceConstants';
 import { motion } from 'framer-motion';
-import { toast } from 'react-hot-toast';
+import customerService from '../../../../services/customerService';
+import toast from 'react-hot-toast';
 
 export default function ExploreHealthInsurance({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [showAllPlans, setShowAllPlans] = useState(false);
+    const [wishlistMap, setWishlistMap] = useState<Map<string, number>>(new Map());
+    const [wishlistLoading, setWishlistLoading] = useState<Set<string>>(new Set());
+    const [userId, setUserId] = useState<number | null>(null);
 
     const categories = useMemo(() => {
         return ['All', ...Array.from(new Set(healthInsurancePlans.map(plan => plan.bestFor))).slice(0, 3)];
@@ -23,6 +27,85 @@ export default function ExploreHealthInsurance({ activeTab, setActiveTab }: { ac
             return matchesSearch && matchesCategory;
         });
     }, [searchQuery, selectedCategory]);
+
+    const fetchWishlist = useCallback(async () => {
+        try {
+            const response = await customerService.getMyWishlist();
+            if (response.success && response.data) {
+                const items = Array.isArray(response.data) ? response.data : [response.data];
+                const map = new Map<string, number>();
+                items.forEach((item: any) => {
+                    if (item.product_type === 'health_insurance') {
+                        map.set(item.product_name, item.id);
+                    }
+                });
+                setWishlistMap(map);
+            }
+        } catch (error) {
+            toast.error('Failed to load wishlist:');
+        }
+    }, []);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await customerService.getProfile();
+                if (response && response.user) {
+                    setUserId(response.user.id);
+                }
+            } catch (error) {
+                toast.error('Failed to fetch user profile:');
+            }
+        };
+        fetchUser();
+        fetchWishlist();
+    }, [fetchWishlist]);
+
+    const toggleWishlist = async (plan: any) => {
+        const planName = plan.name;
+        const wishlistId = wishlistMap.get(planName);
+
+        if (wishlistLoading.has(planName)) return;
+        setWishlistLoading(prev => new Set(prev).add(planName));
+
+        try {
+            if (wishlistId) {
+                const response = await customerService.removeFromWishlist(wishlistId);
+                if (response.success) {
+                    setWishlistMap(prev => {
+                        const updated = new Map(prev);
+                        updated.delete(planName);
+                        return updated;
+                    });
+                    toast.success(`${planName} removed from wishlist`);
+                }
+            } else {
+                const response = await customerService.addToWishlist({
+                    product_type: 'health_insurance',
+                    product_id: 0, // Health insurance doesn't have a numeric ID in constants
+                    product_name: planName,
+                });
+                if (response.success && response.data) {
+                    const newItem = Array.isArray(response.data) ? response.data[0] : response.data;
+                    setWishlistMap(prev => {
+                        const updated = new Map(prev);
+                        updated.set(planName, newItem.id);
+                        return updated;
+                    });
+                    toast.success(`${planName} saved to wishlist`);
+                }
+            }
+        } catch (error: any) {
+           
+            toast.error(error.response?.data?.message || 'Failed to update wishlist');
+        } finally {
+            setWishlistLoading(prev => {
+                const updated = new Set(prev);
+                updated.delete(planName);
+                return updated;
+            });
+        }
+    };
 
     const visiblePlans = useMemo(() => {
         return showAllPlans ? filteredPlans : filteredPlans.slice(0, 5);
@@ -60,79 +143,85 @@ export default function ExploreHealthInsurance({ activeTab, setActiveTab }: { ac
                         </div>
                     </div>
 
-                    <div className="flex bg-gray-200/50 p-1.5 rounded-xl w-full sm:w-fit self-center sm:self-end md:self-center flex-wrap justify-center sm:justify-start">
-                        <button
-                            onClick={() => setActiveTab("explore")}
-                            className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                                activeTab === "explore"
-                                    ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-200"
-                                    : "text-gray-500 hover:bg-gray-200"
-                            }`}
-                        >
-                            Explore Offers
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("applications")}
-                            className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                                activeTab === "applications"
-                                    ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-teal-200"
-                                    : "text-gray-500 hover:bg-gray-200"
-                            }`}
-                        >
-                            My Policies
-                        </button>
+                    <div className="flex pb-2 md:pb-0 w-full sm:w-auto mt-2 sm:mt-0 overflow-x-auto hide-scrollbar sm:overflow-visible">
+                        <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
+                            <button
+                                onClick={() => setActiveTab('explore')}
+                                className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'explore' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                {activeTab === 'explore' && (
+                                    <motion.div
+                                        layoutId="activeTabExploreHealth"
+                                        className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+                                <ShieldPlus size={14} />
+                                <span>Offers</span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('applications')}
+                                className={`relative px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 shrink-0 ${activeTab === 'applications' ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                {activeTab === 'applications' && (
+                                    <motion.div
+                                        layoutId="activeTabExploreHealth"
+                                        className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+                                <FileText size={14} />
+                                <span>Policies</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </motion.div>
 
             {/* Filter Section */}
-            <div className="mb-10">
-                <div className="bg-white/90 backdrop-blur-xl p-2 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-2 items-center w-full">
-                    {/* Search */}
-                    <div className="relative w-full md:w-72 shrink-0">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#2076C7]" size={18} />
-                        <input
-                            type="text"
-                            placeholder="Search insurers..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-12 pl-12 pr-4 bg-gray-50 border-none rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-[#2076C7]/10 transition-all font-medium text-gray-700 text-sm placeholder:text-gray-400"
-                        />
-                    </div>
-
-                    <div className="h-8 w-px bg-gray-200 hidden md:block mx-2"></div>
-
-                    {/* Category Filter */}
-                    <div className="flex flex-wrap justify-center md:justify-start gap-1.5 w-full">
-                        {categories.map((cat) => (
-                            <button
-                                key={cat}
-                                onClick={() => setSelectedCategory(cat)}
-                                className={`px-5 py-2 rounded-xl font-bold text-[11px] tracking-wide transition-all cursor-pointer whitespace-nowrap border ${selectedCategory === cat
-                                    ? 'text-white border-transparent shadow-lg shadow-[#2076C7]/20'
-                                    : 'bg-white text-gray-500 border-gray-100 hover:border-gray-200 hover:bg-gray-50'
-                                    }`}
-                                style={selectedCategory === cat ? { background: 'linear-gradient(to right, #2076C7, #1CADA3)' } : {}}
-                            >
-                                {cat}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Results Count */}
-                <div className="mt-4 px-2 flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                    <span>{filteredPlans.length} PLANS FOUND</span>
-                    {(searchQuery || selectedCategory !== 'All') && (
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                {/* Category Filter - Left Side */}
+                <div className="flex flex-wrap gap-1.5">
+                    {categories.map((cat) => (
                         <button
-                            onClick={() => { setSearchQuery(''); setSelectedCategory('All'); }}
-                            className="text-[#2076C7] hover:text-[#1CADA3] transition-colors cursor-pointer flex items-center gap-1"
+                            key={cat}
+                            onClick={() => setSelectedCategory(cat)}
+                            className={`px-5 py-2 rounded-xl font-bold text-[11px] tracking-wide transition-all cursor-pointer whitespace-nowrap border ${selectedCategory === cat
+                                ? 'text-white border-transparent shadow-lg shadow-[#2076C7]/20'
+                                : 'bg-white text-gray-500 border-gray-100 hover:border-gray-200 hover:bg-gray-50'
+                                }`}
+                            style={selectedCategory === cat ? { background: 'linear-gradient(to right, #2076C7, #1CADA3)' } : {}}
                         >
-                            <span>Clear Filters</span>
-                            <div className="w-4 h-4 rounded-md bg-gray-100 flex items-center justify-center text-[8px] text-gray-500">✕</div>
+                            {cat}
                         </button>
-                    )}
+                    ))}
                 </div>
+
+                {/* Search - Right Side */}
+                <div className="relative w-full md:w-64">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                    <input
+                        type="text"
+                        placeholder="Search insurers..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full h-11 pl-11 pr-4 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#2076C7]/10 transition-all font-medium text-gray-700 text-sm placeholder:text-gray-400 shadow-sm"
+                    />
+                </div>
+            </div>
+
+            {/* Results Count & Clear Filters */}
+            <div className="mb-4 flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
+                <span>{filteredPlans.length} PLANS FOUND</span>
+                {(searchQuery || selectedCategory !== 'All') && (
+                    <button
+                        onClick={() => { setSearchQuery(''); setSelectedCategory('All'); }}
+                        className="text-[#2076C7] hover:text-[#1CADA3] transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                        <span>Clear Filters</span>
+                        <div className="w-4 h-4 rounded-md bg-gray-100 flex items-center justify-center text-[8px] text-gray-500">✕</div>
+                    </button>
+                )}
             </div>
 
             {/* Plans Grid */}
@@ -141,7 +230,10 @@ export default function ExploreHealthInsurance({ activeTab, setActiveTab }: { ac
                     <HealthInsurancePlanCard 
                         key={idx} 
                         {...plan} 
-                        onApply={(name) => toast.success(`Applying for ${name}`)} 
+                         
+                        isWishlisted={wishlistMap.has(plan.name)}
+                        onWishlistToggle={() => toggleWishlist(plan)}
+                        wishlistLoading={wishlistLoading.has(plan.name)}
                     />
                 ))}
             </div>

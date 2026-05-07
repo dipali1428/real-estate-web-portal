@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 
 // Moved calculation logic here for simplification as requested
 export const extractYears = (period: string): number => {

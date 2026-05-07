@@ -209,20 +209,20 @@ export default function HelpSupport() {
                             <p className="text-sm sm:text-base text-gray-500 text-center mb-4 sm:mb-6">
                                 Is your issue fully resolved? Clicking Confirm will finalize and close this support ticket.
                             </p>
-                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                            <div className="flex justify-center gap-2 sm:gap-3">
                                 <button
                                     onClick={() => {
                                         setShowResolveModal(false);
                                         setTicketToResolve(null);
                                     }}
-                                    className="order-2 sm:order-1 py-2.5 sm:py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all text-sm sm:text-base"
+                                    className="px-6 py-2.5 sm:py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all text-sm sm:text-base min-w-[120px]"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleConfirmResolve}
                                     disabled={actionLoading}
-                                    className="order-1 sm:order-2 py-2.5 sm:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-medium hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
+                                    className="px-6 py-2.5 sm:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-medium hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base min-w-[160px]"
                                 >
                                     {actionLoading ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -396,133 +396,134 @@ export default function HelpSupport() {
             )}
 
             {/* VIEW 2: CREATE TICKET MODAL - Responsive */}
-            {view === 'create' && (
-                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-                    <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto mx-3 sm:mx-4">
-                        <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-4 sm:p-6 text-white rounded-t-2xl sm:rounded-t-3xl flex justify-between items-center sticky top-0">
-                            <div className="flex items-center gap-2 sm:gap-3">
-                                <h3 className="text-lg sm:text-xl font-bold">Raise Support Ticket</h3>
-                            </div>
-                            <button 
-                                onClick={() => setView('list')} 
-                                className="p-1.5 sm:p-2 hover:bg-white/20 rounded-lg sm:rounded-xl transition-colors"
+{view === 'create' && (
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto mx-3 sm:mx-4">
+            <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-4 sm:p-6 text-white rounded-t-2xl sm:rounded-t-3xl flex justify-between items-center sticky top-0">
+                <div className="flex items-center gap-2 sm:gap-3">
+                    <h3 className="text-lg sm:text-xl font-bold">Raise Support Ticket</h3>
+                </div>
+                <button 
+                    onClick={() => setView('list')} 
+                    className="p-1.5 sm:p-2 hover:bg-white/20 rounded-lg sm:rounded-xl transition-colors"
+                >
+                    <X size={18} className="sm:w-5 sm:h-5" />
+                </button>
+            </div>
+            
+            <div className="p-4 sm:p-8 space-y-4 sm:space-y-6">
+                <form onSubmit={handleCreateTicket} className="space-y-4 sm:space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                        <div>
+                            <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
+                                Investment Area
+                            </label>
+                            <select 
+                                required 
+                                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-sm sm:text-base appearance-none"
+                                value={formData.category} 
+                                onChange={(e) => setFormData({...formData, category: e.target.value, product_type: e.target.value})}
+                                style={{
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 1rem center',
+                                    backgroundSize: '1rem'
+                                }}
                             >
-                                <X size={18} className="sm:w-5 sm:h-5" />
-                            </button>
+                                <option value="">Select Category</option>
+                                {PRODUCT_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                            </select>
                         </div>
-                        
-                        <div className="p-4 sm:p-8 space-y-4 sm:space-y-6">
-                            <form onSubmit={handleCreateTicket} className="space-y-4 sm:space-y-6">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                                    <div>
-                                        <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
-                                            Investment Area
-                                        </label>
-                                        <select 
-                                            required 
-                                            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-sm sm:text-base appearance-none"
-                                            value={formData.category} 
-                                            onChange={(e) => setFormData({...formData, category: e.target.value, product_type: e.target.value})}
-                                            style={{
-                                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
-                                                backgroundRepeat: 'no-repeat',
-                                                backgroundPosition: 'right 1rem center',
-                                                backgroundSize: '1rem'
-                                            }}
-                                        >
-                                            <option value="">Select Category</option>
-                                            {PRODUCT_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
-                                            Priority
-                                        </label>
-                                        <select 
-                                            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-sm sm:text-base appearance-none"
-                                            value={formData.severity} 
-                                            onChange={(e) => setFormData({...formData, severity: e.target.value})}
-                                            style={{
-                                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
-                                                backgroundRepeat: 'no-repeat',
-                                                backgroundPosition: 'right 1rem center',
-                                                backgroundSize: '1rem'
-                                            }}
-                                        >
-                                            <option value="Low">Low</option>
-                                            <option value="Medium">Medium</option>
-                                            <option value="High">High</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
-                                        Reference ID <span className="text-gray-400 text-[10px] sm:text-xs font-normal">(Optional)</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g., Investment ID, Policy Number"
-                                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-sm sm:text-base"
-                                        value={formData.reference_id}
-                                        onChange={(e) => setFormData({...formData, reference_id: e.target.value})}
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
-                                        Subject
-                                    </label>
-                                    <input
-                                        required
-                                        type="text"
-                                        placeholder="What is the issue?"
-                                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-sm sm:text-base"
-                                        value={formData.subject}
-                                        onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
-                                        Detailed Description
-                                    </label>
-                                    <textarea
-                                        required
-                                        rows={4}
-                                        placeholder="Describe your concern in detail..."
-                                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all resize-none text-sm sm:text-base"
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({...formData, description: e.target.value})}
-                                    />
-                                </div>
-
-                                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => setView('list')}
-                                        className="order-2 sm:order-1 py-3 sm:py-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors text-sm sm:text-base"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={actionLoading || !formData.category || !formData.subject || !formData.description}
-                                        className="order-1 sm:order-2 py-3 sm:py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all text-sm sm:text-base"
-                                    >
-                                        {actionLoading ? (
-                                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                        ) : (
-                                            <Send size={16} className="sm:w-4.5 sm:h-4.5" />
-                                        )}
-                                        Submit Support Request
-                                    </button>
-                                </div>
-                            </form>
+                        <div>
+                            <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
+                                Priority
+                            </label>
+                            <select 
+                                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-sm sm:text-base appearance-none"
+                                value={formData.severity} 
+                                onChange={(e) => setFormData({...formData, severity: e.target.value})}
+                                style={{
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 1rem center',
+                                    backgroundSize: '1rem'
+                                }}
+                            >
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
                         </div>
                     </div>
-                </div>
-            )}
+
+                    <div>
+                        <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
+                            Reference ID <span className="text-gray-400 text-[10px] sm:text-xs font-normal">(Optional)</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="e.g., Investment ID, Policy Number"
+                            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-sm sm:text-base"
+                            value={formData.reference_id}
+                            onChange={(e) => setFormData({...formData, reference_id: e.target.value})}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
+                            Subject
+                        </label>
+                        <input
+                            required
+                            type="text"
+                            placeholder="What is the issue?"
+                            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all text-sm sm:text-base"
+                            value={formData.subject}
+                            onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
+                            Detailed Description
+                        </label>
+                        <textarea
+                            required
+                            rows={4}
+                            placeholder="Describe your concern in detail..."
+                            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all resize-none text-sm sm:text-base"
+                            value={formData.description}
+                            onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        />
+                    </div>
+
+                    {/* Centered Buttons */}
+                    <div className="flex justify-center gap-3 sm:gap-4 pt-4">
+                        <button
+                            type="button"
+                            onClick={() => setView('list')}
+                            className="px-6 py-2.5 sm:py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors text-sm sm:text-base min-w-[140px]"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={actionLoading || !formData.category || !formData.subject || !formData.description}
+                            className="px-6 py-2.5 sm:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all text-sm sm:text-base min-w-[200px]"
+                        >
+                            {actionLoading ? (
+                                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <Send size={16} className="sm:w-4.5 sm:h-4.5" />
+                            )}
+                            Submit Support Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+)}
 
             {/* VIEW 3: CHAT VIEW - Responsive */}
             {view === 'detail' && selectedTicket && (

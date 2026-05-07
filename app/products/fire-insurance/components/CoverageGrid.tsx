@@ -35,7 +35,7 @@ export default function CoverageGrid() {
         {/* Heading */}
         <div className="text-center mb-16 md:mb-20 relative z-10 flex flex-col items-center">
           <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 md:mb-6 uppercase tracking-tight bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
-            What's Covered Under <br className="hidden md:block" /> Fire Insurance?
+            What&apos;s Covered Under <br className="hidden md:block" /> Fire Insurance?
           </h2>
           <p className="text-gray-500 font-medium max-w-2xl text-sm sm:text-base md:text-lg text-center">
             From natural calamities to accidental explosions, we provide a wide shield of protection against diverse risks.
@@ -70,7 +70,7 @@ export default function CoverageGrid() {
                 Standard Exclusions
               </h3>
               <p className="text-gray-600 font-medium text-sm md:text-base leading-relaxed">
-                It's important to understand what's not covered to ensure you have the right add-ons if needed.
+                It&apos;s important to understand what&apos;s not covered to ensure you have the right add-ons if needed.
               </p>
             </div>
 
