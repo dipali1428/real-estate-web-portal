@@ -35,7 +35,7 @@ const Header = () => {
     { label: "Home", href: "/" },
     { label: "About Us", href: "/page/about", component: AboutSection },
     { label: "Media Center", href: "/page/event", component: AboutSection },
-    { label: "Cibil Check", href: "/page/cibil", component: CibilSection, badge: "New" },
+    { label: "Cibil Check", href: "/page/cibil", component: CibilSection, badge: "Free" },
     { label: "Careers", href: "/page/careers" },
   ];
 
