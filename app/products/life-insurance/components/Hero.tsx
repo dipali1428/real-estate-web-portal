@@ -4,7 +4,7 @@ import { useSpring, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useMousePosition } from "../../../hooks/useMousePosition";
 import { useModal } from '@/app/context/ModalContext';
-
+import Image from 'next/image';
 
 export default function Hero() {
   const { openLogin } = useModal();
@@ -93,9 +93,11 @@ export default function Hero() {
           <div className="flex justify-center lg:justify-end">
             <div className="relative w-full max-w-md sm:max-w-lg lg:max-w-xl">
               <div className="rounded-[2rem] overflow-hidden border-8 border-white shadow-2xl">
-                <img
+                <Image
                   src="/insurance/life-insurance-hero-minimalist.png"
                   alt="Secure Family Future"
+                  width={600}
+                  height={450}
                   className="w-full h-[240px] sm:h-[320px] lg:h-[450px] object-cover"
                 />
               </div>

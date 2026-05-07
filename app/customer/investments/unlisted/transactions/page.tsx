@@ -71,7 +71,7 @@ export default function TransactionsPage() {
           return;
         }
 
-        localStorage.setItem('token', token);
+        // localStorage.setItem('token', token);
         const response = await customerService.getTransactions();
         
         if (response.success) {

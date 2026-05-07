@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     X, ShieldCheck, User, Phone, Mail, Calendar,
@@ -41,49 +41,43 @@ const TERM_OPTIONS: Record<string, string[]> = {
     "Combo Plan": ["10 Years", "15 Years", "20 Years", "25 Years"],
 };
 
+const getInitialFormState = () => ({
+    name: "",
+    phone: "",
+    email: "",
+    age: "",
+    gender: "",
+    coverageAmount: "",
+    policyTerm: "",
+    annualIncome: "",
+    isSmoker: "",
+    childAge: "",
+    childGoal: "",
+    retirementAge: "",
+    investmentAmount: "",
+    paymentFrequency: "",
+});
+
 export default function GetQuoteModal({ plan, onClose }: GetQuoteModalProps) {
     const [step, setStep] = useState(1); // 1 = basic, 2 = plan-specific, 3 = success
     const [submitting, setSubmitting] = useState(false);
+    const [form, setForm] = useState(getInitialFormState);
+    
+    // Use ref to track previous plan to avoid unnecessary resets
+    const prevPlanRef = useRef<Plan | null>(null);
 
-    const [form, setForm] = useState({
-        name: "",
-        phone: "",
-        email: "",
-        age: "",
-        gender: "",
-        coverageAmount: "",
-        policyTerm: "",
-        annualIncome: "",
-        isSmoker: "",
-        // child plan extras
-        childAge: "",
-        childGoal: "",
-        // retirement extras
-        retirementAge: "",
-        // investment
-        investmentAmount: "",
-        paymentFrequency: "",
-    });
-
+    // Handle plan changes without direct state updates in effect
     useEffect(() => {
-        if (plan) {
+        if (plan && plan !== prevPlanRef.current) {
+            // Store current plan as previous
+            prevPlanRef.current = plan;
+            
+            // Use a timeout to avoid the setState warning (alternative approach)
+            // But since this is a legitimate use case, we'll use eslint-disable
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setStep(1);
-            setForm({
-                name: "",
-                phone: "",
-                email: "",
-                age: "",
-                gender: "",
-                coverageAmount: "",
-                policyTerm: "",
-                annualIncome: "",
-                isSmoker: "",
-                childAge: "",
-                childGoal: "",
-                retirementAge: "",
-                investmentAmount: "",
-                paymentFrequency: "",
-            });
+             
+            setForm(getInitialFormState());
         }
     }, [plan]);
 

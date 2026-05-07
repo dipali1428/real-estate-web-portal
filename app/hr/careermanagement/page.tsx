@@ -78,7 +78,6 @@ export default function CareerManagementPage() {
         setApplications(res.career_applications);
       }
     } catch (error) {
-      console.error("Fetch Error:", error);
       toast.error("Failed to load applications");
     } finally {
       setLoading(false);

@@ -5,6 +5,7 @@ import {
   ShieldCheck, Loader2, ArrowRight, ArrowLeft, AlertCircle 
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import { toast } from "react-hot-toast";
 
 // --- Constants & Styles ---
 const STYLES = {
@@ -153,8 +154,7 @@ export default function NrpLoanForm({ onClose }: { onClose: () => void }) {
         setStep(2);
       }
     } catch (err) {
-      console.error(err);
-      setStatusMsg("Submission failed.");
+      toast.error("Submission failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -213,7 +213,7 @@ export default function NrpLoanForm({ onClose }: { onClose: () => void }) {
                   <span className="text-sm font-bold text-[#1CADA3] uppercase tracking-wide">Direct Submission</span>
                 </div>
                 <Field label="Self Login to Bank?" type="select" options={["No", "Yes"]} value={form.isSelfLogin} onChange={(v:any)=>handleInputChange("isSelfLogin", v)} error={errors.isSelfLogin} required />
-                <p className="text-[11px] text-gray-500 mt-2 italic">Select "Yes" if you have already initiated the login process with the bank.</p>
+                <p className="text-[11px] text-gray-500 mt-2 italic">Select &quot;Yes&quot; if you have already initiated the login process with the bank.</p>
               </div>
 
               {isSelfLoginActive ? (

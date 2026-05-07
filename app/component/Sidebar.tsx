@@ -5,8 +5,7 @@ import { Sidebar, SidebarBody, SidebarLink } from "../component/ui/sidebar";
 import { cn } from "../lib/utils";
 import { LogOut, ChevronDown, ChevronRight } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
-import { getSidebarLinks } from "../utils/getSidebarLinks";
-import type { Role } from "../utils/getSidebarLinks";
+import { getSidebarLinks, Role } from "../utils/getSidebarLinks";
 
 export interface SidebarItem {
   label: string;

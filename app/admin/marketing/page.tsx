@@ -90,7 +90,7 @@ export default function AdminTemplates() {
 
   const handleAddTemplate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFile) return alert("Please select an image");
+    if (!selectedFile) return toast.error("Please select an image");
 
     setIsSubmitting(true);
     try {

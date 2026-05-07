@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect, useMemo } from 'react';
 import { DashboardService } from "@/app/services/dashboardService";
+import { toast } from 'react-hot-toast';
 
 interface QuickStatsProps {
     // These props are now optional because we are fetching data internally
@@ -27,7 +28,7 @@ const QuickStats: React.FC<QuickStatsProps> = () => {
                     setData(rawData);
                 }
             } catch (error) {
-                console.error("Failed to fetch stats:", error);
+                toast.error("Failed to fetch stats:");
             } finally {
                 setLoading(false);
             }

@@ -30,10 +30,9 @@ export default function ProfileSection() {
             try {
                 setLoading(true);
                 const res = await AdminService.getAdminProfile();
-                console.log("Profile data:", res);
+                toast.success("Profile fetched successfully.");
                 setProfile(res.user);
             } catch (err) {
-                console.error("Profile load error", err);
                 toast.error("Failed to fetch profile.");
             } finally {
                 setLoading(false);

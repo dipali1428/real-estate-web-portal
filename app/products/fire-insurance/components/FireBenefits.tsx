@@ -53,7 +53,7 @@ export default function FireBenefits() {
           </h2>
 
           <p className="text-gray-600 font-medium max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed">
-            We don't just provide a policy; we offer a strategic partnership to safeguard your most valuable investments.
+            We don&apos;t just provide a policy; we offer a strategic partnership to safeguard your most valuable investments.
           </p>
         </div>
 

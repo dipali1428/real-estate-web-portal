@@ -5,6 +5,7 @@ import {
   Loader2, ArrowRight, ArrowLeft, AlertCircle 
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import { toast } from "react-hot-toast";
 
 // --- Constants & Styles ---
 const STYLES = {
@@ -125,8 +126,7 @@ export default function LifeInsuranceForm({ onClose }: { onClose: () => void }) 
         setStep(2);
       }
     } catch (err) {
-      console.error(err);
-      setStatusMsg("Failed to create lead.");
+      toast.error("Failed to create lead.");
     } finally {
       setIsSubmitting(false);
     }

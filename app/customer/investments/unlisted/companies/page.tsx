@@ -1,12 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { 
-  Search, Filter, Building2, TrendingUp, X, Bookmark, 
-  BookmarkCheck, ShoppingCart, CheckCircle, ChevronDown,
-  IndianRupee, Info, Activity, MapPin, Package, FileText,
-  AlertTriangle, Loader2
-} from 'lucide-react';
+import { Search, Filter, Building2, TrendingUp, X, Bookmark, BookmarkCheck, ShoppingCart, CheckCircle, ChevronDown, IndianRupee, Info, Activity, MapPin, Package, FileText, AlertTriangle, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { fetchDashboardData, fetchIdGraphData, GraphPoint } from '../../../../services/unlistedservices';
 import toast from 'react-hot-toast';
@@ -16,7 +11,6 @@ import Chart, { ChartConfiguration } from 'chart.js/auto';
 import Image from "next/image";
 
 // ==================== TYPES ====================
-
 interface Company {
   id: number;
   shares_name: string;
@@ -74,9 +68,9 @@ const getTokenFromCookie = (): string | null => {
 
 const formatCurrency = (amount: string): string => {
   const num = parseFloat(amount);
-  return `₹${num.toLocaleString('en-IN', { 
-    minimumFractionDigits: 2, 
-    maximumFractionDigits: 2 
+  return `₹${num.toLocaleString('en-IN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
   })}`;
 };
 
@@ -91,16 +85,16 @@ const enrichCompanyForModal = (company: Company): Company => {
   const id = company.id;
   const price = parseFloat(company.price);
   const lotSize = company.min_lot_size || 100;
-  
+
   let category = 'Unlisted Shares';
   const name = company.shares_name.toLowerCase();
-  
+
   if (name.includes('tech') || name.includes('software')) category = 'Technology';
   else if (name.includes('fin') || name.includes('bank') || name.includes('microfinance')) category = 'Fintech';
   else if (name.includes('health') || name.includes('pharma') || name.includes('clinical')) category = 'Healthcare';
   else if (name.includes('auto') || name.includes('motor')) category = 'Automotive';
   else if (name.includes('energy') || name.includes('power') || name.includes('renewable')) category = 'Energy';
-  
+
   return {
     ...company,
     category,
@@ -120,35 +114,35 @@ const enrichCompanyForModal = (company: Company): Company => {
 
 export default function CompaniesPage() {
   const router = useRouter();
-  const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstance = useRef<any>(null);
-  
+  const chartRef = useRef<HTMLCanvasElement | null>(null);
+  const chartInstance = useRef<Chart | null>(null);
+
   // Market Stats States
   const [graphData, setGraphData] = useState<any[]>([]);
   const [isGraphLoading, setIsGraphLoading] = useState(true);
-  
+
   // Data States
   const [companies, setCompanies] = useState<Company[]>([]);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // UI States
   const [searchTerm, setSearchTerm] = useState('');
-  const [priceRange, setPriceRange] = useState<PriceRangeOption>('ALL');
-  const [sortBy, setSortBy] = useState<SortOption>('name-asc');
+  const [priceRange, setPriceRange] = useState('ALL');
+  const [sortBy, setSortBy] = useState('name-asc');
   const [showFilters, setShowFilters] = useState(false);
   const [wishlistMap, setWishlistMap] = useState<Map<number, number>>(new Map());
   const [wishlistLoading, setWishlistLoading] = useState(false);
-  
-  // View More State
-  const [visibleCount, setVisibleCount] = useState(12);
-  
+
+  // View More State - 5 companies per row on desktop
+  const [visibleCount, setVisibleCount] = useState(10); // 5x2 initially
+
   // Detail Modal States
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [modalGraphData, setModalGraphData] = useState<GraphPoint[]>([]);
   const [isModalGraphLoading, setIsModalGraphLoading] = useState(false);
   const [graphTimeRange, setGraphTimeRange] = useState('All');
-  
+
   // Toast State
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
@@ -174,8 +168,8 @@ export default function CompaniesPage() {
         if (response?.success && response?.graph) setGraphData(response.graph);
       } catch (error) {
         toast.error('Error fetching market data:');
-      } finally { 
-        setIsGraphLoading(false); 
+      } finally {
+        setIsGraphLoading(false);
       }
     };
     fetchIndexData();
@@ -183,9 +177,7 @@ export default function CompaniesPage() {
 
   const currentIndex = useMemo(() => {
     if (graphData.length === 0) return "0.00";
-    return parseFloat(graphData[graphData.length - 1].market_price).toLocaleString('en-IN', {
-      minimumFractionDigits: 2
-    });
+    return parseFloat(graphData[graphData.length - 1].market_price).toLocaleString('en-IN', { minimumFractionDigits: 2 });
   }, [graphData]);
 
   // --- WISHLIST FETCH WITH PROPER HANDLING ---
@@ -199,13 +191,11 @@ export default function CompaniesPage() {
     try {
       const response = await customerService.getMyWishlist();
       
-      // PROPER RESPONSE HANDLING
       if (!response || !response.success) {
         setWishlistMap(new Map());
         return;
       }
 
-      // SAFE DATA EXTRACTION
       let dataArray: any[] = [];
       
       if (response.data && Array.isArray(response.data)) {
@@ -235,11 +225,11 @@ export default function CompaniesPage() {
     setLoading(true);
     try {
       const token = getTokenFromCookie();
-      if (!token) { 
-        router.push('/'); 
-        return; 
+      if (!token) {
+        router.push('/');
+        return;
       }
-      
+
       const response = await customerService.getAllCompanies();
       const rawData = response?.data || response || [];
       
@@ -251,7 +241,6 @@ export default function CompaniesPage() {
       setCompanies(companiesData);
       setFilteredCompanies(companiesData);
       
-      // Load wishlist after companies are loaded
       await loadWishlist();
     } catch (err) {
       toast.error('Failed to load companies');
@@ -260,8 +249,8 @@ export default function CompaniesPage() {
     }
   };
 
-  useEffect(() => { 
-    fetchCompanies(); 
+  useEffect(() => {
+    fetchCompanies();
   }, []);
 
   // Auto-refresh wishlist every 30 seconds
@@ -269,21 +258,19 @@ export default function CompaniesPage() {
     const intervalId = setInterval(() => {
       loadWishlist();
     }, 30000);
-    
-    // Refresh when page becomes visible
+
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         loadWishlist();
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    // Listen for wishlist updates from other components
+
     const handleWishlistUpdate = () => {
       loadWishlist();
     };
     window.addEventListener('wishlistUpdated', handleWishlistUpdate);
-    
+
     return () => {
       clearInterval(intervalId);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -298,13 +285,12 @@ export default function CompaniesPage() {
       toast.error('Session expired. Please login again.');
       return;
     }
-    
+
     const wishlistId = wishlistMap.get(company.id);
     setWishlistLoading(true);
-    
+
     try {
       if (wishlistId) {
-        // Remove from wishlist
         const res = await customerService.removeFromWishlist(wishlistId);
         if (res.success) {
           setWishlistMap(prev => {
@@ -314,7 +300,6 @@ export default function CompaniesPage() {
           });
           toast.success('Removed from wishlist');
           
-          // Dispatch event for other components
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('wishlistUpdated', { 
               detail: { action: 'remove', productId: company.id } 
@@ -324,7 +309,6 @@ export default function CompaniesPage() {
           toast.error(res.message || 'Failed to remove from wishlist');
         }
       } else {
-        // Add to wishlist
         const res = await customerService.addToWishlist({
           product_type: 'unlisted_share', 
           product_id: company.id, 
@@ -336,7 +320,6 @@ export default function CompaniesPage() {
           setWishlistMap(prev => new Map(prev).set(company.id, newId));
           toast.success('Saved to wishlist');
           
-          // Dispatch event for other components
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('wishlistUpdated', { 
               detail: { action: 'add', productId: company.id } 
@@ -369,25 +352,26 @@ export default function CompaniesPage() {
     filtered.sort((a, b) => {
       if (sortBy === 'name-asc') return a.shares_name.localeCompare(b.shares_name);
       if (sortBy === 'name-desc') return b.shares_name.localeCompare(a.shares_name);
-      const pA = parseFloat(a.price); const pB = parseFloat(b.price);
+      const pA = parseFloat(a.price);
+      const pB = parseFloat(b.price);
       if (sortBy === 'price-asc') return pA - pB;
       if (sortBy === 'price-desc') return pB - pA;
       return 0;
     });
     setFilteredCompanies(filtered);
-    setVisibleCount(12);
+    setVisibleCount(10); 
   }, [companies, searchTerm, priceRange, sortBy]);
 
-  const clearFilters = () => { 
-    setSearchTerm(''); 
-    setPriceRange('ALL'); 
-    setSortBy('name-asc'); 
+  const clearFilters = () => {
+    setSearchTerm('');
+    setPriceRange('ALL');
+    setSortBy('name-asc');
   };
 
   // --- BUY NOW HANDLER ---
   const handleBuyNow = (company: Company) => {
-    sessionStorage.setItem('pendingBuyCompany', JSON.stringify(company));
-    router.push('/customer/checkout');
+    // sessionStorage.setItem('pendingBuyCompany', JSON.stringify(company));
+    // router.push('/customer/checkout');
   };
 
   // --- MODAL GRAPH DATA FETCH ---
@@ -452,7 +436,7 @@ export default function CompaniesPage() {
       cutoffDate.setMonth(now.getMonth() - 3);
       filteredData = modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
     }
-    
+
     filteredData.sort((a, b) => new Date(a.price_date).getTime() - new Date(b.price_date).getTime());
 
     const labels = filteredData.map(item => {
@@ -541,7 +525,7 @@ export default function CompaniesPage() {
   // Get filtered graph data for stats
   const getFilteredGraphData = () => {
     if (!modalGraphData.length) return [];
-    
+
     switch (graphTimeRange) {
       case '1W': {
         const cutoffDate = new Date();
@@ -567,10 +551,10 @@ export default function CompaniesPage() {
   // Toast Icon Helper
   const getToastIcon = (type: ToastMessage['type']) => {
     switch (type) {
-      case 'success': return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case 'error': return <X className="w-4 h-4 text-red-600" />;
-      case 'warning': return <AlertTriangle className="w-4 h-4 text-yellow-600" />;
-      default: return <Info className="w-4 h-4 text-blue-600" />;
+      case 'success': return <CheckCircle size={18} />;
+      case 'error': return <AlertTriangle size={18} />;
+      case 'warning': return <AlertTriangle size={18} />;
+      default: return <Info size={18} />;
     }
   };
 
@@ -585,15 +569,17 @@ export default function CompaniesPage() {
 
   if (loading) {
     return (
-      <div className="w-full py-20 text-center text-gray-500">
-        <div className="w-10 h-10 border-4 border-[#2076C7] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p>Loading companies...</p>
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <Loader2 className="animate-spin mx-auto text-[#2076C7] mb-4" size={48} />
+          <p className="text-gray-600">Loading available companies...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full font-sans bg-gradient-to-br from-gray-50 to-white min-h-screen p-6">
+    <div className="container mx-auto px-4 py-4 pt-4 md:pt-8 min-h-screen">
       
       {/* TOAST CONTAINER */}
       <div className="fixed top-20 right-5 z-[5000] flex flex-col gap-3">
@@ -615,169 +601,253 @@ export default function CompaniesPage() {
       </div>
 
       {/* Market Overview Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2 font-medium">
-             <div className="p-2 bg-blue-50 rounded-lg text-[#2076C7]"><Building2 size={18} /></div>
-             Total Companies
+            <div className="p-2 bg-blue-50 rounded-lg text-[#2076C7]"><Building2 size={18} /></div>
+            Total Companies
           </div>
           <p className="text-2xl font-bold text-gray-900">{companies.length}</p>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2 font-medium">
-             <div className="p-2 bg-green-50 rounded-lg text-emerald-600"><TrendingUp size={18} /></div>
-             Index Value
+            <div className="p-2 bg-green-50 rounded-lg text-emerald-600"><TrendingUp size={18} /></div>
+            Index Value
           </div>
           <p className="text-2xl font-bold text-gray-900">₹{currentIndex}</p>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2 font-medium">
-             <div className="p-2 bg-amber-50 rounded-lg text-amber-600"><TrendingUp size={18} /></div>
-             Current Listings
+            <div className="p-2 bg-amber-50 rounded-lg text-amber-600"><TrendingUp size={18} /></div>
+            Current Listings
           </div>
           <p className="text-2xl font-bold text-gray-900">{filteredCompanies.length}</p>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2 font-medium">
-             <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600"><ShoppingCart size={18} /></div>
-             Wishlist
+            <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600"><ShoppingCart size={18} /></div>
+            Wishlist
           </div>
           <p className="text-2xl font-bold text-gray-900">{wishlistMap.size}</p>
         </div>
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <div className="mb-6">
+        <div className="relative max-w-2xl">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
           <input
             type="text"
-            placeholder="Search company..."
+            placeholder="Search companies by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-600 text-sm outline-none focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
+            className="block w-full pl-12 pr-4 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 outline-none transition-all shadow-sm hover:shadow-md text-gray-900 placeholder-gray-500"
           />
+          {searchTerm && (
+            <button onClick={() => setSearchTerm('')} className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600">
+              <X className="h-5 w-5" />
+            </button>
+          )}
         </div>
-        <button 
-          onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold border transition-all ${
-            showFilters ? 'bg-[#2076C7] text-white border-[#2076C7]' : 'bg-white text-gray-600 border-gray-200 shadow-sm'
-          }`}
-        >
-          <Filter size={18} /> Filters
-        </button>
+      </div>
+
+      <div className="flex flex-wrap gap-4 items-center justify-between mb-8">
+        <div className="flex flex-wrap gap-3 flex-1">
+          <select 
+            className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] transition-all text-gray-900 min-w-[140px] text-sm"
+            value={priceRange} 
+            onChange={(e) => setPriceRange(e.target.value as PriceRangeOption)}
+          >
+            {PRICE_RANGES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+          </select>
+          <select 
+            className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] transition-all text-gray-900 min-w-[160px] text-sm"
+            value={sortBy} 
+            onChange={(e) => setSortBy(e.target.value as SortOption)}
+          >
+            {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+          <div className="flex items-center px-4 py-2 bg-blue-50 rounded-lg">
+            <span className="text-sm text-[#2076C7] font-semibold">{filteredCompanies.length} companies</span>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setShowFilters(!showFilters)}
+            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${
+              showFilters ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 shadow-sm'
+            }`}
+          >
+            <Filter size={16} /> Filters
+          </button>
+        </div>
       </div>
 
       {/* Filter Panel */}
       {showFilters && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Price Range</label>
-              <select className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm" value={priceRange} onChange={(e) => setPriceRange(e.target.value as PriceRangeOption)}>
-                {PRICE_RANGES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-              </select>
+              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Price Range</label>
+              <div className="flex flex-wrap gap-3">
+                {PRICE_RANGES.map(r => (
+                  <button
+                    key={r.value}
+                    onClick={() => setPriceRange(r.value)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      priceRange === r.value
+                        ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md'
+                        : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#2076C7]'
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Sort By</label>
-              <select className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm" value={sortBy} onChange={(e) => setSortBy(e.target.value as SortOption)}>
-                {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select> 
-            </div>
-            <div className="flex items-end">
-               <button onClick={clearFilters} className="text-sm text-red-500 font-bold hover:underline flex items-center gap-1"><X size={14}/> Reset</button>
+              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Sort By</label>
+              <div className="flex flex-wrap gap-3">
+                {SORT_OPTIONS.map(o => (
+                  <button
+                    key={o.value}
+                    onClick={() => setSortBy(o.value)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      sortBy === o.value
+                        ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md'
+                        : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#2076C7]'
+                    }`}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </motion.div>
       )}
 
-      {/* Companies Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+      {/* Companies Grid - 5 COLUMNS ON DESKTOP (xl:grid-cols-5) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8 mb-8">
         {filteredCompanies.slice(0, visibleCount).map((company) => {
           const isSaved = wishlistMap.has(company.id);
           const minInv = calculateMinInvestment(company.price, company.min_lot_size);
 
           return (
-            <div key={company.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-6 flex flex-col items-center text-center h-full relative">
-              
-              {/* Wishlist Button - Floating */}
+            <div 
+              key={company.id} 
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full group relative"
+            >
+              {/* Wishlist Button - ALWAYS VISIBLE */}
               <button 
                 onClick={() => toggleWishlist(company)}
                 disabled={wishlistLoading}
-                className={`absolute top-4 right-4 p-2 rounded-full transition-all ${
+                className={`absolute top-4 right-4 z-10 p-2 rounded-full transition-all shadow-sm ${
                   isSaved 
                     ? 'bg-blue-50 text-[#2076C7]' 
-                    : 'bg-gray-50 text-gray-400 hover:text-[#2076C7]'
+                    : 'bg-white text-gray-400 hover:text-[#2076C7]'
                 } disabled:opacity-50`}
               >
                 {isSaved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
               </button>
 
-              {/* Rectangular Logo Container */}
-              <div className="w-full h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100 shadow-sm overflow-hidden">
+              {/* RECTANGULAR IMAGE CONTAINER */}
+              <div className="w-full h-32 bg-gray-50 rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden">
                 {company.logo_url ? (
-                  <Image src={company.logo_url} width={128} height={128} className="w-full h-full object-contain p-3" alt={company.shares_name} />
+                  <Image
+                    src={company.logo_url} 
+                    width={200}
+                    height={150}
+                    className="w-full h-full object-contain p-3 transition-all duration-700 group-hover:scale-110" 
+                    alt={company.shares_name} 
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      const parent = (e.target as HTMLImageElement).parentElement;
+                      if (parent) {
+                        const span = document.createElement('span');
+                        span.className = 'text-3xl font-bold text-[#2076C7]';
+                        span.textContent = company.shares_name.charAt(0);
+                        parent.appendChild(span);
+                      }
+                    }}
+                  />
                 ) : (
                   <span className="text-3xl font-bold text-[#2076C7]">{company.shares_name.charAt(0)}</span>
                 )}
               </div>
 
-              <h3 className="text-xl font-bold text-gray-900 mb-1">{company.shares_name}</h3>
-              
-              <div className="mb-4">
-                <span className="text-2xl font-bold text-[#2076C7]">
-                  {formatCurrency(company.price)}
-                </span>
-              </div>
-              
-              <div className="text-xs text-gray-500 mb-4 px-3 py-1 bg-gray-100 rounded-full font-bold">Unlisted Shares</div>
+              {/* Company Details */}
+              <div className="p-5 flex flex-col flex-grow">
+                <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-1 group-hover:text-[#2076C7] transition-colors duration-300 text-center">
+                  {company.shares_name}
+                </h4>
+                
+                {/* Price Display */}
+                <div className="mb-4 text-center">
+                  <span className="text-2xl font-bold text-[#2076C7]">
+                    {formatCurrency(company.price)}
+                  </span>
+                </div>
+                
+                <div className="text-sm text-gray-500 text-center mb-4">Unlisted Shares</div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6 py-4 border-y border-gray-50">
-                <div className="text-center">
-                  <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
-                  <div className="text-sm font-bold text-gray-900">{company.min_lot_size?.toLocaleString() || 'N/A'}</div>
+                {/* Info Grid */}
+                <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
+                  <div className="text-center">
+                    <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
+                    <div className="text-sm font-bold text-gray-900">
+                      {company.min_lot_size?.toLocaleString() || 'N/A'} shares
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xs text-gray-500 mb-0.5">Depository</div>
+                    <div className="text-sm font-bold text-gray-900">
+                      {company.depository_applicable?.split(' ')[0] || 'NSDL'}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xs text-gray-500 mb-0.5">Min. Invest</div>
+                    <div className="text-sm font-bold text-gray-900">
+                      ₹{minInv.toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xs text-gray-500 mb-0.5">Available</div>
+                    <div className="text-sm font-bold text-gray-900">
+                      {company.volume || '45.2K'}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-xs text-gray-500 mb-0.5">Depository</div>
-                  <div className="text-sm font-bold text-gray-900">{company.depository_applicable?.split(' ')[0] || 'NSDL'}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xs text-gray-500 mb-0.5">Min. Invest</div>
-                  <div className="text-sm font-bold text-gray-900">₹{minInv.toLocaleString('en-IN')}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xs text-gray-500 mb-0.5">Available</div>
-                  <div className="text-sm font-bold text-gray-900">{company.volume}</div>
-                </div>
-              </div>
 
-              {/* Buttons - Buy Now & Details */}
-              <div className="flex gap-3 w-full mt-auto">
-                <button
-                  onClick={() => handleBuyNow(company)}
-                  className="flex-1 py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
-                >
-                  <ShoppingCart size={18} /> Buy Now
-                </button>
-                <button
-                  onClick={() => setSelectedCompany(company)}
-                  className="flex-1 py-3.5 border-2 border-[#2076C7] text-[#2076C7] text-sm font-bold rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
-                >
-                  Details
-                </button>
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-2 mt-auto">
+                  <button
+                    onClick={() => handleBuyNow(company)}
+                    className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                  >
+                    <ShoppingCart size={18} /> Buy Now
+                  </button>
+                  <button 
+                    onClick={() => setSelectedCompany(company)}
+                    className="w-full py-2.5 border-2 border-[#2076C7]/20 text-[#2076C7] text-xs font-bold rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+                  >
+                    Details
+                  </button>
+                </div>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* View More Button */}
+      {/* View More Button - Load 5 more companies at a time */}
       {visibleCount < filteredCompanies.length && (
         <div className="flex justify-center pb-12">
           <button 
-            onClick={() => setVisibleCount(prev => prev + 12)}
-            className="flex items-center gap-2 px-8 py-3 bg-white border-2 border-gray-100 rounded-xl font-bold text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm"
+            onClick={() => setVisibleCount(prev => prev + 5)}
+            className="flex items-center gap-2 px-8 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm hover:shadow-md"
           >
             View More Companies <ChevronDown size={20} />
           </button>
@@ -791,7 +861,7 @@ export default function CompaniesPage() {
         </div>
       )}
 
-      {/* DETAIL MODAL - SMALLER VERSION */}
+      {/* DETAIL MODAL */}
       <AnimatePresence>
         {selectedCompany && (() => {
           const enriched = getEnrichedCompany(selectedCompany);
@@ -808,108 +878,96 @@ export default function CompaniesPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-white rounded-2xl w-full max-w-4xl shadow-2xl my-8 overflow-hidden flex flex-col border border-gray-100"
+                className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 overflow-hidden flex flex-col border border-gray-100"
               >
                 
-                {/* HEADER - Compact */}
-                <div className="bg-white border-b border-gray-100 p-4 flex flex-wrap items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
+                {/* HEADER */}
+                <div className="bg-white border-b border-gray-100 p-6 flex flex-wrap items-start justify-between gap-3">
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
                       {enriched.logo_url ? (
-                        <Image src={enriched.logo_url} width={48} height={48} className="w-full h-full object-contain p-1" alt={enriched.shares_name} />
+                        <Image src={enriched.logo_url} width={200} height={120} className="w-full h-full object-contain p-2" alt={enriched.shares_name} />
                       ) : (
-                        <span className="text-xl font-bold text-[#2076C7]">{enriched.shares_name.charAt(0)}</span>
+                        <span className="text-2xl font-bold text-[#2076C7]">{enriched.shares_name.charAt(0)}</span>
                       )}
                     </div>
                     <div>
-                      <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                        <span className="px-2 py-0.5 bg-blue-50 text-[#2076C7] text-[10px] font-bold rounded-full">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full">
                           {enriched.category || 'Unlisted Shares'}
                         </span>
                       </div>
-                      <h2 className="text-xl font-bold text-gray-900">{enriched.shares_name}</h2>
-                      <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1 flex-wrap">
-                        <MapPin className="w-3 h-3 flex-shrink-0" /> {enriched.headquarters || 'India'} • Est. {enriched.founded_year}
+                      <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{enriched.shares_name}</h2>
+                      <p className="text-sm text-gray-500 mt-1 flex items-center gap-1 flex-wrap">
+                        <MapPin className="w-3.5 h-3.5" /> {enriched.headquarters || 'India'} • Est. {enriched.founded_year}
                       </p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-4">
                     <div className="text-right">
-                      <p className="text-[10px] text-gray-500 font-medium">Current Price</p>
-                      <div className="text-xl font-bold text-[#10b981]">
+                      <p className="text-xs text-gray-500 font-medium">Current Price</p>
+                      <div className="text-2xl md:text-3xl font-bold text-[#10b981]">
                         {formatCurrency(enriched.price)}
                       </div>
                     </div>
                     <button 
                       onClick={() => setSelectedCompany(null)} 
-                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600 flex-shrink-0"
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600"
                     >
-                      <X size={20} />
+                      <X size={24} />
                     </button>
                   </div>
                 </div>
 
-                {/* BODY - Compact */}
-                <div className="p-4 bg-gray-50/30 overflow-y-auto max-h-[calc(85vh-100px)]">
+                {/* BODY */}
+                <div className="p-6 md:p-8 bg-gray-50/30 overflow-y-auto max-h-[calc(90vh-120px)]">
                   
-                  {/* Metric Cards Row - Smaller */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                  {/* Metric Cards Row */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     {[
                       { label: 'Minimum Lot', value: `${(enriched.min_lot_size || 100).toLocaleString()} Shares`, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
                       { label: 'Min Investment', value: `₹${calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}`, icon: IndianRupee, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                       { label: 'Face Value', value: `₹${enriched.face_value || '10'}`, icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50' },
                       { label: 'Market Cap', value: enriched.market_cap || 'N/A', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50' }
                     ].map((item, i) => (
-                      <div key={i} className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                        <div className={`w-7 h-7 ${item.bg} ${item.color} rounded-lg flex items-center justify-center mb-2`}>
-                          <item.icon size={14} />
+                      <div key={i} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                        <div className={`w-10 h-10 ${item.bg} ${item.color} rounded-lg flex items-center justify-center mb-3`}>
+                          <item.icon size={20} />
                         </div>
-                        <p className="text-[9px] font-medium text-gray-500 uppercase tracking-wider mb-0.5">{item.label}</p>
-                        <p className="text-xs font-bold text-gray-900 break-words">{item.value}</p>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{item.label}</p>
+                        <p className="text-lg font-bold text-gray-900">{item.value}</p>
                       </div>
                     ))}
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
                     {/* LEFT: Graph & Description */}
-                    <div className="lg:col-span-2 space-y-4">
+                    <div className="lg:col-span-2 space-y-6">
                       
-                      {/* Chart Section - Compact */}
-                      <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                      {/* Chart Section */}
+                      <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                           <div>
-                            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                              <span className="text-[10px] font-medium text-gray-500">Price History</span>
-                              <span className="text-[9px] font-medium text-gray-400">•</span>
-                              <span className="text-[9px] font-medium text-gray-400">
-                                {graphTimeRange === 'All' ? 'All Time' : 
-                                graphTimeRange === '3M' ? '3 Months' : 
-                                graphTimeRange === '1M' ? '1 Month' : 
-                                graphTimeRange === '1W' ? '1 Week' : ''}
-                              </span>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-medium text-gray-500">Price History</span>
+                              <span className="text-xs text-gray-400">• {graphTimeRange}</span>
                             </div>
-                            <div className="flex items-baseline gap-2 flex-wrap">
-                              <h3 className="text-lg font-bold text-gray-900">
-                                {formatCurrency(enriched.price)}
-                              </h3>
-                              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">
-                                +{(Math.random() * 5).toFixed(2)}%
-                              </span>
-                            </div>
-                            <p className="text-[10px] text-gray-400 mt-0.5">Current Price</p>
+                            <h3 className="text-2xl font-bold text-gray-900">
+                              {formatCurrency(enriched.price)}
+                            </h3>
                           </div>
                           
-                          <div className="flex gap-1 bg-gray-50/80 p-0.5 rounded-lg border border-gray-200/80 self-start sm:self-auto">
+                          <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80">
                             {['All', '3M', '1M', '1W'].map(r => (
                               <button 
                                 key={r} 
                                 onClick={() => setGraphTimeRange(r)} 
-                                className={`px-2.5 py-1 text-[10px] font-medium rounded-md transition-all ${
+                                className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-all ${
                                   graphTimeRange === r 
                                     ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200' 
-                                    : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                                    : 'text-gray-500 hover:text-gray-700'
                                 }`}
                               >
                                 {r}
@@ -918,105 +976,103 @@ export default function CompaniesPage() {
                           </div>
                         </div>
 
-                        <div className="h-48 w-full relative mb-4">
+                        <div className="h-64 w-full relative mb-8">
                           {isModalGraphLoading ? (
                             <div className="h-full flex items-center justify-center">
-                              <Loader2 className="animate-spin text-[#2076C7]" size={24} />
+                              <Loader2 className="animate-spin text-[#2076C7]" size={32} />
                             </div>
                           ) : modalGraphData.length > 0 ? (
                             <canvas ref={chartRef}></canvas>
                           ) : (
-                            <div className="h-full flex items-center justify-center">
-                              <p className="text-xs text-gray-400">No price data available</p>
-                            </div>
+                            <div className="h-full flex items-center justify-center text-gray-400">No price data available</div>
                           )}
                         </div>
 
-                        {/* 52 Week High/Low - Compact */}
-                        <div className="grid grid-cols-3 gap-2">
-                          <div className="bg-gray-50/50 rounded-lg p-2">
-                            <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wider mb-0.5">52W High</p>
-                            <p className="text-sm font-bold text-gray-900">₹{high52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
-                            <p className="text-[9px] text-gray-500 font-medium mt-0.5 truncate">
+                        {/* 52 Week High/Low */}
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">52W High</p>
+                            <p className="text-lg font-bold text-gray-900">₹{high52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                            <p className="text-xs text-gray-500 font-medium mt-1">
                               {highDate ? new Date(highDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A'}
                             </p>
                           </div>
-                          <div className="bg-gray-50/50 rounded-lg p-2">
-                            <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wider mb-0.5">52W Low</p>
-                            <p className="text-sm font-bold text-gray-900">₹{low52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
-                            <p className="text-[9px] text-gray-500 font-medium mt-0.5 truncate">
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">52W Low</p>
+                            <p className="text-lg font-bold text-gray-900">₹{low52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                            <p className="text-xs text-gray-500 font-medium mt-1">
                               {lowDate ? new Date(lowDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A'}
                             </p>
                           </div>
-                          <div className="bg-gray-50/50 rounded-lg p-2">
-                            <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wider mb-0.5">Avg Volume</p>
-                            <p className="text-sm font-bold text-gray-900">{enriched.volume || '45.2K'}</p>
-                            <p className="text-[9px] text-gray-500 font-medium mt-0.5">Daily avg</p>
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Avg Volume</p>
+                            <p className="text-lg font-bold text-gray-900">{enriched.volume || '45.2K'}</p>
+                            <p className="text-xs text-gray-500 font-medium mt-1">Daily avg</p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Description Card - Compact */}
-                      <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
-                        <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-1.5">
-                          <Info className="text-[#1CADA3]" size={14} />
+                      {/* Description Card */}
+                      <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                        <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                          <Info className="text-[#1CADA3]" size={20} />
                           About the Company
                         </h3>
-                        <p className="text-gray-600 leading-relaxed text-xs">
+                        <p className="text-gray-600 leading-relaxed text-sm">
                           {enriched.description || `${enriched.shares_name} is a leading player in the ${enriched.category || 'unlisted shares'} sector with strong growth potential.`}
                         </p>
                         
-                        <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-gray-100">
+                        <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
                           <div>
-                            <p className="text-[9px] text-gray-500 mb-0.5">ISIN</p>
-                            <p className="text-xs font-semibold text-gray-900 break-words">{enriched.isin || 'N/A'}</p>
+                            <p className="text-xs text-gray-500 mb-1">ISIN</p>
+                            <p className="text-sm font-semibold text-gray-900 break-words">{enriched.isin || 'N/A'}</p>
                           </div>
                           <div>
-                            <p className="text-[9px] text-gray-500 mb-0.5">Depository</p>
-                            <p className="text-xs font-semibold text-gray-900">{enriched.depository_applicable?.split(' ')[0] || 'NSDL'}</p>
+                            <p className="text-xs text-gray-500 mb-1">Depository</p>
+                            <p className="text-sm font-semibold text-gray-900">{enriched.depository_applicable?.split(' ')[0] || 'NSDL'}</p>
                           </div>
                           <div>
-                            <p className="text-[9px] text-gray-500 mb-0.5">Face Value</p>
-                            <p className="text-xs font-semibold text-gray-900">₹{enriched.face_value || '10'}</p>
+                            <p className="text-xs text-gray-500 mb-1">Face Value</p>
+                            <p className="text-sm font-semibold text-gray-900">₹{enriched.face_value || '10'}</p>
                           </div>
                           <div>
-                            <p className="text-[9px] text-gray-500 mb-0.5">Lot Size</p>
-                            <p className="text-xs font-semibold text-gray-900">{(enriched.min_lot_size || 100).toLocaleString()} shares</p>
+                            <p className="text-xs text-gray-500 mb-1">Lot Size</p>
+                            <p className="text-sm font-semibold text-gray-900">{(enriched.min_lot_size || 100).toLocaleString()} shares</p>
                           </div>
                         </div>
                       </div>
                     </div>
                     
-                    {/* RIGHT: Sidebar - Compact */}
-                    <div className="space-y-4">
+                    {/* RIGHT: Sidebar */}
+                    <div className="space-y-6">
                       
-                      {/* Key Statistics Card - Compact */}
-                      <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
-                        <h4 className="text-xs font-bold text-gray-900 mb-2 flex items-center gap-1.5">
-                          <Activity size={12} className="text-[#2076C7]" />
+                      {/* Key Statistics Card */}
+                      <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                        <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                          <Activity size={16} className="text-[#2076C7]" />
                           Key Statistics
                         </h4>
                         
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                           {[
                             { label: 'P/E Ratio', value: enriched.pe_ratio || 'N/A' },
                             { label: 'P/B Ratio', value: enriched.pb_ratio || 'N/A' },
                             { label: 'ROE', value: enriched.roe ? `${enriched.roe}%` : 'N/A' },
-                            { label: '24h Volume', value: enriched.volume || 'N/A' }
+                            { label: '24h Volume', value: enriched.volume || '45.2K' }
                           ].map((stat, i) => (
-                            <div key={i} className="flex justify-between items-center py-1 border-b border-gray-50 last:border-0">
-                              <span className="text-[10px] text-gray-500">{stat.label}</span>
-                              <span className="text-xs font-bold text-gray-900">{stat.value}</span>
+                            <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+                              <span className="text-xs text-gray-500">{stat.label}</span>
+                              <span className="text-sm font-bold text-gray-900">{stat.value}</span>
                             </div>
                           ))}
                         </div>
                       </div>
 
-                      {/* Action Card - Compact */}
-                      <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-3 border border-gray-200 shadow-sm">
-                        <h4 className="text-xs font-bold text-gray-900 mb-2">Ready to Invest?</h4>
-                        <p className="text-[10px] text-gray-500 mb-3">
-                          Min: ₹{calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}
+                      {/* Action Card */}
+                      <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <h4 className="text-sm font-bold text-gray-900 mb-3 text-center">Ready to Invest?</h4>
+                        <p className="text-xs text-gray-500 mb-6 text-center font-bold">
+                          Min investment: ₹{calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}
                         </p>
                         
                         <button
@@ -1024,34 +1080,34 @@ export default function CompaniesPage() {
                             setSelectedCompany(null);
                             handleBuyNow(enriched);
                           }}
-                          className="w-full py-2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-xs font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-1.5"
+                          className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all"
                         >
-                          <ShoppingCart size={14} /> Buy Now
+                          Buy Now
                         </button>
                         
-                        <p className="text-[9px] text-gray-400 text-center mt-2">
+                        <p className="text-xs text-gray-400 text-center mt-3">
                           Contact within 24 hours
                         </p>
                       </div>
 
-                      {/* Valuation Progress Bars - Compact */}
-                      <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
-                        <h4 className="text-xs font-bold text-gray-900 mb-2">Valuation Metrics</h4>
-                        <div className="space-y-2">
+                      {/* Valuation Progress Bars */}
+                      <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                        <h4 className="text-sm font-bold text-gray-900 mb-4">Valuation Metrics</h4>
+                        <div className="space-y-5">
                           {[
                             { label: 'Industry Position', value: '85%', percent: 85 },
                             { label: 'Growth Potential', value: '72%', percent: 72 },
                             { label: 'Market Demand', value: '68%', percent: 68 }
                           ].map((metric, i) => (
                             <div key={i}>
-                              <div className="flex justify-between items-center mb-0.5">
-                                <span className="text-[9px] text-gray-600">{metric.label}</span>
-                                <span className="text-[9px] font-bold text-gray-900">{metric.value}</span>
+                              <div className="flex justify-between items-center mb-1.5">
+                                <span className="text-xs text-gray-600">{metric.label}</span>
+                                <span className="text-xs font-bold text-gray-900">{metric.value}</span>
                               </div>
-                              <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                                 <div 
                                   className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full" 
-                                  style={{ width: metric.percent }}
+                                  style={{ width: `${metric.percent}%` }}
                                 />
                               </div>
                             </div>

@@ -33,13 +33,13 @@ export default function ExploreMortgageLoans({ activeTab, setActiveTab }: { acti
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  useEffect(() => {
-    const savedWishlist = localStorage.getItem("user_wishlist");
-    if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
-  }, []);
+  // useEffect(() => {
+  //   const savedWishlist = localStorage.getItem("user_wishlist");
+  //   if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+  // }, []);
 
   useEffect(() => {
-    localStorage.setItem("user_wishlist", JSON.stringify(wishlist));
+    // localStorage.setItem("user_wishlist", JSON.stringify(wishlist));
   }, [wishlist]);
 
   useEffect(() => {

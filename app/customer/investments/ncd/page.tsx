@@ -369,7 +369,7 @@ export default function NCDDashboard() {
                     </div>
                     <h2 className="text-2xl font-black text-slate-800 mb-2">No Active NCD Assets</h2>
                     <p className="text-slate-500 max-w-sm mx-auto mb-10 leading-relaxed font-medium">
-                        You haven't invested in any Non-Convertible Debentures yet. Explore the market to start earning secure yields.
+                        You haven&apos;t invested in any Non-Convertible Debentures yet. Explore the market to start earning secure yields.
                     </p>
                     <button 
                         onClick={() => setMainTab('explore')}

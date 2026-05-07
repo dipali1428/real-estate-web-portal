@@ -7,13 +7,13 @@ const HeroSection = () => {
     const [isTypingComplete, setIsTypingComplete] = useState(false);
 
     useEffect(() => {
-        const hasVisited = localStorage.getItem("heroVisited");
+        // const hasVisited = localStorage.getItem("heroVisited");
 
-        if (hasVisited) {
-            setDisplayedText(fullText);
-            setIsTypingComplete(true);
-            return;
-        }
+        // if (hasVisited) {
+        //     setDisplayedText(fullText);
+        //     setIsTypingComplete(true);
+        //     return;
+        // }
 
         let index = 0;
         const typingInterval = setInterval(() => {
@@ -22,7 +22,7 @@ const HeroSection = () => {
                 index++;
             } else {
                 setIsTypingComplete(true);
-                localStorage.setItem("heroVisited", "true");
+                // localStorage.setItem("heroVisited", "true");
             }
         }, 80);
 
@@ -63,7 +63,7 @@ const HeroSection = () => {
                             isTypingComplete ? 'opacity-100' : 'opacity-0'
                         }`}
                     >
-                        At <span className="font-semibold" style={{ color: '#1CADA3' }}>Infinity Arthvishva</span>, we are dedicated to helping you navigate the complexities of finance with confidence and clarity. Let's build your path to success together.
+                        At <span className="font-semibold" style={{ color: '#1CADA3' }}>Infinity Arthvishva</span>, we are dedicated to helping you navigate the complexities of finance with confidence and clarity. Let&apos;s build your path to success together.
                     </p>
 
                     {/* Buttons */}

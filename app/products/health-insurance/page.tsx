@@ -1,6 +1,4 @@
 'use client';
-
-import NextImage from 'next/image';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, Variants, AnimatePresence } from 'framer-motion';
@@ -31,6 +29,7 @@ import {
     Stethoscope as StethoscopeIcon
 } from 'lucide-react';
 import { useModal } from '../../context/ModalContext';
+import Image from "next/image";
 
 // Components
 import HealthInsuranceCalculator from './components/HealthInsuranceCalculator';
@@ -56,7 +55,7 @@ const HealthHeroVisual = () => {
                 className="relative z-20 w-full aspect-square max-w-[500px]"
             >
                 <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-white/20">
-                    <NextImage
+                    <Image
                         src="/images/health_insurance_hero.png"
                         alt="Health Insurance Coverage"
                         fill
@@ -453,9 +452,11 @@ const HealthInsurancePage = () => {
                                 transition={{ duration: 1, delay: 0.2 }}
                                 className="relative h-[350px] sm:h-[450px] md:h-[500px] lg:h-[500px] mt-8 lg:mt-0 flex items-center justify-center"
                             >
-                                <img
+                                <Image
                                     src="/insurance/health.jpeg"
                                     alt="Health insurance illustration"
+                                    width={600}
+                                    height={450}
                                     className="w-full h-full object-cover rounded-3xl shadow-2xl"
                                 />
                             </motion.div>
@@ -816,7 +817,7 @@ const HealthInsurancePage = () => {
                             <section className="mb-10">
                                 <div className="max-w-4xl mx-auto bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
                                     <p className="text-sm text-gray-700 text-center leading-relaxed">
-                                        <strong className="text-black">Disclaimer:</strong> Insurance plans, coverage limits, and policy terms are subject to change based on the insurer's internal policies and your eligibility profile. Final approval is at the sole discretion of the respective insurance providers.
+                                        <strong className="text-black">Disclaimer:</strong> Insurance plans, coverage limits, and policy terms are subject to change based on the insurer&apos;s internal policies and your eligibility profile.
                                     </p>
                                 </div>
                             </section>

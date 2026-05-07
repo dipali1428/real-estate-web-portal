@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Search, Anchor, Info, X, FileText } from 'lucide-react';
+import { Search, Anchor, Info, FileText} from 'lucide-react';
 import MarineInsurancePlanCard from './MarineInsurancePlanCard';
 import { marinePlansData } from '../marineInsuranceConstants';
 import { motion } from 'framer-motion';
-import { toast } from 'react-hot-toast';
 
 export default function ExploreMarineInsurance({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -89,47 +88,40 @@ export default function ExploreMarineInsurance({ activeTab, setActiveTab }: { ac
                 </div>
             </motion.div>
 
-            {/* Filter Sticky Bar */}
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-gray-100 shadow-sm sticky top-0 z-40 space-y-6">
-                <div className="flex flex-col md:flex-row gap-4 items-center">
-                    <div className="relative flex-1 w-full">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                        <input
-                            type="text"
-                            placeholder="Search marine plans..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-12 py-4 rounded-xl border border-gray-200 bg-white text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2076C7]/50 shadow-sm transition-all text-sm"
-                        />
-                        {searchQuery && (
-                            <button
-                                onClick={() => setSearchQuery("")}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                            >
-                                <X size={20} />
-                            </button>
-                        )}
-                    </div>
-                    <div className="flex bg-gray-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto no-scrollbar">
-                        {categories.map((cat) => (
-                            <button
-                                key={cat}
-                                onClick={() => setSelectedCategory(cat)}
-                                className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                                    selectedCategory === cat
-                                        ? "bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-200"
-                                        : "text-gray-500 hover:bg-gray-200"
+            {/* Filter Section */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                {/* Category Filter - Left Side */}
+                <div className="flex flex-wrap gap-1.5">
+                    {categories.map((cat) => (
+                        <button
+                            key={cat}
+                            onClick={() => setSelectedCategory(cat)}
+                            className={`px-5 py-2 rounded-xl font-bold text-[11px] tracking-wide transition-all cursor-pointer whitespace-nowrap border ${selectedCategory === cat
+                                ? 'text-white border-transparent shadow-lg shadow-[#2076C7]/20'
+                                : 'bg-white text-gray-500 border-gray-100 hover:border-gray-200 hover:bg-gray-50'
                                 }`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
-                    </div>
+                            style={selectedCategory === cat ? { background: 'linear-gradient(to right, #2076C7, #1CADA3)' } : {}}
+                        >
+                            {cat}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Search - Right Side */}
+                <div className="relative w-full md:w-64">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                    <input
+                        type="text"
+                        placeholder="Search plans..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full h-11 pl-11 pr-4 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#2076C7]/10 transition-all font-medium text-gray-700 text-sm placeholder:text-gray-400 shadow-sm"
+                    />
                 </div>
             </div>
 
-            {/* Results Count */}
-            <div className="px-2 flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            {/* Results Count & Clear Filters */}
+            <div className="mb-4 flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
                 <span>{filteredPlans.length} PLANS FOUND</span>
                 {(searchQuery || selectedCategory !== 'All') && (
                     <button
@@ -148,7 +140,6 @@ export default function ExploreMarineInsurance({ activeTab, setActiveTab }: { ac
                     <MarineInsurancePlanCard 
                         key={idx} 
                         {...plan} 
-                        onApply={(name) => toast.success(`Applying for ${name}`)} 
                     />
                 ))}
             </div>

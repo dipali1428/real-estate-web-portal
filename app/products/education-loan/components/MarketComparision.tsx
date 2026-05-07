@@ -7,6 +7,7 @@ import {
     IconPercentage, IconShieldCheck, IconX, IconArrowLeft
 } from '@tabler/icons-react';
 import { marketPlans,  MarketPlan } from '../data/MarketPlansData';
+import Image from "next/image";
 
 export default function MarketComparison({ onApplyClick }: { onApplyClick?: () => void }) {
     const [activeCategory, setActiveCategory] = useState<'All' | 'NBFC' | 'Private' | 'PSU' | 'Co-operative'>('All');
@@ -70,9 +71,11 @@ export default function MarketComparison({ onApplyClick }: { onApplyClick?: () =
                                 }`}
                             >
                                 <div className="w-20 h-20 mb-5 flex items-center justify-center p-3 rounded-3xl bg-slate-50/80 group-hover:bg-white transition-colors">
-                                    <img 
-                                        src={plan.logo} 
-                                        alt={plan.name} 
+                                    <Image
+                                        src={plan.logo}
+                                        alt={plan.name}
+                                        width={80}
+                                        height={80}
                                         className="w-full h-full object-contain transition-all duration-500"
                                     />
                                 </div>
@@ -105,7 +108,7 @@ export default function MarketComparison({ onApplyClick }: { onApplyClick?: () =
                                 <div className="md:col-span-2 p-8 md:p-12 border-b md:border-b-0 md:border-r border-slate-100">
                                     <div className="flex items-center gap-6 mb-10">
                                         <div className="w-20 h-20 p-4 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center">
-                                            <img src={selectedBank.logo} alt={selectedBank.name} className="w-full h-full object-contain" />
+                                            <Image src={selectedBank.logo} width={40} height={40} alt={selectedBank.name} className="w-full h-full object-contain" />
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">

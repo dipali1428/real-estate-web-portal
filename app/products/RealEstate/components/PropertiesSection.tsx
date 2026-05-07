@@ -9,6 +9,7 @@ import {
     Filter, Search, ChevronRight,
     Info, TrendingUp, Shield, MapPin, X, Star, CheckCircle, Wallet, Plus, Minus, IndianRupee, ChevronLeft, Layout, Zap
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 
 
@@ -754,7 +755,7 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false }: Propertie
 
                         <form onSubmit={(e) => {
                             e.preventDefault();
-                            alert("Thank you for your valuable feedback! It will be listed after moderation.");
+                            toast.success("Thank you for your valuable feedback! It will be listed after moderation.");
                             setShowFeedbackForm(false);
                             setNewFeedback({ name: '', role: '', text: '', rating: 5 });
                         }} className="space-y-6">

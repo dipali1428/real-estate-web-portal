@@ -93,7 +93,6 @@ const EnquiryAdminPage: React.FC = () => {
         setError('Failed to fetch enquiries from server');
       }
     } catch (err: any) {
-      // console.error('Error fetching enquiries:', err);
       toast.error("Error fetching enquiries. Please try again.");
       setError(err?.message || 'Failed to fetch enquiries. Please try again.');
     } finally {
@@ -199,8 +198,7 @@ const EnquiryAdminPage: React.FC = () => {
       const filename = `enquiries_${activeTab.toLowerCase()}_${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(wb, filename);
     } catch (err) {
-      console.error('Export error', err);
-      alert('Failed to export data. Please try again.');
+      toast.error('Failed to export data. Please try again.');
     } finally {
       setIsExporting(false);
     }

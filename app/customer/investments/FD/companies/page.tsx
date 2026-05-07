@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Bank, bankData } from '../../../../products/FD/data/mockData';
+import toast from 'react-hot-toast';
 
 // ==================== TYPES ====================
 
@@ -184,7 +185,7 @@ export default function FDCompaniesPage() {
         );
         setBookmarkedIds(ids);
       } catch (e) {
-        console.error('Error loading wishlist', e);
+        toast.error('Error loading wishlist');
       }
     }
   }, []);

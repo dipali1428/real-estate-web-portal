@@ -8,8 +8,7 @@ import {
     UploadCloud, 
     Trash2, 
     FilePlus, 
-    Layers, 
-    Briefcase,
+    Layers,
     Search,
     FileIcon,
     AlertCircle

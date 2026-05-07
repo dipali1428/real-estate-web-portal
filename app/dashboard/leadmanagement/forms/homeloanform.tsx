@@ -1,8 +1,7 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import {
-  X, CheckCircle, UploadCloud, Trash2, ChevronDown,
-  ShieldCheck, Loader2, ArrowRight, ArrowLeft, AlertCircle
+  X, CheckCircle, UploadCloud, Trash2, ChevronDown, Loader2, ArrowRight, ArrowLeft, AlertCircle
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
 import toast from "react-hot-toast";

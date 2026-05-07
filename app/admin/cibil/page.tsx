@@ -54,7 +54,6 @@ const CIBILPage = () => {
         setLogsData(data);
       }
     } catch (error: any) {
-      console.error('Error fetching data:', error);
       toast.error('Failed to fetch data');
     } finally {
       setLoading(false);

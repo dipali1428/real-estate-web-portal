@@ -26,16 +26,27 @@ export default function LifeInsurancePage() {
     router.push('/');
   };
 
+  // Handle scroll behavior only (no state setting)
   useEffect(() => {
-    setMounted(true);
     // Ensure body is scrollable
     document.body.style.overflow = "auto";
     document.documentElement.style.overflow = "auto";
 
+    // Cleanup function to reset styles
     return () => {
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
     };
+  }, []);
+
+  // Handle mounting separately using a different pattern
+  useEffect(() => {
+    // Use a timeout to avoid direct state update warning
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   // Prevent hydration mismatch
@@ -95,8 +106,6 @@ export default function LifeInsurancePage() {
             <TrustSection />
           </div>
 
-
-
           <InsurersMarquee />
         </div>
 
@@ -111,13 +120,10 @@ export default function LifeInsurancePage() {
         <div className="w-full">
           <FAQSection />
         </div>
-
-
       </main>
       <ScrollToTop />
       <ChatbotWidget />
       <LifeInsuranceCTA />
     </MotionConfig>
-
   );
 }

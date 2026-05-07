@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Copy, Search, Users, TrendingUp, Calendar, Briefcase, Loader2, Share2 } from 'lucide-react';
 import { DashboardService } from '@/app/services/dashboardService'; // ✅ added
+import { toast } from 'react-hot-toast';
 
 interface Partner {
   id: number;
@@ -65,7 +66,7 @@ export default function CoPartnersPage() {
         if (link) setReferralLink(link);
 
       } catch (error) {
-        console.error("Error fetching referral users:", error);
+        toast.error("Error fetching referral users:");
       } finally {
         setLoading(false);
       }
@@ -102,7 +103,7 @@ export default function CoPartnersPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      toast.error('Failed to copy referral link');
     }
   };
 
@@ -122,7 +123,7 @@ export default function CoPartnersPage() {
         setTimeout(() => setCopied(false), 2000);
       }
     } catch (err) {
-      console.error('Share failed:', err);
+      toast.error('Share failed:');
     }
   };
 
@@ -174,7 +175,7 @@ export default function CoPartnersPage() {
                       const code = refData?.data?.referral_code || refData?.referral_code;
                       if (code) setReferralCode(code);
                     } catch (err) {
-                      console.error('Failed to generate referral code', err);
+                      toast.error('Failed to generate referral code');
                     } finally {
                       setLoading(false);
                     }

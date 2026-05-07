@@ -5,6 +5,7 @@ import {
   Loader2, ArrowRight, ArrowLeft, AlertCircle
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
+import { toast } from "react-hot-toast";
 
 // --- Constants & Styles ---
 const STYLES = {
@@ -123,7 +124,7 @@ export default function HealthInsuranceForm({ onClose }: { onClose: () => void }
         setStep(2);
       }
     } catch (err: any) {
-      console.error(err);
+      toast.error("Failed to create lead.");
       // Check for the specific "already exists" error from server
       const serverError = err.response?.data || err;
       if (serverError.success === false) {

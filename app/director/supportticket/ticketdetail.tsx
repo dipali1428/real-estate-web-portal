@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, MessageSquare, Send, User, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import { AdminService } from '@/app/services/adminService';
+import { toast } from 'react-hot-toast';
 
 const TicketDetailsModal = ({ 
   ticket, 
@@ -80,11 +81,9 @@ const TicketDetailsModal = ({
       
       // Update the solution in local state
       setNewSolution(updatedTicket.admin_solution || newSolution);
-      
-      console.log('Ticket solved successfully:', response);
+      toast.success('Ticket solved successfully!');
     } catch (error) {
-      console.error('Error solving ticket:', error);
-      alert('Failed to submit solution');
+      toast.error('Failed to submit solution');
     } finally {
       setSendingSolution(false);
     }
@@ -246,7 +245,7 @@ const TicketDetailsModal = ({
                             // For Resolved/Closed, we need to provide a solution
                             // So we'll prompt the user to add one
                             if (!newSolution.trim() && !ticket.admin_solution) {
-                              alert(`Please add a solution before marking as ${status}`);
+                              toast.error(`Please add a solution before marking as ${status}`);
                               toggleSection('adminSolution');
                               return;
                             }
@@ -411,7 +410,7 @@ const TicketDetailsModal = ({
                   // For Resolved/Closed, require solution
                   if (e.target.value === 'Resolved' || e.target.value === 'Closed') {
                     if (!newSolution.trim() && !ticket.admin_solution) {
-                      alert(`Please add a solution before marking as ${e.target.value}`);
+                      toast.error(`Please add a solution before marking as ${e.target.value}`);
                       toggleSection('adminSolution');
                       return;
                     }

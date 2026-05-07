@@ -167,7 +167,7 @@ export default function FireAnalysis() {
                 70% of businesses fail to reopen after a major fire without insurance.
               </p>
               <p className="text-gray-600 font-medium text-sm italic">
-                Don't let your hard-earned progress turn into ashes. Secure your legacy today.
+                Don&apos;t let your hard-earned progress turn into ashes. Secure your legacy today.
               </p>
             </div>
 

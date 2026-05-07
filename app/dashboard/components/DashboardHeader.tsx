@@ -5,13 +5,12 @@ import { motion, AnimatePresence } from "motion/react";
 import { User as UserIcon, LogOut, UserCircle, ChevronDown } from "lucide-react";
 import { MobileSidebar, SidebarProvider } from "../../component/ui/sidebar";
 import { useRouter, usePathname } from "next/navigation";
-import { getSidebarLinks } from "@/app/utils/getSidebarLinks";
-import type { Role } from "../../utils/getSidebarLinks";
+import { getSidebarLinks, Role } from "@/app/utils/getSidebarLinks";
+
 // import { NotificationPanel } from "./NotificationPanel";
 import { DashboardService } from "@/app/services/dashboardService";
 import toast from "react-hot-toast";
-
-
+import Image from "next/image";
 
 export default function DashboardHeader({ role }: { role: Role }) {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -104,8 +103,10 @@ export default function DashboardHeader({ role }: { role: Role }) {
                         >
                             <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#2076C7] rounded-full flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform overflow-hidden border border-slate-100">
                                 {profileImage ? (
-                                    <img
+                                    <Image
                                         src={profileImage}
+                                        width={36}
+                                        height={36}
                                         alt="Profile"
                                         className="w-full h-full object-cover"
                                     />

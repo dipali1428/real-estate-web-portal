@@ -70,7 +70,7 @@ export default function InsurableProperties() {
           </div>
 
           <p className="text-gray-600 font-medium max-w-md text-sm sm:text-base">
-            Whether it's a small shop or a massive industrial plant, we provide
+            Whether it&apos;s a small shop or a massive industrial plant, we provide
             tailored insurance solutions for all your assets.
           </p>
         </div>
