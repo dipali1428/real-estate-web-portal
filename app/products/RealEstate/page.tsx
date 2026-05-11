@@ -4,14 +4,14 @@ import { useState, Suspense } from 'react';
 import RealEstateHomeSection from './components/HomeSection';
 import RealEstatePropertiesSection from './components/PropertiesSection';
 import RealEstatePropertyDetailsModal from './components/PropertyDetailsModal';
-import Login from '../../auth/login/page';
+import { useModal } from '@/app/context/ModalContext';
 import CTASection from '../../component/CTASection';
 import ScrollToTop from '../../component/ScrollToTop';
 
 export default function Home() {
+  const { openLogin } = useModal();
   // Property Details Modal State
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   // --- Handlers ---
   const handlePropertySelect = (id: string) => {
@@ -39,15 +39,12 @@ export default function Home() {
         <RealEstatePropertyDetailsModal
           propertyId={selectedPropertyId}
           onClose={() => setSelectedPropertyId(null)}
-          onInvestNow={() => setIsLoginOpen(true)}
+          onInvestNow={(propertyTitle) => {
+            setSelectedPropertyId(null);
+            openLogin();
+          }}
         />
       )}
-
-      {/* Login Modal */}
-      <Login 
-        isOpen={isLoginOpen} 
-        onClose={() => setIsLoginOpen(false)} 
-      />
 
       <CTASection 
         title="Find Your Dream Property Today"

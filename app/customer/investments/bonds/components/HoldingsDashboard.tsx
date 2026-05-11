@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Wallet, ShieldCheck, Calendar, BarChart3, 
@@ -8,9 +7,7 @@ import {
     Clock, AlertCircle, FileText, Download, ArrowUpRight,
     CheckCircle2, LayoutDashboard, Globe
 } from 'lucide-react';
-import { 
-    ResponsiveContainer, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, CartesianGrid, AreaChart, Area
-} from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, CartesianGrid, AreaChart, Area} from 'recharts';
 import InvestmentTable from './InvestmentTable';
 
 interface Investment {

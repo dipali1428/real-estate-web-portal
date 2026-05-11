@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bond } from '../../../products/bonds/data/bondsData';
 import { 
-    Search, TrendingUp, ShieldCheck, 
+    Search,TrendingUp, ShieldCheck, 
     LayoutDashboard
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -38,31 +38,40 @@ export default function CustomerBondsDashboard() {
     const [bonds, setBonds] = useState<Bond[]>([]);
     const [wishlistedIds, setWishlistedIds] = useState<Set<number>>(new Set());
 
-    useEffect(() => {
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
-        fetch(`${baseUrl}/api/bonds/all`)
-            .then(res => res.json())
-            .then(data => {
-                const categoryMapping: Record<string, string> = {
-                    'Private': 'Private Corporate',
-                    'TaxFree': 'Tax-Free Bonds',
-                    'StateGuaranteed': 'State Guaranteed',
-                    'GSec': 'G-Sec / SDL',
-                    'PSU': 'PSU Bonds',
-                    'Municipal': 'Municipal Bonds'
-                };
-                const applyMap = (raw: any[]) => raw.map(b => ({ ...b, category: categoryMapping[b.category] || b.category }));
+   useEffect(() => {
+    const fetchBonds = async () => {
+        try {
+            const data = await customerService.getAllBonds();
 
-                if (Array.isArray(data)) {
-                    setBonds(applyMap(data));
-                } else if (data.data && Array.isArray(data.data)) {
-                    setBonds(applyMap(data.data));
-                }
-            })
-            .catch(err => {
-                toast.error("Failed to fetch bonds. Please check your connection.");
-            });
-    }, []);
+            const categoryMapping: Record<string, string> = {
+                Private: "Private Corporate",
+                TaxFree: "Tax-Free Bonds",
+                StateGuaranteed: "State Guaranteed",
+                GSec: "G-Sec / SDL",
+                PSU: "PSU Bonds",
+                Municipal: "Municipal Bonds",
+            };
+
+            const applyMap = (raw: any[]) =>
+                raw.map((b) => ({
+                    ...b,
+                    category: categoryMapping[b.category] || b.category,
+                }));
+
+            if (Array.isArray(data)) {
+                setBonds(applyMap(data));
+            } else if (data?.data && Array.isArray(data.data)) {
+                setBonds(applyMap(data.data));
+            }
+        } catch (error: any) {
+            toast.error(
+                error?.response?.data?.message || "Failed to fetch bonds"
+            );
+        }
+    };
+
+    fetchBonds();
+}, []);
 
     // Fetch existing wishlist to mark already wishlisted bonds
     useEffect(() => {
@@ -228,8 +237,7 @@ export default function CustomerBondsDashboard() {
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-2xl p-5 mb-8 shadow-sm border border-slate-100/60"
-                >
+                    className="bg-white rounded-2xl p-5 mb-8 shadow-sm border border-slate-100/60">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white shadow-md shrink-0">
@@ -307,8 +315,7 @@ export default function CustomerBondsDashboard() {
                                 <div className="flex justify-center mt-10">
                                     <button 
                                         onClick={() => setVisibleCount(prev => prev + getItemsPerPage())}
-                                        className="px-8 py-4 bg-white border border-slate-200 hover:border-[#2076C7] rounded-full text-[#2076C7] text-[10px] font-black uppercase tracking-widest shadow-sm hover:shadow-md hover:bg-slate-50 transition-all active:scale-95"
-                                    >
+                                        className="px-8 py-4 bg-white border border-slate-200 hover:border-[#2076C7] rounded-full text-[#2076C7] text-[10px] font-black uppercase tracking-widest shadow-sm hover:shadow-md hover:bg-slate-50 transition-all active:scale-95">
                                         View More Products
                                     </button>
                                 </div>

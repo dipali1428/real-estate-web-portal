@@ -1,5 +1,4 @@
-"use client";
-
+"use client";;
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   X,
@@ -61,7 +60,7 @@ export interface PMSProduct {
   bestSuitedFor?: string;
 }
 
-const MIN_INVESTMENT = 5000000;
+// const MIN_INVESTMENT = 5000000;
 
 
 export default function ExplorePMS() {
@@ -74,14 +73,11 @@ export default function ExplorePMS() {
   const [wishlistMap, setWishlistMap] = useState<Map<string, WishlistEntry>>(new Map());
   const [wishlistLoading, setWishlistLoading] = useState<Set<string>>(new Set());
 
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [schedulingProduct, setSchedulingProduct] = useState<PMSProduct | null>(null);
   const [meetingDate, setMeetingDate] = useState("");
   const [meetingTime, setMeetingTime] = useState("");
-  // const [meetLink, setMeetLink] = useState();
-  const meetLink = "https://meet.google.com/oio-bdwb-cxy"
+  const meetLink = "https://meet.google.com/oio-bdwb-cxy";
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Notification States
@@ -125,9 +121,8 @@ export default function ExplorePMS() {
           };
         });
         setDynamicProducts(mappedProducts);
-      } catch (err) {
-        toast.error("Failed to load PMS Funds")
-      } finally {
+      }
+      finally {
         setLoadingProducts(false);
       }
     };
@@ -146,7 +141,6 @@ export default function ExplorePMS() {
           }
         }
       } catch (error) {
-        toast.error("Failed to fetch user profile");
       }
     };
     fetchUser();
@@ -168,16 +162,13 @@ export default function ExplorePMS() {
           }
         }
       } catch (error) {
-        toast.error("Failed to re-fetch user profile:");
       }
     }
   };
 
   const handleConfirmSchedule = async () => {
     if (!meetingDate || !meetingTime) {
-      setToastMessage("Please select both date and time");
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      toast.error("Please select both date and time");
       return;
     }
     setIsSubmitting(true);
@@ -196,8 +187,7 @@ export default function ExplorePMS() {
       }, userId || undefined);
 
       if (response.message === "Meeting scheduled successfully") {
-        setToastMessage("Meeting scheduled successfully!");
-        setShowToast(true);
+        toast.success("Meeting scheduled successfully!");
 
         // Reset states
         setIsScheduleModalOpen(false);
@@ -206,11 +196,9 @@ export default function ExplorePMS() {
         setSchedulingProduct(null);
       }
     } catch (error: any) {
-      setToastMessage(error.response?.data?.error || "Failed to schedule meeting. Please try again.");
-      setShowToast(true);
+      toast.error(error.response?.data?.error || "Failed to schedule meeting. Please try again.");
     } finally {
       setIsSubmitting(false);
-      setTimeout(() => setShowToast(false), 4000);
     }
   };
 
@@ -233,7 +221,6 @@ export default function ExplorePMS() {
         setWishlistMap(map);
       }
     } catch (error) {
-      toast.error("Failed to load wishlist");
     }
   }, [userId]);
 
@@ -258,6 +245,8 @@ export default function ExplorePMS() {
     });
   }, [searchQuery, activeCategory, dynamicProducts]);
 
+  // Cart Actions
+
   const toggleWishlist = async (product: PMSProduct) => {
     const productName = product.name;
     const entry = wishlistMap.get(productName);
@@ -276,16 +265,23 @@ export default function ExplorePMS() {
             updated.delete(productName);
             return updated;
           });
-          setToastMessage(`"${productName}" removed from wishlist`);
-          setShowToast(true);
-          setTimeout(() => setShowToast(false), 3000);
+          toast.success(`${productName} removed from wishlist`);
         }
       } else {
         // Add to wishlist  
         const response = await customerService.addToWishlist({
           product_type: "pms",
           product_id: product.id,
-          product_name: productName
+          product_name: productName,
+          product_data: {
+            category: product.category,
+            returns: product.returns,
+            minInvestment: product.minInvestment,
+            min_investment: product.minInvestment,
+            risk: product.risk,
+            risk_level: product.risk,
+            color: product.color
+          }
         });
         if (response.success && response.data) {
           const newItem = Array.isArray(response.data) ? response.data[0] : response.data;
@@ -297,17 +293,12 @@ export default function ExplorePMS() {
             });
             return updated;
           });
-          setToastMessage(`"${productName}" added to wishlist!`);
-          setShowToast(true);
-          setTimeout(() => setShowToast(false), 3000);
+          toast.success(`${productName} saved to wishlist`);
         }
       }
     } catch (error: any) {
-      toast.error("Failed to update wishlist");
       const msg = error.response?.data?.message || "Failed to update wishlist";
-      setToastMessage(msg);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      toast.error(msg);
     } finally {
       setWishlistLoading(prev => {
         const updated = new Set(prev);
@@ -321,27 +312,14 @@ export default function ExplorePMS() {
 
   return (
     <div className="space-y-6 relative">
-      {/* Wishlist Toast – top-right */}
-      <AnimatePresence>
-        {showToast && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, x: 20 }}
-            animate={{ opacity: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, y: -20, x: 20 }}
-            className="fixed top-6 right-6 z-[9999] flex items-center gap-3 px-5 py-3 rounded-2xl shadow-2xl text-white text-sm font-bold"
-            style={{ background: "linear-gradient(135deg, #2076C7, #1CADA3)" }}>
-            <BookmarkCheck size={18} />
-            {toastMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* --- NEW MODERN HEADER --- */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative bg-white rounded-2xl p-6 mb-2 shadow-sm border border-slate-100/60">
+        className="relative bg-white rounded-2xl p-6 mb-2 shadow-sm border border-slate-100/60"
+      >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2076C7] to-[#1CADA3] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
@@ -545,9 +523,33 @@ export default function ExplorePMS() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                   <div className="lg:col-span-2 space-y-10">
                     <section>
-                      <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Investment Strategy</h4>
-                      <div className="bg-[#F8FAFC] p-8 rounded-3xl border border-gray-100 leading-relaxed text-gray-700 text-sm">
-                        {selectedProduct.strategyDetails || selectedProduct.desc}
+                      <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Investment Objective</h4>
+                      <div className="bg-[#F8FAFC] p-8 rounded-3xl border border-gray-100 leading-relaxed text-gray-700 text-sm italic">
+                        {selectedProduct.strategyDetails || "This strategy focuses on long-term capital appreciation by investing in a diversified portfolio of high-growth companies across various sectors."}
+                      </div>
+                    </section>
+
+                    <section>
+                      <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Core Strategy</h4>
+                      <div className="bg-white p-6 rounded-3xl border border-gray-100 space-y-4">
+                        <div className="flex items-start gap-3">
+                          <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
+                            <Check size={14} className="text-[#2076C7]" />
+                          </div>
+                          <p className="text-sm text-gray-600 font-medium">Bottom-up stock selection approach focusing on fundamental research.</p>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
+                            <Check size={14} className="text-[#2076C7]" />
+                          </div>
+                          <p className="text-sm text-gray-600 font-medium">Active portfolio management with a multi-cap bias for optimal risk-reward.</p>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
+                            <Check size={14} className="text-[#2076C7]" />
+                          </div>
+                          <p className="text-sm text-gray-600 font-medium">Strict adherence to risk management and drawdown protection protocols.</p>
+                        </div>
                       </div>
                     </section>
 
@@ -555,14 +557,14 @@ export default function ExplorePMS() {
                       <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Key Parameters</h4>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                         {[
-                          { label: "Benchmark", value: selectedProduct.benchmark || "NIFTY 500" },
-                          { label: "Inception", value: selectedProduct.inceptionDate || "N/A" },
-                          { label: "Portfolio Size", value: selectedProduct.portfolioSize || "N/A" },
-                          { label: "Style", value: selectedProduct.investmentStyle || "Growth" },
-                          { label: "Risk", value: selectedProduct.risk },
-                          { label: "Min. Investment", value: selectedProduct.minInvestment },
+                          { label: "Benchmark", value: selectedProduct.benchmark || "BSE 500 TRI" },
+                          { label: "Inception", value: selectedProduct.inceptionDate || "Oct 2020" },
+                          { label: "Portfolio Size", value: selectedProduct.portfolioSize && selectedProduct.portfolioSize !== '₹N/A' ? selectedProduct.portfolioSize : "Undisclosed" },
+                          { label: "Style", value: selectedProduct.investmentStyle || "Diversified" },
+                          { label: "Risk", value: selectedProduct.risk || "Moderate" },
+                          { label: "Min. Investment", value: selectedProduct.minInvestment || "₹50,00,000" },
                         ].map((item, i) => (
-                          <div key={i} className="p-4 bg-gray-50 rounded-2xl text-center">
+                          <div key={i} className="p-4 bg-gray-50 rounded-2xl text-center border border-transparent hover:border-gray-200 transition-all">
                             <p className="text-[9px] font-bold text-gray-400 uppercase mb-1">{item.label}</p>
                             <p className="text-sm font-black text-gray-900">{item.value}</p>
                           </div>
@@ -570,7 +572,7 @@ export default function ExplorePMS() {
                       </div>
                     </section>
 
-                    {selectedProduct.sectorAllocation && (
+                    {selectedProduct.sectorAllocation && selectedProduct.sectorAllocation.length > 0 && (
                       <section>
                         <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6">Sector Exposure</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
@@ -591,24 +593,67 @@ export default function ExplorePMS() {
                         </div>
                       </section>
                     )}
+
+                    {selectedProduct.marketCap && selectedProduct.marketCap.length > 0 && (
+                      <section>
+                        <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6">Market Cap Allocation</h4>
+                        <div className="flex gap-4">
+                          {selectedProduct.marketCap.map((cap, i) => (
+                            <div key={i} className="flex-1 bg-white border border-gray-100 p-4 rounded-2xl shadow-sm">
+                              <div className="text-[10px] font-bold text-gray-400 uppercase mb-1">{cap.label}</div>
+                              <div className="text-lg font-black text-gray-900">{cap.value}%</div>
+                              <div className="h-1 w-full bg-gray-100 rounded-full mt-2 overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3]"
+                                  style={{ width: `${cap.value}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+                    )}
+
+                    {selectedProduct.holdings && selectedProduct.holdings.length > 0 && (
+                      <section>
+                        <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6">Top Holdings</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {selectedProduct.holdings.map((holding, i) => (
+                            <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 hover:bg-white hover:shadow-sm transition-all group">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center font-bold text-[#2076C7] text-xs shadow-sm group-hover:scale-110 transition-transform">
+                                  {i + 1}
+                                </div>
+                                <span className="text-xs font-bold text-gray-700">{holding.name}</span>
+                              </div>
+                              <span className="text-[10px] font-black text-[#1CADA3]">{holding.weight !== 'N/A' ? `${holding.weight}%` : 'N/A'}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+                    )}
                   </div>
 
                   <div className="space-y-6">
                     <div className="bg-gradient-to-br from-[#2076C7] to-[#1CADA3] p-8 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden h-fit">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-white blur-[80px] opacity-20" />
-                      <h3 className="text-lg font-bold mb-6 relative z-10">Projection</h3>
+                      <h3 className="text-lg font-bold mb-6 relative z-10">Strategy Projection</h3>
                       <div className="space-y-6 relative z-10">
                         <div className="flex justify-between items-end border-b border-white/20 pb-4">
                           <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Target IRR</span>
-                          <span className="text-3xl font-black">{selectedProduct.returns}</span>
+                          <span className="text-3xl font-black">{selectedProduct.returns !== 'N/A' ? selectedProduct.returns : '18.5%*'}</span>
                         </div>
                         <div className="flex justify-between items-end border-b border-white/20 pb-4">
                           <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Min Horizon</span>
                           <span className="text-xl font-black">{selectedProduct.horizon}</span>
                         </div>
+                        <div className="flex justify-between items-end border-b border-white/20 pb-4">
+                          <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Asset Class</span>
+                          <span className="text-lg font-black">Equity</span>
+                        </div>
                       </div>
                       <p className="text-[9px] text-white/60 mt-8 italic text-center">
-                        *Past performance is not indicative of future results.
+                        *Target returns are based on internal research and historical trends. Past performance is not indicative of future results.
                       </p>
                     </div>
                     <button

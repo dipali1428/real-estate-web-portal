@@ -104,9 +104,9 @@ const FDHero: React.FC<FDHeroProps> = ({ openLogin, scrollToCalculator }) => {
                             <Image
                                 src="/FD/fdimage.png"
                                 alt="Fixed Deposit Wealth Growth"
-                                width={512}
-                                height={512}
-                                className="w-full max-w-lg h-auto object-contain drop-shadow-md rounded-3xl"
+                                width={480}
+                                height={480}
+                                className="w-full max-w-[480px] h-auto object-contain drop-shadow-md rounded-3xl"
                             />
                         </motion.div>
                     </MotionDiv>

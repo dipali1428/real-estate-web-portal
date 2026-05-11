@@ -75,7 +75,7 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
                         >
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-20 border rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-sm mt-16 md:mt-24" style={{ color: '#2076C7', borderColor: 'rgba(32, 118, 199, 0.2)' }}>
                                 <IconBuildingSkyscraper size={12} />
-                                Fractional Real Estate • Infinity Arthvishwa
+                                Fractional Real Estate • Infinity Arthvishva
                             </div>
                             <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 sm:mb-6 leading-[1.1] sm:leading-tight" style={{
                                 background: 'linear-gradient(to right, #2076C7, #1CADA3, #2076C7)',
@@ -96,7 +96,8 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Link
                                     href="#properties"
-                                    className="group relative text-white px-8 md:px-10 py-4 md:py-5 rounded-lg font-bold text-lg md:text-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer flex items-center justify-center" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}>
+                                    className="group relative text-white px-8 md:px-10 py-4 md:py-5 rounded-lg font-bold text-lg md:text-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer flex items-center justify-center" style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
+                                >
                                     <span className="relative z-10 flex items-center justify-center gap-1">
                                         View Opportunities 
                                     </span>

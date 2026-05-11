@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import {
     ChevronDown,
@@ -14,8 +13,8 @@ import {
 } from "lucide-react";
 
 
+
 export default function CustomerTermCalculatorPage() {
-    const router = useRouter();
     const [gender, setGender] = useState<"male" | "female">("male");
     const [isSmoker, setIsSmoker] = useState<boolean>(false);
     const [age, setAge] = useState<number>(30);

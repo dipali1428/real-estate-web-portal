@@ -1,779 +1,592 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
-import {
-  Search,
-  Filter,
-  Landmark,
-  TrendingUp,
-  AlertCircle,
-  RefreshCw,
-  Database,
-  Star,
-  Bookmark,
-  CheckCircle,
-  X,
-  Percent
-} from 'lucide-react';
+import { Search, Filter, Landmark, TrendingUp, AlertCircle, RefreshCw, Database, Star, Bookmark, X, Percent, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import api from '../../../../services/api';
 import { useRouter } from 'next/navigation';
-import { Bank, bankData } from '../../../../products/FD/data/mockData';
+import customerService from '@/app/services/customerService';
 import toast from 'react-hot-toast';
 
-// ==================== TYPES ====================
-
 interface FlattenedBank {
-  id: number;
-  name: string;
-  logo: string;
-  category: string;
-  shortRate: string;
-  shortSenior: string;
-  mediumRate: string;
-  mediumSenior: string;
-  longRate: string;
-  longSenior: string;
-  megaRate: string;
-  megaSenior: string;
-  specialRate: string;
-  bestRate: string;
-  bestSeniorRate: string;
+  id: number; name: string; logo: string; category: string;
+  shortRate: string; mediumRate: string; longRate: string; megaRate: string;
+  specialRate: string; bestRate: string; bestSeniorRate: string;
 }
-
-// ==================== HELPER FUNCTIONS ====================
 
 const getTokenFromCookie = (): string | null => {
   if (typeof document === 'undefined') return null;
-  const cookies = document.cookie.split('; ');
-  const authCookie = cookies.find(row => row.startsWith('authToken='));
-  return authCookie ? authCookie.split('=')[1] : null;
+  const c = document.cookie.split('; ').find(r => r.startsWith('authToken='));
+  return c ? c.split('=')[1] : null;
+};
+const getInitials = (n: string) => n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+const parseRate = (v: string) => parseFloat(String(v).replace('%', '')) || 0;
+const fmt = (v: string) => { const n = parseRate(v); return n > 0 ? `${n.toFixed(2)}%` : '—'; };
+
+const CATS: Record<string, { bg: string; text: string; dot: string; short: string }> = {
+  'Public Sector Banks': { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-400', short: 'PSB' },
+  'Private Sector Banks': { bg: 'bg-indigo-50', text: 'text-indigo-700', dot: 'bg-indigo-400', short: 'Pvt' },
+  'Small Finance Banks': { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-400', short: 'SFB' },
+  'NBFCs': { bg: 'bg-violet-50', text: 'text-violet-700', dot: 'bg-violet-400', short: 'NBFC' },
 };
 
-const getCompanyInitials = (name: string): string => {
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
+const normCat = (cat: string) => {
+  const c = (cat || '').trim();
+  if (c === 'Public Sector Bank' || c === 'Public Sector Banks') return 'Public Sector Banks';
+  if (c === 'Private Sector Bank' || c === 'Private Sector Banks') return 'Private Sector Banks';
+  if (c === 'Small Finance Bank' || c === 'Small Finance Banks' || c === 'SFB') return 'Small Finance Banks';
+  if (c === 'NBFC' || c === 'NBFCs') return 'NBFCs';
+  return c || 'Other';
 };
 
-const getCategoryBadge = (category: string): { bg: string; text: string; short: string } => {
-  switch (category) {
-    case 'Public Sector Banks':
-      return { bg: 'bg-blue-50', text: 'text-blue-700', short: 'PSB' };
-    case 'Private Sector Banks':
-      return { bg: 'bg-purple-50', text: 'text-purple-700', short: 'Private' };
-    case 'Small Finance Banks':
-      return { bg: 'bg-emerald-50', text: 'text-emerald-700', short: 'SFB' };
-    case 'NBFCs':
-      return { bg: 'bg-amber-50', text: 'text-amber-700', short: 'NBFC' };
-    default:
-      return { bg: 'bg-gray-50', text: 'text-gray-700', short: category };
-  }
-};
-
-const parseRate = (rateStr: string): number => {
-  return parseFloat(rateStr.replace('%', '')) || 0;
-};
-
-const getBestRate = (bank: Bank): string => {
-  const rates = [
-    parseRate(bank.tenures.short.rate),
-    parseRate(bank.tenures.medium.rate),
-    parseRate(bank.tenures.long.rate),
-    parseRate(bank.tenures.mega.rate),
-  ];
-  return Math.max(...rates).toFixed(2) + '%';
-};
-
-const getBestSeniorRate = (bank: Bank): string => {
-  const rates = [
-    parseRate(bank.tenures.short.senior),
-    parseRate(bank.tenures.medium.senior),
-    parseRate(bank.tenures.long.senior),
-    parseRate(bank.tenures.mega.senior),
-  ];
-  return Math.max(...rates).toFixed(2) + '%';
-};
-
-// Flatten bankData from mockData.ts into a flat array
-const flattenBankData = (): FlattenedBank[] => {
-  let id = 1;
-  const result: FlattenedBank[] = [];
-
-  for (const categoryGroup of bankData) {
-    for (const bank of categoryGroup.banks) {
-      result.push({
-        id: id++,
-        name: bank.name,
-        logo: bank.logo,
-        category: categoryGroup.category,
-        shortRate: bank.tenures.short.rate,
-        shortSenior: bank.tenures.short.senior,
-        mediumRate: bank.tenures.medium.rate,
-        mediumSenior: bank.tenures.medium.senior,
-        longRate: bank.tenures.long.rate,
-        longSenior: bank.tenures.long.senior,
-        megaRate: bank.tenures.mega.rate,
-        megaSenior: bank.tenures.mega.senior,
-        specialRate: bank.specialRate || '',
-        bestRate: getBestRate(bank),
-        bestSeniorRate: getBestSeniorRate(bank),
-      });
-    }
-  }
-
-  return result;
-};
-
-// ==================== FILTER OPTIONS ====================
+const fmt2 = (items: any[]): FlattenedBank[] => {
+  if (!Array.isArray(items)) return [];
+  return items.map((item: any, idx: number) => ({
+    id: item.id || idx + 1, name: item.company_name || 'Unknown', logo: item.logo_url || '',
+    category: normCat(item.category),
+    shortRate: String(item.one_year_rate || 0), mediumRate: String(item.two_year_rate || 0),
+    longRate: String(item.three_year_rate || 0), megaRate: String(item.five_year_rate || 0),
+    specialRate: item.special_offer || '', bestRate: String(item.best_rate || 0),
+    bestSeniorRate: item.best_rate ? String((parseFloat(item.best_rate) + 0.5).toFixed(2)) : '0',
+  }));
+}
 
 const RATE_RANGES = [
-  { label: 'All Rates', value: 'ALL' },
-  { label: 'Above 8%', value: '8-100' },
-  { label: '7% - 8%', value: '7-8' },
-  { label: '6% - 7%', value: '6-7' },
-  { label: 'Below 6%', value: '0-6' },
+  { label: 'All Rates', value: 'ALL' }, { label: 'Above 8%', value: '8-100' },
+  { label: '7% – 8%', value: '7-8' }, { label: '6% – 7%', value: '6-7' }, { label: 'Below 6%', value: '0-6' },
 ] as const;
-
-const CATEGORY_OPTIONS = [
+const CAT_OPTS = [
   { label: 'All Categories', value: 'ALL' },
   { label: 'Public Sector Banks', value: 'Public Sector Banks' },
   { label: 'Private Sector Banks', value: 'Private Sector Banks' },
   { label: 'Small Finance Banks', value: 'Small Finance Banks' },
   { label: 'NBFCs', value: 'NBFCs' },
 ] as const;
-
-const SORT_OPTIONS = [
-  { label: 'Best Rate: High to Low', value: 'rate-desc' },
-  { label: 'Best Rate: Low to High', value: 'rate-asc' },
-  { label: 'Name: A to Z', value: 'name-asc' },
-  { label: 'Name: Z to A', value: 'name-desc' },
+const SORT_OPTS = [
+  { label: 'Best Rate ↓', value: 'rate-desc' }, { label: 'Best Rate ↑', value: 'rate-asc' },
+  { label: 'Name A→Z', value: 'name-asc' }, { label: 'Name Z→A', value: 'name-desc' },
 ] as const;
-
-type SortOption = typeof SORT_OPTIONS[number]['value'];
-type RateRangeOption = typeof RATE_RANGES[number]['value'];
-type CategoryOption = typeof CATEGORY_OPTIONS[number]['value'];
-
-// ==================== MAIN COMPONENT ====================
+type RangeOpt = typeof RATE_RANGES[number]['value'];
+type CatOpt = typeof CAT_OPTS[number]['value'];
+type SortOpt = typeof SORT_OPTS[number]['value'];
 
 export default function FDCompaniesPage() {
   const router = useRouter();
-
-  // State
+  // const { toggleWishlist, isInWishlist } = useWishlist();
   const [companies, setCompanies] = useState<FlattenedBank[]>([]);
-  const [filteredCompanies, setFilteredCompanies] = useState<FlattenedBank[]>([]);
+  const [filtered, setFiltered] = useState<FlattenedBank[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [rateRange, setRateRange] = useState<RateRangeOption>('ALL');
-  const [categoryFilter, setCategoryFilter] = useState<CategoryOption>('ALL');
-  const [sortBy, setSortBy] = useState<SortOption>('rate-desc');
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [rateRange, setRateRange] = useState<RangeOpt>('ALL');
+  const [category, setCategory] = useState<CatOpt>('ALL');
+  const [sortBy, setSortBy] = useState<SortOpt>('rate-desc');
   const [showFilters, setShowFilters] = useState(false);
-  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
-  const [bookmarkedIds, setBookmarkedIds] = useState<Set<number>>(new Set());
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [imgErr, setImgErr] = useState<Set<number>>(new Set());
+  // wishlistedIds: maps company.id → wishlist-row-id (from DB) so we can delete by the right ID
+  const [wishlistedIds, setWishlistedIds] = useState<Record<number, number>>({});
+  const [wishlistLoading, setWishlistLoading] = useState<Set<number>>(new Set());
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
-  // ========== LOAD BOOKMARKS ==========
-  useEffect(() => {
-    const saved = localStorage.getItem('wishlistItems');
-    if (saved) {
-      try {
-        const items = JSON.parse(saved);
-        const ids = new Set<number>(
-          items.filter((i: any) => i.category === 'fixed-income').map((i: any) => i.id)
-        );
-        setBookmarkedIds(ids);
-      } catch (e) {
-        toast.error('Error loading wishlist');
-      }
-    }
-  }, []);
-
-  const toggleBookmark = (company: FlattenedBank) => {
-    const saved = localStorage.getItem('wishlistItems');
-    let items: any[] = [];
-    if (saved) {
-      try { items = JSON.parse(saved); } catch (e) {}
-    }
-
-    const isBookmarked = bookmarkedIds.has(company.id);
-    if (isBookmarked) {
-      items = items.filter((i: any) => !(i.id === company.id && i.category === 'fixed-income'));
-      setBookmarkedIds(prev => {
-        const next = new Set(prev);
-        next.delete(company.id);
-        return next;
-      });
-    } else {
-      const newItem = {
-        id: company.id,
-        category: 'fixed-income',
-        name: company.name,
-        logo: company.logo, // Wishlist component will handle image error rendering
-        keyMetrics: {
-          interestRate: parseRate(company.bestRate),
-          tenure: 'Multiple Options',
-          risk: 'Low',
-          creditRating: company.category
-        },
-        addedDate: new Date().toISOString()
-      };
-      items.push(newItem);
-      setBookmarkedIds(prev => new Set(prev).add(company.id));
-      
-      // Show toast
-      setToastMessage('Added to saved funds');
-      setTimeout(() => setToastMessage(null), 3000);
-    }
-    localStorage.setItem('wishlistItems', JSON.stringify(items));
-  };
-
-  // ========== LOAD COMPANIES ==========
   useEffect(() => {
     const token = getTokenFromCookie();
-
-    if (!token) {
-      router.push('/');
-      return;
-    }
-
+    if (!token) { router.push('/'); return; }
     localStorage.setItem('token', token);
-
-    // Load all FD companies from mockData
-    const allCompanies = flattenBankData();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCompanies(allCompanies);
-    setFilteredCompanies(allCompanies);
-    setLoading(false);
+    (async () => {
+      try {
+        setLoading(true);
+        // Load FD plans
+        const res = await api.get('/api/products/investments/fd/plans');
+        setCompanies(fmt2(res.data?.data || []));
+        // Load existing wishlist to pre-fill bookmark state
+        const wl = await customerService.getMyWishlist();
+        if (wl.success && Array.isArray(wl.data)) {
+          const map: Record<number, number> = {};
+          wl.data
+            .filter((item: any) => item.product_type === 'fd')
+            .forEach((item: any) => { map[item.product_id] = item.id; });
+          setWishlistedIds(map);
+        }
+      } catch { setError('Failed to load FD plans.'); }
+      finally { setLoading(false); }
+    })();
   }, [router]);
 
-  // ========== APPLY FILTERS AND SEARCH ==========
   useEffect(() => {
-    if (!companies.length) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setFilteredCompanies([]);
-      return;
-    }
-
-    let filtered = [...companies];
-
-    // Apply search
-    if (searchTerm.trim()) {
-      filtered = filtered.filter(company =>
-        company.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Apply rate range filter (based on best general rate)
+    let r = [...companies];
+    if (search.trim()) r = r.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.category.toLowerCase().includes(search.toLowerCase()));
     if (rateRange !== 'ALL') {
       const [min, max] = rateRange.split('-').map(Number);
-      filtered = filtered.filter(company => {
-        const rate = parseRate(company.bestRate);
-        return rate >= min && rate <= max;
-      });
+      r = r.filter(c => { const v = parseRate(c.bestRate); return v >= min && v <= max; });
     }
-
-    // Apply category filter
-    if (categoryFilter !== 'ALL') {
-      filtered = filtered.filter(company => company.category === categoryFilter);
-    }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      const rateA = parseRate(a.bestRate);
-      const rateB = parseRate(b.bestRate);
-
-      switch (sortBy) {
-        case 'name-asc': return a.name.localeCompare(b.name);
-        case 'name-desc': return b.name.localeCompare(a.name);
-        case 'rate-asc': return rateA - rateB;
-        case 'rate-desc': return rateB - rateA;
-        default: return 0;
-      }
+    if (category !== 'ALL') r = r.filter(c => c.category === category);
+    r.sort((a, b) => {
+      if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
+      if (sortBy === 'name-desc') return b.name.localeCompare(a.name);
+      if (sortBy === 'rate-asc') return parseRate(a.bestRate) - parseRate(b.bestRate);
+      return parseRate(b.bestRate) - parseRate(a.bestRate);
     });
+    setFiltered(r);
+    setPage(1); // reset to page 1 whenever filters change
+  }, [companies, search, rateRange, category, sortBy]);
 
-    setFilteredCompanies(filtered);
-  }, [companies, searchTerm, rateRange, categoryFilter, sortBy]);
-
-  // ========== HANDLE IMAGE ERRORS ==========
-  const handleImageError = (companyId: number): void => {
-    setImageErrors(prev => new Set(prev).add(companyId));
+  // Toggle wishlist via API
+  const handleWishlistToggle = async (company: FlattenedBank) => {
+    const isBookmarked = wishlistedIds[company.id] !== undefined;
+    setWishlistLoading(prev => new Set(prev).add(company.id));
+    try {
+      if (isBookmarked) {
+        // Remove from wishlist
+        const rowId = wishlistedIds[company.id];
+        const res = await customerService.removeFromWishlist(rowId);
+        if (res.success) {
+          setWishlistedIds(prev => { const n = { ...prev }; delete n[company.id]; return n; });
+          toast.success(`${company.name} removed from wishlist`);
+        } else {
+          toast.error(res.message || 'Failed to remove from wishlist');
+        }
+      } else {
+        // Add to wishlist
+        const res = await customerService.addToWishlist({
+          product_type: 'fd',
+          product_id: company.id,
+          product_name: company.name,
+          category: company.category,
+          Short_Term: company.shortRate,
+          Medium_Term: company.mediumRate,
+          Long_Term: company.longRate,
+          Mega_Term: company.megaRate,
+          Special_Offer: company.specialRate,
+          best_rate: company.bestRate, // Added for UI display in wishlist
+          senior_rate: company.bestSeniorRate,
+          risk: 'Low',
+        } as any);
+        if (res.success && res.data && !Array.isArray(res.data)) {
+          setWishlistedIds(prev => ({ ...prev, [company.id]: (res.data as any).id }));
+          toast.success(`${company.name} added to wishlist! 🔖`);
+        } else if (res.success) {
+          // Fallback: Reload wishlist to get the correct row ID
+          const wl = await customerService.getMyWishlist();
+          if (wl.success && Array.isArray(wl.data)) {
+            const map: Record<number, number> = {};
+            wl.data.filter((i: any) => i.product_type === 'fd')
+              .forEach((i: any) => { map[i.product_id] = i.id; });
+            setWishlistedIds(map);
+          }
+          toast.success(`${company.name} added to wishlist! 🔖`);
+        } else {
+          toast.error(res.message || 'Failed to add to wishlist');
+        }
+      }
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || 'Wishlist update failed';
+      toast.error(msg);
+      console.error('Wishlist Error:', err);
+    } finally {
+      setWishlistLoading(prev => { const n = new Set(prev); n.delete(company.id); return n; });
+    }
   };
 
-  // ========== RENDER COMPANY LOGO ==========
-  const renderCompanyLogo = (company: FlattenedBank) => {
-    if (company.logo && !imageErrors.has(company.id)) {
-      return (
-        <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0 border border-gray-100">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={company.logo}
-            alt={company.name}
-            className="w-full h-full object-contain"
-            onError={() => handleImageError(company.id)}
-            loading="lazy"
-          />
-        </div>
-      );
-    }
+  const clearFilters = () => { setSearch(''); setRateRange('ALL'); setCategory('ALL'); setSortBy('rate-desc'); setShowFilters(false); };
+  const activeCnt = [search ? 1 : 0, rateRange !== 'ALL' ? 1 : 0, category !== 'ALL' ? 1 : 0, sortBy !== 'rate-desc' ? 1 : 0].reduce((a, b) => a + b, 0);
+  const avgRate = companies.length ? companies.reduce((s, c) => s + parseRate(c.bestRate), 0) / companies.length : 0;
+  const maxRate = companies.length ? Math.max(...companies.map(c => parseRate(c.bestRate))) : 0;
+  const maxSenior = companies.length ? Math.max(...companies.map(c => parseRate(c.bestSeniorRate))) : 0;
 
-    return (
-      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center text-[#2076C7] font-bold text-sm flex-shrink-0">
-        {getCompanyInitials(company.name)}
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  // Pagination helper: show at most 5 page numbers
+  const getPageNumbers = () => {
+    const pages: number[] = [];
+    const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+    const end = Math.min(totalPages, start + 4);
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
+
+  const PaginationBar = () => (
+    totalPages > 1 ? (
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setPage(p => Math.max(1, p - 1))}
+          disabled={page === 1}
+          className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:border-[#2076C7] hover:text-[#2076C7] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+
+        {getPageNumbers().map(pg => (
+          <button
+            key={pg}
+            onClick={() => setPage(pg)}
+            className={`w-8 h-8 rounded-xl text-xs font-bold transition-all ${page === pg
+              ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md shadow-blue-200'
+              : 'border border-slate-200 text-slate-500 hover:border-[#2076C7] hover:text-[#2076C7]'}`}
+          >
+            {pg}
+          </button>
+        ))}
+
+        <button
+          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+          disabled={page === totalPages}
+          className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:border-[#2076C7] hover:text-[#2076C7] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
-    );
-  };
+    ) : null
+  );
 
-  // ========== CLEAR FILTERS ==========
-  const clearFilters = (e?: React.MouseEvent): void => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    setSearchTerm('');
-    setRateRange('ALL');
-    setCategoryFilter('ALL');
-    setSortBy('rate-desc');
-  };
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="text-center space-y-4">
+        <div className="w-12 h-12 border-[3px] border-[#2076C7]/20 border-t-[#2076C7] rounded-full animate-spin mx-auto" />
+        <p className="text-gray-400 text-sm font-medium">Loading FD plans...</p>
+      </div>
+    </div>
+  );
+  if (error) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="bg-white rounded-2xl p-8 text-center max-w-xs border border-red-100 shadow-sm">
+        <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+        <p className="text-gray-700 font-semibold text-sm mb-4">{error}</p>
+        <button onClick={() => window.location.reload()} className="px-4 py-2 bg-[#2076C7] text-white text-sm font-semibold rounded-xl flex items-center gap-2 mx-auto hover:bg-[#1a5fa8] transition-colors">
+          <RefreshCw size={13} /> Retry
+        </button>
+      </div>
+    </div>
+  );
 
-  // ========== CALCULATE STATS ==========
-  const totalCompanies = companies.length;
+  return (
+    <div className="w-full space-y-6">
 
-  const avgRate = companies.length > 0
-    ? companies.reduce((sum, c) => sum + parseRate(c.bestRate), 0) / companies.length
-    : 0;
 
-  const maxRate = companies.length > 0
-    ? Math.max(...companies.map(c => parseRate(c.bestRate)))
-    : 0;
-
-  const maxSeniorRate = companies.length > 0
-    ? Math.max(...companies.map(c => parseRate(c.bestSeniorRate)))
-    : 0;
-
-  const activeFilterCount = [
-    searchTerm ? 1 : 0,
-    rateRange !== 'ALL' ? 1 : 0,
-    categoryFilter !== 'ALL' ? 1 : 0,
-    sortBy !== 'rate-desc' ? 1 : 0
-  ].reduce((a, b) => a + b, 0);
-
-  // ========== LOADING STATE ==========
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-[#2076C7]/20 border-t-[#2076C7] rounded-full animate-spin mx-auto"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full animate-pulse"></div>
+      {/* ── Stats ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {[
+          { icon: Landmark, label: 'Total Plans', value: `${companies.length}`, color: 'text-[#2076C7]', bg: 'bg-blue-50' },
+          { icon: Percent, label: 'Avg. Best Rate', value: avgRate > 0 ? `${avgRate.toFixed(2)}%` : '—', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { icon: TrendingUp, label: 'Highest Rate', value: maxRate > 0 ? `${maxRate.toFixed(2)}%` : '—', color: 'text-amber-600', bg: 'bg-amber-50' },
+          { icon: Star, label: 'Best Sr. Rate', value: maxSenior > 0 ? `${maxSenior.toFixed(2)}%` : '—', color: 'text-violet-600', bg: 'bg-violet-50' },
+        ].map((s, i) => (
+          <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 flex items-center gap-3 sm:gap-4 shadow-sm hover:shadow-md transition-shadow">
+            <div className={`w-9 h-9 sm:w-10 sm:h-10 ${s.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+              <s.icon size={16} className={s.color} />
+            </div>
+            <div>
+              <p className="text-lg sm:text-xl font-black text-gray-900 leading-tight">{s.value}</p>
+              <p className="text-[10px] sm:text-[11px] text-gray-400 font-medium mt-0.5">{s.label}</p>
             </div>
           </div>
-          <p className="text-gray-600 font-medium mt-6 animate-pulse">
-            Loading FD companies...
-          </p>
-        </div>
+        ))}
       </div>
-    );
-  }
 
-  // ========== ERROR STATE ==========
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 sm:p-8 text-center border border-red-100">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-            <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-red-500" />
-          </div>
-          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
-            Unable to Load Companies
+      {/* ── Toolbar ── */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <h3 className="text-xl font-black text-gray-900">
+            Explore FD Plans
+            <span className="ml-2 px-2.5 py-0.5 bg-[#2076C7]/10 text-[#2076C7] text-[11px] font-bold rounded-lg">{filtered.length} plans</span>
           </h3>
-          <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="w-full py-3 px-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-semibold rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
-          >
-            <RefreshCw size={18} />
-            Retry Connection
+          <p className="text-xs text-gray-400 mt-0.5 font-medium">Compare daily-updated rates from {companies.length}+ institutions</p>
+        </div>
+        <div className="flex items-center gap-2.5 w-full md:w-auto">
+          <div className="relative flex-1 md:w-64">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+            <input type="text" placeholder="Search institution..." value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/5 transition-all" />
+          </div>
+          <button onClick={() => setShowFilters(!showFilters)}
+            className={`px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 border transition-all ${showFilters ? 'bg-[#2076C7] text-white border-[#2076C7] shadow-md' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+            <Filter size={14} />
+            Filter
+            {activeCnt > 0 && <span className={`w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center ${showFilters ? 'bg-white text-[#2076C7]' : 'bg-[#2076C7] text-white'}`}>{activeCnt}</span>}
+            <ChevronDown size={13} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
           </button>
         </div>
       </div>
-    );
-  }
 
-  // ========== MAIN RENDER ==========
-  return (
-    <div className="w-full">
-      <main className="w-full">
-
-        {/* Controls Row: Search & Filters */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-          <div>
-             <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                Explore FD Plans
-                <span className="px-2 py-0.5 bg-blue-50 text-[#2076C7] text-[10px] font-black rounded-lg border border-blue-100 uppercase tracking-wider">
-                  {totalCompanies} Available
-                </span>
-             </h3>
-             <p className="text-xs text-gray-500 font-medium mt-0.5">Compare daily updated rates from across 33+ institutions</p>
+      {/* ── Filter Panel ── */}
+      {showFilters && (
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-bold text-gray-700">Refine Results</p>
+            <button onClick={clearFilters} className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 font-medium"><X size={12} /> Clear all</button>
           </div>
-
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-             <div className="relative flex-1 sm:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search companies..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-[#2076C7] focus:shadow-[0_0_0_4px_rgba(32,118,199,0.05)] transition-all"
-                />
-              </div>
-
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`px-5 py-2.5 rounded-xl text-sm font-black flex items-center gap-2 transition-all border ${showFilters
-                    ? 'bg-[#2076C7] text-white border-[#2076C7] shadow-lg shadow-blue-500/20'
-                    : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm'
-                  }`}
-              >
-                <Filter size={18} />
-                <span className="hidden xs:inline">Filters</span>
-                {activeFilterCount > 0 && (
-                  <span className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-black ${showFilters ? 'bg-white text-[#2076C7]' : 'bg-[#2076C7] text-white'}`}>
-                    {activeFilterCount}
-                  </span>
-                )}
-              </button>
-          </div>
-        </div>
-
-        {/* Market Overview Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-              <Landmark size={16} className="text-[#2076C7]" />
-              Total Companies
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{totalCompanies}</p>
-          </div>
-
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-              <Percent size={16} className="text-emerald-600" />
-              Avg. Best Rate
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {avgRate > 0 ? `${avgRate.toFixed(2)}%` : 'N/A'}
-            </p>
-          </div>
-
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-              <TrendingUp size={16} className="text-amber-600" />
-              Highest General Rate
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {maxRate > 0 ? `${maxRate.toFixed(2)}%` : 'N/A'}
-            </p>
-          </div>
-
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-              <Star size={16} className="text-purple-600" />
-              Highest Senior Rate
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {maxSeniorRate > 0 ? `${maxSeniorRate.toFixed(2)}%` : 'N/A'}
-            </p>
-          </div>
-        </div>
-
-        {/* Filter Panel */}
-        {showFilters && (
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8 animate-fadeIn">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <Filter className="w-5 h-5 text-[#2076C7]" />
-                Filter Companies
-              </h3>
-              <button
-                type="button"
-                onClick={(e) => clearFilters(e)}
-                className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 group transition-colors"
-              >
-                <X size={16} className="group-hover:rotate-90 transition-transform" />
-                Clear all
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Interest Rate Filter */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-                  Best Rate
-                </label>
-                <select
-                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                  value={rateRange}
-                  onChange={(e) => setRateRange(e.target.value as RateRangeOption)}
-                >
-                  {RATE_RANGES.map(range => (
-                    <option key={range.value} value={range.value}>
-                      {range.label}
-                    </option>
-                  ))}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[
+              { label: 'Best Rate', value: rateRange, opts: RATE_RANGES, set: setRateRange },
+              { label: 'Category', value: category, opts: CAT_OPTS, set: setCategory },
+              { label: 'Sort By', value: sortBy, opts: SORT_OPTS, set: setSortBy },
+            ].map((f, i) => (
+              <div key={i}>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">{f.label}</label>
+                <select value={f.value} onChange={e => (f.set as any)(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 outline-none focus:border-[#2076C7] focus:bg-white transition-all cursor-pointer">
+                  {f.opts.map((o: any) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
-
-              {/* Category Filter */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-                  Category
-                </label>
-                <select
-                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value as CategoryOption)}
-                >
-                  {CATEGORY_OPTIONS.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Sort By */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-                  Sort By
-                </label>
-                <select
-                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 outline-none focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 transition-all"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as SortOption)}
-                >
-                  {SORT_OPTIONS.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Results Summary */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Showing</p>
-                  <p className="text-2xl font-bold text-gray-900">{filteredCompanies.length}</p>
-                  <p className="text-xs text-gray-500">of {totalCompanies} companies</p>
-                </div>
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
-                  <Database className="w-6 h-6 text-[#2076C7]" />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Companies List */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          {/* Table Header - Desktop */}
-          <div className="hidden lg:block bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-            <div className="grid grid-cols-12 gap-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
-              <div className="col-span-3">Company</div>
-              <div className="col-span-1 text-center">Category</div>
-              <div className="col-span-1 text-center">Short Term</div>
-              <div className="col-span-1 text-center">Medium Term</div>
-              <div className="col-span-1 text-center">Long Term</div>
-              <div className="col-span-1 text-center">5Y+</div>
-              <div className="col-span-1 text-right">Best Rate</div>
-              <div className="col-span-3 text-center">Special Offer</div>
-            </div>
-          </div>
-
-          {/* Company Rows */}
-          <div className="divide-y divide-gray-200">
-            {filteredCompanies.length > 0 ? (
-              filteredCompanies.map((company) => {
-                const catBadge = getCategoryBadge(company.category);
-
-                return (
-                  <div
-                    key={company.id}
-                    className="px-4 sm:px-6 py-4 hover:bg-gray-50 transition-colors"
-                  >
-                    {/* Desktop View */}
-                    <div className="hidden lg:grid grid-cols-12 gap-4 items-center">
-                      {/* Company */}
-                      <div className="col-span-3">
-                        <div className="flex items-center gap-3">
-                          {renderCompanyLogo(company)}
-                          <div>
-                            <div className="font-semibold text-gray-900 text-sm leading-tight">
-                              {company.name}
-                            </div>
-
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Category */}
-                      <div className="col-span-1 text-center">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium ${catBadge.bg} ${catBadge.text}`}>
-                          {catBadge.short}
-                        </span>
-                      </div>
-
-                      {/* Short Term Rate */}
-                      <div className="col-span-1 text-center">
-                        <div className="text-sm font-semibold text-gray-800">{company.shortRate}</div>
-                        <div className="text-[10px] text-emerald-600">{company.shortSenior}</div>
-                      </div>
-
-                      {/* Medium Term Rate */}
-                      <div className="col-span-1 text-center">
-                        <div className="text-sm font-semibold text-gray-800">{company.mediumRate}</div>
-                        <div className="text-[10px] text-emerald-600">{company.mediumSenior}</div>
-                      </div>
-
-                      {/* Long Term Rate */}
-                      <div className="col-span-1 text-center">
-                        <div className="text-sm font-semibold text-gray-800">{company.longRate}</div>
-                        <div className="text-[10px] text-emerald-600">{company.longSenior}</div>
-                      </div>
-
-                      {/* 5Y+ Rate */}
-                      <div className="col-span-1 text-center">
-                        <div className="text-sm font-semibold text-gray-800">{company.megaRate}</div>
-                        <div className="text-[10px] text-emerald-600">{company.megaSenior}</div>
-                      </div>
-
-                      {/* Best Rate */}
-                      <div className="col-span-1 text-right">
-                        <span className="font-bold text-[#2076C7] text-base">
-                          {company.bestRate}
-                        </span>
-                      </div>
-
-                      {/* Special Offer & Action */}
-                      <div className="col-span-3 flex items-center justify-end gap-3 pr-2">
-                        <div className="flex-1 text-center">
-                          {company.specialRate ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-50 text-amber-700 text-[11px] font-medium border border-amber-100">
-                              <Star size={10} className="fill-amber-400 text-amber-400" />
-                              {company.specialRate}
-                            </span>
-                          ) : (
-                            <span className="text-xs text-gray-400">—</span>
-                          )}
-                        </div>
-                        <button 
-                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleBookmark(company); }}
-                          className={`p-2 rounded-full transition-all flex-shrink-0 ${bookmarkedIds.has(company.id) ? 'bg-blue-50 text-[#2076C7]' : 'hover:bg-gray-100 text-gray-400 hover:text-gray-600'}`}
-                          title="Add to Wishlist"
-                        >
-                          <Bookmark size={18} className={bookmarkedIds.has(company.id) ? "fill-current" : ""} />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Mobile / Tablet View */}
-                    <div className="lg:hidden">
-                      <div className="flex items-start gap-3 mb-3">
-                        {renderCompanyLogo(company)}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold text-gray-900 text-sm truncate">
-                              {company.name}
-                            </span>
-                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium ${catBadge.bg} ${catBadge.text}`}>
-                              {catBadge.short}
-                            </span>
-                          </div>
-                          {company.specialRate && (
-                            <div className="flex items-center gap-1 text-xs text-amber-700">
-                              <Star size={10} className="fill-amber-400 text-amber-400" />
-                              <span className="truncate">{company.specialRate}</span>
-                            </div>
-                          )}
-                        </div>
-                        <button
-                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleBookmark(company); }}
-                          className={`p-2 -mt-1 -mr-1 rounded-full transition-all flex-shrink-0 ${bookmarkedIds.has(company.id) ? 'bg-blue-50 text-[#2076C7]' : 'hover:bg-gray-100 text-gray-400 hover:text-gray-600'}`}
-                        >
-                          <Bookmark size={20} className={bookmarkedIds.has(company.id) ? "fill-current" : ""} />
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-4 gap-2 bg-gray-50 rounded-lg p-3">
-                        <div>
-                          <p className="text-[9px] text-gray-500 uppercase font-medium">Short</p>
-                          <p className="text-xs font-bold text-gray-800">{company.shortRate}</p>
-                          <p className="text-[9px] text-emerald-600">{company.shortSenior}</p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] text-gray-500 uppercase font-medium">Medium</p>
-                          <p className="text-xs font-bold text-gray-800">{company.mediumRate}</p>
-                          <p className="text-[9px] text-emerald-600">{company.mediumSenior}</p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] text-gray-500 uppercase font-medium">Long</p>
-                          <p className="text-xs font-bold text-gray-800">{company.longRate}</p>
-                          <p className="text-[9px] text-emerald-600">{company.longSenior}</p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] text-gray-500 uppercase font-medium">Best</p>
-                          <p className="text-xs font-bold text-[#2076C7]">{company.bestRate}</p>
-                          <p className="text-[9px] text-emerald-600">{company.bestSeniorRate}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              /* Empty State */
-              <div className="px-6 py-12 text-center">
-                <Database className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-600 mb-2">No companies found</p>
-                <button
-                  type="button"
-                  onClick={(e) => clearFilters(e)}
-                  className="text-[#2076C7] text-sm font-black hover:underline"
-                >
-                  Clear filters
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
-
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-4 right-4 z-50 animate-fadeIn">
-          <div className="bg-white border border-gray-100 text-gray-700 px-4 py-3 rounded-full shadow-sm flex items-center gap-2">
-            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-              <CheckCircle size={14} className="text-white" />
-            </div>
-            <p className="text-sm font-medium">{toastMessage}</p>
+            ))}
           </div>
         </div>
       )}
 
+      {/* ── Category Tabs ── */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        {CAT_OPTS.map(opt => {
+          const meta = CATS[opt.value as keyof typeof CATS];
+          const count = opt.value === 'ALL' ? companies.length : companies.filter(c => c.category === opt.value).length;
+          const active = category === opt.value;
+          return (
+            <button key={opt.value} onClick={() => setCategory(opt.value as CatOpt)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap border transition-all ${active ? 'bg-[#2076C7] text-white border-[#2076C7] shadow-md shadow-blue-100'
+                : 'bg-white border-gray-200 text-gray-600 hover:border-[#2076C7]/40 hover:text-[#2076C7]'}`}>
+              {meta && !active && <span className={`w-2 h-2 rounded-full ${meta.dot}`} />}
+              {opt.value === 'ALL' ? 'All' : meta?.short ?? opt.label}
+              <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${active ? 'bg-white/20' : 'bg-gray-100 text-gray-500'}`}>{count}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Desktop Table / Mobile Cards ── */}
+      <div className="space-y-4">
+        {/* Mobile Cards (Hidden on md+) */}
+        <div className="grid grid-cols-1 gap-4 md:hidden">
+          {paginated.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center shadow-sm">
+              <Database className="w-8 h-8 text-gray-200 mx-auto mb-3" />
+              <p className="text-gray-400 font-bold text-sm">No plans found</p>
+            </div>
+          ) : (
+            paginated.map((company) => {
+              const meta = CATS[company.category] ?? { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-300', short: company.category.substring(0, 4) };
+              // const bookmarked = isInWishlist(company.id);
+              const best = parseRate(company.bestRate);
+              return (
+                <div key={company.id} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4 relative overflow-hidden">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      {company.logo && !imgErr.has(company.id) ? (
+                        <img src={company.logo} alt={company.name} className="w-10 h-10 rounded-xl object-contain border border-gray-50 p-1" onError={() => setImgErr(p => new Set(p).add(company.id))} />
+                      ) : (
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#2076C7] font-black text-xs">
+                          {getInitials(company.name)}
+                        </div>
+                      )}
+                      <div>
+                        <h4 className="font-bold text-gray-900 text-sm leading-tight">{company.name}</h4>
+                        <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter ${meta.bg} ${meta.text}`}>
+                          {meta.short}
+                        </span>
+                      </div>
+                    </div>
+                    {/* <button onClick={() => handleBookmark(company)} className={`p-2 rounded-xl transition-all ${bookmarked ? 'bg-blue-50 text-[#2076C7]' : 'text-gray-300'}`}>
+                      <Bookmark size={18} className={bookmarked ? 'fill-current' : ''} />
+                    </button> */}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className="bg-gray-50/50 rounded-xl p-3 border border-gray-100">
+                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Best Rate</p>
+                      <p className="text-lg font-black text-[#2076C7]">{best > 0 ? `${best.toFixed(2)}%` : '—'}</p>
+                    </div>
+                    <div className="bg-emerald-50/30 rounded-xl p-3 border border-emerald-50">
+                      <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest mb-1">Sr. Citizen</p>
+                      <p className="text-lg font-black text-emerald-700">{parseRate(company.bestSeniorRate) > 0 ? `${parseRate(company.bestSeniorRate).toFixed(2)}%` : '—'}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 py-2 border-y border-gray-50">
+                    {['1Y', '2Y', '3Y', '5Y'].map((label, i) => {
+                      const rates = [company.shortRate, company.mediumRate, company.longRate, company.megaRate];
+                      const val = parseRate(rates[i]);
+                      return (
+                        <div key={label} className="text-center">
+                          <p className="text-[8px] font-black text-gray-300 uppercase mb-0.5">{label}</p>
+                          <p className={`text-[11px] font-bold ${val > 0 ? 'text-gray-700' : 'text-gray-300'}`}>{val > 0 ? `${val}%` : '—'}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {company.specialRate && (
+                    <div className="bg-amber-50 rounded-xl p-2.5 border border-amber-100 flex items-center gap-2">
+                      <Star size={12} className="text-amber-400 fill-amber-400" />
+                      <p className="text-[10px] font-bold text-amber-800 line-clamp-1">{company.specialRate}</p>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="flex-1 py-3.5 rounded-xl text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all cursor-default bg-linear-to-r from-[#2076C7] to-[#1CADA3] whitespace-nowrap"
+                    >
+                      Apply Now
+                    </button>
+                    <button
+                      onClick={() => handleWishlistToggle(company)}
+                      disabled={wishlistLoading.has(company.id)}
+                      className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center border transition-all ${wishlistedIds[company.id] !== undefined
+                        ? 'bg-[#2076C7]/10 border-[#2076C7]/30 text-[#2076C7]'
+                        : 'border-gray-200 text-gray-400 hover:border-[#2076C7]/40 hover:text-[#2076C7]'
+                        } disabled:opacity-50 disabled:cursor-wait`}
+                      title={wishlistedIds[company.id] !== undefined ? 'Remove from wishlist' : 'Add to wishlist'}
+                    >
+                      {wishlistLoading.has(company.id) ? (
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Bookmark
+                          size={17}
+                          strokeWidth={wishlistedIds[company.id] !== undefined ? 2.5 : 2}
+                          className={wishlistedIds[company.id] !== undefined ? 'fill-current' : ''}
+                        />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        <div className="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto scrollbar-hide">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest w-48 whitespace-nowrap">Company</th>
+                  <th className="px-4 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest w-24 whitespace-nowrap">Category</th>
+                  {['1Y Rate', '2Y Rate', '3Y Rate', '5Y Rate'].map(h => (
+                    <th key={h} className="px-4 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest w-20 whitespace-nowrap">{h}</th>
+                  ))}
+                  <th className="px-4 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest w-24 whitespace-nowrap">Best Rate</th>
+                  <th className="px-4 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest w-24 whitespace-nowrap">Sr. Citizen</th>
+                  <th className="px-4 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest w-32 whitespace-nowrap">Special Offer</th>
+                  <th className="px-4 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest w-28 whitespace-nowrap">Action</th>
+                  <th className="px-4 py-4 w-10" />
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={10} className="py-20 text-center">
+                      <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <Database className="w-6 h-6 text-gray-300" />
+                      </div>
+                      <p className="text-gray-400 font-semibold text-sm">No plans match your filters</p>
+                      <button onClick={clearFilters} className="text-[#2076C7] text-xs font-bold mt-2 hover:underline">Clear filters</button>
+                    </td>
+                  </tr>
+                ) : paginated.map((company, idx) => {
+                  const meta = CATS[company.category] ?? { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-300', short: company.category.substring(0, 4) };
+                  // const bookmarked = isInWishlist(company.id);
+                  const best = parseRate(company.bestRate);
+                  return (
+                    <tr key={company.id}
+                      className={`group transition-colors border-b border-gray-50 last:border-0 hover:bg-blue-50/40 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-3">
+                          {company.logo && !imgErr.has(company.id) ? (
+                            <img src={company.logo} alt={company.name} className="w-9 h-9 rounded-xl object-contain border border-gray-100 bg-white flex-shrink-0 shadow-sm" onError={() => setImgErr(p => new Set(p).add(company.id))} loading="lazy" />
+                          ) : (
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center text-[#2076C7] font-black text-xs flex-shrink-0">
+                              {getInitials(company.name)}
+                            </div>
+                          )}
+                          <span className="font-semibold text-gray-900 text-sm truncate whitespace-nowrap max-w-[150px] block">{company.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-5">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold ${meta.bg} ${meta.text}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
+                          {meta.short}
+                        </span>
+                      </td>
+                      {[company.shortRate, company.mediumRate, company.longRate, company.megaRate].map((r, i) => (
+                        <td key={i} className="px-4 py-5 text-right">
+                          <span className={`text-sm font-semibold ${parseRate(r) > 0 ? 'text-gray-800' : 'text-gray-300'}`}>
+                            {fmt(r)}
+                          </span>
+                        </td>
+                      ))}
+                      <td className="px-4 py-5 text-right">
+                        {best > 0 ? (
+                          <span className="inline-flex items-center justify-center px-2.5 py-1 bg-[#2076C7]/10 text-[#2076C7] text-sm font-black rounded-lg">
+                            {best.toFixed(2)}%
+                          </span>
+                        ) : <span className="text-gray-300 text-sm">—</span>}
+                      </td>
+                      <td className="px-4 py-5 text-right">
+                        {parseRate(company.bestSeniorRate) > 0 ? (
+                          <span className="inline-flex items-center gap-1 text-emerald-700 text-sm font-semibold">
+                            <TrendingUp size={12} className="text-emerald-500" />
+                            {parseRate(company.bestSeniorRate).toFixed(2)}%
+                          </span>
+                        ) : <span className="text-gray-300 text-sm">—</span>}
+                      </td>
+                      <td className="px-4 py-5">
+                        {company.specialRate ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-[11px] font-semibold border border-amber-100 max-w-[120px] truncate">
+                            <Star size={10} className="fill-amber-400 text-amber-400 flex-shrink-0" />
+                            <span className="truncate">{company.specialRate}</span>
+                          </span>
+                        ) : <span className="text-gray-300 text-xs">—</span>}
+                      </td>
+                      <td className="px-4 py-5 text-center">
+                        <button
+                          className="px-5 py-2.5 rounded-xl text-white font-black text-[10px] uppercase tracking-widest shadow-md shadow-blue-500/10 hover:shadow-lg active:scale-95 transition-all cursor-default bg-linear-to-r from-[#2076C7] to-[#1CADA3] whitespace-nowrap"
+                        >
+                          Apply Now
+                        </button>
+                      </td>
+                      <td className="px-4 py-5">
+                        <button
+                          onClick={e => { e.preventDefault(); e.stopPropagation(); handleWishlistToggle(company); }}
+                          disabled={wishlistLoading.has(company.id)}
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${wishlistedIds[company.id] !== undefined
+                            ? 'bg-[#2076C7]/10 text-[#2076C7]'
+                            : 'text-gray-400 hover:bg-gray-100 hover:text-[#2076C7]'
+                            } disabled:opacity-50 disabled:cursor-wait`}
+                          title={wishlistedIds[company.id] !== undefined ? 'Remove from wishlist' : 'Add to wishlist'}
+                        >
+                          {wishlistLoading.has(company.id) ? (
+                            <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Bookmark
+                              size={17}
+                              strokeWidth={wishlistedIds[company.id] !== undefined ? 2.5 : 2}
+                              className={wishlistedIds[company.id] !== undefined ? 'fill-current' : ''}
+                            />
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Footer with pagination — matches admin FD dashboard style */}
+          {filtered.length > 0 && (
+            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+              <p className="text-xs text-slate-400 font-medium">
+                Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+              </p>
+              <PaginationBar />
+            </div>
+          )}
+        </div>
+      </div>
 
 
-      {/* Custom Animation Styles */}
       <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px) scale(0.95); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        .scrollbar-hide::-webkit-scrollbar { display: none !important; }
+        .scrollbar-hide { -ms-overflow-style: none !important; scrollbar-width: none !important; }
+        @keyframes fadeIn { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
+        .animate-fadeIn { animation: fadeIn 0.25s ease; }
       `}</style>
     </div>
   );

@@ -73,8 +73,8 @@ export default function ComparisonDesk({ selectedCompareIds, setSelectedCompareI
                                     <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 max-h-[220px] overflow-y-auto p-2 opacity-0 group-focus-within:opacity-100 pointer-events-none group-focus-within:pointer-events-auto transition-all scale-95 group-focus-within:scale-100 origin-top">
                                         {bondsData
                                             .filter(b => !selectedCompareIds.includes(b.id) && 
-                                                    (b.company.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                                     b.category.toLowerCase().includes(searchQuery.toLowerCase())))
+                                                    ((b.company || "").toLowerCase().includes((searchQuery || "").toLowerCase()) || 
+                                                     (b.category || "").toLowerCase().includes((searchQuery || "").toLowerCase())))
                                             .slice(0, 10)
                                             .map(b => (
                                                 <button 
@@ -90,8 +90,8 @@ export default function ComparisonDesk({ selectedCompareIds, setSelectedCompareI
                                                 </button>
                                             ))}
                                         {bondsData.filter(b => !selectedCompareIds.includes(b.id) && 
-                                                    (b.company.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                                     b.category.toLowerCase().includes(searchQuery.toLowerCase()))).length === 0 && (
+                                                    ((b.company || "").toLowerCase().includes((searchQuery || "").toLowerCase()) || 
+                                                     (b.category || "").toLowerCase().includes((searchQuery || "").toLowerCase()))).length === 0 && (
                                             <p className="p-4 text-[9px] font-black text-slate-400 text-center uppercase tracking-widest font-sans">No matching assets</p>
                                         )}
                                     </div>

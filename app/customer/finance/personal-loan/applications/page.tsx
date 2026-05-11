@@ -100,7 +100,7 @@ export default function MyApplicationsPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="sticky top-0 z-50 bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-sm border border-slate-100/60"
+          className="bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-sm border border-slate-100/60"
         >
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
 

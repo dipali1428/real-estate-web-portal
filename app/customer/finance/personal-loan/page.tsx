@@ -61,7 +61,11 @@ export default function PersonalLoanDashboard() {
   const activePlans = selectedBank ? getPlansForBank(selectedBank) : null;
 
   // Pre-approved offers data (static/illustrative)
-  const preApprovedOffers: any[] = [];
+  const preApprovedOffers = [
+    { bank: "HDFC BANK", rate: "10.25%", amount: "₹15L" },
+    { bank: "ICICI BANK", rate: "10.50%", amount: "₹12L" },
+    { bank: "AXIS BANK", rate: "10.75%", amount: "₹10L" },
+  ];
 
   return (
     <div className="flex-1 min-h-screen bg-[#FAFAFA] font-sans">
@@ -72,7 +76,7 @@ export default function PersonalLoanDashboard() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="sticky top-0 z-50 bg-white/80 backdrop-blur-md rounded-2xl p-5 mb-8 shadow-sm border border-slate-100/60"
+          className="bg-white/80 backdrop-blur-md rounded-2xl p-5 mb-8 shadow-sm border border-slate-100/60"
         >
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
 

@@ -3,7 +3,33 @@
 import React, { useState } from 'react';
 import { motion } from "framer-motion";
 import { Plus, Minus } from 'lucide-react';
-import { faqs } from '../data/mockData';
+
+const faqs = [
+    {
+        question: "What is a Fixed Deposit (FD)?",
+        answer: "A Fixed Deposit is a financial instrument where you deposit a lump sum amount for a fixed tenure at a guaranteed interest rate. It is one of the safest investment options in India."
+    },
+    {
+        question: "Is my money safe in a Fixed Deposit?",
+        answer: "Yes, Fixed Deposits with scheduled commercial banks are insured by the DICGC (a subsidiary of RBI) for up to ₹5 Lakh, including principal and interest."
+    },
+    {
+        question: "Can I withdraw my FD before the maturity date?",
+        answer: "Yes, most FDs allow premature withdrawal, though it usually comes with a small penalty (typically 0.5% to 1%) on the applicable interest rate."
+    },
+    {
+        question: "What is the difference between Bank FD and NBFC FD?",
+        answer: "Bank FDs are insured by RBI (up to ₹5L) and offer moderate returns. NBFC FDs (Corporate FDs) are not insured by RBI but often offer higher interest rates. Safety in NBFCs is determined by credit ratings like AAA or AA+."
+    },
+    {
+        question: "How is interest on FD taxed?",
+        answer: "Interest earned on FD is taxable as per your income tax slab. Banks deduct TDS (Tax Deducted at Source) at 10% if the interest exceeds ₹40,000 (₹50,000 for senior citizens) in a financial year."
+    },
+    {
+        question: "Are interest rates higher for senior citizens?",
+        answer: "Yes, most banks and financial institutions offer an additional 0.50% to 0.75% interest rate to senior citizens (individuals aged 60 and above)."
+    }
+];
 
 const FAQ = () => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -22,7 +48,7 @@ const FAQ = () => {
                     </h2>
                     <div className="w-24 h-1 mx-auto rounded-full mb-4" style={{ background: 'linear-gradient(to right, #2076C7, #1CADA3)' }}></div>
                     <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
-                        Got questions about Fixed Deposits? We&apos;ve got you covered.
+                        Got questions about Fixed Deposits? We've got you covered.
                     </p>
                 </div>
 
@@ -38,7 +64,7 @@ const FAQ = () => {
                                     {activeIndex === idx ? <Minus size={18} strokeWidth={3} /> : <Plus size={18} strokeWidth={3} />}
                                 </div>
                             </button>
- 
+
                             {activeIndex === idx && (
                                 <motion.div
                                     initial={{ opacity: 0, height: 0 }}

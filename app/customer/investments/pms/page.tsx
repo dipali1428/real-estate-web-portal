@@ -1,6 +1,5 @@
 'use client';
-
-import React from 'react';
+;
 import ExplorePMS from './components/ExplorePMS';
 
 export default function PMSDashboard() {

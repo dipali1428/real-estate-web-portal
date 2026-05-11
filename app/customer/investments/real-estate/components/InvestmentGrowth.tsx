@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import {
+import { 
     TrendingUp,
     FileText,
     Download,
@@ -21,7 +21,7 @@ import {
     Tooltip, 
     ResponsiveContainer
 } from 'recharts';
-import { properties as staticProperties } from '@/app/products/RealEstate/data/properties';
+import { properties as staticProperties } from '../../../../products/RealEstate/data/properties';
 
 // --- TYPES ---
 interface Investment {
