@@ -52,19 +52,40 @@ const RealEstateImport: React.FC = () => {
     fetchProperties();
   }, []);
 
-  const fetchProperties = async () => {
-    setPropertiesLoading(true);
-    try {
-      const response = await realEstateAPI. getAllProperties();
-      if (response && Array.isArray(response.data)) {
-        setProperties(response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching real estate properties:', error);
-    } finally {
-      setPropertiesLoading(false);
+ const fetchProperties = async () => {
+  setPropertiesLoading(true);
+
+  try {
+    const response = await realEstateAPI.getAllProperties();
+
+    if (response && Array.isArray(response.data)) {
+      setProperties(response.data);
+
+      setToast({
+        message: "Properties loaded successfully",
+        type: "success"
+      });
+    } else {
+      setProperties([]);
+
+      setToast({
+        message: "No properties found",
+        type: "info"
+      });
     }
-  };
+
+  } catch (error) {
+    setProperties([]);
+
+    setToast({
+      message: "Error fetching real estate properties",
+      type: "error"
+    });
+
+  } finally {
+    setPropertiesLoading(false);
+  }
+};
 
 
 

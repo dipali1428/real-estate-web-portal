@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, CheckCircle2, X, Landmark, Database, Star } from 'lucide-react';
+import { ChevronDown, CheckCircle2, X, Landmark, Database, Star, CheckCircle } from 'lucide-react';
 
 import { useRouter } from 'next/navigation';
-import api from '@/app/services/api';
+// import api from '@/app/services/api';
 // import { DashboardService } from '@/app/services/dashboardService';
+import { FDAdminService } from "../../../../services/fdAdminServices";
+import toast from 'react-hot-toast';
 
 type Bank = {
   company_name: string;
@@ -78,18 +80,18 @@ export default function CompareFDPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    const loadBanks = async () => {
-      try {
-        const res = await api.get("/api/products/investments/fd/plans");
-        setBanks(res.data.data || []);
-      } catch (error) {
-       
-      }
-    };
+ useEffect(() => {
+  const loadBanks = async () => {
+    try {
+      const data = await FDAdminService.getFDPlans();
+      setBanks(data || []);
+    } catch (error) {
+      toast("Failed to load FD plans");
+    }
+  };
 
-    loadBanks();
-  }, []);
+  loadBanks();
+}, []);
 
   const allBanks = banks;
 
