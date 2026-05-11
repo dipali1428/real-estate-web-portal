@@ -26,12 +26,20 @@ export default function PlaybookBypassTokens() {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(10);
+  const [allLabels, setAllLabels] = useState<string[]>(["All"]);
+
 
   const [formData, setFormData] = useState({
     count: 1,
     prefix: "",
     batchLabel: ""
+  });
+
+  const [stats, setStats] = useState({
+    total: 0,
+    used: 0,
+    unused: 0
   });
 
   const [filters, setFilters] = useState({
@@ -58,24 +66,23 @@ export default function PlaybookBypassTokens() {
   const fetchTokens = async () => {
     try {
       setLoading(true);
-
-      // Prepare API params
+  
       const params: any = {
-        // If status is "All", don't send it to the API
         status: filters.status !== "All" ? filters.status.toUpperCase() : undefined,
-        coupon_code: filters.search || undefined,
-        // You can add page/limit here if you add pagination state later
+        coupon_code: filters.search.trim() !== "" ? filters.search : undefined,
+        batch_label: filters.batch !== "All" ? filters.batch : undefined,
       };
-
+  
       const response = await AdminService.getCouponsDetails({
         ...params,
         page: currentPage,
         limit: pageSize
       });
-
-      setTotalPages(response.pagination.total_pages);
-
+  
+      const pagination = response.pagination;
       const dataArray = response.data || [];
+  
+      // Map the data
       const formattedData = dataArray.map((item: any) => ({
         id: item.id,
         token: item.coupon_code || "",
@@ -89,8 +96,21 @@ export default function PlaybookBypassTokens() {
         usedAt: formatDate(item.used_at),
         created: formatDate(item.created_at)
       }));
-
+  
       setTokens(formattedData);
+      setTotalPages(pagination.total_pages || 1);
+  
+      // FIX THE STATS HERE:
+      // Some APIs use total_count, some just use total. 
+      const serverTotal = pagination.total_count || pagination.total || 0;
+      
+      setStats({
+        total: serverTotal,
+        // If server doesn't provide global used count, we count the current page as a fallback
+        used: pagination.total_used ?? formattedData.filter((t: { status: string; }) => t.status === "USED").length,
+        unused: pagination.total_unused ?? (serverTotal - (pagination.total_used || formattedData.filter((t: { status: string; }) => t.status === "USED").length))
+      });
+  
     } catch (error) {
       toast.error("Failed to fetch tokens");
     } finally {
@@ -99,8 +119,31 @@ export default function PlaybookBypassTokens() {
   };
 
   useEffect(() => {
+    const loadBatchLabels = async () => {
+      try {
+        // Fetch a large number of items just once to get all unique labels
+        const response = await AdminService.getCouponsDetails({ page: 1, limit: 1000 });
+        if (response.data) {
+          const labels = response.data
+            .map((item: any) => String(item.batch_label || "")) // Force everything to a string
+            .filter((label: string) => label && label !== "" && label !== "-");
+
+          // Type the unique array explicitly
+          const uniqueLabels: string[] = Array.from(new Set(labels));
+
+          setAllLabels(["All", ...uniqueLabels]);
+        }
+      } catch (error) {
+        console.error("Failed to load batch labels", error);
+      }
+    };
+
+    loadBatchLabels();
+  }, []);
+
+  useEffect(() => {
     fetchTokens();
-  }, [filters.status, filters.search, currentPage, pageSize]);
+  }, [filters.status, filters.search, filters.batch, currentPage, pageSize]);
 
   const handleGenerate = async () => {
     if (!formData.batchLabel) return toast.error("Batch label is required");
@@ -132,9 +175,9 @@ export default function PlaybookBypassTokens() {
     let result = [...tokens];
 
     // Client-side Batch Filter
-    if (filters.batch !== "All") {
-      result = result.filter(t => t.batchLabel === filters.batch);
-    }
+    // if (filters.batch !== "All") {
+    //   result = result.filter(t => t.batchLabel === filters.batch);
+    // }
 
     // Sort Logic
     return result.sort((a, b) => {
@@ -142,15 +185,20 @@ export default function PlaybookBypassTokens() {
       const dateB = new Date(b.created).getTime();
       return filters.sort === "Newest First" ? dateB - dateA : dateA - dateB;
     });
-  }, [tokens, filters.sort, filters.batch]); // Added filters.batch here
+  }, [tokens, filters.sort]); // Added filters.batch here
 
+  // Replace your current 'batches' useMemo with this:
   const batches = useMemo(() => {
-    const uniqueBatches = Array.from(new Set(tokens.map(t => String(t.batchLabel || "N/A"))));
-    return ["All", ...uniqueBatches];
+    // Get unique batch labels from the tokens
+    const uniqueLabels = Array.from(
+      new Set(tokens.map((t) => t.batchLabel).filter((label) => label !== "-"))
+    );
+    return ["All", ...uniqueLabels];
   }, [tokens]);
-  const totalTokens = tokens.length;
-  const usedCount = tokens.filter(t => t.status === "USED").length;
-  const unusedCount = totalTokens - usedCount;
+
+  const totalTokens = stats.total;
+  const usedCount = stats.used;
+  const unusedCount = stats.unused;
   // const totalTokens = filteredData.length;
   // const usedCount = filteredData.filter(t => t.status === "USED").length;
   // const unusedCount = totalTokens - usedCount;
@@ -224,18 +272,16 @@ export default function PlaybookBypassTokens() {
           <div className="flex flex-col gap-1">
             <label className="text-xs text-gray-500">Filter Batch</label>
             <select
-  value={filters.batch}
-  onChange={(e) => {
-    // FIX: Update the 'batch' property
-    setFilters({ ...filters, batch: e.target.value }); 
-    setCurrentPage(1);
-  }}
-  className="border border-gray-300 rounded px-3 py-1.5 text-sm"
->
-              {batches.map((b, index) => (
-                // Using a combined key of value + index is the safest way to prevent duplicates
-                <option key={`batch-opt-${b}-${index}`} value={b}>
-                  {b}
+              value={filters.batch}
+              onChange={(e) => {
+                setFilters({ ...filters, batch: e.target.value });
+                setCurrentPage(1);
+              }}
+              className="border border-gray-300 rounded px-3 py-1.5 text-sm"
+            >
+              {allLabels.map((label) => (
+                <option key={label} value={label}>
+                  {label}
                 </option>
               ))}
             </select>
