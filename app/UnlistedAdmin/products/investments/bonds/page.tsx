@@ -9,16 +9,21 @@ import{
   X,
   Zap,
   Loader2,
+  Database,
+  Download,
   CheckCircle,
   AlertCircle,
   RefreshCw,
   Search,
+  Hash,
   Layers3,
+  IndianRupee,
   Clock,
   Briefcase,
   Pencil,
   Trash2
 } from "lucide-react";
+import hotToast from 'react-hot-toast';
 
 const BondsAdmin: React.FC = () => {
   // States
@@ -37,25 +42,32 @@ const BondsAdmin: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchBonds = async () => {
-    setLoading(true);
-    try {
-      const response = await AdminService.getBonds();
-      if (Array.isArray(response)) {
-        setBonds(response);
-      } else if (response && response.data && Array.isArray(response.data)) {
-        setBonds(response.data);
-      } else {
-        setBonds([]);
-      }
-    } catch (error) {
-      console.error('Error fetching bonds:', error);
-      setBonds([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchBonds = async () => {
+  setLoading(true);
 
+  try {
+    const response = await AdminService.getBonds();
+
+    if (Array.isArray(response)) {
+      setBonds(response);
+    } else if (response && response.data && Array.isArray(response.data)) {
+      setBonds(response.data);
+    } else {
+      setBonds([]);
+    }
+  } catch (error) {
+    setToast({
+      message: "Failed to fetch bonds",
+      type: "error",
+    });
+
+    hotToast.error("Failed to fetch bonds");
+
+    setBonds([]);
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => {
     fetchBonds();
   }, []);
