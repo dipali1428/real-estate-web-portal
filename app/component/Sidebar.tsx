@@ -106,6 +106,16 @@ export default function DashboardSidebar({ role }: { role: Role }) {
 
           {/* Footer */}
           <div>
+              <div className="mx-2 mb-8 flex flex-col items-center justify-center rounded-xl bg-white p-4 shadow-sm border border-neutral-200">
+                <img
+                  src="/QR/IVishva_QR.png" // Replace with your actual QR path or API URL
+                  alt="QR Code"
+                  className="h-28 w-28 object-contain"
+                />
+                <p className="mt-2 text-center text-[10px] font-medium text-neutral-500">
+                  Scan to download App
+                </p>
+              </div>
             <SidebarLink
               link={{
                 label: "Logout",
