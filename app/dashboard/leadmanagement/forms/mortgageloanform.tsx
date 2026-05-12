@@ -1,11 +1,10 @@
 "use client";
 import { useState, useRef, useMemo } from "react";
 import { 
-  X, CheckCircle, UploadCloud, Trash2, ChevronDown, 
-  ShieldCheck, Loader2, ArrowRight, ArrowLeft, AlertCircle 
+  X, CheckCircle, UploadCloud, Trash2, ChevronDown, Loader2, ArrowRight, ArrowLeft, AlertCircle 
 } from "lucide-react";
 import { DashboardService } from "../../../services/dashboardService";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 // --- Constants & Styles ---
 const STYLES = {
@@ -159,7 +158,7 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
         setStep(2);
       }
     } catch (err) {
-      toast.error("Failed to create application.");
+      toast.error("Failed to create lead.");
     } finally {
       setIsSubmitting(false);
     }
@@ -208,13 +207,13 @@ export default function MortgageLoanForm({ onClose }: { onClose: () => void }) {
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50/30">
           {step === 1 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              <div className="col-span-1 md:col-span-2 bg-[#1CADA3]/5 border-l-4 border-[#1CADA3] p-4 rounded-r-lg shadow-sm mb-2">
+              {/* <div className="col-span-1 md:col-span-2 bg-[#1CADA3]/5 border-l-4 border-[#1CADA3] p-4 rounded-r-lg shadow-sm mb-2">
                 <div className="flex items-center gap-2 mb-2">
                   <ShieldCheck className="text-[#1CADA3]" size={20} />
                   <span className="text-sm font-bold text-[#1CADA3] uppercase tracking-wide">Direct Bank Submission</span>
                 </div>
                 <Field label="Self Login to Bank?" type="select" options={["No", "Yes"]} value={form.isSelfLogin} onChange={(v:any)=>handleInputChange("isSelfLogin", v)} error={errors.isSelfLogin} required />
-              </div>
+              </div> */}
 
               {isSelfLoginActive ? (
                 <>

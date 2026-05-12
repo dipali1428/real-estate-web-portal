@@ -59,21 +59,18 @@ export default function Downloads() {
           // ✅ FIX 1: use API category
           category: item.main_category,
 
-          // ✅ FIX 2: normalize sub_category
           subCategory: item.sub_category
             ?.toLowerCase()
             .replace(/\s+/g, '-'),
 
-          // optional
           mainCategory: item.main_category,
 
-          // ✅ FIX 3: use file_url instead of file_path
           filePath: item.file_url
         }));
 
         setDocuments(formatted);
       } catch (error) {
-        toast.error("Error fetching documents:");
+        toast.error('Error fetching documents:');
       } finally {
         setIsLoadingDocs(false);
       }
@@ -145,6 +142,7 @@ export default function Downloads() {
 
     toast.success('Download Success', { id: 'dl' });
   } catch (error) {
+    toast.error('Failed to download file');
     toast.error('Download error', { id: 'dl' });
   }
 };
