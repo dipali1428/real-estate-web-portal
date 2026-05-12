@@ -321,8 +321,10 @@ const AboutSection = () => {
                             {
                                 title: "Kolhapur Branch",
                                 lines: [
-                                    "Dabholkar Corner, Amatya Towers",
-                                    "Kolhapur, Maharashtra – 416001"
+                                    "Yashonandan Plaza, 1st Floor",
+                                    "Shahupuri 3rd Lane",
+                                    "Near Shubhash Photo",
+                                    "Kolhapur, Maharashtra - 416001"
                                 ]
                             },
                             {
@@ -381,7 +383,7 @@ const AboutSection = () => {
                         ))}
                     </div>
 
-                    {/* Lower container for Moshi, Hyderabad, and Jalna branches */}
+                    {/* Lower container for Moshi, Hyderabad, Jalna, PCMC and NEW Kolhapur branch */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-6">
 
                         {/* Moshi Branch - Vertical Column 1 */}
@@ -456,6 +458,22 @@ const AboutSection = () => {
                             </div>
                         </div>
 
+                        {/* New Kolhapur Branch - Added exactly below Moshi Branch */}
+                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-[1px] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 h-full">
+                            <div className="bg-white rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+                                <div>
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
+                                        Kolhapur Branch
+                                    </h3>
+
+                                    <div className="text-sm text-gray-600 leading-relaxed space-y-2">
+                                        <p className="font-medium text-gray-800">Dabholkar Corner,</p>
+                                        <p>Amatya Towers,</p>
+                                        <p>Kolhapur, Maharashtra – 416001</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
