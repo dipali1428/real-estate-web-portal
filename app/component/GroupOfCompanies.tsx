@@ -172,11 +172,6 @@ const GroupOfCompaniesPage = () => {
               </div>
 
               <div>
-                <span className="text-gray-500">TAN:</span>{" "}
-                <span className="font-semibold text-black">PNEI14562C</span>
-              </div>
-
-              <div>
                 <span className="text-gray-500">GST:</span>{" "}
                 <span className="font-semibold text-black">Under Process</span>
               </div>
