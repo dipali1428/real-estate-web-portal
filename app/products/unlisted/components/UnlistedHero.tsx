@@ -87,10 +87,6 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
         e.preventDefault();
         
         // Validate all required fields
-        if (!formData.companyId.trim()) {
-            setEnquiryError('Company ID is required');
-            return;
-        }
         if (!formData.fullName.trim()) {
             setEnquiryError('Full name is required');
             return;
@@ -103,22 +99,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
             setEnquiryError('Phone number is required');
             return;
         }
-        if (!formData.quantity.trim()) {
-            setEnquiryError('Quantity is required');
-            return;
-        }
         
-        const companyIdNum = parseInt(formData.companyId);
-        if (isNaN(companyIdNum) || companyIdNum <= 0) {
-            setEnquiryError('Please enter a valid company ID');
-            return;
-        }
-        
-        const quantityNum = parseInt(formData.quantity);
-        if (isNaN(quantityNum) || quantityNum <= 0) {
-            setEnquiryError('Please enter a valid quantity');
-            return;
-        }
         
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.email.trim())) {
@@ -138,13 +119,10 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
         try {
             // Create payload matching the service's expected type
             const payload: EnquiryPayload = {
-                company_id: companyIdNum,
-                enquiry_type: 'buy',  // Changed to lowercase to match service
+                enquiry_type: 'buy',
                 full_name: formData.fullName.trim(),
                 email: formData.email.trim(),
                 phone: formData.phone.trim(),
-                quantity: quantityNum,
-                message: `Enquiry for company ID ${companyIdNum} - ${quantityNum} shares`
             };
             
             await createEnquiry(payload);
@@ -314,6 +292,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
             </div>
 
             {/* Enquiry Modal - Compact Size */}
+{/* Enquiry Modal - Updated for API: full_name, email, phone, message */}
             {showEnquiryModal && (
                 <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
@@ -334,25 +313,6 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                     <span>{enquiryError}</span>
                                 </div>
                             )}
-                            
-                            {/* Company ID */}
-                            <div>
-                                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                                    Company ID <span className="text-rose-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                    <input 
-                                        type="number"
-                                        value={formData.companyId} 
-                                        onChange={(e) => handleInputChange('companyId', e.target.value)} 
-                                        required 
-                                        className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                                        placeholder="Enter company ID" 
-                                        min="1"
-                                    />
-                                </div>
-                            </div>
                             
                             {/* Full Name */}
                             <div>
@@ -396,26 +356,23 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                         onChange={(e) => handleInputChange('phone', e.target.value)} 
                                         required 
                                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                                        placeholder="9876543210" 
+                                        placeholder="8421736838" 
                                     />
                                 </div>
                             </div>
                             
-                            {/* Quantity */}
+                            {/* Message */}
                             <div>
                                 <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                                    Quantity (Shares) <span className="text-rose-500">*</span>
+                                    Message <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative">
-                                    <Calculator className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                    <input 
-                                        type="number" 
-                                        value={formData.quantity} 
-                                        onChange={(e) => handleInputChange('quantity', e.target.value)} 
+                                    <textarea 
+                                        onChange={(e) => handleInputChange('message', e.target.value)} 
                                         required 
-                                        className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                                        placeholder="Number of shares" 
-                                        min="1"
+                                        rows={3}
+                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black resize-none" 
+                                        placeholder="Enter your enquiry details here..." 
                                     />
                                 </div>
                             </div>

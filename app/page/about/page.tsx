@@ -383,10 +383,10 @@ const AboutSection = () => {
                         ))}
                     </div>
 
-                    {/* NEW - Centered container for Moshi and Hyderabad branches */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-6">
+                    {/* Lower container for Moshi, Hyderabad, Jalna, PCMC and NEW Kolhapur branch */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-6">
 
-                        {/* Moshi Branch */}
+                        {/* Moshi Branch - Vertical Column 1 */}
                         <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-[1px] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 h-full">
                             <div className="bg-white rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
                                 <div>
@@ -404,7 +404,7 @@ const AboutSection = () => {
                             </div>
                         </div>
 
-                        {/* Hyderabad Branch */}
+                        {/* Hyderabad Branch - Vertical Column 2 */}
                         <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-[1px] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 h-full">
                             <div className="bg-white rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
                                 <div>
@@ -422,6 +422,58 @@ const AboutSection = () => {
                             </div>
                         </div>
 
+                        {/* Jalna Office - Vertical Column 3 */}
+                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-[1px] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 h-full">
+                            <div className="bg-white rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+                                <div>
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
+                                        Jalna Branch
+                                    </h3>
+
+                                    <div className="text-sm text-gray-600 leading-relaxed space-y-2">
+                                        <p className="font-medium text-gray-800">Office No 1, </p>
+                                        <p>Base Floor</p>
+                                        <p>Banjara Tower Ambad Road</p>
+                                        <p>Jalna 431203</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Column 4 (Below Sangli Branch) */}
+                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-[1px] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 h-full">
+                            <div className="bg-white rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+                                <div>
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
+                                        Pimpri-Chinchwad Branch
+                                    </h3>
+
+                                    <div className="text-sm text-gray-600 leading-relaxed space-y-2">
+                                        <p className="font-medium text-gray-800">Ganga Aashiyana Sosa Road,</p>
+                                        <p>Near Purnabhamha Hotel,</p>
+                                        <p>Thergaon, Pimpri-Chinchwad</p>
+                                        <p>Maharashtra - 411033</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* New Kolhapur Branch - Added exactly below Moshi Branch */}
+                        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-[1px] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 h-full">
+                            <div className="bg-white rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+                                <div>
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
+                                        Kolhapur Branch
+                                    </h3>
+
+                                    <div className="text-sm text-gray-600 leading-relaxed space-y-2">
+                                        <p className="font-medium text-gray-800">Dabholkar Corner,</p>
+                                        <p>Amatya Towers,</p>
+                                        <p>Kolhapur, Maharashtra – 416001</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

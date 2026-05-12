@@ -568,7 +568,7 @@ export default function FDCompaniesPage() {
               </tbody>
             </table>
           </div>
-
+          
           {/* Footer with pagination — matches admin FD dashboard style */}
           {filtered.length > 0 && (
             <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">

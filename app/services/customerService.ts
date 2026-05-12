@@ -525,26 +525,26 @@ const CustomerService = {
         return response.data;
     },
 
-  getAllBonds: async () => {
-    try {
-        const response = await api.get(
-            "/api/products/investments/bonds/all"
-        );
+    getAllBonds: async () => {
+        try {
+            const response = await api.get(
+                "/api/products/investments/bonds/all"
+            );
 
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-},
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
 
-isAuthenticated: async (): Promise<boolean> => {
-  try {
-    const res = await api.get("/api/dashboard/profile");
-    return res.data?.success === true;
-  } catch {
-    return false;
-  }
-},
+    isAuthenticated: async (): Promise<boolean> => {
+        try {
+            const res = await api.get("/api/dashboard/profile");
+            return res.data?.success === true;
+        } catch {
+            return false;
+        }
+    },
 };
 
 export default CustomerService;
