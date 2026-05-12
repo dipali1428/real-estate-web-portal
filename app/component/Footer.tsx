@@ -147,7 +147,7 @@ className="group p-3 rounded-full bg-gray-800 hover:bg-linear-to-r hover:from-[#
 
 {/* Google Play */}
 <a
-href="https://play.google.com/store/apps/details?id=com.infinityarth.infinityarthapp&pcampaignid=web_share"
+href="https://play.google.com/store/apps/details?id=com.infinityarth.infi_world&pli=1"
 target="_blank"
 rel="noopener noreferrer"
 className="transition-all duration-300 transform hover:-translate-y-1"

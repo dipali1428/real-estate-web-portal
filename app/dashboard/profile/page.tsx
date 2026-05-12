@@ -794,7 +794,7 @@ export default function ProfileSection() {
         const ctx = canvas.getContext("2d");
         if (!ctx) return setIsDownloadingCard(false);
         canvas.width = 1200; canvas.height = 675;
-        const locationText = (kyc?.aadhaar_kyc_data?.full_address || profile.city).toUpperCase();
+        const locationText = (profile.address || kyc?.aadhaar_kyc_data?.full_address || profile.city).toUpperCase();
 
         try {
             const templateImg = new Image();
@@ -1228,7 +1228,7 @@ export default function ProfileSection() {
                                             <div className="grid grid-cols-1 gap-4">
                                                 <div><p className="text-[10px] font-black text-slate-400 uppercase">Mobile Number</p><p className="font-medium text-md text-slate-800 text-sm">{profile.mobile}</p></div>
                                                 <div><p className="text-[10px] font-black text-slate-400 uppercase">Email</p><p className="font-medium text-md text-slate-800 truncate text-sm">{profile.email}</p></div>
-                                                <div><p className="text-[10px] font-black text-slate-400 uppercase">Location</p><p className="font-medium text-slate-800 text-sm">{kyc?.aadhaar_kyc_data?.full_address || `${profile.city}, ${profile.state}`}</p></div>
+                                                <div><p className="text-[10px] font-black text-slate-400 uppercase">Location</p><p className="font-medium text-slate-800 text-sm">{profile.address || kyc?.aadhaar_kyc_data?.full_address || `${profile.city}, ${profile.state}`}</p></div>
                                             </div>
                                         </div>
                                     </div>
@@ -2145,7 +2145,7 @@ export default function ProfileSection() {
 
                                             <div>
                                                 {/* 3. Fluid font sizes: 5.5% of container width */}
-                                                <h4 className="text-[4.5cqw] font-black text-slate-700 leading-none truncate">
+                                                <h4 className="text-[4.5cqw] mt-[8cqw] font-black text-slate-700 leading-none truncate">
                                                     {profile.name}
                                                 </h4>
                                                 <p className="text-[2cqw] font-bold text-slate-500 mt-[1.5cqw] uppercase tracking-widest">
@@ -2166,7 +2166,7 @@ export default function ProfileSection() {
                                                 <div className="flex items-start gap-[2cqw] max-w-[60cqw]">
                                                     <MapPin className="w-[3cqw] h-[3cqw] text-slate-400 mt-[0.5cqw] shrink-0" />
                                                     <span className="text-[2.2cqw] font-bold text-slate-700 leading-tight line-clamp-2">
-                                                        {kyc?.aadhaar_kyc_data?.full_address || profile.city}
+                                                        {profile.address || kyc?.aadhaar_kyc_data?.full_address || profile.city}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-[2cqw]">
@@ -2178,7 +2178,7 @@ export default function ProfileSection() {
                                             {/* 5. Scaling the button */}
                                             <button
                                                 onClick={downloadCardAsPhoto}
-                                                className="w-fit bg-slate-800 text-white px-[2.8cqw] py-[1.6cqw] rounded-[1.5cqw] text-[2cqw] font-bold flex items-center gap-[1.5cqw] shadow-lg active:scale-95 transition-transform"
+                                                className="w-fit mt-[2.5cqw] bg-slate-800 text-white px-[2.5cqw] py-[1.3cqw] rounded-[1.5cqw] text-[2cqw] font-bold flex items-center gap-[1.5cqw] shadow-lg active:scale-95 transition-transform"
                                             >
                                                 {isDownloadingCard ?
                                                     <Loader2 className="w-[2.5cqw] h-[2.5cqw] animate-spin" /> :
@@ -2200,7 +2200,7 @@ export default function ProfileSection() {
                                             <div className="text-center mb-4"><h4 className="text-sm sm:text-md font-black text-blue-600 uppercase leading-tight">{profile.name}</h4><p className="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase">Authorized Partner</p><p className="text-[8px] sm:text-[9px] font-bold text-slate-700 mt-1">Partner ID - {profile.adv_id}</p></div>
                                             <div className="w-full text-center space-y-1 border-t border-slate-100 pt-4 mb-4">
                                                 <p className="text-[10px] sm:text-[11px] font-bold text-slate-700">+91 {profile.mobile}</p>
-                                                <p className="text-[9px] sm:text-[10px] font-bold text-slate-700 px-2 leading-tight truncate-2-lines">{kyc?.aadhaar_kyc_data?.full_address || profile.city}</p>
+                                                <p className="text-[9px] sm:text-[10px] font-bold text-slate-700 px-2 leading-tight truncate-2-lines">{profile.address || kyc?.aadhaar_kyc_data?.full_address || profile.city}</p>
                                             </div>
                                             <div className="mt-auto pt-2"><p className="text-[8px] sm:text-[9px] font-bold text-blue-600">www.infinityarthvishva.com</p></div>
                                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">

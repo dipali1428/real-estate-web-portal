@@ -9,19 +9,20 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  category: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest';
+  category: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest' | 'other';
   subCategory: string;
   description: string;
   imageUrl: string;
 }
 
 const CATEGORY_MAP = {
-  insurance: ['insurance', 'life insurance', 'health insurance', 'motor insurance', 'marine insurance', 'general insurance'],
-  loan: ['loan', 'home loan', 'personal loan', 'business loan', 'educational loan', 'vehicle loan'],
-  investments: ['investments'],
-  mutualfunds: ['mutualfunds'],
-  realestate: ['realestate'],
-  contest: ['current']
+  insurance: ['insurance', 'life insurance', 'health insurance', 'motor insurance', 'marine insurance', 'general insurance', 'other'],
+  loan: ['loan', 'home loan', 'personal loan', 'business loan', 'educational loan', 'vehicle loan', 'other'],
+  investments: ['investments', 'other'],
+  mutualfunds: ['mutualfunds', 'other'],
+  realestate: ['realestate', 'other'],
+  contest: ['current', 'other'],
+  other: ['other']
 };
 
 export default function AdminTemplates() {

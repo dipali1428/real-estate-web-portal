@@ -8,7 +8,7 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  category: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest'; // Added contest
+  category: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest' | 'other'; // Added contest
   subCategory: string;
   description: string;
   imageUrl: string;
@@ -31,6 +31,7 @@ const subCategoryLabels: Record<string, string> = {
   personal: 'Personal Loan',
   educational: 'Educational Loan',
   current: 'Current Contest',
+  other: 'Other Templates',
   upcoming: 'Upcoming Contest',
   closed: 'Closed Contest'
 };
