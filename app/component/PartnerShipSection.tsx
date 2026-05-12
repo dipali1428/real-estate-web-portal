@@ -7,19 +7,19 @@ const stats = [
   {
     icon: <Users className="w-14 h-14 text-[#1CADA3]" />,
     title: "Trusted Partnerships",
-    value: "3000+",
+    value: "3200+",
     subtitle: "Active DSA & Partners",
   },
   {
     icon: <Building2 className="w-14 h-14 text-[#1CADA3]" />,
     title: "Pan India Presence",
-    value: "20+",
+    value: "30+",
     subtitle: "Branches Across India",
   },
   {
     icon: <MapPin className="w-14 h-14 text-[#1CADA3]" />,
     title: "Cities Covered",
-    value: "134+",
+    value: "143+",
     subtitle: "Across India",
   },
 ];

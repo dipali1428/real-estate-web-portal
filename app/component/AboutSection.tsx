@@ -26,25 +26,6 @@ const AboutSection = () => (
         individuals and businesses to achieve their goals with confidence.
       </p>
 
-      {/* GST & CIN */}
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
-
-        <div className="bg-white border border-[#1CADA3]/30 rounded-lg px-5 py-3 shadow-sm text-center w-full sm:w-auto">
-          <p className="text-sm font-semibold text-[#1CADA3]">GST Number</p>
-          <p className="font-mono text-sm text-gray-700 mt-1 break-all  font-bold">
-            27AAICI0723K1ZJ
-          </p>
-        </div>
-
-        <div className="bg-white border border-[#1CADA3]/30 rounded-lg px-5 py-3 shadow-sm text-center w-full sm:w-auto">
-          <p className="text-sm font-semibold text-[#1CADA3]">CIN Number</p>
-          <p className="font-mono text-sm text-gray-700 mt-1 break-all  font-bold">
-            U66190PN2025PTC238981
-          </p>
-        </div>
-
-      </div>
-
     </div>
 
     {/* Content Grid */}
