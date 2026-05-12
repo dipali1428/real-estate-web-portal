@@ -65,7 +65,6 @@ const RelationshipManager: React.FC = () => {
 
   const contactCards: ContactCard[] = [
     { id: '1', name: 'Sandip Powar', phone: '+91 9595247614', designation: 'Vice President', specialization: 'Vice President' },
-    { id: '2', name: 'Satyen Mehta', phone: '+91 9833196133', designation: 'General Manager', specialization: 'General Manager' },
     { id: '3', name: 'Ashwini Kamble', phone: '+91 8007817504', designation: 'Senior Relationship Manager', specialization: 'Health Insurance' },
     { id: '4', name: 'Shweta Dalvi', phone: '+91 9922128499', designation: 'Business Development Manager', specialization: 'Investments' },
     { id: '5', name: 'Rohit Kadam', phone: '+91 9876543214', designation: 'Operation Executive', specialization: 'Accounts' },

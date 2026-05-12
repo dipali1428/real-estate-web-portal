@@ -12,7 +12,7 @@ interface TemplateItem {
   id: string;
   name: string;
   type: 'image';
-  category: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest';
+  category: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest' | 'other';
   subCategory: string;
   description: string;
   imageUrl: string; // This will store the Pre-signed S3 URL
@@ -24,14 +24,14 @@ interface UserProfile {
 }
 
 export default function ImageTemplates() {
-  const [activeCategory, setActiveCategory] = useState<'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest'>('insurance');
+  const [activeCategory, setActiveCategory] = useState<'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest' | 'other'>('insurance');
   const [activeSubCategory, setActiveSubCategory] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [allTemplates, setAllTemplates] = useState<TemplateItem[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile>({ name: '', contactNumber: '' });
 
   const [dropdowns, setDropdowns] = useState({
-    insurance: false, loan: false, investments: false, mutualfunds: false, realestate: false, contest: false
+    insurance: false, loan: false, investments: false, mutualfunds: false, realestate: false, contest: false, other: false
   });
 
   useEffect(() => {
@@ -175,7 +175,7 @@ export default function ImageTemplates() {
 
   const handleDropdownToggle = (type: keyof typeof dropdowns, event: React.MouseEvent) => {
     event.stopPropagation();
-    setDropdowns({ insurance: false, loan: false, investments: false, mutualfunds: false, realestate: false, contest: false, [type]: !dropdowns[type] });
+    setDropdowns({ insurance: false, loan: false, investments: false, mutualfunds: false, realestate: false, contest: false, other: false, [type]: !dropdowns[type] });
     setActiveCategory(type as any);
     setActiveSubCategory('all');
   };
@@ -193,7 +193,7 @@ export default function ImageTemplates() {
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
           <div className="flex flex-wrap gap-4">
-            {(['insurance', 'loan', 'investments', 'mutualfunds', 'realestate', 'contest'] as const).map((cat) => (
+            {(['insurance', 'loan', 'investments', 'mutualfunds', 'realestate', 'contest', 'other'] as const).map((cat) => (
               <CategoryDropdown
                 key={cat}
                 type={cat}

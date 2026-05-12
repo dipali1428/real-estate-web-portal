@@ -13,7 +13,8 @@ import {
     Hash,
     Briefcase,
     ShieldCheck,
-    UserCog
+    UserCog,
+    Download
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -41,6 +42,53 @@ export default function ReferralLeadDashboard() {
     const [selectedLead, setSelectedLead] = useState<ReferralLead | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+
+
+    const handleDownload = () => {
+        if (leads.length === 0) return;
+
+        // Define headers
+        const headers = [
+            "ID", "Ref ID", "Lead Name", "Email", "Contact",
+            "Department", "Sub Category", "Status", "Notes",
+            "Created At", "DSA ID", "RM ID", "Assigned RM ID"
+        ];
+
+        // Map data to rows
+        const csvRows = leads.map(lead => [
+            lead.id,
+            `"${lead.ref_id}"`,
+            `"${lead.lead_name}"`,
+            lead.email,
+            lead.contact_number,
+            lead.department,
+            lead.sub_category,
+            lead.referral_lead_status,
+            // Add (lead.notes || "") to handle null values safely
+            `"${(lead.notes || "").toString().replace(/"/g, '""')}"`,
+            new Date(lead.created_at).toLocaleDateString('en-GB'),
+            lead.dsa_id,
+            lead.rm_id || 'N/A',
+            lead.assigned_rm_id
+        ]);
+
+        // Create CSV content
+        const csvContent = [
+            headers.join(","),
+            ...csvRows.map(row => row.join(","))
+        ].join("\n");
+
+        // Create blob and download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `referral_leads_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     useEffect(() => {
         const fetchLeads = async () => {
@@ -78,7 +126,10 @@ export default function ReferralLeadDashboard() {
                 </div>
 
                 {/* SEARCH & CONTROLS */}
-                <div className="flex flex-col md:flex-row justify-between mb-4 gap-4">
+                {/* SEARCH & CONTROLS */}
+                <div className="flex flex-col md:flex-row justify-between mb-4 gap-4 items-end md:items-center">
+
+                    {/* LEFT SIDE: Search Bar */}
                     <div className="relative w-full md:w-96">
                         <input
                             type="text"
@@ -88,14 +139,24 @@ export default function ReferralLeadDashboard() {
                         />
                         <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-700" />
                     </div>
-                    <select
-                        onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                        className="border rounded-lg px-3 py-2 text-sm bg-white font-bold text-gray-700"
-                    >
-                        {[10, 25, 50].map(v => <option key={v} value={v}>Show {v}</option>)}
-                    </select>
-                </div>
 
+                    {/* RIGHT SIDE: Action Buttons & Dropdown */}
+                    <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+                        <button
+                            onClick={handleDownload}
+                            className="flex-1 md:flex-none inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium transition-colors shadow-sm cursor-pointer">
+                            <Download className="w-4 h-4 mr-2" /> Download CSV
+                        </button>
+
+                        <select
+                            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                            className="border rounded-lg px-3 py-2 text-sm bg-white font-bold text-gray-700"
+                        >
+                            {[10, 25, 50].map(v => <option key={v} value={v}>Show {v}</option>)}
+                        </select>
+                    </div>
+
+                </div>
                 {/* DATA TABLE */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden">
                     <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-x-thin scrollbar-thumb-gray-300">
@@ -139,7 +200,7 @@ export default function ReferralLeadDashboard() {
                                         <td className="px-4 py-3">
                                             <span className="px-2 py-0.5 rounded-full text-[10px] font-black border bg-orange-50 text-orange-600 border-orange-200">
                                                 {lead.referral_lead_status
-}
+                                                }
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 text-xs text-gray-700">

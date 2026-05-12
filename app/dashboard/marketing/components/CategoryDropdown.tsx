@@ -1,12 +1,12 @@
 // import investmentService from "@/app/products/mutual-funds/services/investmentService";
 
 interface CategoryDropdownProps {
-  type: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest';
+  type: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest' | 'other';
   isOpen: boolean;
-  activeCategory: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest';
+  activeCategory: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest' | 'other';
   activeSubCategory: string;
   subCategories?: string[]; // Added this to match page.tsx usage
-  onToggle: (type: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest', event: React.MouseEvent) => void;
+  onToggle: (type: 'insurance' | 'loan' | 'investments' | 'mutualfunds' | 'realestate' | 'contest' | 'other', event: React.MouseEvent) => void;
   onSubCategorySelect: (subCategory: string, event: React.MouseEvent) => void;
 }
 
@@ -27,6 +27,7 @@ const subCategoryLabels: Record<string, string> = {
   mutualfunds: 'Mutual Funds',
   realestate: 'Real Estate',
   current: 'Current Contests',
+  other: 'Other Templates',
   upcoming: 'Upcoming Contests',
   closed: 'Closed Contests'
 };
@@ -48,7 +49,8 @@ export default function CategoryDropdown({
     investments: { bg: 'bg-yellow-100', text: 'text-yellow-700', border: 'border-yellow-300' },
     mutualfunds: { bg: 'bg-pink-100', text: 'text-pink-700', border: 'border-pink-300' },
     realestate: { bg: 'bg-teal-100', text: 'text-teal-700', border: 'border-teal-300' },
-    contest: { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-300' }
+    contest: { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-300' },
+    other: { bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-300' }
   };
 
   const currentColors = colorConfig[type];
@@ -69,6 +71,8 @@ export default function CategoryDropdown({
       return ['all', 'realestate'];
     } else if (type === 'contest') {
       return ['all', 'current', 'upcoming'];
+    } else if (type === 'other') {
+      return ['all', 'other'];
     }
     return ['all'];
   };
