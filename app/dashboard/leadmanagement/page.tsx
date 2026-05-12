@@ -98,7 +98,7 @@ export default function LeadManagementPage() {
       "Real Estate": () => setShowRealEstateForm(true),
       "Unlisted Shares": () => setShowUnlistedSharesForm(true),
     };
-    return handlerMap[title] || (() => toast.error(`No handler for ${title}`));
+    return handlerMap[title] ;
   }
 
   const productCards = {
@@ -205,7 +205,6 @@ export default function LeadManagementPage() {
               toast.success(`${lead.clientName} deleted successfully`);
             }}
           />
-          ) : (
             <div className="mt-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
               <div className="mb-6 flex flex-wrap gap-2">
                 {tabs.map(tab => (

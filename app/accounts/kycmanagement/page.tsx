@@ -59,7 +59,7 @@ export default function KycStatusPage() {
         setTotalPages(Math.ceil((response.total_requests || 0) / limit));
       }
     } catch (err) {
-     toast.error("Fetch Error:");
+      toast.error("Fetch Error:");
       setData([]);
     } finally {
       setLoading(false);
@@ -162,10 +162,7 @@ export default function KycStatusPage() {
         {/* Search Bar Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div>
-            <h2 className="text-lg font-bold text-gray-800">
-              {activeTab === 'kyc' ? "KYC Verification" : "Agreement Requests"}
-            </h2>
-            <p className="text-gray-500 text-xs">Verify status for {totalRecords} records</p>
+
           </div>
 
           <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
@@ -374,7 +371,14 @@ export default function KycStatusPage() {
                 value={editingDsa?.kyc_completed ? "Completed" : "Pending"}
               />
             </div>
-            <button onClick={() => setIsModalOpen(false)} className="mt-6 w-full bg-gray-800 text-white py-2 rounded-lg">Close</button>
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-[#2076C7] text-white px-6 py-2 rounded-lg hover:bg-[#2076C7] transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -42,7 +42,8 @@ import {
     FileUp,
     LandPlot,
     Landmark,
-    Building2
+    Building2,
+    Equal,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -123,6 +124,7 @@ export const sidebarLinks = {
         { label: "Upload Payout", href: "/admin/uploadpayout", icon: <FileUp className="h-5 w-5 text-neutral-700" /> },
         { label: "Generate Coupons", href: "/admin/generatecoupons", icon: <TicketCheck className="h-5 w-5 text-neutral-700" /> },
         { label: "Add Branch", href: "/admin/branch", icon: <LandPlot className="h-5 w-5 text-neutral-700" /> },
+        { label: "Unassigned Branches", href: "/admin/unassignedbranches", icon: <Equal className="h-5 w-5 text-neutral-700" /> },
     ],
 
     GM: [],
@@ -132,10 +134,18 @@ export const sidebarLinks = {
         { label: "Dashboard", href: "/accounts", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/accounts/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "KYC Management", href: "/accounts/kycmanagement", icon: <ShieldCheck className="h-5 w-5 text-neutral-700" /> },
+        { label: "All Leads", href: "/accounts/allleads", icon: <Layers className="h-5 w-5 text-neutral-700" />,
+             children:
+                [
+                    { label: "Refferal Leads", href: "/accounts/referralleads", icon: <Share2 className="h-4 w-4 text-neutral-700" /> },
+                    { label: "Detailed Leads", href: "/accounts/detailedleads", icon: <FileUp className="h-4 w-4 text-neutral-700" /> },
+                ],     
+         },
         { label: "Receivables", href: "/accounts/reciveable", icon: <Wallet className="h-5 w-5 text-neutral-700" /> },
         { label: "TDS Management", href: "/accounts/tdsmanagement", icon: <ReceiptIndianRupee className="h-5 w-5 text-neutral-700" /> },
         { label: "Lead Payments", href: "/accounts/leadmanagement", icon: <FileText className="h-5 w-5 text-neutral-700" /> },
         { label: "Bill Payments", href: "/accounts/billpayment", icon: <CreditCard className="h-5 w-5 text-neutral-700" /> },
+       
     ],
 
     DEPARTMENTHEAD: [
@@ -163,9 +173,17 @@ export const sidebarLinks = {
         { label: "Career Applications", href: "/hr/careermanagement", icon: < Briefcase className="h-5 w-5 text-neutral-700" /> },
     ],
 
-    BRANCHHEAD: [
-        { label: "HR Dashboard", href: "/branchhead", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
+   BRANCHHEAD: [
+        { label: "Branch Head Dashboard", href: "/branchhead", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/branchhead/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
+        { label: "My Branches", href: "/branchhead/branches", icon: <User className="h-5 w-5 text-neutral-700" /> },
+    ],
+
+     BRANCH: [
+        { label: "Branch Dashboard", href: "/branch", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
+        { label: "My Profile", href: "/branch/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
+        { label: "My Branch Dsa's", href: "/branch/branches", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+
     ],
 
     DIRECTOR: [

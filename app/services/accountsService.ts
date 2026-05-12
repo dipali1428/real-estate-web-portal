@@ -12,4 +12,12 @@ export const AccountService = {
         const response = await api.get("/api/accounts/dsa-kyc-status", { params });
         return response.data;
       },
+      getCompletedReferralLeads: async () => {
+        const response = await api.get("/api/accounts/completed-referral-leads");
+        return response.data;
+    },
+     getCompletedDetailLeads: async () => {
+        const response = await api.get("/api/accounts/completed-detail-leads");
+        return response.data;
+    },
 }
