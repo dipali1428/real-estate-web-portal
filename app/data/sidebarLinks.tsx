@@ -44,6 +44,7 @@ import {
     Landmark,
     Building2,
     Equal,
+    CalendarDays 
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -233,6 +234,16 @@ export const sidebarLinks = {
   { label: "Shares Management", href: "/UnlistedAdmin/SharesManagement", icon: <TrendingUp className="h-5 w-5 text-neutral-700" /> },
 
   { label: "Demat Management", href: "/UnlistedAdmin/DematManagement", icon: <Shield className="h-5 w-5 text-neutral-700" /> },
+ {
+  label: "Meetings",
+  icon: <CalendarDays className="h-5 w-5 text-neutral-700" />,
+  children: [
+    {
+      label: "NPS consultation meetings",
+      href: "/UnlistedAdmin/products/investments/nps",
+    },
+  ],
+},
 
   // ✅ NEW PRODUCTS DROPDOWN
   {
@@ -260,6 +271,11 @@ export const sidebarLinks = {
         label: "Bonds",
         href: "/UnlistedAdmin/products/investments/bonds",
         icon: <FileText className="h-4 w-4 text-neutral-600" />,
+      },
+      {
+        label: "NCD",
+        href: "/UnlistedAdmin/products/investments/ncd",
+        icon: <Landmark className="h-4 w-4 text-neutral-600" />,
       },
     ],
   },

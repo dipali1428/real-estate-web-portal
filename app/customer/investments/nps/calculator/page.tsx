@@ -27,6 +27,10 @@ const NPSCalculator: React.FC = () => {
   const annuityCorpus = totalCorpus * (annuityPercent / 100);
   const monthlyPension = (annuityCorpus * annuityReturn) / 100 / 12;
   const totalInvested = monthlyContribution * months;
+  const wealthGained = totalCorpus - totalInvested;
+  
+  const investedPercent = (totalInvested / totalCorpus) * 100;
+  const gainedPercent = (wealthGained / totalCorpus) * 100;
   
   // Calculate percentages for slider tracks
   const depositPercent = ((monthlyContribution - 500) / 99500) * 100;
@@ -61,7 +65,7 @@ const NPSCalculator: React.FC = () => {
             <input type="range" min={500} max={100000} step={500} value={monthlyContribution}
               onChange={(e) => setMonthlyContribution(Number(e.target.value))}
               style={{ background: `linear-gradient(to right, #2076C7 ${depositPercent}%, #E2E8F0 ${depositPercent}%)` }}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7] transition-all"
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7]"
             />
             <div className="flex justify-between text-[10px] text-gray-400 mt-0.5"><span>₹500</span><span>₹1L</span></div>
           </div>
@@ -75,7 +79,7 @@ const NPSCalculator: React.FC = () => {
             <input type="range" min={18} max={55} step={1} value={currentAge}
               onChange={(e) => setCurrentAge(Number(e.target.value))}
               style={{ background: `linear-gradient(to right, #2076C7 ${agePercent}%, #E2E8F0 ${agePercent}%)` }}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7] transition-all"
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7]"
             />
             <div className="flex justify-between text-[10px] text-gray-400 mt-0.5"><span>18</span><span>55</span></div>
           </div>
@@ -89,7 +93,7 @@ const NPSCalculator: React.FC = () => {
             <input type="range" min={Math.max(currentAge + 5, 45)} max={70} step={1} value={retirementAge}
               onChange={(e) => setRetirementAge(Number(e.target.value))}
               style={{ background: `linear-gradient(to right, #2076C7 ${retirementPercent}%, #E2E8F0 ${retirementPercent}%)` }}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7] transition-all"
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7]"
             />
             <div className="flex justify-between text-[10px] text-gray-400 mt-0.5"><span>45</span><span>70</span></div>
           </div>
@@ -103,7 +107,7 @@ const NPSCalculator: React.FC = () => {
             <input type="range" min={6} max={20} step={0.5} value={expectedReturn}
               onChange={(e) => setExpectedReturn(Number(e.target.value))}
               style={{ background: `linear-gradient(to right, #2076C7 ${returnPercent}%, #E2E8F0 ${returnPercent}%)` }}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7] transition-all"
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7]"
             />
             <div className="flex justify-between text-[10px] text-gray-400 mt-0.5"><span>6%</span><span>20%</span></div>
           </div>
@@ -117,7 +121,7 @@ const NPSCalculator: React.FC = () => {
             <input type="range" min={40} max={100} step={5} value={annuityPercent}
               onChange={(e) => setAnnuityPercent(Number(e.target.value))}
               style={{ background: `linear-gradient(to right, #2076C7 ${annuityPercentVal}%, #E2E8F0 ${annuityPercentVal}%)` }}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7] transition-all"
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7]"
             />
             <div className="flex justify-between text-[10px] text-gray-400 mt-0.5"><span>40% (min)</span><span>100%</span></div>
           </div>
@@ -131,7 +135,7 @@ const NPSCalculator: React.FC = () => {
             <input type="range" min={4} max={10} step={0.5} value={annuityReturn}
               onChange={(e) => setAnnuityReturn(Number(e.target.value))}
               style={{ background: `linear-gradient(to right, #2076C7 ${annuityRatePercent}%, #E2E8F0 ${annuityRatePercent}%)` }}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7] transition-all"
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#2076C7]"
             />
             <div className="flex justify-between text-[10px] text-gray-400 mt-0.5"><span>4%</span><span>10%</span></div>
           </div>
@@ -160,22 +164,44 @@ const NPSCalculator: React.FC = () => {
         })}
       </div>
 
-      {/* Wealth Breakdown Bar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-        <h3 className="text-sm font-bold text-gray-900 mb-3">Corpus Breakdown</h3>
-        <div className="w-full h-5 rounded-full overflow-hidden flex">
-          <div style={{ width: `${100 - annuityPercent}%` }} className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] h-full transition-all duration-500" />
-          <div style={{ width: `${annuityPercent}%` }} className="bg-blue-100 h-full transition-all duration-500" />
+      {/* Wealth & Withdrawal Breakdown */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Wealth Generation */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <h3 className="text-sm font-bold text-gray-900 mb-3">Wealth Generation</h3>
+          <div className="w-full h-4 rounded-full overflow-hidden flex">
+            <div style={{ width: `${investedPercent}%` }} className="bg-gray-200 h-full" />
+            <div style={{ width: `${gainedPercent}%` }} className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] h-full" />
+          </div>
+          <div className="flex justify-between mt-3 gap-3 text-[11px] sm:text-xs">
+            <span className="flex items-center gap-1.5 text-gray-600">
+              <span className="w-2.5 h-2.5 rounded-sm bg-gray-200 inline-block shrink-0" />
+              Invested <span className="font-bold text-gray-900">{fmt(totalInvested)}</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-gray-600">
+              <span className="w-2.5 h-2.5 rounded-sm bg-[#1CADA3] inline-block shrink-0" />
+              Returns <span className="font-bold text-gray-900">{fmt(wealthGained)}</span>
+            </span>
+          </div>
         </div>
-        <div className="flex flex-col sm:flex-row justify-between mt-3 gap-3 text-[11px] sm:text-xs">
-          <span className="flex items-center gap-1.5 text-gray-600">
-            <span className="w-3 h-3 rounded-sm bg-gradient-to-r from-[#2076C7] to-[#1CADA3] inline-block shrink-0" />
-            Lump Sum ({100 - annuityPercent}%) &mdash; <span className="font-bold text-gray-900">{fmt(lumpSum)}</span>
-          </span>
-          <span className="flex items-center gap-1.5 text-gray-600">
-            <span className="w-3 h-3 rounded-sm bg-blue-100 inline-block shrink-0" />
-            Annuity ({annuityPercent}%) &mdash; <span className="font-bold text-gray-900">{fmt(annuityCorpus)}</span>
-          </span>
+
+        {/* Withdrawal Breakdown */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <h3 className="text-sm font-bold text-gray-900 mb-3">Withdrawal Breakdown</h3>
+          <div className="w-full h-4 rounded-full overflow-hidden flex">
+            <div style={{ width: `${100 - annuityPercent}%` }} className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] h-full" />
+            <div style={{ width: `${annuityPercent}%` }} className="bg-blue-100 h-full" />
+          </div>
+          <div className="flex justify-between mt-3 gap-3 text-[11px] sm:text-xs">
+            <span className="flex items-center gap-1.5 text-gray-600">
+              <span className="w-2.5 h-2.5 rounded-sm bg-[#2076C7] inline-block shrink-0" />
+              Lump Sum <span className="font-bold text-gray-900">{fmt(lumpSum)}</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-gray-600">
+              <span className="w-2.5 h-2.5 rounded-sm bg-blue-100 inline-block shrink-0" />
+              Annuity <span className="font-bold text-gray-900">{fmt(annuityCorpus)}</span>
+            </span>
+          </div>
         </div>
       </div>
 

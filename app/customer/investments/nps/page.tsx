@@ -1,27 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   Calculator,
   PiggyBank,
   CalendarDays,
+  UserPlus,
+  Briefcase,
+  User
 } from "lucide-react";
 import NPSDashboard from "./dashboard/page";
 import NPSCalculator from "./calculator/page";
-// import NPSInvestments from "./investments/page";
+import NPSMeetingsPage from "./meetings/page";
 import ScheduleMeetingModal from "./ScheduleMeetingModal";
 
 const tabs = [
   { id: "DASHBOARD", label: "Overview", icon: LayoutDashboard },
   { id: "CALCULATOR", label: "Calculator", icon: Calculator },
   // { id: "INVESTMENTS", label: "My Investments", icon: Briefcase },
+  { id: "MEETINGS", label: "Meetings", icon: CalendarDays },
 ];
 
 export default function UnifiedNPSPage() {
   const [activeTab, setActiveTab] = useState("DASHBOARD");
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+
+  useEffect(() => {
+    const handleOpenModal = () => setShowScheduleModal(true);
+    window.addEventListener('openScheduleModal', handleOpenModal);
+    return () => window.removeEventListener('openScheduleModal', handleOpenModal);
+  }, []);
 
   return (
     <div className="flex-1 p-4 sm:p-6 bg-gray-50/50 min-h-screen">
@@ -72,8 +82,8 @@ export default function UnifiedNPSPage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`relative w-full sm:w-auto px-4 md:px-5 py-2.5 md:py-2 rounded-xl sm:rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 z-10 flex items-center justify-center sm:justify-start gap-1.5 ${isActive
-                        ? "text-white"
-                        : "text-slate-500 hover:text-slate-700"
+                      ? "text-white"
+                      : "text-slate-500 hover:text-slate-700"
                       }`}
                   >
                     {isActive && (
@@ -98,39 +108,32 @@ export default function UnifiedNPSPage() {
         </div>
       </motion.div>
 
-      {/* Schedule Meeting Section */}
-      {activeTab === "DASHBOARD" && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mb-6 flex justify-center md:justify-end px-2"
-        >
-          <button
-            onClick={() => setShowScheduleModal(true)}
-            className="flex items-center justify-center gap-2 px-5 py-2 bg-white hover:bg-gray-50 border border-slate-200 rounded-full text-[10px] font-black text-slate-700 shadow-sm transition-all active:scale-95 uppercase tracking-widest"
-          >
-            <CalendarDays size={14} className="text-[#2076C7]" />
-            Schedule Meeting
-          </button>
-        </motion.div>
-      )}
 
       {/* Content */}
-      <motion.div
-        key={activeTab}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.3 }}
-      >
-        {activeTab === "DASHBOARD" && <NPSDashboard />}
-        {activeTab === "CALCULATOR" && <NPSCalculator />}
-        {/* {activeTab === "INVESTMENTS" && <NPSInvestments />} */}
-      </motion.div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="min-h-[500px]"
+        >
+          {activeTab === "DASHBOARD" && <NPSDashboard />}
+          {activeTab === "CALCULATOR" && <NPSCalculator />}
+          {activeTab === "MEETINGS" && <NPSMeetingsPage />}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Modal */}
       {showScheduleModal && (
-        <ScheduleMeetingModal onClose={() => setShowScheduleModal(false)} />
+        <ScheduleMeetingModal onClose={() => {
+          setShowScheduleModal(false);
+          // Refresh list if we are on the meetings tab
+          if (activeTab === "MEETINGS") {
+            window.location.reload(); // Simple way to refresh
+          }
+        }} />
       )}
 
       {/* Hide Scrollbar */}

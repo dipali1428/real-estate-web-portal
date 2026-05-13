@@ -40,7 +40,14 @@ export const FDAdminService = {
   updateFDPlan: async (id: number, data: any) => {
     const res = await api.put(`/api/unlisted/admin/fd/update/${id}`, data);
     return res.data;
+  },
+  /**
+   * Get FD Plans for customer comparison
+   * GET → /api/products/investments/fd/plans
+   */
+  getFDPlansForCompare: async () => {
+    const response = await api.get("/api/products/investments/fd/plans");
+    return response.data;
   }
-
 
 };

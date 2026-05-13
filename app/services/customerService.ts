@@ -536,6 +536,40 @@ const CustomerService = {
             throw error;
         }
     },
+    scheduleNPSMeeting: async (meetingData: any) => {
+        const response = await api.post("/api/products/investments/npsMeetings/schedule", {
+            ...meetingData,
+        });
+        return response.data;
+    },
+
+    /**
+     * Get NPS meetings for the current user
+     * GET → /api/products/investments/npsMeetings/my-meetings
+     */
+    getMyNPSMeetings: async () => {
+        const response = await api.get("/api/products/investments/npsMeetings/my-meetings");
+        return response.data;
+    },
+
+    /**
+     * Update NPS meeting (Customer)
+     * PUT → /api/products/investments/npsMeetings/:id
+     */
+    updateNPSMeeting: async (id: string | number, meetingData: any) => {
+        const response = await api.put(`/api/products/investments/npsMeetings/${id}`, meetingData);
+        return response.data;
+    },
+
+    
+    getAllNCDs: async () => {
+        try {
+            const response = await api.get("/api/products/investments/ncd/all");
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
 
     isAuthenticated: async (): Promise<boolean> => {
         try {
