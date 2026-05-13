@@ -44,7 +44,8 @@ import {
     Landmark,
     Building2,
     Equal,
-    CalendarDays 
+    CalendarDays ,
+    BriefcaseBusiness
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -239,9 +240,10 @@ export const sidebarLinks = {
   icon: <CalendarDays className="h-5 w-5 text-neutral-700" />,
   children: [
     {
-      label: "NPS consultation meetings",
-      href: "/UnlistedAdmin/products/investments/nps",
-    },
+  label: "NPS consultation meetings",
+  href: "/UnlistedAdmin/products/investments/nps",
+  icon: <BriefcaseBusiness className="h-4 w-4 text-neutral-600" />,
+},
   ],
 },
 
