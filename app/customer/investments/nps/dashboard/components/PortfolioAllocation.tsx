@@ -19,8 +19,8 @@ const allocations: Allocation[] = [
 
 const PortfolioAllocation: React.FC = () => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-base font-black text-gray-900 flex items-center gap-2">
           <PieChart size={18} className="text-[#2076C7]" />
           Asset Allocation
@@ -29,13 +29,13 @@ const PortfolioAllocation: React.FC = () => {
       </div>
 
       {/* Visual Ring (Simplified representation using multiple border rings or a CSS bar) */}
-      <div className="relative h-4 w-full bg-gray-100 rounded-full overflow-hidden flex mb-8">
+      <div className="relative h-3 w-full bg-gray-100 rounded-full overflow-hidden flex mb-5">
         {allocations.map((a, i) => (
           <div key={i} style={{ width: `${a.value}%` }} className={`${a.color} h-full transition-all duration-700`} />
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-3">
         {allocations.map((a, i) => {
           const Icon = a.icon;
           return (
@@ -58,7 +58,7 @@ const PortfolioAllocation: React.FC = () => {
         })}
       </div>
 
-      <div className="mt-6 p-3 bg-blue-50 border border-blue-100 rounded-xl">
+      <div className="mt-4 p-2.5 bg-blue-50 border border-blue-100 rounded-xl">
         <p className="text-[10px] text-blue-700 leading-relaxed flex items-start gap-2">
           <Landmark size={12} className="flex-shrink-0 mt-0.5" />
           Based on your current portfolio, your exposure to Equity is within the recommended limit for your age group.

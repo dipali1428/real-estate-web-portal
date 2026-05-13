@@ -20,9 +20,10 @@ interface NCDDetailDrawerProps {
   ncd: NCDData | null;
   isOpen: boolean;
   onClose: () => void;
+  onInvest?: (ncd: NCDData) => void;
 }
 
-export default function NCDDetailDrawer({ ncd, isOpen, onClose }: NCDDetailDrawerProps) {
+export default function NCDDetailDrawer({ ncd, isOpen, onClose, onInvest }: NCDDetailDrawerProps) {
   const [investAmount, setInvestAmount] = useState<number>(0);
   const [totalReturns, setTotalReturns] = useState<{ interest: number; total: number }>({ interest: 0, total: 0 });
 
@@ -45,11 +46,9 @@ export default function NCDDetailDrawer({ ncd, isOpen, onClose }: NCDDetailDrawe
     }
   }, [ncd, investAmount]);
 
-  if (!ncd) return null;
-
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && ncd && (
         <>
           <motion.div
             initial={{ opacity: 0 }}
@@ -210,7 +209,10 @@ export default function NCDDetailDrawer({ ncd, isOpen, onClose }: NCDDetailDrawe
             {/* Footer Actions */}
             <div className="p-6 border-t border-slate-100 bg-white shadow-[0_-10px_20px_-15px_rgba(0,0,0,0.1)]">
               {ncd.status === "Open" ? (
-                <button className="w-full bg-[#2076C7] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-[0_10px_20px_-10px_rgba(32,118,199,0.4)] hover:bg-[#1CADA3] transition-all flex items-center justify-center gap-3 active:scale-95 group">
+                <button 
+                  onClick={() => onInvest && onInvest(ncd)}
+                  className="w-full bg-[#2076C7] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-[0_10px_20px_-10px_rgba(32,118,199,0.4)] hover:bg-[#1CADA3] transition-all flex items-center justify-center gap-3 active:scale-95 group"
+                >
                   Confirm Investment <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               ) : ncd.status === "Upcoming" ? (

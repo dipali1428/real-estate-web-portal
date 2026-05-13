@@ -6,12 +6,15 @@ import { useRouter } from "next/navigation";
 import {
   Briefcase, TrendingUp, ShieldCheck, Landmark, Star, Search, Plus,
   Wallet, PieChart as PieChartIcon, 
-  ShoppingBag
+  ShoppingBag, Bookmark
 } from "lucide-react";
 
 
-import { ncdData, NCDData } from "../../../products/NCD/data/ncdData";
+import { NCDData } from "../../../products/NCD/data/ncdData";
 import NCDDetailDrawer from "./components/NCDDetailDrawer";
+import CustomerService from "../../../services/customerService";
+import toast from "react-hot-toast";
+// import EnquiryModal from "../../../component/EnquiryModal";
 
 interface NCDInvestment {
     id: string;
@@ -37,13 +40,56 @@ export default function NCDDashboard() {
 
   // Portfolio State
   const [investments, setInvestments] = useState<NCDInvestment[]>([]);
+  const [ncds, setNcds] = useState<NCDData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [wishlistingId, setWishlistingId] = useState<string | number | null>(null);
+  const [wishlistedIds, setWishlistedIds] = useState<Set<string | number>>(new Set());
+  const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
+  const [enquiryProduct, setEnquiryProduct] = useState<any>(null);
 
-  // Backend Integration Pending (Initially Empty)
+  // Fetch NCDs from backend
+  useEffect(() => {
+      const fetchNCDs = async () => {
+          try {
+              const data = await CustomerService.getAllNCDs();
+              if (Array.isArray(data)) {
+                  setNcds(data);
+              } else if (data?.data && Array.isArray(data.data)) {
+                  setNcds(data.data);
+              }
+          } catch (error: any) {
+              console.error("Failed to fetch NCDs:", error);
+              setNcds([]); // Clear data on error
+              toast.error(error?.response?.data?.message || "Failed to fetch live NCD data.");
+          } finally {
+              setLoading(false);
+          }
+      };
+
+      fetchNCDs();
+
+      // Fetch user's wishlist to highlight icons
+      const fetchWishlist = async () => {
+          try {
+              const response = await CustomerService.getMyWishlist();
+              if (response.success && Array.isArray(response.data)) {
+                  const ncdIds = response.data
+                      .filter((item: any) => item.product_type === "ncd")
+                      .map((item: any) => item.product_id);
+                  setWishlistedIds(new Set(ncdIds));
+              }
+          } catch (error) {
+              console.error("Failed to fetch wishlist:", error);
+          }
+      };
+
+      fetchWishlist();
+  }, []);
+
+  // Backend Integration Pending (Portfolio)
   useEffect(() => {
       // Data will be fetched from actual backend/database here
       setInvestments([]);
-      setLoading(false);
   }, []);
 
   // Stats for Portfolio
@@ -86,16 +132,18 @@ export default function NCDDashboard() {
   }, [investments, portfolioStats.returns]);
 
   // Get unique ratings for filter
-  const ratings = ["All", ...new Set(ncdData.map(ncd => ncd.ratingAgency))];
+  const ratings = useMemo(() => ["All", ...new Set(ncds.map(ncd => ncd.ratingAgency))], [ncds]);
 
   // Filtered NCDs
-  const filteredNCDs = ncdData.filter((ncd) => {
-    const tabMatch = ncd.status === ncdStatusTab;
-    const ratingMatch = selectedRating === "All" || ncd.ratingAgency === selectedRating;
-    const searchMatch = ncd.issuer.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                        ncd.title.toLowerCase().includes(searchQuery.toLowerCase());
-    return tabMatch && ratingMatch && searchMatch;
-  });
+  const filteredNCDs = useMemo(() => {
+    return ncds.filter((ncd) => {
+      const tabMatch = ncd.status === ncdStatusTab;
+      const ratingMatch = selectedRating === "All" || ncd.ratingAgency === selectedRating;
+      const searchMatch = ncd.issuer.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          ncd.title.toLowerCase().includes(searchQuery.toLowerCase());
+      return tabMatch && ratingMatch && searchMatch;
+    });
+  }, [ncds, ncdStatusTab, selectedRating, searchQuery]);
 
   const handleViewDetails = (ncd: NCDData) => {
     setSelectedNCD(ncd);
@@ -103,8 +151,57 @@ export default function NCDDashboard() {
   };
 
   const handleInvestNow = (ncd: NCDData) => {
-    setSelectedNCD(ncd);
-    setIsDrawerOpen(true);
+    setEnquiryProduct({
+      product_type: 'NCD',
+      product_name: ncd.issuer,
+      product_id: ncd.id
+    });
+    setEnquiryModalOpen(true);
+  };
+
+  const handleWishlistToggle = async (ncd: NCDData) => {
+    setWishlistingId(ncd.id);
+    try {
+      if (wishlistedIds.has(ncd.id)) {
+        // Remove from wishlist logic
+        const response = await CustomerService.getMyWishlist();
+        if (response.success && Array.isArray(response.data)) {
+          const entry = response.data.find((item: any) => 
+            item.product_type === "ncd" && item.product_id === ncd.id
+          );
+          if (entry) {
+            const removeRes = await CustomerService.removeFromWishlist(entry.id);
+            if (removeRes.success) {
+              setWishlistedIds(prev => {
+                const next = new Set(prev);
+                next.delete(ncd.id);
+                return next;
+              });
+              toast.success("Removed from wishlist");
+              return;
+            }
+          }
+        }
+        toast.error("Failed to remove from wishlist");
+      } else {
+        // Add to wishlist logic
+        const response = await CustomerService.addToWishlist({
+          product_type: "ncd",
+          product_id: ncd.id,
+          product_name: ncd.issuer,
+        });
+
+        if (response.success) {
+          toast.success("NCD added to wishlist!");
+          setWishlistedIds(prev => new Set(prev).add(ncd.id));
+        }
+      }
+    } catch (error: any) {
+      console.error("Wishlist error:", error);
+      toast.error(error?.response?.data?.message || "Wishlist action failed");
+    } finally {
+      setWishlistingId(null);
+    }
   };
 
   return (
@@ -265,7 +362,28 @@ export default function NCDDashboard() {
                             className="group border border-slate-100 rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden bg-white hover:border-blue-200 hover:shadow-xl transition-all duration-300 flex flex-col pt-2"
                           >
                             <div className="px-6 py-4 relative">
-                               <div className="absolute top-4 right-6">
+                               <div className="absolute top-4 right-6 flex items-center gap-2">
+                                   <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleWishlistToggle(ncd);
+                                    }}
+                                    disabled={wishlistingId === ncd.id}
+                                    className={`p-2 rounded-xl border transition-all ${
+                                      wishlistedIds.has(ncd.id)
+                                        ? "bg-blue-50 border-blue-100 text-[#2076C7]"
+                                        : wishlistingId === ncd.id 
+                                          ? "opacity-50 cursor-not-allowed border-slate-100" 
+                                          : "border-slate-100 hover:bg-blue-50 hover:border-blue-100 text-slate-400 hover:text-[#2076C7]"
+                                    }`}
+                                    title={wishlistedIds.has(ncd.id) ? "Remove from Wishlist" : "Add to Wishlist"}
+                                  >
+                                    <Bookmark 
+                                      size={16} 
+                                      fill={wishlistedIds.has(ncd.id) ? "currentColor" : "none"}
+                                      className={wishlistingId === ncd.id ? "animate-pulse" : ""} 
+                                    />
+                                  </button>
                                  <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-lg border ${
                                     ncdStatusTab === "Open" ? "bg-emerald-50 border-emerald-100 text-emerald-600" 
                                     : ncdStatusTab === "Upcoming" ? "bg-amber-50 border-amber-100 text-amber-600"
@@ -369,7 +487,7 @@ export default function NCDDashboard() {
                     </div>
                     <h2 className="text-2xl font-black text-slate-800 mb-2">No Active NCD Assets</h2>
                     <p className="text-slate-500 max-w-sm mx-auto mb-10 leading-relaxed font-medium">
-                        You haven&apos;t invested in any Non-Convertible Debentures yet. Explore the market to start earning secure yields.
+                        You haven't invested in any Non-Convertible Debentures yet. Explore the market to start earning secure yields.
                     </p>
                     <button 
                         onClick={() => setMainTab('explore')}
@@ -389,7 +507,17 @@ export default function NCDDashboard() {
         isOpen={isDrawerOpen}
         ncd={selectedNCD}
         onClose={() => setIsDrawerOpen(false)}
+        onInvest={(ncd) => {
+          setIsDrawerOpen(false);
+          handleInvestNow(ncd);
+        }}
       />
+
+      {/* <EnquiryModal 
+        isOpen={enquiryModalOpen}
+        onClose={() => setEnquiryModalOpen(false)}
+        productDetails={enquiryProduct}
+      /> */}
 
     </div>
   );

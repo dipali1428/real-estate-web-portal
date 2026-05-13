@@ -395,6 +395,47 @@ export const AdminService = {
     const response = await api.put(`/api/unlisted/admin/bonds/update/${bond_id}`, data);
     return response.data;
   },
+
+   /**
+   * Upload NCDs data via CSV
+   * POST → /api/unlisted/admin/ncd/upload
+   */
+  uploadNCDs: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post("/api/unlisted/admin/ncd/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  },
+
+  /**
+   * Fetch all NCDs (Admin)
+   * GET → /api/unlisted/admin/ncd/all
+   */
+  // getNCDs: async () => {
+  //   const response = await api.get("/api/unlisted/admin/ncd/all");
+  //   return response.data;
+  // },
+
+  /**
+   * Delete an NCD
+   * DELETE → /api/unlisted/admin/ncd/delete/:id
+   */
+  deleteNCD: async (id: number | string) => {
+    const response = await api.delete(`/api/unlisted/admin/ncd/delete/${id}`);
+    return response.data;
+  },
+
+  /**
+   * Update an NCD
+   * PUT → /api/unlisted/admin/ncd/update/:id
+   */
+  updateNCD: async (id: number | string, data: any) => {
+    const response = await api.put(`/api/unlisted/admin/ncd/update/${id}`, data);
+    return response.data;
+  },
+
 };
 
 

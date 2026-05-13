@@ -4,10 +4,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, CheckCircle2, X, Landmark, Database, Star, CheckCircle } from 'lucide-react';
 
 import { useRouter } from 'next/navigation';
-// import api from '@/app/services/api';
-// import { DashboardService } from '@/app/services/dashboardService';
-import { FDAdminService } from "../../../../services/fdAdminServices";
-import toast from 'react-hot-toast';
+import { DashboardService } from '@/app/services/dashboardService';
+import { FDAdminService } from '@/app/services/fdAdminServices';
+import { toast } from 'react-hot-toast';
 
 type Bank = {
   company_name: string;
@@ -54,8 +53,8 @@ export default function CompareFDPage() {
   const [isAuthed, setIsAuthed] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  // const [isFormOpen, setIsFormOpen] = useState(false);
-  // const [selectedBankName, setSelectedBankName] = useState<string>("");
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedBankName, setSelectedBankName] = useState<string>("");
 
   // Auth check
   useEffect(() => {
@@ -64,7 +63,7 @@ export default function CompareFDPage() {
       router.push('/');
       return;
     }
-    // localStorage.setItem('token', token);
+    localStorage.setItem('token', token);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsAuthed(true);
   }, [router]);
@@ -80,18 +79,18 @@ export default function CompareFDPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
- useEffect(() => {
-  const loadBanks = async () => {
-    try {
-      const data = await FDAdminService.getFDPlans();
-      setBanks(data || []);
-    } catch (error) {
-      toast("Failed to load FD plans");
-    }
-  };
+  useEffect(() => {
+    const loadBanks = async () => {
+      try {
+        const res = await FDAdminService.getFDPlansForCompare();
+        setBanks(res.data || []);
+      } catch (error) {
+        toast.error("Unable to load banking partners. Please refresh.");
+      }
+    };
 
-  loadBanks();
-}, []);
+    loadBanks();
+  }, []);
 
   const allBanks = banks;
 
@@ -102,11 +101,16 @@ export default function CompareFDPage() {
       return newBanks;
     });
     setOpenDropdownIndex(null);
+    if (bank) {
+      toast.success(`${bank.company_name} added to comparison`);
+    } else {
+      toast.success("Slot cleared");
+    }
   };
 
-  // const handleApply = (bankName: string) => {
-  //   // Action disabled as per user request
-  // };
+  const handleApply = (bankName: string) => {
+    // Action disabled as per user request
+  };
 
   const selectedBanksCount = selectedBanks.filter(b => b !== null).length;
 
