@@ -86,7 +86,7 @@ const AboutSection = () => {
             name: "Mr. Rahul Gadekar",
             title: "Branch Head (Jalna Branch)",
             description: "Mr. Rahul Gadekar has 10+ years of banking and finance experience, specializing in Home, Car, Education, Mortgage, and Business Loans. Formerly with State Bank of India, Old Jalna, he is skilled in loan processing and financial advisory across Jalna.",
-            image: "/leader/Rahul-Gadekar.png"
+            image: "/leader/mr-gadekar.png"
         },
         {
             name: "Mr. Yogesh Joshi",
