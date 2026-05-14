@@ -129,8 +129,8 @@ export default function ChatbotWidget() {
               <div className="flex items-center space-x-2">
                 <AnitaAvatar size="sm" />
                 <div>
-                  <h3 className="font-bold text-xs tracking-tight">ANITA</h3>
-                  <p className="text-[9px] opacity-90 font-medium italic">Automated Navigation and Interface Task Assistant.</p>
+                  <h3 className="font-bold text-[#2076C7] text-xs tracking-tight">ANITA</h3>
+                  <p className="text-[9px] opacity-90 text-black font-medium italic">Automated Navigation and Interface Task Assistant.</p>
                 </div>
               </div>
               <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-white/20 rounded-md transition-colors">
@@ -173,7 +173,7 @@ export default function ChatbotWidget() {
             })}
 
             {isTyping && (
-              <div ref={lastMessageRef} className="flex items-center space-x-2 animate-pulse text-gray-400 text-[11px] italic pl-2">
+              <div ref={lastMessageRef} className="flex items-center space-x-2 animate-pulse text-gray-600 text-[11px] italic pl-2">
                 <Bot size={12}/> Anita is typing...
               </div>
             )}
@@ -200,7 +200,7 @@ export default function ChatbotWidget() {
                 onChange={(e) => setUserInput(e.target.value)} 
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()} 
                 placeholder="Ask ANITA anything..." 
-                className="flex-1 bg-transparent outline-none py-2 text-xs" 
+                className="flex-1 bg-transparent outline-none py-2 text-xs text-gray-600" 
               />
               <button onClick={handleSend} disabled={!userInput.trim()}>
                 <Send size={14} />

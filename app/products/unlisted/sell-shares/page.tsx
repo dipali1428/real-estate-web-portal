@@ -434,7 +434,7 @@ const SellShares: FC = () => {
                   placeholder="Enter quantity" 
                   value={qtyToSell} 
                   onChange={(e) => setQtyToSell(e.target.value)} 
-                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-[#2076C7] outline-none font-bold" 
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-[#2076C7] outline-none font-bold text-gray-900" 
                 />
               </div>
               <button 

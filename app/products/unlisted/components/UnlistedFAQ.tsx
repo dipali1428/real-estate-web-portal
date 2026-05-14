@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { IconPlus, IconMinus } from '@tabler/icons-react';
+import { Plus, Minus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const faqs = [
@@ -86,7 +86,7 @@ export default function UnlistedFAQ() {
                                     {faq.q}
                                 </span>
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${activeIndex === idx ? 'bg-[#2076C7] text-white rotate-180' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#2076C7]'}`}>
-                                    {activeIndex === idx ? <IconMinus size={20} strokeWidth={3} /> : <IconPlus size={20} strokeWidth={3} />}
+                                    {activeIndex === idx ? <Minus size={20} strokeWidth={3} /> : <Plus size={20} strokeWidth={3} />}
                                 </div>
                             </button>
 
@@ -116,7 +116,7 @@ export default function UnlistedFAQ() {
                             className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-white text-[#2076C7] font-black uppercase tracking-widest text-xs shadow-lg shadow-blue-100/50 border border-slate-100 hover:bg-[#2076C7] hover:text-white transition-all duration-300 cursor-pointer active:scale-95"
                         >
                             {showAllFaqs ? 'Show Less' : 'View All Questions'}
-                            <IconPlus size={16} strokeWidth={3} className={`transition-transform duration-500 ${showAllFaqs ? 'rotate-45' : ''}`} />
+                            <Plus size={16} strokeWidth={3} className={`transition-transform duration-500 ${showAllFaqs ? 'rotate-45' : ''}`} />
                         </button>
                     </motion.div>
                 )}

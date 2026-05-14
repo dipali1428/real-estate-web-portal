@@ -1,7 +1,6 @@
 'use client';
-
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Search, Filter, Building2, TrendingUp, X, Bookmark, BookmarkCheck, ShoppingCart, CheckCircle, ChevronDown, IndianRupee, Info, Activity, MapPin, Package, FileText, AlertTriangle, Loader2 } from 'lucide-react';
+import { Search, Filter, Building2, TrendingUp, X, Bookmark, BookmarkCheck, ShoppingCart, CheckCircle, ChevronDown, IndianRupee, Info, Activity, MapPin, Package, FileText, AlertTriangle, Loader2, Plus, Minus, CreditCard, Building, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { fetchDashboardData, fetchIdGraphData, GraphPoint } from '../../../../services/unlistedservices';
 import toast from 'react-hot-toast';
@@ -37,8 +36,22 @@ interface ToastMessage {
   type: 'success' | 'error' | 'info' | 'warning';
 }
 
-// ==================== CONSTANTS ====================
+interface CartItem {
+  id: number;
+  company: Company;
+  quantity: number;
+}
 
+interface CompanyCardProps {
+  company: Company;
+  isSaved: boolean;
+  onToggleWishlist: (company: Company) => void;
+  onAddToCart: (company: Company, quantity: number) => void;
+  wishlistLoading: boolean;
+  onViewDetails: (company: Company) => void;
+}
+
+// ==================== CONSTANTS ====================
 const PRICE_RANGES = [
   { label: 'All Prices', value: 'ALL' },
   { label: 'Under ₹100', value: '0-100' },
@@ -58,7 +71,6 @@ type SortOption = typeof SORT_OPTIONS[number]['value'];
 type PriceRangeOption = typeof PRICE_RANGES[number]['value'];
 
 // ==================== HELPER FUNCTIONS ====================
-
 const getTokenFromCookie = (): string | null => {
   if (typeof document === 'undefined') return null;
   const cookies = document.cookie.split('; ');
@@ -68,10 +80,7 @@ const getTokenFromCookie = (): string | null => {
 
 const formatCurrency = (amount: string): string => {
   const num = parseFloat(amount);
-  return `₹${num.toLocaleString('en-IN', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })}`;
+  return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
 const calculateMinInvestment = (price: string, minLotSize: number | null): number => {
@@ -80,21 +89,19 @@ const calculateMinInvestment = (price: string, minLotSize: number | null): numbe
   return priceNum * lotSize;
 };
 
-// Helper to enrich company data with additional fields for modal
 const enrichCompanyForModal = (company: Company): Company => {
   const id = company.id;
   const price = parseFloat(company.price);
   const lotSize = company.min_lot_size || 100;
-
   let category = 'Unlisted Shares';
   const name = company.shares_name.toLowerCase();
-
+  
   if (name.includes('tech') || name.includes('software')) category = 'Technology';
   else if (name.includes('fin') || name.includes('bank') || name.includes('microfinance')) category = 'Fintech';
   else if (name.includes('health') || name.includes('pharma') || name.includes('clinical')) category = 'Healthcare';
   else if (name.includes('auto') || name.includes('motor')) category = 'Automotive';
   else if (name.includes('energy') || name.includes('power') || name.includes('renewable')) category = 'Energy';
-
+  
   return {
     ...company,
     category,
@@ -110,8 +117,134 @@ const enrichCompanyForModal = (company: Company): Company => {
   };
 };
 
-// ==================== MAIN COMPONENT ====================
+// ==================== COMPANY CARD COMPONENT ====================
+const CompanyCard: React.FC<CompanyCardProps> = ({
+  company,
+  isSaved,
+  onToggleWishlist,
+  onAddToCart,
+  wishlistLoading,
+  onViewDetails
+}) => {
+  const [quantity, setQuantity] = useState(1);
+  const minInv = calculateMinInvestment(company.price, company.min_lot_size);
+  const maxLot = company.min_lot_size || Infinity;
 
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity >= 1 && newQuantity <= maxLot) {
+      setQuantity(newQuantity);
+    }
+  };
+
+  const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value >= 1 && value <= maxLot) {
+      setQuantity(value);
+    } else if (value === 0) {
+      setQuantity(1);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full group relative">
+      {/* Wishlist Button */}
+      <button
+        onClick={() => onToggleWishlist(company)}
+        disabled={wishlistLoading}
+        className={`absolute top-4 right-4 z-10 p-2 rounded-full transition-all shadow-sm ${isSaved ? 'bg-blue-50 text-[#2076C7]' : 'bg-white text-gray-400 hover:text-[#2076C7]'} disabled:opacity-50`}
+      >
+        {isSaved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+      </button>
+
+      {/* Image Container */}
+      <div className="w-full h-32 bg-gray-50 rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden">
+        {company.logo_url ? (
+          <Image
+            src={company.logo_url} 
+            width={200}
+            height={150}
+            className="w-full h-full object-contain p-3 transition-all duration-700 group-hover:scale-110" 
+            alt={company.shares_name} 
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+              const parent = (e.target as HTMLImageElement).parentElement;
+              if (parent) {
+                const span = document.createElement('span');
+                span.className = 'text-3xl font-bold text-[#2076C7]';
+                span.textContent = company.shares_name.charAt(0);
+                parent.appendChild(span);
+              }
+            }}
+          />
+        ) : (
+          <span className="text-3xl font-bold text-[#2076C7]">{company.shares_name.charAt(0)}</span>
+        )}
+      </div>
+
+      {/* Company Details */}
+      <div className="p-5 flex flex-col flex-grow">
+        <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-1 group-hover:text-[#2076C7] transition-colors duration-300 text-center">
+          {company.shares_name}
+        </h4>
+        
+        {/* Price Display */}
+        <div className="mb-4 text-center">
+          <span className="text-2xl font-bold text-[#2076C7]">
+            {formatCurrency(company.price)}
+          </span>
+        </div>
+        
+        <div className="text-sm text-gray-500 text-center mb-4">Unlisted Shares</div>
+
+        {/* Info Grid */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
+          <div className="text-center">
+            <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
+            <div className="text-sm font-bold text-gray-900">
+              {company.min_lot_size?.toLocaleString() || 'N/A'}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-xs text-gray-500 mb-0.5">Depository</div>
+            <div className="text-sm font-bold text-gray-900">
+              {company.depository_applicable?.split(' ')[0] || 'NSDL'}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-xs text-gray-500 mb-0.5">Min. Invest</div>
+            <div className="text-sm font-bold text-gray-900">
+              ₹{minInv.toLocaleString('en-IN')}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-xs text-gray-500 mb-0.5">Available</div>
+            <div className="text-sm font-bold text-gray-900">
+              {company.volume || '45.2K'}
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="mt-auto space-y-2">
+          <button
+            onClick={() => onAddToCart(company, quantity)}
+            className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
+          >
+            <ShoppingCart size={18} /> Add to Cart
+          </button>
+          <button 
+            onClick={() => onViewDetails(company)}
+            className="w-full py-2.5 border-2 border-[#2076C7]/20 text-[#2076C7] text-xs font-bold rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+          >
+            Details
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==================== MAIN COMPONENT ====================
 export default function CompaniesPage() {
   const router = useRouter();
   const chartRef = useRef<HTMLCanvasElement | null>(null);
@@ -134,14 +267,19 @@ export default function CompaniesPage() {
   const [wishlistMap, setWishlistMap] = useState<Map<number, number>>(new Map());
   const [wishlistLoading, setWishlistLoading] = useState(false);
 
-  // View More State - 5 companies per row on desktop
-  const [visibleCount, setVisibleCount] = useState(10); // 5x2 initially
+  // View More State
+  const [visibleCount, setVisibleCount] = useState(10);
 
   // Detail Modal States
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [modalGraphData, setModalGraphData] = useState<GraphPoint[]>([]);
   const [isModalGraphLoading, setIsModalGraphLoading] = useState(false);
   const [graphTimeRange, setGraphTimeRange] = useState('All');
+
+  // Cart States
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [showCartDrawer, setShowCartDrawer] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState<'cart' | 'payment'>('cart');
 
   // Toast State
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -167,7 +305,7 @@ export default function CompaniesPage() {
         const response = await fetchDashboardData();
         if (response?.success && response?.graph) setGraphData(response.graph);
       } catch (error) {
-        toast.error('Error fetching market data:');
+        toast.error('Error fetching market data');
       } finally {
         setIsGraphLoading(false);
       }
@@ -180,7 +318,7 @@ export default function CompaniesPage() {
     return parseFloat(graphData[graphData.length - 1].market_price).toLocaleString('en-IN', { minimumFractionDigits: 2 });
   }, [graphData]);
 
-  // --- WISHLIST FETCH WITH PROPER HANDLING ---
+  // --- WISHLIST FETCH ---
   const loadWishlist = useCallback(async () => {
     const token = getTokenFromCookie();
     if (!token) {
@@ -215,7 +353,7 @@ export default function CompaniesPage() {
       
       setWishlistMap(newMap);
     } catch (error) {
-      toast.error('Error loading wishlist:');
+      toast.error('Error loading wishlist');
       setWishlistMap(new Map());
     }
   }, []);
@@ -336,12 +474,92 @@ export default function CompaniesPage() {
     }
   };
 
+  // --- CART FUNCTIONS ---
+  const addToCart = useCallback((company: Company, quantity: number) => {
+    const maxLot = company.min_lot_size || Infinity;
+    
+    if (quantity > maxLot) {
+      showToast(`You can only buy up to ${maxLot} shares (lot size limit).`, 'warning');
+      return;
+    }
+    
+    setCartItems(prev => {
+      const existing = prev.find(item => item.id === company.id);
+      if (existing) {
+        const newQuantity = existing.quantity + quantity;
+        if (newQuantity > maxLot) {
+          showToast(`Cannot exceed lot size limit of ${maxLot} shares.`, 'warning');
+          return prev;
+        }
+        return prev.map(item => 
+          item.id === company.id ? { ...item, quantity: newQuantity } : item
+        );
+      }
+      return [...prev, { id: company.id, company, quantity }];
+    });
+    
+    showToast(`Added ${quantity} share(s) of ${company.shares_name} to cart`, 'success');
+    // REMOVED: setShowCartDrawer(true); - Cart drawer will NOT open automatically
+  }, [showToast]);
+
+  const updateCartQuantity = useCallback((companyId: number, newQuantity: number) => {
+    const item = cartItems.find(item => item.id === companyId);
+    if (!item) return;
+    
+    const maxLot = item.company.min_lot_size || Infinity;
+    
+    if (newQuantity > maxLot) {
+      showToast(`Cannot exceed lot size limit of ${maxLot} shares.`, 'warning');
+      return;
+    }
+    
+    if (newQuantity <= 0) {
+      removeFromCart(companyId);
+      return;
+    }
+    
+    setCartItems(prev => prev.map(item =>
+      item.id === companyId ? { ...item, quantity: newQuantity } : item
+    ));
+  }, [cartItems, showToast]);
+
+  const removeFromCart = useCallback((companyId: number) => {
+    setCartItems(prev => prev.filter(item => item.id !== companyId));
+  }, []);
+
+  const getCartTotal = useCallback(() => {
+    return cartItems.reduce((total, item) => {
+      return total + (parseFloat(item.company.price) * item.quantity);
+    }, 0);
+  }, [cartItems]);
+
+  const handleProceedToPayment = useCallback(() => {
+    if (cartItems.length === 0) {
+      showToast('Your cart is empty', 'warning');
+      return;
+    }
+    setCheckoutStep('payment');
+  }, [cartItems, showToast]);
+
+  const handlePaymentConfirm = useCallback(() => {
+    showToast('Order placed successfully! Our team will contact you shortly via email for Net Banking payment.', 'success');
+    setCartItems([]);
+    setShowCartDrawer(false);
+    setCheckoutStep('cart');
+  }, [showToast]);
+
+  const handleBackToCart = useCallback(() => {
+    setCheckoutStep('cart');
+  }, []);
+
   // --- FILTERING & SORTING ---
   useEffect(() => {
     let filtered = [...companies];
+    
     if (searchTerm.trim()) {
       filtered = filtered.filter(c => c.shares_name.toLowerCase().includes(searchTerm.toLowerCase()));
     }
+    
     if (priceRange !== 'ALL') {
       const [min, max] = priceRange.split('-').map(Number);
       filtered = filtered.filter(c => {
@@ -349,6 +567,7 @@ export default function CompaniesPage() {
         return max ? (p >= min && p <= max) : p >= min;
       });
     }
+    
     filtered.sort((a, b) => {
       if (sortBy === 'name-asc') return a.shares_name.localeCompare(b.shares_name);
       if (sortBy === 'name-desc') return b.shares_name.localeCompare(a.shares_name);
@@ -358,27 +577,16 @@ export default function CompaniesPage() {
       if (sortBy === 'price-desc') return pB - pA;
       return 0;
     });
+    
     setFilteredCompanies(filtered);
-    setVisibleCount(10); 
+    setVisibleCount(10);
   }, [companies, searchTerm, priceRange, sortBy]);
-
-  const clearFilters = () => {
-    setSearchTerm('');
-    setPriceRange('ALL');
-    setSortBy('name-asc');
-  };
-
-  // --- BUY NOW HANDLER ---
-  const handleBuyNow = (company: Company) => {
-    // sessionStorage.setItem('pendingBuyCompany', JSON.stringify(company));
-    // router.push('/customer/checkout');
-  };
 
   // --- MODAL GRAPH DATA FETCH ---
   useEffect(() => {
     const loadGraphData = async () => {
       if (!selectedCompany) return;
-
+      
       setIsModalGraphLoading(true);
       setModalGraphData([]);
       
@@ -398,7 +606,7 @@ export default function CompaniesPage() {
           }
         }
       } catch (error) {
-        toast.error('Error loading graph data:');
+        toast.error('Error loading graph data');
         setModalGraphData([]);
       } finally {
         setIsModalGraphLoading(false);
@@ -412,7 +620,7 @@ export default function CompaniesPage() {
   useEffect(() => {
     if (!chartRef.current || !selectedCompany) return;
     if (modalGraphData.length === 0) return;
-
+    
     if (chartInstance.current) {
       chartInstance.current.destroy();
     }
@@ -518,14 +726,14 @@ export default function CompaniesPage() {
   }, [selectedCompany]);
 
   // Get enriched company for modal
-  const getEnrichedCompany = (company: Company): Company => {
+  const getEnrichedCompany = useCallback((company: Company): Company => {
     return enrichCompanyForModal(company);
-  };
+  }, []);
 
   // Get filtered graph data for stats
-  const getFilteredGraphData = () => {
+  const getFilteredGraphData = useCallback(() => {
     if (!modalGraphData.length) return [];
-
+    
     switch (graphTimeRange) {
       case '1W': {
         const cutoffDate = new Date();
@@ -546,7 +754,7 @@ export default function CompaniesPage() {
       default:
         return modalGraphData;
     }
-  };
+  }, [modalGraphData, graphTimeRange]);
 
   // Toast Icon Helper
   const getToastIcon = (type: ToastMessage['type']) => {
@@ -580,7 +788,6 @@ export default function CompaniesPage() {
 
   return (
     <div className="container mx-auto px-4 py-4 pt-4 md:pt-8 min-h-screen">
-      
       {/* TOAST CONTAINER */}
       <div className="fixed top-20 right-5 z-[5000] flex flex-col gap-3">
         <AnimatePresence>
@@ -618,14 +825,14 @@ export default function CompaniesPage() {
         </div>
         <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2 font-medium">
-            <div className="p-2 bg-amber-50 rounded-lg text-amber-600"><TrendingUp size={18} /></div>
-            Current Listings
+            <div className="p-2 bg-amber-50 rounded-lg text-amber-600"><ShoppingCart size={18} /></div>
+            Cart Items
           </div>
-          <p className="text-2xl font-bold text-gray-900">{filteredCompanies.length}</p>
+          <p className="text-2xl font-bold text-gray-900">{cartItems.length}</p>
         </div>
         <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2 font-medium">
-            <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600"><ShoppingCart size={18} /></div>
+            <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600"><Bookmark size={18} /></div>
             Wishlist
           </div>
           <p className="text-2xl font-bold text-gray-900">{wishlistMap.size}</p>
@@ -682,6 +889,18 @@ export default function CompaniesPage() {
           >
             <Filter size={16} /> Filters
           </button>
+          <button 
+            onClick={() => setShowCartDrawer(true)}
+            className="px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-white text-gray-600 border border-gray-200 shadow-sm hover:border-[#2076C7] hover:text-[#2076C7] relative"
+          >
+            <ShoppingCart size={16} />
+            Cart
+            {cartItems.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {cartItems.length}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
@@ -729,120 +948,26 @@ export default function CompaniesPage() {
         </motion.div>
       )}
 
-      {/* Companies Grid - 5 COLUMNS ON DESKTOP (xl:grid-cols-5) */}
+      {/* Companies Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8 mb-8">
         {filteredCompanies.slice(0, visibleCount).map((company) => {
           const isSaved = wishlistMap.has(company.id);
-          const minInv = calculateMinInvestment(company.price, company.min_lot_size);
-
+          
           return (
-            <div 
-              key={company.id} 
-              className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full group relative"
-            >
-              {/* Wishlist Button - ALWAYS VISIBLE */}
-              <button 
-                onClick={() => toggleWishlist(company)}
-                disabled={wishlistLoading}
-                className={`absolute top-4 right-4 z-10 p-2 rounded-full transition-all shadow-sm ${
-                  isSaved 
-                    ? 'bg-blue-50 text-[#2076C7]' 
-                    : 'bg-white text-gray-400 hover:text-[#2076C7]'
-                } disabled:opacity-50`}
-              >
-                {isSaved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
-              </button>
-
-              {/* RECTANGULAR IMAGE CONTAINER */}
-              <div className="w-full h-32 bg-gray-50 rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden">
-                {company.logo_url ? (
-                  <Image
-                    src={company.logo_url} 
-                    width={200}
-                    height={150}
-                    className="w-full h-full object-contain p-3 transition-all duration-700 group-hover:scale-110" 
-                    alt={company.shares_name} 
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                      const parent = (e.target as HTMLImageElement).parentElement;
-                      if (parent) {
-                        const span = document.createElement('span');
-                        span.className = 'text-3xl font-bold text-[#2076C7]';
-                        span.textContent = company.shares_name.charAt(0);
-                        parent.appendChild(span);
-                      }
-                    }}
-                  />
-                ) : (
-                  <span className="text-3xl font-bold text-[#2076C7]">{company.shares_name.charAt(0)}</span>
-                )}
-              </div>
-
-              {/* Company Details */}
-              <div className="p-5 flex flex-col flex-grow">
-                <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-1 group-hover:text-[#2076C7] transition-colors duration-300 text-center">
-                  {company.shares_name}
-                </h4>
-                
-                {/* Price Display */}
-                <div className="mb-4 text-center">
-                  <span className="text-2xl font-bold text-[#2076C7]">
-                    {formatCurrency(company.price)}
-                  </span>
-                </div>
-                
-                <div className="text-sm text-gray-500 text-center mb-4">Unlisted Shares</div>
-
-                {/* Info Grid */}
-                <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
-                  <div className="text-center">
-                    <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
-                    <div className="text-sm font-bold text-gray-900">
-                      {company.min_lot_size?.toLocaleString() || 'N/A'} shares
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-gray-500 mb-0.5">Depository</div>
-                    <div className="text-sm font-bold text-gray-900">
-                      {company.depository_applicable?.split(' ')[0] || 'NSDL'}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-gray-500 mb-0.5">Min. Invest</div>
-                    <div className="text-sm font-bold text-gray-900">
-                      ₹{minInv.toLocaleString('en-IN')}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-gray-500 mb-0.5">Available</div>
-                    <div className="text-sm font-bold text-gray-900">
-                      {company.volume || '45.2K'}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col gap-2 mt-auto">
-                  <button
-                    onClick={() => handleBuyNow(company)}
-                    className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
-                  >
-                    <ShoppingCart size={18} /> Buy Now
-                  </button>
-                  <button 
-                    onClick={() => setSelectedCompany(company)}
-                    className="w-full py-2.5 border-2 border-[#2076C7]/20 text-[#2076C7] text-xs font-bold rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
-                  >
-                    Details
-                  </button>
-                </div>
-              </div>
-            </div>
+            <CompanyCard
+              key={company.id}
+              company={company}
+              isSaved={isSaved}
+              onToggleWishlist={toggleWishlist}
+              onAddToCart={addToCart}
+              wishlistLoading={wishlistLoading}
+              onViewDetails={setSelectedCompany}
+            />
           );
         })}
       </div>
 
-      {/* View More Button - Load 5 more companies at a time */}
+      {/* View More Button */}
       {visibleCount < filteredCompanies.length && (
         <div className="flex justify-center pb-12">
           <button 
@@ -871,6 +996,23 @@ export default function CompaniesPage() {
           const low52W = prices.length ? Math.min(...prices) : parseFloat(selectedCompany.price);
           const highDate = filteredGraphData.find(d => parseFloat(d.market_price) === high52W)?.price_date;
           const lowDate = filteredGraphData.find(d => parseFloat(d.market_price) === low52W)?.price_date;
+          const [modalQuantity, setModalQuantity] = useState(1);
+          const modalMaxLot = selectedCompany.min_lot_size || Infinity;
+
+          const handleModalQuantityChange = (newQuantity: number) => {
+            if (newQuantity >= 1 && newQuantity <= modalMaxLot) {
+              setModalQuantity(newQuantity);
+            }
+          };
+
+          const handleModalQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = parseInt(e.target.value);
+            if (!isNaN(value) && value >= 1 && value <= modalMaxLot) {
+              setModalQuantity(value);
+            } else if (value === 0) {
+              setModalQuantity(1);
+            }
+          };
           
           return (
             <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
@@ -1068,21 +1210,49 @@ export default function CompaniesPage() {
                         </div>
                       </div>
 
-                      {/* Action Card */}
+                      {/* Action Card with Quantity Selector */}
                       <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm">
                         <h4 className="text-sm font-bold text-gray-900 mb-3 text-center">Ready to Invest?</h4>
-                        <p className="text-xs text-gray-500 mb-6 text-center font-bold">
+                        <p className="text-xs text-gray-500 mb-4 text-center font-bold">
                           Min investment: ₹{calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}
                         </p>
                         
+                        <div className="flex items-center justify-center gap-3 bg-white rounded-xl p-2 border border-gray-200 mb-4">
+                          <button
+                            onClick={() => handleModalQuantityChange(modalQuantity - 1)}
+                            className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                            disabled={modalQuantity <= 1}
+                          >
+                            <Minus size={16} />
+                          </button>
+                          <input
+                            type="number"
+                            value={modalQuantity}
+                            onChange={handleModalQuantityInput}
+                            className="w-20 text-center border border-gray-200 rounded-lg py-2 text-sm focus:outline-none focus:border-[#2076C7]"
+                            min="1"
+                            max={modalMaxLot}
+                          />
+                          <button
+                            onClick={() => handleModalQuantityChange(modalQuantity + 1)}
+                            className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                            disabled={modalQuantity >= modalMaxLot}
+                          >
+                            <Plus size={16} />
+                          </button>
+                        </div>
+                        <p className="text-xs text-center text-gray-400 mb-4">
+                          Max lot: {modalMaxLot === Infinity ? 'Unlimited' : modalMaxLot.toLocaleString()} shares
+                        </p>
+
                         <button
                           onClick={() => {
+                            addToCart(enriched, modalQuantity);
                             setSelectedCompany(null);
-                            handleBuyNow(enriched);
                           }}
-                          className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all"
+                          className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
                         >
-                          Buy Now
+                          <ShoppingCart size={18} /> Add to Cart
                         </button>
                         
                         <p className="text-xs text-gray-400 text-center mt-3">
@@ -1121,6 +1291,167 @@ export default function CompaniesPage() {
             </div>
           );
         })()}
+      </AnimatePresence>
+
+      {/* Cart Drawer */}
+      <AnimatePresence>
+        {showCartDrawer && (
+          <>
+            <div className="fixed inset-0 bg-black/50 z-[1000]" onClick={() => setShowCartDrawer(false)} />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25 }}
+              className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-[1001] flex flex-col"
+            >
+              <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white">
+                <h2 className="text-xl font-bold">
+                  {checkoutStep === 'cart' ? 'Your Cart' : 'Payment Details'}
+                </h2>
+                <button onClick={() => setShowCartDrawer(false)} className="p-1 hover:bg-white/20 rounded-lg transition">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4">
+                {checkoutStep === 'cart' ? (
+                  cartItems.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500">
+                      <ShoppingCart size={48} className="mx-auto mb-4 opacity-50" />
+                      <p>Your cart is empty</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {cartItems.map((item) => {
+                        const maxLot = item.company.min_lot_size || Infinity;
+                        return (
+                          <div key={item.id} className="bg-gray-50 rounded-xl p-4 flex gap-3">
+                            <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center border border-gray-100">
+                              {item.company.logo_url ? (
+                                <Image src={item.company.logo_url} width={60} height={60} className="object-contain" alt={item.company.shares_name} />
+                              ) : (
+                                <span className="text-xl font-bold text-[#2076C7]">{item.company.shares_name.charAt(0)}</span>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-bold text-gray-900">{item.company.shares_name}</h4>
+                              <p className="text-[#2076C7] font-bold">{formatCurrency(item.company.price)}</p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <button
+                                  onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
+                                  className="p-1 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                  disabled={item.quantity <= 1}
+                                >
+                                  <Minus size={14} />
+                                </button>
+                                <input
+                                  type="number"
+                                  value={item.quantity}
+                                  onChange={(e) => {
+                                    const val = parseInt(e.target.value);
+                                    if (!isNaN(val) && val >= 1 && val <= maxLot) {
+                                      updateCartQuantity(item.id, val);
+                                    }
+                                  }}
+                                  className="w-16 text-center border border-gray-200 rounded-lg py-1 text-gray-800 focus:outline-none focus:border-[#2076C7]"
+                                  min="1"
+                                  max={maxLot}
+                                />
+                                <button
+                                  onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
+                                  className="p-1 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                  disabled={item.quantity >= maxLot}
+                                >
+                                  <Plus size={14} />
+                                </button>
+                                <button
+                                  onClick={() => removeFromCart(item.id)}
+                                  className="ml-auto text-red-500 text-xs hover:underline"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                              <p className="text-xs text-gray-400 mt-1">
+                                Max lot: {maxLot === Infinity ? 'Unlimited' : maxLot.toLocaleString()} shares
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )
+                ) : (
+                  // Payment Step - Simplified to Net Banking Only
+                  <div className="space-y-6">
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h3 className="font-bold text-gray-900 mb-3">Order Summary</h3>
+                      {cartItems.map((item) => (
+                        <div key={item.id} className="text-sm justify-between text-gray-800 mb-2">
+                          <span>{item.company.shares_name} x {item.quantity}</span> &nbsp;= &nbsp;
+                          <span>{((parseFloat(item.company.price) * item.quantity).toString())}</span>
+                        </div>
+                      ))}
+                      <div className="border-t border-gray-200 text-gray-900 pt-2 mt-2 flex justify-between font-bold">
+                        <span>Total</span>
+                        <span className="text-[#2076C7]">{formatCurrency(getCartTotal().toString())}</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                      <div className="flex items-center gap-3 mb-3">
+                        <CreditCard size={20} className="text-[#2076C7]" />
+                        <h3 className="font-bold text-gray-900">Payment Method: Net Banking</h3>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        Payment will be processed through our secure net banking partner.
+                      </p>
+                    </div>
+
+                    <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-100">
+                      <p className="text-xs text-yellow-700">
+                        <strong>Note:</strong> After confirmation, our team will contact you within 24 hours to complete the transaction via Net Banking.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4 border-t border-gray-100 bg-gray-50">
+                {checkoutStep === 'cart' ? (
+                  <>
+                    <div className="flex justify-between mb-4">
+                      <span className="text-gray-600">Total Amount:</span>
+                      <span className="text-xl font-bold text-[#2076C7]">{formatCurrency(getCartTotal().toString())}</span>
+                    </div>
+                    <button
+                      onClick={handleProceedToPayment}
+                      disabled={cartItems.length === 0}
+                      className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Proceed to Net Banking Payment
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleBackToCart}
+                      className="flex-1 py-3 border border-gray-300 text-gray-700 font-bold rounded-xl hover:bg-gray-100"
+                    >
+                      Back to Cart
+                    </button>
+                    <button
+                      onClick={handlePaymentConfirm}
+                      className="flex-1 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-xl"
+                    >
+                      Confirm & Pay via Net Banking
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
       </AnimatePresence>
     </div>
   );
