@@ -2,41 +2,41 @@
 
 import { motion } from 'framer-motion';
 import { 
-    IconBuildingSkyscraper, 
-    IconShoppingCart, 
-    IconCreditCard, 
-    IconPackages,
-    IconChecklist,
-    IconArrowWaveRightUp
-} from '@tabler/icons-react';
+    Building,
+    ShoppingCart, 
+    CreditCard, 
+    CheckCircle,
+    ArrowUpRight,
+    Package
+} from 'lucide-react';
 
 const steps = [
     { 
-        icon: IconBuildingSkyscraper, 
+        icon: Building, 
         title: 'Select Company', 
         desc: 'Browse and choose from our curated list of high-growth pre-IPO companies based on your investment goals.', 
         color: 'bg-blue-50 text-blue-600' 
     },
     { 
-        icon: IconShoppingCart, 
+        icon: ShoppingCart, 
         title: 'Buy Shares', 
         desc: 'Select the number of shares you wish to purchase and review the investment amount before proceeding.', 
         color: 'bg-indigo-50 text-indigo-600' 
     },
     { 
-        icon: IconCreditCard, 
+        icon: CreditCard, 
         title: 'Transaction & Payment', 
         desc: 'Complete the payment securely via our integrated payment gateway or direct bank transfer with ESCROW protection.', 
         color: 'bg-teal-50 text-teal-600' 
     },
     { 
-        icon: IconPackages, 
+        icon: Package, 
         title: 'Demat Transfer', 
         desc: 'Shares are transferred to your Demat account within 24-48 hours after successful payment verification.', 
         color: 'bg-sky-50 text-sky-600' 
     },
     { 
-        icon: IconChecklist, 
+        icon: CheckCircle, 
         title: 'Confirmation & Updates', 
         desc: 'Receive email confirmation and regular updates on your investment portfolio performance.', 
         color: 'bg-emerald-50 text-emerald-600' 
@@ -103,7 +103,7 @@ export default function InvestmentProcess() {
                                     {/* Connector Arrow for Desktop (except last) */}
                                     {!isLast && (
                                         <div className="hidden xl:block absolute -right-8 top-8 text-[#2076C7]/20">
-                                            <IconArrowWaveRightUp size={32} strokeWidth={1} />
+                                            <ArrowUpRight size={32} strokeWidth={1} />
                                         </div>
                                     )}
                                 </div>

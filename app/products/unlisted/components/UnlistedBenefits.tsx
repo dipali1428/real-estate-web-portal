@@ -3,17 +3,17 @@
 import { motion } from 'framer-motion';
 import { useRef } from 'react';
 import { 
-    IconTrendingUp, IconShieldCheck, IconBuildingSkyscraper, 
-    IconChartPie, IconClock, IconAward, IconChevronLeft, IconChevronRight 
-} from '@tabler/icons-react';
+    TrendingUp, ShieldCheck, Building, 
+    ChartPie, Clock, Award, ChevronLeft, ChevronRight,
+} from 'lucide-react';
 
 const benefits = [
-    { icon: IconTrendingUp, title: 'High Return Potential', desc: 'Higher returns vs listed equities, especially post-IPO. Capitalize on early growth phases.' },
-    { icon: IconShieldCheck, title: 'Early Entry Advantage', desc: 'Invest before public listing at lower valuations before institutional premiums apply.' },
-    { icon: IconBuildingSkyscraper, title: 'Access to Unicorns', desc: 'Exclusive access to fast-growing pre-IPO companies and late-stage startups.' },
-    { icon: IconChartPie, title: 'Portfolio Diversification', desc: 'Low correlation with public stock markets, helping balance your overall portfolio risk.' },
-    { icon: IconClock, title: 'Long-term Wealth', desc: 'Participate in the multi-year growth stories of emerging market leaders.' },
-    { icon: IconAward, title: 'Pre-IPO Allocation', desc: 'Secure your share allocation before the highly oversubscribed public issues launch.' }
+    { icon: TrendingUp, title: 'High Return Potential', desc: 'Higher returns vs listed equities, especially post-IPO. Capitalize on early growth phases.' },
+    { icon: ShieldCheck, title: 'Early Entry Advantage', desc: 'Invest before public listing at lower valuations before institutional premiums apply.' },
+    { icon: Building, title: 'Access to Unicorns', desc: 'Exclusive access to fast-growing pre-IPO companies and late-stage startups.' },
+    { icon: ChartPie, title: 'Portfolio Diversification', desc: 'Low correlation with public stock markets, helping balance your overall portfolio risk.' },
+    { icon: Clock, title: 'Long-term Wealth', desc: 'Participate in the multi-year growth stories of emerging market leaders.' },
+    { icon: Award, title: 'Pre-IPO Allocation', desc: 'Secure your share allocation before the highly oversubscribed public issues launch.' }
 ];
 
 export default function UnlistedBenefits() {
@@ -58,13 +58,13 @@ export default function UnlistedBenefits() {
                         onClick={() => scroll('left')} 
                         className="w-12 h-12 rounded-full border border-slate-100 bg-white shadow-md flex items-center justify-center text-[#2076C7] active:scale-90 transition-all"
                     >
-                        <IconChevronLeft size={24} strokeWidth={2.5} />
+                        <ChevronLeft size={24} strokeWidth={2.5} />
                     </button>
                     <button 
                         onClick={() => scroll('right')} 
                         className="w-12 h-12 rounded-full border border-slate-100 bg-white shadow-md flex items-center justify-center text-[#2076C7] active:scale-90 transition-all"
                     >
-                        <IconChevronRight size={24} strokeWidth={2.5} />
+                        <ChevronRight size={24} strokeWidth={2.5} />
                     </button>
                 </div>
 
@@ -76,7 +76,7 @@ export default function UnlistedBenefits() {
                         onClick={() => scroll('left')} 
                         className="hidden md:flex absolute -left-6 z-20 w-12 h-12 rounded-full border border-slate-50 bg-white items-center justify-center text-[#2076C7] hover:bg-[#2076C7] hover:text-white transition-all active:scale-90 shadow-[0_10px_25px_rgba(0,0,0,0.1)]"
                     >
-                        <IconChevronLeft size={24} strokeWidth={2.5} />
+                        <ChevronLeft size={24} strokeWidth={2.5} />
                     </button>
 
                     <div 
@@ -117,7 +117,7 @@ export default function UnlistedBenefits() {
                         onClick={() => scroll('right')} 
                         className="hidden md:flex absolute -right-6 z-20 w-12 h-12 rounded-full border border-slate-50 bg-white items-center justify-center text-[#2076C7] hover:bg-[#2076C7] hover:text-white transition-all active:scale-90 shadow-[0_10px_25px_rgba(0,0,0,0.1)]"
                     >
-                        <IconChevronRight size={24} strokeWidth={2.5} />
+                        <ChevronRight size={24} strokeWidth={2.5} />
                     </button>
                 </div>
             </div>

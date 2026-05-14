@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { IconArrowRight } from '@tabler/icons-react';
 import React, { useState } from 'react';
 import { useModal } from '../../../context/ModalContext';
 import { createEnquiry } from '../../../services/unlistedservices';
@@ -12,7 +11,7 @@ import {
     Loader2, 
     Building,
     Calculator,
-    CheckCircle 
+    CheckCircle, ArrowRight
 } from 'lucide-react';
 
 // Define Enquiry type for API calls
@@ -192,7 +191,7 @@ export default function UnlistedCTA() {
                                 className="group flex items-center justify-center gap-3 px-10 py-4 bg-white text-teal-600 rounded-xl font-extrabold text-base shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 w-full sm:w-auto"
                             >
                                 Create Free Account
-                                <IconArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                             </button>
                             
                             {/* Enquire Now Button - Opens Enquiry Modal */}
