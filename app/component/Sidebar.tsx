@@ -106,16 +106,54 @@ export default function DashboardSidebar({ role }: { role: Role }) {
 
           {/* Footer */}
           <div>
+            {role === "DSA" && (
               <div className="mx-2 mb-8 flex flex-col items-center justify-center rounded-xl bg-white p-4 shadow-sm border border-neutral-200">
                 <img
-                  src="/QR/IVishva_QR.png" // Replace with your actual QR path or API URL
+                  src="/QR/IVishva_QR.png"
                   alt="QR Code"
-                  className="h-28 w-28 object-contain"
+                  className="h-32 w-32 object-contain"
                 />
                 <p className="mt-2 text-center text-[10px] font-medium text-neutral-500">
                   Scan to download App
                 </p>
+                <div className="mt-2 flex items-center mr-2 gap-4">
+                  <img
+                    src="/icons/play-store-logo.png" // Change to your actual filename
+                    alt="Play Store"
+                    className="h-10 w-auto object-contain"
+                  />
+                  <img
+                    src="/icons/android_logo.png" // Change to your actual filename
+                    alt="Android"
+                    className="h-6 w-auto object-contain"
+                  />
+                </div>
               </div>
+            )}
+            {role === "CUSTOMER" && (
+              <div className="mx-2 mb-8 flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-sm border border-neutral-200">
+                <img
+                  src="/QR/Infinity_App_QR.png"
+                  alt="QR Code"
+                  className="h-35 w-35 object-contain"
+                />
+                <p className="mt-2 text-center text-[10px] font-medium text-neutral-500">
+                  Scan to download App
+                </p>
+                <div className="mt-2 flex items-center mr-2 gap-4">
+                  <img
+                    src="/icons/play-store-logo.png" // Change to your actual filename
+                    alt="Play Store"
+                    className="h-10 w-auto object-contain"
+                  />
+                  <img
+                    src="/icons/android_logo.png" // Change to your actual filename
+                    alt="Android"
+                    className="h-6 w-auto object-contain"
+                  />
+                </div>
+              </div>
+            )}
             <SidebarLink
               link={{
                 label: "Logout",

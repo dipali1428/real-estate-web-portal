@@ -196,24 +196,25 @@ export default function LeadManagementPage() {
           </div>
 
           {/* Body Content */}
-          <LeadTable
-            onEdit={(lead) => {
-              toast(`Opening ${lead.clientName}`, {
-              });
-            }}
-            onDelete={(lead) => {
-              toast.success(`${lead.clientName} deleted successfully`);
-            }}
-          />
+          {viewMode === 'table' ? (
+            <LeadTable
+              onEdit={(lead) => {
+                toast(`Opening ${lead.clientName}`, {});
+              }}
+              onDelete={(lead) => {
+                toast.success(`${lead.clientName} deleted successfully`);
+              }}
+            />
+          ) : (
             <div className="mt-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
               <div className="mb-6 flex flex-wrap gap-2">
-                {tabs.map(tab => (
+                {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`py-2 px-5 rounded-full font-medium text-sm border transition-all ${activeTab === tab.id
-                      ? 'bg-[#2076C7] text-white border-[#2076C7] shadow-md'
-                      : 'bg-white text-slate-600 border-slate-300 hover:border-slate-400'
+                        ? "bg-[#2076C7] text-white border-[#2076C7] shadow-md"
+                        : "bg-white text-slate-600 border-slate-300 hover:border-slate-400"
                       }`}
                   >
                     {tab.name}
@@ -222,28 +223,29 @@ export default function LeadManagementPage() {
               </div>
 
               <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
-                {Object.entries(productCards).map(([tabId, products]) => (
-                  activeTab === tabId && (
-                    <div
-                      key={tabId}
-                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
-                    >
-                      {products.map((product, index) => (
-                        <ProductCard
-                          key={index}
-                          title={product.title}
-                          description={product.description}
-                          onClick={product.onClick}
-                          activeLeads={product.activeLeads}
-                          converted={product.converted}
-                        />
-                      ))}
-                    </div>
-                  )
-                ))}
+                {Object.entries(productCards).map(
+                  ([tabId, products]) =>
+                    activeTab === tabId && (
+                      <div
+                        key={tabId}
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+                      >
+                        {products.map((product, index) => (
+                          <ProductCard
+                            key={index}
+                            title={product.title}
+                            description={product.description}
+                            onClick={product.onClick}
+                            activeLeads={product.activeLeads}
+                            converted={product.converted}
+                          />
+                        ))}
+                      </div>
+                    )
+                )}
               </div>
             </div>
-          )
+          )}
         </div>
       </section>
 
