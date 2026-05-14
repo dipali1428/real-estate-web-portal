@@ -52,7 +52,7 @@ export default function DSAAgreement() {
 
   const handleDownload = async () => {
     // We use the uuid from the profile state fetched during useEffect
-    const uuid = profile?.agreementUuid;
+    const uuid = profile?.request_uuid; 
     const name = profile?.name || "DSA";
 
     if (!uuid) {
@@ -226,7 +226,7 @@ export default function DSAAgreement() {
           </p>
 
           {/* --- ADD THIS BUTTON SECTION --- */}
-          {/* <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-4">
             <button
               onClick={handleDownload}
               disabled={downloadingId !== null}
@@ -240,7 +240,7 @@ export default function DSAAgreement() {
               {downloadingId ? "Preparing PDF..." : "Download Agreement Copy"}
             </button>
             <p className="text-xs text-gray-400 font-medium italic">Sign via the link sent to your email to activate partnership.</p>
-          </div> */}
+          </div>
           {/* ------------------------------ */}
 
         </div>
