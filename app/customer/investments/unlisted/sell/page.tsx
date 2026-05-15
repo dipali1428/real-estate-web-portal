@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Search, HandCoins, CheckCircle, ChevronDown, Check, TrendingUp, Send, Info, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -93,6 +93,26 @@ export default function SellSharesComponent() {
       total: price * parseInt(qtyToSell)
     });
   };
+
+  // 5. Handle Sell Shares
+  const handleSellShares = useCallback(() => {
+    if (!selectedCompany || !calcResult) {
+      toast.error('Please calculate the value before proceeding');
+      return;
+    }
+    
+    toast.success(
+      `Sell order placed successfully for ${selectedCompany.shares_name}! Our team will contact you shortly via email for the transaction process.`,
+    );
+    
+    // Reset the form after successful submission
+    setSelectedCompany(null);
+    setQtyToSell('');
+    setCalcResult(null);
+    
+    // Optional: Scroll back to top of the companies list
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [selectedCompany, calcResult]);
 
   if (loading) {
     return (
@@ -227,7 +247,7 @@ export default function SellSharesComponent() {
                 {/* Button: Reduced padding and font size */}
                 <button 
                   onClick={handleCalculate}
-                  className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-black transition-all shadow-md flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-[#2076C7] text-white rounded-xl font-bold text-sm hover:bg-[#1CADA3] transition-all shadow-md flex items-center justify-center gap-2"
                 >
                   Calculate Estimated Value
                 </button>
@@ -254,7 +274,10 @@ export default function SellSharesComponent() {
                             <div className="text-base font-bold text-gray-700">T+7 Days</div>
                         </div>
                     </div>
-                    <button className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2">
+                    <button 
+                      onClick={handleSellShares}
+                      className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+                    >
                       <Send size={16} /> SELL SHARES NOW
                     </button>
                   </div>
