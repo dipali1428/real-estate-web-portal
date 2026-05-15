@@ -158,6 +158,18 @@ alt="Google Play"
 className="h-10 sm:h-12 object-contain"
 />
 </a>
+<a
+href="https://apps.apple.com/us/app/infi-world/id6762125519"
+target="_blank"
+rel="noopener noreferrer"
+className="transition-all duration-300 transform hover:-translate-y-1"
+>
+<img
+src="/icons/App_Store.png"
+alt="Apple Store"
+className="h-10 sm:h-12 object-contain"
+/>
+</a>
 
 </div>
 
