@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "../component/ui/sidebar";
 import { cn } from "../lib/utils";
-import { LogOut, ChevronDown, ChevronRight } from "lucide-react";
+import { LogOut, ChevronDown, ChevronRight, Smartphone, Apple } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { getSidebarLinks, Role } from "../utils/getSidebarLinks";
 
@@ -14,11 +14,43 @@ export interface SidebarItem {
   children?: SidebarItem[];
 }
 
+// Helper component for the Toggle
+const PlatformToggle = ({ 
+  platform, 
+  setPlatform 
+}: { 
+  platform: "android" | "ios", 
+  setPlatform: (p: "android" | "ios") => void 
+}) => (
+  <div className="flex bg-gray-200 p-1 rounded-lg mb-3 mx-2">
+    <button
+      onClick={() => setPlatform("android")}
+      className={cn(
+        "flex-1 flex items-center justify-center gap-1 py-1 text-[10px] font-bold rounded-md transition-all",
+        platform === "android" ? "bg-white shadow-sm text-black" : "text-gray-500"
+      )}
+    >
+      <Smartphone size={12} /> Android
+    </button>
+    <button
+      onClick={() => setPlatform("ios")}
+      className={cn(
+        "flex-1 flex items-center justify-center gap-1 py-1 text-[10px] font-bold rounded-md transition-all",
+        platform === "ios" ? "bg-white shadow-sm text-black" : "text-gray-500"
+      )}
+    >
+      <Smartphone size={12} /> iOS
+    </button>
+  </div>
+);
+
 export default function DashboardSidebar({ role }: { role: Role }) {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  // New state for platform
+  const [platform, setPlatform] = useState<"android" | "ios">("android");
 
   const links = getSidebarLinks(role) as SidebarItem[];
 
@@ -48,7 +80,6 @@ export default function DashboardSidebar({ role }: { role: Role }) {
 
       return (
         <div key={key}>
-          {/* Parent Button */}
           <button
             onClick={() => {
               if (hasChildren) {
@@ -80,7 +111,6 @@ export default function DashboardSidebar({ role }: { role: Role }) {
             )}
           </button>
 
-          {/* Children */}
           {hasChildren && isExpanded && (
             <div className="flex flex-col gap-1 mt-1">
               {renderLinks(item.children!, level + 1, key)}
@@ -91,69 +121,65 @@ export default function DashboardSidebar({ role }: { role: Role }) {
     });
   };
 
+  // Helper to determine QR paths
+  const getQRData = () => {
+    if (role === "DSA") {
+      return {
+        qr: platform === "android" ? "/QR/IVishva_Android_QR.png" : "/QR/IVishva_IOS_QR.png", // Update paths as needed
+        storeIcon: platform === "android" ? "/icons/Play_Store_Logo.png" : "/icons/Apple_Store_Logo.png",
+        platformIcon: platform === "android" ? "/icons/android_logo.png" : "/icons/Apple_Device_Logo.png",
+      };
+    }
+    return {
+      qr: platform === "android" ? "/QR/InfiWorld_Android_QR.png" : "/QR/InfiWorld_IOS_QR.png",
+      storeIcon: platform === "android" ? "/icons/Play_Store_Logo.png" : "/icons/Apple_Store_Logo.png",
+      platformIcon: platform === "android" ? "/icons/android_logo.png" : "/icons/Apple_Device_Logo.png",
+    };
+  };
+
+  const qrData = getQRData();
+
   return (
     <div className="flex h-full flex-col border-r border-neutral-300">
       <Sidebar open={open} setOpen={setOpen} animate={false}>
         <SidebarBody className="justify-between gap-10">
-          {/* Logo Section */}
           <div className="flex flex-1 flex-col overflow-x-hidden bg-gray-100">
             <Logo />
-
             <div className="mt-8 flex flex-col gap-1">
               {renderLinks(links)}
             </div>
           </div>
 
-          {/* Footer */}
           <div>
-            {role === "DSA" && (
-              <div className="mx-2 mb-8 flex flex-col items-center justify-center rounded-xl bg-white p-4 shadow-sm border border-neutral-200">
-                <img
-                  src="/QR/IVishva_QR.png"
-                  alt="QR Code"
-                  className="h-32 w-32 object-contain"
-                />
-                <p className="mt-2 text-center text-[10px] font-medium text-neutral-500">
-                  Scan to download App
-                </p>
-                <div className="mt-2 flex items-center mr-2 gap-4">
+            {(role === "DSA" || role === "CUSTOMER") && (
+              <div className="mx-2 mb-4">
+                <PlatformToggle platform={platform} setPlatform={setPlatform} />
+                
+                <div className="flex flex-col items-center justify-center rounded-xl bg-white p-4 shadow-sm border border-neutral-200 transition-all">
                   <img
-                    src="/icons/play-store-logo.png" // Change to your actual filename
-                    alt="Play Store"
-                    className="h-10 w-auto object-contain"
+                    src={qrData.qr}
+                    alt={`${platform} QR Code`}
+                    className="h-32 w-32 object-contain"
                   />
-                  <img
-                    src="/icons/android_logo.png" // Change to your actual filename
-                    alt="Android"
-                    className="h-6 w-auto object-contain"
-                  />
+                  <p className="mt-2 text-center text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
+                    Scan for {platform} App
+                  </p>
+                  <div className="mt-2 flex items-center justify-center gap-4">
+                    <img
+                      src={qrData.storeIcon}
+                      alt="Store logo"
+                      className="h-6 w-auto object-contain"
+                    />
+                    <img
+                      src={qrData.platformIcon}
+                      alt="Platform logo"
+                      className="h-6 w-auto object-contain"
+                    />
+                  </div>
                 </div>
               </div>
             )}
-            {role === "CUSTOMER" && (
-              <div className="mx-2 mb-8 flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-sm border border-neutral-200">
-                <img
-                  src="/QR/Infinity_App_QR.png"
-                  alt="QR Code"
-                  className="h-35 w-35 object-contain"
-                />
-                <p className="mt-2 text-center text-[10px] font-medium text-neutral-500">
-                  Scan to download App
-                </p>
-                <div className="mt-2 flex items-center mr-2 gap-4">
-                  <img
-                    src="/icons/play-store-logo.png" // Change to your actual filename
-                    alt="Play Store"
-                    className="h-10 w-auto object-contain"
-                  />
-                  <img
-                    src="/icons/android_logo.png" // Change to your actual filename
-                    alt="Android"
-                    className="h-6 w-auto object-contain"
-                  />
-                </div>
-              </div>
-            )}
+
             <SidebarLink
               link={{
                 label: "Logout",
