@@ -137,6 +137,12 @@ const AboutSection = () => {
             title: "CRM Manager – Real Estate (PCMC Branch)",
             description: "With over 10 years of experience in financial institutes and real estate, he specializes in CRM management, sales growth, loan coordination, client relationship management, and delivering seamless customer experiences through effective team coordination and performance optimization.",
             image: "/leader/mr-swami.png"
+        },
+        {
+            name: "Mr. Girijatmaj Sarnikar",
+            title: "Branch Manager (Jalna Branch)",
+            description: "Mr. Girijatmaj Sarnikar brings 2+ years of experience in Lending and Financial Services, specializing in sales growth, client relationship management, business development, and profitable branch performance through strong leadership and market expertise.",
+            image: "/leader/mr-sarnikar.png"
         }
 
     ];
@@ -234,6 +240,13 @@ const AboutSection = () => {
             lines: ["Ganga Aashiyana Sosa Road,", "Near Purnabhamha Hotel,", "Thergaon, Pimpri-Chinchwad", "Maharashtra - 411033"]
         },
         {
+            title: "Jalna Branch",
+            manager: "Girijatmaj Sarnikar",
+            mobile: "+91 96077 57794",
+            email: " girijatmajsarnikar@infinityarthvishva.com",
+            lines: ["07, Kalptaru Park", "Opp Jalna Hospital", "Near Ambad Chaufuly", "Jalna, Maharashtra – 431203"]
+        },
+        {
             title: "Kanpur Branch",
             lines: ["Office No. 01, Kamlist Tower", "Behind Mishra Jewellers, Near Joga Bhogha Chauraha", "Nehru Nagar, Shuklaganj", "Kanpur, Unnao, Uttar Pradesh - 209861"]
         },
@@ -242,8 +255,6 @@ const AboutSection = () => {
             title: "Kolkata Branch",
             lines: ["PS Qube, Room No. 620, 6th Floor", "Plot No. IID/31/1, NewTown", "Kolkata, West Bengal - 700135"]
         },
-
-
         {
             title: "Chiplun Branch",
             lines: ["United Classic, 203/204, 2nd Floor", "Near Old S.T. Stand", "Chiplun Bazarpeth", "Chiplun, Maharashtra - 415605"]
@@ -252,14 +263,10 @@ const AboutSection = () => {
             title: "Ratnagiri Branch",
             lines: ["S No. A-4", "Soham Samarth Apartment, S.V. Road", "Maruti Mandir", "Ratnagiri, Maharashtra - 415612"]
         },
-
-
         {
             title: "Jalna Branch",
             lines: ["Office No 1, Base Floor", "Banjara Tower Ambad Road", "Jalna 431203"]
         },
-
-
     ];
 
     return (
@@ -348,60 +355,33 @@ const AboutSection = () => {
                                 </h3>
                                 <div className="w-16 h-0.5 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mt-2"></div>
                             </div>
-
-                            {/* Branch Heads Grid - Top 10 Branch Heads */}
-                            <div className="max-w-[95rem] mx-auto gap-8 mb-12">
-                                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
-                                    {leaders.slice(8, 18).map((leader, index) => (
-                                        <div
-                                            key={index + 8}
-                                            className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
-                                        >
-                                            <div className="w-full aspect-square overflow-hidden">
-                                                <Image
-                                                    src={leader.image}
-                                                    alt={leader.name}
-                                                    width={800}
-                                                    height={360}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                />
-                                            </div>
-                                            <div className="p-6 text-center">
-                                                <h3 className="text-lg font-bold text-gray-800 mb-1">{leader.name}</h3>
-                                                <p className="text-[#2076C7] font-semibold mb-3">{leader.title}</p>
-                                                <p className="text-gray-800 text-sm leading-relaxed">{leader.description}</p>
-                                            </div>
+                            
+                        {/* Branch Heads Grid - Combined for perfect alignment */}
+                        <div className="max-w-[95rem] mx-auto mb-12">
+                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
+                                {leaders.slice(8).map((leader, index) => (
+                                    <div
+                                        key={index + 8}
+                                        className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+                                    >
+                                        <div className="w-full aspect-square overflow-hidden">
+                                            <Image
+                                                src={leader.image}
+                                                alt={leader.name}
+                                                width={800}
+                                                height={360}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            />
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* New Row: 2 Leaders Centered (Sanjay Kankariya & Sumeet Raju Nikalje) */}
-                            <div className="max-w-[95rem] mx-auto gap-8 mb-12">
-                                <div className="flex flex-wrap justify-center gap-8 mb-12">
-                                    {leaders.slice(18).map((leader, index) => (
-                                        <div
-                                            key={index + 18}
-                                            className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 w-full md:w-[calc(50%-1.5rem)] lg:w-[calc(20%-1.5rem)]"
-                                        >
-                                            <div className="w-full aspect-square overflow-hidden">
-                                                <Image
-                                                    src={leader.image}
-                                                    alt={leader.name}
-                                                    width={800}
-                                                    height={360}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                />
-                                            </div>
-                                            <div className="p-6 text-center">
-                                                <h3 className="text-lg font-bold text-gray-800 mb-1">{leader.name}</h3>
-                                                <p className="text-[#2076C7] font-semibold mb-3">{leader.title}</p>
-                                                <p className="text-gray-800 text-sm leading-relaxed">{leader.description}</p>
-                                            </div>
+                                        <div className="p-6 text-center">
+                                            <h3 className="text-lg font-bold text-gray-800 mb-1">{leader.name}</h3>
+                                            <p className="text-[#2076C7] font-semibold mb-3">{leader.title}</p>
+                                            <p className="text-gray-800 text-sm leading-relaxed">{leader.description}</p>
                                         </div>
-                                    ))}
-                                </div>
+                                    </div>
+                                ))}
                             </div>
+                        </div>
                         </div>
                     </div>
 
