@@ -17,6 +17,7 @@ const ContactSection = ({ productName }: ContactSectionProps) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [qrType, setQrType] = useState<"android" | "ios">("android");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -354,17 +355,37 @@ const ContactSection = ({ productName }: ContactSectionProps) => {
             <div className="flex-1 text-center md:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1CADA3]/10 text-[#1CADA3] font-medium text-sm mb-4">
                 <QrCode className="w-4 h-4" />
-                <span>Quick Connect</span>
+                <span>Quick App Download</span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Scan to Connect</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3">Scan to Download</h3>
               <p className="text-gray-600 mb-4">
-                Scan this QR code to download the app.
+                Scan this QR code to download the Infi World app.
               </p>
+              <div className="flex items-center justify-center md:justify-start p-1 bg-gray-100 rounded-lg w-fit mx-auto md:mx-0">
+                <button
+                  onClick={() => setQrType("android")}
+                  className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${qrType === "android" ? "bg-white text-[#1CADA3] shadow-sm" : "text-gray-500 hover:text-gray-700"
+                    }`}
+                >
+                  Android
+                </button>
+                <button
+                  onClick={() => setQrType("ios")}
+                  className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${qrType === "ios" ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-500 hover:text-gray-700"
+                    }`}
+                >
+                  iOS (App Store)
+                </button>
+              </div>
             </div>
 
             <div className="shrink-0 bg-white p-4 rounded-2xl border-2 border-dashed border-[#1CADA3]/30">
-              <div className="bg-gray-100 w-40 h-40 rounded-xl flex items-center justify-center">
-                <img src="/QR/Infinity_App_QR.png" alt="QR Code" className="w-full h-full object-contain" />
+              <div className="bg-gray-100 w-40 h-40 rounded-xl flex items-center justify-center overflow-hidden">
+                <img
+                  src={qrType === "android" ? "/QR/Infinity_App_QR.png" : "/QR/InfiWorld_Android_QR.png"}
+                  alt={`${qrType} QR Code`}
+                  className="w-full h-full object-contain transition-opacity duration-300"
+                />
               </div>
             </div>
           </div>
