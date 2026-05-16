@@ -130,7 +130,7 @@ const HeroSection = () => {
                                     clipRule="evenodd"
                                 />
                             </svg>
-                            <span className="font-medium">3000+ Active DSA Partners</span>
+                            <span className="font-medium">3200+ Active DSA Partners</span>
                         </div>
 
                         <div className="flex items-center gap-2">
