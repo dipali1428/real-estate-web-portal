@@ -45,7 +45,8 @@ import {
     Building2,
     Equal,
     CalendarDays ,
-    BriefcaseBusiness
+    BriefcaseBusiness,
+    Weight,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -184,6 +185,7 @@ export const sidebarLinks = {
      BRANCH: [
         { label: "Branch Dashboard", href: "/branch", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/branch/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
+        { label: "DSA Management", href: "/branch/dsamanagement", icon: <Weight className="h-5 w-5 text-neutral-700" /> },
         { label: "My Branch Dsa's", href: "/branch/branches", icon: <Users className="h-5 w-5 text-neutral-700" /> },
 
     ],
