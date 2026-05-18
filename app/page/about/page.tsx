@@ -237,7 +237,7 @@ const AboutSection = () => {
             manager: "Mr. Pravin Swami",
             mobile: "+91 91463 00555",
             email: "pravinswami@infinityarthvishva.com",
-            lines: ["Ganga Aashiyana Sosa Road,", "Near Purnabhamha Hotel,", "Thergaon, Pimpri-Chinchwad", "Maharashtra - 411033"]
+            lines: ["Ganga Aashiyana Sosa Road,", "Near Purnabhamha Hotel,", "Thergaon, Pimpri-Chinchwad,", "Maharashtra - 411033"]
         },
         {
             title: "Jalna Branch",
@@ -245,6 +245,13 @@ const AboutSection = () => {
             mobile: "+91 96077 57794",
             email: " girijatmajsarnikar@infinityarthvishva.com",
             lines: ["07, Kalptaru Park", "Opp Jalna Hospital", "Near Ambad Chaufuly", "Jalna, Maharashtra – 431203"]
+        },
+        {
+            title: "Jalna Branch",
+            manager: "Mr. Rahul Gadekar",
+            mobile: "+91 98901 41450",
+            email: "rahulgadekar@infinityarthvishva.com",
+            lines: ["Office No 1,", "Base Floor,", "Banjara Tower Ambad Road,", "Jalna, Maharashtra – 431203"]
         },
         {
             title: "Kanpur Branch",
@@ -263,10 +270,7 @@ const AboutSection = () => {
             title: "Ratnagiri Branch",
             lines: ["S No. A-4", "Soham Samarth Apartment, S.V. Road", "Maruti Mandir", "Ratnagiri, Maharashtra - 415612"]
         },
-        {
-            title: "Jalna Branch",
-            lines: ["Office No 1, Base Floor", "Banjara Tower Ambad Road", "Jalna 431203"]
-        },
+
     ];
 
     return (
