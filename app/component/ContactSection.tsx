@@ -374,7 +374,7 @@ const ContactSection = ({ productName }: ContactSectionProps) => {
                   className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${qrType === "ios" ? "bg-white text-[#2076C7] shadow-sm" : "text-gray-500 hover:text-gray-700"
                     }`}
                 >
-                  iOS (App Store)
+                  iOS
                 </button>
               </div>
             </div>
@@ -382,7 +382,7 @@ const ContactSection = ({ productName }: ContactSectionProps) => {
             <div className="shrink-0 bg-white p-4 rounded-2xl border-2 border-dashed border-[#1CADA3]/30">
               <div className="bg-gray-100 w-40 h-40 rounded-xl flex items-center justify-center overflow-hidden">
                 <img
-                  src={qrType === "android" ? "/QR/Infinity_App_QR.png" : "/QR/InfiWorld_Android_QR.png"}
+                  src={qrType === "android" ? "/QR/Infinity_App_QR.png" : "/QR/InfiWorld_IOS_QR.jpeg"}
                   alt={`${qrType} QR Code`}
                   className="w-full h-full object-contain transition-opacity duration-300"
                 />

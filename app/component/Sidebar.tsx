@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "../component/ui/sidebar";
 import { cn } from "../lib/utils";
-import { LogOut, ChevronDown, ChevronRight, Smartphone, Apple } from "lucide-react";
+import { LogOut, ChevronDown, ChevronRight, Smartphone } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { getSidebarLinks, Role } from "../utils/getSidebarLinks";
 
@@ -15,12 +15,12 @@ export interface SidebarItem {
 }
 
 // Helper component for the Toggle
-const PlatformToggle = ({ 
-  platform, 
-  setPlatform 
-}: { 
-  platform: "android" | "ios", 
-  setPlatform: (p: "android" | "ios") => void 
+const PlatformToggle = ({
+  platform,
+  setPlatform
+}: {
+  platform: "android" | "ios",
+  setPlatform: (p: "android" | "ios") => void
 }) => (
   <div className="flex bg-gray-200 p-1 rounded-lg mb-3 mx-2">
     <button
@@ -125,13 +125,13 @@ export default function DashboardSidebar({ role }: { role: Role }) {
   const getQRData = () => {
     if (role === "DSA") {
       return {
-        qr: platform === "android" ? "/QR/IVishva_Android_QR.png" : "/QR/IVishva_IOS_QR.png", // Update paths as needed
+        qr: platform === "android" ? "/QR/IVishva_Play_Store_QR.jpeg" : "/QR/IVishva_IOS_QR.jpeg", // Update paths as needed
         storeIcon: platform === "android" ? "/icons/Play_Store_Logo.png" : "/icons/Apple_Store_Logo.png",
         platformIcon: platform === "android" ? "/icons/android_logo.png" : "/icons/Apple_Device_Logo.png",
       };
     }
     return {
-      qr: platform === "android" ? "/QR/InfiWorld_Android_QR.png" : "/QR/InfiWorld_IOS_QR.png",
+      qr: platform === "android" ? "/QR/Infinity_App_QR.png" : "/QR/InfiWorld_IOS_QR.jpeg",
       storeIcon: platform === "android" ? "/icons/Play_Store_Logo.png" : "/icons/Apple_Store_Logo.png",
       platformIcon: platform === "android" ? "/icons/android_logo.png" : "/icons/Apple_Device_Logo.png",
     };
@@ -143,10 +143,12 @@ export default function DashboardSidebar({ role }: { role: Role }) {
     <div className="flex h-full flex-col border-r border-neutral-300">
       <Sidebar open={open} setOpen={setOpen} animate={false}>
         <SidebarBody className="justify-between gap-10">
-          <div className="flex flex-1 flex-col overflow-x-hidden bg-gray-100">
+          <div className="flex flex-1 flex-col overflow-hidden bg-gray-100">
             <Logo />
-            <div className="mt-8 flex flex-col gap-1">
-              {renderLinks(links)}
+            <div className="mt-8 flex-1 overflow-y-auto px-2 custom-scrollbar [mask-image:linear-gradient(to_bottom,black_90%,transparent_100%)]">
+              <div className="flex flex-col gap-1 pb-10">
+                {renderLinks(links)}
+              </div>
             </div>
           </div>
 
@@ -154,7 +156,7 @@ export default function DashboardSidebar({ role }: { role: Role }) {
             {(role === "DSA" || role === "CUSTOMER") && (
               <div className="mx-2 mb-4">
                 <PlatformToggle platform={platform} setPlatform={setPlatform} />
-                
+
                 <div className="flex flex-col items-center justify-center rounded-xl bg-white p-4 shadow-sm border border-neutral-200 transition-all">
                   <img
                     src={qrData.qr}

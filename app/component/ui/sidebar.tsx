@@ -4,7 +4,7 @@ import { cn } from "../../lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 // import { SidebarItem } from "../Sidebar";
 import { ChevronDown, ChevronRight, LogOut } from "lucide-react";
 
@@ -104,11 +104,6 @@ export const DesktopSidebar = ({
 };
 
 //  Mobile Sidebar (Full Link Menu) 
-const handleLogout = () => {
-    document.cookie = "authToken=; path=/; max-age=0; SameSite=Lax";
-    router.push("/");
-};
-
 export const MobileSidebar = ({
     links,
     onNavigate
@@ -116,7 +111,13 @@ export const MobileSidebar = ({
     links: Links[];
     onNavigate: (href: string) => void;
 }) => {
+    const router = useRouter();
     const { open, setOpen } = useSidebar();
+
+    const handleLogout = () => {
+        document.cookie = "authToken=; path=/; max-age=0; SameSite=Lax";
+        router.push("/");
+    };
 
     return (
         <div className="md:hidden">
