@@ -77,203 +77,203 @@ export const getCustomResponses = (): CustomResponseConfig => {
         category: 'Leadership Team'
       },
       {
-        keywords: ["rahul kangane", "rahul", "who is rahul kangane", "tell me about rahul kangane", "information about rahul kangane"],
+        keywords: ["rahul kangane", "rahul", "who is rahul kangane", "tell me about rahul kangane", "information about rahul kangane", "chairman", "managing director", "MrKangane"],
         response: "**Mr. Rahul Kangane** is our **Chairman and Managing Director**. He brings 15 years of deep expertise in broking and wealth management. His sharp market insights and focus on portfolio strategy are the driving forces behind the company's growth and success.",
         category: "Leadership"
       },
       {
-        keywords: ["rajesh parkhi", "rajesh", "who is rajesh parkhi", "tell me about rajesh parkhi", "information about rajesh parkhi"],
+        keywords: ["rajesh parkhi", "rajesh", "who is rajesh parkhi", "tell me about rajesh parkhi", "information about rajesh parkhi", "Mr Parkhi"],
         response: "**Mr. Rajesh Parkhi** is our **Executive Director**. He has over 25 years of extensive experience in the retail finance sector and holds an MBA in Marketing. He is an expert in structuring retail loan portfolios and fostering sustainable business growth.",
         category: "Leadership"
       },
       {
-        keywords: ["pravin marathe", "pravin", "who is pravin marathe", "tell me about pravin marathe", "information about pravin marathe"],
+        keywords: ["pravin marathe", "pravin", "who is pravin marathe", "tell me about pravin marathe", "information about pravin marathe", "director", "Mr. Marathe"],
         response: "**Mr. Pravin Marathe** is a **Director** at Infinity Arthvishva. With over 18 years of experience in financial markets, he is known for his client-focused approach and strategic vision, specifically driving growth through Mutual Funds, Portfolio Management Services (PMS), and Alternative Investment Funds (AIFs).",
         category: "Leadership"
       },
       {
-        keywords: ["k krishna", "krishna", "who is k krishna", "tell me about k krishna", "information about k krishna", "telangana state director"],
+        keywords: ["k krishna", "krishna", "who is k krishna", "tell me about k krishna", "information about k krishna", "telangana state director", "Mr. Krishna"],
         response: "**Mr. K Krishna** is our **Telangana State Director**. He brings 18+ years of banking experience, driving strategic growth, operational excellence, and revenue expansion through high-performing teams and strong client-focused strategies.",
         category: "Leadership"
       },
       {
-        keywords: ["sanjay shaha", "dr sanjay shaha", "who is sanjay shaha", "tell me about sanjay shaha", "information about sanjay shaha"],
+        keywords: ["sanjay shaha", "dr sanjay shaha", "who is sanjay shaha", "tell me about sanjay shaha", "information about sanjay shaha", "Mr. Shaha", "sanjay"],
         response: "**Dr. Sanjay Shaha** is a **Director** at Infinity Arthvishva. He is a senior physician with 40+ years of experience, National Merit Winner, Gold Medalist & Vijay Ratna Awardee, bringing strategic vision and ethical leadership.",
         category: "Leadership"
       },
       {
-        keywords: ["arun job", "arun", "who is arun job", "tell me about arun job", "information about arun job", "regional director hyderabad"],
+        keywords: ["arun job", "arun", "who is arun job", "tell me about arun job", "information about arun job", "regional director hyderabad", "Mr. Arun"],
         response: "**Mr. Arun Job** is our **Regional Director (Hyderabad)**. With over 20 years of leadership across telecommunications, manufacturing, pharma packaging and banking sectors, he drives transformative growth and operational excellence. He is an IIMA alumnus known for building high-performing teams, strategic partnerships, and revenue expansion.",
         category: "Leadership"
       },
       {
-        keywords: ["sandip powar", "sandip", "who is sandip powar", "tell me about sandip powar", "information about sandip powar"],
+        keywords: ["sandip powar", "sandip", "who is sandip powar", "tell me about sandip powar", "information about sandip powar", "vice president", "Mr. Powar"],
         response: "**Mr. Sandip Powar** is our **Vice President**. He brings 11+ years of expertise in Home Loans and Insurance, leading Pan-India expansion, branch development, and strategic growth with a strong customer-focused approach.",
         category: "Leadership"
       },
       {
-        keywords: ["ajay mundada", "ajay", "who is ajay mundada", "tell me about ajay mundada", "information about ajay mundada"],
+        keywords: ["ajay mundada", "ajay", "who is ajay mundada", "tell me about ajay mundada", "information about ajay mundada", "Mr. Mundada"],
         response: "**Mr. Ajay Mundada** is our **Business Growth Officer**. He leads business expansion, strategic alliances, and performance-driven growth. With a strong focus on data-backed decision-making, risk management, and market adaptability, he ensures consistent value creation across evolving financial landscapes.",
         category: "Leadership"
       },
       {
-        keywords: ["sharad kulkarni", "sharad", "who is sharad kulkarni", "tell me about sharad kulkarni", "information about sharad kulkarni", "sangli branch head"],
+        keywords: ["sharad kulkarni", "sharad", "who is sharad kulkarni", "tell me about sharad kulkarni", "information about sharad kulkarni", "sangli branch head", "Mr. Kulkarni"],
         response: "**Mr. Sharad Kulkarni** is our **Regional Business Head (Sangli Branch)**. He brings over 9 years of lending and 5 years of insurance experience, driving regional growth, high-performing teams, and strong client-focused business expansion.",
         category: "Leadership"
       },
       {
-        keywords: ["anant chachad", "anant", "who is anant chachad", "tell me about anant chachad", "information about anant chachad", "kolhapur branch head"],
+        keywords: ["anant chachad", "anant", "who is anant chachad", "tell me about anant chachad", "information about anant chachad", "kolhapur branch head", "Mr. Chachad"],
         response: "**Mr. Anant Chachad** is our **Regional Business Head (Kolhapur Branch)**. He brings over 14 years of experience in financial services, leading Mortgage Loans for the West region with expertise in Home Loans, LAP, distribution network development, and strategic portfolio growth.",
         category: "Leadership"
       },
       {
-        keywords: ["kailas patil", "kailas", "who is kailas patil", "tell me about kailas patil", "information about kailas patil", "nashik branch head"],
+        keywords: ["kailas patil", "kailas", "who is kailas patil", "tell me about kailas patil", "information about kailas patil", "nashik branch head", "Mr. Patil"],
         response: "**Mr. Kailas Patil** is our **Assistant Vice President (Nashik Branch)**. He is a finance professional with 15+ years of experience in Home Loans, LAP, and Business Loans, driving regional growth through strong sales leadership, channel partnerships, and operational excellence.",
         category: "Leadership"
       },
       {
-        keywords: ["neeraj mohata", "neeraj", "who is neeraj mohata", "tell me about neeraj mohata", "information about neeraj mohata", "nagpur branch head"],
+        keywords: ["neeraj mohata", "neeraj", "who is neeraj mohata", "tell me about neeraj mohata", "information about neeraj mohata", "nagpur branch head", "Mr. Mohata"],
         response: "**Mr. Neeraj Mohata** is our **Regional Business Head (Nagpur Branch)**. He brings 11+ years of experience in lending and financial services, driving regional sales growth, channel expansion, and profitable business performance with strong leadership and market expertise.",
         category: "Leadership"
       },
       {
-        keywords: ["pravin rautray", "pravin rautray", "who is pravin rautray", "tell me about pravin rautray", "information about pravin rautray", "moshi branch head"],
+        keywords: ["pravin rautray", "pravin rautray", "who is pravin rautray", "tell me about pravin rautray", "information about pravin rautray", "moshi branch head", "Mr. Rautray"],
         response: "**Mr. Pravin Rautray** is our **Business Head (Moshi Branch)**. He drives growth across Loans and Insurance with a strong track record in building high-performing teams, expanding market reach, and delivering strategic, customer-focused revenue growth.",
         category: "Leadership"
       },
       {
-        keywords: ["rahul gadekar", "rahul gadekar", "who is rahul gadekar", "tell me about rahul gadekar", "information about rahul gadekar", "jalna branch head"],
+        keywords: ["rahul gadekar", "who is rahul gadekar", "tell me about rahul gadekar", "information about rahul gadekar", "jalna branch head", "Gadekar", "Mr. Gadekar"],
         response: "**Mr. Rahul Gadekar** is our **Branch Head (Jalna Branch)**. He has 10+ years of banking and finance experience, specializing in Home, Car, Education, Mortgage, and Business Loans. Formerly with State Bank of India, Old Jalna, he is skilled in loan processing and financial advisory across Jalna.",
         category: "Leadership"
       },
       {
-        keywords: ["yogesh joshi", "yogesh", "who is yogesh joshi", "tell me about yogesh joshi", "information about yogesh joshi", "sambhajinagar branch head"],
+        keywords: ["yogesh joshi", "yogesh", "who is yogesh joshi", "tell me about yogesh joshi", "information about yogesh joshi", "sambhajinagar branch head", "Mr. Joshi"],
         response: "**Mr. Yogesh Joshi** is our **Branch Head (Chhatrapati Sambhajinagar Branch)**. He is a seasoned professional with 16 years of experience in Home Loans. Previously served 5 years at IDBI Bank, 4 years as RM at Fullerton India, and 7 years as a Home Loan counsellor at SBI Bank.",
         category: "Leadership"
       },
       {
-        keywords: ["anil akolkar", "anil", "who is anil akolkar", "tell me about anil akolkar", "information about anil akolkar"],
+        keywords: ["anil akolkar", "anil", "who is anil akolkar", "tell me about anil akolkar", "information about anil akolkar", "Mr. Akolkar"],
         response: "**Mr. Anil Akolkar** is an **Investment Professional** at Infinity Arthvishva. He has 18 years of experience in Mutual Funds and various insurance products. He specializes in customer-need-based financial planning for early retirement and a bright future.",
         category: "Leadership"
       },
       {
-        keywords: ["santosh tupe", "santosh", "who is santosh tupe", "tell me about santosh tupe", "information about santosh tupe", "ahilyanagar branch head"],
+        keywords: ["santosh tupe", "santosh", "who is santosh tupe", "tell me about santosh tupe", "information about santosh tupe", "ahilyanagar branch head", "Mr. Tupe"],
         response: "**Mr. Santosh Tupe** is our **Tax Consultant & Financial Services (Ahilyanagar Branch)**. He is a seasoned professional with 18+ years of experience in taxation, compliance, and planning. He helps clients optimize tax positions and achieve sustainable growth through personalized financial solutions.",
         category: "Leadership"
       },
       {
-        keywords: ["pravin nikam", "nikam", "who is pravin nikam", "tell me about pravin nikam", "information about pravin nikam"],
+        keywords: ["pravin nikam", "nikam", "who is pravin nikam", "tell me about pravin nikam", "information about pravin nikam", "Mr. Nikam"],
         response: "**Mr. Pravin Nikam** is our **Branch Head (Chhatrapati Sambhajinagar Branch)**. He is a result-oriented BFSI professional with 15+ years of experience in retail lending and sales across HDFC Bank and HDB Financial Services. Expert in Loan Against Property, Home Loans, and SME lending with strong team management skills.",
         category: "Leadership"
       },
       {
-        keywords: ["sanjay kankariya", "kankariya", "who is sanjay kankariya", "tell me about sanjay kankariya", "information about sanjay kankariya"],
+        keywords: ["sanjay kankariya", "kankariya", "who is sanjay kankariya", "tell me about sanjay kankariya", "information about sanjay kankariya", "Mr. Kankariya"],
         response: "**Mr. Sanjay Kankariya** is our **Regional Business Head (Chhatrapati Sambhajinagar Branch)**. With over 30 years of experience in Tax & Finance Consultancy and Real Estate, he has expertise in financial consulting, investment guidance, and real estate solutions across Mumbai, Pune, Nagpur, and Dubai.",
         category: "Leadership"
       },
       {
-        keywords: ["sumeet nikalje", "sumeet", "who is sumeet nikalje", "tell me about sumeet nikalje", "information about sumeet nikalje"],
+        keywords: ["sumeet nikalje", "sumeet", "who is sumeet nikalje", "tell me about sumeet nikalje", "information about sumeet nikalje", "Mr. Nikalje"],
         response: "**Mr. Sumeet Nikalje** is our **Branch Manager (Chhatrapati Sambhajinagar Branch)**. With 7 years of experience in Business and Personal Loans, he specializes in financial planning, loan advisory, and client relationship management, delivering reliable and customer-focused financial solutions.",
         category: "Leadership"
       },
       {
-        keywords: ["manoj powar", "manoj", "who is manoj powar", "tell me about manoj powar", "information about manoj powar"],
+        keywords: ["manoj powar", "manoj", "who is manoj powar", "tell me about manoj powar", "information about manoj powar", "Mr. Powar"],
         response: "**Mr. Manoj Powar** is our **Branch Manager (Kolhapur Branch)**. He serves as the Branch Manager for the Kolhapur Branch with expertise in Home, Business, and Personal Loans, along with branch operations, business growth, and client relationship management.",
         category: "Leadership"
       },
       {
-        keywords: ["pravin swami", "swami", "who is pravin swami", "tell me about pravin swami", "information about pravin swami"],
+        keywords: ["pravin swami", "swami", "who is pravin swami", "tell me about pravin swami", "information about pravin swami", "Mr. Swami"],
         response: "**Mr. Pravin Swami** is our **CRM Manager – Real Estate (PCMC Branch)**. With over 10 years of experience in financial institutes and real estate, he specializes in CRM management, sales growth, loan coordination, client relationship management, and delivering seamless customer experiences through effective team coordination and performance optimization.",
         category: "Leadership"
       },
       {
-        keywords: ["girijatmaj sarnikar", "girijatmaj", "sarnikar", "who is girijatmaj sarnikar", "tell me about girijatmaj sarnikar", "information about girijatmaj sarnikar"],
+        keywords: ["girijatmaj sarnikar", "girijatmaj", "sarnikar", "who is girijatmaj sarnikar", "tell me about girijatmaj sarnikar", "information about girijatmaj sarnikar", "Mr. Sarnikar"],
         response: "**Mr. Girijatmaj Sarnikar** is our **Branch Manager (Jalna Branch)**. He brings 2+ years of experience in Lending and Financial Services, specializing in sales growth, client relationship management, business development, and profitable branch performance through strong leadership and market expertise.",
         category: "Leadership"
       },
 
       {
-        keywords: ["sangli branch", "where is sangli branch", "sangli branch address", "sangli branch location", "sangli office"],
+        keywords: ["sangli branch", "where is sangli branch", "sangli branch address", "sangli branch location", "sangli office", "sangli branch head"],
         response: "Sangli Branch\n\nManager: Mr. Sharad Kulkarni\nEmail: sharad@infinityarthvishva.com\nMob: +91 99555 91177\nAddress: 1st Floor, Plot No. 103, Adity Sai Landmark Near Bhoi Clinic, Ram Mandir Chowk, Sangli, Maharashtra - 416416",
         category: "branches"
       },
       {
-        keywords: ["kolhapur branch", "where is kolhapur branch", "kolhapur branch address", "kolhapur branch location", "kolhapur office"],
+        keywords: ["kolhapur branch", "where is kolhapur branch", "kolhapur branch address", "kolhapur branch location", "kolhapur office", "kolhapur branch head"],
         response: "Kolhapur Branches\n\nBranch 1 (Mr. Manoj Powar): Dabholkar Corner, Amatya Towers, Kolhapur, Maharashtra – 416001, Mob: +91 99237 37637\n\nBranch 2 (Mr. Anant Chachad): Yashonandan Plaza, 1st Floor, Shahupuri 3rd Lane, Near Shubhash Photo, Kolhapur, Maharashtra - 416001, Mob: +91 90498 29090",
         category: "branches"
       },
       {
-        keywords: ["pune branch", "where is pune branch", "pune branch address", "pune main branch", "pune office", "shivajinagar branch", "main branch"],
+        keywords: ["pune branch", "where is pune branch", "pune branch address", "pune main branch", "pune office", "shivajinagar branch", "main branch", "pune branch head"],
         response: "**Pune Main Branch (Head Office)**\n\nAddress: 1001 & 1201, 7 Business Square by Naiknavare, Ganeshkhind Rd, Near Datta Mandir, Model Colony, Shivajinagar, Pune, Maharashtra 411016\nPhone: 1800-532-7600\nEmail: info@infinityarthvishva.com",
         category: "branches"
       },
       {
-        keywords: ["nashik branch", "where is nashik branch", "nashik branch address", "nashik branch location", "nashik office"],
+        keywords: ["nashik branch", "where is nashik branch", "nashik branch address", "nashik branch location", "nashik office", "nashik branch head"],
         response: "Nashik Branch\n\nManager: Mr. Kailas Patil\nEmail: kailas@infinityarthvishva.com\nMob: +91 832 978 2325\nAddress: 2064, 2nd Floor, Roongta Shopping Hub, Near Hotel Surya, Mumbai Agra Road, Indira Nagar, Nashik, Maharashtra - 422009",
         category: "branches"
       },
       {
-        keywords: ["nagpur branch", "where is nagpur branch", "nagpur branch address", "nagpur branch location", "nagpur office"],
+        keywords: ["nagpur branch", "where is nagpur branch", "nagpur branch address", "nagpur branch location", "nagpur office", "nagpur branch head"],
         response: "Nagpur Branch\n\nManager: Mr. Neeraj Mohta\nMob: +91 88050 02728\nAddress: Apartment No. 202, 2nd Floor, Sharda Enclave, Nagji Bhai Town, Besides Platina Heart Institute, Sitabuldi, Nagpur, Maharashtra - 440012",
         category: "branches"
       },
       {
-        keywords: ["hyderabad branch", "where is hyderabad branch", "hyderabad branch address", "hyderabad branch location", "hyderabad office"],
+        keywords: ["hyderabad branch", "where is hyderabad branch", "hyderabad branch address", "hyderabad branch location", "hyderabad office", "hyderabad branch head"],
         response: "Hyderabad Branch\n\nManager: Mr. Mohan Sai\nEmail: mohan@infintyarthvishva.com\nMob: +91 76708 99115\nAddress: Office No: 5B, 5th Floor, Vishwa Heritage Arcade, Near ESI Metro Station, Pillar No. 1010, SR Nagar, Hyderabad, Telangana - 500038",
         category: "branches"
       },
       {
-        keywords: ["jalna branch", "where is jalna branch", "jalna branch address", "jalna branch location", "jalna office"],
+        keywords: ["jalna branch", "where is jalna branch", "jalna branch address", "jalna branch location", "jalna office", "jalna branch head"],
         response: "Jalna Branches\n\nBranch 1 (Girijatmaj Sarnikar): 07, Kalptaru Park, Opp Jalna Hospital, Near Ambad Chaufuly, Jalna, Maharashtra – 431203, Mob: +91 96077 57794\n\nBranch 2 (Mr. Rahul Gadekar): Office No 1, Base Floor, Banjara Tower Ambad Road, Jalna, Maharashtra – 431203, Mob: +91 98901 41450",
         category: "branches"
       },
       {
-        keywords: ["ahilyanagar branch", "ahilyanagar branch address", "ahilyanagar branch location", "ahmednagar branch", "savedi branch"],
+        keywords: ["ahilyanagar branch", "ahilyanagar branch address", "ahilyanagar branch location", "ahmednagar branch", "savedi branch", "ahilyanagar branch head"],
         response: "Ahilyanagar Branch (Ahmednagar)\n\nManager: Mr. Santosh Tupe\nEmail: santoshtupe@infinityarthvishva.com\nMob: +91 98818 27936\nAddress: Office No : 3, Rameshwar Appt., Vani Nagar, Pipeline Road, Savedi, Ahilyanagar, Maharashtra - 414003",
         category: "branches"
       },
       {
-        keywords: ["sambhajinagar branch", "chhatrapati sambhajinagar branch", "aurangabad branch", "sambhajinagar branch address", "csn branch"],
+        keywords: ["sambhajinagar branch", "chhatrapati sambhajinagar branch", "aurangabad branch", "sambhajinagar branch address", "csn branch", "sambhajinagar branch head"],
         response: "Chhatrapati Sambhajinagar Branches (Aurangabad)\n\nBranch 1 (Mr. Sumeet Nikalje): Office No 507, 5th Floor, Freedom Tower, Akashwani Chowk, Chhatrapati Sambhajinagar, MH – 431001, Mob: +91 96571 95136\n\nBranch 2 (Mr. Pravin Nikam): Office No 03, Dwarka Complex, Mahesh Nagar, Chhatrapati Sambhaji Nagar, MH – 431001, Mob: +91 87675 56611\n\nBranch 3 (Mr. Yogesh Joshi): N-12 C-133, Swami Vivekanand Nagar, T V Center Road, Hudco, Opp. Maharshi Statue, Chhatrapati Sambhajinagar, MH - 431001, Mob: +91 98233 20790\n\nBranch 4 (Mr. Sanjay Kankariya): Office Akil Complex, Pundalik Nagar Road, Opp. Nayara Petrol Pump, Chhatrapati Sambhajinagar, MH – 431009, Mob: +91 9326009808",
         category: "branches"
       },
       {
-        keywords: ["moshi branch", "where is moshi branch", "moshi branch address", "moshi branch location", "pune moshi branch"],
+        keywords: ["moshi branch", "where is moshi branch", "moshi branch address", "moshi branch location", "pune moshi branch", "moshi branch head"],
         response: "Moshi Branch (Pune)\n\nManager: Mr. Pravin Rautray\nEmail: pravinrautray@infinityarthvishva.com\nMob: +91 77981 82112\nAddress: 1st Floor, Office No 104, Destination Ostiya, F Building, Alandi Moshi Road, Pune, Maharashtra - 412105",
         category: "branches"
       },
       {
-        keywords: ["pimpri chinchwad branch", "pcmc branch", "pimpri branch", "thergaon branch", "pimpri chinchwad branch address"],
+        keywords: ["pimpri chinchwad branch", "pcmc branch", "pimpri branch", "thergaon branch", "pimpri chinchwad branch address", "pimpri chinchwad branch head"],
         response: "Pimpri-Chinchwad Branch (PCMC)\n\nManager: Mr. Pravin Swami\nEmail: pravinswami@infinityarthvishva.com\nMob: +91 91463 00555\nAddress: Ganga Aashiyana Sosa Road, Near Purnabhamha Hotel, Thergaon, Pimpri-Chinchwad, Maharashtra - 411033",
         category: "branches"
       },
       {
-        keywords: ["mumbai branch", "where is mumbai branch", "mumbai branch address", "mumbai office"],
+        keywords: ["mumbai branch", "where is mumbai branch", "mumbai branch address", "mumbai office", "mumbai branch head" ],
         response: "Mumbai Branch\n\nAddress: Coming Soon. Currently, you can visit our Pune Head Office or contact us at 1800-532-7600 for assistance in Mumbai region. We have a strong presence across Maharashtra with planned expansion in Mumbai.",
         category: "branches"
       },
       {
-        keywords: ["kanpur branch", "where is kanpur branch", "kanpur branch address", "kanpur office", "uttar pradesh branch"],
+        keywords: ["kanpur branch", "where is kanpur branch", "kanpur branch address", "kanpur office", "uttar pradesh branch", "kanpur branch head"],
         response: "Kanpur Branch\n\nAddress: Office No. 01, Kamlist Tower, Behind Mishra Jewellers, Near Joga Bhogha Chauraha, Nehru Nagar, Shuklaganj, Kanpur, Unnao, Uttar Pradesh - 209861",
         category: "branches"
       },
       {
-        keywords: ["kolkata branch", "where is kolkata branch", "kolkata branch address", "kolkata office", "west bengal branch"],
+        keywords: ["kolkata branch", "where is kolkata branch", "kolkata branch address", "kolkata office", "west bengal branch", "kolkata branch head"],
         response: "Kolkata Branch\n\nAddress: PS Qube, Room No. 620, 6th Floor, Plot No. IID/31/1, NewTown, Kolkata, West Bengal - 700135",
         category: "branches"
       },
       {
-        keywords: ["chiplun branch", "where is chiplun branch", "chiplun branch address", "chiplun office", "ratnagiri branch"],
+        keywords: ["chiplun branch", "where is chiplun branch", "chiplun branch address", "chiplun office", "ratnagiri branch", "chiplun branch head"],
         response: "Chiplun Branch\n\nAddress: United Classic, 203/204, 2nd Floor, Near Old S.T. Stand, Chiplun Bazarpeth, Chiplun, Maharashtra - 415605",
         category: "branches"
       },
       {
-        keywords: ["ratnagiri branch", "where is ratnagiri branch", "ratnagiri branch address", "ratnagiri office"],
+        keywords: ["ratnagiri branch", "where is ratnagiri branch", "ratnagiri branch address", "ratnagiri office", "ratnagiri branch head"],
         response: "Ratnagiri Branch\n\nAddress: S No. A-4, Soham Samarth Apartment, S.V. Road, Maruti Mandir, Ratnagiri, Maharashtra - 415612",
         category: "branches"
       },
       {
-        keywords: ["nearest branch", "branch near me", "closest branch", "find branch", "branch location near me"],
+        keywords: ["nearest branch", "branch near me", "closest branch", "find branch", "branch location near me", "where is the nearest branch", "nearest branch head"],
         response: "To find the nearest Infinity Arthvishva branch, We have branches across Maharashtra (Pune, Mumbai, Nashik, Nagpur, Kolhapur, Sangli, Chhatrapati Sambhajinagar, Jalna, Ahilyanagar, Chiplun, Ratnagiri, Pimpri-Chinchwad, Moshi), plus Hyderabad (Telangana), Kanpur (Uttar Pradesh), and Kolkata (West Bengal). Call 1800-532-7600 for assistance.",
         category: "branches"
       },
@@ -618,7 +618,7 @@ export const getCustomResponses = (): CustomResponseConfig => {
       },
       {
         keywords: ["unlisted shares", "pre ipo investment", "unlisted shares buy", "private equity investment", "pre ipo shares india"],
-        response: "Pre-IPO and Unlisted Shares Investment\n\nInvest in high-growth unlisted companies before they go public. Access to fast-growing startups and unicorns at pre-IPO valuations. Minimum investment from Rs. 28,750 depending on company. Shares transferred to your Demat account within 24-48 hours. High return potential post-listing. 15,000+ active investors. 172+ companies available including late-stage startups.",
+        response: "Pre-IPO and Unlisted Shares Investment\n\nInvest in high-growth unlisted companies before they go public. Access to fast-growing startups and unicorns at pre-IPO valuations. Minimum investment from Rs. 28,750 depending on company. Shares transferred to your Demat account within 24-48 hours. High return potential post-listing. 150+ companies available including late-stage startups.",
         category: "Investment"
       },
       {

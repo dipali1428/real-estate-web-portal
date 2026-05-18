@@ -261,7 +261,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                             
                             <motion.div animate={{ y: [0, -15, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute -top-4 right-0 md:right-4 bg-white p-4 rounded-2xl shadow-2xl border border-blue-50 flex items-center gap-3 z-20">
                                 <div className="w-10 h-10 bg-[#1CADA3] rounded-xl flex items-center justify-center text-white shadow-lg"><CheckCircle size={22} strokeWidth={2.5} /></div>
-                                <div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Users</p><p className="text-lg font-black text-slate-800 leading-none">15,000+</p></div>
+                                <div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Users</p></div>
                             </motion.div>
 
                             <motion.div animate={{ y: [0, 15, 0] }} transition={{ duration: 5, repeat: Infinity, delay: 0.5 }} className="absolute bottom-10 left-0 md:-left-4 bg-white p-4 rounded-2xl shadow-2xl border border-blue-50 flex items-center gap-3 z-20">

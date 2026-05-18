@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Building2, History, LayoutGrid, Info, HandCoins, ShoppingCart } from 'lucide-react';
+import { History, Info, HandCoins, ShoppingCart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import CompaniesComponent from './companies/page';

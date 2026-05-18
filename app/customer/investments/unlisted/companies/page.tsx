@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Search, Filter, Building2, TrendingUp, X, Bookmark, BookmarkCheck, ShoppingCart, CheckCircle, ChevronDown, IndianRupee, Info, Activity, MapPin, Package, FileText, AlertTriangle, Loader2, Plus, Minus, CreditCard, Building, ChevronRight } from 'lucide-react';
+import { Search, Filter, Building2, TrendingUp, X, Bookmark, BookmarkCheck, ShoppingCart, CheckCircle, ChevronDown, IndianRupee, Info, Activity, MapPin, Package, FileText, AlertTriangle, Loader2, Plus, Minus, CreditCard,} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { fetchDashboardData, fetchIdGraphData, GraphPoint } from '../../../../services/unlistedservices';
 import toast from 'react-hot-toast';
@@ -240,6 +240,483 @@ const CompanyCard: React.FC<CompanyCardProps> = ({
           </button>
         </div>
       </div>
+    </div>
+  );
+};
+
+// ==================== COMPANY DETAIL MODAL COMPONENT ====================
+const CompanyDetailModal: React.FC<{
+  company: Company;
+  onClose: () => void;
+  onAddToCart: (company: Company, quantity: number) => void;
+}> = ({ company, onClose, onAddToCart }) => {
+  const [modalQuantity, setModalQuantity] = useState(1);
+  const [modalGraphData, setModalGraphData] = useState<GraphPoint[]>([]);
+  const [isModalGraphLoading, setIsModalGraphLoading] = useState(false);
+  const [graphTimeRange, setGraphTimeRange] = useState('All');
+  const chartRef = useRef<HTMLCanvasElement | null>(null);
+  const chartInstance = useRef<Chart | null>(null);
+
+  const enriched = enrichCompanyForModal(company);
+  const modalMaxLot = company.min_lot_size || Infinity;
+
+  // Fetch graph data when modal opens
+  useEffect(() => {
+    const loadGraphData = async () => {
+      setIsModalGraphLoading(true);
+      setModalGraphData([]);
+      
+      try {
+        const response = await fetchIdGraphData(company.id);
+        
+        if (response && response.success && response.graph && Array.isArray(response.graph)) {
+          const formattedData: GraphPoint[] = response.graph
+            .filter(item => item && item.price_date && item.market_price !== null && item.market_price !== undefined)
+            .map((item) => ({
+              price_date: item.price_date,
+              market_price: item.market_price?.toString() || '0'
+            }));
+          
+          if (formattedData.length > 0) {
+            setModalGraphData(formattedData);
+          }
+        }
+      } catch (error) {
+        toast.error('Error loading graph data');
+        setModalGraphData([]);
+      } finally {
+        setIsModalGraphLoading(false);
+      }
+    };
+
+    loadGraphData();
+  }, [company.id]);
+
+  // Chart initialization effect
+  useEffect(() => {
+    if (!chartRef.current) return;
+    if (modalGraphData.length === 0) return;
+    
+    if (chartInstance.current) {
+      chartInstance.current.destroy();
+    }
+
+    const ctx = chartRef.current.getContext('2d');
+    if (!ctx) return;
+
+    let filteredData = [...modalGraphData];
+    const now = new Date();
+
+    if (graphTimeRange === '1W') {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(now.getDate() - 7);
+      filteredData = modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
+    } else if (graphTimeRange === '1M') {
+      const cutoffDate = new Date();
+      cutoffDate.setMonth(now.getMonth() - 1);
+      filteredData = modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
+    } else if (graphTimeRange === '3M') {
+      const cutoffDate = new Date();
+      cutoffDate.setMonth(now.getMonth() - 3);
+      filteredData = modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
+    }
+
+    filteredData.sort((a, b) => new Date(a.price_date).getTime() - new Date(b.price_date).getTime());
+
+    const labels = filteredData.map(item => {
+      const date = new Date(item.price_date);
+      return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+    });
+
+    const prices = filteredData.map(item => parseFloat(item.market_price));
+
+    const config: ChartConfiguration = {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Price History',
+          data: prices,
+          borderColor: '#2076C7',
+          backgroundColor: 'rgba(32, 118, 199, 0.05)',
+          borderWidth: 2,
+          pointRadius: filteredData.length > 50 ? 0 : 3,
+          pointHoverRadius: 6,
+          tension: 0.2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: (ctx) => `₹${parseFloat(ctx.raw as string).toLocaleString('en-IN')}`
+            }
+          }
+        },
+        scales: {
+          y: {
+            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+            ticks: { 
+              callback: (val) => `₹${val}`,
+              font: { size: 10 }
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              autoSkip: true,
+              maxRotation: 0,
+              autoSkipPadding: 20,
+              font: { size: 9 }
+            }
+          }
+        }
+      }
+    };
+
+    chartInstance.current = new Chart(ctx, config);
+
+    return () => {
+      if (chartInstance.current) {
+        chartInstance.current.destroy();
+      }
+    };
+  }, [modalGraphData, graphTimeRange]);
+
+  // Prevent scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
+  const getFilteredGraphData = useCallback(() => {
+    if (!modalGraphData.length) return [];
+    
+    switch (graphTimeRange) {
+      case '1W': {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(new Date().getDate() - 7);
+        return modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
+      }
+      case '1M': {
+        const cutoffDate = new Date();
+        cutoffDate.setMonth(new Date().getMonth() - 1);
+        return modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
+      }
+      case '3M': {
+        const cutoffDate = new Date();
+        cutoffDate.setMonth(new Date().getMonth() - 3);
+        return modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
+      }
+      case 'All':
+      default:
+        return modalGraphData;
+    }
+  }, [modalGraphData, graphTimeRange]);
+
+  const filteredGraphData = getFilteredGraphData();
+  const prices = filteredGraphData.map(d => parseFloat(d.market_price));
+  const high52W = prices.length ? Math.max(...prices) : parseFloat(company.price);
+  const low52W = prices.length ? Math.min(...prices) : parseFloat(company.price);
+  const highDate = filteredGraphData.find(d => parseFloat(d.market_price) === high52W)?.price_date;
+  const lowDate = filteredGraphData.find(d => parseFloat(d.market_price) === low52W)?.price_date;
+
+  const handleModalQuantityChange = (newQuantity: number) => {
+    if (newQuantity >= 1 && newQuantity <= modalMaxLot) {
+      setModalQuantity(newQuantity);
+    }
+  };
+
+  const handleModalQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value >= 1 && value <= modalMaxLot) {
+      setModalQuantity(value);
+    } else if (value === 0) {
+      setModalQuantity(1);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 overflow-hidden flex flex-col border border-gray-100"
+      >
+        {/* HEADER */}
+        <div className="bg-white border-b border-gray-100 p-6 flex flex-wrap items-start justify-between gap-3">
+          <div className="flex items-center gap-4">
+            <div className="w-20 h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
+              {enriched.logo_url ? (
+                <Image src={enriched.logo_url} width={200} height={120} className="w-full h-full object-contain p-2" alt={enriched.shares_name} />
+              ) : (
+                <span className="text-2xl font-bold text-[#2076C7]">{enriched.shares_name.charAt(0)}</span>
+              )}
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full">
+                  {enriched.category || 'Unlisted Shares'}
+                </span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{enriched.shares_name}</h2>
+              <p className="text-sm text-gray-500 mt-1 flex items-center gap-1 flex-wrap">
+                <MapPin className="w-3.5 h-3.5" /> {enriched.headquarters || 'India'} • Est. {enriched.founded_year}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-start gap-4">
+            <div className="text-right">
+              <p className="text-xs text-gray-500 font-medium">Current Price</p>
+              <div className="text-2xl md:text-3xl font-bold text-[#10b981]">
+                {formatCurrency(enriched.price)}
+              </div>
+            </div>
+            <button 
+              onClick={onClose} 
+              className="p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600"
+            >
+              <X size={24} />
+            </button>
+          </div>
+        </div>
+
+        {/* BODY */}
+        <div className="p-6 md:p-8 bg-gray-50/30 overflow-y-auto max-h-[calc(90vh-120px)]">
+          
+          {/* Metric Cards Row */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[
+              { label: 'Minimum Lot', value: `${(enriched.min_lot_size || 100).toLocaleString()} Shares`, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
+              { label: 'Min Investment', value: `₹${calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}`, icon: IndianRupee, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+              { label: 'Face Value', value: `₹${enriched.face_value || '10'}`, icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50' },
+              { label: 'Market Cap', value: enriched.market_cap || 'N/A', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50' }
+            ].map((item, i) => (
+              <div key={i} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                <div className={`w-10 h-10 ${item.bg} ${item.color} rounded-lg flex items-center justify-center mb-3`}>
+                  <item.icon size={20} />
+                </div>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{item.label}</p>
+                <p className="text-lg font-bold text-gray-900">{item.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* LEFT: Graph & Description */}
+            <div className="lg:col-span-2 space-y-6">
+              
+              {/* Chart Section */}
+              <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-medium text-gray-500">Price History</span>
+                      <span className="text-xs text-gray-400">• {graphTimeRange}</span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      {formatCurrency(enriched.price)}
+                    </h3>
+                  </div>
+                  
+                  <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80">
+                    {['All', '3M', '1M', '1W'].map(r => (
+                      <button 
+                        key={r} 
+                        onClick={() => setGraphTimeRange(r)} 
+                        className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-all ${
+                          graphTimeRange === r 
+                            ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200' 
+                            : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="h-64 w-full relative mb-8">
+                  {isModalGraphLoading ? (
+                    <div className="h-full flex items-center justify-center">
+                      <Loader2 className="animate-spin text-[#2076C7]" size={32} />
+                    </div>
+                  ) : modalGraphData.length > 0 ? (
+                    <canvas ref={chartRef}></canvas>
+                  ) : (
+                    <div className="h-full flex items-center justify-center text-gray-400">No price data available</div>
+                  )}
+                </div>
+
+                {/* 52 Week High/Low */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">52W High</p>
+                    <p className="text-lg font-bold text-gray-900">₹{high52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-xs text-gray-500 font-medium mt-1">
+                      {highDate ? new Date(highDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A'}
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">52W Low</p>
+                    <p className="text-lg font-bold text-gray-900">₹{low52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-xs text-gray-500 font-medium mt-1">
+                      {lowDate ? new Date(lowDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A'}
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Avg Volume</p>
+                    <p className="text-lg font-bold text-gray-900">{enriched.volume || '45.2K'}</p>
+                    <p className="text-xs text-gray-500 font-medium mt-1">Daily avg</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description Card */}
+              <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <Info className="text-[#1CADA3]" size={20} />
+                  About the Company
+                </h3>
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  {enriched.description || `${enriched.shares_name} is a leading player in the ${enriched.category || 'unlisted shares'} sector with strong growth potential.`}
+                </p>
+                
+                <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">ISIN</p>
+                    <p className="text-sm font-semibold text-gray-900 break-words">{enriched.isin || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Depository</p>
+                    <p className="text-sm font-semibold text-gray-900">{enriched.depository_applicable?.split(' ')[0] || 'NSDL'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Face Value</p>
+                    <p className="text-sm font-semibold text-gray-900">₹{enriched.face_value || '10'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Lot Size</p>
+                    <p className="text-sm font-semibold text-gray-900">{(enriched.min_lot_size || 100).toLocaleString()} shares</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* RIGHT: Sidebar */}
+            <div className="space-y-6">
+              
+              {/* Key Statistics Card */}
+              <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Activity size={16} className="text-[#2076C7]" />
+                  Key Statistics
+                </h4>
+                
+                <div className="space-y-4">
+                  {[
+                    { label: 'P/E Ratio', value: enriched.pe_ratio || 'N/A' },
+                    { label: 'P/B Ratio', value: enriched.pb_ratio || 'N/A' },
+                    { label: 'ROE', value: enriched.roe ? `${enriched.roe}%` : 'N/A' },
+                    { label: '24h Volume', value: enriched.volume || '45.2K' }
+                  ].map((stat, i) => (
+                    <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+                      <span className="text-xs text-gray-500">{stat.label}</span>
+                      <span className="text-sm font-bold text-gray-900">{stat.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Card with Quantity Selector */}
+              <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                <h4 className="text-sm font-bold text-gray-900 mb-3 text-center">Ready to Invest?</h4>
+                <p className="text-xs text-gray-500 mb-4 text-center font-bold">
+                  Min investment: ₹{calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}
+                </p>
+                
+                <div className="flex items-center justify-center gap-3 bg-white rounded-xl p-2 border border-gray-200 mb-4">
+                  <button
+                    onClick={() => handleModalQuantityChange(modalQuantity - 1)}
+                    className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                    disabled={modalQuantity <= 1}
+                  >
+                    <Minus size={16} />
+                  </button>
+                  <input
+                    type="number"
+                    value={modalQuantity}
+                    onChange={handleModalQuantityInput}
+                    className="w-20 text-center border border-gray-200 rounded-lg py-2 text-gray-500 focus:outline-none focus:border-[#2076C7]"
+                    min="1"
+                    max={modalMaxLot}
+                  />
+                  <button
+                    onClick={() => handleModalQuantityChange(modalQuantity + 1)}
+                    className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                    disabled={modalQuantity >= modalMaxLot}
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+                <p className="text-xs text-center text-gray-400 mb-4">
+                  Max lot: {modalMaxLot === Infinity ? 'Unlimited' : modalMaxLot.toLocaleString()} shares
+                </p>
+
+                <button
+                  onClick={() => {
+                    onAddToCart(enriched, modalQuantity);
+                    onClose();
+                  }}
+                  className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                >
+                  <ShoppingCart size={18} /> Add to Cart
+                </button>
+                
+                <p className="text-xs text-gray-400 text-center mt-3">
+                  Contact within 24 hours
+                </p>
+              </div>
+
+              {/* Valuation Progress Bars */}
+              <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                <h4 className="text-sm font-bold text-gray-900 mb-4">Valuation Metrics</h4>
+                <div className="space-y-5">
+                  {[
+                    { label: 'Industry Position', value: '85%', percent: 85 },
+                    { label: 'Growth Potential', value: '72%', percent: 72 },
+                    { label: 'Market Demand', value: '68%', percent: 68 }
+                  ].map((metric, i) => (
+                    <div key={i}>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <span className="text-xs text-gray-600">{metric.label}</span>
+                        <span className="text-xs font-bold text-gray-900">{metric.value}</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full" 
+                          style={{ width: `${metric.percent}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };
@@ -987,311 +1464,15 @@ export default function CompaniesPage() {
       )}
 
       {/* DETAIL MODAL */}
-      <AnimatePresence>
-        {selectedCompany && (() => {
-          const enriched = getEnrichedCompany(selectedCompany);
-          const filteredGraphData = getFilteredGraphData();
-          const prices = filteredGraphData.map(d => parseFloat(d.market_price));
-          const high52W = prices.length ? Math.max(...prices) : parseFloat(selectedCompany.price);
-          const low52W = prices.length ? Math.min(...prices) : parseFloat(selectedCompany.price);
-          const highDate = filteredGraphData.find(d => parseFloat(d.market_price) === high52W)?.price_date;
-          const lowDate = filteredGraphData.find(d => parseFloat(d.market_price) === low52W)?.price_date;
-          const [modalQuantity, setModalQuantity] = useState(1);
-          const modalMaxLot = selectedCompany.min_lot_size || Infinity;
-
-          const handleModalQuantityChange = (newQuantity: number) => {
-            if (newQuantity >= 1 && newQuantity <= modalMaxLot) {
-              setModalQuantity(newQuantity);
-            }
-          };
-
-          const handleModalQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = parseInt(e.target.value);
-            if (!isNaN(value) && value >= 1 && value <= modalMaxLot) {
-              setModalQuantity(value);
-            } else if (value === 0) {
-              setModalQuantity(1);
-            }
-          };
-          
-          return (
-            <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 overflow-hidden flex flex-col border border-gray-100"
-              >
-                
-                {/* HEADER */}
-                <div className="bg-white border-b border-gray-100 p-6 flex flex-wrap items-start justify-between gap-3">
-                  <div className="flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
-                      {enriched.logo_url ? (
-                        <Image src={enriched.logo_url} width={200} height={120} className="w-full h-full object-contain p-2" alt={enriched.shares_name} />
-                      ) : (
-                        <span className="text-2xl font-bold text-[#2076C7]">{enriched.shares_name.charAt(0)}</span>
-                      )}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full">
-                          {enriched.category || 'Unlisted Shares'}
-                        </span>
-                      </div>
-                      <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{enriched.shares_name}</h2>
-                      <p className="text-sm text-gray-500 mt-1 flex items-center gap-1 flex-wrap">
-                        <MapPin className="w-3.5 h-3.5" /> {enriched.headquarters || 'India'} • Est. {enriched.founded_year}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500 font-medium">Current Price</p>
-                      <div className="text-2xl md:text-3xl font-bold text-[#10b981]">
-                        {formatCurrency(enriched.price)}
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => setSelectedCompany(null)} 
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600"
-                    >
-                      <X size={24} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* BODY */}
-                <div className="p-6 md:p-8 bg-gray-50/30 overflow-y-auto max-h-[calc(90vh-120px)]">
-                  
-                  {/* Metric Cards Row */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    {[
-                      { label: 'Minimum Lot', value: `${(enriched.min_lot_size || 100).toLocaleString()} Shares`, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
-                      { label: 'Min Investment', value: `₹${calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}`, icon: IndianRupee, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                      { label: 'Face Value', value: `₹${enriched.face_value || '10'}`, icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50' },
-                      { label: 'Market Cap', value: enriched.market_cap || 'N/A', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50' }
-                    ].map((item, i) => (
-                      <div key={i} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                        <div className={`w-10 h-10 ${item.bg} ${item.color} rounded-lg flex items-center justify-center mb-3`}>
-                          <item.icon size={20} />
-                        </div>
-                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{item.label}</p>
-                        <p className="text-lg font-bold text-gray-900">{item.value}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    {/* LEFT: Graph & Description */}
-                    <div className="lg:col-span-2 space-y-6">
-                      
-                      {/* Chart Section */}
-                      <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-medium text-gray-500">Price History</span>
-                              <span className="text-xs text-gray-400">• {graphTimeRange}</span>
-                            </div>
-                            <h3 className="text-2xl font-bold text-gray-900">
-                              {formatCurrency(enriched.price)}
-                            </h3>
-                          </div>
-                          
-                          <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80">
-                            {['All', '3M', '1M', '1W'].map(r => (
-                              <button 
-                                key={r} 
-                                onClick={() => setGraphTimeRange(r)} 
-                                className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-all ${
-                                  graphTimeRange === r 
-                                    ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200' 
-                                    : 'text-gray-500 hover:text-gray-700'
-                                }`}
-                              >
-                                {r}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="h-64 w-full relative mb-8">
-                          {isModalGraphLoading ? (
-                            <div className="h-full flex items-center justify-center">
-                              <Loader2 className="animate-spin text-[#2076C7]" size={32} />
-                            </div>
-                          ) : modalGraphData.length > 0 ? (
-                            <canvas ref={chartRef}></canvas>
-                          ) : (
-                            <div className="h-full flex items-center justify-center text-gray-400">No price data available</div>
-                          )}
-                        </div>
-
-                        {/* 52 Week High/Low */}
-                        <div className="grid grid-cols-3 gap-4">
-                          <div className="bg-gray-50 rounded-lg p-3">
-                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">52W High</p>
-                            <p className="text-lg font-bold text-gray-900">₹{high52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
-                            <p className="text-xs text-gray-500 font-medium mt-1">
-                              {highDate ? new Date(highDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A'}
-                            </p>
-                          </div>
-                          <div className="bg-gray-50 rounded-lg p-3">
-                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">52W Low</p>
-                            <p className="text-lg font-bold text-gray-900">₹{low52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
-                            <p className="text-xs text-gray-500 font-medium mt-1">
-                              {lowDate ? new Date(lowDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A'}
-                            </p>
-                          </div>
-                          <div className="bg-gray-50 rounded-lg p-3">
-                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Avg Volume</p>
-                            <p className="text-lg font-bold text-gray-900">{enriched.volume || '45.2K'}</p>
-                            <p className="text-xs text-gray-500 font-medium mt-1">Daily avg</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Description Card */}
-                      <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                        <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-                          <Info className="text-[#1CADA3]" size={20} />
-                          About the Company
-                        </h3>
-                        <p className="text-gray-600 leading-relaxed text-sm">
-                          {enriched.description || `${enriched.shares_name} is a leading player in the ${enriched.category || 'unlisted shares'} sector with strong growth potential.`}
-                        </p>
-                        
-                        <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
-                          <div>
-                            <p className="text-xs text-gray-500 mb-1">ISIN</p>
-                            <p className="text-sm font-semibold text-gray-900 break-words">{enriched.isin || 'N/A'}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 mb-1">Depository</p>
-                            <p className="text-sm font-semibold text-gray-900">{enriched.depository_applicable?.split(' ')[0] || 'NSDL'}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 mb-1">Face Value</p>
-                            <p className="text-sm font-semibold text-gray-900">₹{enriched.face_value || '10'}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 mb-1">Lot Size</p>
-                            <p className="text-sm font-semibold text-gray-900">{(enriched.min_lot_size || 100).toLocaleString()} shares</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* RIGHT: Sidebar */}
-                    <div className="space-y-6">
-                      
-                      {/* Key Statistics Card */}
-                      <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                        <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                          <Activity size={16} className="text-[#2076C7]" />
-                          Key Statistics
-                        </h4>
-                        
-                        <div className="space-y-4">
-                          {[
-                            { label: 'P/E Ratio', value: enriched.pe_ratio || 'N/A' },
-                            { label: 'P/B Ratio', value: enriched.pb_ratio || 'N/A' },
-                            { label: 'ROE', value: enriched.roe ? `${enriched.roe}%` : 'N/A' },
-                            { label: '24h Volume', value: enriched.volume || '45.2K' }
-                          ].map((stat, i) => (
-                            <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
-                              <span className="text-xs text-gray-500">{stat.label}</span>
-                              <span className="text-sm font-bold text-gray-900">{stat.value}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Action Card with Quantity Selector */}
-                      <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                        <h4 className="text-sm font-bold text-gray-900 mb-3 text-center">Ready to Invest?</h4>
-                        <p className="text-xs text-gray-500 mb-4 text-center font-bold">
-                          Min investment: ₹{calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}
-                        </p>
-                        
-                        <div className="flex items-center justify-center gap-3 bg-white rounded-xl p-2 border border-gray-200 mb-4">
-                          <button
-                            onClick={() => handleModalQuantityChange(modalQuantity - 1)}
-                            className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                            disabled={modalQuantity <= 1}
-                          >
-                            <Minus size={16} />
-                          </button>
-                          <input
-                            type="number"
-                            value={modalQuantity}
-                            onChange={handleModalQuantityInput}
-                            className="w-20 text-center border border-gray-200 rounded-lg py-2 text-sm focus:outline-none focus:border-[#2076C7]"
-                            min="1"
-                            max={modalMaxLot}
-                          />
-                          <button
-                            onClick={() => handleModalQuantityChange(modalQuantity + 1)}
-                            className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                            disabled={modalQuantity >= modalMaxLot}
-                          >
-                            <Plus size={16} />
-                          </button>
-                        </div>
-                        <p className="text-xs text-center text-gray-400 mb-4">
-                          Max lot: {modalMaxLot === Infinity ? 'Unlimited' : modalMaxLot.toLocaleString()} shares
-                        </p>
-
-                        <button
-                          onClick={() => {
-                            addToCart(enriched, modalQuantity);
-                            setSelectedCompany(null);
-                          }}
-                          className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
-                        >
-                          <ShoppingCart size={18} /> Add to Cart
-                        </button>
-                        
-                        <p className="text-xs text-gray-400 text-center mt-3">
-                          Contact within 24 hours
-                        </p>
-                      </div>
-
-                      {/* Valuation Progress Bars */}
-                      <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                        <h4 className="text-sm font-bold text-gray-900 mb-4">Valuation Metrics</h4>
-                        <div className="space-y-5">
-                          {[
-                            { label: 'Industry Position', value: '85%', percent: 85 },
-                            { label: 'Growth Potential', value: '72%', percent: 72 },
-                            { label: 'Market Demand', value: '68%', percent: 68 }
-                          ].map((metric, i) => (
-                            <div key={i}>
-                              <div className="flex justify-between items-center mb-1.5">
-                                <span className="text-xs text-gray-600">{metric.label}</span>
-                                <span className="text-xs font-bold text-gray-900">{metric.value}</span>
-                              </div>
-                              <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full" 
-                                  style={{ width: `${metric.percent}%` }}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          );
-        })()}
-      </AnimatePresence>
+<AnimatePresence>
+  {selectedCompany && (
+    <CompanyDetailModal
+      company={selectedCompany}
+      onClose={() => setSelectedCompany(null)}
+      onAddToCart={addToCart}
+    />
+  )}
+</AnimatePresence>
 
       {/* Cart Drawer */}
       <AnimatePresence>
