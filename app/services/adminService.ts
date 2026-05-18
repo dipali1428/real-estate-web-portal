@@ -326,7 +326,7 @@ export const AdminService = {
   },
 
   getAssignedDsas: async (params?: { limit?: number; offset: number; search?: string }) => {
-    const response = await api.get(`/api/admin/assigned-dsas`, { params });
+    const response = await api.get(`/api/admin/branch/assigned-dsas`, { params });
     return response.data;
   },
 
@@ -460,5 +460,37 @@ export const AdminService = {
     const response = await api.delete(`/api/admin/branches/${id}`);
     return response.data;
   },
+
+  getBranchUnassignedDsas: async (params?: { limit?: number; offset: number; search?: string }) => {
+    const response = await api.get("/api/admin/branch/unassigned-dsas", { params });
+    return response.data;
+  },
+
+  assignDsaToBranch: async (payload: { dsa_id: string; branch_id: string }) => {
+    const response = await api.put("/api/admin/branch/change-dsa-branch", payload);
+    return response.data;
+  },
+  AssignDsaToBranch: async (payload: { branch_id: number; dsa_ids: number[] }) => {
+    // Note: URL changed to /api/admin/branch/assign-dsas to match your first message
+    const response = await api.put("/api/admin/branch/assign-dsas", payload);
+    return response.data;
+  },
+  getDsasByBranch: async (branchId: number) => {
+    const response = await api.get(`/api/admin/branch/${branchId}/dsas`);
+    return response.data;
+  },
+  getAllBranches: async (params?: any) => {
+  const response = await api.get("/api/admin/branch/get-all-branches", { params });
+  return response.data;
+},
+getBranchUsers: async () => {
+    // As per your instruction: PUT : /api/admin/branch/branch-users
+    const response = await api.get("/api/admin/branch/branch-users"); 
+    return response.data;
+},
+assignBranchUser: async (payload: { user_id: number; branch_id: number }) => {
+    const response = await api.post("/api/admin/branch/assign-branch-user", payload);
+    return response.data;
+},
 };
 
