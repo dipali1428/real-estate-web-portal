@@ -80,8 +80,7 @@ export default function MockBranchAssignmentPanel() {
       }
 
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to load records");
+      toast.error("Failed to load data");
     } finally {
       setLoading(false);
       setIsRefreshing(false);

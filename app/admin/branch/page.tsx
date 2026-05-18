@@ -62,7 +62,7 @@ export default function BranchPage() {
             const res = await AdminService.getBranchUsers();
             setBranchUsers(res.data || []);
         } catch (err) {
-            console.error("Failed to fetch branch users", err);
+            toast.error("Failed to fetch branch users");
         } finally {
             setUsersLoading(false);
         }
