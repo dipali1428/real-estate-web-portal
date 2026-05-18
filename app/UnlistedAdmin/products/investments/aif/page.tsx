@@ -59,9 +59,13 @@ const AIFImportAdmin: React.FC = () => {
     try {
       const data = await CustomerService.getAIFFundsList();
       setFunds(data);
-    } catch (err) {
-      console.error("Failed to fetch AIF funds:", err);
-    } finally {
+    }catch (err: any) {
+  setToast({
+    message: "Failed to fetch AIF funds",
+    type: "error"
+  });
+  setTimeout(() => setToast(null), 3000);
+} finally {
       setIsLoadingFunds(false);
     }
   };
