@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { PMSService, PMSFund } from '../../../../services/pmsService';
+import { AIFService, AIFFund } from '../../../../services/aifService';
 import api from '../../../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -11,20 +11,21 @@ import {
   X,
   Zap,
   Loader2,
-  Database,
   Download,
   CheckCircle,
   AlertCircle,
   RefreshCw,
   Gem,
   Package,
+  Layers,
   Edit3,
   Trash2,
-  Search,
+  Search
 } from "lucide-react";
-import CustomerService from '../../../../services/customerService';
+import CustomerService from '@/app/services/customerService';
 
-const PMSImportAdmin: React.FC = () => {
+const AIFImportAdmin: React.FC = () => {
+  const router = useRouter();
 
   // States for Import
   const [file, setFile] = useState<File | null>(null);
@@ -39,10 +40,10 @@ const PMSImportAdmin: React.FC = () => {
   } | null>(null);
 
   // States for Fund Management
-  const [funds, setFunds] = useState<PMSFund[]>([]);
+  const [funds, setFunds] = useState<AIFFund[]>([]);
   const [isLoadingFunds, setIsLoadingFunds] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [editingFund, setEditingFund] = useState<PMSFund | null>(null);
+  const [editingFund, setEditingFund] = useState<AIFFund | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const [isClient, setIsClient] = useState(false);
@@ -56,21 +57,20 @@ const PMSImportAdmin: React.FC = () => {
   const fetchFunds = async () => {
     setIsLoadingFunds(true);
     try {
-      const data = await CustomerService.getPMSFundsList();
+      const data = await CustomerService.getAIFFundsList();
       setFunds(data);
-    } catch (err: any) {
+    }catch (err: any) {
   setToast({
-    message: "Failed to fetch PMS funds",
-    type: "error",
+    message: "Failed to fetch AIF funds",
+    type: "error"
   });
-
   setTimeout(() => setToast(null), 3000);
 } finally {
       setIsLoadingFunds(false);
     }
   };
 
-  // --- IMPORT PMS FUNDS ---
+  // --- IMPORT AIF FUNDS ---
   const startImport = async () => {
     if (!file) {
       setToast({ message: 'Please select a file first', type: 'error' });
@@ -80,12 +80,12 @@ const PMSImportAdmin: React.FC = () => {
 
     setIsImporting(true);
     setProgress({ percent: 30, status: 'Processing...' });
-    setToast({ message: `Importing PMS fund data...`, type: 'info' });
-    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] Starting PMS import of ${file.name}...`]);
+    setToast({ message: `Importing AIF fund data...`, type: 'info' });
+    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] Starting AIF import of ${file.name}...`]);
     setImportResult(null);
 
     try {
-      const response = await PMSService.uploadPMSFunds(file);
+      const response = await AIFService.uploadAIFFunds(file);
 
       setProgress({ percent: 100, status: 'Completed' });
 
@@ -94,7 +94,7 @@ const PMSImportAdmin: React.FC = () => {
         skipped: response.skipped
       });
 
-      const successMsg = `✓ PMS Funds imported successfully (${response.processed} rows processed, ${response.skipped} skipped)`;
+      const successMsg = `✓ AIF Funds imported successfully (${response.processed} rows processed, ${response.skipped} skipped)`;
       setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${successMsg}`]);
       setToast({ message: successMsg, type: 'success' });
 
@@ -123,7 +123,7 @@ const PMSImportAdmin: React.FC = () => {
     if (!window.confirm(`Are you sure you want to delete ${name}?`)) return;
 
     try {
-      await PMSService.deletePMSFund(id);
+      await AIFService.deleteAIFFund(id);
       setToast({ message: `${name} deleted successfully`, type: 'success' });
       setFunds(prev => prev.filter(f => f.id !== id));
       setTimeout(() => setToast(null), 3000);
@@ -140,7 +140,7 @@ const PMSImportAdmin: React.FC = () => {
 
     setIsUpdating(true);
     try {
-      await PMSService.updatePMSFund(editingFund.id, editingFund);
+      await AIFService.updateAIFFund(editingFund.id, editingFund);
       setToast({ message: `${editingFund.fund_name} updated successfully`, type: 'success' });
       setFunds(prev => prev.map(f => f.id === editingFund.id ? editingFund : f));
       setEditingFund(null);
@@ -153,7 +153,7 @@ const PMSImportAdmin: React.FC = () => {
     }
   };
 
-  const filteredFunds = funds.filter(f =>
+  const filteredFunds = funds.filter(f => 
     f.fund_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     f.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -172,9 +172,9 @@ const PMSImportAdmin: React.FC = () => {
         <div className="flex items-center gap-3">
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Database className="w-6 h-6" /> PMS Data Portal
+              <Layers className="w-6 h-6" /> AIF Data Portal
             </h2>
-            <p className="text-sm opacity-90">Import & manage PMS fund strategy data</p>
+            <p className="text-sm opacity-90">Import & manage AIF fund strategy data</p>
           </div>
         </div>
       </motion.div>
@@ -186,12 +186,13 @@ const PMSImportAdmin: React.FC = () => {
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className={`fixed top-24 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${toast.type === 'success'
+            className={`fixed top-24 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${
+              toast.type === 'success'
                 ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                 : toast.type === 'error'
-                  ? 'bg-red-50 border-red-200 text-red-700'
-                  : 'bg-blue-50 border-blue-200 text-blue-700'
-              }`}
+                ? 'bg-red-50 border-red-200 text-red-700'
+                : 'bg-blue-50 border-blue-200 text-blue-700'
+            }`}
           >
             {toast.type === 'success' ? (
               <CheckCircle className="w-5 h-5" />
@@ -209,7 +210,7 @@ const PMSImportAdmin: React.FC = () => {
       </AnimatePresence>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
+        
         {/* LEFT COLUMN - IMPORT SECTION */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -220,7 +221,7 @@ const PMSImportAdmin: React.FC = () => {
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-blue-100">
             <h3 className="font-bold text-gray-800 flex items-center gap-2">
               <Upload className="w-5 h-5 text-[#2076C7]" />
-              Import PMS Fund Data
+              Import AIF Fund Data
             </h3>
           </div>
 
@@ -271,12 +272,12 @@ const PMSImportAdmin: React.FC = () => {
               disabled={!file || isImporting}
               className="w-full py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-black uppercase text-xs tracking-widest rounded-xl disabled:opacity-50 flex items-center justify-center gap-3 shadow-lg shadow-blue-100"
             >
-              {isImporting ? <><Loader2 className="animate-spin w-4 h-4" /> Importing...</> : <><Zap className="w-4 h-4" /> Import PMS Funds</>}
+              {isImporting ? <><Loader2 className="animate-spin w-4 h-4" /> Importing...</> : <><Zap className="w-4 h-4" /> Import AIF Funds</>}
             </button>
           </div>
         </motion.div>
 
-        {/* RIGHT COLUMN - EXPORT PMS FUNDS */}
+        {/* RIGHT COLUMN - EXPORT AIF FUNDS */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -286,7 +287,7 @@ const PMSImportAdmin: React.FC = () => {
           <div className="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 border-b border-emerald-100">
             <h3 className="font-bold text-gray-800 flex items-center gap-2">
               <Download className="w-5 h-5 text-emerald-600" />
-              Export PMS Funds
+              Export AIF Funds
             </h3>
           </div>
 
@@ -295,39 +296,39 @@ const PMSImportAdmin: React.FC = () => {
               <div className="w-20 h-20 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-emerald-600">
                 <Package className="w-10 h-10" />
               </div>
-
-              <h4 className="text-xl font-bold text-gray-800 mb-2">PMS Funds Export</h4>
+              
+              <h4 className="text-xl font-bold text-gray-800 mb-2">AIF Funds Export</h4>
               <p className="text-sm text-gray-500 mb-8 max-w-md mx-auto">
-                Download complete list of all PMS funds with strategy details, returns, and benchmarks for reporting purposes.
+                Download complete list of all AIF funds with category, fees, lock-in period, and risk levels for reporting purposes.
               </p>
 
-              <button
+              <button 
                 disabled={isExporting}
                 onClick={async () => {
                   setIsExporting(true);
-                  setToast({ message: 'Preparing PMS export...', type: 'info' });
+                  setToast({ message: 'Preparing AIF export...', type: 'info' });
                   try {
-                    const response = await api.get('/api/products/investments/pms/funds');
+                    const response = await api.get('/api/unlisted/admin/aif/funds');
                     const fundsData = response.data;
-                    const headers = ['Fund Name', 'Category', 'Risk Level', 'Min Investment', 'AUM', 'Return 1Y', 'Return 3Y', 'Return 5Y', 'Benchmark', 'Strategy Type', 'Portfolio Style', 'Description'];
+                    const headers = ['Fund Name','Category','Risk Level','Min Investment','AUM','Perf Fee','Mgt Fee','Lock-in Period','Inception Date'];
                     const csvRows = [headers.join(',')];
                     fundsData.forEach((f: any) => {
                       csvRows.push([
                         `"${f.fund_name || ''}"`, `"${f.category || ''}"`, `"${f.risk_level || ''}"`,
-                        f.min_investment || '', f.aum || '', f.return_1y || '', f.return_3y || '', f.return_5y || '',
-                        `"${f.benchmark || ''}"`, `"${f.strategy_type || ''}"`, `"${f.portfolio_style || ''}"`, `"${(f.description || '').replace(/"/g, '""')}"`
+                        `"${f.min_investment || ''}"`, `"${f.aum || ''}"`, `"${f.performance_fee || ''}"`,
+                        `"${f.management_fee || ''}"`, `"${f.lock_in_period || ''}"`, `"${f.inception_date || ''}"`
                       ].join(','));
                     });
                     const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
                     const url = window.URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
-                    link.setAttribute('download', `pms_funds_export_${new Date().toISOString().split('T')[0]}.csv`);
+                    link.setAttribute('download', `aif_funds_export_${new Date().toISOString().split('T')[0]}.csv`);
                     document.body.appendChild(link);
                     link.click();
                     link.remove();
                     window.URL.revokeObjectURL(url);
-                    setToast({ message: '✓ PMS funds exported successfully', type: 'success' });
+                    setToast({ message: '✓ AIF funds exported successfully', type: 'success' });
                     setTimeout(() => setToast(null), 3000);
                   } catch (err: any) {
                     setToast({ message: `✗ Export failed: ${err.message}`, type: 'error' });
@@ -359,8 +360,8 @@ const PMSImportAdmin: React.FC = () => {
         {/* List Header */}
         <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
           <h3 className="font-bold text-gray-800 flex items-center gap-2">
-            <Database className="w-5 h-5 text-[#2076C7]" />
-            Existing Funds
+            <Layers className="w-5 h-5 text-[#2076C7]" />
+            Existing AIF Funds
             <span className="bg-blue-100 text-[#2076C7] text-[10px] px-2 py-0.5 rounded-full ml-1">
               {funds.length}
             </span>
@@ -388,7 +389,7 @@ const PMSImportAdmin: React.FC = () => {
           ) : filteredFunds.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-20 text-gray-400 text-center">
               <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                <Database className="w-8 h-8 opacity-20" />
+                <Layers className="w-8 h-8 opacity-20" />
               </div>
               <p className="text-sm font-bold text-gray-600 mb-1">No funds found</p>
               <p className="text-xs">Try searching for something else or import a new file.</p>
@@ -399,10 +400,9 @@ const PMSImportAdmin: React.FC = () => {
                 <tr>
                   <th className="px-4 py-3 whitespace-nowrap">Fund Name</th>
                   <th className="px-4 py-3 whitespace-nowrap">Category</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Risk</th>
-                  <th className="px-4 py-3 whitespace-nowrap text-right">Min Invest</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Strategy Type</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Benchmark</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Min Invest</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Mgt Fee</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Perf Fee</th>
                   <th className="px-4 py-3 whitespace-nowrap text-center sticky right-0 bg-gray-50">Actions</th>
                 </tr>
               </thead>
@@ -420,25 +420,19 @@ const PMSImportAdmin: React.FC = () => {
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className="text-[10px] font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md">{fund.category || '—'}</span>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${fund.risk_level === 'High' || fund.risk_level === 'Very High' ? 'bg-red-50 text-red-600' :
-                          fund.risk_level === 'Moderate' ? 'bg-amber-50 text-amber-600' :
-                            'bg-green-50 text-green-600'
-                        }`}>{fund.risk_level || '—'}</span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-right text-xs font-semibold text-gray-700">
-                      {fund.min_investment ? `₹${(fund.min_investment / 100000).toFixed(0)}L` : '—'}
+                    <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-700">
+                      {fund.min_investment || '—'}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-600">
-                      {fund.strategy_type || '—'}
+                      {fund.management_fee || '—'}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-600">
-                      {fund.benchmark || '—'}
+                      {fund.performance_fee || '—'}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-center sticky right-0 bg-white border-l border-gray-100">
                       <div className="flex items-center justify-center gap-1">
                         <button
-                          onClick={() => setEditingFund({ ...fund })}
+                          onClick={() => setEditingFund({...fund})}
                           className="p-1.5 bg-blue-50 hover:bg-blue-100 rounded-lg text-blue-600 transition-all"
                           title="Edit Strategy"
                         >
@@ -482,8 +476,8 @@ const PMSImportAdmin: React.FC = () => {
               <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-6 text-white shrink-0">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-xl font-black uppercase tracking-tight">Edit PMS Strategy</h3>
-                    <p className="text-xs opacity-80">Modify fund details and performance metrics</p>
+                    <h3 className="text-xl font-black uppercase tracking-tight">Edit AIF Strategy</h3>
+                    <p className="text-xs opacity-80">Modify fund details and parameters</p>
                   </div>
                   <button
                     onClick={() => setEditingFund(null)}
@@ -506,7 +500,7 @@ const PMSImportAdmin: React.FC = () => {
                         <input
                           type="text"
                           value={editingFund.fund_name}
-                          onChange={e => setEditingFund({ ...editingFund, fund_name: e.target.value })}
+                          onChange={e => setEditingFund({...editingFund, fund_name: e.target.value})}
                           className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none"
                         />
                       </div>
@@ -515,81 +509,120 @@ const PMSImportAdmin: React.FC = () => {
                         <input
                           type="text"
                           value={editingFund.category}
-                          onChange={e => setEditingFund({ ...editingFund, category: e.target.value })}
+                          onChange={e => setEditingFund({...editingFund, category: e.target.value})}
                           className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none"
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* Financials */}
+                  {/* Details */}
                   <div className="space-y-4">
-                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b pb-2">Investment Details</h4>
+                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b pb-2">Investment Specs</h4>
                     <div className="space-y-4">
                       <div className="space-y-1.5">
-                        <label className="text-[11px] font-bold text-gray-500 ml-1">Min Investment (₹)</label>
+                        <label className="text-[11px] font-bold text-gray-500 ml-1">Min Investment</label>
                         <input
-                          type="number"
+                          type="text"
                           value={editingFund.min_investment}
-                          onChange={e => setEditingFund({ ...editingFund, min_investment: Number(e.target.value) })}
+                          onChange={e => setEditingFund({...editingFund, min_investment: e.target.value})}
                           className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none"
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[11px] font-bold text-gray-500 ml-1">AUM (₹ Cr)</label>
-                        <input type="number" value={editingFund.aum} onChange={e => setEditingFund({ ...editingFund, aum: Number(e.target.value) })}className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none"/>
+                        <label className="text-[11px] font-bold text-gray-500 ml-1">AUM</label>
+                        <input
+                          type="text"
+                          value={editingFund.aum}
+                          onChange={e => setEditingFund({...editingFund, aum: e.target.value})}
+                          className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none"
+                        />
                       </div>
                     </div>
                   </div>
 
-                  {/* Performance */}
+                  {/* Fees */}
                   <div className="space-y-4">
-                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b pb-2">Returns (%)</h4>
+                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b pb-2">Fees & Risk</h4>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[11px] font-bold text-gray-500 ml-1">3Y Return</label>
-                       <input
-                          type="number"
-                          step="0.01"
-                          value={editingFund.return_3y || ''}
-                          onChange={e => setEditingFund({...editingFund, return_3y: Number(e.target.value)})}
-                          className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-black font-bold focus:ring-2 focus:ring-blue-100 outline-none"
+                        <label className="text-[11px] font-bold text-gray-500 ml-1">Mgt Fee</label>
+                        <input
+                          type="text"
+                          value={editingFund.management_fee}
+                          onChange={e => setEditingFund({...editingFund, management_fee: e.target.value})}
+                          className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none"
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[11px] font-bold text-gray-500 ml-1">5Y Return</label>
+                        <label className="text-[11px] font-bold text-gray-500 ml-1">Perf Fee</label>
                         <input
-                          type="number"
-                          step="0.01"
-                          value={editingFund.return_5y}
-                          onChange={e => setEditingFund({ ...editingFund, return_5y: Number(e.target.value) })}
+                          type="text"
+                          value={editingFund.performance_fee}
+                          onChange={e => setEditingFund({...editingFund, performance_fee: e.target.value})}
+                          className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-500 ml-1">Lock-in Period</label>
+                        <input
+                          type="text"
+                          value={editingFund.lock_in_period}
+                          onChange={e => setEditingFund({...editingFund, lock_in_period: e.target.value})}
+                          className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-500 ml-1">Risk Level</label>
+                        <select
+                          value={editingFund.risk_level}
+                          onChange={e => setEditingFund({...editingFund, risk_level: e.target.value})}
+                          className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none"
+                        >
+                          <option value="Low">Low</option>
+                          <option value="Moderate">Moderate</option>
+                          <option value="High">High</option>
+                          <option value="Very High">Very High</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                   {/* Returns & Audience */}
+                   <div className="space-y-4 sm:col-span-2">
+                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b pb-2">Performance & Audience</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-500 ml-1">Returns Since Inception</label>
+                        <input
+                          type="text"
+                          value={editingFund.returns_since_inception}
+                          onChange={e => setEditingFund({...editingFund, returns_since_inception: e.target.value})}
                           className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none font-bold text-emerald-600"
                         />
                       </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[11px] font-bold text-gray-500 ml-1">Risk Level</label>
-                      <select
-                        value={editingFund.risk_level}
-                        onChange={e => setEditingFund({ ...editingFund, risk_level: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none"
-                      >
-                        <option value="Low">Low</option>
-                        <option value="Moderate">Moderate</option>
-                        <option value="High">High</option>
-                        <option value="Very High">Very High</option>
-                      </select>
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-500 ml-1">Target Audience</label>
+                        <input
+                          type="text"
+                          value={editingFund.target_audience}
+                          onChange={e => setEditingFund({...editingFund, target_audience: e.target.value})}
+                          className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 outline-none"
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  {/* Description */}
-                  <div className="space-y-4 sm:col-span-2">
-                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b pb-2">Notes & Strategy</h4>
+                   {/* Description */}
+                   <div className="space-y-4 sm:col-span-2">
+                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b pb-2">Strategy Description</h4>
                     <div className="space-y-1.5">
                       <textarea
                         rows={3}
-                        value={editingFund.description}
-                        onChange={e => setEditingFund({ ...editingFund, description: e.target.value })}
+                        value={editingFund.strategy_description}
+                        onChange={e => setEditingFund({...editingFund, strategy_description: e.target.value})}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-100 outline-none resize-none"
                         placeholder="Strategy details..."
                       />
@@ -610,8 +643,8 @@ const PMSImportAdmin: React.FC = () => {
                     disabled={isUpdating}
                     className="flex-[2] py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-xl shadow-lg shadow-blue-100 flex items-center justify-center gap-2"
                   >
-                    {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Database className="w-4 h-4" />}
-                    Update Strategy
+                    {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />}
+                    Update AIF Strategy
                   </button>
                 </div>
               </form>
@@ -623,4 +656,4 @@ const PMSImportAdmin: React.FC = () => {
   );
 };
 
-export default PMSImportAdmin;
+export default AIFImportAdmin;

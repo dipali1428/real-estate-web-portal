@@ -22,7 +22,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import customerService from "../../../../services/customerService";
 import toast from "react-hot-toast";
-import Image from 'next/image';
 
 interface CartItem {
   id: string;
@@ -60,7 +59,7 @@ export interface PMSProduct {
   bestSuitedFor?: string;
 }
 
-// const MIN_INVESTMENT = 5000000;
+const MIN_INVESTMENT = 5000000;
 
 
 export default function ExplorePMS() {
@@ -69,15 +68,15 @@ export default function ExplorePMS() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<PMSProduct | null>(null);
   const [activeCategory, setActiveCategory] = useState("All");
-  // Backend-synced wishlist: maps PMS product name -> backend wishlist entry
-  const [wishlistMap, setWishlistMap] = useState<Map<string, WishlistEntry>>(new Map());
+  // Backend-synced wishlist: maps PMS product name -> backend wishlist entry ID
+  const [wishlistMap, setWishlistMap] = useState<Record<string, number>>({});
   const [wishlistLoading, setWishlistLoading] = useState<Set<string>>(new Set());
 
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [schedulingProduct, setSchedulingProduct] = useState<PMSProduct | null>(null);
   const [meetingDate, setMeetingDate] = useState("");
   const [meetingTime, setMeetingTime] = useState("");
-  const meetLink = "https://meet.google.com/oio-bdwb-cxy";
+  const [meetLink, setMeetLink] = useState("https://meet.google.com/oio-bdwb-cxy");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Notification States
@@ -121,8 +120,9 @@ export default function ExplorePMS() {
           };
         });
         setDynamicProducts(mappedProducts);
-      }
-      finally {
+      } catch (err) {
+        toast.error("Failed to load PMS funds");
+      } finally {
         setLoadingProducts(false);
       }
     };
@@ -141,6 +141,7 @@ export default function ExplorePMS() {
           }
         }
       } catch (error) {
+        toast.error("Failed to fetch user profile");
       }
     };
     fetchUser();
@@ -162,6 +163,7 @@ export default function ExplorePMS() {
           }
         }
       } catch (error) {
+        toast.error("Failed to re-fetch user profile");
       }
     }
   };
@@ -204,25 +206,22 @@ export default function ExplorePMS() {
 
   // Load wishlist from backend on mount
   const loadWishlist = useCallback(async () => {
-    if (!userId) return;
     try {
       const response = await customerService.getMyWishlist();
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [response.data];
-        const map = new Map<string, WishlistEntry>();
+        const map: Record<string, number> = {};
         items.forEach((item: any) => {
           if (item.product_type === "pms") {
-            map.set(item.product_name, {
-              backendId: item.id,
-              productName: item.product_name,
-            });
+            map[item.product_name] = item.id;
           }
         });
         setWishlistMap(map);
       }
     } catch (error) {
+      toast.error("Failed to load wishlist");
     }
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     const savedCart = localStorage.getItem("pms_cart");
@@ -231,7 +230,7 @@ export default function ExplorePMS() {
   }, [loadWishlist]);
 
   useEffect(() => {
-    // localStorage.setItem("pms_cart", JSON.stringify(cart));
+    localStorage.setItem("pms_cart", JSON.stringify(cart));
   }, [cart]);
 
   // Filtering
@@ -246,23 +245,34 @@ export default function ExplorePMS() {
   }, [searchQuery, activeCategory, dynamicProducts]);
 
   // Cart Actions
+  const handleAddToCart = (product: PMSProduct) => {
+    if (cart.find(item => item.id === product.name)) {
+      setIsCartOpen(true);
+      return;
+    }
+    const newItem: CartItem = { id: product.name, name: product.name, amount: MIN_INVESTMENT };
+    setCart([...cart, newItem]);
+    setIsCartOpen(true);
+  };
+
+
 
   const toggleWishlist = async (product: PMSProduct) => {
     const productName = product.name;
-    const entry = wishlistMap.get(productName);
+    const backendId = wishlistMap[productName];
 
     // Prevent double-clicking while loading
     if (wishlistLoading.has(productName)) return;
     setWishlistLoading(prev => new Set(prev).add(productName));
 
     try {
-      if (entry) {
+      if (backendId) {
         // Remove from wishlist
-        const response = await customerService.removeFromWishlist(entry.backendId);
+        const response = await customerService.removeFromWishlist(backendId);
         if (response.success) {
           setWishlistMap(prev => {
-            const updated = new Map(prev);
-            updated.delete(productName);
+            const updated = { ...prev };
+            delete updated[productName];
             return updated;
           });
           toast.success(`${productName} removed from wishlist`);
@@ -285,14 +295,10 @@ export default function ExplorePMS() {
         });
         if (response.success && response.data) {
           const newItem = Array.isArray(response.data) ? response.data[0] : response.data;
-          setWishlistMap(prev => {
-            const updated = new Map(prev);
-            updated.set(productName, {
-              backendId: newItem.id,
-              productName: productName,
-            });
-            return updated;
-          });
+          setWishlistMap(prev => ({
+            ...prev,
+            [productName]: newItem.id
+          }));
           toast.success(`${productName} saved to wishlist`);
         }
       }
@@ -375,7 +381,7 @@ export default function ExplorePMS() {
               >
                 {wishlistLoading.has(product.name) ? (
                   <Loader2 size={16} className="animate-spin text-[#2076C7]" />
-                ) : wishlistMap.has(product.name) ? (
+                ) : wishlistMap[product.name] ? (
                   <BookmarkCheck size={16} className="text-[#2076C7]" fill="#2076C7" />
                 ) : (
                   <Bookmark size={16} />
@@ -857,7 +863,7 @@ export default function ExplorePMS() {
                 <div className="relative z-10 pt-10 border-t border-white/10">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full border-2 border-white/20 p-1">
-                      <Image src="https://ui-avatars.com/api/?name=Admin&background=white&color=2076C7" className="w-full h-full rounded-full border border-white/20" height={40} width={40} alt="Icon" />
+                      <img src="https://ui-avatars.com/api/?name=Admin&background=white&color=2076C7" className="w-full h-full rounded-full border border-white/20" alt="Icon" />
                     </div>
                     <div>
                       <p className="text-[10px] font-black text-white/60 uppercase tracking-widest">Organizer</p>

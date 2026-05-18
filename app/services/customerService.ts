@@ -372,11 +372,6 @@ const CustomerService = {
         const response = await api.get("/api/customer/my-wishlist");
         return response.data;
     },
-
-    /**
-     * Get specific wishlist item by ID
-     * GET → /api/customer/wishlist/:id
-     */
     getWishlistItem: async (wishlistId: number): Promise<WishlistResponse> => {
         const response = await api.get(`/api/customer/wishlist/${wishlistId}`);
         return response.data;
@@ -443,60 +438,30 @@ const CustomerService = {
         return response.data;
     },
 
-    // Add these methods to your customerService object
-
-    // ==================== REPORT API METHODS ====================
-
-    /**
-     * Get report overview
-     * GET → /api/customer/reports/overview
-     */
     getReportOverview: async () => {
         const response = await api.get("/api/customer/reports/overview");
         return response.data;
     },
 
-    /**
-     * Get product summary
-     * GET → /api/customer/reports/product-summary
-     */
     getProductSummary: async () => {
         const response = await api.get("/api/customer/reports/product-summary");
         return response.data;
     },
 
-    /**
-     * Get recent investments
-     * GET → /api/customer/reports/recent-investments
-     */
     getRecentInvestments: async () => {
         const response = await api.get("/api/customer/reports/recent-investments");
         return response.data;
     },
-
-    /**
-     * Get portfolio distribution
-     * GET → /api/customer/reports/portfolio-distribution
-     */
     getPortfolioDistribution: async () => {
         const response = await api.get("/api/customer/reports/portfolio-distribution");
         return response.data;
     },
-
-    /**
-     * Get assigned relationship manager
-     * GET → /api/customer/rm/assigned-rm
-     */
 
     getrmcustomer: async () => {
         const response = await api.get('/api/customer/rm/assigned-rm');
         return response.data;
     },
 
-    /**
-   * Get assigned relationship manager
-   * POST → /api/unlisted/user/logout
-   */
 
     logout: async () => {
         const response = await api.post("/api/unlisted/user/logout");
@@ -510,11 +475,6 @@ const CustomerService = {
         });
         return response.data;
     },
-
-    /**
-     * Get PMS meeting status
-     * GET → /api/products/investments/pms/meetings/status/:id
-     */
     getPMSMeetingStatus: async (meetingId: number) => {
         const response = await api.get(`/api/products/investments/meetings/status/${meetingId}`);
         return response.data;
@@ -525,6 +485,21 @@ const CustomerService = {
         return response.data;
     },
 
+    getAIFFundsList: async () => {
+        const response = await api.get("/api/products/investments/aif/funds");
+        return response.data;
+    },
+    scheduleAIFMeeting: async (meetingData: any, userId?: number) => {
+        const response = await api.post("/api/products/investments/aif/meetings/schedule", {
+            ...meetingData,
+            user_id: userId
+        });
+        return response.data;
+    },
+    getAIFMeetingStatus: async (meetingId: number) => {
+        const response = await api.get(`/api/products/investments/aif/meetings/status/${meetingId}`);
+        return response.data;
+    },
     getAllBonds: async () => {
         try {
             const response = await api.get(
@@ -543,24 +518,15 @@ const CustomerService = {
         return response.data;
     },
 
-    /**
-     * Get NPS meetings for the current user
-     * GET → /api/products/investments/npsMeetings/my-meetings
-     */
     getMyNPSMeetings: async () => {
         const response = await api.get("/api/products/investments/npsMeetings/my-meetings");
         return response.data;
     },
 
-    /**
-     * Update NPS meeting (Customer)
-     * PUT → /api/products/investments/npsMeetings/:id
-     */
     updateNPSMeeting: async (id: string | number, meetingData: any) => {
         const response = await api.put(`/api/products/investments/npsMeetings/${id}`, meetingData);
         return response.data;
     },
-
     
     getAllNCDs: async () => {
         try {

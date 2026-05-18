@@ -1,6 +1,7 @@
 import { aifStrategies } from "@/app/products/aif/data/aif_funds";
 
 export interface AIFProduct {
+  id: number;
   name: string;
   desc: string;
   manager: string;
@@ -29,7 +30,19 @@ export interface AIFProduct {
 
 export const MIN_INVESTMENT_AIF = 10000000; // 1 Crore
 
+// Simple hash function to generate a stable numeric ID from name
+const generateId = (name: string): number => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    const char = name.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash % 1000000) + 5000; // Keep it positive and in a safe range
+};
+
 export const aifProducts: AIFProduct[] = aifStrategies.map((strategy: any) => ({
+  id: generateId(strategy.name),
   name: strategy.name,
   desc: strategy.desc,
   manager: strategy.manager || "Investment Team",

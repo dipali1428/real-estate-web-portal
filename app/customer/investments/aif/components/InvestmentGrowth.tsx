@@ -1,6 +1,5 @@
 'use client';
-
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
     TrendingUp,
     FileText,
@@ -10,7 +9,7 @@ import {
     Building2,
     Wallet,
     BarChart3,
-    ShieldCheck
+    ShieldCheck,
 } from 'lucide-react';
 import { 
     AreaChart, 
@@ -23,7 +22,6 @@ import {
 } from 'recharts';
 import { aifStrategies } from '@/app/products/aif/data/aif_funds';
 import Link from 'next/link';
-
 // --- TYPES ---
 interface Investment {
     id: number;
@@ -32,21 +30,16 @@ interface Investment {
     date: string;
     units: number; // Renamed from factionTockens
 }
-
 export default function InvestmentGrowth() {
     const [isDemoMode, setIsDemoMode] = useState(false);
-    
     // Real Data (Empty for now)
     const [realInvestments] = useState<Investment[]>([]); 
-
     // Demo Data
     const demoInvestments: Investment[] = [
         { id: 1, fundName: "360 ONE Multi-Stage Defense Fund", amount: 10000000, date: '2024-11-15', units: 1000 },
         { id: 2, fundName: "ABSL Structured Opportunities Fund", amount: 15000000, date: '2025-01-10', units: 1500 },
     ];
-
     const activeInvestments = isDemoMode ? demoInvestments : realInvestments;
-
     // Derived Funds Data
     const investedFunds = useMemo(() => {
         return activeInvestments.map(inv => {
@@ -57,23 +50,19 @@ export default function InvestmentGrowth() {
             };
         });
     }, [activeInvestments]);
-
     // Format Helpers
     const formatCurrency = (val: number) => {
         if (val >= 10000000) return `₹${(val / 10000000).toFixed(2)} Cr`;
         if (val >= 100000) return `₹${(val / 100000).toFixed(2)} L`;
         return `₹${val.toLocaleString('en-IN')}`;
     };
-
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     };
-
     // --- AGGREGATED CALCULATIONS ---
     const totalInvested = activeInvestments.reduce((sum, inv) => sum + inv.amount, 0);
     let totalCurrentValue = 0;
     let weightedIRRSum = 0;
-    
     investedFunds.forEach(inv => {
         if (!inv.fund) {
             // Fallback for simple demo entries
@@ -85,49 +74,37 @@ export default function InvestmentGrowth() {
         // Parse "18-22%" or similar to get a number
         const irrMatch = irrText.match(/\d+/);
         const irr = irrMatch ? parseInt(irrMatch[0]) : 14; 
-        
         // Capital appreciation (Compound interest)
         const invDate = new Date(inv.date);
         const today = new Date();
         const yearsHeld = Math.max(0, (today.getTime() - invDate.getTime()) / (1000 * 3600 * 24 * 365));
-        
         const currentValue = inv.amount * Math.pow(1 + irr / 100, yearsHeld);
-        
         totalCurrentValue += currentValue;
         weightedIRRSum += irr * inv.amount;
     });
-
     const totalReturns = (totalCurrentValue - totalInvested);
     const blendedIRR = totalInvested > 0 ? (weightedIRRSum / totalInvested).toFixed(1) : "0.0";
-
     const isEmpty = activeInvestments.length === 0;
-
     // --- WEALTH PROJECTION CHART DATA ---
     const growthChartData = useMemo(() => {
         const data = [];
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan","Feb", "Mar", "Apr","May", "Jun","Jul"];
-        
         for (let i = 0; i <= 11; i++) {
             let monthTotalValue = 0;
             let monthTotalInvested = 0;
-
             const futureDate = new Date();
             futureDate.setMonth(futureDate.getMonth() + i);
-
             investedFunds.forEach(inv => {
                 const irrText = inv.fund?.details?.targetIRR || "18-22%";
                 const irrMatch = irrText.match(/\d+/);
                 const irr = irrMatch ? parseInt(irrMatch[0]) : 14; 
-
                 // Future value from original investment date + i months from NOW
                 const yearsHeldNow = Math.max(0, (new Date().getTime() - new Date(inv.date).getTime()) / (1000 * 3600 * 24 * 365));
                 const totalYears = yearsHeldNow + (i / 12);
-                
                 const projectedVal = inv.amount * Math.pow(1 + irr / 100, totalYears);
                 monthTotalValue += projectedVal;
                 monthTotalInvested += inv.amount;
             });
-
             data.push({
                 month: `${monthNames[futureDate.getMonth()]} '${futureDate.getFullYear().toString().slice(2)}`,
                 ProjectedValue: Math.round(monthTotalValue),
@@ -136,12 +113,10 @@ export default function InvestmentGrowth() {
         }
         return data;
     }, [investedFunds]);
-
     // MAIN DASHBOARD LAYOUT
     return (
         <div className="flex-1 p-6 sm:p-10 bg-slate-50 min-h-screen font-sans">
             <div className="max-w-7xl mx-auto">
-                
                 {/* 1. HEADER SECTION */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-slate-200 pb-5">
                     <div>
@@ -164,7 +139,6 @@ export default function InvestmentGrowth() {
                         </Link>
                     </div>
                 </div>
-
                 {/* 2. EXECUTIVE SUMMARY (HERO STATS) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm border-t-4 border-t-[#2076C7]">
@@ -174,7 +148,6 @@ export default function InvestmentGrowth() {
                         </div>
                         <p className="text-2xl font-bold text-slate-800">{formatCurrency(totalInvested)}</p>
                     </div>
-
                     <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <TrendingUp size={16} />
@@ -183,7 +156,6 @@ export default function InvestmentGrowth() {
                         <p className="text-2xl font-bold text-[#2076C7]">{formatCurrency(totalCurrentValue)}</p>
                         <p className="text-xs text-slate-500 mt-1">Capital Appreciation Only</p>
                     </div>
-
                     <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <BarChart3 size={16} />
@@ -192,7 +164,6 @@ export default function InvestmentGrowth() {
                         <p className="text-2xl font-bold text-slate-800">{formatCurrency(totalReturns)}</p>
                         <p className="text-xs text-emerald-600 mt-1 font-medium">Growth on Principal</p>
                     </div>
-
                     <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <Building2 size={16} />
@@ -202,7 +173,6 @@ export default function InvestmentGrowth() {
                         <p className="text-xs text-slate-500 mt-1">Weighted Average</p>
                     </div>
                 </div>
-
                 {/* 3. PROJECTED WEALTH CHART */}
                 <div className="bg-white rounded-xl border border-slate-200 shadow-sm mb-8 overflow-hidden">
                     <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50">
@@ -268,7 +238,6 @@ export default function InvestmentGrowth() {
                         </ResponsiveContainer>
                     </div>
                 </div>
-
                 {/* 4. PROFESSIONAL DATA TABLE */}
                 <div className="bg-white rounded-xl border border-slate-200 shadow-sm mb-8 overflow-hidden">
                     <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
@@ -301,10 +270,8 @@ export default function InvestmentGrowth() {
                                         const irrText = inv.fund?.details?.targetIRR || "18-22%";
                                         const irrMatch = irrText.match(/\d+/);
                                         const irr = irrMatch ? parseInt(irrMatch[0]) : 14; 
-                                        
                                         const yearsHeld = Math.max(0, (new Date().getTime() - new Date(inv.date).getTime()) / (1000 * 3600 * 24 * 365));
                                         const currentVal = inv.amount * Math.pow(1 + irr / 100, yearsHeld);
-                                        
                                         return (
                                             <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
                                                 <td className="px-6 py-4">
@@ -339,7 +306,6 @@ export default function InvestmentGrowth() {
                         </table>
                     </div>
                 </div>
-
                 {/* 5. DOCUMENT VAULT (Simple List) */}
                 <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50">
@@ -365,7 +331,6 @@ export default function InvestmentGrowth() {
                                         </span>
                                     </div>
                                 </div>
-                                
                                 <div className="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors cursor-pointer group">
                                     <div className="p-2.5 bg-slate-100 text-slate-500 rounded-lg group-hover:bg-[#2076C7] group-hover:text-white transition-colors">
                                         <FileText size={20} />
@@ -378,7 +343,6 @@ export default function InvestmentGrowth() {
                                         </span>
                                     </div>
                                 </div>
-
                                 <div className="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors cursor-pointer group">
                                     <div className="p-2.5 bg-slate-100 text-slate-500 rounded-lg group-hover:bg-[#2076C7] group-hover:text-white transition-colors">
                                         <TrendingUp size={20} />
@@ -395,7 +359,6 @@ export default function InvestmentGrowth() {
                         )}
                     </div>
                 </div>
-
             </div>
         </div>
     );
