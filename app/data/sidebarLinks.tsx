@@ -137,18 +137,19 @@ export const sidebarLinks = {
         { label: "Dashboard", href: "/accounts", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/accounts/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "KYC Management", href: "/accounts/kycmanagement", icon: <ShieldCheck className="h-5 w-5 text-neutral-700" /> },
-        { label: "All Leads", href: "/accounts/allleads", icon: <Layers className="h-5 w-5 text-neutral-700" />,
-             children:
+        {
+            label: "All Leads", href: "/accounts/allleads", icon: <Layers className="h-5 w-5 text-neutral-700" />,
+            children:
                 [
                     { label: "Refferal Leads", href: "/accounts/referralleads", icon: <Share2 className="h-4 w-4 text-neutral-700" /> },
                     { label: "Detailed Leads", href: "/accounts/detailedleads", icon: <FileUp className="h-4 w-4 text-neutral-700" /> },
-                ],     
-         },
+                ],
+        },
         { label: "Receivables", href: "/accounts/reciveable", icon: <Wallet className="h-5 w-5 text-neutral-700" /> },
         { label: "TDS Management", href: "/accounts/tdsmanagement", icon: <ReceiptIndianRupee className="h-5 w-5 text-neutral-700" /> },
         { label: "Lead Payments", href: "/accounts/leadmanagement", icon: <FileText className="h-5 w-5 text-neutral-700" /> },
         { label: "Bill Payments", href: "/accounts/billpayment", icon: <CreditCard className="h-5 w-5 text-neutral-700" /> },
-       
+
     ],
 
     DEPARTMENTHEAD: [
@@ -176,13 +177,13 @@ export const sidebarLinks = {
         { label: "Career Applications", href: "/hr/careermanagement", icon: < Briefcase className="h-5 w-5 text-neutral-700" /> },
     ],
 
-   BRANCHHEAD: [
+    BRANCHHEAD: [
         { label: "Branch Head Dashboard", href: "/branchhead", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/branchhead/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "My Branches", href: "/branchhead/branches", icon: <User className="h-5 w-5 text-neutral-700" /> },
     ],
 
-     BRANCH: [
+    BRANCH: [
         { label: "Branch Dashboard", href: "/branch", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/branch/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "DSA Management", href: "/branch/dsamanagement", icon: <Weight className="h-5 w-5 text-neutral-700" /> },
@@ -223,65 +224,71 @@ export const sidebarLinks = {
         { label: "Help & Support", href: "/customer/support", icon: <LifeBuoy className="h-5 w-5 text-neutral-700" /> },
         { label: "Relationship Manager", href: "/customer/relationshipmanager", icon: <UserCheck className="h-5 w-5 text-neutral-700" /> },
     ],
-   UNLISTEDADMIN: [
-  { label: "Dashboard", href: "/UnlistedAdmin", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
+    UNLISTEDADMIN: [
+        { label: "Dashboard", href: "/UnlistedAdmin", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
 
-  { label: "Analytics View", href: "/UnlistedAdmin/AnalyticsView", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Analytics View", href: "/UnlistedAdmin/AnalyticsView", icon: <Users className="h-5 w-5 text-neutral-700" /> },
 
-  { label: "Customer Management", href: "/UnlistedAdmin/UserManagement", icon: <UserPlus className="h-5 w-5 text-neutral-700" /> },
+        { label: "Customer Management", href: "/UnlistedAdmin/UserManagement", icon: <UserPlus className="h-5 w-5 text-neutral-700" /> },
 
-  { label: "Enquiry Details", href: "/UnlistedAdmin/EnquiryManagement", icon: <MessageSquare className="h-5 w-5 text-neutral-700" /> },
+        { label: "Enquiry Details", href: "/UnlistedAdmin/EnquiryManagement", icon: <MessageSquare className="h-5 w-5 text-neutral-700" /> },
 
-  { label: "Transaction Management", href: "/UnlistedAdmin/TransactionManagement", icon: <CreditCard className="h-5 w-5 text-neutral-700" /> },
+        { label: "Transaction Management", href: "/UnlistedAdmin/TransactionManagement", icon: <CreditCard className="h-5 w-5 text-neutral-700" /> },
 
-  { label: "Shares Management", href: "/UnlistedAdmin/SharesManagement", icon: <TrendingUp className="h-5 w-5 text-neutral-700" /> },
+        { label: "Shares Management", href: "/UnlistedAdmin/SharesManagement", icon: <TrendingUp className="h-5 w-5 text-neutral-700" /> },
 
-  { label: "Demat Management", href: "/UnlistedAdmin/DematManagement", icon: <Shield className="h-5 w-5 text-neutral-700" /> },
- {
-  label: "Meetings",
-  icon: <CalendarDays className="h-5 w-5 text-neutral-700" />,
-  children: [
-    {
-  label: "NPS consultation meetings",
-  href: "/UnlistedAdmin/products/investments/nps",
-  icon: <BriefcaseBusiness className="h-4 w-4 text-neutral-600" />,
-},
-  ],
-},
+        { label: "Demat Management", href: "/UnlistedAdmin/DematManagement", icon: <Shield className="h-5 w-5 text-neutral-700" /> },
+        {
+            label: "Meetings",
+            icon: <CalendarDays className="h-5 w-5 text-neutral-700" />,
+            children: [
+                {
+                    label: "NPS consultation meetings",
+                    href: "/UnlistedAdmin/products/investments/nps",
+                    icon: <BriefcaseBusiness className="h-4 w-4 text-neutral-600" />,
+                },
+            ],
+        },
 
-  // ✅ NEW PRODUCTS DROPDOWN
-  {
-    label: "Products",
-    icon: <Package className="h-5 w-5 text-neutral-700" />,
-    children: [
-        { label: "Unlisted shares", href: "/UnlistedAdmin/ImportExportAdmin", icon: <TrendingUp  className="h-5 w-5 text-neutral-700" /> },
+        // ✅ NEW PRODUCTS DROPDOWN
+        {
+            label: "Products",
+            icon: <Package className="h-5 w-5 text-neutral-700" />,
+            children: [
+                { label: "Unlisted shares", href: "/UnlistedAdmin/ImportExportAdmin", icon: <TrendingUp className="h-5 w-5 text-neutral-700" /> },
 
-      {
-        label: "Real Estate",
-        href: "/UnlistedAdmin/products/investments/realestateimport",
-        icon: <Building2 className="h-4 w-4 text-neutral-600" />,
-      },
-      {
-        label: "PMS Data Export",
-        href: "/UnlistedAdmin/products/investments/pms",
-        icon: <BarChart3 className="h-4 w-4 text-neutral-600" />,
-      },
-      {
-        label: "Fixed Deposit",
-        href: "/UnlistedAdmin/products/investments/Fixed-Deposit",
-        icon: <Landmark className="h-4 w-4 text-neutral-600" />,
-      },
-      {
-        label: "Bonds",
-        href: "/UnlistedAdmin/products/investments/bonds",
-        icon: <FileText className="h-4 w-4 text-neutral-600" />,
-      },
-      {
-        label: "NCD",
-        href: "/UnlistedAdmin/products/investments/ncd",
-        icon: <Landmark className="h-4 w-4 text-neutral-600" />,
-      },
+                {
+                    label: "Real Estate",
+                    href: "/UnlistedAdmin/products/investments/realestateimport",
+                    icon: <Building2 className="h-4 w-4 text-neutral-600" />,
+                },
+                {
+                    label: "PMS ",
+                    href: "/UnlistedAdmin/products/investments/pms",
+                    icon: <BarChart3 className="h-4 w-4 text-neutral-600" />,
+                },
+                {
+                    label: "Fixed Deposit",
+                    href: "/UnlistedAdmin/products/investments/Fixed-Deposit",
+                    icon: <Landmark className="h-4 w-4 text-neutral-600" />,
+                },
+                {
+                    label: "Bonds",
+                    href: "/UnlistedAdmin/products/investments/bonds",
+                    icon: <FileText className="h-4 w-4 text-neutral-600" />,
+                },
+                {
+                    label: "NCD",
+                    href: "/UnlistedAdmin/products/investments/ncd",
+                    icon: <Landmark className="h-4 w-4 text-neutral-600" />,
+                },
+                {
+                    label: "AIF",
+                    href: "/UnlistedAdmin/products/investments/aif",
+                    icon: <Layers className="h-5 w-5 text-neutral-600" />
+                },
+
+            ],
+        },
     ],
-  },
-],
 };

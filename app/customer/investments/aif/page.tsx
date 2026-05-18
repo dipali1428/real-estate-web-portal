@@ -1,16 +1,11 @@
-'use client';
-
-import React from 'react';
+'use client';;
 import ExploreAIF from './components/ExploreAIF';
-
 export default function AIFDashboard() {
     return (
         <div className="min-h-screen bg-gradient-to-tr from-gray-50 via-white to-blue-50">
             <div className="p-4 sm:p-6 lg:p-8">
-
                 {/* Interactive Explore Section */}
                 <ExploreAIF />
-
                 {/* Disclaimer Section */}
                 <div className="mt-12 p-6 bg-teal-50 rounded-3xl border border-teal-100">
                     <p className="text-xs text-teal-800 leading-relaxed text-center italic">

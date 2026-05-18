@@ -12,7 +12,7 @@ import {
     BarChart3,
     ShieldCheck,
 } from 'lucide-react';
-import { AreaChart,Area,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer} from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import customerService from '../../../../services/customerService';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
