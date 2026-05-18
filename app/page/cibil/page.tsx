@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { PublicService } from "../../services/publicService";
+import {Construction} from "lucide-react"
 import toast from "react-hot-toast";
 import Image from "next/image";
 
@@ -136,6 +137,8 @@ const CreditScorePage: React.FC = () => {
     const [showCongrats, setShowCongrats] = useState(false); // New state for congrats popup
     const [error, setError] = useState<string | null>(null);
     const [isEligible, setIsEligible] = useState(true);
+
+    const IS_MAINTENANCE_MODE = true;
 
     // New state for dynamic report values
     const [reportSummary, setReportSummary] = useState({
@@ -424,6 +427,27 @@ const CreditScorePage: React.FC = () => {
 
     const toggleFaq = (index: number) => setactiveFaq(activeFaq === index ? null : index);
     const scrollToSection = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
+    if (IS_MAINTENANCE_MODE) {
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-[#2076C7] to-[#1CADA3] flex items-center justify-center p-6 text-white text-center">
+            <div className="bg-white/10 backdrop-blur-md p-12 rounded-[40px] border border-white/20 shadow-2xl max-w-lg w-full">
+                <Image src="/cibil-logo.svg" alt="Logo" width={150} height={50} className="mx-auto mb-8 brightness-0 invert" />
+                <div className="mb-6 flex justify-center">
+                    <Construction size={64} className="text-white animate-pulse" />
+                </div>
+                <h1 className="text-3xl font-bold mb-4">Under Construction</h1>
+                <p className="text-lg opacity-90 leading-relaxed mb-8">
+                    We're currently upgrading our credit score systems to provide you with a better experience. We'll be back shortly!
+                </p>
+                <div className="text-sm font-medium bg-white/20 py-2 px-4 rounded-full inline-block">
+                    Expected back: Coming Soon
+                </div>
+            </div>
+        </div>
+    );
+}
+
 
     return (
         <div className="bg-white min-h-screen text-gray-600">
