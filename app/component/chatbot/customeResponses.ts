@@ -234,7 +234,7 @@ export const getCustomResponses = (): CustomResponseConfig => {
       },
       {
         keywords: ["sambhajinagar branch", "chhatrapati sambhajinagar branch", "aurangabad branch", "sambhajinagar branch address", "csn branch", "sambhajinagar branch head"],
-        response: "Chhatrapati Sambhajinagar Branches (Aurangabad)\n\nBranch 1 (Mr. Sumeet Nikalje): Office No 507, 5th Floor, Freedom Tower, Akashwani Chowk, Chhatrapati Sambhajinagar, MH – 431001, Mob: +91 96571 95136\n\nBranch 2 (Mr. Pravin Nikam): Office No 03, Dwarka Complex, Mahesh Nagar, Chhatrapati Sambhaji Nagar, MH – 431001, Mob: +91 87675 56611\n\nBranch 3 (Mr. Yogesh Joshi): N-12 C-133, Swami Vivekanand Nagar, T V Center Road, Hudco, Opp. Maharshi Statue, Chhatrapati Sambhajinagar, MH - 431001, Mob: +91 98233 20790\n\nBranch 4 (Mr. Sanjay Kankariya): Office Akil Complex, Pundalik Nagar Road, Opp. Nayara Petrol Pump, Chhatrapati Sambhajinagar, MH – 431009, Mob: +91 9326009808",
+        response: "Chhatrapati Sambhajinagar Branches (Aurangabad)\n\nBranch 1 (Mr. Sumeet Nikalje): Office No 507, 5th Floor, Freedom Tower, Akashwani Chowk, Chhatrapati Sambhajinagar, Maharashtra – 431001, Mob: +91 96571 95136\n\nBranch 2 (Mr. Pravin Nikam): Office No 03, Dwarka Complex, Mahesh Nagar, Chhatrapati Sambhaji Nagar, Maharashtra – 431001, Mob: +91 87675 56611\n\nBranch 3 (Mr. Yogesh Joshi): N-12 C-133, Swami Vivekanand Nagar, T V Center Road, Hudco, Opp. Maharshi Statue, Chhatrapati Sambhajinagar, Maharashtra - 431001, Mob: +91 98233 20790\n\nBranch 4 (Mr. Sanjay Kankariya): Office Akil Complex, Pundalik Nagar Road, Opp. Nayara Petrol Pump, Chhatrapati Sambhajinagar, Maharashtra – 431009, Mob: +91 9326009808",
         category: "branches"
       },
       {
@@ -280,21 +280,21 @@ export const getCustomResponses = (): CustomResponseConfig => {
 
       // ==== SERVICES: FINANCE & LOANS ====
       {
-        keywords: ["loan", "finance", "borrow", "emi", "loan services"],
+        keywords: ["loan", "finance", "borrow", "emi", "loan services", "loans"],
         response: "We provide comprehensive loan solutions tailored to your needs:\n\n• **Residential:** Home Loans, Mortgage Loans (LAP).\n• **Business:** Business Loans, SME Loans, Loans Against Securities.\n• **Personal \u0026 Education:** Personal Loans, Education Loans.\n• **Vehicles:** Auto Loans, Vehicle Loans.\n\nOur goal is to provide the best interest rates and smooth processing for all your credit requirements.",
         category: "Finance"
       },
 
       // ==== SERVICES: PROTECTION & INSURANCE ====
       {
-        keywords: ["insurance", "protection", "safe", "policy", "insurance services"],
+        keywords: ["insurance", "protection", "safe", "policy", "insurance services", "insurance products", "protections"],
         response: "Safeguard your future and assets with our wide range of insurance products:\n\n• **Personal:** Life Insurance, Health Insurance, Travel Insurance.\n• **Asset:** Motor Insurance, Property Insurance, Marine Insurance.\n• **Commercial:** Corporate General Insurance, Worker Compensation Insurance, Group Medi-Claim Cover, Group Personal Accident Cover.\n• **Specialized:** Cattle Insurance.",
         category: "Protection"
       },
 
       // ==== SERVICES: INVESTMENTS ====
       {
-        keywords: ["investment", "invest", "wealth", "mutual fund", "stock", "investment services"],
+        keywords: ["investment", "invest", "wealth", "mutual fund", "stock", "investment services", "investments"],
         response: "Grow your wealth strategically with our expert investment advisory:\n\n• **Market Instruments:** Mutual Funds, Stocks \u0026 Securities, Bonds, Unlisted Shares.\n• **Management:** Portfolio Management Service (PMS), Alternative Investment Fund (AIF), Wealth Management.\n• **Savings:** Fixed Deposits, Pension Funds.\n• **Real Estate:** Real Estate Investments.\n• **Services:** Demat Account opening, Tax Consultancy.",
         category: "Investment"
       },
@@ -346,17 +346,17 @@ export const getCustomResponses = (): CustomResponseConfig => {
           "🏢 Chhatrapati Sambhajinagar Branch (Mr. Sumeet Nikalje)\n" +
           "   Office No 507, 5th Floor, Freedom Tower\n" +
           "   Akashwani Chowk\n" +
-          "   Chhatrapati Sambhajinagar, MH – 431001\n\n" +
+          "   Chhatrapati Sambhajinagar, Maharashtra – 431001\n\n" +
 
           "🏢 Chhatrapati Sambhajinagar Branch (Mr. Pravin Nikam)\n" +
           "   Office No 03, Dwarka Complex\n" +
           "   Mahesh Nagar\n" +
-          "   Chhatrapati Sambhaji Nagar, MH – 431001\n\n" +
+          "   Chhatrapati Sambhaji Nagar, Maharashtra – 431001\n\n" +
 
           "🏢 Chhatrapati Sambhajinagar Branch (Mr. Yogesh Joshi)\n" +
           "   N-12 C-133, Swami Vivekanand Nagar\n" +
           "   T V Center Road, Hudco, Opp. Maharshi Statue\n" +
-          "   Chhatrapati Sambhajinagar, MH - 431001\n\n" +
+          "   Chhatrapati Sambhajinagar, Maharashtra - 431001\n\n" +
 
           "🏢 Ahilyanagar Branch (Mr. Santosh Tupe)\n" +
           "   Office No : 3, Rameshwar Appt., Vani Nagar\n" +
@@ -366,7 +366,7 @@ export const getCustomResponses = (): CustomResponseConfig => {
           "🏢 Chhatrapati Sambhajinagar Branch (Mr. Sanjay Kankariya)\n" +
           "   Office Akil Complex, Pundalik Nagar Road\n" +
           "   Opp. Nayara Petrol Pump\n" +
-          "   Chhatrapati Sambhajinagar, MH – 431009\n\n" +
+          "   Chhatrapati Sambhajinagar, Maharashtra – 431009\n\n" +
 
           "🏢 Kolhapur Branch (Mr. Manoj Powar)\n" +
           "   Dabholkar Corner,\n" +

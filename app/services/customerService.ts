@@ -81,8 +81,6 @@ export interface KycStatusResponse {
     ifsc_code?: string;
     bank_name?: string;
     bank_verified: boolean;
-    gst_number?: string;
-    gst_verified: boolean;
     kyc_completed: boolean;
     profile_image_url?: string;
     aadhaar_kyc_data?: any;
@@ -459,12 +457,6 @@ const CustomerService = {
 
     getrmcustomer: async () => {
         const response = await api.get('/api/customer/rm/assigned-rm');
-        return response.data;
-    },
-
-
-    logout: async () => {
-        const response = await api.post("/api/unlisted/user/logout");
         return response.data;
     },
 
