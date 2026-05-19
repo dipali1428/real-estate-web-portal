@@ -141,16 +141,6 @@ const FDDashboard: React.FC = () => {
   }, [router]);
 
   // ========== HANDLE LOGOUT ==========
-  const handleLogout = async () => {
-    try {
-      await customerService.logout();
-    } catch (err) {
-
-    }
-    removeTokenCookie();
-    localStorage.removeItem('token');
-    router.push('/');
-  };
 
   // ========== FORMATTERS ==========
   const formatCurrency = (amount: string) => {
@@ -196,7 +186,6 @@ const FDDashboard: React.FC = () => {
               Retry Connection
             </button>
             <button
-              onClick={handleLogout}
               className="w-full py-3 px-4 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all text-sm sm:text-base"
             >
               Back to Login
