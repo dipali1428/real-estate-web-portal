@@ -97,7 +97,7 @@ const AboutSection = () => {
 
         {
             name: "Mr. Anil Akolkar",
-            title: "Investment Professional",
+            title: "Investment Professional (Ahilyanagar Branch)",
             description: "Investment Professional with 18 years of experience in Mutual Funds and various insurance products. Specializes in customer-need-based financial planning for early retirement and a bright future.",
             image: "/leader/mr-akolkar.png"
         },
@@ -141,9 +141,15 @@ const AboutSection = () => {
         {
             name: "Mr. Girijatmaj Sarnikar",
             title: "Branch Manager (Jalna Branch)",
-            description: "Mr. Girijatmaj Sarnikar brings 2+ years of experience in Lending and Financial Services, specializing in sales growth, client relationship management, business development, and profitable branch performance through strong leadership and market expertise.",
+            description: "With over 2+ years of experience in Lending and Financial Services, specializing in sales growth, client relationship management, business development, and profitable branch performance through strong leadership and market expertise.",
             image: "/leader/mr-sarnikar.png"
-        }
+        },
+        {
+            name: "Mr. Rajendra Pawar",
+            title: "Branch Head (Karad Branch)",
+            description: "Serves the Branch Head of the Karad Branch with over 5 years of experience in Home, Business, and Personal Loans. He is skilled in branch operations, client relationship management, team leadership, and driving business growth through a result-oriented approach.",
+            image: "/leader/mr-rajendra.png"
+        },
 
     ];
 
@@ -153,35 +159,35 @@ const AboutSection = () => {
             manager: "Mr. Sumeet Nikalje",
             mobile: "+91 96571 95136",
             email: "sumeetnikalje@infinityarthvishva.com",
-            lines: ["Office No 507, 5th Floor, Freedom Tower", "Akashwani Chowk", "Chhatrapati Sambhajinagar, MH – 431001"]
+            lines: ["Office No 507,", "5th Floor, Freedom Tower,", "Akashwani Chowk,", "Chhatrapati Sambhajinagar, Maharashtra – 431001"]
         },
         {
             title: "Chhatrapati Sambhajinagar Branch",
             manager: "Mr. Pravin Nikam",
             mobile: "+91 87675 56611",
             email: "pravinnikam@infinityarthvishva.com",
-            lines: ["Office No 03, Dwarka Complex", "Mahesh Nagar", "Chhatrapati Sambhaji Nagar, MH – 431001"]
+            lines: ["Office No 03,", "Dwarka Complex,", "Mahesh Nagar,", "Chhatrapati Sambhaji Nagar, Maharashtra – 431001"]
         },
         {
             title: "Chhatrapati Sambhajinagar Branch",
             manager: "Mr. Yogesh Joshi",
             mobile: "+91 98233 20790",
             email: "yogeshjoshi@infinityarthvishva.com",
-            lines: ["N-12 C-133, Swami Vivekanand Nagar", "T V Center Road, Hudco, Opp. Maharshi Statue", "Chhatrapati Sambhajinagar, MH - 431001"]
+            lines: ["N-12 C-133,", "Swami Vivekanand Nagar,", "T V Center Road, Hudco, Opp. Maharshi Statue,", "Chhatrapati Sambhajinagar, Maharashtra - 431001"]
         },
         {
             title: "Ahilyanagar Branch",
             manager: "Mr. Santosh Tupe",
             mobile: "+91 98818 27936",
             email: "santoshtupe@infinityarthvishva.com",
-            lines: ["Office No : 3, Rameshwar Appt., Vani Nagar", "Pipeline Road, Savedi", "Ahilyanagar, Maharashtra - 414003"]
+            lines: ["Office No : 3, Rameshwar Appt.,", "Vani Nagar,", "Pipeline Road, Savedi", "Ahilyanagar, Maharashtra - 414003"]
         },
         {
             title: "Chhatrapati Sambhajinagar Branch",
             manager: "Mr. Sanjay Kankariya",
             mobile: "+91 9326009808 / 95116 31210",
             email: "sanjaykankariya@infinityarthvishva.com",
-            lines: ["Office Akil Complex, Pundalik Nagar Road", "Opp. Nayara Petrol Pump", "Chhatrapati Sambhajinagar, MH – 431009"]
+            lines: ["Office Akil Complex, Pundalik Nagar Road", "Opp. Nayara Petrol Pump", "Chhatrapati Sambhajinagar, Maharashtra – 431009"]
         },
         {
             title: "Kolhapur Branch",
@@ -189,6 +195,14 @@ const AboutSection = () => {
             mobile: "+91 99237 37637",
             email: "manojpowar@infinityarthvishva.com",
             lines: ["Dabholkar Corner,", "Amatya Towers,", "Kolhapur, Maharashtra – 416001"]
+        },
+        {
+            title: "Ahilyanagar Branch",
+            manager: "Mr. Anil Akolkar",
+            mobile: "+91 92707 19400",
+            email: "anilakolkar@infinityarthvishva.com",
+            website: "www.infinityarthvishva.com",
+            lines: ["94, Sahakarnagar,", "Pipeline Road, Savedi,", "Ahilyanagar, Maharashtra – 414003"]
         },
         {
             title: "Nagpur Branch",
@@ -241,7 +255,7 @@ const AboutSection = () => {
         },
         {
             title: "Jalna Branch",
-            manager: "Girijatmaj Sarnikar",
+            manager: "Mr. Girijatmaj Sarnikar",
             mobile: "+91 96077 57794",
             email: " girijatmajsarnikar@infinityarthvishva.com",
             lines: ["07, Kalptaru Park", "Opp Jalna Hospital", "Near Ambad Chaufuly", "Jalna, Maharashtra – 431203"]
@@ -254,13 +268,27 @@ const AboutSection = () => {
             lines: ["Office No 1,", "Base Floor,", "Banjara Tower Ambad Road,", "Jalna, Maharashtra – 431203"]
         },
         {
+            title: "Karad Branch",
+            manager: "Mr. Rajendra Pawar",
+            mobile: "+91 94238 64043",
+            email: "karadbranch@infinityarthvishva.com",
+            lines: ["Office No 12,", "Prestige Point Pol Wasti, ", "Dhebewadi Road, Agashivnagar", "Karad, Satara, Maharashtra – 415539"]
+        },
+        {
+            title: "Kondhwa Branch",
+            manager: "Mr. Ajay Mundada",
+            mobile: "+91 94035 79419",
+            email: "ajaymundada@gmail.com",
+            lines: ["Pukhraj Villa,", "Opp. Shantingar Society,", "Kondhwa Bk,", "Pune, Maharashtra - 411048"]
+        },
+        {
             title: "Kanpur Branch",
             lines: ["Office No. 01, Kamlist Tower", "Behind Mishra Jewellers, Near Joga Bhogha Chauraha", "Nehru Nagar, Shuklaganj", "Kanpur, Unnao, Uttar Pradesh - 209861"]
         },
 
         {
             title: "Kolkata Branch",
-            lines: ["PS Qube, Room No. 620, 6th Floor", "Plot No. IID/31/1, NewTown", "Kolkata, West Bengal - 700135"]
+            lines: ["PS Qube,", "Room No. 620", "6th Floor", "Plot No. IID/31/1, NewTown", "Kolkata, West Bengal - 700135"]
         },
         {
             title: "Chiplun Branch",
@@ -359,33 +387,35 @@ const AboutSection = () => {
                                 </h3>
                                 <div className="w-16 h-0.5 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mt-2"></div>
                             </div>
-                            
-                        {/* Branch Heads Grid - Combined for perfect alignment */}
-                        <div className="max-w-[95rem] mx-auto mb-12">
-                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
-                                {leaders.slice(8).map((leader, index) => (
-                                    <div
-                                        key={index + 8}
-                                        className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
-                                    >
-                                        <div className="w-full aspect-square overflow-hidden">
-                                            <Image
-                                                src={leader.image}
-                                                alt={leader.name}
-                                                width={800}
-                                                height={360}
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                            />
+
+
+                            {/* Branch Heads Grid - Centered with exactly 5 per row on desktop */}
+                            <div className="max-w-[95rem] mx-auto mb-12">
+                                {/* We use flex-wrap and justify-center to center the last row dynamically */}
+                                <div className="flex flex-wrap justify-center gap-8">
+                                    {leaders.slice(8).map((leader, index) => (
+                                        <div
+                                            key={index + 8}
+                                            className="group bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 w-full sm:w-[calc(50%-2rem)] md:w-[calc(33.33%-2rem)] lg:w-[calc(20%-2rem)]"
+                                        >
+                                            <div className="w-full aspect-square overflow-hidden">
+                                                <Image
+                                                    src={leader.image}
+                                                    alt={leader.name}
+                                                    width={800}
+                                                    height={360}
+                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                />
+                                            </div>
+                                            <div className="p-6 text-center">
+                                                <h3 className="text-lg font-bold text-gray-800 mb-1">{leader.name}</h3>
+                                                <p className="text-[#2076C7] font-semibold mb-3">{leader.title}</p>
+                                                <p className="text-gray-800 text-sm leading-relaxed">{leader.description}</p>
+                                            </div>
                                         </div>
-                                        <div className="p-6 text-center">
-                                            <h3 className="text-lg font-bold text-gray-800 mb-1">{leader.name}</h3>
-                                            <p className="text-[#2076C7] font-semibold mb-3">{leader.title}</p>
-                                            <p className="text-gray-800 text-sm leading-relaxed">{leader.description}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
-                        </div>
                         </div>
                     </div>
 

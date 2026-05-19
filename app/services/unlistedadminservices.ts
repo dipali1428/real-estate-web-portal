@@ -257,18 +257,6 @@ export const AdminService = {
     return response.data;
   },
 
-  // ==================== LOGOUT ====================
-
-  logout: async () => {
-    const response = await api.post("/api/unlisted/admin/logout");
-
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-    }
-
-    return response.data;
-  },
-
   // ==================== DEMAT ====================
 
   getUserDemat: async (userId: number): Promise<{ success: boolean; data: DematDetails }> => {
