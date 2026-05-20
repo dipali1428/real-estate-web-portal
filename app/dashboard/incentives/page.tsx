@@ -1,7 +1,7 @@
 'use client';
 import { useState, useMemo, useEffect } from 'react';
-import { 
-  IndianRupee, Search, Filter, Download, 
+import {
+  IndianRupee, Search, Filter, Download,
   Wallet, Clock, Calculator, ChevronRight, TrendingUp,
   Building2, ShieldCheck, PieChart, Briefcase, Landmark,
   Inbox, Users, Coins
@@ -60,13 +60,13 @@ export default function IncentivesPayouts() {
   // --- CSV Export Functionality ---
   const handleExport = () => {
     const dataToExport = historySubTab === 'detail' ? payoutData : referralPayoutData;
-    
+
     if (dataToExport.length === 0) return;
 
     // Define CSV Headers
     const headers = [
-      "ID", "Payout ID", "Date", "Client Name", "Lead ID", "Product", 
-      "Category", "Ref Number", "Payment Mode", "Status", "Amount", 
+      "ID", "Payout ID", "Date", "Client Name", "Lead ID", "Product",
+      "Category", "Ref Number", "Payment Mode", "Status", "Amount",
       "Gross Amount", "TDS", "GST", "Net Payout", "Invoice Number"
     ];
 
@@ -112,7 +112,7 @@ export default function IncentivesPayouts() {
       try {
         setIsLoading(true);
         const response = await DashboardService.getCompletedDetailLeads();
-        const refResponse: any = []; 
+        const refResponse: any = [];
 
         const mapData = (raw: any) => {
           const rawList = Array.isArray(raw) ? raw : (raw?.leads || raw?.data || []);
@@ -167,15 +167,15 @@ export default function IncentivesPayouts() {
   const productMapping: Record<CategoryType, string[]> = {
     'loans': ['Home Loan', 'Personal Loan', 'Vehicle Loan', 'SME Loan', 'Mortgage Loan', 'Business Loan', 'Loan Against Securities', 'Education Loan'],
     'insurance': ['Life Insurance', 'Health Insurance', 'Motor Insurance', 'Travel Insurance', 'Fire Insurance', 'Cattle Insurance', 'Marine Insurance', 'Corporate Insurance', 'Loan Protector'],
-    'mutual-funds': ['Mutual Fund'],
-    'investments': ['PMS', 'AIF', 'Fixed Deposit', 'Bonds'],
+    'mutual-funds': ['Equity Funds', 'Debt Funds', 'Hybrid Funds'], // Changed from ['Mutual Fund']
+    'investments': ['NCD Bonds', 'FD', 'Bonds'], // Changed to match commission keys
     'real-estate': ['Fractional']
   };
 
   const commissionStructure = {
     'loans': [{ name: 'Personal Loan', rate: '1.5% - 2.5%' }, { name: 'Home Loan', rate: '0.4% - 0.88%' }, { name: 'Business Loan', rate: '1.0% - 2.0%' }, { name: 'Commercial / Mortgage', rate: '1.04% - 1.44%' }, { name: 'SME Loan', rate: '1.2% - 2.0%' }, { name: 'Education Loan', rate: '0.40% - 0.96%' }, { name: 'Vehicle Loan', rate: '0.75% - 1.5%' }, { name: 'NRP Loan', rate: '0.75% - 1.5%' }, { name: 'Loan Against Securities', rate: '0.5% - 1.2%' }],
     'insurance': [{ name: 'Life Insurance', rate: '2% - 56%' }, { name: 'Health Insurance', rate: '3% - 32%' }, { name: 'Motor Insurance', rate: '0.5% - 50%' }, { name: 'Travel Insurance', rate: '22% - 40%' }, { name: 'Fire Insurance', rate: '6% - 28%' }, { name: 'Cattle Insurance', rate: '12%' }, { name: 'Marine Insurance', rate: '8% - 22%' }, { name: 'Corporate Insurance', rate: '5%' }, { name: 'Loan Protector', rate: '23% - 35%' }],
-    'mutual-funds': [{ name: 'Equity Funds', rate: '0.5% - 0.8%' }, { name: 'Debt Funds', rate: '0.1% - 0.4%' }, { name: 'Hybrid Funds', rate: '0.3% - 0.8%' }],
+    'mutual-funds': [ { name: 'Equity Funds', rate: '0.5% - 0.8%' },{ name: 'Debt Funds', rate: '0.1% - 0.4%' }, { name: 'Hybrid Funds', rate: '0.3% - 0.8%' } ],
     'investments': [{ name: 'NCD Bonds', rate: '0.40% - 1.40%' }, { name: 'FD', rate: '0.10% - 1.52%' }, { name: 'Bonds', rate: '0.12% - 0.30%' }],
     'real-estate': [{ name: 'Fractional', rate: '0.5% - 1.5%' }]
   };
@@ -183,7 +183,11 @@ export default function IncentivesPayouts() {
   const calculation = useMemo(() => {
     const receivableAmount = parseFloat(amount) || 0;
     const productInfo = commissionStructure[leadCategory].find(p => p.name === selectedProduct);
-    const rates = (productInfo?.rate.match(/\d+(\.\d+)?/g) || [0]).map(Number);
+
+    // Safety check: If no product selected or found, return zeros
+    if (!productInfo) return { gross: "0", tds: "0", net: "0", percent: "0%" };
+
+    const rates = (productInfo.rate.match(/\d+(\.\d+)?/g) || [0]).map(Number);
     const avgRatePercent = rates.reduce((a, b) => a + b, 0) / rates.length;
     const grossAmount = receivableAmount * (avgRatePercent / 100);
     const tdsAmount = grossAmount * 0.02;
@@ -198,7 +202,7 @@ export default function IncentivesPayouts() {
   return (
     <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-6">
-        
+
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-700">Incentives & Payouts</h1>
@@ -211,9 +215,8 @@ export default function IncentivesPayouts() {
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
-                  className={`px-4 py-2 text-sm font-semibold transition-all rounded-lg whitespace-nowrap ${
-                    activeTab === id ? 'bg-[#1CADA3] text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'
-                  }`}
+                  className={`px-4 py-2 text-sm font-semibold transition-all rounded-lg whitespace-nowrap ${activeTab === id ? 'bg-[#1CADA3] text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'
+                    }`}
                 >
                   {label}
                 </button>
@@ -390,8 +393,8 @@ export default function IncentivesPayouts() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 p-12 text-center opacity-60">
-                   <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mb-4"><Calculator className="w-8 h-8 text-slate-300" /></div>
-                   <h3 className="text-lg font-bold text-slate-700 mb-2">Ready to Calculate?</h3>
+                  <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mb-4"><Calculator className="w-8 h-8 text-slate-300" /></div>
+                  <h3 className="text-lg font-bold text-slate-700 mb-2">Ready to Calculate?</h3>
                 </div>
               )}
             </div>

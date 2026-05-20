@@ -6,7 +6,6 @@ import {
   Users,
   CheckCircle,
   RefreshCw,
-  Building2,
   MapPin,
   UserMinus,
   ChevronDown,

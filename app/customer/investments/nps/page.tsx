@@ -6,10 +6,7 @@ import {
   LayoutDashboard,
   Calculator,
   PiggyBank,
-  CalendarDays,
-  UserPlus,
-  Briefcase,
-  User
+  CalendarDays
 } from "lucide-react";
 import NPSDashboard from "./dashboard/page";
 import NPSCalculator from "./calculator/page";

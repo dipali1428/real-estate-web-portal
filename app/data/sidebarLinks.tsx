@@ -44,9 +44,9 @@ import {
     Landmark,
     Building2,
     Equal,
-    CalendarDays ,
+    CalendarDays,
     BriefcaseBusiness,
-    Weight,
+    SquareChartGantt,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -168,6 +168,7 @@ export const sidebarLinks = {
         { label: "Detailed Leads", href: "/rm/detailedleads", icon: <FileText className="h-5 w-5 text-neutral-700" /> },
         { label: "Consumer Leads", href: "/rm/consumerdetailedleads", icon: <UserCheck className="h-5 w-5 text-neutral-700" /> },
         { label: "Upload Payout", href: "/rm/uploadpayout", icon: <FileUp className="h-5 w-5 text-neutral-700" /> },
+        { label: "Lead Management", href: "/rm/leadmanagement", icon: <Users className="h-5 w-5 text-neutral-700" /> },
     ],
 
     HR: [
@@ -186,8 +187,13 @@ export const sidebarLinks = {
     BRANCH: [
         { label: "Branch Dashboard", href: "/branch", icon: <LayoutDashboard className="h-5 w-5 text-neutral-700" /> },
         { label: "My Profile", href: "/branch/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
-        { label: "DSA Management", href: "/branch/dsamanagement", icon: <Weight className="h-5 w-5 text-neutral-700" /> },
+        { label: "Agreement", href: "/branch/agreement", icon: <Handshake className="h-4 w-4 text-neutral-700" /> },
+        { label: "Lead Management", href: "/branch/dsamanagement", icon: <SquareChartGantt className="h-5 w-5 text-neutral-700" /> },
         { label: "My Branch Dsa's", href: "/branch/branches", icon: <Users className="h-5 w-5 text-neutral-700" /> },
+        { label: "Branch Payout", href: "/branch/branchpayout", icon: <WalletCards className="h-4 w-4 text-neutral-700" /> },
+        { label: "Downloads", href: "/branch/payoutgrid", icon: <Download className="h-5 w-5 text-neutral-700" /> },
+        { label: "Relationship Manager", href: "/branch/relationshipmanager", icon: <UserCheck className="h-5 w-5 text-neutral-700" /> },
+        { label: "Help & Support", href: "/branch/supportticket", icon: <HelpCircle className="h-5 w-5 text-neutral-700" /> },
 
     ],
 

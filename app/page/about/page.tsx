@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { Manager } from 'socket.io-client';
 
 const AboutSection = () => {
     const leaders = [

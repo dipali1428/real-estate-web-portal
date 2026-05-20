@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-    Search, X, FileText, ExternalLink, ChevronLeft, ChevronRight, Loader2, CheckCircle2, UserCheck, FileSignature,
+    Search, X, FileText, ExternalLink, ChevronLeft, ChevronRight, Loader2, CheckCircle2, UserCheck, FileSignature, Check,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AccountService } from '@/app/services/accountsService';
@@ -27,6 +27,7 @@ interface Lead {
     dsa_name: string;
     dsa_adv_id: string;
     dsa_mobile: string;
+    final_lead_confirm_status: boolean;
 
     rm_id: number;
     rm_name: string;
@@ -94,9 +95,43 @@ export default function LeadDashboard() {
         fetchLeads();
     }, [fetchLeads]);
 
+    // --- Confirm Status Update Logic ---
+    const handleConfirmStatusChange = async (
+        leadId: number,
+        value: string
+    ) => {
+        if (!value) return;
+
+        let statusBoolean: boolean;
+
+        if (value === "yes") {
+            statusBoolean = true;
+        } else {
+            statusBoolean = false;
+        }
+
+        console.log(typeof statusBoolean);
+        console.log(statusBoolean);
+
+        try {
+            await AccountService.updateLeadConfirmStatus(
+                leadId,
+                statusBoolean
+            );
+
+            toast.success("Status updated successfully");
+
+            fetchLeads();
+        } catch (error: any) {
+            toast.error(
+                error?.response?.data?.message ||
+                "Failed to update confirm status"
+            );
+        }
+    };
+
     // --- Search & Filter Logic ---
     const filteredLeads = useMemo(() => {
-        // Only include leads where status is COMPLETED
         let result = leads.filter(lead => lead.lead_status?.toUpperCase() === 'COMPLETED');
 
         const term = searchTerm.toLowerCase().trim();
@@ -185,8 +220,9 @@ export default function LeadDashboard() {
                                 <tr>
                                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ID</th>
                                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Lead Details</th>
-                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">DSA & ADV ID</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">RM Lead Status</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Final Confirmation</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">DSA Details</th>
                                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Assigned RM</th>
                                     <th className="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
                                 </tr>
@@ -194,8 +230,27 @@ export default function LeadDashboard() {
                             <tbody className="divide-y divide-gray-200">
                                 {currentLeads.length > 0 ? (
                                     currentLeads.map((lead) => (
-                                        <tr key={lead.id} className="hover:bg-blue-50/30 transition-colors">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-500">#{lead.id}</td>
+                                        <tr
+                                            key={lead.id}
+                                            className={`
+                                                        transition-colors
+                                                    hover:bg-blue-50/30
+                                                       ${lead.final_lead_confirm_status === true
+                                                    ? 'bg-green-50'
+                                                    : ''} `}  >
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center gap-2">
+                                                    {lead.final_lead_confirm_status === true && (
+                                                        <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                                                            <Check size={12} className="text-white" />
+                                                        </div>
+                                                    )}
+
+                                                    <span className="text-sm font-bold text-gray-500">
+                                                        #{lead.id}
+                                                    </span>
+                                                </div>
+                                            </td>
                                             <td className="px-6 py-4">
                                                 <div className="text-sm font-bold text-gray-900">{lead.lead_name}</div>
                                                 <div className="text-[11px] text-gray-500 font-medium">{lead.detail_lead_id}</div>
@@ -205,6 +260,41 @@ export default function LeadDashboard() {
                                                     COMPLETED
                                                 </span>
                                             </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+
+                                                {lead.final_lead_confirm_status ? (
+
+                                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-100 text-green-700 border border-green-200">
+
+                                                        <CheckCircle2 size={14} />
+
+                                                        <span className="text-[11px] font-bold uppercase tracking-wide">
+                                                            Completed
+                                                        </span>
+
+                                                    </div>
+
+                                                ) : (
+
+                                                    <select
+                                                        className="text-[11px] font-bold border text-gray-600 rounded-md px-2 py-1 bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                                                        onChange={(e) =>
+                                                            handleConfirmStatusChange(
+                                                                lead.id,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        defaultValue=""
+                                                    >
+                                                        <option value="">Select</option>
+                                                        <option value="yes">Yes</option>
+                                                        <option value="no">No</option>
+                                                    </select>
+
+                                                )}
+
+                                            </td>
+
                                             <td className="px-6 py-4">
                                                 <div className="text-sm font-semibold text-gray-700">
                                                     {lead.dsa_name}
@@ -230,7 +320,7 @@ export default function LeadDashboard() {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-20 text-center">
+                                        <td colSpan={7} className="px-6 py-20 text-center">
                                             <div className="flex flex-col items-center justify-center">
                                                 <Search size={40} className="text-gray-200 mb-2" />
                                                 <p className="text-gray-500 font-medium text-lg">No completed leads found</p>

@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
-import { FileUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import toast from 'react-hot-toast';
 import { AccountService } from '@/app/services/accountsService'; // Adjust path if necessary
 

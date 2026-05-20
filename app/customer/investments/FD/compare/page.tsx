@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, CheckCircle2, X, Landmark, Database, Star, CheckCircle } from 'lucide-react';
+import { ChevronDown, CheckCircle2, X, Landmark, Database, Star } from 'lucide-react';
 
 import { useRouter } from 'next/navigation';
-import { DashboardService } from '@/app/services/dashboardService';
 import { FDAdminService } from '@/app/services/fdAdminServices';
 import { toast } from 'react-hot-toast';
 

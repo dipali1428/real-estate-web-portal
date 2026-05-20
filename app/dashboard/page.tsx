@@ -18,6 +18,8 @@ interface UserProfile {
     city: string;
     head: string;
     category: string;
+    paymentMethod?: string; // Field from API root
+    agreement_amount?: string | number; 
 }
 
 // ✅ Interface for top products
@@ -65,104 +67,106 @@ export default function Dashboard() {
             .join(' ');
     };
 
-    // Fetch profile data (unchanged logic)
+    // Fetch profile and earnings data
     useEffect(() => {
         if (hasFetched.current) return;
         hasFetched.current = true;
 
-        const fetchProfile = async () => {
+        const fetchData = async () => {
             try {
-
                 const token = getToken();
                 if (!token || isTokenExpired(token)) {
                     router.push("/");
+                    return;
                 }
                 setLoading(true);
 
-                const data = await DashboardService.getProfile();
-                const userData = data.user;
+                // 1. Get Profile First
+                const profileData = await DashboardService.getProfile();
+                const userData = profileData.user;
+                
+                // Extract paymentMethod from root as per your API response JSON
                 const formattedUser = {
                     ...userData,
-                    name: capitalizeFullName(userData.name)
+                    name: capitalizeFullName(userData.name),
+                    paymentMethod: profileData.paymentMethod 
                 };
                 setUser(formattedUser);
 
-                // Fetch leads count
-                try {
-                    const [referralRes, detailedRes] = await Promise.all([
-                        DashboardService.getLeads(),
-                        DashboardService.getMyLeads()
-                    ]);
+                // 2. Fetch leads counts and earnings leads in parallel
+                const [referralRes, detailedRes, earningsRes] = await Promise.all([
+                    DashboardService.getLeads(),
+                    DashboardService.getMyLeads(),
+                    DashboardService.getCompletedDetailLeads()
+                ]);
 
-                    const referralCount = (referralRes?.success && Array.isArray(referralRes.data)) ? referralRes.data.length : 0;
-                    const detailedCount = (detailedRes?.success && Array.isArray(detailedRes.data)) ? detailedRes.data.length : 0;
-                    setTotalLeadsCount(referralCount + detailedCount);
-                } catch (err) {
-                    toast.error("Leads count fetch error:");
-                }
+                // Update Lead Counts
+                const referralCount = (referralRes?.success && Array.isArray(referralRes.data)) ? referralRes.data.length : 0;
+                const detailedCount = (detailedRes?.success && Array.isArray(detailedRes.data)) ? detailedRes.data.length : 0;
+                setTotalLeadsCount(referralCount + detailedCount);
 
-                // Fetch earnings
-                try {
-                    const response = await DashboardService.getCompletedDetailLeads();
-                    const rawList = Array.isArray(response)
-                        ? response
-                        : (response?.leads || response?.data || []);
+                // Calculate Earnings
+                const rawList = Array.isArray(earningsRes)
+                    ? earningsRes
+                    : (earningsRes?.leads || earningsRes?.data || []);
 
-                    if (Array.isArray(rawList)) {
-                        const total = rawList.reduce((acc: number, curr: any) => {
-                            let val = curr.net_payout_amount || 0;
-                            if (typeof val === 'string') {
-                                val = val.replace(/,/g, '');
-                            }
-                            return acc + (parseFloat(val) || 0);
-                        }, 0);
-                        setTotalEarnings(total.toLocaleString('en-IN'));
-
-                        // ✅ Calculate top products from leads data
-                        const productCounts: Record<string, { count: number; revenue: number }> = {};
-
-                        rawList.forEach((lead: any) => {
-                            const productName = lead.product_name || lead.product || 'Other';
-                            const revenue = parseFloat(lead.net_payout_amount?.replace(/,/g, '') || '0');
-
-                            if (!productCounts[productName]) {
-                                productCounts[productName] = { count: 0, revenue: 0 };
-                            }
-                            productCounts[productName].count += 1;
-                            productCounts[productName].revenue += revenue;
-                        });
-
-                        // Sort and get top 4 products
-                        const sortedProducts = Object.entries(productCounts)
-                            .sort((a, b) => b[1].revenue - a[1].revenue)
-                            .slice(0, 4)
-                            .map(([name, data], index) => ({
-                                name,
-                                count: data.count,
-                                revenue: data.revenue,
-                                color: ['from-blue-500 to-cyan-500', 'from-green-500 to-emerald-500', 'from-yellow-500 to-orange-500', 'from-purple-500 to-pink-500'][index]
-                            }));
-
-                        if (sortedProducts.length > 0) {
-                            setTopProducts(sortedProducts);
+                if (Array.isArray(rawList)) {
+                    const totalRevenue = rawList.reduce((acc: number, curr: any) => {
+                        let val = curr.net_payout_amount || 0;
+                        if (typeof val === 'string') {
+                            val = val.replace(/,/g, '');
                         }
+                        return acc + (parseFloat(val) || 0);
+                    }, 0);
+
+                    // ✅ DEDUCTION LOGIC: If paymentMethod is USE_COUPON, deduct 590
+                    let finalDisplayValue = totalRevenue;
+                    
+                    if (profileData.paymentMethod === "USE_COUPON") {
+                        finalDisplayValue = totalRevenue - 590;
                     }
-                } catch (err) {
-                    toast.error("Earnings fetch error:");
+
+                    setTotalEarnings(finalDisplayValue.toLocaleString('en-IN'));
+
+                    // ✅ Calculate top products from leads data
+                    const productCounts: Record<string, { count: number; revenue: number }> = {};
+
+                    rawList.forEach((lead: any) => {
+                        const productName = lead.product_name || lead.product || 'Other';
+                        const revenue = parseFloat(lead.net_payout_amount?.toString().replace(/,/g, '') || '0');
+
+                        if (!productCounts[productName]) {
+                            productCounts[productName] = { count: 0, revenue: 0 };
+                        }
+                        productCounts[productName].count += 1;
+                        productCounts[productName].revenue += revenue;
+                    });
+
+                    const sortedProducts = Object.entries(productCounts)
+                        .sort((a, b) => b[1].revenue - a[1].revenue)
+                        .slice(0, 4)
+                        .map(([name, data], index) => ({
+                            name,
+                            count: data.count,
+                            revenue: data.revenue,
+                            color: ['from-blue-500 to-cyan-500', 'from-green-500 to-emerald-500', 'from-yellow-500 to-orange-500', 'from-purple-500 to-pink-500'][index]
+                        }));
+
+                    if (sortedProducts.length > 0) {
+                        setTopProducts(sortedProducts);
+                    }
                 }
 
             } catch (error: any) {
-                toast.error("Profile fetch error:");
+               toast.error("Fetch error:", error);
                 if (error?.response?.status === 401) {
-                    toast.error("Login session expired! Please login again.", { duration: 2000 });
-                    document.cookie = `authToken=; path=/; expires=${new Date(0).toUTCString()}`;
-                    setTimeout(() => router.push("/"), 500);
+                    router.push("/");
                 }
             } finally {
                 setLoading(false);
             }
         };
-        fetchProfile();
+        fetchData();
     }, [router]);
 
     // Token check
@@ -173,8 +177,8 @@ export default function Dashboard() {
         }
     }, [router]);
 
-    // ✅ KPI Card Component
-    const KpiCard = ({ icon, color, value, label, bgColor }: any) => (
+    // ✅ KPI Card Component (Updated to handle sub-text for deductions)
+    const KpiCard = ({ icon, color, value, label, subLabel }: any) => (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between">
                 <div className={`w-12 h-12 bg-linear-to-r ${color} rounded-2xl flex items-center justify-center text-white`}>
@@ -185,6 +189,11 @@ export default function Dashboard() {
                 <div className="text-2xl font-bold font-sans text-gray-800">
                     {loading ? "..." : value}
                 </div>
+                {subLabel && !loading && (
+                    <div className="text-xs font-semibold text-red-500 mt-0.5">
+                        {subLabel}
+                    </div>
+                )}
                 <div className="text-gray-600 mt-1">{label}</div>
             </div>
         </div>
@@ -219,6 +228,7 @@ export default function Dashboard() {
                         color="from-blue-500 to-cyan-500"
                         value={`₹ ${totalEarnings}`}
                         label="Total Payout Earnings"
+                        subLabel={user?.paymentMethod === "USE_COUPON" ? "Inc. ₹590 Agreement Deduction" : null}
                     />
 
                     <KpiCard
@@ -274,7 +284,7 @@ export default function Dashboard() {
                         <PortfolioChart />
                     </div>
 
-                    {/* Top Products Section - Replaced Recent Activity */}
+                    {/* Top Products Section */}
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">
                             <svg className="w-5 h-5 text-purple-500 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,18 +325,10 @@ export default function Dashboard() {
                                                     <span className="text-sm font-semibold text-gray-900">
                                                         ₹{product.revenue.toLocaleString('en-IN')}
                                                     </span>
-                                                    <span className="text-xs text-gray-500 ml-2">
-                                                        ({product.count} {product.count === 1 ? 'policy' : 'policies'})
-                                                    </span>
                                                 </div>
                                             </div>
 
-                                            {/* Progress bar with label */}
                                             <div className="relative pt-1">
-                                                <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-                                                    <span>Revenue share</span>
-                                                    <span>{percentage}% of top product</span>
-                                                </div>
                                                 <div className="overflow-hidden h-2 text-xs flex rounded-full bg-gray-100">
                                                     <motion.div
                                                         initial={{ width: 0 }}
@@ -336,68 +338,9 @@ export default function Dashboard() {
                                                     />
                                                 </div>
                                             </div>
-
-                                            {/* Mini metric badges */}
-                                            <div className="flex gap-3 mt-1">
-                                                <div className="text-xs text-gray-500">
-                                                    <span className="font-medium text-gray-700">Avg. per policy: </span>
-                                                    ₹{product.count > 0 ? (product.revenue / product.count).toFixed(0) : 0}
-                                                </div>
-                                            </div>
                                         </motion.div>
                                     );
                                 })}
-
-                                {topProducts.every(p => p.revenue === 0) && (
-                                    <div className="text-center py-8">
-                                        <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                                            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                            </svg>
-                                        </div>
-                                        <p className="text-gray-600 font-medium">No product data available yet</p>
-                                        <p className="text-sm text-gray-400 mt-1">Start adding leads to see your top performers</p>
-                                        <button className="mt-4 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors">
-                                            + Add Your First Lead
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Performance Summary Footer */}
-                        {!loading && topProducts.some(p => p.revenue > 0) && (
-                            <div className="mt-6 pt-4 border-t border-gray-100">
-                                <div className="grid grid-cols-3 gap-3">
-                                    <div className="bg-blue-50 rounded-lg p-3 text-center">
-                                        <div className="text-xs text-blue-600 font-medium mb-1">Best Seller</div>
-                                        <div className="font-semibold text-gray-800 text-sm truncate" title={topProducts[0]?.name}>
-                                            {topProducts[0]?.name || 'N/A'}
-                                        </div>
-                                    </div>
-                                    <div className="bg-green-50 rounded-lg p-3 text-center">
-                                        <div className="text-xs text-green-600 font-medium mb-1">Total Revenue</div>
-                                        <div className="font-semibold text-gray-800">
-                                            ₹{topProducts.reduce((sum, p) => sum + p.revenue, 0).toLocaleString('en-IN')}
-                                        </div>
-                                    </div>
-                                    <div className="bg-purple-50 rounded-lg p-3 text-center">
-                                        <div className="text-xs text-purple-600 font-medium mb-1">Active Products</div>
-                                        <div className="font-semibold text-gray-800">
-                                            {topProducts.filter(p => p.revenue > 0).length}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Performance tip */}
-                                {topProducts[0]?.revenue > 0 && (
-                                    <div className="mt-3 text-xs text-gray-500 flex items-center justify-center">
-                                        <svg className="w-4 h-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                        Tip: {topProducts[0]?.name} is your top performer. Consider focusing more on this product!
-                                    </div>
-                                )}
                             </div>
                         )}
                     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, ChangeEvent } from "react";
-import { Search, User, Briefcase, Phone, BadgeCheck, Eye, X, ShieldCheck, FileText } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 // Mock Data updated with all required fields
 const INITIAL_LEADS = [

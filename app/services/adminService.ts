@@ -483,9 +483,9 @@ export const AdminService = {
   const response = await api.get("/api/admin/branch/get-all-branches", { params });
   return response.data;
 },
-getBranchUsers: async () => {
-    // As per your instruction: PUT : /api/admin/branch/branch-users
-    const response = await api.get("/api/admin/branch/branch-users"); 
+getBranchUsers: async (page = 1) => {
+    // Added page parameter to the URL
+    const response = await api.get(`/api/admin/branch/branch-users?page=${page}`); 
     return response.data;
 },
 assignBranchUser: async (payload: { user_id: number; branch_id: number }) => {
