@@ -110,9 +110,6 @@ export default function LeadDashboard() {
             statusBoolean = false;
         }
 
-        console.log(typeof statusBoolean);
-        console.log(statusBoolean);
-
         try {
             await AccountService.updateLeadConfirmStatus(
                 leadId,
