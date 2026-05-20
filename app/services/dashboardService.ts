@@ -87,6 +87,7 @@ export const DashboardService = {
         };
         meta: {
             is_self_login: boolean;
+            dsa_id?: number;
         };
         form_data: any;
     }) => {
@@ -204,8 +205,15 @@ export const DashboardService = {
         return response.data;
     },
 
-    verifyPayment: async (order_id: string) => {
-        const response = await api.get(`/api/dashboard/payment/verify-payment/${order_id}`);
+    verifyPayment: async (payload: {
+        razorpay_order_id: string;
+        razorpay_payment_id: string;
+        razorpay_signature: string;
+    }) => {
+        const response = await api.post(
+            "/api/dashboard/payment/verify-payment",
+            payload
+        );
         return response.data;
     },
 
@@ -238,6 +246,7 @@ export const DashboardService = {
         });
         return response.data;
     },
+
     // 🔹 Validate Coupon
     validateCoupon: async (coupon_code: string) => {
         const response = await api.post("/api/dashboard/profile/validate-coupon", { coupon_code });
@@ -264,7 +273,7 @@ export const DashboardService = {
         return response.data;
     },
 
-// Partners API's
+    // Partners API's
     addPartnersOfficeAddress: async (payload: { office_address: string }) => {
         const response = await api.post("/api/dashboard/partnership/add-partners-office-address", payload);
         return response.data;
@@ -275,21 +284,23 @@ export const DashboardService = {
         const response = await api.post("/api/dashboard/partnership/verify-pan-add-partnership", payload);
         return response.data;
     },
+    
     generateAadhaarOtpDirector: async (payload: { aadhaar_number: string }) => {
         const response = await api.post("/api/dashboard/partnership/aadhaar/generate-otp", payload);
         return response.data;
     },
+
     verifyAadhaarOtpDirector: async (payload: { partner_id: string; reference_id: string; otp: string; aadhaar_number: string }) => {
         const response = await api.post("/api/dashboard/partnership/aadhaar/verify-otp", payload);
         return response.data;
     },
-    verifyDirectorPanAadhaarLink: async (payload: { partner_id:string; }) => {
+
+    verifyDirectorPanAadhaarLink: async (payload: { partner_id: string; }) => {
         // Replace with your actual backend route
         const response = await api.post("/api/dashboard/partnership/verify-pan-aadhaar-link", payload);
         return response.data;
     },
 
-    
     // 🔹 Delete a Director/Partner
     deletePartner: async (partner_id: string) => {
         const response = await api.delete(`/api/dashboard/partnership/delete-partner/${partner_id}`);
