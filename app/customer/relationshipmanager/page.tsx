@@ -57,7 +57,6 @@ useEffect(() => {
   // Contact Cards Data
   const contactCards: ContactCard[] = [
     { id: '1', name: 'Sandip Powar', phone: '+91 95952 47614', designation: 'Vice President', specialization: 'Vice President' },
-    { id: '2', name: 'Satyen Mehta', phone: '+91 98331 96133', designation: 'General Manager', specialization: 'General Manager' },
     { id: '3', name: 'Ashwini Kamble', phone: '+91 80078 17504', designation: 'Senior Relationship Manager', specialization: 'Health Insurance' },
     { id: '4', name: 'Shweta Dalvi', phone: '+91 99221 28499', designation: 'Business Development Manager', specialization: 'Wealth Loan' },
     { id: '5', name: 'Rohit Kadam', phone: '+91 98765 43214', designation: 'Operation Executive', specialization: 'Accounts' },
