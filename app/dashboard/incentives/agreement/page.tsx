@@ -1,11 +1,18 @@
 "use client";
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 import React, { useState, useEffect } from 'react';
 import { FileText, CheckCircle, X, AlertCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { DashboardService } from "@/app/services/dashboardService";
 import { AdminService } from "@/app/services/adminService";
 import toast, { Toaster } from 'react-hot-toast';
-import { load } from "@cashfreepayments/cashfree-js";
+// import { load } from "@cashfreepayments/cashfree-js";
+import Script from 'next/script';
 
 export default function DSAAgreement() {
   const [profile, setProfile] = useState<any>(null);
@@ -31,6 +38,11 @@ export default function DSAAgreement() {
       setLoading(false);
       return;
     }
+    const script = document.createElement("script");
+    script.src = process.env.NEXT_PUBLIC_RAZORPAY_URL || "";
+    script.async = true;
+    document.body.appendChild(script);
+
     const fetchProfileData = async () => {
       try {
         const response = await DashboardService.checkKycStatus();
@@ -52,7 +64,7 @@ export default function DSAAgreement() {
 
   const handleDownload = async () => {
     // We use the uuid from the profile state fetched during useEffect
-    const uuid = profile?.request_uuid; 
+    const uuid = profile?.request_uuid;
     const name = profile?.name || "DSA";
 
     if (!uuid) {
@@ -81,48 +93,71 @@ export default function DSAAgreement() {
 
   const handlePayment = async () => {
     setIsSubmitting(true);
+
     try {
+      // 1. Create Order via your backend
       const data = await DashboardService.createOrder();
 
-      const order_id = data.order_id;
-      const paymentSessionId = data.orderToken;
+      const options = {
+        key: data.key,
+        amount: data.amount * 100,
+        currency: data.currency,
+        name: "Infinity Arthvishva",
+        description: "DSA Agreement Payment",
+        order_id: data.order_id,
 
+        handler: async function (response: any) {
+          try {
+            // 2. Verify Payment via your backend
+            const verifyRes = await DashboardService.verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
 
-      if (!paymentSessionId) {
-        toast.error("Payment session ID missing from server");
+            if (verifyRes?.success) {
+              await handleSubmit("PAY_DIRECTLY");
+            } else {
+              toast.error(verifyRes?.message || "Payment verification failed");
+              setIsSubmitting(false); // Reset state on failure
+            }
+          } catch (err: any) {
+            toast.error(err.response?.data?.message || "Verification failed");
+            setIsSubmitting(false);
+          }
+        },
+
+        modal: {
+          ondismiss: async function () {
+            await DashboardService.markFailed(data.order_id);
+            toast.error("Payment cancelled");
+            setIsSubmitting(false); // Reset state on cancel
+          },
+        },
+
+        prefill: {
+          name: profile?.name || "", // Use 'profile' from your state
+          email: profile?.email || "",
+          contact: profile?.mobile || "",
+        },
+
+        theme: {
+          color: "#2076C7",
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.on("payment.failed", async function (response: any) {
+        await DashboardService.markFailed(data.order_id);
+        toast.error("Payment failed");
         setIsSubmitting(false);
-        return;
-      }
-
-      // 🔹 3. Initialize SDK
-      const cashfree = await load({
-        mode: "production", // Change to "production" when going live
       });
 
-      // 🔹 4. Open Checkout
-      const result = await cashfree.checkout({
-        paymentSessionId: paymentSessionId,
-        redirectTarget: "_modal", // This opens the popup
-      });
-
-      if (result.error) {
-        toast.error(result.error.message);
-        await DashboardService.markFailed(order_id);
-      }
-
-      if (result.paymentDetails) {
-        const verifyRes = await DashboardService.verifyPayment(order_id);
-
-        if (verifyRes?.success) {
-          await handleSubmit('PAY_DIRECTLY');
-        } else {
-          toast.error(verifyRes?.message || "Payment verification failed");
-        }
-      }
+      razorpay.open();
 
     } catch (err: any) {
-      toast.error(err.response?.data?.message);
-    } finally {
+      toast.error(err.response?.data?.message || "Something went wrong");
       setIsSubmitting(false);
     }
   };
@@ -251,6 +286,12 @@ export default function DSAAgreement() {
   return (
     <div className="min-h-full w-full bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <Toaster position="top-right" reverseOrder={false} />
+
+      {/* ADD THIS SCRIPT TAG HERE */}
+      <Script
+        src={process.env.NEXT_PUBLIC_RAZORPAY_URL || ""}
+        strategy="lazyOnload"
+      />
 
       <div className="max-w-4xl mx-auto relative rounded-xl shadow-xl overflow-hidden bg-white">
 
