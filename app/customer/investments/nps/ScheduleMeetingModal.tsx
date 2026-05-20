@@ -12,11 +12,9 @@ import {
   Phone,
   MapPin,
   User,
-  Mail,
   CheckCircle,
   MessageSquare,
   Clock,
-  ExternalLink,
 } from 'lucide-react';
 
 const TIME_SLOTS = [

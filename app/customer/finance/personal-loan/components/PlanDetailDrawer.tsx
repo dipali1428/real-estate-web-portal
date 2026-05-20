@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   X,
   FileText,
@@ -18,7 +18,6 @@ import {
   Briefcase,
   CreditCard,
   User,
-  ChevronDown,
 } from "lucide-react";
 
 // ─── Plan Type Definitions ───
@@ -206,7 +205,7 @@ const NBFC_BANK_GROUP = [
 ];
 
 export function getPlansForBank(bankName: string): PlanInfo[] {
-  let basePlans = [TERM_LOAN, BALANCE_TRANSFER, TOP_UP];
+  const basePlans = [TERM_LOAN, BALANCE_TRANSFER, TOP_UP];
 
   if (FOUR_PLAN_BANKS.includes(bankName)) {
     basePlans.push(OVERDRAFT_FACILITY);

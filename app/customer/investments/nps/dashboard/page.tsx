@@ -2,11 +2,8 @@
 
 import React from 'react';
 import {
-  PiggyBank,
   BadgeCheck,
-  TrendingUp,
   Receipt,
-  ArrowUpRight,
   ArrowDownCircle,
   UserPlus,
   CalendarDays,

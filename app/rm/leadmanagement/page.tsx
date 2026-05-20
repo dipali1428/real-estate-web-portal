@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { Plus, ArrowLeft, UserPlus } from "lucide-react";
 import AddLeadModal from "./components/AddLeadModal";
 import ProductCard from "./components/ProductCard";
 import { productCards as initialProductCards } from "./data/productData";

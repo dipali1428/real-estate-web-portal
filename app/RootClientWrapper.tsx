@@ -40,6 +40,7 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
   const isHRProfile = pathname?.startsWith("/hr");
   const isDirector = pathname?.startsWith("/director");
   const isBranchHead = pathname?.startsWith("/branchhead");
+  const isBranch = pathname?.startsWith("/branch");
   const isContactList = pathname?.startsWith("/page/contactlist");
 
   const isProtectedRoute = !!(
@@ -52,7 +53,8 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
     isUnlistedAdmin ||
     isHRProfile ||
     isDirector ||
-    isBranchHead
+    isBranchHead ||
+    isBranch
   );
 
   return (
@@ -74,7 +76,8 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
         !isUnlistedAdmin &&
         !isHRProfile &&
         !isDirector &&
-        !isBranchHead && <Header />}
+        !isBranchHead &&
+        !isBranch && <Header />}
 
 
       {children}
@@ -89,8 +92,9 @@ export default function RootClientWrapper({ children }: { children: React.ReactN
         !isUnlistedAdmin &&
         !isHRProfile &&
         !isDirector &&
-        !isBranchHead && <Footer />}
-{/* </WishlistProvider> */}
+        !isBranchHead &&
+        !isBranch && <Footer />}
+      {/* </WishlistProvider> */}
     </ModalProvider>
   );
 }

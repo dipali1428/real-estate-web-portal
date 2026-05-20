@@ -172,7 +172,7 @@ export default function PlaybookBypassTokens() {
   };
 
   const filteredData = useMemo(() => {
-    let result = [...tokens];
+    const result = [...tokens];
 
     // Client-side Batch Filter
     // if (filters.batch !== "All") {

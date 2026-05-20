@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { realEstateAPI, RealEstateInvestment } from '../../../services/realestateAPI';
 import { MapPin, CheckCircle, Info, Shield, X, Share2, Download, Loader, Calculator, FileText } from 'lucide-react';
 import Image from 'next/image';

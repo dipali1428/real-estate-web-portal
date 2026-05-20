@@ -220,7 +220,7 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
         }
     };
 
-    type UserRole = "ADMIN" | "DEPARTMENTHEAD" | "RM" | "ACCOUNTS" | "CUSTOMER" | "UNLISTEDADMIN" | "HR" | "USER" | "DIRECTOR";
+    type UserRole = "ADMIN" | "DEPARTMENTHEAD" | "RM" | "ACCOUNTS" | "CUSTOMER" | "UNLISTEDADMIN" | "HR" | "USER" | "DIRECTOR" | "BRANCH" | "BRANCHHEAD";
 
     const redirectByRole = (role: UserRole) => {
         const routes: Record<UserRole, string> = {
@@ -232,7 +232,9 @@ const Login = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
             HR: "/hr",
             USER: "/dashboard",
             UNLISTEDADMIN: "/UnlistedAdmin",
-            DIRECTOR: "/director"
+            DIRECTOR: "/director",
+            BRANCH: "/branch",
+            BRANCHHEAD: "/branchhead"
         };
         router.push(routes[role] ?? "/dashboard");
     };
