@@ -91,12 +91,93 @@ export default function DSAAgreement() {
     }
   };
 
+  // Razorpay V1 
+  // const handlePayment = async () => {
+  //   setIsSubmitting(true);
+
+  //   try {
+  //     // 1. Create Order via your backend
+  //     const data = await DashboardService.createOrder();
+
+  //     const options = {
+  //       key: data.key,
+  //       amount: data.amount * 100,
+  //       currency: data.currency,
+  //       name: "Infinity Arthvishva",
+  //       description: "DSA Agreement Payment",
+  //       order_id: data.order_id,
+
+  //       handler: async function (response: any) {
+  //         try {
+  //           // 2. Verify Payment via your backend
+  //           const verifyRes = await DashboardService.verifyPayment({
+  //             razorpay_order_id: response.razorpay_order_id,
+  //             razorpay_payment_id: response.razorpay_payment_id,
+  //             razorpay_signature: response.razorpay_signature,
+  //           });
+
+  //           if (verifyRes?.success) {
+  //             await handleSubmit("PAY_DIRECTLY");
+  //           } else {
+  //             toast.error(verifyRes?.message || "Payment verification failed");
+  //             setIsSubmitting(false); // Reset state on failure
+  //           }
+  //         } catch (err: any) {
+  //           toast.error(err.response?.data?.message || "Verification failed");
+  //           setIsSubmitting(false);
+  //         }
+  //       },
+
+  //       modal: {
+  //         ondismiss: async function () {
+  //           await DashboardService.markFailed(data.order_id);
+  //           toast.error("Payment cancelled");
+  //           setIsSubmitting(false); // Reset state on cancel
+  //         },
+  //       },
+
+  //       prefill: {
+  //         name: profile?.name || "", // Use 'profile' from your state
+  //         email: profile?.email || "",
+  //         contact: profile?.phone_number || "",
+  //       },
+
+  //       theme: {
+  //         color: "#2076C7",
+  //       },
+  //     };
+
+  //     const razorpay = new window.Razorpay(options);
+
+  //     razorpay.on("payment.failed", async function (response: any) {
+  //       await DashboardService.markFailed(data.order_id);
+  //       toast.error("Payment failed");
+  //       setIsSubmitting(false);
+  //     });
+
+  //     razorpay.open();
+
+  //   } catch (err: any) {
+  //     toast.error(err.response?.data?.message || "Something went wrong");
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+
+  // Razorpay V2 Optimized
   const handlePayment = async () => {
+
+    if (isSubmitting) return;
+
     setIsSubmitting(true);
 
     try {
-      // 1. Create Order via your backend
       const data = await DashboardService.createOrder();
+      if (!window.Razorpay) {
+        toast.error("Razorpay SDK failed to load");
+        setIsSubmitting(false);
+        return;
+      }
 
       const options = {
         key: data.key,
@@ -105,59 +186,133 @@ export default function DSAAgreement() {
         name: "Infinity Arthvishva",
         description: "DSA Agreement Payment",
         order_id: data.order_id,
+        image: "/logo.png", // optional
 
         handler: async function (response: any) {
+
           try {
-            // 2. Verify Payment via your backend
             const verifyRes = await DashboardService.verifyPayment({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             });
 
-            if (verifyRes?.success) {
-              await handleSubmit("PAY_DIRECTLY");
-            } else {
-              toast.error(verifyRes?.message || "Payment verification failed");
-              setIsSubmitting(false); // Reset state on failure
+            if (!verifyRes?.success) {
+              toast.error(
+                verifyRes?.message ||
+                "Payment verification failed"
+              );
+              setIsSubmitting(false);
+              return;
             }
-          } catch (err: any) {
-            toast.error(err.response?.data?.message || "Verification failed");
+
+            try {
+              await handleSubmit("PAY_DIRECTLY");
+            } catch (submitErr: any) {
+
+              toast.error(
+                submitErr?.response?.data?.message ||
+                "Agreement submission failed"
+              );
+
+              setIsSubmitting(false);
+            }
+
+          } catch (verifyErr: any) {
+
+            toast.error(
+              verifyErr?.response?.data?.message ||
+              "Payment verification failed"
+            );
+
             setIsSubmitting(false);
           }
         },
 
-        modal: {
-          ondismiss: async function () {
-            await DashboardService.markFailed(data.order_id);
-            toast.error("Payment cancelled");
-            setIsSubmitting(false); // Reset state on cancel
-          },
+        prefill: {
+          name: profile?.name || "",
+          email: profile?.email || "",
+          contact:
+            profile?.phone_number ||
+            profile?.mobile ||
+            "",
         },
 
-        prefill: {
-          name: profile?.name || "", // Use 'profile' from your state
-          email: profile?.email || "",
-          contact: profile?.mobile || "",
+        notes: {
+          module: "DSA_AGREEMENT_PAYMENT",
         },
 
         theme: {
           color: "#2076C7",
         },
+
+        modal: {
+
+          // Disable accidental closing
+          escape: false,
+
+          ondismiss: function () {
+            DashboardService
+              .markFailed(data.order_id)
+              .catch((err: any) => {
+                console.error(
+                  "MARK FAILED ERROR:",
+                  err
+                );
+              });
+
+            toast.error("Payment cancelled");
+
+            setIsSubmitting(false);
+          },
+        },
+
+        retry: {
+          enabled: true,
+          max_count: 2,
+        },
+
+        remember_customer: true,
       };
 
-      const razorpay = new window.Razorpay(options);
+      const razorpay =
+        new window.Razorpay(options);
 
-      razorpay.on("payment.failed", async function (response: any) {
-        await DashboardService.markFailed(data.order_id);
-        toast.error("Payment failed");
-        setIsSubmitting(false);
-      });
+      razorpay.on(
+        "payment.failed",
+        function (response: any) {
+
+          console.error(
+            "RAZORPAY PAYMENT FAILED:",
+            response
+          );
+
+          DashboardService
+            .markFailed(data.order_id)
+            .catch((err: any) => {
+              console.error(
+                "MARK FAILED ERROR:",
+                err
+              );
+            });
+
+          toast.error(
+            response?.error?.description ||
+            "Payment failed"
+          );
+
+          setIsSubmitting(false);
+        }
+      );
 
       razorpay.open();
 
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Something went wrong");
+      toast.error(
+        err?.response?.data?.message ||
+        "Unable to initiate payment"
+      );
+
       setIsSubmitting(false);
     }
   };
