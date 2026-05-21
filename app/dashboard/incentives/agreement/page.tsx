@@ -232,10 +232,7 @@ export default function DSAAgreement() {
         prefill: {
           name: profile?.name || "",
           email: profile?.email || "",
-          contact:
-            profile?.phone_number ||
-            profile?.mobile ||
-            "",
+          contact: profile?.phone_number || "",
         },
 
         notes: {
