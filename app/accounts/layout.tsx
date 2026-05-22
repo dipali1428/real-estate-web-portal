@@ -19,7 +19,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             {/* Main Section */}
             <div className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden max-md:pl-0">
                 <DashboardHeader role={role} />
-                <main className="flex-1 overflow-y-auto max-h-screen">
+                <main className="flex-1 overflow-y-auto max-h-screen font-sans">
                     {children}
                 </main>
             </div>

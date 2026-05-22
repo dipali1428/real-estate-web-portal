@@ -138,7 +138,7 @@ const CreditScorePage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isEligible, setIsEligible] = useState(true);
 
-    const IS_MAINTENANCE_MODE = true;
+    const IS_MAINTENANCE_MODE = false;
 
     // New state for dynamic report values
     const [reportSummary, setReportSummary] = useState({
