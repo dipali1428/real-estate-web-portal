@@ -168,6 +168,17 @@ export interface SupportCategory {
     category_name: string;
 }
 
+export interface SubmitEnquiryParams {
+    full_name: string;
+    email: string;
+    phone: string;
+    city: string;
+    message: string;
+    product_type: string;
+    product_name: string;
+    product_id: number;
+}
+
 // ==================== CUSTOMER SERVICE ====================
 
 const CustomerService = {
@@ -393,10 +404,12 @@ const CustomerService = {
         return response.data;
     },
 
+    // ==================== TICKETS ====================
+
     createTicket: async (ticketData: {
         category: string;
         product_type: string;
-        reference_id: string;
+        reference_id: string; // Ensure this is always sent
         issue_type: string;
         severity: string;
         subject: string;
@@ -406,31 +419,26 @@ const CustomerService = {
         return response.data;
     },
 
-    // 2) GET: /api/customer/list
     getTicketList: async () => {
         const response = await api.get("/api/customer/list");
         return response.data;
     },
 
-    // 3) GET: /api/customer/categories
     getSupportCategories: async () => {
         const response = await api.get("/api/customer/categories");
         return response.data;
     },
 
-    // 4) POST : /api/customer/reply
-    replyToTicket: async (replyData: { ticket_id: string; message: string }) => {
-        const response = await api.post("/api/customer/reply", replyData);
+    replyToTicket: async (replyData: { ticket_id: string; message: string; status?: string }) => {
+        const response = await api.post("/api/customer/:ticket_id/reply", replyData);
         return response.data;
     },
 
-    // 5) POST : /api/customer/close
-    closeTicket: async (ticket_id: string) => {
-        const response = await api.post("/api/customer/close", { ticket_id });
+    closeTicket: async (payload: { ticket_id: string; message?: string }) => {
+        const response = await api.post("/api/customer/:ticket_id/close", payload);
         return response.data;
     },
 
-    // 6) GET : /api/customer/:ticket_id
     getTicketDetails: async (ticket_id: string) => {
         const response = await api.get(`/api/customer/${ticket_id}`);
         return response.data;
@@ -519,7 +527,7 @@ const CustomerService = {
         const response = await api.put(`/api/products/investments/npsMeetings/${id}`, meetingData);
         return response.data;
     },
-    
+
     getAllNCDs: async () => {
         try {
             const response = await api.get("/api/products/investments/ncd/all");
@@ -536,6 +544,19 @@ const CustomerService = {
         } catch {
             return false;
         }
+    },
+    submitEnquiry: async (enquiryData: SubmitEnquiryParams) => {
+        const response = await api.post("/api/customer/enquiries", {
+            full_name: enquiryData.full_name,
+            email: enquiryData.email,
+            phone: enquiryData.phone,
+            city: enquiryData.city,
+            message: enquiryData.message,
+            product_type: enquiryData.product_type,
+            product_name: enquiryData.product_name,
+            product_id: enquiryData.product_id
+        });
+        return response.data;
     },
 };
 

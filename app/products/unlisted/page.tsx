@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useModal } from "../../context/ModalContext"; 
 import { CheckCircle } from 'lucide-react';
-import { fetchAllShares, createEnquiry } from '../../services/unlistedservices';
+import { fetchAllShares } from '../../services/unlistedservices';
 
 // Components
 import UnlistedHero from './components/UnlistedHero';
@@ -26,14 +26,20 @@ interface Company {
 }
 
 export default function UnlistedHomePage() {
-    const { openPartner, openLogin } = useModal(); // Also get openLogin from context
+    const { openPartner, openLogin } = useModal();
     const [companies, setCompanies] = useState<Company[]>([]);
     const [loading, setLoading] = useState(true);
     const [enquiryCompany, setEnquiryCompany] = useState<Company | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [enquiryError, setEnquiryError] = useState<string | null>(null);
-    const [formData, setFormData] = useState({ fullName: '', email: '', phone: '', quantity: '', message: '' });
+    const [formData, setFormData] = useState({ 
+        fullName: '', 
+        email: '', 
+        phone: '', 
+        city: '', 
+        message: '' 
+    });
 
     useEffect(() => {
         const loadData = async () => {
@@ -42,41 +48,22 @@ export default function UnlistedHomePage() {
                 const res = await fetchAllShares();
                 const data = Array.isArray(res) ? res : res?.data || res?.shares || [];
                 setCompanies(data);
-            } catch (err) { toast.error('Error fetching companies:'); } finally { setLoading(false); }
+            } catch (err) { 
+                toast.error('Error fetching companies:'); 
+            } finally { 
+                setLoading(false); 
+            }
         };
         loadData();
     }, []);
 
-    const handleEnquiry = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (formData.phone.length !== 10) return setEnquiryError('Enter 10-digit mobile number');
-        setIsSubmitting(true);
-        try {
-            await createEnquiry({
-                company_id: enquiryCompany!.id,
-                company_name: enquiryCompany!.name,
-                enquiry_type: 'buy',
-                full_name: formData.fullName,
-                email: formData.email,
-                phone: formData.phone,
-                quantity: parseInt(formData.quantity),
-                message: `Enquiry for ${enquiryCompany!.name}`
-            });
-            setShowSuccess(true);
-            setEnquiryCompany(null);
-            setFormData({ fullName: '', email: '', phone: '', quantity: '', message: '' });
-        } catch { setEnquiryError('Failed to submit.'); } finally { setIsSubmitting(false); }
-    };
-
     return (
         <main className="min-h-screen bg-gradient-to-br from-[#b5d9f3] via-white to-[#ecf5ec] text-slate-800 font-sans scroll-smooth">
-            {/* Pass both props - onActionClick and onApplyClick */}
             <UnlistedHero 
                 onActionClick={openPartner} 
-                onApplyClick={openLogin} // Pass openLogin for the Apply Now button
+                onApplyClick={openLogin}
             />
             
-            {/* Sections are now seamless without borders or block backgrounds */}
             <FeaturedCompanies companies={companies} loading={loading} onEnquire={setEnquiryCompany} />
             <UnlistedBenefits />
             <InvestmentProcess />
@@ -93,12 +80,46 @@ export default function UnlistedHomePage() {
             <UnlistedCTA />
             <ScrollToTop />
 
+            {/* Enquiry Modal */}
+            {enquiryCompany && (
+                <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-8">
+                        <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-5 text-white flex justify-between items-center sticky top-0">
+                            <div>
+                                <h3 className="text-xl font-black uppercase tracking-tight">Enquire About {enquiryCompany.name}</h3>
+                                <p className="text-sm text-white/80">Fill details to get started</p>
+                            </div>
+                            <button 
+                                onClick={() => setEnquiryCompany(null)} 
+                                className="hover:bg-white/20 p-2 rounded-full transition-all"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
+            {/* Success Modal */}
             {showSuccess && (
-                <div className="fixed inset-0 z-[5000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-[2.5rem] p-10 text-center">
-                        <CheckCircle size={60} className="text-emerald-500 mx-auto mb-4" />
-                        <h2 className="text-2xl font-black">Submitted Successfully</h2>
-                        <button onClick={() => setShowSuccess(false)} className="mt-6 px-10 py-3 bg-[#2076C7] text-white rounded-xl font-bold">Close</button>
+                <div className="fixed inset-0 z-[7000] bg-black/60 flex items-center justify-center p-4">
+                    <div className="bg-white p-8 rounded-2xl max-w-md w-full text-center shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <CheckCircle className="w-8 h-8 text-green-600" />
+                        </div>
+                        <h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">Enquiry Sent!</h3>
+                        <p className="text-gray-500 text-sm mb-4 leading-relaxed">
+                            Thank you for your interest! Our relationship manager will contact you within 24 hours.
+                        </p>
+                        <button 
+                            onClick={() => setShowSuccess(false)} 
+                            className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold hover:opacity-90 transition-all"
+                        >
+                            Close
+                        </button>
                     </div>
                 </div>
             )}

@@ -133,6 +133,56 @@ export interface DematListResponse {
   data: DematDetails[];
 }
 
+export interface Ticket {
+  id: string;
+  ticket_id: string;
+  category: string;
+  product_type: string;
+  reference_id: string;
+  issue_type: string;
+  subject: string;
+  description: string;
+  status: string;
+  severity: string;
+  created_at: string;
+  updated_at: string;
+  closed_at?: string | null;
+  customer_id: string | number;
+  customer_name?: string;
+  customer_email?: string;
+  customer_mobile?: string;
+}
+
+export interface TicketStats {
+  total_tickets: number;
+  open_tickets: number;
+  in_progress_tickets: number;
+  resolved_tickets: number;
+  closed_tickets: number;
+}
+
+export interface Enquiry {
+  id: number;
+  full_name: string;
+  email: string;
+  phone: string;
+  created_at: string;
+  message: string;
+  city: string | null;
+  product_type: string | null; // e.g., 'SHARE', 'PMS'
+  product_name: string | null;
+  product_id: number | null;
+  source_page: string | null;
+  user_id: number | null;
+  platform: string;
+  customer_adv_id: string | null;
+}
+
+export interface TicketReplyPayload {
+  reply_message: string;
+  status: string;
+}
+
 // ==================== ADMIN SERVICE ====================
 
 export const AdminService = {
@@ -247,13 +297,6 @@ export const AdminService = {
 
   rejectTransaction: async (txnId: number) => {
     const response = await api.post("/api/unlisted/admin/transactions/reject", { txn_id: txnId });
-    return response.data;
-  },
-
-  // ==================== ENQUIRIES ====================
-
-  getEnquiries: async (): Promise<Enquiry[]> => {
-    const response = await api.get("/api/unlisted/admin/enquiries");
     return response.data;
   },
 
@@ -424,6 +467,43 @@ export const AdminService = {
     return response.data;
   },
 
+  // ==================== TICKETS ====================
+
+  getTickets: async (): Promise<{ success: boolean; count: number; data: Ticket[] }> => {
+    const response = await api.get("/api/unlisted/admin/tickets");
+    return response.data;
+  },
+
+  getTicketStats: async (): Promise<{ success: boolean; data: TicketStats }> => {
+    const response = await api.get("/api/unlisted/admin/tickets/stats");
+    return response.data;
+  },
+
+  getTicketById: async (ticketId: string): Promise<{ success: boolean; data: Ticket }> => {
+    const response = await api.get(`/api/unlisted/admin/tickets/${ticketId}`);
+    return response.data;
+  },
+
+  replyToTicket: async (ticketId: string, payload: TicketReplyPayload) => {
+    const response = await api.post(`/api/unlisted/admin/tickets/${ticketId}/reply`, payload);
+    return response.data;
+  },
+
+  updateTicketStatus: async (ticketId: string, status: string) => {
+    const response = await api.patch(`/api/unlisted/admin/tickets/${ticketId}/status`, { status });
+    return response.data;
+  },
+
+  closeTicket: async (ticketId: string, status: string = "COMPLETED") => {
+    const response = await api.patch(`/api/unlisted/admin/tickets/${ticketId}/close`, { status });
+    return response.data;
+  },
+
+  // ==================== ENQUIRIES ====================
+getEnquiries: async (): Promise<{ success: boolean; data: Enquiry[] }> => {
+  const response = await api.get("/api/unlisted/admin/enquirieslist");
+  return response.data;
+},
 };
 
 

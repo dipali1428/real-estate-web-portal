@@ -121,31 +121,33 @@ export const SIPCalculatorContent: React.FC = () => {
   const lumpsumBarHeight = getBarHeight(computedLumpsumResults.totalValue, maxChartValue);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-        <div className="p-6 lg:p-8 font-sans">
+    <div className="w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-w-7xl mx-auto">
+        <div className="p-4 sm:p-6 lg:p-8 font-sans">
 
-          {/* Tabs */}
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-8 max-w-md mx-auto">
+          {/* Tabs - Responsive */}
+          <div className="flex flex-col sm:flex-row bg-gray-100 rounded-xl p-1 mb-6 sm:mb-8 max-w-full sm:max-w-md mx-auto gap-1 sm:gap-0">
             <button
-              className={`flex-1 py-3 px-5 text-center cursor-pointer rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${activeTab === 'sip'
-                ? 'bg-[#1CADA3] text-white shadow-md'
-                : 'text-gray-600 hover:text-gray-800'
-                }`}
+              className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-5 text-center cursor-pointer rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 text-sm sm:text-base ${
+                activeTab === 'sip'
+                  ? 'bg-[#1CADA3] text-white shadow-md'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
               onClick={() => setActiveTab('sip')}
             >
-              <i className="fas fa-chart-line text-sm"></i>
+              <i className="fas fa-chart-line text-xs sm:text-sm"></i>
               <span>SIP Calculator</span>
             </button>
 
             <button
-              className={`flex-1 py-3 px-5 text-center cursor-pointer rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${activeTab === 'lumpsum'
-                ? 'bg-[#1CADA3] text-white shadow-md'
-                : 'text-gray-600 hover:text-gray-800'
-                }`}
+              className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-5 text-center cursor-pointer rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 text-sm sm:text-base ${
+                activeTab === 'lumpsum'
+                  ? 'bg-[#1CADA3] text-white shadow-md'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
               onClick={() => setActiveTab('lumpsum')}
             >
-              <i className="fas fa-coins text-sm"></i>
+              <i className="fas fa-coins text-xs sm:text-sm"></i>
               <span>Lumpsum Calculator</span>
             </button>
           </div>
@@ -153,25 +155,25 @@ export const SIPCalculatorContent: React.FC = () => {
           {/* SIP Calculator */}
           {activeTab === 'sip' && (
             <div className="animate-fade-in">
-              <div className="flex flex-col lg:flex-row gap-8">
+              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
 
                 {/* Input Card */}
-                <div className="flex-1 bg-white rounded-xl border border-gray-200 p-6">
-                  <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
-                    <div className="w-12 h-12 bg-teal-50 rounded-lg flex items-center justify-center text-teal-500 mr-4">
-                      <i className="fas fa-piggy-bank text-2xl"></i>
+                <div className="flex-1 bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+                  <div className="flex items-center mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-gray-200">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-teal-50 rounded-lg flex items-center justify-center text-teal-500 mr-3 sm:mr-4">
+                      <i className="fas fa-piggy-bank text-xl sm:text-2xl"></i>
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-gray-800">SIP Calculator</h2>
-                      <p className="text-sm text-gray-600">Calculate returns on your monthly investments</p>
+                      <h2 className="text-lg sm:text-xl font-bold text-gray-800">SIP Calculator</h2>
+                      <p className="text-xs sm:text-sm text-gray-600">Calculate returns on your monthly investments</p>
                     </div>
                   </div>
 
                   {/* Monthly Investment */}
-                  <div className="mb-6">
-                    <div className="flex justify-between mb-2">
-                      <label className="block text-[#2076C7] font-semibold text-sm">Monthly Investment</label>
-                      <span className="font-bold font-sans text-[#1CADA3] text-sm">{formatCurrency(sipAmount)}</span>
+                  <div className="mb-5 sm:mb-6">
+                    <div className="flex flex-col sm:flex-row justify-between mb-2 gap-1">
+                      <label className="block text-[#2076C7] font-semibold text-xs sm:text-sm">Monthly Investment</label>
+                      <span className="font-bold font-sans text-[#1CADA3] text-sm sm:text-base">{formatCurrency(sipAmount)}</span>
                     </div>
                     <input
                       type="range"
@@ -189,10 +191,10 @@ export const SIPCalculatorContent: React.FC = () => {
                   </div>
 
                   {/* Investment Period */}
-                  <div className="mb-6">
-                    <div className="flex justify-between mb-2">
-                      <label className="block text-[#2076C7] font-semibold text-sm">Investment Period</label>
-                      <span className="font-bold font-sans text-[#1CADA3] text-sm">{sipDuration} Years</span>
+                  <div className="mb-5 sm:mb-6">
+                    <div className="flex flex-col sm:flex-row justify-between mb-2 gap-1">
+                      <label className="block text-[#2076C7] font-semibold text-xs sm:text-sm">Investment Period</label>
+                      <span className="font-bold font-sans text-[#1CADA3] text-sm sm:text-base">{sipDuration} Years</span>
                     </div>
                     <input
                       type="range"
@@ -209,10 +211,10 @@ export const SIPCalculatorContent: React.FC = () => {
                   </div>
 
                   {/* Expected Return */}
-                  <div className="mb-6">
-                    <div className="flex justify-between mb-2">
-                      <label className="block text-[#2076C7] font-semibold text-sm">Expected Annual Return</label>
-                      <span className="font-bold font-sans text-[#1CADA3] text-sm">{sipReturn}%</span>
+                  <div className="mb-5 sm:mb-6">
+                    <div className="flex flex-col sm:flex-row justify-between mb-2 gap-1">
+                      <label className="block text-[#2076C7] font-semibold text-xs sm:text-sm">Expected Annual Return</label>
+                      <span className="font-bold font-sans text-[#1CADA3] text-sm sm:text-base">{sipReturn}%</span>
                     </div>
                     <input
                       type="range"
@@ -231,23 +233,23 @@ export const SIPCalculatorContent: React.FC = () => {
                 </div>
 
                 {/* Results Card */}
-                <div className="flex-1 bg-gray-50 rounded-xl shadow-sm border-l-4 border-[#1CADA3] p-6">
-                  <h3 className="text-[#2076C7] font-semibold mb-4 text-lg flex items-center gap-2">
+                <div className="flex-1 bg-gray-50 rounded-xl shadow-sm border-l-4 border-[#1CADA3] p-4 sm:p-6">
+                  <h3 className="text-[#2076C7] font-semibold mb-3 sm:mb-4 text-base sm:text-lg flex items-center gap-2">
                     <i className="fas fa-chart-pie"></i>
                     <span>Investment Summary</span>
                   </h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between pb-3 border-b border-gray-200">
-                      <span className="text-gray-600">Total Investment</span>
-                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(computedSipResults.totalInvestment)}</span>
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200">
+                      <span className="text-gray-600 text-sm sm:text-base">Total Investment</span>
+                      <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base">{formatCurrency(computedSipResults.totalInvestment)}</span>
                     </div>
-                    <div className="flex justify-between pb-3 border-b border-gray-200">
-                      <span className="text-gray-600">Est. Returns</span>
-                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(computedSipResults.estimatedReturns)}</span>
+                    <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200">
+                      <span className="text-gray-600 text-sm sm:text-base">Est. Returns</span>
+                      <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base">{formatCurrency(computedSipResults.estimatedReturns)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Total Value</span>
-                      <span className="font-medium font-sans text-[#1CADA3] text-lg">{formatCurrency(computedSipResults.totalValue)}</span>
+                      <span className="text-gray-600 text-sm sm:text-base">Total Value</span>
+                      <span className="font-medium font-sans text-[#1CADA3] text-base sm:text-lg">{formatCurrency(computedSipResults.totalValue)}</span>
                     </div>
                   </div>
                 </div>
@@ -258,25 +260,25 @@ export const SIPCalculatorContent: React.FC = () => {
           {/* Lumpsum Calculator */}
           {activeTab === 'lumpsum' && (
             <div className="animate-fade-in">
-              <div className="flex flex-col lg:flex-row gap-8">
+              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
 
                 {/* Input Card */}
-                <div className="flex-1 bg-white rounded-xl border border-gray-200 p-6">
-                  <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
-                    <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 mr-4">
-                      <i className="fas fa-hand-holding-usd text-2xl"></i>
+                <div className="flex-1 bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+                  <div className="flex items-center mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-gray-200">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 mr-3 sm:mr-4">
+                      <i className="fas fa-hand-holding-usd text-xl sm:text-2xl"></i>
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-gray-800">Lumpsum Calculator</h2>
-                      <p className="text-sm text-gray-600">Calculate returns on your one-time investment</p>
+                      <h2 className="text-lg sm:text-xl font-bold text-gray-800">Lumpsum Calculator</h2>
+                      <p className="text-xs sm:text-sm text-gray-600">Calculate returns on your one-time investment</p>
                     </div>
                   </div>
 
                   {/* Investment Amount */}
-                  <div className="mb-6">
-                    <div className="flex justify-between mb-2">
-                      <label className="block text-[#2076C7] font-semibold text-sm">Investment Amount</label>
-                      <span className="font-bold font-sans text-[#1CADA3] text-sm">{formatCurrency(lumpsumAmount)}</span>
+                  <div className="mb-5 sm:mb-6">
+                    <div className="flex flex-col sm:flex-row justify-between mb-2 gap-1">
+                      <label className="block text-[#2076C7] font-semibold text-xs sm:text-sm">Investment Amount</label>
+                      <span className="font-bold font-sans text-[#1CADA3] text-sm sm:text-base">{formatCurrency(lumpsumAmount)}</span>
                     </div>
                     <input
                       type="range"
@@ -294,10 +296,10 @@ export const SIPCalculatorContent: React.FC = () => {
                   </div>
 
                   {/* Investment Period */}
-                  <div className="mb-6">
-                    <div className="flex justify-between mb-2">
-                      <label className="block text-[#2076C7] font-semibold text-sm">Investment Period</label>
-                      <span className="font-bold font-sans text-[#1CADA3] text-sm">{lumpsumDuration} Years</span>
+                  <div className="mb-5 sm:mb-6">
+                    <div className="flex flex-col sm:flex-row justify-between mb-2 gap-1">
+                      <label className="block text-[#2076C7] font-semibold text-xs sm:text-sm">Investment Period</label>
+                      <span className="font-bold font-sans text-[#1CADA3] text-sm sm:text-base">{lumpsumDuration} Years</span>
                     </div>
                     <input
                       type="range"
@@ -314,10 +316,10 @@ export const SIPCalculatorContent: React.FC = () => {
                   </div>
 
                   {/* Expected Return */}
-                  <div className="mb-6">
-                    <div className="flex justify-between mb-2">
-                      <label className="block text-[#2076C7] font-semibold text-sm">Expected Annual Return</label>
-                      <span className="font-bold font-sans text-[#1CADA3] text-sm">{lumpsumReturn}%</span>
+                  <div className="mb-5 sm:mb-6">
+                    <div className="flex flex-col sm:flex-row justify-between mb-2 gap-1">
+                      <label className="block text-[#2076C7] font-semibold text-xs sm:text-sm">Expected Annual Return</label>
+                      <span className="font-bold font-sans text-[#1CADA3] text-sm sm:text-base">{lumpsumReturn}%</span>
                     </div>
                     <input
                       type="range"
@@ -336,23 +338,23 @@ export const SIPCalculatorContent: React.FC = () => {
                 </div>
 
                 {/* Results Card */}
-                <div className="flex-1 bg-gray-50 rounded-xl shadow-sm border-l-4 border-[#1CADA3] p-6">
-                  <h3 className="text-[#2076C7] font-semibold mb-4 text-lg flex items-center gap-2">
+                <div className="flex-1 bg-gray-50 rounded-xl shadow-sm border-l-4 border-[#1CADA3] p-4 sm:p-6">
+                  <h3 className="text-[#2076C7] font-semibold mb-3 sm:mb-4 text-base sm:text-lg flex items-center gap-2">
                     <i className="fas fa-chart-pie"></i>
                     <span>Investment Summary</span>
                   </h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between pb-3 border-b border-gray-200">
-                      <span className="text-gray-600">Total Investment</span>
-                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(computedLumpsumResults.totalInvestment)}</span>
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200">
+                      <span className="text-gray-600 text-sm sm:text-base">Total Investment</span>
+                      <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base">{formatCurrency(computedLumpsumResults.totalInvestment)}</span>
                     </div>
-                    <div className="flex justify-between pb-3 border-b border-gray-200">
-                      <span className="text-gray-600">Est. Returns</span>
-                      <span className="font-medium font-sans text-[#1CADA3]">{formatCurrency(computedLumpsumResults.estimatedReturns)}</span>
+                    <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200">
+                      <span className="text-gray-600 text-sm sm:text-base">Est. Returns</span>
+                      <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base">{formatCurrency(computedLumpsumResults.estimatedReturns)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Total Value</span>
-                      <span className="font-medium font-sans text-[#1CADA3] text-lg">{formatCurrency(computedLumpsumResults.totalValue)}</span>
+                      <span className="text-gray-600 text-sm sm:text-base">Total Value</span>
+                      <span className="font-medium font-sans text-[#1CADA3] text-base sm:text-lg">{formatCurrency(computedLumpsumResults.totalValue)}</span>
                     </div>
                   </div>
                 </div>
@@ -360,99 +362,89 @@ export const SIPCalculatorContent: React.FC = () => {
             </div>
           )}
 
-          {/* Comparison Chart */}
-          <div className="bg-white rounded-xl border shadow-md p-6 mt-8">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center flex items-center justify-center gap-2">
+          {/* Comparison Chart - Responsive */}
+          <div className="bg-white rounded-xl border shadow-md p-4 sm:p-6 mt-6 sm:mt-8">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 text-center flex items-center justify-center gap-2">
               <i className="fas fa-chart-bar text-[#2076C7]"></i>
               <span>Investment Comparison</span>
             </h2>
-            <div className="flex items-end justify-center gap-16 py-6">
+            <div className="flex items-end justify-center gap-8 sm:gap-12 md:gap-16 py-4 sm:py-6">
               {/* SIP Bar */}
               <div className="flex flex-col items-center">
                 <div
-                  className="w-16 bg-gradient-to-t from-[#1CADA3] to-[#1CADA3] rounded-t-lg relative shadow-sm"
-                  style={{ height: `${sipBarHeight}px` }}
+                  className="w-12 sm:w-16 bg-gradient-to-t from-[#1CADA3] to-[#1CADA3] rounded-t-lg relative shadow-sm"
+                  style={{ height: `${Math.min(sipBarHeight, 200)}px`, minHeight: '30px' }}
                 >
-                  <div className="absolute -top-8 left-0 w-full text-center font-bold font-sans text-gray-800 text-sm">
+                  <div className="absolute -top-7 sm:-top-8 left-0 w-full text-center font-bold font-sans text-gray-800 text-xs sm:text-sm whitespace-nowrap">
                     {formatCurrency(computedSipResults.totalValue)}
                   </div>
                 </div>
-                <div className="mt-3 text-sm font-semibold text-gray-700 flex items-center gap-1">
+                <div className="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-700 flex items-center gap-1">
                   <i className="fas fa-chart-line text-[#1CADA3] text-xs"></i>
-                  <span>SIP Investment</span>
+                  <span className="hidden sm:inline">SIP Investment</span>
+                  <span className="sm:hidden">SIP</span>
                 </div>
               </div>
 
               {/* Lumpsum Bar */}
               <div className="flex flex-col items-center">
                 <div
-                  className="w-16 bg-gradient-to-t from-[#2076C7] to-[#2076C7] rounded-t-lg relative shadow-sm"
-                  style={{ height: `${lumpsumBarHeight}px` }}
+                  className="w-12 sm:w-16 bg-gradient-to-t from-[#2076C7] to-[#2076C7] rounded-t-lg relative shadow-sm"
+                  style={{ height: `${Math.min(lumpsumBarHeight, 200)}px`, minHeight: '30px' }}
                 >
-                  <div className="absolute -top-8 left-0 w-full text-center font-bold font-sans text-gray-800 text-sm">
+                  <div className="absolute -top-7 sm:-top-8 left-0 w-full text-center font-bold font-sans text-gray-800 text-xs sm:text-sm whitespace-nowrap">
                     {formatCurrency(computedLumpsumResults.totalValue)}
                   </div>
                 </div>
-                <div className="mt-3 text-sm font-semibold text-gray-700 flex items-center gap-1">
+                <div className="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-700 flex items-center gap-1">
                   <i className="fas fa-coins text-[#2076C7] text-xs"></i>
-                  <span>Lumpsum Investment</span>
+                  <span className="hidden sm:inline">Lumpsum Investment</span>
+                  <span className="sm:hidden">Lumpsum</span>
                 </div>
-              </div>
-            </div>
-
-            {/* Legend */}
-            <div className="flex justify-center gap-8 mt-6">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-[#1CADA3] rounded"></div>
-                <span className="text-xs text-gray-600">SIP Investment</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-[#2076C7] rounded"></div>
-                <span className="text-xs text-gray-600">Lumpsum Investment</span>
               </div>
             </div>
           </div>
 
-          {/* Metric Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 mt-8 ">
-            <div className="bg-white rounded-xl border shadow-md p-4 text-center hover:shadow-lg transition-shadow">
-              <div className="w-10 h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i className="fas fa-rocket text-[#1CADA3] text-lg"></i>
+          {/* Metric Cards - Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8 mt-6 sm:mt-8">
+            <div className="bg-white rounded-xl border shadow-md p-3 sm:p-4 text-center hover:shadow-lg transition-shadow">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i className="fas fa-rocket text-[#1CADA3] text-base sm:text-lg"></i>
               </div>
               <div className="text-xs text-gray-600 mb-1">Wealth Gain</div>
-              <div className="font-bold text-lg font-sans text-[#1CADA3]">
+              <div className="font-bold text-base sm:text-lg font-sans text-[#1CADA3]">
                 {formatCurrency(activeTab === 'sip' ? computedSipResults.estimatedReturns : computedLumpsumResults.estimatedReturns)}
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border shadow-md p-4 text-center hover:shadow-lg transition-shadow">
-              <div className="w-10 h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i className="fas fa-percentage text-[#1CADA3] text-lg"></i>
+            <div className="bg-white rounded-xl border shadow-md p-3 sm:p-4 text-center hover:shadow-lg transition-shadow">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i className="fas fa-percentage text-[#1CADA3] text-base sm:text-lg"></i>
               </div>
               <div className="text-xs text-gray-600 mb-1">Annualized Return</div>
-              <div className="font-bold text-lg font-sans text-[#1CADA3]">
+              <div className="font-bold text-base sm:text-lg font-sans text-[#1CADA3]">
                 {activeTab === 'sip' ? sipReturn : lumpsumReturn}%
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border shadow-md p-4 text-center hover:shadow-lg transition-shadow">
-              <div className="w-10 h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i className="fas fa-calendar-alt text-[#1CADA3] text-lg"></i>
+            <div className="bg-white rounded-xl border shadow-md p-3 sm:p-4 text-center hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i className="fas fa-calendar-alt text-[#1CADA3] text-base sm:text-lg"></i>
               </div>
               <div className="text-xs text-gray-600 mb-1">Investment Period</div>
-              <div className="font-bold text-lg font-sans text-[#1CADA3]">
+              <div className="font-bold text-base sm:text-lg font-sans text-[#1CADA3]">
                 {activeTab === 'sip' ? sipDuration : lumpsumDuration} Years
               </div>
             </div>
           </div>
 
-          {/* Key Insights Section */}
-          <div className="bg-white rounded-xl border shadow-md p-5 mt-8">
-            <h2 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+          {/* Key Insights Section - Responsive */}
+          <div className="bg-white rounded-xl border shadow-md p-4 sm:p-5 mt-6 sm:mt-8">
+            <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
               Key Insights
             </h2>
 
-            <div className="text-gray-700 leading-relaxed text-xs">
+            <div className="text-gray-700 leading-relaxed text-xs sm:text-sm">
               <ul className="list-disc pl-4 space-y-1.5">
                 <li>
                   <span className="font-medium">Total Investment</span> - Your total investment amount is{' '}
@@ -502,7 +494,7 @@ export const SIPCalculatorContent: React.FC = () => {
                 </p>
               </div>
 
-              <p className="text-[11px] text-gray-500 mt-2 flex items-start gap-1">
+              <p className="text-[10px] sm:text-[11px] text-gray-500 mt-2 flex items-start gap-1">
                 <span><strong>Note:</strong> Past performance doesn&apos;t guarantee future returns. These calculations are for illustration purposes only. Actual returns may vary based on market conditions.</span>
               </p>
             </div>
@@ -522,6 +514,16 @@ export const SIPCalculatorContent: React.FC = () => {
         }
         .animate-fade-in {
           animation: fadeIn 0.5s ease;
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 640px) {
+          input[type="range"] {
+            min-height: 44px;
+          }
+          button {
+            min-height: 44px;
+          }
         }
       `}</style>
     </div>
@@ -543,29 +545,29 @@ const SIPLumpsumCalculatorStandalone: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <i className="fas fa-chart-line text-white text-2xl"></i>
-          <h1 className="text-3xl font-bold">SIP Calculator</h1>
+      {/* Header - Responsive */}
+      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 sm:py-6 px-4 sm:px-8 text-center">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+          <i className="fas fa-chart-line text-white text-xl sm:text-2xl"></i>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">SIP Calculator</h1>
         </div>
-        <p className="text-blue-100">Plan your mutual fund investments and estimate future wealth</p>
+        <p className="text-blue-100 text-sm sm:text-base px-2">Plan your mutual fund investments and estimate future wealth</p>
       </div>
 
-      {/* Dropdown */}
-      <div className="container mx-auto px-4 py-4 max-w-md">
+      {/* Dropdown - Responsive */}
+      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-md">
         <div className="relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
+            className="w-full bg-white border-2 border-gray-200 p-3 sm:p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
-                <activeData.icon className="w-5 h-5 text-teal-600" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
+                <activeData.icon className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
               </div>
-              <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
+              <span className="font-semibold text-gray-800 text-base sm:text-lg">{activeData.label}</span>
             </div>
-            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           <AnimatePresence>
@@ -583,24 +585,27 @@ const SIPLumpsumCalculatorStandalone: React.FC = () => {
                       handleCalculatorChange(calc.path);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${calc.id === 'sip' ? 'bg-teal-500/5' : ''
-                      }`}
+                    className={`w-full text-left p-3 sm:p-4 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 transition-colors ${
+                      calc.id === 'sip' ? 'bg-teal-500/5' : ''
+                    }`}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${calc.id === 'sip'
-                      ? 'bg-teal-500 text-white'
-                      : 'bg-gray-100 text-gray-500'
-                      }`}>
-                      <calc.icon className="w-4 h-4" />
+                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${
+                      calc.id === 'sip'
+                        ? 'bg-teal-500 text-white'
+                        : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      <calc.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                     <div className="flex-1">
-                      <span className={`font-medium ${calc.id === 'sip' ? 'text-teal-600' : 'text-gray-700'
-                        }`}>
+                      <span className={`font-medium text-sm sm:text-base ${
+                        calc.id === 'sip' ? 'text-teal-600' : 'text-gray-700'
+                      }`}>
                         {calc.label}
                       </span>
-                      <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
+                      <p className="text-xs text-gray-400 line-clamp-1 hidden sm:block">{calc.desc}</p>
                     </div>
                     {calc.id === 'sip' && (
-                      <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-500 ml-auto" />
                     )}
                   </button>
                 ))}

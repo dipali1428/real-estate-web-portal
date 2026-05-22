@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Search, Filter, Building2, TrendingUp, X, Bookmark, BookmarkCheck, ShoppingCart, CheckCircle, ChevronDown, IndianRupee, Info, Activity, MapPin, Package, FileText, AlertTriangle, Loader2, Plus, Minus, CreditCard,} from 'lucide-react';
+import { Search, Filter, Building, TrendingUp, X, Bookmark, BookmarkCheck, ShoppingCart, CheckCircle, ChevronDown, IndianRupee, Info, Activity, MapPin, Package, FileText, AlertTriangle, Loader2, Plus, Minus, CreditCard, Send, User, Briefcase, Mail, Phone, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { fetchDashboardData, fetchIdGraphData, GraphPoint } from '../../../../services/unlistedservices';
 import toast from 'react-hot-toast';
@@ -49,6 +49,18 @@ interface CompanyCardProps {
   onAddToCart: (company: Company, quantity: number) => void;
   wishlistLoading: boolean;
   onViewDetails: (company: Company) => void;
+}
+
+// Enquiry payload type
+interface EnquiryPayload {
+    full_name: string;
+    email: string;
+    phone: string;
+    city: string;
+    message: string;
+    product_type: string;
+    product_name: string;
+    product_id: number;
 }
 
 // ==================== CONSTANTS ====================
@@ -130,111 +142,90 @@ const CompanyCard: React.FC<CompanyCardProps> = ({
   const minInv = calculateMinInvestment(company.price, company.min_lot_size);
   const maxLot = company.min_lot_size || Infinity;
 
-  const handleQuantityChange = (newQuantity: number) => {
-    if (newQuantity >= 1 && newQuantity <= maxLot) {
-      setQuantity(newQuantity);
-    }
-  };
-
-  const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-    if (!isNaN(value) && value >= 1 && value <= maxLot) {
-      setQuantity(value);
-    } else if (value === 0) {
-      setQuantity(1);
-    }
-  };
-
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full group relative">
-      {/* Wishlist Button */}
+    <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full group relative overflow-hidden">
       <button
         onClick={() => onToggleWishlist(company)}
         disabled={wishlistLoading}
-        className={`absolute top-4 right-4 z-10 p-2 rounded-full transition-all shadow-sm ${isSaved ? 'bg-blue-50 text-[#2076C7]' : 'bg-white text-gray-400 hover:text-[#2076C7]'} disabled:opacity-50`}
+        className={`absolute top-2 sm:top-4 right-2 sm:right-4 z-10 p-1.5 sm:p-2 rounded-full transition-all shadow-sm ${isSaved ? 'bg-blue-50 text-[#2076C7]' : 'bg-white text-gray-400 hover:text-[#2076C7]'} disabled:opacity-50`}
       >
-        {isSaved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+        {isSaved ? <BookmarkCheck size={14} className="sm:w-[18px] sm:h-[18px]" /> : <Bookmark size={14} className="sm:w-[18px] sm:h-[18px]" />}
       </button>
 
-      {/* Image Container */}
-      <div className="w-full h-32 bg-gray-50 rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden">
+      <div className="w-full h-24 sm:h-32 bg-gray-50 rounded-t-xl sm:rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden">
         {company.logo_url ? (
           <Image
             src={company.logo_url} 
             width={200}
             height={150}
-            className="w-full h-full object-contain p-3 transition-all duration-700 group-hover:scale-110" 
+            className="w-full h-full object-contain p-2 sm:p-3 transition-all duration-700 group-hover:scale-110" 
             alt={company.shares_name} 
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
               const parent = (e.target as HTMLImageElement).parentElement;
               if (parent) {
                 const span = document.createElement('span');
-                span.className = 'text-3xl font-bold text-[#2076C7]';
+                span.className = 'text-2xl sm:text-3xl font-bold text-[#2076C7]';
                 span.textContent = company.shares_name.charAt(0);
                 parent.appendChild(span);
               }
             }}
           />
         ) : (
-          <span className="text-3xl font-bold text-[#2076C7]">{company.shares_name.charAt(0)}</span>
+          <span className="text-2xl sm:text-3xl font-bold text-[#2076C7]">{company.shares_name.charAt(0)}</span>
         )}
       </div>
 
-      {/* Company Details */}
-      <div className="p-5 flex flex-col flex-grow">
-        <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-1 group-hover:text-[#2076C7] transition-colors duration-300 text-center">
+      <div className="p-3 sm:p-5 flex flex-col flex-grow">
+        <h4 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 mb-2 sm:mb-3 line-clamp-2 group-hover:text-[#2076C7] transition-colors duration-300 text-center min-h-[40px] sm:min-h-[48px] px-1">
           {company.shares_name}
         </h4>
         
-        {/* Price Display */}
-        <div className="mb-4 text-center">
-          <span className="text-2xl font-bold text-[#2076C7]">
+        <div className="mb-2 sm:mb-4 text-center w-full overflow-hidden">
+          <span className="inline-block text-lg sm:text-xl md:text-2xl font-bold text-[#2076C7] whitespace-nowrap sm:whitespace-normal break-words max-w-full px-2">
             {formatCurrency(company.price)}
           </span>
         </div>
         
-        <div className="text-sm text-gray-500 text-center mb-4">Unlisted Shares</div>
+        <div className="text-[10px] sm:text-xs text-gray-500 text-center mb-2 sm:mb-4">Unlisted Shares</div>
 
-        {/* Info Grid */}
-        <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
+        <div className="grid grid-cols-2 gap-x-2 sm:gap-x-6 gap-y-2 sm:gap-y-3 w-full mb-4 sm:mb-6">
           <div className="text-center">
-            <div className="text-xs text-gray-500 mb-0.5">Lot Size</div>
-            <div className="text-sm font-bold text-gray-900">
+            <div className="text-[9px] sm:text-xs text-gray-500 mb-0.5">Lot Size</div>
+            <div className="text-[11px] sm:text-sm font-bold text-gray-900 truncate">
               {company.min_lot_size?.toLocaleString() || 'N/A'}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-500 mb-0.5">Depository</div>
-            <div className="text-sm font-bold text-gray-900">
+            <div className="text-[9px] sm:text-xs text-gray-500 mb-0.5">Depository</div>
+            <div className="text-[11px] sm:text-sm font-bold text-gray-900 truncate">
               {company.depository_applicable?.split(' ')[0] || 'NSDL'}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-500 mb-0.5">Min. Invest</div>
-            <div className="text-sm font-bold text-gray-900">
+            <div className="text-[9px] sm:text-xs text-gray-500 mb-0.5">Min. Invest</div>
+            <div className="text-[11px] sm:text-sm font-bold text-gray-900 truncate">
               ₹{minInv.toLocaleString('en-IN')}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-500 mb-0.5">Available</div>
-            <div className="text-sm font-bold text-gray-900">
+            <div className="text-[9px] sm:text-xs text-gray-500 mb-0.5">Available</div>
+            <div className="text-[11px] sm:text-sm font-bold text-gray-900 truncate">
               {company.volume || '45.2K'}
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="mt-auto space-y-2">
+        <div className="mt-auto space-y-1.5 sm:space-y-2">
           <button
             onClick={() => onAddToCart(company, quantity)}
-            className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm font-bold rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-2"
+            className="w-full py-2 sm:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-1.5 sm:gap-2"
           >
-            <ShoppingCart size={18} /> Add to Cart
+            <ShoppingCart size={14} className="sm:w-[18px] sm:h-[18px]" /> Add to Cart
           </button>
           <button 
             onClick={() => onViewDetails(company)}
-            className="w-full py-2.5 border-2 border-[#2076C7]/20 text-[#2076C7] text-xs font-bold rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+            className="w-full py-1.5 sm:py-2.5 border-2 border-[#2076C7]/20 text-[#2076C7] text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-1.5 sm:gap-2"
           >
             Details
           </button>
@@ -260,7 +251,6 @@ const CompanyDetailModal: React.FC<{
   const enriched = enrichCompanyForModal(company);
   const modalMaxLot = company.min_lot_size || Infinity;
 
-  // Fetch graph data when modal opens
   useEffect(() => {
     const loadGraphData = async () => {
       setIsModalGraphLoading(true);
@@ -292,7 +282,6 @@ const CompanyDetailModal: React.FC<{
     loadGraphData();
   }, [company.id]);
 
-  // Chart initialization effect
   useEffect(() => {
     if (!chartRef.current) return;
     if (modalGraphData.length === 0) return;
@@ -364,7 +353,7 @@ const CompanyDetailModal: React.FC<{
             grid: { color: 'rgba(0, 0, 0, 0.05)' },
             ticks: { 
               callback: (val) => `₹${val}`,
-              font: { size: 10 }
+              font: { size: 11 }
             }
           },
           x: {
@@ -373,7 +362,7 @@ const CompanyDetailModal: React.FC<{
               autoSkip: true,
               maxRotation: 0,
               autoSkipPadding: 20,
-              font: { size: 9 }
+              font: { size: 10 }
             }
           }
         }
@@ -389,7 +378,6 @@ const CompanyDetailModal: React.FC<{
     };
   }, [modalGraphData, graphTimeRange]);
 
-  // Prevent scroll when modal is open
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -446,96 +434,86 @@ const CompanyDetailModal: React.FC<{
 
   return (
     <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 overflow-hidden flex flex-col border border-gray-100"
-      >
-        {/* HEADER */}
-        <div className="bg-white border-b border-gray-100 p-6 flex flex-wrap items-start justify-between gap-3">
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 overflow-hidden flex flex-col border border-gray-100 max-h-[95vh] md:max-h-[90vh]">
+        {/* Modal Header */}
+        <div className="bg-white border-b border-gray-100 p-4 md:p-6 flex flex-col md:flex-row md:items-start justify-between gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="w-12 h-12 md:w-20 md:h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
               {enriched.logo_url ? (
-                <Image src={enriched.logo_url} width={200} height={120} className="w-full h-full object-contain p-2" alt={enriched.shares_name} />
+                <Image src={enriched.logo_url} width={200} height={120} className="w-full h-full object-contain p-1 md:p-2" alt={enriched.shares_name} />
               ) : (
-                <span className="text-2xl font-bold text-[#2076C7]">{enriched.shares_name.charAt(0)}</span>
+                <span className="text-xl md:text-2xl font-bold text-[#2076C7]">{enriched.shares_name.charAt(0)}</span>
               )}
             </div>
             <div>
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2 py-0.5 md:px-3 md:py-1 bg-blue-50 text-[#2076C7] text-[10px] md:text-xs font-bold rounded-full">
                   {enriched.category || 'Unlisted Shares'}
                 </span>
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{enriched.shares_name}</h2>
-              <p className="text-sm text-gray-500 mt-1 flex items-center gap-1 flex-wrap">
-                <MapPin className="w-3.5 h-3.5" /> {enriched.headquarters || 'India'} • Est. {enriched.founded_year}
+              <h2 className="text-lg md:text-2xl lg:text-3xl font-bold text-gray-900 line-clamp-2">{enriched.shares_name}</h2>
+              <p className="text-xs text-gray-500 mt-0.5 md:mt-1 flex items-center gap-1">
+                <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5" /> {enriched.headquarters || 'India'} • Est. {enriched.founded_year}
               </p>
             </div>
           </div>
-          
-          <div className="flex items-start gap-4">
+          <div className="flex items-center justify-between md:justify-end gap-4">
             <div className="text-right">
-              <p className="text-xs text-gray-500 font-medium">Current Price</p>
-              <div className="text-2xl md:text-3xl font-bold text-[#10b981]">
-                {formatCurrency(enriched.price)}
-              </div>
+              <p className="text-[10px] md:text-xs text-gray-500 font-medium">Current Price</p>
+              <div className="text-lg md:text-2xl lg:text-3xl font-bold text-[#10b981]">{formatCurrency(enriched.price)}</div>
             </div>
             <button 
               onClick={onClose} 
-              className="p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600"
+              className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600"
             >
-              <X size={24} />
+              <X size={20} className="md:w-6 md:h-6" />
             </button>
           </div>
         </div>
 
-        {/* BODY */}
-        <div className="p-6 md:p-8 bg-gray-50/30 overflow-y-auto max-h-[calc(90vh-120px)]">
+        {/* Scrollable Content */}
+        <div className="p-4 md:p-6 lg:p-8 bg-gray-50/30 overflow-y-auto">
           
-          {/* Metric Cards Row */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
             {[
               { label: 'Minimum Lot', value: `${(enriched.min_lot_size || 100).toLocaleString()} Shares`, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
               { label: 'Min Investment', value: `₹${calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}`, icon: IndianRupee, color: 'text-emerald-600', bg: 'bg-emerald-50' },
               { label: 'Face Value', value: `₹${enriched.face_value || '10'}`, icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50' },
               { label: 'Market Cap', value: enriched.market_cap || 'N/A', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50' }
             ].map((item, i) => (
-              <div key={i} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                <div className={`w-10 h-10 ${item.bg} ${item.color} rounded-lg flex items-center justify-center mb-3`}>
-                  <item.icon size={20} />
+              <div key={i} className="bg-white p-3 md:p-4 lg:p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                <div className={`w-7 h-7 md:w-9 md:h-9 lg:w-10 lg:h-10 ${item.bg} ${item.color} rounded-lg flex items-center justify-center mb-2 md:mb-3`}>
+                  <item.icon size={16} className="md:w-5 md:h-5" />
                 </div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{item.label}</p>
-                <p className="text-lg font-bold text-gray-900">{item.value}</p>
+                <p className="text-[10px] md:text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5 md:mb-1">{item.label}</p>
+                <p className="text-sm md:text-base lg:text-lg font-bold text-gray-900 break-words">{item.value}</p>
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
             
-            {/* LEFT: Graph & Description */}
-            <div className="lg:col-span-2 space-y-6">
+            {/* Left Column */}
+            <div className="lg:w-2/3 space-y-4 md:space-y-6">
               
               {/* Chart Section */}
-              <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div className="bg-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-100 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 md:mb-6">
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-medium text-gray-500">Price History</span>
-                      <span className="text-xs text-gray-400">• {graphTimeRange}</span>
+                    <div className="flex items-center gap-2 mb-0.5 md:mb-1">
+                      <span className="text-xs md:text-sm font-medium text-gray-500">Price History</span>
+                      <span className="text-[9px] md:text-[10px] text-gray-400">• {graphTimeRange}</span>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900">
-                      {formatCurrency(enriched.price)}
-                    </h3>
+                    <h3 className="text-xl md:text-2xl font-bold text-gray-900">{formatCurrency(enriched.price)}</h3>
                   </div>
-                  
-                  <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80">
+                  <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80 self-start sm:self-auto">
                     {['All', '3M', '1M', '1W'].map(r => (
-                      <button 
-                        key={r} 
-                        onClick={() => setGraphTimeRange(r)} 
-                        className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-all ${
+                      <button
+                        key={r}
+                        onClick={() => setGraphTimeRange(r)}
+                        className={`px-2.5 md:px-3.5 py-1 md:py-1.5 text-xs font-medium rounded-md transition-all ${
                           graphTimeRange === r 
                             ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200' 
                             : 'text-gray-500 hover:text-gray-700'
@@ -546,162 +524,128 @@ const CompanyDetailModal: React.FC<{
                     ))}
                   </div>
                 </div>
-
-                <div className="h-64 w-full relative mb-8">
+                <div className="h-48 sm:h-56 md:h-64 w-full relative">
                   {isModalGraphLoading ? (
                     <div className="h-full flex items-center justify-center">
-                      <Loader2 className="animate-spin text-[#2076C7]" size={32} />
+                      <Loader2 className="animate-spin text-[#2076C7]" size={28} />
                     </div>
                   ) : modalGraphData.length > 0 ? (
-                    <canvas ref={chartRef}></canvas>
+                    <canvas ref={chartRef} className="w-full h-full"></canvas>
                   ) : (
-                    <div className="h-full flex items-center justify-center text-gray-400">No price data available</div>
+                    <div className="h-full flex items-center justify-center text-gray-400 text-sm">No price data available</div>
                   )}
-                </div>
-
-                {/* 52 Week High/Low */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">52W High</p>
-                    <p className="text-lg font-bold text-gray-900">₹{high52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
-                    <p className="text-xs text-gray-500 font-medium mt-1">
-                      {highDate ? new Date(highDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A'}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">52W Low</p>
-                    <p className="text-lg font-bold text-gray-900">₹{low52W.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
-                    <p className="text-xs text-gray-500 font-medium mt-1">
-                      {lowDate ? new Date(lowDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A'}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Avg Volume</p>
-                    <p className="text-lg font-bold text-gray-900">{enriched.volume || '45.2K'}</p>
-                    <p className="text-xs text-gray-500 font-medium mt-1">Daily avg</p>
-                  </div>
                 </div>
               </div>
 
-              {/* Description Card */}
-              <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-                  <Info className="text-[#1CADA3]" size={20} />
-                  About the Company
+              {/* About Section */}
+              <div className="bg-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-100 shadow-sm">
+                <h3 className="text-base md:text-lg font-bold text-gray-900 mb-2 md:mb-3 flex items-center gap-2">
+                  <Info className="text-[#1CADA3]" size={18} /> About the Company
                 </h3>
-                <p className="text-gray-600 leading-relaxed text-sm">
-                  {enriched.description || `${enriched.shares_name} is a leading player in the ${enriched.category || 'unlisted shares'} sector with strong growth potential.`}
+                <p className="text-gray-600 leading-relaxed text-xs sm:text-sm">
+                  {enriched.description || `${enriched.shares_name} is a leading player in the ${enriched.category || 'unlisted shares'} sector with strong growth potential and a proven track record of innovation. The company has shown consistent performance and is poised for significant expansion in the coming years.`}
                 </p>
                 
-                <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
+                <div className="grid grid-cols-2 gap-3 md:gap-4 mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-100">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">ISIN</p>
-                    <p className="text-sm font-semibold text-gray-900 break-words">{enriched.isin || 'N/A'}</p>
+                    <p className="text-[10px] md:text-xs text-gray-500 mb-0.5 md:mb-1">ISIN</p>
+                    <p className="text-xs md:text-sm font-semibold text-gray-900 break-words">{enriched.isin || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Depository</p>
-                    <p className="text-sm font-semibold text-gray-900">{enriched.depository_applicable?.split(' ')[0] || 'NSDL'}</p>
+                    <p className="text-[10px] md:text-xs text-gray-500 mb-0.5 md:mb-1">Depository</p>
+                    <p className="text-xs md:text-sm font-semibold text-gray-900">{enriched.depository_applicable?.split(' ')[0] || 'NSDL'}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Face Value</p>
-                    <p className="text-sm font-semibold text-gray-900">₹{enriched.face_value || '10'}</p>
+                    <p className="text-[10px] md:text-xs text-gray-500 mb-0.5 md:mb-1">Face Value</p>
+                    <p className="text-xs md:text-sm font-semibold text-gray-900">₹{enriched.face_value || '10'}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Lot Size</p>
-                    <p className="text-sm font-semibold text-gray-900">{(enriched.min_lot_size || 100).toLocaleString()} shares</p>
+                    <p className="text-[10px] md:text-xs text-gray-500 mb-0.5 md:mb-1">Lot Size</p>
+                    <p className="text-xs md:text-sm font-semibold text-gray-900">{(enriched.min_lot_size || 100).toLocaleString()} shares</p>
                   </div>
                 </div>
               </div>
             </div>
             
-            {/* RIGHT: Sidebar */}
-            <div className="space-y-6">
+            {/* Right Column */}
+            <div className="lg:w-1/3 space-y-4 md:space-y-6">
               
-              {/* Key Statistics Card */}
-              <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Activity size={16} className="text-[#2076C7]" />
-                  Key Statistics
+              {/* Key Statistics */}
+              <div className="bg-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-100 shadow-sm">
+                <h4 className="text-sm md:text-base font-bold text-gray-900 mb-3 md:mb-4 flex items-center gap-2">
+                  <Activity size={16} className="text-[#2076C7]" /> Key Statistics
                 </h4>
-                
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {[
                     { label: 'P/E Ratio', value: enriched.pe_ratio || 'N/A' },
                     { label: 'P/B Ratio', value: enriched.pb_ratio || 'N/A' },
-                    { label: 'ROE', value: enriched.roe ? `${enriched.roe}%` : 'N/A' },
-                    { label: '24h Volume', value: enriched.volume || '45.2K' }
+                    { label: 'ROE', value: enriched.roe ? `${enriched.roe}%` : 'N/A' }
                   ].map((stat, i) => (
                     <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
-                      <span className="text-xs text-gray-500">{stat.label}</span>
-                      <span className="text-sm font-bold text-gray-900">{stat.value}</span>
+                      <span className="text-xs md:text-sm text-gray-500">{stat.label}</span>
+                      <span className="text-sm md:text-base font-bold text-gray-900">{stat.value}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Action Card with Quantity Selector */}
-              <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                <h4 className="text-sm font-bold text-gray-900 mb-3 text-center">Ready to Invest?</h4>
-                <p className="text-xs text-gray-500 mb-4 text-center font-bold">
+              {/* Investment CTA */}
+              <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-200 shadow-sm">
+                <h4 className="text-sm md:text-base font-bold text-gray-900 mb-2 text-center">Ready to Invest?</h4>
+                <p className="text-xs md:text-sm text-gray-500 mb-4 md:mb-6 text-center font-bold">
                   Min investment: ₹{calculateMinInvestment(enriched.price, enriched.min_lot_size).toLocaleString('en-IN')}
                 </p>
-                
-                <div className="flex items-center justify-center gap-3 bg-white rounded-xl p-2 border border-gray-200 mb-4">
+                <div className="flex items-center justify-center gap-2 md:gap-3 bg-white rounded-xl p-1.5 md:p-2 border border-gray-200 mb-3 md:mb-4">
                   <button
                     onClick={() => handleModalQuantityChange(modalQuantity - 1)}
-                    className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                    className="p-1.5 md:p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
                     disabled={modalQuantity <= 1}
                   >
-                    <Minus size={16} />
+                    <Minus size={14} className="md:w-4 md:h-4" />
                   </button>
                   <input
                     type="number"
                     value={modalQuantity}
                     onChange={handleModalQuantityInput}
-                    className="w-20 text-center border border-gray-200 rounded-lg py-2 text-gray-500 focus:outline-none focus:border-[#2076C7]"
+                    className="w-16 md:w-20 text-center border border-gray-200 rounded-lg py-1.5 md:py-2 text-gray-500 text-sm focus:outline-none focus:border-[#2076C7]"
                     min="1"
                     max={modalMaxLot}
                   />
                   <button
                     onClick={() => handleModalQuantityChange(modalQuantity + 1)}
-                    className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                    className="p-1.5 md:p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
                     disabled={modalQuantity >= modalMaxLot}
                   >
-                    <Plus size={16} />
+                    <Plus size={14} className="md:w-4 md:h-4" />
                   </button>
                 </div>
-                <p className="text-xs text-center text-gray-400 mb-4">
+                <p className="text-[9px] md:text-xs text-center text-gray-400 mb-3 md:mb-4">
                   Max lot: {modalMaxLot === Infinity ? 'Unlimited' : modalMaxLot.toLocaleString()} shares
                 </p>
-
-                <button
-                  onClick={() => {
-                    onAddToCart(enriched, modalQuantity);
-                    onClose();
-                  }}
-                  className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                <button 
+                  onClick={() => { onAddToCart(enriched, modalQuantity); onClose(); }} 
+                  className="w-full py-2.5 md:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm md:text-base font-bold rounded-lg hover:opacity-90 transition-all"
                 >
-                  <ShoppingCart size={18} /> Add to Cart
+                  Add to Cart
                 </button>
-                
-                <p className="text-xs text-gray-400 text-center mt-3">
+                <p className="text-[9px] md:text-xs text-gray-400 text-center mt-2 md:mt-3">
                   Contact within 24 hours
                 </p>
               </div>
 
-              {/* Valuation Progress Bars */}
-              <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                <h4 className="text-sm font-bold text-gray-900 mb-4">Valuation Metrics</h4>
-                <div className="space-y-5">
+              {/* Valuation Metrics */}
+              <div className="bg-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-100 shadow-sm">
+                <h4 className="text-sm md:text-base font-bold text-gray-900 mb-3 md:mb-4">Valuation Metrics</h4>
+                <div className="space-y-4 md:space-y-5">
                   {[
                     { label: 'Industry Position', value: '85%', percent: 85 },
                     { label: 'Growth Potential', value: '72%', percent: 72 },
                     { label: 'Market Demand', value: '68%', percent: 68 }
                   ].map((metric, i) => (
                     <div key={i}>
-                      <div className="flex justify-between items-center mb-1.5">
-                        <span className="text-xs text-gray-600">{metric.label}</span>
-                        <span className="text-xs font-bold text-gray-900">{metric.value}</span>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs md:text-sm text-gray-600">{metric.label}</span>
+                        <span className="text-xs md:text-sm font-bold text-gray-900">{metric.value}</span>
                       </div>
                       <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                         <div 
@@ -716,7 +660,348 @@ const CompanyDetailModal: React.FC<{
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
+    </div>
+  );
+};
+
+// ==================== ENQUIRY MODAL COMPONENT ====================
+const EnquiryModal: React.FC<{
+  onClose: () => void;
+  onSuccess: () => void;
+}> = ({ onClose, onSuccess }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [enquiryError, setEnquiryError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    product_id: '',
+    product_name: '',
+    product_type: 'SHARE',
+    full_name: '',
+    email: '',
+    phone: '',
+    city: '',
+    message: ''
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (enquiryError) setEnquiryError(null);
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate all required fields
+    if (!formData.product_id.trim()) {
+      setEnquiryError('Product/Company ID is required');
+      return;
+    }
+    if (!formData.product_name.trim()) {
+      setEnquiryError('Product/Company name is required');
+      return;
+    }
+    if (!formData.full_name.trim()) {
+      setEnquiryError('Full name is required');
+      return;
+    }
+    if (!formData.email.trim()) {
+      setEnquiryError('Email is required');
+      return;
+    }
+    if (!formData.phone.trim()) {
+      setEnquiryError('Phone number is required');
+      return;
+    }
+    if (!formData.city.trim()) {
+      setEnquiryError('City is required');
+      return;
+    }
+    if (!formData.message.trim()) {
+      setEnquiryError('Message is required');
+      return;
+    }
+    
+    // Validate product ID
+    const productIdNum = parseInt(formData.product_id);
+    if (isNaN(productIdNum) || productIdNum <= 0) {
+      setEnquiryError('Please enter a valid product/company ID');
+      return;
+    }
+    
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      setEnquiryError('Please enter a valid email address');
+      return;
+    }
+    
+    // Validate phone (10 digits)
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(formData.phone.trim())) {
+      setEnquiryError('Please enter a valid 10-digit phone number');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setEnquiryError(null);
+    
+    try {
+      const payload: EnquiryPayload = {
+        full_name: formData.full_name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        city: formData.city.trim(),
+        message: formData.message.trim(),
+        product_type: formData.product_type,
+        product_name: formData.product_name.trim(),
+        product_id: productIdNum
+      };
+
+      await customerService.submitEnquiry(payload);
+      onSuccess();
+      onClose();
+      
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to submit enquiry. Please try again.';
+      setEnquiryError(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[2000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-8">
+        <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-5 text-white flex justify-between items-center sticky top-0">
+          <div>
+            <h3 className="text-xl font-black uppercase tracking-tight">Investor Enquiry</h3>
+            <p className="text-sm text-white/80">Fill details to complete your investment request</p>
+          </div>
+          <button 
+            onClick={onClose} 
+            className="hover:bg-white/20 p-2 rounded-full transition-all"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <form className="p-6 space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto" onSubmit={handleFormSubmit}>
+          {enquiryError && (
+            <div className="bg-rose-50 text-rose-600 text-sm p-3 rounded-lg border border-rose-200 flex items-start gap-2">
+              <X className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <span>{enquiryError}</span>
+            </div>
+          )}
+          
+          {/* Product/Company Details Section */}
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+            <h4 className="text-sm font-black text-gray-700 mb-3 flex items-center gap-2">
+              <Briefcase className="w-4 h-4 text-[#2076C7]" />
+              Product/Company Details
+            </h4>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                  Product/Company ID <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                  <input 
+                    type="number"
+                    value={formData.product_id}
+                    onChange={(e) => handleInputChange('product_id', e.target.value)}
+                    required 
+                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
+                    placeholder="Enter company ID" 
+                    min="1"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                  Product Name <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                  <input 
+                    type="text"
+                    value={formData.product_name}
+                    onChange={(e) => handleInputChange('product_name', e.target.value)}
+                    required 
+                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
+                    placeholder="e.g., Tata Technologies" 
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="mt-3">
+              <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                Product Type
+              </label>
+              <select
+                value={formData.product_type}
+                onChange={(e) => handleInputChange('product_type', e.target.value)}
+                className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black"
+              >
+                <option value="SHARE">SHARE</option>
+                <option value="MUTUAL_FUND">MUTUAL FUND</option>
+                <option value="BOND">BOND</option>
+                <option value="NCD">NCD</option>
+                <option value="PMS">PMS</option>
+                <option value="AIF">AIF</option>
+              </select>
+            </div>
+          </div>
+          
+          {/* Personal Details Section */}
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+            <h4 className="text-sm font-black text-gray-700 mb-3 flex items-center gap-2">
+              <User className="w-4 h-4 text-[#2076C7]" />
+              Personal Information
+            </h4>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                  Full Name <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                  <input 
+                    value={formData.full_name}
+                    onChange={(e) => handleInputChange('full_name', e.target.value)}
+                    required 
+                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
+                    placeholder="Your full name" 
+                  />
+                </div>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                    Email <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                    <input 
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      required 
+                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
+                      placeholder="your@email.com" 
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                    Phone <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                    <input 
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      required 
+                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
+                      placeholder="9876543210" 
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                  City <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                  <input 
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                    required 
+                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
+                    placeholder="Your city" 
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Message Section */}
+          <div>
+            <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+              Your Message <span className="text-rose-500">*</span>
+            </label>
+            <div className="relative">
+              <MessageCircle className="absolute left-3 top-3 w-4 h-4 text-gray-300" />
+              <textarea 
+                value={formData.message}
+                onChange={(e) => handleInputChange('message', e.target.value)}
+                required 
+                rows={4}
+                className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black resize-none" 
+                placeholder="I want to invest in this company. Please share the investment details and process."
+              />
+            </div>
+          </div>
+          
+          {/* Submit Button */}
+          <button 
+            type="submit" 
+            disabled={isSubmitting} 
+            className="w-full py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-base hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Submitting Enquiry...
+              </>
+            ) : (
+              <>
+                <Send className="w-5 h-5" />
+                Submit Investment Request
+              </>
+            )}
+          </button>
+          
+          {/* Trust message */}
+          <p className="text-xs text-gray-400 text-center pt-2 flex items-center justify-center gap-2">
+            <CheckCircle className="w-3 h-3" />
+            Your information is secure and will not be shared
+            <CheckCircle className="w-3 h-3" />
+            Our RM will contact you within 24 hours
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// ==================== SUCCESS MODAL COMPONENT ====================
+const SuccessModal: React.FC<{
+  productName: string;
+  onClose: () => void;
+}> = ({ productName, onClose }) => {
+  return (
+    <div className="fixed inset-0 z-[3000] bg-black/60 flex items-center justify-center p-4">
+      <div className="bg-white p-8 rounded-2xl max-w-md w-full text-center shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="w-8 h-8 text-green-600" />
+        </div>
+        <h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">Enquiry Sent!</h3>
+        <p className="text-gray-500 text-sm mb-4 leading-relaxed">
+          Thank you for your interest! Our relationship manager will contact you within 24 hours with more information about <span className="font-semibold text-[#2076C7]">{productName}</span>.
+        </p>
+        <button 
+          onClick={onClose} 
+          className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold hover:opacity-90 transition-all"
+        >
+          Continue Shopping
+        </button>
+      </div>
     </div>
   );
 };
@@ -724,44 +1009,30 @@ const CompanyDetailModal: React.FC<{
 // ==================== MAIN COMPONENT ====================
 export default function CompaniesPage() {
   const router = useRouter();
-  const chartRef = useRef<HTMLCanvasElement | null>(null);
-  const chartInstance = useRef<Chart | null>(null);
 
-  // Market Stats States
   const [graphData, setGraphData] = useState<any[]>([]);
   const [isGraphLoading, setIsGraphLoading] = useState(true);
-
-  // Data States
   const [companies, setCompanies] = useState<Company[]>([]);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // UI States
   const [searchTerm, setSearchTerm] = useState('');
   const [priceRange, setPriceRange] = useState('ALL');
   const [sortBy, setSortBy] = useState('name-asc');
   const [showFilters, setShowFilters] = useState(false);
   const [wishlistMap, setWishlistMap] = useState<Map<number, number>>(new Map());
   const [wishlistLoading, setWishlistLoading] = useState(false);
-
-  // View More State
   const [visibleCount, setVisibleCount] = useState(10);
-
-  // Detail Modal States
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-  const [modalGraphData, setModalGraphData] = useState<GraphPoint[]>([]);
-  const [isModalGraphLoading, setIsModalGraphLoading] = useState(false);
-  const [graphTimeRange, setGraphTimeRange] = useState('All');
-
-  // Cart States
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showCartDrawer, setShowCartDrawer] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<'cart' | 'payment'>('cart');
-
-  // Toast State
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  
+  // Enquiry modal states
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successProductName, setSuccessProductName] = useState('');
 
-  // Toast Handlers
   const showToast = useCallback((message: string, type: ToastMessage['type'] = 'info', duration: number = 4000) => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type }]);
@@ -774,7 +1045,6 @@ export default function CompaniesPage() {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   }, []);
 
-  // --- MARKET DATA FETCH ---
   useEffect(() => {
     const fetchIndexData = async () => {
       setIsGraphLoading(true);
@@ -795,7 +1065,6 @@ export default function CompaniesPage() {
     return parseFloat(graphData[graphData.length - 1].market_price).toLocaleString('en-IN', { minimumFractionDigits: 2 });
   }, [graphData]);
 
-  // --- WISHLIST FETCH ---
   const loadWishlist = useCallback(async () => {
     const token = getTokenFromCookie();
     if (!token) {
@@ -835,7 +1104,6 @@ export default function CompaniesPage() {
     }
   }, []);
 
-  // --- MAIN DATA FETCH ---
   const fetchCompanies = async () => {
     setLoading(true);
     try {
@@ -868,7 +1136,6 @@ export default function CompaniesPage() {
     fetchCompanies();
   }, []);
 
-  // Auto-refresh wishlist every 30 seconds
   useEffect(() => {
     const intervalId = setInterval(() => {
       loadWishlist();
@@ -893,7 +1160,6 @@ export default function CompaniesPage() {
     };
   }, [loadWishlist]);
 
-  // --- WISHLIST TOGGLE ---
   const toggleWishlist = async (company: Company) => {
     const token = getTokenFromCookie();
     if (!token) {
@@ -951,7 +1217,6 @@ export default function CompaniesPage() {
     }
   };
 
-  // --- CART FUNCTIONS ---
   const addToCart = useCallback((company: Company, quantity: number) => {
     const maxLot = company.min_lot_size || Infinity;
     
@@ -976,7 +1241,6 @@ export default function CompaniesPage() {
     });
     
     showToast(`Added ${quantity} share(s) of ${company.shares_name} to cart`, 'success');
-    // REMOVED: setShowCartDrawer(true); - Cart drawer will NOT open automatically
   }, [showToast]);
 
   const updateCartQuantity = useCallback((companyId: number, newQuantity: number) => {
@@ -1018,18 +1282,29 @@ export default function CompaniesPage() {
     setCheckoutStep('payment');
   }, [cartItems, showToast]);
 
+  // Updated handlePaymentConfirm to open enquiry modal instead of showing success directly
   const handlePaymentConfirm = useCallback(() => {
-    showToast('Order placed successfully! Our team will contact you shortly via email for Net Banking payment.', 'success');
-    setCartItems([]);
+    if (cartItems.length === 0) return;
+    
+    // Close the cart drawer first
     setShowCartDrawer(false);
     setCheckoutStep('cart');
-  }, [showToast]);
+    
+    // Open the enquiry modal
+    setShowEnquiryModal(true);
+  }, [cartItems]);
 
   const handleBackToCart = useCallback(() => {
     setCheckoutStep('cart');
   }, []);
 
-  // --- FILTERING & SORTING ---
+  const handleEnquirySuccess = useCallback(() => {
+    const productNames = cartItems.map(item => item.company.shares_name).join(', ');
+    setSuccessProductName(productNames);
+    setShowSuccessModal(true);
+    setCartItems([]); // Clear cart after successful enquiry
+  }, [cartItems]);
+
   useEffect(() => {
     let filtered = [...companies];
     
@@ -1059,181 +1334,6 @@ export default function CompaniesPage() {
     setVisibleCount(10);
   }, [companies, searchTerm, priceRange, sortBy]);
 
-  // --- MODAL GRAPH DATA FETCH ---
-  useEffect(() => {
-    const loadGraphData = async () => {
-      if (!selectedCompany) return;
-      
-      setIsModalGraphLoading(true);
-      setModalGraphData([]);
-      
-      try {
-        const response = await fetchIdGraphData(selectedCompany.id);
-        
-        if (response && response.success && response.graph && Array.isArray(response.graph)) {
-          const formattedData: GraphPoint[] = response.graph
-            .filter(item => item && item.price_date && item.market_price !== null && item.market_price !== undefined)
-            .map((item) => ({
-              price_date: item.price_date,
-              market_price: item.market_price?.toString() || '0'
-            }));
-          
-          if (formattedData.length > 0) {
-            setModalGraphData(formattedData);
-          }
-        }
-      } catch (error) {
-        toast.error('Error loading graph data');
-        setModalGraphData([]);
-      } finally {
-        setIsModalGraphLoading(false);
-      }
-    };
-
-    loadGraphData();
-  }, [selectedCompany]);
-
-  // --- MODAL CHART INITIALIZATION ---
-  useEffect(() => {
-    if (!chartRef.current || !selectedCompany) return;
-    if (modalGraphData.length === 0) return;
-    
-    if (chartInstance.current) {
-      chartInstance.current.destroy();
-    }
-
-    const ctx = chartRef.current.getContext('2d');
-    if (!ctx) return;
-
-    let filteredData = [...modalGraphData];
-    const now = new Date();
-
-    if (graphTimeRange === '1W') {
-      const cutoffDate = new Date();
-      cutoffDate.setDate(now.getDate() - 7);
-      filteredData = modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
-    } else if (graphTimeRange === '1M') {
-      const cutoffDate = new Date();
-      cutoffDate.setMonth(now.getMonth() - 1);
-      filteredData = modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
-    } else if (graphTimeRange === '3M') {
-      const cutoffDate = new Date();
-      cutoffDate.setMonth(now.getMonth() - 3);
-      filteredData = modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
-    }
-
-    filteredData.sort((a, b) => new Date(a.price_date).getTime() - new Date(b.price_date).getTime());
-
-    const labels = filteredData.map(item => {
-      const date = new Date(item.price_date);
-      return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-    });
-
-    const prices = filteredData.map(item => parseFloat(item.market_price));
-
-    const config: ChartConfiguration = {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Price History',
-          data: prices,
-          borderColor: '#2076C7',
-          backgroundColor: 'rgba(32, 118, 199, 0.05)',
-          borderWidth: 2,
-          pointRadius: filteredData.length > 50 ? 0 : 3,
-          pointHoverRadius: 6,
-          tension: 0.2,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            mode: 'index',
-            intersect: false,
-            callbacks: {
-              label: (ctx) => `₹${parseFloat(ctx.raw as string).toLocaleString('en-IN')}`
-            }
-          }
-        },
-        scales: {
-          y: {
-            grid: { color: 'rgba(0, 0, 0, 0.05)' },
-            ticks: { 
-              callback: (val) => `₹${val}`,
-              font: { size: 10 }
-            }
-          },
-          x: {
-            grid: { display: false },
-            ticks: {
-              autoSkip: true,
-              maxRotation: 0,
-              autoSkipPadding: 20,
-              font: { size: 9 }
-            }
-          }
-        }
-      }
-    };
-
-    chartInstance.current = new Chart(ctx, config);
-
-    return () => {
-      if (chartInstance.current) {
-        chartInstance.current.destroy();
-      }
-    };
-  }, [modalGraphData, graphTimeRange, selectedCompany]);
-
-  // Prevent scroll when modal is open
-  useEffect(() => {
-    if (selectedCompany) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [selectedCompany]);
-
-  // Get enriched company for modal
-  const getEnrichedCompany = useCallback((company: Company): Company => {
-    return enrichCompanyForModal(company);
-  }, []);
-
-  // Get filtered graph data for stats
-  const getFilteredGraphData = useCallback(() => {
-    if (!modalGraphData.length) return [];
-    
-    switch (graphTimeRange) {
-      case '1W': {
-        const cutoffDate = new Date();
-        cutoffDate.setDate(new Date().getDate() - 7);
-        return modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
-      }
-      case '1M': {
-        const cutoffDate = new Date();
-        cutoffDate.setMonth(new Date().getMonth() - 1);
-        return modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
-      }
-      case '3M': {
-        const cutoffDate = new Date();
-        cutoffDate.setMonth(new Date().getMonth() - 3);
-        return modalGraphData.filter(item => new Date(item.price_date) >= cutoffDate);
-      }
-      case 'All':
-      default:
-        return modalGraphData;
-    }
-  }, [modalGraphData, graphTimeRange]);
-
-  // Toast Icon Helper
   const getToastIcon = (type: ToastMessage['type']) => {
     switch (type) {
       case 'success': return <CheckCircle size={18} />;
@@ -1264,9 +1364,8 @@ export default function CompaniesPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-4 pt-4 md:pt-8 min-h-screen">
-      {/* TOAST CONTAINER */}
-      <div className="fixed top-20 right-5 z-[5000] flex flex-col gap-3">
+    <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 pt-3 sm:pt-4 md:pt-8 min-h-screen">
+      <div className="fixed top-16 sm:top-20 right-2 sm:right-5 z-[5000] flex flex-col gap-2 sm:gap-3">
         <AnimatePresence>
           {toasts.map(toastMsg => (
             <motion.div 
@@ -1274,106 +1373,104 @@ export default function CompaniesPage() {
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 100 }}
-              className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 border ${getToastBg(toastMsg.type)} max-w-sm cursor-pointer`}
+              className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg shadow-lg flex items-center gap-2 sm:gap-3 border ${getToastBg(toastMsg.type)} max-w-[90vw] sm:max-w-sm cursor-pointer text-xs sm:text-sm`}
               onClick={() => removeToast(toastMsg.id)}
             >
               {getToastIcon(toastMsg.type)}
-              <span className="text-sm font-medium">{toastMsg.message}</span>
+              <span className="text-xs sm:text-sm font-medium">{toastMsg.message}</span>
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
 
-      {/* Market Overview Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-2 font-medium">
-            <div className="p-2 bg-blue-50 rounded-lg text-[#2076C7]"><Building2 size={18} /></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-2 font-medium">
+            <div className="p-1.5 sm:p-2 bg-blue-50 rounded-lg text-[#2076C7]"><Building size={16} className="sm:w-[18px] sm:h-[18px]" /></div>
             Total Companies
           </div>
-          <p className="text-2xl font-bold text-gray-900">{companies.length}</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900">{companies.length}</p>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-2 font-medium">
-            <div className="p-2 bg-green-50 rounded-lg text-emerald-600"><TrendingUp size={18} /></div>
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-2 font-medium">
+            <div className="p-1.5 sm:p-2 bg-green-50 rounded-lg text-emerald-600"><TrendingUp size={16} className="sm:w-[18px] sm:h-[18px]" /></div>
             Index Value
           </div>
-          <p className="text-2xl font-bold text-gray-900">₹{currentIndex}</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900">₹{currentIndex}</p>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-2 font-medium">
-            <div className="p-2 bg-amber-50 rounded-lg text-amber-600"><ShoppingCart size={18} /></div>
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-2 font-medium">
+            <div className="p-1.5 sm:p-2 bg-amber-50 rounded-lg text-amber-600"><ShoppingCart size={16} className="sm:w-[18px] sm:h-[18px]" /></div>
             Cart Items
           </div>
-          <p className="text-2xl font-bold text-gray-900">{cartItems.length}</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900">{cartItems.length}</p>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-2 font-medium">
-            <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600"><Bookmark size={18} /></div>
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:border-[#2076C7] transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-2 font-medium">
+            <div className="p-1.5 sm:p-2 bg-indigo-50 rounded-lg text-indigo-600"><Bookmark size={16} className="sm:w-[18px] sm:h-[18px]" /></div>
             Wishlist
           </div>
-          <p className="text-2xl font-bold text-gray-900">{wishlistMap.size}</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900">{wishlistMap.size}</p>
         </div>
       </div>
 
-      {/* Action Bar */}
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6">
         <div className="relative max-w-2xl">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
+          <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
           </div>
           <input
             type="text"
             placeholder="Search companies by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-12 pr-4 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 outline-none transition-all shadow-sm hover:shadow-md text-gray-900 placeholder-gray-500"
+            className="block w-full pl-9 sm:pl-12 pr-8 sm:pr-4 py-3 sm:py-4 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 outline-none transition-all shadow-sm hover:shadow-md text-gray-900 placeholder-gray-500"
           />
           {searchTerm && (
-            <button onClick={() => setSearchTerm('')} className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600">
-              <X className="h-5 w-5" />
+            <button onClick={() => setSearchTerm('')} className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-gray-600">
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           )}
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-4 items-center justify-between mb-8">
-        <div className="flex flex-wrap gap-3 flex-1">
+      <div className="flex flex-wrap gap-2 sm:gap-4 items-center justify-between mb-6 sm:mb-8">
+        <div className="flex flex-wrap gap-2 sm:gap-3 flex-1">
           <select 
-            className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] transition-all text-gray-900 min-w-[140px] text-sm"
+            className="px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] transition-all text-gray-900 min-w-[120px] sm:min-w-[140px] text-xs sm:text-sm"
             value={priceRange} 
             onChange={(e) => setPriceRange(e.target.value as PriceRangeOption)}
           >
             {PRICE_RANGES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
           </select>
           <select 
-            className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] transition-all text-gray-900 min-w-[160px] text-sm"
+            className="px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] transition-all text-gray-900 min-w-[140px] sm:min-w-[160px] text-xs sm:text-sm"
             value={sortBy} 
             onChange={(e) => setSortBy(e.target.value as SortOption)}
           >
             {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
-          <div className="flex items-center px-4 py-2 bg-blue-50 rounded-lg">
-            <span className="text-sm text-[#2076C7] font-semibold">{filteredCompanies.length} companies</span>
+          <div className="flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-50 rounded-lg">
+            <span className="text-xs sm:text-sm text-[#2076C7] font-semibold">{filteredCompanies.length} companies</span>
           </div>
         </div>
         <div className="flex gap-2">
           <button 
             onClick={() => setShowFilters(!showFilters)}
-            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${
+            className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 ${
               showFilters ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 shadow-sm'
             }`}
           >
-            <Filter size={16} /> Filters
+            <Filter size={14} className="sm:w-4 sm:h-4" /> Filters
           </button>
           <button 
             onClick={() => setShowCartDrawer(true)}
-            className="px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-white text-gray-600 border border-gray-200 shadow-sm hover:border-[#2076C7] hover:text-[#2076C7] relative"
+            className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 bg-white text-gray-600 border border-gray-200 shadow-sm hover:border-[#2076C7] hover:text-[#2076C7] relative"
           >
-            <ShoppingCart size={16} />
+            <ShoppingCart size={14} className="sm:w-4 sm:h-4" />
             Cart
             {cartItems.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+              <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] sm:text-xs font-bold rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center">
                 {cartItems.length}
               </span>
             )}
@@ -1381,18 +1478,17 @@ export default function CompaniesPage() {
         </div>
       </div>
 
-      {/* Filter Panel */}
       {showFilters && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-200 shadow-lg mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Price Range</label>
-              <div className="flex flex-wrap gap-3">
+              <label className="block text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Price Range</label>
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 {PRICE_RANGES.map(r => (
                   <button
                     key={r.value}
                     onClick={() => setPriceRange(r.value)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-medium transition-all ${
                       priceRange === r.value
                         ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md'
                         : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#2076C7]'
@@ -1404,13 +1500,13 @@ export default function CompaniesPage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Sort By</label>
-              <div className="flex flex-wrap gap-3">
+              <label className="block text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Sort By</label>
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 {SORT_OPTIONS.map(o => (
                   <button
                     key={o.value}
                     onClick={() => setSortBy(o.value)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-medium transition-all ${
                       sortBy === o.value
                         ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md'
                         : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#2076C7]'
@@ -1425,8 +1521,7 @@ export default function CompaniesPage() {
         </motion.div>
       )}
 
-      {/* Companies Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
         {filteredCompanies.slice(0, visibleCount).map((company) => {
           const isSaved = wishlistMap.has(company.id);
           
@@ -1444,37 +1539,33 @@ export default function CompaniesPage() {
         })}
       </div>
 
-      {/* View More Button */}
       {visibleCount < filteredCompanies.length && (
-        <div className="flex justify-center pb-12">
+        <div className="flex justify-center pb-8 sm:pb-12">
           <button 
             onClick={() => setVisibleCount(prev => prev + 5)}
-            className="flex items-center gap-2 px-8 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm hover:shadow-md"
+            className="flex items-center gap-1.5 sm:gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm hover:shadow-md text-xs sm:text-sm"
           >
-            View More Companies <ChevronDown size={20} />
+            View More Companies <ChevronDown size={16} className="sm:w-5 sm:h-5" />
           </button>
         </div>
       )}
 
-      {/* Empty State */}
       {!loading && filteredCompanies.length === 0 && (
-        <div className="text-center py-20 text-gray-500 bg-white rounded-3xl border border-gray-100 shadow-sm">
+        <div className="text-center py-12 sm:py-20 text-gray-500 bg-white rounded-2xl sm:rounded-3xl border border-gray-100 shadow-sm">
           No companies found matching your search.
         </div>
       )}
 
-      {/* DETAIL MODAL */}
-<AnimatePresence>
-  {selectedCompany && (
-    <CompanyDetailModal
-      company={selectedCompany}
-      onClose={() => setSelectedCompany(null)}
-      onAddToCart={addToCart}
-    />
-  )}
-</AnimatePresence>
+      <AnimatePresence>
+        {selectedCompany && (
+          <CompanyDetailModal
+            company={selectedCompany}
+            onClose={() => setSelectedCompany(null)}
+            onAddToCart={addToCart}
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Cart Drawer */}
       <AnimatePresence>
         {showCartDrawer && (
           <>
@@ -1486,45 +1577,45 @@ export default function CompaniesPage() {
               transition={{ type: 'spring', damping: 25 }}
               className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-[1001] flex flex-col"
             >
-              <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white">
-                <h2 className="text-xl font-bold">
+              <div className="p-3 sm:p-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white">
+                <h2 className="text-lg sm:text-xl font-bold">
                   {checkoutStep === 'cart' ? 'Your Cart' : 'Payment Details'}
                 </h2>
                 <button onClick={() => setShowCartDrawer(false)} className="p-1 hover:bg-white/20 rounded-lg transition">
-                  <X size={20} />
+                  <X size={18} className="sm:w-5 sm:h-5" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="flex-1 overflow-y-auto p-3 sm:p-4">
                 {checkoutStep === 'cart' ? (
                   cartItems.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
-                      <ShoppingCart size={48} className="mx-auto mb-4 opacity-50" />
-                      <p>Your cart is empty</p>
+                    <div className="text-center py-8 sm:py-12 text-gray-500">
+                      <ShoppingCart size={36} className="sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 opacity-50" />
+                      <p className="text-sm sm:text-base">Your cart is empty</p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       {cartItems.map((item) => {
                         const maxLot = item.company.min_lot_size || Infinity;
                         return (
-                          <div key={item.id} className="bg-gray-50 rounded-xl p-4 flex gap-3">
-                            <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center border border-gray-100">
+                          <div key={item.id} className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 flex gap-2 sm:gap-3">
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-lg flex items-center justify-center border border-gray-100">
                               {item.company.logo_url ? (
-                                <Image src={item.company.logo_url} width={60} height={60} className="object-contain" alt={item.company.shares_name} />
+                                <Image src={item.company.logo_url} width={60} height={60} className="object-contain w-10 h-10 sm:w-auto sm:h-auto" alt={item.company.shares_name} />
                               ) : (
-                                <span className="text-xl font-bold text-[#2076C7]">{item.company.shares_name.charAt(0)}</span>
+                                <span className="text-base sm:text-xl font-bold text-[#2076C7]">{item.company.shares_name.charAt(0)}</span>
                               )}
                             </div>
-                            <div className="flex-1">
-                              <h4 className="font-bold text-gray-900">{item.company.shares_name}</h4>
-                              <p className="text-[#2076C7] font-bold">{formatCurrency(item.company.price)}</p>
-                              <div className="flex items-center gap-2 mt-2">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-bold text-gray-900 text-xs sm:text-sm truncate">{item.company.shares_name}</h4>
+                              <p className="text-[#2076C7] font-bold text-xs sm:text-sm">{formatCurrency(item.company.price)}</p>
+                              <div className="flex items-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
                                 <button
                                   onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
                                   className="p-1 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
                                   disabled={item.quantity <= 1}
                                 >
-                                  <Minus size={14} />
+                                  <Minus size={12} className="sm:w-3.5 sm:h-3.5" />
                                 </button>
                                 <input
                                   type="number"
@@ -1535,7 +1626,7 @@ export default function CompaniesPage() {
                                       updateCartQuantity(item.id, val);
                                     }
                                   }}
-                                  className="w-16 text-center border border-gray-200 rounded-lg py-1 text-gray-800 focus:outline-none focus:border-[#2076C7]"
+                                  className="w-12 sm:w-16 text-center border border-gray-200 rounded-lg py-0.5 sm:py-1 text-gray-800 focus:outline-none focus:border-[#2076C7] text-xs sm:text-sm"
                                   min="1"
                                   max={maxLot}
                                 />
@@ -1544,16 +1635,16 @@ export default function CompaniesPage() {
                                   className="p-1 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
                                   disabled={item.quantity >= maxLot}
                                 >
-                                  <Plus size={14} />
+                                  <Plus size={12} className="sm:w-3.5 sm:h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => removeFromCart(item.id)}
-                                  className="ml-auto text-red-500 text-xs hover:underline"
+                                  className="ml-auto text-red-500 text-[10px] sm:text-xs hover:underline"
                                 >
                                   Remove
                                 </button>
                               </div>
-                              <p className="text-xs text-gray-400 mt-1">
+                              <p className="text-[9px] sm:text-xs text-gray-400 mt-1">
                                 Max lot: {maxLot === Infinity ? 'Unlimited' : maxLot.toLocaleString()} shares
                               </p>
                             </div>
@@ -1563,34 +1654,33 @@ export default function CompaniesPage() {
                     </div>
                   )
                 ) : (
-                  // Payment Step - Simplified to Net Banking Only
-                  <div className="space-y-6">
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <h3 className="font-bold text-gray-900 mb-3">Order Summary</h3>
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                      <h3 className="font-bold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">Order Summary</h3>
                       {cartItems.map((item) => (
-                        <div key={item.id} className="text-sm justify-between text-gray-800 mb-2">
-                          <span>{item.company.shares_name} x {item.quantity}</span> &nbsp;= &nbsp;
-                          <span>{((parseFloat(item.company.price) * item.quantity).toString())}</span>
+                        <div key={item.id} className="text-xs sm:text-sm flex justify-between text-gray-800 mb-1.5 sm:mb-2">
+                          <span className="truncate">{item.company.shares_name} x {item.quantity}</span>
+                          <span>{formatCurrency((parseFloat(item.company.price) * item.quantity).toString())}</span>
                         </div>
                       ))}
                       <div className="border-t border-gray-200 text-gray-900 pt-2 mt-2 flex justify-between font-bold">
-                        <span>Total</span>
-                        <span className="text-[#2076C7]">{formatCurrency(getCartTotal().toString())}</span>
+                        <span className="text-sm sm:text-base">Total</span>
+                        <span className="text-[#2076C7] text-sm sm:text-base">{formatCurrency(getCartTotal().toString())}</span>
                       </div>
                     </div>
 
-                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                      <div className="flex items-center gap-3 mb-3">
-                        <CreditCard size={20} className="text-[#2076C7]" />
-                        <h3 className="font-bold text-gray-900">Payment Method: Net Banking</h3>
+                    <div className="bg-blue-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-blue-100">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                        <CreditCard size={16} className="sm:w-5 sm:h-5 text-[#2076C7]" />
+                        <h3 className="font-bold text-gray-900 text-sm sm:text-base">Payment Method: Net Banking</h3>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-[11px] sm:text-sm text-gray-600">
                         Payment will be processed through our secure net banking partner.
                       </p>
                     </div>
 
-                    <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-100">
-                      <p className="text-xs text-yellow-700">
+                    <div className="bg-yellow-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-yellow-100">
+                      <p className="text-[10px] sm:text-xs text-yellow-700">
                         <strong>Note:</strong> After confirmation, our team will contact you within 24 hours to complete the transaction via Net Banking.
                       </p>
                     </div>
@@ -1598,40 +1688,60 @@ export default function CompaniesPage() {
                 )}
               </div>
 
-              <div className="p-4 border-t border-gray-100 bg-gray-50">
+              <div className="p-3 sm:p-4 border-t border-gray-100 bg-gray-50">
                 {checkoutStep === 'cart' ? (
                   <>
-                    <div className="flex justify-between mb-4">
-                      <span className="text-gray-600">Total Amount:</span>
-                      <span className="text-xl font-bold text-[#2076C7]">{formatCurrency(getCartTotal().toString())}</span>
+                    <div className="flex justify-between mb-3 sm:mb-4">
+                      <span className="text-gray-600 text-sm sm:text-base">Total Amount:</span>
+                      <span className="text-lg sm:text-xl font-bold text-[#2076C7]">{formatCurrency(getCartTotal().toString())}</span>
                     </div>
                     <button
                       onClick={handleProceedToPayment}
                       disabled={cartItems.length === 0}
-                      className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg sm:rounded-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                     >
                       Proceed to Net Banking Payment
                     </button>
                   </>
                 ) : (
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 sm:gap-3">
                     <button
                       onClick={handleBackToCart}
-                      className="flex-1 py-3 border border-gray-300 text-gray-700 font-bold rounded-xl hover:bg-gray-100"
+                      className="flex-1 py-2.5 sm:py-3 border border-gray-300 text-gray-700 font-bold rounded-lg sm:rounded-xl hover:bg-gray-100 text-sm sm:text-base"
                     >
                       Back to Cart
                     </button>
                     <button
                       onClick={handlePaymentConfirm}
-                      className="flex-1 py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-xl"
+                      className="flex-1 py-2.5 sm:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg sm:rounded-xl text-sm sm:text-base"
                     >
-                      Confirm & Pay via Net Banking
+                      Confirm & Pay
                     </button>
                   </div>
                 )}
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Enquiry Modal */}
+      <AnimatePresence>
+        {showEnquiryModal && (
+          <EnquiryModal
+            onClose={() => setShowEnquiryModal(false)}
+            onSuccess={handleEnquirySuccess}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <SuccessModal
+            productName={successProductName}
+            onClose={() => setShowSuccessModal(false)}
+          />
         )}
       </AnimatePresence>
     </div>

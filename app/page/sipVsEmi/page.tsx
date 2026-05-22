@@ -302,42 +302,42 @@ export const LoanTenureCalculatorContent: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-        <div className="p-6 lg:p-8 font-sans">
+    <div className="w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-w-7xl mx-auto">
+        <div className="p-4 sm:p-6 lg:p-8 font-sans">
 
           {/* Loan & Investment Parameters Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
-            <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
-              <div className="w-12 h-12 bg-teal-50 rounded-lg flex items-center justify-center text-teal-500 mr-4">
-                <i className="fas fa-calculator text-2xl"></i>
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+            <div className="flex items-center mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-gray-200">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-teal-50 rounded-lg flex items-center justify-center text-teal-500 mr-3 sm:mr-4">
+                <i className="fas fa-calculator text-xl sm:text-2xl"></i>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-800">Loan & Investment Parameters</h2>
-                <p className="text-sm text-gray-600">Adjust the parameters to see the impact of loan tenure on your finances</p>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-800">Loan & Investment Parameters</h2>
+                <p className="text-xs sm:text-sm text-gray-600">Adjust the parameters to see the impact of loan tenure on your finances</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
               <div>
-                <label className="block text-[#2076C7] font-semibold text-sm mb-2">Loan Amount (₹)</label>
+                <label className="block text-[#2076C7] font-semibold text-xs sm:text-sm mb-2">Loan Amount (₹)</label>
                 <input
                   type="number"
                   value={parameters.loanAmount === 0 ? '' : parameters.loanAmount}
                   onChange={(e) => handleInputChange('loanAmount', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white transition-colors text-gray-800"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white transition-colors text-gray-800 text-sm sm:text-base"
                   min="100000"
                   step="100000"
                 />
               </div>
 
               <div>
-                <label className="block text-[#2076C7] font-semibold text-sm mb-2">Interest Rate (%)</label>
+                <label className="block text-[#2076C7] font-semibold text-xs sm:text-sm mb-2">Interest Rate (%)</label>
                 <input
                   type="number"
                   value={parameters.interestRate === 0 ? '' : parameters.interestRate}
                   onChange={(e) => handleInputChange('interestRate', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white transition-colors text-gray-800"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white transition-colors text-gray-800 text-sm sm:text-base"
                   min="1"
                   max="30"
                   step="0.1"
@@ -345,12 +345,12 @@ export const LoanTenureCalculatorContent: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[#2076C7] font-semibold text-sm mb-2">SIP Expected Return (%)</label>
+                <label className="block text-[#2076C7] font-semibold text-xs sm:text-sm mb-2">SIP Expected Return (%)</label>
                 <input
                   type="number"
                   value={parameters.sipReturn === 0 ? '' : parameters.sipReturn}
                   onChange={(e) => handleInputChange('sipReturn', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white transition-colors text-gray-800"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white transition-colors text-gray-800 text-sm sm:text-base"
                   min="1"
                   max="30"
                   step="0.1"
@@ -358,12 +358,12 @@ export const LoanTenureCalculatorContent: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[#2076C7] font-semibold text-sm mb-2">Base Tenure (Years)</label>
+                <label className="block text-[#2076C7] font-semibold text-xs sm:text-sm mb-2">Base Tenure (Years)</label>
                 <input
                   type="number"
                   value={parameters.shorterTenure === 0 ? '' : parameters.shorterTenure}
                   onChange={(e) => handleInputChange('shorterTenure', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white transition-colors text-gray-800"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white transition-colors text-gray-800 text-sm sm:text-base"
                   min="1"
                   max="29"
                   step="1"
@@ -371,17 +371,17 @@ export const LoanTenureCalculatorContent: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={calculateImpact}
-                className="bg-[#2076C7] hover:bg-[#006ace] text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                className="bg-[#2076C7] hover:bg-[#006ace] text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-sm sm:text-base"
               >
                 <i className="fas fa-calculator"></i>
                 Calculate
               </button>
               <button
                 onClick={resetForm}
-                className="bg-[#1CADA3] hover:bg-[#0d968d] text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                className="bg-[#1CADA3] hover:bg-[#0d968d] text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-sm sm:text-base"
               >
                 <i className="fas fa-redo"></i>
                 Reset
@@ -389,58 +389,58 @@ export const LoanTenureCalculatorContent: React.FC = () => {
             </div>
           </div>
 
-          {/* Metric Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-white rounded-xl border shadow-md p-4 text-center hover:shadow-lg transition-shadow">
-              <div className="w-10 h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i className="fas fa-chart-line text-[#1CADA3] text-lg"></i>
+          {/* Metric Cards - Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div className="bg-white rounded-xl border shadow-md p-3 sm:p-4 text-center hover:shadow-lg transition-shadow">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i className="fas fa-chart-line text-[#1CADA3] text-base sm:text-lg"></i>
               </div>
               <div className="text-xs text-gray-600 mb-1">EMI ({parameters.shorterTenure} Years)</div>
-              <div className="font-bold text-lg font-sans text-[#1CADA3]">
+              <div className="font-bold text-base sm:text-lg font-sans text-[#1CADA3] break-all">
                 {formatCurrency(results.emi20)}
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border shadow-md p-4 text-center hover:shadow-lg transition-shadow">
-              <div className="w-10 h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i className="fas fa-money-bill-wave text-[#1CADA3] text-lg"></i>
+            <div className="bg-white rounded-xl border shadow-md p-3 sm:p-4 text-center hover:shadow-lg transition-shadow">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i className="fas fa-money-bill-wave text-[#1CADA3] text-base sm:text-lg"></i>
               </div>
               <div className="text-xs text-gray-600 mb-1">EMI (30 Years)</div>
-              <div className="font-bold text-lg font-sans text-[#1CADA3]">
+              <div className="font-bold text-base sm:text-lg font-sans text-[#1CADA3] break-all">
                 {formatCurrency(results.emi30)}
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border shadow-md p-4 text-center hover:shadow-lg transition-shadow">
-              <div className="w-10 h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i className="fas fa-chart-line text-[#1CADA3] text-lg"></i>
+            <div className="bg-white rounded-xl border shadow-md p-3 sm:p-4 text-center hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i className="fas fa-chart-line text-[#1CADA3] text-base sm:text-lg"></i>
               </div>
               <div className="text-xs text-gray-600 mb-1">Monthly SIP Difference</div>
-              <div className="font-bold text-lg font-sans text-[#1CADA3]">
+              <div className="font-bold text-base sm:text-lg font-sans text-[#1CADA3] break-all">
                 {formatCurrency(results.emiDifference)}
               </div>
             </div>
           </div>
 
           {/* Yearly Breakdown Table */}
-          <div className="bg-white rounded-xl border shadow-md overflow-hidden mb-8">
-            <div className="bg-gray-50 p-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          <div className="bg-white rounded-xl border shadow-md overflow-hidden mb-6 sm:mb-8">
+            <div className="bg-gray-50 p-3 sm:p-4 border-b border-gray-200">
+              <h2 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 flex items-center gap-2">
                 <i className="fas fa-table text-[#2076C7]"></i>
                 <span>Yearly Breakdown: EMI Savings Invested in SIP</span>
               </h2>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
+              <table className="w-full border-collapse min-w-[600px]">
                 <thead>
                   <tr className="bg-[#2076C7] text-white">
-                    <th className="px-4 py-3 text-left font-medium">Year</th>
-                    <th className="px-4 py-3 text-left font-medium">EMI Savings (₹)</th>
-                    <th className="px-4 py-3 text-left font-medium">SIP Value (₹)</th>
-                    <th className="px-4 py-3 text-left font-medium">Loan Balance (₹)</th>
-                    <th className="px-4 py-3 text-left font-medium">Status</th>
-                  </tr>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left font-medium text-xs sm:text-sm">Year</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left font-medium text-xs sm:text-sm">EMI Savings (₹)</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left font-medium text-xs sm:text-sm">SIP Value (₹)</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left font-medium text-xs sm:text-sm">Loan Balance (₹)</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left font-medium text-xs sm:text-sm">Status</th>
+                   </tr>
                 </thead>
                 <tbody>
                   {yearlyBreakdown.map((row, index) => (
@@ -448,25 +448,25 @@ export const LoanTenureCalculatorContent: React.FC = () => {
                       key={index}
                       className={`border-b border-gray-200 hover:bg-gray-50 text-gray-800 ${row.className || ''}`}
                     >
-                      <td className="px-4 py-3">{row.year}</td>
-                      <td className="px-4 py-3">{formatCurrency(row.emiSavings)}</td>
-                      <td className="px-4 py-3">{formatCurrency(row.sipValue)}</td>
-                      <td className="px-4 py-3">{formatCurrency(row.loanBalance)}</td>
-                      <td className="px-4 py-3">{row.status}</td>
-                    </tr>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{row.year}</td>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{formatCurrency(row.emiSavings)}</td>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{formatCurrency(row.sipValue)}</td>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{formatCurrency(row.loanBalance)}</td>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{row.status}</td>
+                     </tr>
                   ))}
                 </tbody>
-              </table>
+               </table>
             </div>
           </div>
 
           {/* Key Insights Section */}
-          <div className="bg-white rounded-xl border shadow-md p-5">
-            <h2 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+          <div className="bg-white rounded-xl border shadow-md p-4 sm:p-5">
+            <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
               Key Insights
             </h2>
 
-            <div className="text-gray-700 leading-relaxed text-xs">
+            <div className="text-gray-700 leading-relaxed text-xs sm:text-sm">
               <p className="mb-2">By extending your loan tenure from {parameters.shorterTenure} to 30 years:</p>
               <ul className="list-disc pl-4 space-y-1.5 mb-3">
                 <li>
@@ -499,13 +499,13 @@ export const LoanTenureCalculatorContent: React.FC = () => {
                 </li>
               </ul>
 
-              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="mt-3 p-2.5 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-xs text-yellow-800 flex items-start gap-2">
                   <span><strong>Pro Tip:</strong> Consider investing the EMI difference in a disciplined SIP to build wealth while managing your loan payments effectively.</span>
                 </p>
               </div>
 
-              <p className="text-[11px] text-gray-500 mt-2 flex items-start gap-1">
+              <p className="text-[10px] sm:text-[11px] text-gray-500 mt-2 flex items-start gap-1">
                 <span><strong>Note:</strong> This analysis assumes consistent SIP returns and doesn&apos;t account for inflation or tax implications. Actual results may vary.</span>
               </p>
             </div>
@@ -517,14 +517,14 @@ export const LoanTenureCalculatorContent: React.FC = () => {
       {/* Font Awesome */}
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-      {/* Notification */}
+      {/* Notification - Responsive */}
       {notification.show && (
-        <div className={`fixed top-5 right-5 bg-white rounded-lg shadow-lg z-50 max-w-sm border-l-4 ${notification.type === 'success' ? 'border-[#1CADA3]' : 'border-red-500'}`}>
-          <div className="p-4 flex items-center gap-3">
-            <i className={`fas ${notification.type === 'success' ? 'fa-check-circle text-green-500' : 'fa-exclamation-circle text-red-500'} text-xl`}></i>
-            <span className="flex-1 text-gray-600 text-sm">{notification.message}</span>
+        <div className={`fixed top-4 sm:top-5 right-3 sm:right-5 bg-white rounded-lg shadow-lg z-50 max-w-[calc(100%-1.5rem)] sm:max-w-sm border-l-4 ${notification.type === 'success' ? 'border-[#1CADA3]' : 'border-red-500'}`}>
+          <div className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+            <i className={`fas ${notification.type === 'success' ? 'fa-check-circle text-green-500' : 'fa-exclamation-circle text-red-500'} text-lg sm:text-xl`}></i>
+            <span className="flex-1 text-gray-600 text-xs sm:text-sm">{notification.message}</span>
             <button onClick={() => setNotification(prev => ({ ...prev, show: false }))} className="text-gray-400 hover:text-gray-600 transition-colors">
-              <i className="fas fa-times"></i>
+              <i className="fas fa-times text-sm sm:text-base"></i>
             </button>
           </div>
         </div>
@@ -548,29 +548,29 @@ const LoanTenureCalculatorStandalone: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <i className="fas fa-balance-scale text-white text-2xl"></i>
-          <h1 className="text-3xl font-bold">EMI VS SIP Calculator</h1>
+      {/* Header - Responsive */}
+      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 sm:py-6 px-4 sm:px-8 text-center">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+          <i className="fas fa-balance-scale text-white text-xl sm:text-2xl"></i>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">EMI VS SIP Calculator</h1>
         </div>
-        <p className="text-blue-100">Compare how different loan tenures affect your finances</p>
+        <p className="text-blue-100 text-sm sm:text-base px-2">Compare how different loan tenures affect your finances</p>
       </div>
 
-      {/* Dropdown */}
-      <div className="container mx-auto px-4 py-4 max-w-md">
+      {/* Dropdown - Responsive */}
+      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-md">
         <div className="relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
+            className="w-full bg-white border-2 border-gray-200 p-3 sm:p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
-                <activeData.icon className="w-5 h-5 text-teal-600" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
+                <activeData.icon className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
               </div>
-              <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
+              <span className="font-semibold text-gray-800 text-base sm:text-lg">{activeData.label}</span>
             </div>
-            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           <AnimatePresence>
@@ -588,24 +588,24 @@ const LoanTenureCalculatorStandalone: React.FC = () => {
                       handleCalculatorChange(calc.path);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${calc.id === 'sipVsEmi' ? 'bg-teal-500/5' : ''
+                    className={`w-full text-left p-3 sm:p-4 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 transition-colors ${calc.id === 'sipVsEmi' ? 'bg-teal-500/5' : ''
                       }`}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${calc.id === 'sipVsEmi'
+                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${calc.id === 'sipVsEmi'
                       ? 'bg-teal-500 text-white'
                       : 'bg-gray-100 text-gray-500'
                       }`}>
-                      <calc.icon className="w-4 h-4" />
+                      <calc.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                     <div className="flex-1">
-                      <span className={`font-medium ${calc.id === 'sipVsEmi' ? 'text-teal-600' : 'text-gray-700'
+                      <span className={`font-medium text-sm sm:text-base ${calc.id === 'sipVsEmi' ? 'text-teal-600' : 'text-gray-700'
                         }`}>
                         {calc.label}
                       </span>
-                      <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
+                      <p className="text-xs text-gray-400 line-clamp-1 hidden sm:block">{calc.desc}</p>
                     </div>
                     {calc.id === 'sipVsEmi' && (
-                      <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-500 ml-auto" />
                     )}
                   </button>
                 ))}

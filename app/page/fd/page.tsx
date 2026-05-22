@@ -343,16 +343,16 @@ export const FDCalculatorContent: React.FC = () => {
   }, [compoundingFrequency]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
+    <div className="w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row p-4 sm:p-6 lg:p-8 font-sans gap-6 lg:gap-8">
+          
           {/* Input Section */}
-          <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
-
+          <div className="flex-1 min-w-0">
             {/* Principal Amount */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <label htmlFor="principalAmount" className="block text-[#2076C7] font-semibold">
+            <div className="mb-5 sm:mb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-1">
+                <label htmlFor="principalAmount" className="block text-[#2076C7] font-semibold text-sm sm:text-base">
                   Deposit Amount (₹)
                 </label>
                 {errors.principalAmount && (
@@ -370,7 +370,7 @@ export const FDCalculatorContent: React.FC = () => {
                   onChange={handlePrincipalAmountChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>₹10,000</span>
                   <span>₹1,00,00,000</span>
                 </div>
@@ -382,17 +382,17 @@ export const FDCalculatorContent: React.FC = () => {
                   value={getPrincipalAmountDisplayValue()}
                   onChange={handlePrincipalAmountInputChange}
                   onWheel={handleWheelPrevent}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-10 sm:pr-12 text-gray-800 text-sm sm:text-base"
                   placeholder="e.g., 100000"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
+                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-sm sm:text-base">₹</span>
               </div>
             </div>
 
             {/* Interest Rate */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold">
+            <div className="mb-5 sm:mb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-1">
+                <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold text-sm sm:text-base">
                   Interest Rate (% per annum)
                 </label>
                 {errors.interestRate && (
@@ -410,7 +410,7 @@ export const FDCalculatorContent: React.FC = () => {
                   onChange={handleInterestRateChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>1%</span>
                   <span>15%</span>
                 </div>
@@ -425,17 +425,17 @@ export const FDCalculatorContent: React.FC = () => {
                   value={interestRate === 0 ? '' : interestRate}
                   onChange={handleInterestRateInputChange}
                   onWheel={handleNumberInputWheel}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-10 sm:pr-12 text-gray-800 text-sm sm:text-base"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
+                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-sm sm:text-base">%</span>
               </div>
             </div>
 
             {/* Tenure */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center space-x-4">
-                  <label htmlFor="tenure" className="block text-[#2076C7] font-semibold">
+            <div className="mb-5 sm:mb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-2">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:space-x-4">
+                  <label htmlFor="tenure" className="block text-[#2076C7] font-semibold text-sm sm:text-base">
                     Deposit Tenure
                   </label>
                   {errors.tenure && (
@@ -446,14 +446,18 @@ export const FDCalculatorContent: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleTenureTypeToggle('years')}
-                    className={`px-3 py-1 text-sm rounded-full transition-colors ${tenureType === 'years' ? 'bg-[#1CADA3] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                    className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full transition-colors ${
+                      tenureType === 'years' ? 'bg-[#1CADA3] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
                   >
                     Years
                   </button>
                   <button
                     type="button"
                     onClick={() => handleTenureTypeToggle('months')}
-                    className={`px-3 py-1 text-sm rounded-full transition-colors ${tenureType === 'months' ? 'bg-[#1CADA3] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                    className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full transition-colors ${
+                      tenureType === 'months' ? 'bg-[#1CADA3] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
                   >
                     Months
                   </button>
@@ -470,7 +474,7 @@ export const FDCalculatorContent: React.FC = () => {
                   onChange={handleTenureChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>{tenureType === 'years' ? '1 Year' : '1 Month'}</span>
                   <span>{tenureType === 'years' ? '30 Years' : '360 Months'}</span>
                 </div>
@@ -485,47 +489,50 @@ export const FDCalculatorContent: React.FC = () => {
                   value={tenure === 0 ? '' : tenure}
                   onChange={handleTenureInputChange}
                   onWheel={handleNumberInputWheel}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-24 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-16 sm:pr-24 text-gray-800 text-sm sm:text-base"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-xs sm:text-sm">
                   {tenureType === 'years' ? 'Years' : 'Months'}
                 </span>
               </div>
             </div>
 
             {/* Compounding Frequency */}
-            <div className="mb-8">
-              <label className="block text-[#2076C7] font-semibold mb-3">
+            <div className="mb-6 sm:mb-8">
+              <label className="block text-[#2076C7] font-semibold mb-3 text-sm sm:text-base">
                 Compounding Frequency
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setCompoundingFrequency('monthly')}
-                  className={`py-2 px-3 rounded-lg border text-sm transition-all ${compoundingFrequency === 'monthly'
-                    ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
-                    : 'border-gray-300 hover:border-gray-400 text-gray-700'
-                    }`}
+                  className={`py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg border text-xs sm:text-sm transition-all ${
+                    compoundingFrequency === 'monthly'
+                      ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
+                      : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                  }`}
                 >
                   Monthly
                 </button>
                 <button
                   type="button"
                   onClick={() => setCompoundingFrequency('quarterly')}
-                  className={`py-2 px-3 rounded-lg border text-sm transition-all ${compoundingFrequency === 'quarterly'
-                    ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
-                    : 'border-gray-300 hover:border-gray-400 text-gray-700'
-                    }`}
+                  className={`py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg border text-xs sm:text-sm transition-all ${
+                    compoundingFrequency === 'quarterly'
+                      ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
+                      : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                  }`}
                 >
                   Quarterly
                 </button>
                 <button
                   type="button"
                   onClick={() => setCompoundingFrequency('annually')}
-                  className={`py-2 px-3 rounded-lg border text-sm transition-all ${compoundingFrequency === 'annually'
-                    ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
-                    : 'border-gray-300 hover:border-gray-400 text-gray-700'
-                    }`}
+                  className={`py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg border text-xs sm:text-sm transition-all ${
+                    compoundingFrequency === 'annually'
+                      ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
+                      : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                  }`}
                 >
                   Annually
                 </button>
@@ -538,72 +545,72 @@ export const FDCalculatorContent: React.FC = () => {
             {/* Reset Button */}
             <button
               onClick={handleReset}
-              className="w-full mb-6 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-300"
+              className="w-full mb-6 px-3 sm:px-4 py-2 sm:py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-300 text-sm sm:text-base"
             >
               Reset to Default Values
             </button>
 
             {/* Results Section */}
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
-              <div className="text-center mb-6">
-                <div className="text-sm text-[#2076C7] font-medium mb-1">Maturity Amount</div>
-                <div className="text-3xl font-bold text-[#1CADA3] font-sans">
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
+              <div className="text-center mb-4 sm:mb-6">
+                <div className="text-xs sm:text-sm text-[#2076C7] font-medium mb-1">Maturity Amount</div>
+                <div className="text-2xl sm:text-3xl font-bold text-[#1CADA3] font-sans break-all">
                   {maturityAmount > 0 ? formatCurrency(maturityAmount) : '₹0'}
                 </div>
               </div>
-              <div className="flex justify-between">
-                <div className="text-center flex-1 px-4">
-                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+              <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
+                <div className="text-center flex-1 px-2 sm:px-4">
+                  <div className="text-base sm:text-lg font-medium font-sans text-[#1CADA3] break-all">
                     {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                   </div>
-                  <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
+                  <div className="text-xs sm:text-sm text-[#1CADA3] mt-1">Total Interest</div>
                 </div>
-                <div className="text-center flex-1 px-4">
-                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                <div className="text-center flex-1 px-2 sm:px-4">
+                  <div className="text-base sm:text-lg font-medium font-sans text-[#1CADA3] break-all">
                     {estimatedReturns > 0 ? formatCurrency(estimatedReturns) : '₹0'}
                   </div>
-                  <div className="text-sm text-[#1CADA3] mt-1">Estimated Returns</div>
+                  <div className="text-xs sm:text-sm text-[#1CADA3] mt-1">Estimated Returns</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Visualization Section */}
-          <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0">
-            <div className="chart-container h-64 mb-6">
+          <div className="flex-1 min-w-0">
+            <div className="chart-container h-48 sm:h-56 md:h-64 mb-4 sm:mb-6">
               <canvas ref={canvasRef}></canvas>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-6">
-              <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">FD Summary</h5>
-              <div className="space-y-4">
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Deposit Amount</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-4 sm:mb-6">
+              <h5 className="text-[#2076C7] font-semibold mb-3 sm:mb-4 text-base sm:text-lg">FD Summary</h5>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Deposit Amount</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {principalAmount > 0 ? formatCurrency(principalAmount) : '₹0'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Interest Rate</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Interest Rate</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base">
                     {interestRate > 0 ? `${interestRate.toFixed(1)}%` : '0%'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Tenure</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Tenure</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {tenure > 0 ? `${tenure} ${tenureType}` : '0'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Compounding</span>
-                  <span className="font-medium font-sans text-[#1CADA3] capitalize">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Compounding</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base capitalize">
                     {compoundingFrequency}
                   </span>
                 </div>
-                <div className="flex justify-between pt-2">
-                  <span className="text-gray-600 font-semibold">Total Interest Earned</span>
-                  <span className="font-bold font-sans text-[#1CADA3]">
+                <div className="flex justify-between pt-2 flex-wrap gap-2">
+                  <span className="text-gray-600 font-semibold text-sm sm:text-base">Total Interest Earned</span>
+                  <span className="font-bold font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                   </span>
                 </div>
@@ -611,12 +618,12 @@ export const FDCalculatorContent: React.FC = () => {
             </div>
 
             {/* Key Insights Section - Inside right column */}
-            <div className="bg-white rounded-xl border shadow-md p-5">
-              <h2 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+            <div className="bg-white rounded-xl border shadow-md p-4 sm:p-5">
+              <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
                 Key Insights
               </h2>
 
-              <div className="text-gray-700 leading-relaxed text-xs">
+              <div className="text-gray-700 leading-relaxed text-xs sm:text-sm">
                 <ul className="list-disc pl-4 space-y-1.5">
                   <li>
                     Your investment of{' '}
@@ -755,14 +762,14 @@ export const FDCalculatorContent: React.FC = () => {
                   </li>
                 </ul>
 
-                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="mt-3 p-2.5 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-xs text-yellow-800">
                     <strong>Investment Tip:</strong> Senior citizens (above 60 years) typically get 0.5% higher FD rates.
                     Consider splitting large FDs into smaller ones to maintain liquidity and avoid breaking the entire FD for partial withdrawals.
                   </p>
                 </div>
 
-                <p className="text-[11px] text-gray-500 mt-2">
+                <p className="text-[10px] sm:text-[11px] text-gray-500 mt-2">
                   <strong>Note:</strong> FD interest is fully taxable. TDS is deducted at 10% if interest exceeds ₹40,000
                   (₹50,000 for senior citizens). Interest rates vary between banks and change periodically.
                 </p>
@@ -790,29 +797,29 @@ const FDCalculatorStandalone: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <i className="fas fa-chart-pie text-white text-2xl"></i>
-          <h1 className="text-3xl font-bold">Fixed Deposit Calculator</h1>
+      {/* Header - Responsive */}
+      <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 sm:py-6 px-4 sm:px-8 text-center">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+          <i className="fas fa-chart-pie text-white text-xl sm:text-2xl"></i>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Fixed Deposit Calculator</h1>
         </div>
-        <p className="text-blue-100">Calculate the maturity amount of your fixed deposits</p>
+        <p className="text-blue-100 text-sm sm:text-base px-2">Calculate the maturity amount of your fixed deposits</p>
       </div>
 
-      {/* Dropdown */}
-      <div className="container mx-auto px-4 py-4 max-w-md">
+      {/* Dropdown - Responsive */}
+      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-md">
         <div className="relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
+            className="w-full bg-white border-2 border-gray-200 p-3 sm:p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
-                <activeData.icon className="w-5 h-5 text-teal-600" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
+                <activeData.icon className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
               </div>
-              <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
+              <span className="font-semibold text-gray-800 text-base sm:text-lg">{activeData.label}</span>
             </div>
-            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           <AnimatePresence>
@@ -830,24 +837,27 @@ const FDCalculatorStandalone: React.FC = () => {
                       handleCalculatorChange(calc.path);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${calc.id === 'fd' ? 'bg-teal-500/5' : ''
-                      }`}
+                    className={`w-full text-left p-3 sm:p-4 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 transition-colors ${
+                      calc.id === 'fd' ? 'bg-teal-500/5' : ''
+                    }`}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${calc.id === 'fd'
-                      ? 'bg-teal-500 text-white'
-                      : 'bg-gray-100 text-gray-500'
-                      }`}>
-                      <calc.icon className="w-4 h-4" />
+                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${
+                      calc.id === 'fd'
+                        ? 'bg-teal-500 text-white'
+                        : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      <calc.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                     <div className="flex-1">
-                      <span className={`font-medium ${calc.id === 'fd' ? 'text-teal-600' : 'text-gray-700'
-                        }`}>
+                      <span className={`font-medium text-sm sm:text-base ${
+                        calc.id === 'fd' ? 'text-teal-600' : 'text-gray-700'
+                      }`}>
                         {calc.label}
                       </span>
-                      <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
+                      <p className="text-xs text-gray-400 line-clamp-1 hidden sm:block">{calc.desc}</p>
                     </div>
                     {calc.id === 'fd' && (
-                      <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-500 ml-auto" />
                     )}
                   </button>
                 ))}

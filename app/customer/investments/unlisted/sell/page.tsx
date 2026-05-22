@@ -60,11 +60,13 @@ export default function SellSharesComponent() {
     return Math.round(p * 0.97); 
   };
 
-  // 3. Filtering
-  const filteredCompanies = useMemo(() => {
-    return companies.filter(c => 
+  // 3. Filtering & Sorting (Alphabetical by shares_name)
+  const filteredAndSortedCompanies = useMemo(() => {
+    const filtered = companies.filter(c => 
       c.shares_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    // Sort alphabetically by shares_name
+    return filtered.sort((a, b) => a.shares_name.localeCompare(b.shares_name));
   }, [companies, searchTerm]);
 
   // 4. Handlers
@@ -123,25 +125,25 @@ export default function SellSharesComponent() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8 px-4 sm:px-0">
       
-      {/* SEARCH BAR */}
-      <div className="relative max-w-2xl">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400" />
+      {/* SEARCH BAR - Responsive */}
+      <div className="relative max-w-2xl mx-auto sm:mx-0">
+        <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+          <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
         </div>
         <input
           type="text"
           placeholder="Search for shares you want to sell..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="block w-full pl-12 pr-4 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 outline-none transition-all shadow-sm hover:shadow-md text-gray-900 placeholder-gray-500"
+          className="block w-full pl-9 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 text-sm sm:text-base border-2 border-gray-200 rounded-xl focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 outline-none transition-all shadow-sm hover:shadow-md text-gray-900 placeholder-gray-500"
         />
       </div>
 
-      {/* COMPANIES GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
-        {filteredCompanies.slice(0, visibleCount).map((company) => {
+      {/* COMPANIES GRID - Responsive grid with alphabetical order */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5 md:gap-6">
+        {filteredAndSortedCompanies.slice(0, visibleCount).map((company) => {
           const isSelected = selectedCompany?.id === company.id;
           const sellPrice = getSellPrice(company.price);
 
@@ -149,45 +151,55 @@ export default function SellSharesComponent() {
             <div 
               key={company.id} 
               onClick={() => handleSelect(company)}
-              className={`bg-white rounded-2xl shadow-lg border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full group relative cursor-pointer ${
+              className={`bg-white rounded-xl sm:rounded-2xl shadow-lg border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full group relative cursor-pointer ${
                 isSelected ? 'border-[#2076C7] ring-2 ring-[#2076C7]/10' : 'border-gray-100 hover:border-[#2076C7]'
               }`}
             >
-              <div className="w-full h-32 bg-gray-50 rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden relative">
+              <div className="w-full h-24 sm:h-28 md:h-32 bg-gray-50 rounded-t-xl sm:rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden relative">
                 {isSelected && (
-                  <div className="absolute top-3 right-3 z-10 bg-[#2076C7] text-white rounded-full p-1 shadow-md">
+                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 bg-[#2076C7] text-white rounded-full p-1 shadow-md">
                     <Check size={14} strokeWidth={3} />
                   </div>
                 )}
                 {company.logo_url ? (
-                  <Image src={company.logo_url} width={200} height={150} className="w-full h-full object-contain p-3 transition-all duration-700 group-hover:scale-110" alt={company.shares_name} />
+                  <Image 
+                    src={company.logo_url} 
+                    width={200} 
+                    height={150} 
+                    className="w-full h-full object-contain p-2 sm:p-3 transition-all duration-700 group-hover:scale-110" 
+                    alt={company.shares_name} 
+                  />
                 ) : (
-                  <span className="text-3xl font-bold text-[#2076C7]">{company.shares_name.charAt(0)}</span>
+                  <span className="text-2xl sm:text-3xl font-bold text-[#2076C7]">{company.shares_name.charAt(0)}</span>
                 )}
               </div>
 
-              <div className="p-5 flex flex-col flex-grow">
-                <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-1 group-hover:text-[#2076C7] transition-colors duration-300 text-center">
+              <div className="p-3 sm:p-4 md:p-5 flex flex-col flex-grow">
+                <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-2 sm:mb-3 line-clamp-1 group-hover:text-[#2076C7] transition-colors duration-300 text-center">
                   {company.shares_name}
                 </h4>
-                <div className="mb-4 text-center">
-                  <span className="text-2xl font-bold text-[#2076C7]">₹{sellPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                  <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter mt-1">Estimated Sell Price</div>
+                <div className="mb-3 sm:mb-4 text-center">
+                  <span className="text-xl sm:text-2xl font-bold text-[#2076C7]">₹{sellPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                  <div className="text-[8px] sm:text-[10px] text-gray-400 font-bold uppercase tracking-tighter mt-0.5 sm:mt-1">Estimated Sell Price</div>
                 </div>
-                <div className="text-xs text-gray-500 text-center mb-4 uppercase font-semibold">Unlisted Share</div>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full mb-6">
+                <div className="text-[10px] sm:text-xs text-gray-500 text-center mb-3 sm:mb-4 uppercase font-semibold">Unlisted Share</div>
+                <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3 w-full mb-4 sm:mb-6">
                   <div className="text-center">
-                    <div className="text-[10px] text-gray-400 font-bold uppercase mb-0.5">Lot Size</div>
-                    <div className="text-sm font-bold text-gray-900">{company.min_lot_size}</div>
+                    <div className="text-[8px] sm:text-[10px] text-gray-400 font-bold uppercase mb-0.5">Lot Size</div>
+                    <div className="text-xs sm:text-sm font-bold text-gray-900">{company.min_lot_size}</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-[10px] text-gray-400 font-bold uppercase mb-0.5">Depository</div>
-                    <div className="text-sm font-bold text-gray-900">{company.depository_applicable?.split(' ')[0] || 'NSDL'}</div>
+                    <div className="text-[8px] sm:text-[10px] text-gray-400 font-bold uppercase mb-0.5">Depository</div>
+                    <div className="text-xs sm:text-sm font-bold text-gray-900">{company.depository_applicable?.split(' ')[0] || 'NSDL'}</div>
                   </div>
                 </div>
                 <div className="mt-auto">
-                  <button className={`w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${isSelected ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md' : 'border-2 border-[#2076C7]/20 text-[#2076C7] hover:bg-blue-50'}`}>
-                    {isSelected ? <CheckCircle size={18} /> : <HandCoins size={18} />} 
+                  <button className={`w-full py-2 sm:py-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1 sm:gap-2 transition-all ${
+                    isSelected 
+                      ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md' 
+                      : 'border-2 border-[#2076C7]/20 text-[#2076C7] hover:bg-blue-50'
+                  }`}>
+                    {isSelected ? <CheckCircle size={16} /> : <HandCoins size={16} />} 
                     {isSelected ? 'Selected' : 'Select to Sell'}
                   </button>
                 </div>
@@ -198,15 +210,18 @@ export default function SellSharesComponent() {
       </div>
 
       {/* VIEW MORE BUTTON */}
-      {visibleCount < filteredCompanies.length && (
-        <div className="flex justify-center pb-8">
-          <button onClick={() => setVisibleCount(v => v + 5)} className="flex items-center gap-2 px-8 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm">
-            View More Companies <ChevronDown size={20} />
+      {visibleCount < filteredAndSortedCompanies.length && (
+        <div className="flex justify-center pb-4 sm:pb-8">
+          <button 
+            onClick={() => setVisibleCount(v => v + (window.innerWidth < 640 ? 4 : 6))} 
+            className="flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-sm sm:text-base text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm"
+          >
+            View More Companies <ChevronDown size={18} />
           </button>
         </div>
       )}
 
-      {/* COMPACT CALCULATOR SECTION */}
+      {/* COMPACT CALCULATOR SECTION - Fully responsive */}
       <AnimatePresence>
         {selectedCompany && (
           <motion.div 
@@ -214,79 +229,90 @@ export default function SellSharesComponent() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
+            className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden mx-0"
           >
-            {/* Header: Reduced padding and font size */}
-            <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] px-6 py-4 text-white">
-              <h3 className="text-base font-bold flex items-center gap-2">
-                <HandCoins size={18} /> {selectedCompany.shares_name} Selling Valuation
+            {/* Header - Responsive padding */}
+            <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] px-4 sm:px-6 py-3 sm:py-4 text-white">
+              <h3 className="text-sm sm:text-base font-bold flex items-center gap-2">
+                <HandCoins size={16} /> {selectedCompany.shares_name} Selling Valuation
               </h3>
             </div>
             
-            {/* Body: Reduced padding and grid gap */}
-            <div className="p-5 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
-              <div className="space-y-4">
+            {/* Body - Responsive padding and layout */}
+            <div className="p-4 sm:p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 items-start lg:items-center">
+              {/* Left Column - Input Section */}
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Quantity to Sell</label>
+                  <label className="block text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1 sm:mb-2">
+                    Quantity to Sell
+                  </label>
                   <div className="relative">
                     <input 
                       type="number"
                       placeholder="e.g. 100"
                       value={qtyToSell}
                       onChange={(e) => setQtyToSell(e.target.value)}
-                      className="w-full p-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-[#2076C7] outline-none text-lg font-bold text-gray-900 transition-all"
+                      className="w-full p-2.5 sm:p-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-[#2076C7] outline-none text-base sm:text-lg font-bold text-gray-900 transition-all"
                     />
                   </div>
-                  {/* Info alert: Reduced padding and text size */}
-                  <div className="flex items-start gap-2 mt-3 p-2 bg-amber-50 rounded-lg border border-amber-100">
+                  {/* Info alert - Responsive */}
+                  <div className="flex items-start gap-1.5 sm:gap-2 mt-2 sm:mt-3 p-2 sm:p-2.5 bg-amber-50 rounded-lg border border-amber-100">
                     <Info size={14} className="text-amber-600 shrink-0 mt-0.5" />
-                    <p className="text-[10px] text-amber-800 font-medium leading-tight">Ensure shares are available in your demat account for a smooth transfer.</p>
+                    <p className="text-[9px] sm:text-[10px] text-amber-800 font-medium leading-tight">
+                      Ensure shares are available in your demat account for a smooth transfer.
+                    </p>
                   </div>
                 </div>
                 
-                {/* Button: Reduced padding and font size */}
+                {/* Calculate Button */}
                 <button 
                   onClick={handleCalculate}
-                  className="w-full py-3 bg-[#2076C7] text-white rounded-xl font-bold text-sm hover:bg-[#1CADA3] transition-all shadow-md flex items-center justify-center gap-2"
+                  className="w-full py-2.5 sm:py-3 bg-[#2076C7] text-white rounded-xl font-bold text-sm hover:bg-[#1CADA3] transition-all shadow-md flex items-center justify-center gap-2"
                 >
                   Calculate Estimated Value
                 </button>
               </div>
 
-              {/* Result Area: Reduced overall padding */}
-              <div className="bg-gray-50 rounded-xl p-6 border border-gray-100 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-5">
-                    <TrendingUp size={80} />
+              {/* Right Column - Result Area */}
+              <div className="bg-gray-50 rounded-xl p-4 sm:p-5 md:p-6 border border-gray-100 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-3 sm:p-4 opacity-5">
+                    <TrendingUp size={60} />
                 </div>
                 {calcResult ? (
-                  <div className="space-y-4 relative z-10 text-center lg:text-left">
+                  <div className="space-y-3 sm:space-y-4 relative z-10 text-center lg:text-left">
                     <div>
-                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Estimated Total Payout</div>
-                      <div className="text-3xl font-black text-[#2076C7] tracking-tight">₹{calcResult.total.toLocaleString('en-IN')}</div>
+                      <div className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 sm:mb-1">
+                        Estimated Total Payout
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#2076C7] tracking-tight">
+                        ₹{calcResult.total.toLocaleString('en-IN')}
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
                         <div className="bg-white p-2 rounded-lg border border-gray-200">
-                            <div className="text-[9px] text-gray-400 font-bold uppercase">Price / Share</div>
-                            <div className="text-base font-bold text-gray-900">₹{calcResult.price.toLocaleString()}</div>
+                            <div className="text-[8px] sm:text-[9px] text-gray-400 font-bold uppercase">Price / Share</div>
+                            <div className="text-sm sm:text-base font-bold text-gray-900">₹{calcResult.price.toLocaleString()}</div>
                         </div>
                         <div className="bg-white p-2 rounded-lg border border-gray-200">
-                            <div className="text-[9px] text-gray-400 font-bold uppercase">Settlement</div>
-                            <div className="text-base font-bold text-gray-700">T+7 Days</div>
+                            <div className="text-[8px] sm:text-[9px] text-gray-400 font-bold uppercase">Settlement</div>
+                            <div className="text-sm sm:text-base font-bold text-gray-700">T+7 Days</div>
                         </div>
                     </div>
                     <button 
                       onClick={handleSellShares}
-                      className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+                      className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
                     >
-                      <Send size={16} /> SELL SHARES NOW
+                      <Send size={14} /> SELL SHARES NOW
                     </button>
                   </div>
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 py-8">
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 border border-gray-100">
-                        <HandCoins size={24} className="text-gray-300" />
+                  <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 py-6 sm:py-8">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 sm:mb-3 border border-gray-100">
+                        <HandCoins size={20} className="text-gray-300" />
                     </div>
-                    <p className="text-xs font-bold leading-tight">Enter quantity to generate your <br/> customized selling quote</p>
+                    <p className="text-[10px] sm:text-xs font-bold leading-tight">
+                      Enter quantity to generate your <br className="hidden sm:inline" /> customized selling quote
+                    </p>
                   </div>
                 )}
               </div>
