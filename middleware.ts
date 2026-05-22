@@ -1,26 +1,47 @@
-import { NextResponse,NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
+
+const protectedRoutes = [
+  "/dashboard",
+  "/director",
+  "/departmenthead",
+  "/customer",
+  "/branch",
+  "/branchhead",
+  "/admin",
+  "/accounts",
+  "/hr",
+  "/rm",
+];
 
 export function middleware(req: NextRequest) {
-    const token = req.cookies.get("authToken")?.value;
-    const { pathname } = req.nextUrl;
+  const token = req.cookies.get("authToken")?.value;
+  const { pathname } = req.nextUrl;
 
-    // Protect ALL dashboard routes
-    if (pathname.startsWith("/dashboard")) {
-        if (!token) {
-            const loginUrl = new URL("/", req.url);
-            return NextResponse.redirect(loginUrl);
-        }
-    }
-    if (pathname.startsWith("/admin")) {
-        if (!token) {
-            const loginUrl = new URL("/", req.url);
-            return NextResponse.redirect(loginUrl);
-        }
-    }
-    return NextResponse.next();
+  // Check if current path is protected
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
+
+  // Redirect if no token
+  if (isProtectedRoute && !token) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
+  return NextResponse.next();
 }
 
-// Apply middleware ONLY to dashboard
+// Apply middleware to all protected routes
 export const config = {
-    matcher: ["/dashboard/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/director/:path*",
+    "/departmenthead/:path*",
+    "/customer/:path*",
+    "/branch/:path*",
+    "/branchhead/:path*",
+    "/admin/:path*",
+    "/accounts/:path*",
+    "/hr/:path*",
+    "/rm/:path*",
+  ],
 };

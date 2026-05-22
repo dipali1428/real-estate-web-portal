@@ -15,6 +15,12 @@ const AboutSection = () => {
             image: "/leader/rahulsir4.jpeg"
         },
         {
+            name: "Mrs. Triveni Deshpande",
+            title: "Director - Business Manager",
+            description: "30+ years of experience in business management, finance, and IT across India and Australia, specializing in operations and strategic growth.",
+            image: "/leader/mrs-deshpande.png"
+        },
+        {
             name: "Mr. K Krishna",
             title: "Telangana State Director ",
             description: "K Krishna brings 18+ years of banking experience, driving strategic growth, operational excellence, and revenue expansion through high-performing teams and strong client-focused strategies.",
